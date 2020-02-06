@@ -1,5 +1,6 @@
 #CC= gcc
-CC=/usr/bin/arm-linux-gnueabihf-gcc 
+#CC=/usr/bin/arm-linux-gnueabihf-gcc 
+CC=/usr/bin/aarch64-linux-gnu-gcc
 
 CFLAGS=  -O2 -Wall
 #CFLAGS=  -g -Wall

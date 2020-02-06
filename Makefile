@@ -16,9 +16,10 @@ HOME	= /home/stef
 # c'est la qu'on va chercher les fichiers d'inclusion et les librairies
 
 TARGET= ${HOME}/${GIT}/${PROJET}
-SRC	  = ${HOME}/${PROJET}/src
-EPE	  = ${HOME}/${PROJET}/eph
+SRC		= ${TARGET}/src
+EPE		= ${TARGET}/eph
 EXEC	= ${FICHIER}
+
 # Le compilateur est cense etre dans le PATH (dans /usr/bin normalement)
 # Il peut resulter sous debian d un apt-get install --buil-essential <architecture>
 
@@ -28,13 +29,13 @@ EXEC	= ${FICHIER}
 # CC	= /usr/bin/arm-linux-gnueabihf-gcc
 CC  = /usr/bin/aarch64-linux-gnu-gcc
 
-INCS 	= -I${TARGET}/lib -I${TARGET}/lib/lirc -I${EPE} -I${SRC}
-LIBS	= -L${TARGET}/lib -L/usr/lib -L${EPE} -lpthread -lm -lrt -llirc_client -lsss
+INCS 	= -I. -I${SRC} -I${TARGET}/inc -I${TARGET}/lib -I${TARGET}/lib/lirc -I${EPE}
+LIBS	= -L${TARGET}/lib/lirc -L${TARGET}/lib -L/usr/lib -L${EPE} -lpthread -lm -lrt
 
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 
-OBJ	= astro.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o 
-LINKOBJ	= astro.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o 
+OBJ	= astro.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o libephe.a 
+LINKOBJ	= astro.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o
 
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
@@ -51,7 +52,7 @@ clean: clean-custom
 	@echo [CC] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
 
-$(EXEC): $(OBJ)
+$(EXEC): $(LINKOBJ)
 	$(CC) $(LINKOBJ) $(INCS) -o ${EXEC} $(LIBS)
 
 
