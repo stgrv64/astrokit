@@ -1,0 +1,64 @@
+kinit_moi : Terrestrial east longitude -0.6000 deg
+kinit_moi : geocentric latitude 43.1080 deg
+kinit_moi : Earth radius 0.99847
+kinit_moi : Input time is TDT.
+update : case 1
+hms :  11h 38m 51.736s  198611.000000000.0000002016 January 29 FridayUT
+
+hms :  11h 40m 00.000s  2016 January 29 FridayTDT
+
+main : -0.600000 43.300000 250.000000 2016 1 29 11 40 0 : 1 : 2457416.986111
+main : 
+	Mercury        
+main : 
+JD 2457416.99,
+update : case 1
+hms :  11h 38m 51.736s  2016 January 29 FridayUT
+
+hms :  11h 40m 00.000s  2016 January 29 FridayTDT
+
+dms :   
+dms : 186d 12' 00.21"  
+dms :   
+dms :   4d 43' 46.06"  ecliptic long lat rad 3.962935E-01
+
+showcor : aberration dRA 0.811s dDec 4.77"light time 6.9856m,  Vearth 9.685242e-01, X -0.013738, Y -0.009888, Z -0.004287
+
+reduce : true geocentric distance 0.8400600 au    
+reduce : equatorial diameter 8.00"
+
+reduce : approx. visual magnitude -1.9, phase 0.419
+
+showrd : Astrometric J2000.0:  R.A. 
+hms :  19h 06m 04.496s  
+showrd : Dec. 
+dms :  -
+dms :  20d 19' 27.10"  
+showrd : Astrometric B1950.0:  R.A. 
+hms :  19h 03m 06.960s  
+showrd : Dec. 
+dms :  -
+dms :  20d 24' 05.86"  
+showcor : light defl. dRA -0.000s dDec -0.00"
+showcor : annual aberration dRA -1.351s dDec -2.48"
+showcor : nutation dRA -0.100s dDec 8.84"
+reduce : Sgr Sagittarii.
+showrd :   Apparent:  R.A. 
+hms :  19h 07m 00.098s  
+showrd : Dec. 
+dms :  -
+dms :  20d 17' 48.52"  
+dms :   
+dms : 285d 41' 41.34"  
+dms :   
+dms :   2d 13' 56.84"  elongation from sun 23.39 degrees, Apparent geocentric ecliptic long lat rad 8.399390E-01
+
+hms :  20h 09m 07.903s  diurnal aberration dRA 0.016s dDec -0.02"
+
+showcor : diurnal parallax dRA -0.145s dDec -9.25"
+hms :  19h 07m 01.894s  
+dms :  -
+dms :  20d 15' 54.53"  infos->asc = 0.270308
+infos->dec = -0.898112
+infos->alt = 24.851625
+infos->azi = 196.064261

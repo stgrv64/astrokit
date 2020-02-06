@@ -1,0 +1,45 @@
+# Project: monture altazimutale controlee par port gpio raspaberry pi
+# Makefile created by stephane Gravois - 2014
+# Reel6 : inclut la fonctionnalite infrarouge 
+
+FICHIER	= astro
+VERSION	= reel13
+
+#HOME	= /root
+HOME	= /home/root
+HOMEB	= ${HOME}/kernel/rpi-buildroot
+#CC   	= gcc  
+#CC   	= arm-linux-gcc  
+CC	= arm-linux-gnueabihf-gcc
+
+INCLIRC	= ${HOME}/lib
+INCS 	= -I${INCLIRC} -I${HOME}/${VERSION}
+#INCS 	= -I/${HOME}/${VERSION}
+
+
+LIBLIRC	= ${HOME}/lib
+LIBS	= -L${LIBLIRC} -lpthread -lm -lrt -llirc_client
+#LIBS	= -lpthread -lm -lrt -llirc_client
+
+DEBUG	= -g
+OBJ	= ${FICHIER}.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o
+LINKOBJ	= ${FICHIER}.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o
+
+BIN	= ${FICHIER}${VERSION}
+CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os
+
+RM 	= rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before ${FICHIER}${VERSION} all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o ${FICHIER}${VERSION} $(LIBS)
+
+.c.o:
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) $< -o $@

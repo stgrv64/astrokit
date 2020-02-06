@@ -1,0 +1,33 @@
+# Project: monture altazimutale controlee par port gpio raspaberry pi
+# Makefile created by stephane Gravois - 2014
+# Reel6 : inclut la fonctionnalite infrarouge 
+
+FICHIER	= astro
+VERSION	= reel13
+
+CPP  	= /usr/bin/g++
+#CC   	= /usr/bin/gcc
+CC   	= arm-linux-gcc
+DEBUG	= -g
+OBJ	= ${FICHIER}.o arguments.o config.o calculs.o gpio.o cat.o ir.o i2c.o
+LINKOBJ	= ${FICHIER}.o arguments.o config.o calculs.o gpio.o cat.o ir.o i2c.o
+LIBS	= -L/lib -L/usr/lib -L/usr/local/lib -lpthread -lm -lrt -llirc_client
+INCS 	= -I. -I/usr/include -I/usr/local/include -I/root/${VERSION}
+BIN	= ${FICHIER}${VERSION}
+CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe
+
+RM 	= rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before ${FICHIER}${VERSION} all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o ${FICHIER}${VERSION} $(LIBS)
+
+.c.o:
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) $< -o $@

@@ -1,0 +1,41 @@
+# Project: monture altazimutale controlee par port gpio raspaberry pi
+# Makefile created by stephane Gravois - 2014
+# Reel6 : inclut la fonctionnalite infrarouge 
+
+FICHIER	= main_gpio
+VERSION	= reel13
+
+HOME	= /root
+CC   	= gcc  
+
+# INCLIRC	= ${HOME}/output/build/lirc-tools-0.9.2/lib
+# LIBLIRC	= ${HOME}/output/target/usr/lib
+# LIBS	= -L${LIBLIRC} -lpthread -lm -lrt -llirc_client
+
+DEBUG	= -g
+OBJ	= ${FICHIER}.o gpio.o
+LINKOBJ	= ${FICHIER}.o gpio.o
+
+LIBS	= -lpthread -lm -lrt -llirc_client
+
+#INCS 	= -I${INCLIRC} -I${HOME}/${VERSION}
+INCS 	= -I/${HOME}/${VERSION}
+
+BIN	= ${FICHIER}_${VERSION}
+CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os
+
+RM 	= rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before ${FICHIER}${VERSION} all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o ${FICHIER}_${VERSION} $(LIBS)
+
+.c.o:
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) $< -o $@

@@ -1,0 +1,16 @@
+aa.c
+  kinit()
+  zgetdate()    dms.c
+    getnum()    dms.c
+    caltoj()    dms.c
+  gethms()      dms.c
+    getnum()    dms.c
+  getstar()     kfiles.c
+    fincat()    kfiles.c
+  dosun()
+  domoon()
+  dostart()
+  doplanet()    rplanet.c
+    kepler()	kepler.c
+    reduce()    
+    
