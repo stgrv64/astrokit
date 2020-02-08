@@ -1,59 +1,100 @@
 # Project: monture altazimutale controlee par port gpio raspaberry pi
-# Makefile created by stephane Gravois - 2014
-# Reel6 : inclut la fonctionnalite infrarouge 
+# Makefile created by stephane Gravois - 2020
+# -------------------------------------------------------------------------------------
+# Le compilateur est cense etre dans le PATH (dans /usr/bin par exemple)
+# Il peut resulter sous debian d un 
+#   apt-get install --buil-essential <architecture>
+# ou bien de facon plus general : 
+#		sudo apt-get install gcc-<arch>-linux
+#   sudo apt-get install gcc-aarch64-linux-gnu
+# -------------------------------------------------------------------------------------
+# Regles implicites (rappel) : 
+# * make va d'abord rechercher EXEC pui all puis ..
+
+#--------------------------------------------------------------------------------------
+# CC	= gcc
+# CC	= armv6-gcc
+# CC	=	/usr/bin/arm-linux-gnueabi-gcc
+# CC	= /usr/bin/arm-linux-gnueabihf-gcc
+CC  = /usr/bin/aarch64-linux-gnu-gcc
+#--------------------------------------------------------------------------------------
 
 GIT=git
 
-ARCH	  = armv8
-PROJET	= astrokit
-FICHIER	= astroreel
-VERSION	= 3.0
-
+ARCH	= armv8
+PROJ	= astrokit
+FICH	= astroreel
+VERS	= 3.0
 HOME	= /home/stef
+RM 		= rm -f
+EPHA	= libephe.a
 
-# TARGET est une sauvegarde du rep output/target de buildroot 
-# (plus leger que l'ensemble du rep output car output/build est lourd ..
-# c'est la qu'on va chercher les fichiers d'inclusion et les librairies
+RPWD		= ${HOME}/${GIT}/${PROJ}
+RSRC		= ${RPWD}/src
+REPH		= ${RPWD}/eph
+RLIB		= ${RPWD}/lib
 
-TARGET= ${HOME}/${GIT}/${PROJET}
-SRC		= ${TARGET}/src
-EPE		= ${TARGET}/eph
-EXEC	= ${FICHIER}
+# la cible est ici EXEC pour make sans argument
+EXEC	= ${FICH}.${VERS}
 
-# Le compilateur est cense etre dans le PATH (dans /usr/bin normalement)
-# Il peut resulter sous debian d un apt-get install --buil-essential <architecture>
+INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RPWD}/lib -I${RPWD}/lib/lirc -I${REPH}
+LIBS	= -L${RPWD}/lib/lirc -L${RPWD}/lib -L/usr/lib -L${REPH} -lpthread -lm -lrt
 
-# CC	= gcc
-# CC	= armv6-gcc
-# CC	= /usr/local/bin/arm-linux-gnueabihf-gcc
-# CC	= /usr/bin/arm-linux-gnueabihf-gcc
-CC  = /usr/bin/aarch64-linux-gnu-gcc
-
-INCS 	= -I. -I${SRC} -I${TARGET}/inc -I${TARGET}/lib -I${TARGET}/lib/lirc -I${EPE}
-LIBS	= -L${TARGET}/lib/lirc -L${TARGET}/lib -L/usr/lib -L${EPE} -lpthread -lm -lrt
-
-DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
-
-OBJ	= astro.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o libephe.a 
-LINKOBJ	= astro.o arguments.o config.o calculs.o gpio.o cat.o i2c.o ir.o
-
+DEBUG		= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
-RM 	= rm -f
+SRC			=	src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
+OBJ			= $(SRC:.c=.o)
 
-.PHONY: all all-before all-after clean clean-custom
-
-all: all-before $(EXEC) all-after
-
-clean: clean-custom
-	${RM} $(OBJ) $(EXEC)
+LEPH		= ${RLIB}/${EPHA}
+EPHS		= $(REPH)/*.c
+SRCS		= ${RSRC}/*.c
+OBJS		= $(SRCS:.c=.o)
+OBJSUP	= $(LEPH)
 
 .c.o:
 	@echo [CC] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
 
-$(EXEC): $(LINKOBJ)
-	$(CC) $(LINKOBJ) $(INCS) -o ${EXEC} $(LIBS)
+$(EXEC): $(OBJ)
+	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${EXEC} $(LIBS)
 
+$(LEPH)	:
+	cd ${REPH} ; make clean ; make
+
+.PHONY: all all-before all-after clean clean-custom
+
+clean: clean-custom
+	${RM} $(OBJS) 
+	${RM} $(EXEC)
+
+cleanlib:
+	${RM} ${REPH}/*.o
+	${RM} ${LEPH}
+
+cleanall: clean cleanlib
+
+lib: $(LEPH)
+
+all: all-before cleanall $(LEPH) $(EXEC) all-after
+
+
+# -----------------------------------------------------------------------------
+# help -help - help - help - help - help - help - help - help - help - help -  
+# -----------------------------------------------------------------------------
+
+help:
+	@echo "make           : compiler les sources (a besoin de ${LEPH} : make lib si besoin)"
+	@echo "make lib       : creer la librairie ${LEPH}"
+	@echo "make all       : make lib puis make"
+	@echo "make clean     : nettoie repertoire $RSRC et $(EXEC)"
+	@echo "make cleanlib  : nettoie repertoire ${REPH} et ${LEPH}"
+	@echo "make cleanall  : make clean et cleanall"
+
+# ================================================================================
+#
+# Fin Makefile - Fin Makefile - Fin Makefile - Fin Makefile - Fin Makefile -  
+#
+# ================================================================================
 
 

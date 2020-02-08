@@ -1,69 +1,82 @@
-#CC= gcc
-#CC=/usr/bin/arm-linux-gnueabihf-gcc 
-CC=/usr/bin/aarch64-linux-gnu-gcc
+# Project: monture altazimutale controlee par port gpio raspaberry pi
+# Makefile created by stephane Gravois - 2020
+# -------------------------------------------------------------------------------------
+# Le compilateur est cense etre dans le PATH (dans /usr/bin par exemple)
+# Il peut resulter sous debian d un 
+#   apt-get install --buil-essential <architecture>
+# ou bien de facon plus general : 
+#		sudo apt-get install gcc-<arch>-linux
+#   sudo apt-get install gcc-aarch64-linux-gnu
+# -------------------------------------------------------------------------------------
+# Regles implicites (rappel) : 
+# * make va d'abord rechercher EXEC pui all puis ..
 
-CFLAGS=  -O2 -Wall
-#CFLAGS=  -g -Wall
+#--------------------------------------------------------------------------------------
+# CC	= gcc
+# CC	= armv6-gcc
+# CC	=	/usr/bin/arm-linux-gnueabi-gcc
+# CC	= /usr/bin/arm-linux-gnueabihf-gcc
+CC  = /usr/bin/aarch64-linux-gnu-gcc
+#--------------------------------------------------------------------------------------
 
-OBJS = altaz.o angles.o annuab.o constel.o deflec.o deltat.o diurab.o \
-diurpx.o dms.o epsiln.o fk4fk5.o kepler.o kfiles.o lightt.o lonlat.o \
-nutate.o precess.o refrac.o rplanet.o rstar.o sidrlt.o sun.o domoon.o \
-trnsit.o vearth.o zatan2.o \
-gplan.o mer404.o ven404.o ear404.o mar404.o jup404.o \
-sat404.o ura404.o nep404.o plu404.o mlr404.o mlat404.o
+GIT=git
 
-INCS = kep.h plantbl.h
+ARCH	= armv8
+PROJ	= astrokit
+FICH	= astroreel
+VERS	= 3.0
+HOME	= /home/stef
+RM 		= rm -f
+EPHA	= libephe.a
 
-ss: ss.o $(OBJS) $(INCS)
-	$(CC) -o ss ss.o $(OBJS) -lm
+RPWD		= ${HOME}/${GIT}/${PROJ}
+RSRC		= ${RPWD}/src
+REPH		= ${RPWD}/eph
+RLIB		= ${RPWD}/lib
 
-conjunct: conjunct.o $(OBJS) $(INCS)
-	$(CC) -o conjunct conjunct.o $(OBJS) -lm
+LEPH		= ${RLIB}/${EPHA}
+# la cible est ici EXEC pour make sans argument
+EXEC	= ${LEPH}
 
-conjunct.o: conjunct.c $(INCS)
+SRC = altaz.c angles.c annuab.c constel.c deflec.c deltat.c diurab.c \
+diurpx.c dms.c epsiln.c fk4fk5.c kepler.c kfiles.c lightt.c lonlat.c \
+nutate.c precess.c refrac.c rplanet.c rstar.c sidrlt.c sun.c domoon.c \
+trnsit.c vearth.c zatan2.c gplan.c mer404.c ven404.c ear404.c mar404.c jup404.c \
+sat404.c ura404.c nep404.c plu404.c mlr404.c mlat404.c ss.c
 
-moonrise: moonrise.o $(OBJS) $(INCS)
-	$(CC) -o moonrise moonrise.o $(OBJS) -lm
+OBJ		= $(SRC:.c=.o)
 
-clean:
-	rm *.o
+WFLAGS	= -Wno-unused-result
+WFLAGS2	= -Wno-misleading-indentation -Wno-format-overflow
+DEBUG		= -g -Wall -O2 -Winline -pipe -fPIC 
+CFLAGS 	= $(DEBUG) $(WFLAGS)
 
-ss.o: ss.c $(INCS)
-moonrise.o: moonrise.c $(INCS)
-altaz.o: altaz.c $(INCS)
-angles.o: angles.c $(INCS)
-annuab.o: annuab.c $(INCS)
-constel.o: constel.c $(INCS)
-deflec.o: deflec.c $(INCS)
-deltat.o: deltat.c $(INCS)
-diurab.o: diurab.c $(INCS)
-diurpx.o: diurpx.c $(INCS)
-dms.o: dms.c $(INCS)
-epsiln.o: epsiln.c $(INCS)
-fk4fk5.o: fk4fk5.c $(INCS)
-kepler.o: kepler.c $(INCS)
-kfiles.o: kfiles.c $(INCS)
-lightt.o: lightt.c $(INCS)
-lonlat.o: lonlat.c $(INCS)
-nutate.o: nutate.c $(INCS)
-precess.o: precess.c $(INCS)
-refrac.o: refrac.c $(INCS)
-rplanet.o: rplanet.c $(INCS)
-rstar.o: rstar.c $(INCS)
-sidrlt.o: sidrlt.c $(INCS)
-sun.o: sun.c $(INCS)
-trnsit.o: trnsit.c $(INCS)
-vearth.o: vearth.c $(INCS)
-zatan2.o: zatan2.c $(INCS)
-domoon.o: domoon.c $(INCS)
-ear404.o: ear404.c $(INCS)
-jup404.o: jup404.c $(INCS)
-mar404.o: mar404.c $(INCS)
-mer404.o: mer404.c $(INCS)
-nep404.o: nep404.c $(INCS)
-sat404.o: sat404.c $(INCS)
-ura404.o: ura404.c $(INCS)
-ven404.o: ven404.c $(INCS)
-plu404.o: plu404.c $(INCS)
-mlr404.o: mlr404.c $(INCS)
-mlat404.o: mlat404.c $(INCS)
+INCS 	= -I.
+LIBS	= -L. -lm 
+
+.c.o:
+#	@echo $(CC) -c $(CFLAGS) $(INCS) $< -o $@
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) $(INCS) $< -o $@
+
+$(EXEC): $(OBJ)
+#	@echo ar -r $(EXEC) $(OBJ)
+	ar -r $(EXEC) $(OBJ)
+	chmod 755 $(EXEC)
+#	@echo $(CC) $(OBJ) $(INCS) -o ${EXEC} $(LIBS)
+#	$(CC) $(OBJ) $(INCS) -o ${EXEC} $(LIBS)
+
+#	ar -r  $(LEPH) $@
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(EXEC) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(EXEC)
+
+# ================================================================================
+#
+# Fin Makefile - Fin Makefile - Fin Makefile - Fin Makefile - Fin Makefile -  
+#
+# ================================================================================
+
