@@ -12,11 +12,11 @@
 # * make va d'abord rechercher EXEC pui all puis ..
 
 #--------------------------------------------------------------------------------------
-# CC	= gcc
+CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
 # CC	= /usr/bin/arm-linux-gnueabihf-gcc
-CC  = /usr/bin/aarch64-linux-gnu-gcc
+# CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
 GIT=git
@@ -25,8 +25,9 @@ ARCH	= armv8
 PROJ	= astrokit
 FICH	= astroreel
 VERS	= 3.0
-HOME	= /home/stef
-RM 		= rm -f
+HOME	= /home/root
+
+RM	= rm -f
 EPHA	= libephe.a
 
 RPWD		= ${HOME}/${GIT}/${PROJ}
