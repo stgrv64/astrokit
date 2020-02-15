@@ -15,8 +15,8 @@
 # CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
-# CC	= /usr/bin/arm-linux-gnueabihf-gcc
-CC  = /usr/bin/aarch64-linux-gnu-gcc
+CC	= /usr/bin/arm-linux-gnueabihf-gcc
+#CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
 GIT=git
@@ -26,15 +26,17 @@ PROJ	= astrokit
 FICH	= astroreel
 VERS	= 3.0
 HOME	= /home/stef
-RM 		= rm -f
+RM 	= rm -f
 EPHA	= libephe.a
 
-RPWD		= ${HOME}/${GIT}/${PROJ}
-RSRC		= ${RPWD}/src
-REPH		= ${RPWD}/eph
-RLIB		= ${RPWD}/lib
+RPWD	= ${HOME}/${GIT}/${PROJ}
+RSRC	= ${RPWD}/src
+REPH	= ${RPWD}/eph
 
-LEPH		= ${RLIB}/${EPHA}
+RLIB	= ${RPWD}/lib32
+#RLIB	= ${RPWD}/lib64
+
+LEPH	= ${RLIB}/${EPHA}
 # la cible est ici EXEC pour make sans argument
 EXEC	= ${LEPH}
 

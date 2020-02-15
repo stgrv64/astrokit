@@ -15,8 +15,8 @@
 # CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
-# CC	= /usr/bin/arm-linux-gnueabihf-gcc
-CC  = /usr/bin/aarch64-linux-gnu-gcc
+CC	= /usr/bin/arm-linux-gnueabihf-gcc
+# CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
 GIT=git
@@ -29,27 +29,28 @@ HOME	= /home/stef
 RM 		= rm -f
 EPHA	= libephe.a
 
-RPWD		= ${HOME}/${GIT}/${PROJ}
-RSRC		= ${RPWD}/src
-REPH		= ${RPWD}/eph
-RLIB		= ${RPWD}/lib
+RPWD	= ${HOME}/${GIT}/${PROJ}
+RSRC	= ${RPWD}/src
+REPH	= ${RPWD}/eph
+RLIB	= ${RPWD}/lib32
+#RLIB	= ${RPWD}/lib64
 
 # la cible est ici EXEC pour make sans argument
 EXEC	= ${FICH}.${VERS}
 
-INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RPWD}/lib -I${RPWD}/lib/lirc -I${REPH}
-LIBS	= -L${RPWD}/lib/lirc -L${RPWD}/lib -L/usr/lib -L${REPH} -lpthread -lm -lrt
+INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
+LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
 
-DEBUG		= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
+DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
-SRC			=	src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
-OBJ			= $(SRC:.c=.o)
+SRC	=	src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
+OBJ	= $(SRC:.c=.o)
 
-LEPH		= ${RLIB}/${EPHA}
-EPHS		= $(REPH)/*.c
-SRCS		= ${RSRC}/*.c
-OBJS		= $(SRCS:.c=.o)
+LEPH	= ${RLIB}/${EPHA}
+EPHS	= $(REPH)/*.c
+SRCS	= ${RSRC}/*.c
+OBJS	= $(SRCS:.c=.o)
 OBJSUP	= $(LEPH)
 
 .c.o:
