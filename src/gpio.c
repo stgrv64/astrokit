@@ -1053,7 +1053,7 @@ void * suivi_clavier() {
 //          ET choix de la fonction de rapport cyclique
 // ##########################################################################################################
 
-void main21(int argc, char **argv)
+void main_(int argc, char **argv)
 {
   int         i, pid, nbcpus, nbm , type_fonction;
   double      param0, param1 ;

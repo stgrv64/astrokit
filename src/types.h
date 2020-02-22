@@ -419,7 +419,9 @@ typedef struct {
  double dt ;
  double acc ;
  double acc_old ;
- 
+
+ long long num ; 
+
  double DT ; // dt effectif en microsec en tenant compte de acceleration et de tous les autres parametres
 }
 VOUTE ;

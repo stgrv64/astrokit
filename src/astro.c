@@ -692,7 +692,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
         pthread_mutex_unlock(& suivi->mutex_alt );
 
         suivi->SUIVI_EQUATORIAL = 0 ;
-        //suivi->SUIVI_VOUTE      = 1 ; // TODO : verifier utilite SUIVI_VOUTE
+        suivi->SUIVI_VOUTE      = 1 ; 
+
+				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_0 ; 
 
@@ -710,7 +713,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
         pthread_mutex_unlock(& suivi->mutex_alt );
 
         suivi->SUIVI_EQUATORIAL = 1 ;
-        //suivi->SUIVI_VOUTE      = 1 ; // TODO : verifier utilite SUIVI_VOUTE
+        suivi->SUIVI_VOUTE      = 0 ; 
+
+				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_0 ;
 
@@ -755,7 +761,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         TRACE("appel : %d : MENU_INFO" , suivi->menu) ;
         LOG("appel : %d : MENU_INFO" , suivi->menu) ;
 
-        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre) ;
+        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_0 ;
@@ -869,12 +875,15 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
     
       if ( suivi->SUIVI_ALIGNEMENT )          CONFIG_AFFICHER_ASTRE(astre) ;
-      if ( suivi->menu_old != suivi->menu  )  CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre) ;
+      if ( suivi->menu_old != suivi->menu  )  CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
 
-      astre->A += voute->pas ;
-      
+      astre->A   += voute->pas ;
+      voute->deb += voute->pas ;
+
       suivi->d_temps += CALCUL_TEMPORISATION_VOUTE( voute, t00 ) ; 
       gettimeofday(&t00,NULL) ;
+
+			voute->num ++ ;
       incr++ ;
       // attention cet appel systeme genere une interuption
       // uniquement utiliser pour les tests

@@ -36,6 +36,7 @@ RLIB	= ${RPWD}/lib32
 
 # la cible est ici EXEC pour make sans argument
 EXEC	= ${FICH}.${VERS}
+GPIO	=	gpios
 
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
 LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
@@ -58,6 +59,9 @@ OBJSUP	= $(LEPH)
 
 $(EXEC): $(OBJ)
 	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${EXEC} $(LIBS)
+
+$(GPIO): $(OBJ)
+	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${GPIO} $(LIBS)
 
 $(LEPH)	:
 	cd ${REPH} ; make clean ; make

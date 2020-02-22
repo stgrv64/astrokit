@@ -183,7 +183,10 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
   if ( clavier->mot_en_cours && clavier->appui_en_cours == 0 ) {
   
     TRACE("mot trouver = %s\n", clavier->mot ) ;
-    
+    LOG("mot trouver = %s\n", clavier->mot) ;
+		
+		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;
+
     //------------------------------------------------------------
     // On incremente la phrase avec le mot et
     // On incremente le nombre avec le mot si premier n'est pas vide

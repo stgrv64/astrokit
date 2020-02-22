@@ -9,9 +9,6 @@ README 2020 :
   - date.txt
   - hhmm.txt
 
-
-  Ce repertoire est sur le depot et porte le nom de cfg
-
 * le repertoire /root/catalogues soit exister sur la cible et contenir les fichiers
 
   - ngc.csv   I.E  la recherche des messiers se fait dans ce catalogue

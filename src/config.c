@@ -278,6 +278,7 @@ void CONFIG_INIT_VOUTE(VOUTE *voute) {
   voute->pourcentage_tempo = 0.96 ;   
   voute->calibration_voute = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
   
+	voute->num   = 0 ;
   voute->deb   = 0 ;
   voute->fin   = 0 ;
   voute->dt    = 1  ;
@@ -292,6 +293,7 @@ void CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) {
   voute->pourcentage_tempo  = percent ; 
   voute->calibration_voute  = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
   voute->deb                = 0 ;
+  voute->num                = 0 ;
   voute->fin                = PIPI ;
   voute->dt                 = dt  ;
   voute->pas                = voute->dt * ROT_RAD_SEC ;
@@ -307,7 +309,7 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->SUIVI_MANUEL     = 0 ;
   suivi->SUIVI_ALIGNEMENT = 0 ;
   suivi->SUIVI_GOTO       = 0 ;
-  suivi->SUIVI_VOUTE      = 0 ;
+  suivi->SUIVI_VOUTE      = 1 ;
   suivi->SUIVI_EQUATORIAL = 0 ;
 
   // a modifier  : instancier ces variables a l aide du fichier de config
@@ -839,16 +841,12 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
     
-  //for(C=0; C< 10;C++) {
-  //  if (strcmp( as->plus_proche[C], "")) TRACE("astre->plus_proche[%d]=%s\n",C,as->plus_proche[C]) ;
-  //}
-  
-  TRACE("nom %s : a %.2f h %.2f A %.2f H %.2f : Va %.2f Vh %.2f",as->nom, astre->a, astre->h, astre->A, astre->H, astre->Va, astre->Vh) ;
-    
-  TRACE1("astre->a   = %f - %f - %dh%dmn",astre->a   , astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
-  TRACE1("astre->h   = %f - %f - %dh%dmn",astre->h   , astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
-  TRACE1("astre->A   = %f - %f - %dh%dmn",astre->A   , astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
-  TRACE1("astre->H   = %f - %f - %dh%dmn",astre->H   , astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
+  TRACE("ASTRE : %s\n - Va = %.2f -Vh = %.2f", as->nom, as->Va,  as->Vh  ) ;
+
+  TRACE(" altitude    = %.2f - %.2f - %d.%d (hh.mm)",astre->a , astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
+  TRACE(" azimut      = %.2f - %.2f - %d.%d (hh.mm)",astre->h , astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
+  TRACE(" ang-horaire = %.2f - %.2f - %d.%d (hh.mm)",astre->A , astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
+  TRACE(" declinaison = %.2f - %.2f - %d.%d (hh.mm)",astre->H , astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
   
   TRACE2("astre->AZI  = %f",astre->AZI) ;
   TRACE2("astre->AZI1 = %f",astre->AZI1) ;
@@ -858,12 +856,18 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   TRACE2("astre->ASC = %f - %f (degres)",astre->ASC , astre->ASC * DEGRES) ;
 }
 //============================================================================
-void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre) {
+void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
+	
+	TRACE("voute->num %lld", voute->num) ;
+}
+//============================================================================
+void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre, VOUTE *voute) {
 
   CONFIG_AFFICHER_CLAVIER( clavier ) ;   
   CONFIG_AFFICHER_TEMPS( temps ) ;
   CONFIG_AFFICHER_LIEU( lieu );
   CONFIG_AFFICHER_ASTRE( astre ) ;
+  CONFIG_AFFICHER_VOUTE( voute ) ;
 }
 //============================================================================
 void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {

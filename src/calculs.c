@@ -636,12 +636,12 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
 
 void CALCUL_TOUT(LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *clavier ) {
   
-  ASTRE_TYPES i_planete ;
+  ASTRE_TYPES i_astre ;
   
-  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_planete = PLANETE ;
-  else                                            i_planete = CIEL_PROFOND ;
+  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = PLANETE ;
+  else                                            i_astre = CIEL_PROFOND ;
   
-  switch (i_planete) {
+  switch (i_astre) {
 
     //---------------------------------------------------------------------------------------
     
