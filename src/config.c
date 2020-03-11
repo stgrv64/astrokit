@@ -220,8 +220,8 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
 
   if ( system( buf ) < 0 ) perror( buf) ;
 
-  TRACE("prise en compte nouvelle date : %s", buf) ;
-    LOG("prise en compte nouvelle date : %s", buf) ;
+  TRACE("Nouvelle date : %s", buf) ;
+
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
@@ -258,8 +258,6 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   sprintf(buf, "/bin/echo %s:%s > %s/%s ", hou, min, CONFIG_REP, CONFIG_HHMM ) ;
   TRACE("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
-
-  LOG("prise en compte nouvelle heure et minutes") ;
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_INIT_TEMPS( TEMPS *temps) {
@@ -780,14 +778,6 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
           lieu->TSR,\
           lieu->JD ) ;
 
-  LOG("lat %.2f lon %.2f alt %.2f JJ %.2f TS %.2f TSR %.2f JD %.2f",\
-          lieu->lat * DEGRES,\
-          lieu->lon * DEGRES,\
-          lieu->alt , lieu->JJ,
-          lieu->TS,\
-          lieu->TSR,\
-          lieu->JD ) ;
-
   TRACE1("lieu->lat (degres) = %f",lieu->lat * DEGRES ) ;
   TRACE1("lieu->lon (degres) = %f",lieu->lon * DEGRES ) ;
   TRACE1("lieu->alt = %f",lieu->alt ) ;
@@ -800,7 +790,6 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
 void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
   
   TRACE("%d %d %d %d %d %d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
-    LOG("%d %d %d %d %d %d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
 
   TRACE1("temps->yy = %d", temps->yy ) ;
   TRACE1("temps->mm = %d", temps->mm ) ;
@@ -822,15 +811,6 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
     clavier->valider,\
     clavier->menu) ;
 
-  LOG("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
-    clavier->phrase,\
-    clavier->mot,\
-    clavier->symbole,\
-    clavier->nombre,\
-    clavier->premier,\
-    clavier->valider,\
-    clavier->menu) ;
-
   TRACE1("clavier->mot         = %s",clavier->mot) ;
   TRACE1("clavier->premier     = %s",clavier->premier) ;
   TRACE1("clavier->phrase      = %s",clavier->phrase) ;
@@ -842,11 +822,10 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
     
   TRACE("ASTRE : %s\n - Va = %.2f -Vh = %.2f", as->nom, as->Va,  as->Vh  ) ;
-
-  TRACE(" altitude    = %.2f - %.2f - %d.%d (hh.mm)",astre->a , astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
-  TRACE(" azimut      = %.2f - %.2f - %d.%d (hh.mm)",astre->h , astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
-  TRACE(" ang-horaire = %.2f - %.2f - %d.%d (hh.mm)",astre->A , astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
-  TRACE(" declinaison = %.2f - %.2f - %d.%d (hh.mm)",astre->H , astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
+  TRACE(" azimut      = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->a , astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
+  TRACE(" altitude    = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->h , astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
+  TRACE(" ang-horaire = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->A , astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
+  TRACE(" declinaison = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->H , astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
   
   TRACE2("astre->AZI  = %f",astre->AZI) ;
   TRACE2("astre->AZI1 = %f",astre->AZI1) ;
@@ -895,7 +874,6 @@ void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
   if ( suivi->menu_old != suivi->menu ) {
 
     TRACE("appel : %d : %s" , suivi->menu,s_menu) ;
-      LOG("appel : %d : %s" , suivi->menu,s_menu) ;
 
    GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 

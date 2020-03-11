@@ -45,7 +45,7 @@ void LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) {
   strcpy( irc->key[24],"KEY_LEFT") ;        strcpy( irc->code[24],"o") ;
   strcpy( irc->key[25],"KEY_SETUP") ;       strcpy( irc->code[25],"SETUP") ;
   // strcpy( irc->key[26],"KEY_TIME") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
-  strcpy( irc->key[26],"KEY_BACK") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
+  strcpy( irc->key[26],"KEY_SOUND") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
 
   strcpy( irc->key[27],"KEY_FORWARD") ;     strcpy( irc->code[27],"forward") ;
   strcpy( irc->key[28],"KEY_REWIND") ;      strcpy( irc->code[28],"rewind") ;    // ajout du 26/11/2017
@@ -182,8 +182,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
   
   if ( clavier->mot_en_cours && clavier->appui_en_cours == 0 ) {
   
-    TRACE("mot trouver = %s\n", clavier->mot ) ;
-    LOG("mot trouver = %s\n", clavier->mot) ;
+    TRACE("mot trouver = %s", clavier->mot ) ;
 		
 		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;
 

@@ -116,17 +116,17 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 // TODO : voir la reelle utilite de SUIVI_MENU_PREALABLE et des variables suivi->SUIVI_MANUEL , suivi->SUIVI_EQUATORIAL , etc ..
 
   switch ( suivi->menu ) {
-    case MENU_MANUEL_BRUT : ; break ;
-    case MENU_MANUEL_0   : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_1   : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_AZIMUTAL   : suivi->SUIVI_EQUATORIAL = 0 ; break ;
-    case MENU_EQUATORIAL : suivi->SUIVI_EQUATORIAL = 1 ; break ;
-    case MENU_GOTO       : suivi->SUIVI_GOTO       = 1 ; break ;
-    case MENU_INFO       : break ;
-    case MENU_RESEAU_UP  : break ;
-    case MENU_RESEAU_DOWN  : break ; 
+    case MENU_MANUEL_0        : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_1        : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_AZIMUTAL        : suivi->SUIVI_EQUATORIAL = 0 ; break ;
+    case MENU_EQUATORIAL      : suivi->SUIVI_EQUATORIAL = 1 ; break ;
+    case MENU_GOTO            : suivi->SUIVI_GOTO       = 1 ; break ;
+    case MENU_MANUEL_BRUT     : suivi->SUIVI_EQUATORIAL = 0 ; break ;
+    case MENU_INFO            : break ;
+    case MENU_RESEAU_UP       : break ;
+    case MENU_RESEAU_DOWN     : break ; 
     case MENU_PROGRAMME_DOWN  : break ; 
-    case MENU_DOWN  : break ; 
+    case MENU_DOWN            : break ; 
   }
 }
 // #######################################################################################
@@ -209,8 +209,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
       memset( astre->nom, ZERO_CHAR, strlen(astre->nom)) ;
       sprintf( astre->nom, "%s%s", clavier->symbole, clavier->nombre) ;
     
-      TRACE("%s a ete pris en compte",astre->nom) ;
-        LOG("%s a ete pris en compte",astre->nom) ;
+      TRACE("== %s ==",astre->nom) ;
       
       if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
       if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
@@ -234,7 +233,6 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
         case 4 : // Si longueur = 4 cela ne peut etre qu'un changement d'heure et de minutes
           
           TRACE("demande changement heure minutes : %s" , clavier->nombre) ;
-          LOG("demande changement heure minutes : %s" , clavier->nombre) ;
     
           CONFIG_SET_HOUR_AND_MINUTES( clavier->nombre ) ;
           
@@ -245,7 +243,6 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
         case 8 : // Si longueur = 5 cela est un changement de mois jour avec verif de l'annee
 
           TRACE("demande changement annee : %s" , clavier->nombre) ;
-          LOG("demande changement annee : %s" , clavier->nombre) ;
           
           CONFIG_SET_YEAR_MONTH_AND_DAY( clavier->nombre ) ;
       
@@ -319,9 +316,6 @@ void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
     TRACE("reset : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f",\
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
            
-      LOG("reset : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f",\
-           suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
-           
     pthread_mutex_unlock(& suivi->mutex_azi );
     pthread_mutex_unlock(& suivi->mutex_alt );
 
@@ -362,7 +356,6 @@ void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
     suivi->reset = 0 ;
 
     TRACE("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
-      LOG("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 
     pthread_mutex_unlock(& suivi->mutex_azi );
     pthread_mutex_unlock(& suivi->mutex_alt );
@@ -386,7 +379,6 @@ void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
     pthread_mutex_unlock(& suivi->mutex_alt );
 
     TRACE("acc*ALTAZ_FORWARD %.4f acc_azi %.4f acc_alt %.4f", ALTAZ_FORWARD, suivi->acc_azi, suivi->acc_alt ) ;
-      LOG("acc*ALTAZ_FORWARD %.4f acc_azi %.4f acc_alt %.4f", ALTAZ_FORWARD, suivi->acc_azi, suivi->acc_alt ) ;
     
     suivi->pas_forward = 0 ;
     flag_calcul = 1 ;
@@ -403,7 +395,6 @@ void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
     pthread_mutex_unlock(& suivi->mutex_alt );
 
     TRACE("acc/ALTAZ_REWIND %.4f acc_azi %.4f acc_alt %.4f ", ALTAZ_REWIND, suivi->acc_azi, suivi->acc_alt ) ;
-      LOG("acc/ALTAZ_REWIND %.4f acc_azi %.4f acc_alt %.4f ", ALTAZ_REWIND, suivi->acc_azi, suivi->acc_alt ) ;
     
     suivi->pas_rewind  = 0 ;
     flag_calcul = 1 ;
@@ -425,7 +416,6 @@ void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
     pthread_mutex_unlock(& suivi->mutex_alt );
 
     TRACE("acc*ALTAZ_FORWARD_FAST %.4f acc_azi %.4f acc_alt %.4f", ALTAZ_FORWARD_FAST, suivi->acc_azi, suivi->acc_alt ) ;
-      LOG("acc*ALTAZ_FORWARD_FAST %.4f acc_azi %.4f acc_alt %.4f", ALTAZ_FORWARD_FAST, suivi->acc_azi, suivi->acc_alt ) ;
     
     suivi->pas_forward_fast = 0 ;
     flag_calcul = 1 ;
@@ -442,7 +432,6 @@ void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
     pthread_mutex_unlock(& suivi->mutex_alt );
 
     TRACE("acc/ALTAZ_REWIND_FAST  %.4f acc_azi %.4f acc_alt %.4f ", ALTAZ_REWIND_FAST, suivi->acc_azi, suivi->acc_alt ) ;
-      LOG("acc/ALTAZ_REWIND_FAST  %.4f acc_azi %.4f acc_alt %.4f ", ALTAZ_REWIND_FAST, suivi->acc_azi, suivi->acc_alt ) ;
       
     suivi->pas_rewind_fast  = 0 ;
     flag_calcul = 1 ;
@@ -682,7 +671,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         // a modifier / completer : CALCUL_TEMPS_SIDERAL et CALCUL_ANGLE_HORAIRE
         // sont a supprimer car deja calculer dans SUIVI_
 
-        LOG("appel : %d : MENU_AZIMUTAL" , suivi->menu) ;
+        TRACE("appel : %d : MENU_AZIMUTAL" , suivi->menu) ;
 
         pthread_mutex_lock(& suivi->mutex_azi );   
         pthread_mutex_lock(& suivi->mutex_alt );
@@ -729,7 +718,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
         // TODO : verifier
 
         TRACE("appel : %d : MENU_MANUEL_BRUT" , suivi->menu) ;
-        LOG("appel : %d : MENU_MANUEL_BRUT" , suivi->menu) ;
 
         pthread_mutex_lock(& suivi->mutex_azi );   
         pthread_mutex_lock(& suivi->mutex_alt );
@@ -737,6 +725,8 @@ void * SUIVI_MENU(SUIVI * suivi) {
         suivi->acc_azi          = 0 ;
         pthread_mutex_unlock(& suivi->mutex_azi );   
         pthread_mutex_unlock(& suivi->mutex_alt );
+
+				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_0 ; 
@@ -747,7 +737,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
       case MENU_GOTO :
 
         TRACE("appel : %d : MENU_GOTO" , suivi->menu) ;
-        LOG("appel : %d : MENU_GOTO" , suivi->menu) ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_0 ;
@@ -759,7 +748,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
       case MENU_INFO :
 
         TRACE("appel : %d : MENU_INFO" , suivi->menu) ;
-        LOG("appel : %d : MENU_INFO" , suivi->menu) ;
 
         CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
 
@@ -773,7 +761,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
       case MENU_RESEAU_UP :
 
         TRACE("appel : %d : MENU_RESEAU_UP" , suivi->menu) ;
-        LOG("appel : %d : MENU_RESEAU_UP" , suivi->menu) ;
 
         if ( system("/etc/init.d/OLD/S40network start")) {
          perror("Probleme avec system(/etc/init.d/OLD/S40network start)"); 
@@ -790,7 +777,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
       case MENU_RESEAU_DOWN :
      
         TRACE("appel : %d : MENU_RESEAU_DOWN" , suivi->menu) ;
-        LOG("appel : %d : MENU_RESEAU_DOWN" , suivi->menu) ;
 
         if ( system("/etc/init.d/OLD/S40network stop")) {
           perror("Probleme avec system(/etc/init.d/OLD/S40network stop)"); 
@@ -805,8 +791,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
       case MENU_PROGRAMME_DOWN :
      
         TRACE("appel : %d : MENU_PROGRAMME_DOWN" , suivi->menu) ;
-        LOG("appel : %d : MENU_PROGRAMME_DOWN" , suivi->menu) ;
-
 
         TRAP_MAIN(1) ;
         break ;
@@ -815,7 +799,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
       case MENU_DOWN :
 
         TRACE("appel : %d : MENU_DOWN" , suivi->menu) ;
-        LOG("appel : %d : MENU_DOWN" , suivi->menu) ;
 
         TRAP_MAIN(0) ;
 
@@ -1056,7 +1039,6 @@ int main(int argc, char ** argv) {
   // -----------------------------------------------------------------
   
   CONFIG_INIT_LOG(); 
-  LOG( "=== debut astrokit ===" ) ;
     
   CONFIG_READ       ( datas ) ;
   CONFIG_INIT_VAR   ( datas ) ;   
@@ -1070,10 +1052,8 @@ int main(int argc, char ** argv) {
   // CONFIG_AFFICHER_DATAS( datas ) ;
   // CONFIG_AFFICHER_VARIABLES() ;
 
-  printf("==> GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
-  printf("==> ASTRE_PAR_DEFAUT, = %s\n", ASTRE_PAR_DEFAUT );
-
-  LOG("==> ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
+  TRACE("GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
+  TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
   
   // -----------------------------------------------------------------
   // fonctions initialisations des structures de donnees
@@ -1143,11 +1123,9 @@ int main(int argc, char ** argv) {
   
   GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[], gpio_azi[], gpio_masque[] et gpio_frequence_pwm[]
   
-  printf("gpio_alt[x]=") ;    for(i=0;i<4;i++) printf("%d ",gpio_alt[i]) ; printf("\n") ;
-  printf("gpio_azi[x]=") ;    for(i=0;i<4;i++) printf("%d ",gpio_azi[i]) ; printf("\n") ;
-  printf("gpio_masque[x]=") ; for(i=0;i<4;i++) printf("%d ",gpio_masque[i]) ; printf("\n") ;
-  
-  LOG("gpio_alt[x]=") ;    for(i=0;i<4;i++) LOG("%d ",gpio_alt[i]) ; LOG("\n") ;
+  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_alt[i]) ; printf("\n") ;
+  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_azi[i]) ; printf("\n") ;
+  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpio_masque[i]) ; printf("\n") ;
   
   GPIO_INIT_PWM_MOTEUR_2(\
     pm_alt,\

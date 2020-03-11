@@ -1,0 +1,109 @@
+TEMPO_MENU      50000
+TEMPO_RAQ       5000
+TEMPO_IR        100000
+TEMPO_CLAVIER   52000
+TEMPO_CAPTEURS  52000
+
+DONNEES_CONTROLEUR   0  # flag qui indique utilisation des controleurs de moteur externes
+DONNEES_CAPTEURS     0  # flag qui indique utilisation de capteurs 
+DONNEES_RAQUETTE     0  # flag qui indique utilisation d une raquette 
+DONNEES_BLUETOOTH    0  # flag qui indique utilisation du bluetooth 
+DONNEES_INFRAROUGE   1  # flag qui indique utilisation de infrarouge
+
+MENU_PAR_DEFAUT  2 
+ASTRE_PAR_DEFAUT PLA0
+
+#==============================================
+#  LIEU 
+#==============================================
+
+LATITUDE   43.3
+LONGITUDE -0.39 
+ALTITUDE   200
+
+#==============================================
+#  GPIOS 
+#==============================================
+
+GPIO_LED_ETAT   4 
+GPIO_LED_IR     27 
+ 
+GPIO_INPUT   7,8 
+GPIO_OUTPUT  14,15 
+GPIO_RESER   2,3 # reserve I2C
+
+GPIO_ALT       21,26,19,13
+GPIO_AZI       6,5,7,11
+GPIO_MASQUE    3,1,0,2
+
+GPIO_FREQUENCE_PWM  1211 
+
+# GPIO_MASQUE  3,1,0,2   # masque pour la NEQ3-2 - nouvelle carte avec SN754410 
+# GPIO_MASQUE  1,0,3,2   # moteur 14HS130406S un - nouvelle carte avec SN754410
+
+#==============================================
+#  numero des ports GPIO
+#==============================================
+
+GPIO_DIR_ALT 21    # direction de l'altitude
+GPIO_CLK_ALT 20    # horloge de l'altitude
+GPIO_SLP_ALT 16    # sleep du controleur du moteur
+GPIO_RST_ALT 12    # reset du controleur du moteur
+GPIO_MMM_ALT 7     # mode micro pas du controleur du moteur
+GPIO_ENA_ALT 8     # broche enable du controleur du moteur
+
+GPIO_DIR_AZI 25    # direction de l'azimut
+GPIO_CLK_AZI 24    # horloge de l'azimut
+GPIO_SLP_AZI 23    # sleep du controleur du moteur
+GPIO_RST_AZI 18    # reset du controleur du moteur
+GPIO_MMM_AZI 15    # mode micro pas du controleur du moteur
+GPIO_ENA_AZI 14    # broche enable du controleur du moteur
+
+#==============================================
+# parametres de RAQUETTE [ GPIO doivent etre en INPUT ] 
+#==============================================
+
+GPIO_RAQ_O   19    # raquette direction OUEST
+GPIO_RAQ_E   6     # raquette direction EST
+GPIO_RAQ_S   13    # raquette direction SUD
+GPIO_RAQ_N   26    # raquette direction NORD
+GPIO_RAQ_V   5     # raquette VALIDER
+
+#==============================================
+# parametres de CLAVIER 4 * 4 = 16 touches (16 switchs)
+# [ LIGNES   doivent etre en INPUT  ]
+# [ COLONNES doivent etre en OUTPUT ]
+#==============================================
+
+GPIO_KEY_L1  10   # entree keyboard ligne 1
+GPIO_KEY_L2  9    # entree keyboard ligne 2
+GPIO_KEY_L3  11   # entree keyboard ligne 3
+GPIO_KEY_L4  5    # entree keyboard ligne 4
+
+GPIO_KEY_C1  6    # sortie keyboard colonnne 1
+GPIO_KEY_C2  13   # sortie keyboard colonnne 2
+GPIO_KEY_C3  19   # sortie keyboard colonnne 3
+GPIO_KEY_C4  26   # sortie keyboard colonnne 4
+
+#==============================================
+# parametres de ALTITUDE 
+#==============================================
+
+ALT_R1  43.33  # reduction liee a la monture ( = 65 dents / 1.5 = 43.333)
+ALT_R2  28.75  # reducteur du moteur = 28.75
+ALT_R3  200    # nombre de pas du moteur en altitude
+ALT_R4  77     # mode micro pas utilise (1/x)
+ALT_ROT 1      # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
+ALT_ACC 1.5    # Facteur de multiplication en mode MANUEL
+
+#==============================================
+# parametres de AZIMUT 
+#==============================================
+
+AZI_R1   130   # reduction lee a la monture ( = 130 dents)
+AZI_R2   28.75 # reducteur du moteur = 28.75
+AZI_R3   200   # nombre de pas du moteur en azimut
+AZI_R4   49    # mode micro pas utilise (1/x)
+AZI_ROT  1     # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
+AZI_ACC  1.5   # Facteur de multiplication en mode MANUEL
+
