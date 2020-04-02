@@ -40,7 +40,7 @@
 
 // FIN INCLUDES =====================================
 
-#define   CAT_REP            "/home/root/catalogues"
+#define   CAT_REP            "/home/root/cat"
 #define   CAT_NGC_TXT        "ngc.csv"
 #define   CAT_MES_TXT        "mes.csv"
 #define   CAT_ETO_TXT        "eto.csv"
