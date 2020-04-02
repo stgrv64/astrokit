@@ -25,7 +25,7 @@ ARCH	= armv8
 PROJ	= astrokit
 FICH	= astroreel
 VERS	= 3.0
-HOME	= /home/root
+HOME	= /home/stef
 
 RM	= rm -f
 EPHA	= libephe.a
@@ -62,12 +62,15 @@ LIBS	= -L. -lm
 
 $(EXEC): $(OBJ)
 #	@echo ar -r $(EXEC) $(OBJ)
+#	ar -r $(EPHA) $(OBJ)
 	ar -r $(EXEC) $(OBJ)
+#	sudo cp -pf $(EPHA) $(EXEC)
+#	sudo chmod 755 $(EXEC)
 	chmod 755 $(EXEC)
 #	@echo $(CC) $(OBJ) $(INCS) -o ${EXEC} $(LIBS)
 #	$(CC) $(OBJ) $(INCS) -o ${EXEC} $(LIBS)
-
 #	ar -r  $(LEPH) $@
+
 .PHONY: all all-before all-after clean clean-custom
 
 all: all-before $(EXEC) all-after

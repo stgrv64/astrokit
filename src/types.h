@@ -90,10 +90,10 @@
 #define  CONFIG_ETO           "ETO"
 #define  CONFIG_PLA           "PLA"
 
-#define  CONFIG_REP           "/root/conf"
-#define  CONFIG_REP_LOG       "/root/log"
+#define  CONFIG_REP           "/home/root/cfg"
+#define  CONFIG_REP_LOG       "/home/root/log"
 #define  CONFIG_FIC_LOG       "astrokit.log"
-#define  CONFIG_IN            "/root/in"
+#define  CONFIG_IN            "/home/root/in"
 
 #define  CONFIG_FIC           "config.txt"
 #define  CONFIG_DATE          "date.txt"
