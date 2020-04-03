@@ -155,6 +155,13 @@ typedef enum {
 ASTRE_TYPES ;
 
 typedef enum { 
+	SUIVI_MANUEL,
+	SUIVI_EQUATORIAL,
+	SUIVI_AZIMUTAL,
+}
+SUIVIS ;
+
+typedef enum { 
 
   MENU_MANUEL_0,   
   MENU_MANUEL_1,

@@ -675,8 +675,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
         pthread_mutex_lock(& suivi->mutex_azi );   
         pthread_mutex_lock(& suivi->mutex_alt );
+
         suivi->acc_alt          = 1 ;
         suivi->acc_azi          = 1 ;
+
         pthread_mutex_unlock(& suivi->mutex_azi );   
         pthread_mutex_unlock(& suivi->mutex_alt );
 
@@ -696,8 +698,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
         pthread_mutex_lock(& suivi->mutex_azi );   
         pthread_mutex_lock(& suivi->mutex_alt );
+
         suivi->acc_alt          = 0 ;
         suivi->acc_azi          = 1 ;
+
         pthread_mutex_unlock(& suivi->mutex_azi );   
         pthread_mutex_unlock(& suivi->mutex_alt );
 
@@ -721,8 +725,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
         pthread_mutex_lock(& suivi->mutex_azi );   
         pthread_mutex_lock(& suivi->mutex_alt );
+
         suivi->acc_alt          = 0 ;
         suivi->acc_azi          = 0 ;
+
         pthread_mutex_unlock(& suivi->mutex_azi );   
         pthread_mutex_unlock(& suivi->mutex_alt );
 
@@ -857,7 +863,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       
       CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
     
-      if ( suivi->SUIVI_ALIGNEMENT )          CONFIG_AFFICHER_ASTRE(astre) ;
+      if ( suivi->SUIVI_ALIGNEMENT )          { CONFIG_AFFICHER_ASTRE(astre) ; suivi->SUIVI_ALIGNEMENT = 0 ; }
       if ( suivi->menu_old != suivi->menu  )  CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
 
       astre->A   += voute->pas ;

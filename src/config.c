@@ -213,6 +213,7 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
 
   sprintf(buf, "/bin/date -s %s-%s-%s", year, month, day ) ;
   if ( system( buf ) < 0 ) perror( buf) ;
+	TRACE("buf = %s", buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
   sprintf(buf, "/bin/echo %s-%s-%s > %s/%s ", year, month, day, CONFIG_REP, CONFIG_DATE ) ;
@@ -247,8 +248,6 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   
   for(i=0;i<2;i++) hou[i]=s_data[i] ;
   for(i=0;i<2;i++) min[i]=s_data[i+2] ;
-  
-  TRACE("hh:mm= %s:%s", hou,min) ;
   
   sprintf(buf, "/bin/date -s %s:%s",hou, min ) ;
   TRACE("buf = %s", buf) ;
