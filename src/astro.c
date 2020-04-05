@@ -878,7 +878,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       incr++ ;
       // attention cet appel systeme genere une interuption
       // uniquement utiliser pour les tests
-      // system("/bin/date >> /root/astrokit.begin.log") ;
+      // system("/bin/date >> /home/root/astrokit.begin.log") ;
     }
     
     // TRES IMPORTANT !!
@@ -888,7 +888,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
     else {
       // attention cet appel systeme genere une interuption
       // uniquement utiliser pour les tests
-      // system("/bin/date >> /root/astrokit.begin.log") ;
+      // system("/bin/date >> /home/root/astrokit.begin.log") ;
       //TRACE("La voute ne tourne pas") ;
       usleep( voute->DT );
     }
@@ -1014,7 +1014,7 @@ int main(int argc, char ** argv) {
   pthread_t p_thread_m_azi ;
   // -----------------------------------------------------------------
   
-  system("/bin/date > /root/astrokit.begin.date.log") ;
+  system("/bin/date > /home/root/astrokit.begin.date.log") ;
   
   incrlog=0 ;
   

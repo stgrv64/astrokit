@@ -12,11 +12,11 @@
 # * make va d'abord rechercher EXEC pui all puis ..
 
 #--------------------------------------------------------------------------------------
-# CC	= gcc
+CC	= gcc
 # CC	= armv6-gcc
-# CC	=	/usr/bin/arm-linux-gnueabi-gcc
+# CC	= /usr/bin/arm-linux-gnueabi-gcc
 # CC	= /usr/bin/arm-linux-gnueabihf-gcc
-CC  = /usr/bin/aarch64-linux-gnu-gcc
+# CC    = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
 GIT=git
@@ -26,7 +26,7 @@ PROJ	= astrokit
 FICH	= astroreel
 VERS	= 3.0
 HOME	= /home/stef
-RM 		= rm -f
+RM 	= rm -f
 EPHA	= libephe.a
 
 RPWD		= ${HOME}/${GIT}/${PROJ}
@@ -37,8 +37,11 @@ RLIB		= ${RPWD}/lib
 # la cible est ici EXEC pour make sans argument
 EXEC	= ${FICH}.${VERS}
 
+RMOD_LIRC	= /lib/modules/4.14.98-v7+/kernel/drivers/media/rc/lirc_dev.ko
+RLIB_LIRC	= /usr/lib/arm-linux-gnueabihf/
+
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RPWD}/lib -I${RPWD}/lib/lirc -I${REPH}
-LIBS	= -L${RPWD}/lib/lirc -L${RPWD}/lib -L/usr/lib -L${REPH} -lpthread -lm -lrt
+LIBS	= -L${RPWD}/lib/lirc -L${RPWD}/lib -L/usr/lib -L${REPH} -lpthread -lm -lrt -llirc_client
 
 DEBUG		= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
