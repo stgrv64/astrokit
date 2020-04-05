@@ -1,0 +1,31 @@
+#!/bin/sh
+# SD card image builder for rpi-buildroot
+
+FDISK=/sbin/fdisk
+IMAGE=$1
+
+# partition image
+${FDISK} ${IMAGE} <<END
+o
+n
+p
+1
+
++32M
+n
+p
+2
+
+
+t
+1
+e
+a
+1
+w
+END
+
+mkfs.vfat -F 16 -n bootfs -I "${IMAGE}p1" || exit 1
+mkfs.ext4 -F -q -L rootfs "${IMAGE}p2" || exit 1
+
+exit 0
