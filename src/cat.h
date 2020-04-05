@@ -42,7 +42,6 @@
 
 #define   CAT_REP            "/root/catalogues"
 #define   CAT_NGC_TXT        "ngc.csv"
-#define   CAT_MES_TXT        "mes.csv"
 #define   CAT_ETO_TXT        "eto.csv"
 #define   CAT_NB_LIGNES      10000
 #define   CAT_NB_COLONNES    6
