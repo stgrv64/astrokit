@@ -1,0 +1,9 @@
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  4      [ ]         DGRAM                      5636 /dev/log
+unix  2      [ ACC ]     STREAM     LISTENING       6185 /var/run/lirc/lircd
+unix  2      [ ]         DGRAM                      6187 
+unix  2      [ ]         DGRAM                       120 

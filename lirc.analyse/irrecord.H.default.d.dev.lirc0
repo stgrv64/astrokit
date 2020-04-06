@@ -1,0 +1,42 @@
+
+irrecord -  application for recording IR-codes for usage with lirc
+
+Copyright (C) 1998,1999 Christoph Bartelmus(lirc@bartelmus.de)
+
+This program will record the signals from your remote control
+and create a config file for lircd.
+
+
+A proper config file for lircd is maybe the most vital part of this
+package, so you should invest some time to create a working config
+file. Although I put a good deal of effort in this program it is often
+not possible to automatically recognize all features of a remote
+control. Often short-comings of the receiver hardware make it nearly
+impossible. If you have problems to create a config file check the wiki
+at https://sourceforge.net/p/lirc-remotes/wiki, the Checklist and the
+manual page.
+If there already is a remote control of the same brand available at
+http://www.lirc.org/remotes/ you might also want to try using such a
+remote as a template. The config files already contain all
+parameters of the protocol used by remotes of a certain brand and
+knowing these parameters makes the job of this program much
+easier. There are also template files for the most common protocols
+available in the remotes/generic/ directory of the source
+distribution of this package. You can use a template files by
+providing the path of the file as command line parameter.
+
+Please take the time to finish this file as described in
+https://sourceforge.net/p/lirc-remotes/wiki/Checklist/
+and make it available to others by sending it to 
+<lirc@bartelmus.de>
+
+Press RETURN to continue.
+Now start pressing buttons on your remote control.
+
+It is very important that you press many different buttons and hold them
+down for approximately one second. Each button should generate at least one
+dot but in no case more than ten dots of output.
+Don't stop pressing buttons until two lines of dots (2x80) have been
+generated.
+
+Press RETURN now to start recording.

@@ -1,0 +1,9 @@
+total 207
+-rw-r--r--    1 root     root           101 Feb  1 14:22 lircrc
+-rw-r--r--    1 root     root           117 Feb  1 14:22 lircmd.conf
+drwxr-xr-x    4 root     root          1024 Feb  1 14:22 lircd.conf.d
+-rw-r--r--    1 root     root           313 Feb  1 14:22 lircd.conf
+-rw-r--r--    1 root     root           701 Feb  1 14:22 lirc_options.conf
+-rwxr-xr-x    1 root     root        204800 Feb  1 14:22 etc.lirc.tar
+drwxr-xr-x    2 root     root          1024 Feb  1 14:22 OLD
+drwxr-xr-x    3 root     root          1024 Feb  1 14:22 IRRECORD

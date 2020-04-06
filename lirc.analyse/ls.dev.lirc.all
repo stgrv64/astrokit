@@ -1,0 +1,2 @@
+crw-------    1 root     root      245,   0 Jan  1  1970 /dev/lirc0
+lrwxrwxrwx    1 root     root            19 Apr  4 19:09 /dev/lircd -> /var/run/lirc/lircd

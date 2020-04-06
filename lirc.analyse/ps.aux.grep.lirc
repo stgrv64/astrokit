@@ -1,0 +1,2 @@
+  334 root     /usr/sbin/lircd -n -O /etc/lirc/lirc_options.conf
+  338 root     grep lirc

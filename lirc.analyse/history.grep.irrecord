@@ -1,0 +1,3 @@
+ 465 irrecord -H default -d /dev/lirc0 
+ 997 history | grep irr | grep default
+ 998 history | grep irr | grep default > history.grep.irrecord
