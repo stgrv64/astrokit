@@ -875,6 +875,12 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
   TRACE("Fin calcul rapports cycliques") ;
 }
 // ##########################################################################################################
+// Cette fonction, pour chaque phase, en parallele dans 4 threads de meme priorite,
+// module les etats hauts et bas de la phase
+// avec les rapports cycliques calcules pour chaque micro pas
+// et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
+// ##########################################################################################################
+
 void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
   
   char   buf0[BUFFER] ;
