@@ -406,6 +406,11 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   pthread_mutex_init( & suivi->mutex_alt, NULL ) ;
   pthread_mutex_init( & suivi->mutex_azi, NULL ) ;
   pthread_mutex_init( & suivi->mutex_cal, NULL ) ;
+
+  suivi->temps_a = 0 ; 
+  suivi->temps_h = 0 ; 
+  
+   gettimeofday(&suivi->tval,NULL) ;
 }
 //============================================================================
 int CONFIG_FORMAT_ADMIS(char c) {

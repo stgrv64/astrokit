@@ -86,6 +86,8 @@ typedef struct {
   int     gpio_fd ;
   
   double  deltat_m ;
+
+  struct timeval tval ;
 }
 GPIO_PWM_PHASE ;
 
@@ -102,15 +104,37 @@ typedef struct {
   int     pas ;
   double  deltat ;
   double  t ;
+
   double  Fm ;  
   double  Tm ;  
   double  Fpwm ;  
   double  Tpwm ; 
+
   double  upas ; 
   long    nbdeltat ;
   int     type_fonction ; 
+
   double  param0 ;
   double  param1 ;
+
+  // FIXME : la difference entre temps et  temps_reel : voir fonction *suivi_main_M
+  //         *  temps      : on utilise deltat , qui sert pour le usleep 
+  //         *  temps_reel : on utilise gettimeofday , qui sert a calculer la duree de la boucle while(en entier)
+
+  double  temps ;      // temps ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                       // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  double  temps_reel ; // temps REEL ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                       // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  double  temps_moyen ;       // temps ecoule moyen sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                              // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  double  temps_reel_moyen ;  // temps REEL ecoule moyen sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                              // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  struct timeval tval ;
+
 }
 GPIO_PWM_MOTEUR ;
 

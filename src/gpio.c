@@ -926,7 +926,7 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
         pwrite( ph->gpio_fd,buf1,strlen(buf1),0) ;
 
     usleep( TUpwm_haut ) ;  
-        pwrite( ph->gpio_fd,buf0,strlen(buf0),0) ;
+    pwrite( ph->gpio_fd,buf0,strlen(buf0),0) ;
     usleep( TUpwm_bas ) ;
   }
 }
@@ -935,6 +935,8 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
    
    int i=0 , sens=0 ;
    double deltat=0 ;
+   double tdiff=0 ;
+   long   i_incr=0 ; 
    struct sched_param param;
    
    if ( priority > 0) {
@@ -947,60 +949,74 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
    pm->pas = 0 ;
    pm->t = 0 ;
    deltat = pm->deltat ;
-   
+
    while (1) {
-      pthread_mutex_lock( & pm->mutex ) ;
-      
-      switch ( pm->id ) {
-        case 0 : 
-          pthread_mutex_lock( & pm->suivi->mutex_alt ) ;
-            deltat = pm->suivi->Th   ;
-            sens   = pm->suivi->Sh ;
-          pthread_mutex_unlock( & pm->suivi->mutex_alt ) ;
-          break ;
-        case 1 :
-            pthread_mutex_lock( & pm->suivi->mutex_azi ) ;
-            deltat = pm->suivi->Ta   ; 
-            sens = pm->suivi->Sa ;
-          pthread_mutex_unlock( & pm->suivi->mutex_azi ) ;
-          break ;
-      }
 
-      //TRACE("deltat=%f",deltat) ;
-      // correction bug 26/08/2016 :
-      // incorrect : if ( sens > 0 ) { if ( pm->pas == pm->upas ) { pm->pas = 0 ; }         else { pm->pas++ ; }}
-      if ( sens > 0 ) { if ( pm->pas == pm->upas - 1 ) { pm->pas = 0 ; }         else { pm->pas++ ; }}
-      else            { if ( pm->pas == 0 )        { pm->pas = pm->upas-1 ;} else { pm->pas-- ; }}
-      
-      pm->t += pm->deltat ;
-      
-      //printf("%d\t",pm->pas) ;
+        pthread_mutex_lock( & pm->mutex ) ;
+        
+        switch ( pm->id ) {
+          case 0 : 
+            pthread_mutex_lock( & pm->suivi->mutex_alt ) ;
 
-      // On recopie les donnees de la structure moteur qui vont servir dans 
-      // la structure phase (4 phases a priori dans un moteur pas a pas)
+              deltat              = pm->suivi->Th   ;
+              sens                = pm->suivi->Sh ;
+              pm->temps          += pm->deltat ;
+              pm->suivi->temps_h  = pm->temps ;
 
-      for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+            pthread_mutex_unlock( & pm->suivi->mutex_alt ) ;
+            break ;
+          case 1 :
+              pthread_mutex_lock( & pm->suivi->mutex_azi ) ;
 
-        pthread_mutex_lock( & pm->phase[i]->mutex ) ;
+              deltat              = pm->suivi->Ta   ; 
+              sens                = pm->suivi->Sa ;
+              pm->temps          += pm->deltat ;
+              pm->suivi->temps_a  = pm->temps  ;
 
-          pm->phase[i]->pas      = pm->pas ;
-          pm->phase[i]->Tpwm     = pm->Tpwm ;
-          pm->phase[i]->rc       = pm->phase[i]->rap[ pm->pas ] ;
-          pm->phase[i]->deltat_m = deltat ; 
+            pthread_mutex_unlock( & pm->suivi->mutex_azi ) ;
+            break ;
+        }
 
-        pthread_mutex_unlock( & pm->phase[i]->mutex ) ;
-        //TRACE("%d\t%f\t%f",pm->pas,pm->t,pm->phase[i]->rap[ pm->pas ] ) ;
-        //printf("\t%f",pm->phase[i]->rc ) ;
-      }
-     //printf("\n") ;
-     pthread_mutex_unlock(  & pm->mutex ) ;
+        //TRACE("deltat=%f",deltat) ;
+        // correction bug 26/08/2016 :
+        // incorrect : if ( sens > 0 ) { if ( pm->pas == pm->upas ) { pm->pas = 0 ; }         else { pm->pas++ ; }}
+        if ( sens > 0 ) { if ( pm->pas == pm->upas - 1 ) { pm->pas = 0 ; }         else { pm->pas++ ; }}
+        else            { if ( pm->pas == 0 )        { pm->pas = pm->upas-1 ;} else { pm->pas-- ; }}
+        
+        
+        
+        //printf("%d\t",pm->pas) ;
 
-     // si deltat est trop grand (>GPIO_SUIVI_MAIN_ATTENTE_MAX) on ne peut pas attendre plus ..
-     // on attend GPIO_SUIVI_MAIN_ATTENTE_MAX maximum (c est un seuil d attente maximum donc)
+        // On recopie les donnees de la structure moteur qui vont servir dans 
+        // la structure phase (4 phases a priori dans un moteur pas a pas)
 
-     if (deltat < GPIO_SUIVI_MAIN_ATTENTE_MAX ) usleep( deltat * GPIO_MICRO_SEC ) ;
-     else usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC * 0.1 ) ;
-   }
+        for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+
+          pthread_mutex_lock( & pm->phase[i]->mutex ) ;
+
+            pm->phase[i]->pas      = pm->pas ;
+            pm->phase[i]->Tpwm     = pm->Tpwm ;
+            pm->phase[i]->rc       = pm->phase[i]->rap[ pm->pas ] ;
+            pm->phase[i]->deltat_m = deltat ; 
+
+          pthread_mutex_unlock( & pm->phase[i]->mutex ) ;
+          //TRACE("%d\t%f\t%f",pm->pas,pm->t,pm->phase[i]->rap[ pm->pas ] ) ;
+          //printf("\t%f",pm->phase[i]->rc ) ;
+        }
+       //printf("\n") ;
+       pthread_mutex_unlock(  & pm->mutex ) ;
+
+       // si deltat est trop grand (>GPIO_SUIVI_MAIN_ATTENTE_MAX) on ne peut pas attendre plus ..
+       // on attend GPIO_SUIVI_MAIN_ATTENTE_MAX maximum (c est un seuil d attente maximum donc)
+
+       if (deltat < GPIO_SUIVI_MAIN_ATTENTE_MAX ) usleep( deltat * GPIO_MICRO_SEC ) ;
+       else usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC * 0.1 ) ;
+
+       // FIXME : calcule la duree reelle d une iteration dans la boucle
+
+       tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
+       i_incr++ ;
+   } // FIXME : fin boucle while 
 }
 // ##########################################################################################################
 void GPIO_INIT_PWM_MOTEUR_2(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) {
@@ -1023,7 +1039,13 @@ void GPIO_INIT_PWM_MOTEUR_2(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_M
   pm->Tpwm          = 1 / pm->Fpwm ;
   pm->nbdeltat      = (long)(pm->Fm * pm->upas) ;
   pm->deltat        =  1 / ( pm->Fm * pm->upas ) ;
-  
+  pm->temps            = 0 ; 
+  pm->temps_reel       = 0 ; 
+  pm->temps_moyen      = 0 ; 
+  pm->temps_reel_moyen = 0 ; 
+
+  gettimeofday(&pm->tval,NULL) ;
+
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     
     pm->phase[i]=(GPIO_PWM_PHASE *)malloc(sizeof(GPIO_PWM_PHASE)) ;
@@ -1166,11 +1188,13 @@ void main_(int argc, char **argv)
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
     pthread_create( &p_thread_p0[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm0->phase[i] ) ;
+
   pthread_create( &p_thread_m0, NULL, (void*)suivi_main_M, pm0 ) ;
   
   if(nbm) {
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
       pthread_create( &p_thread_p1[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm1->phase[i] ) ;
+
     pthread_create( &p_thread_m1, NULL, (void*)suivi_main_M, pm1 ) ;
   }
   pthread_create( &p_thread_getc, NULL, (void*)suivi_clavier, NULL ) ;

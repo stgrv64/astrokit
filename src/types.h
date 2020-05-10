@@ -301,21 +301,30 @@ typedef struct {
   long         pas_nord ;      // flag d'appui sur le touche NORD
   long         pas_sud ;       // flag d'appui sur le touche SUD
   
-  double       Ta ;  // periode de la frequence a injecter directement
-  double       Th ;  // periode de la frequence a injecter directement
+  double       Ta ;       // periode de la frequence a injecter directement
+  double       Th ;       // periode de la frequence a injecter directement
+
+  double       temps_a ;   // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
+  double       temps_h ;   // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
+
   double       Fa ;  // frequence a injecter directement 
   double       Fh ;  // frequence a injecter directement 
 
   double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
   double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
+
   double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
   double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
+
   unsigned long Ia ;              // nombre d'impulsions mesurees sur azimut
   unsigned long Ih ;              // nombre d'impulsions mesureees sur altitude
+
   unsigned long Ia_prec ;         // nombre d'impulsions mesurees sur azimut
   unsigned long Ih_prec ;         // nombre d'impulsions mesureees sur altitude 
+
   double        Ias ;             // somme sur nombres d'impulsions mesurees 
   double        Ihs ;             // somme sur nombres d'impulsions mesurees 
+
   unsigned long Iat[CONFIG_ASS] ; // tableau des nombres d'impulsions mesurees
   unsigned long Iht[CONFIG_ASS] ; // tableau des nombres d'impulsions mesurees
   
@@ -349,6 +358,8 @@ typedef struct {
   char         datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
   char         datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
   char         datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
+
+  struct timeval tval ; 
 } 
 SUIVI ;
 

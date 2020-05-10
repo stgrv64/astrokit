@@ -14,6 +14,51 @@ double RAD  (int degres, int minutes )                  { return ((double)degres
 double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
 
 //========================================================================================
+// FIXME : CALCUL_DUREE_MICROSEC : 
+// FIXME : * permet de calculer une duree depuis un dernier appel a cette meme focntion
+// FIXME : * resultat en microsecondes
+// FIXME : * met a jour la structure appelee (pointeur)
+// FIXME : * utlisation gettimeofday
+//========================================================================================
+
+double CALCUL_DUREE_MICROSEC(struct timeval *t00) {
+  
+  struct timeval t01 ;
+  double  t_diff ;
+  
+  gettimeofday(&t01,NULL) ;
+
+  t_diff = GPIO_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
+
+  t00->tv_sec  = t01.tv_sec ; 
+  t00->tv_usec = t01.tv_usec ;
+
+  return t_diff ;
+}
+//========================================================================================
+// FIXME : CALCUL_DUREE_NANOSEC : 
+// FIXME : * permet de calculer une duree depuis un dernier appel a cette meme focntion
+// FIXME : * resultat en nanosecondes
+// FIXME : * met a jour la structure appelee (pointeur)
+// FIXME : * utlisation FIXME : modifier et mettre a jour
+//========================================================================================
+// TODO : a finir : modifier pour passer en nanosecondes
+
+double CALCUL_DUREE_NANOSEC(struct timeval *t00) {
+  
+  struct timeval t01 ;
+  double  t_diff ;
+  
+  gettimeofday(&t01,NULL) ;
+
+  t_diff = GPIO_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
+
+  t00->tv_sec  = t01.tv_sec ; 
+  t00->tv_usec = t01.tv_usec ;
+
+  return t_diff ;
+}
+//========================================================================================
 // FIXME : CALCUL_TEMPORISATION_VOUTE : 
 // FIXME : * permet de faire une temporisation (1s) dans la boucle infinie de SUIVI_VOUTE
 // FIXME : * utilise un usleep() sur 99% du temps de la temporisation (cf calibration_voute)
