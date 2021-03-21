@@ -1,0 +1,39 @@
+root@astrokit-4:~# ldd ./astroreel.3.0 
+	linux-vdso.so.1 (0x7efa1000)
+	/usr/lib/arm-linux-gnueabihf/libarmmem.so (0x76f7d000)
+	libpthread.so.0 => /lib/arm-linux-gnueabihf/libpthread.so.0 (0x76f3e000)
+	libm.so.6 => /lib/arm-linux-gnueabihf/libm.so.6 (0x76ebf000)
+	librt.so.1 => /lib/arm-linux-gnueabihf/librt.so.1 (0x76ea8000)
+	liblirc_client.so.0 => /usr/lib/arm-linux-gnueabihf/liblirc_client.so.0 (0x76e8f000)
+	libc.so.6 => /lib/arm-linux-gnueabihf/libc.so.6 (0x76d50000)
+	/lib/ld-linux-armhf.so.3 (0x76f93000)
+	libdl.so.2 => /lib/arm-linux-gnueabihf/libdl.so.2 (0x76d3d000)
+
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# ldd /home/root/astroreel.3.0 
+	linux-vdso.so.1 (0x7ec22000)
+	/usr/lib/arm-linux-gnueabihf/libarmmem.so (0x76f05000)
+	libpthread.so.0 => /lib/arm-linux-gnueabihf/libpthread.so.0 (0x76ec6000)
+	libm.so.6 => /lib/arm-linux-gnueabihf/libm.so.6 (0x76e47000)
+	librt.so.1 => /lib/arm-linux-gnueabihf/librt.so.1 (0x76e30000)
+	liblirc_client.so.0 => /usr/lib/arm-linux-gnueabihf/liblirc_client.so.0 (0x76e17000)
+	libc.so.6 => /lib/arm-linux-gnueabihf/libc.so.6 (0x76cd8000)
+	/lib/ld-linux-armhf.so.3 (0x76f1b000)
+	libdl.so.2 => /lib/arm-linux-gnueabihf/libdl.so.2 (0x76cc5000)
+
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# ls -lrt liblirc_client.so.0
+lrwxrwxrwx 1 root root 23 avril  6  2017 liblirc_client.so.0 -> liblirc_client.so.0.5.0
+
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# ls -lrt liblirc_client.so.0
+liblirc_client.so.0      liblirc_client.so.0.5.0  
+
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# ls -lrt liblirc_client.so.0.5.0 
+-rw-r--r-- 1 root root 34304 avril  6  2017 liblirc_client.so.0.5.0
+
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# md5sum liblirc_client.so.0.5.0
+2178af506141250f6c3783d94ec267a2  liblirc_client.so.0.5.0
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# 
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# 
+
+root@astrokit-4:/usr/lib/arm-linux-gnueabihf# md5sum liblirc_client.so.0.5.0
+2178af506141250f6c3783d94ec267a2  liblirc_client.so.0.5.0
+
