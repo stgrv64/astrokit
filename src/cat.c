@@ -1,3 +1,13 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * ajout entree chemins de config.txt
+# -------------------------------------------------------------- 
+*/
+
 #include <cat.h>
 
 //============================================================================
@@ -38,11 +48,11 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
     }
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
-  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;
   
   if ( (fin=fopen(buf,"r")) == NULL) {
     // completer et modifier
-    printf("probleme ouverture %s\n",buf) ;
+    TRACE("probleme ouverture %s\n",buf) ;
     exit(2) ;
   }
   else printf("open %s ok\n", buf) ;
@@ -174,11 +184,11 @@ void CAT_FORMAT_DECIMAL( \
   } 
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
-    printf("probleme ouverture %s\n",buf) ;
+    TRACE("probleme ouverture %s\n",buf) ;
     exit(2) ;
   }
   L=0 ;
@@ -242,11 +252,11 @@ void CAT_FORMAT_DECIMAL_2( \
   } 
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
-    printf("probleme ouverture %s\n",buf) ;
+    TRACE("probleme ouverture %s\n",buf) ;
     exit(2) ;
   }
   L=0 ;

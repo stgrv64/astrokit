@@ -1,6 +1,11 @@
-/*
-   astrokit - config.c
-
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * ajout entree chemins de config.txt
+# -------------------------------------------------------------- 
 */
 
 #include <config.h>
@@ -73,7 +78,7 @@ void CONFIG_INIT_LOG(void) {
     
     if ( (flog=fopen(buf,"a")) == NULL) {
       // completer et modifier
-      printf("probleme ouverture %s\n",buf) ;
+      TRACE("probleme ouverture %s\n",buf) ;
       exit(2) ;
     }
     else printf("open %s ok\n", buf) ;
@@ -216,7 +221,7 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
 	TRACE("buf = %s", buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s ", year, month, day, CONFIG_REP, CONFIG_DATE ) ;
+  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s ", year, month, day, CONFIG_REP_CFG, CONFIG_FIC_DATE ) ;
   TRACE("buf = %s", buf) ;
 
   if ( system( buf ) < 0 ) perror( buf) ;
@@ -254,7 +259,7 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   if ( system( buf ) < 0 ) perror( buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  sprintf(buf, "/bin/echo %s:%s > %s/%s ", hou, min, CONFIG_REP, CONFIG_HHMM ) ;
+  sprintf(buf, "/bin/echo %s:%s > %s/%s ", hou, min, CONFIG_REP_CFG, CONFIG_FIC_HHMM ) ;
   TRACE("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 }
@@ -484,121 +489,145 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 
    //----------------------------------------------------------------------
    // Lecture des variables dans la config lue dans le fichier de config
-   //-----------ASTRE_PAR_DEFAUT-----------------------------------------------------------
-   
-   memset( ASTRE_PAR_DEFAUT, ZERO_CHAR, sizeof( ASTRE_PAR_DEFAUT ) ) ;
-   
-   for(l=0;l<DATAS_NB_LIGNES;l++) {
-   
-   if(!strcmp("ASTRE_PAR_DEFAUT",datas[l][0]))          strcpy( ASTRE_PAR_DEFAUT, datas[l][1]) ;
-   
-   if(!strcmp("TEMPO_RAQ",datas[l][0]))      TEMPO_RAQ=atol(datas[l][1]);
-   if(!strcmp("TEMPO_MENU",datas[l][0]))     TEMPO_MENU=atol(datas[l][1]);
-   if(!strcmp("TEMPO_IR",datas[l][0]))       TEMPO_IR=atol(datas[l][1]);
-   if(!strcmp("TEMPO_CLAVIER",datas[l][0]))  TEMPO_CLAVIER=atol(datas[l][1]);
-   if(!strcmp("TEMPO_CAPTEURS",datas[l][0])) TEMPO_CAPTEURS=atol(datas[l][1]);
-   
-   if(!strcmp("MODE_EQUATORIAL",datas[l][0]))    MODE_EQUATORIAL=atoi(datas[l][1]);
-   if(!strcmp("MENU_PAR_DEFAUT",datas[l][0]))    MENU_PAR_DEFAUT=atoi(datas[l][1]);
-   if(!strcmp("GPIO_LED_ETAT",datas[l][0]))      GPIO_LED_ETAT=atoi(datas[l][1]);
+   //-----------ASTRE_PAR_DEFAUT-------------------------------------------
 
-   if(!strcmp("DONNEES_CONTROLEUR",datas[l][0]))  DONNEES_CONTROLEUR=atoi(datas[l][1]);
-   if(!strcmp("DONNEES_CAPTEURS",datas[l][0]))   DONNEES_CAPTEURS=atoi(datas[l][1]);
-   if(!strcmp("DONNEES_RAQUETTE",datas[l][0]))   DONNEES_RAQUETTE=atoi(datas[l][1]);
-   if(!strcmp("DONNEES_BLUETOOTH",datas[l][0]))  DONNEES_BLUETOOTH=atoi(datas[l][1]);
-   if(!strcmp("DONNEES_INFRAROUGE",datas[l][0])) DONNEES_INFRAROUGE=atoi(datas[l][1]);
-
-   if(!strcmp("ALT_ROT",datas[l][0]))      ALT_ROT=atoi(datas[l][1]);
-   if(!strcmp("AZI_ROT",datas[l][0]))      AZI_ROT=atoi(datas[l][1]);
+  memset( ASTRE_PAR_DEFAUT, ZERO_CHAR, sizeof( ASTRE_PAR_DEFAUT ) ) ;
+  memset( CONFIG_REP_CAT, ZERO_CHAR, sizeof( CONFIG_REP_CAT ) ) ;
+  memset( CONFIG_REP_CFG, ZERO_CHAR, sizeof( CONFIG_REP_CFG ) ) ;
+  memset( CONFIG_REP_LOG, ZERO_CHAR, sizeof( CONFIG_REP_LOG ) ) ;
+  memset( CONFIG_REP_IN, ZERO_CHAR, sizeof( CONFIG_REP_IN ) ) ;
+  memset( CONFIG_FIC_LOG, ZERO_CHAR, sizeof( CONFIG_FIC_LOG ) ) ;
+  memset( CONFIG_FIC_DATE, ZERO_CHAR, sizeof( CONFIG_FIC_DATE ) ) ;
+  memset( CONFIG_FIC_HHMM, ZERO_CHAR, sizeof( CONFIG_FIC_HHMM ) ) ;
    
-   if(!strcmp("ALT_F",datas[l][0]))        ALT_F=atol(datas[l][1]);
-   if(!strcmp("AZI_F",datas[l][0]))        AZI_F=atol(datas[l][1]);
-   
-   if(!strcmp("ALT_N",datas[l][0]))        ALT_N=atoi(datas[l][1]);
-   if(!strcmp("AZI_N",datas[l][0]))        AZI_N=atoi(datas[l][1]);
-   
-   if(!strcmp("ALT_R",datas[l][0]))        ALT_R=atof(datas[l][1]);
-   if(!strcmp("AZI_R",datas[l][0]))        AZI_R=atof(datas[l][1]);
-   
-   if(!strcmp("GPIO_RAQ_O",datas[l][0]))   GPIO_RAQ_O=atoi(datas[l][1]);
-   if(!strcmp("GPIO_RAQ_E",datas[l][0]))   GPIO_RAQ_E=atoi(datas[l][1]);
-   if(!strcmp("GPIO_RAQ_S",datas[l][0]))   GPIO_RAQ_S=atoi(datas[l][1]);
-   if(!strcmp("GPIO_RAQ_N",datas[l][0]))   GPIO_RAQ_N=atoi(datas[l][1]);
-   if(!strcmp("GPIO_RAQ_V",datas[l][0]))   GPIO_RAQ_V=atoi(datas[l][1]);
-   
-   if(!strcmp("GPIO_KEY_L1",datas[l][0]))   GPIO_KEY_L1=atoi(datas[l][1]);
-   if(!strcmp("GPIO_KEY_L2",datas[l][0]))   GPIO_KEY_L2=atoi(datas[l][1]);
-   if(!strcmp("GPIO_KEY_L3",datas[l][0]))   GPIO_KEY_L3=atoi(datas[l][1]);
-   if(!strcmp("GPIO_KEY_L4",datas[l][0]))   GPIO_KEY_L4=atoi(datas[l][1]);
-   
-   if(!strcmp("GPIO_KEY_C1",datas[l][0]))   GPIO_KEY_C1=atoi(datas[l][1]);
-   if(!strcmp("GPIO_KEY_C2",datas[l][0]))   GPIO_KEY_C2=atoi(datas[l][1]);
-   if(!strcmp("GPIO_KEY_C3",datas[l][0]))   GPIO_KEY_C3=atoi(datas[l][1]);
-   if(!strcmp("GPIO_KEY_C4",datas[l][0]))   GPIO_KEY_C4=atoi(datas[l][1]);
+  for(l=0;l<DATAS_NB_LIGNES;l++) {
+     
+     if(!strcmp("ASTRE_PAR_DEFAUT",datas[l][0])) strcpy( ASTRE_PAR_DEFAUT, datas[l][1]) ;
+     
+     if(!strcmp("TEMPO_RAQ",datas[l][0]))      TEMPO_RAQ=atol(datas[l][1]);
+     if(!strcmp("TEMPO_MENU",datas[l][0]))     TEMPO_MENU=atol(datas[l][1]);
+     if(!strcmp("TEMPO_IR",datas[l][0]))       TEMPO_IR=atol(datas[l][1]);
+     if(!strcmp("TEMPO_CLAVIER",datas[l][0]))  TEMPO_CLAVIER=atol(datas[l][1]);
+     if(!strcmp("TEMPO_CAPTEURS",datas[l][0])) TEMPO_CAPTEURS=atol(datas[l][1]);
+     
+     if(!strcmp("MODE_EQUATORIAL",datas[l][0]))    MODE_EQUATORIAL=atoi(datas[l][1]);
+     if(!strcmp("MENU_PAR_DEFAUT",datas[l][0]))    MENU_PAR_DEFAUT=atoi(datas[l][1]);
+     if(!strcmp("GPIO_LED_ETAT",datas[l][0]))      GPIO_LED_ETAT=atoi(datas[l][1]);
 
-   if(!strcmp("LONGITUDE",datas[l][0]))     LONGITUDE=atof(datas[l][1]);
-   if(!strcmp("LATITUDE",datas[l][0]))      LATITUDE=atof(datas[l][1]);
-   if(!strcmp("ALTITUDE",datas[l][0]))      ALTITUDE=atof(datas[l][1]);
+     if(!strcmp("DONNEES_CONTROLEUR",datas[l][0]))  DONNEES_CONTROLEUR=atoi(datas[l][1]);
+     if(!strcmp("DONNEES_CAPTEURS",datas[l][0]))   DONNEES_CAPTEURS=atoi(datas[l][1]);
+     if(!strcmp("DONNEES_RAQUETTE",datas[l][0]))   DONNEES_RAQUETTE=atoi(datas[l][1]);
+     if(!strcmp("DONNEES_BLUETOOTH",datas[l][0]))  DONNEES_BLUETOOTH=atoi(datas[l][1]);
+     if(!strcmp("DONNEES_INFRAROUGE",datas[l][0])) DONNEES_INFRAROUGE=atoi(datas[l][1]);
 
-   // donnees de altitude
+     if(!strcmp("ALT_ROT",datas[l][0]))      ALT_ROT=atoi(datas[l][1]);
+     if(!strcmp("AZI_ROT",datas[l][0]))      AZI_ROT=atoi(datas[l][1]);
+     
+     if(!strcmp("ALT_F",datas[l][0]))        ALT_F=atol(datas[l][1]);
+     if(!strcmp("AZI_F",datas[l][0]))        AZI_F=atol(datas[l][1]);
+     
+     if(!strcmp("ALT_N",datas[l][0]))        ALT_N=atoi(datas[l][1]);
+     if(!strcmp("AZI_N",datas[l][0]))        AZI_N=atoi(datas[l][1]);
+     
+     if(!strcmp("ALT_R",datas[l][0]))        ALT_R=atof(datas[l][1]);
+     if(!strcmp("AZI_R",datas[l][0]))        AZI_R=atof(datas[l][1]);
+     
+     if(!strcmp("GPIO_RAQ_O",datas[l][0]))   GPIO_RAQ_O=atoi(datas[l][1]);
+     if(!strcmp("GPIO_RAQ_E",datas[l][0]))   GPIO_RAQ_E=atoi(datas[l][1]);
+     if(!strcmp("GPIO_RAQ_S",datas[l][0]))   GPIO_RAQ_S=atoi(datas[l][1]);
+     if(!strcmp("GPIO_RAQ_N",datas[l][0]))   GPIO_RAQ_N=atoi(datas[l][1]);
+     if(!strcmp("GPIO_RAQ_V",datas[l][0]))   GPIO_RAQ_V=atoi(datas[l][1]);
+     
+     if(!strcmp("GPIO_KEY_L1",datas[l][0]))   GPIO_KEY_L1=atoi(datas[l][1]);
+     if(!strcmp("GPIO_KEY_L2",datas[l][0]))   GPIO_KEY_L2=atoi(datas[l][1]);
+     if(!strcmp("GPIO_KEY_L3",datas[l][0]))   GPIO_KEY_L3=atoi(datas[l][1]);
+     if(!strcmp("GPIO_KEY_L4",datas[l][0]))   GPIO_KEY_L4=atoi(datas[l][1]);
+     
+     if(!strcmp("GPIO_KEY_C1",datas[l][0]))   GPIO_KEY_C1=atoi(datas[l][1]);
+     if(!strcmp("GPIO_KEY_C2",datas[l][0]))   GPIO_KEY_C2=atoi(datas[l][1]);
+     if(!strcmp("GPIO_KEY_C3",datas[l][0]))   GPIO_KEY_C3=atoi(datas[l][1]);
+     if(!strcmp("GPIO_KEY_C4",datas[l][0]))   GPIO_KEY_C4=atoi(datas[l][1]);
 
-   if(!strcmp("ALT_R1",datas[l][0]))       ALT_R1 = atof(datas[l][1]);         
-   if(!strcmp("ALT_R2",datas[l][0]))       ALT_R2 = atof(datas[l][1]);
-   if(!strcmp("ALT_R3",datas[l][0]))       ALT_R3 = atof(datas[l][1]);         
-   if(!strcmp("ALT_R4",datas[l][0]))       ALT_R4 = atof(datas[l][1]);         
-   if(!strcmp("ALT_ACC",datas[l][0]))      ALT_ACC= atof(datas[l][1])      ;
+     if(!strcmp("LONGITUDE",datas[l][0]))     LONGITUDE=atof(datas[l][1]);
+     if(!strcmp("LATITUDE",datas[l][0]))      LATITUDE=atof(datas[l][1]);
+     if(!strcmp("ALTITUDE",datas[l][0]))      ALTITUDE=atof(datas[l][1]);
 
-   if(!strcmp("GPIO_DIR_ALT",datas[l][0])) GPIO_DIR_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_CLK_ALT",datas[l][0])) GPIO_CLK_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_SLP_ALT",datas[l][0])) GPIO_SLP_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_RST_ALT",datas[l][0])) GPIO_RST_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_MMM_ALT",datas[l][0])) GPIO_MMM_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_ENA_ALT",datas[l][0])) GPIO_ENA_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_M2_ALT",datas[l][0]))  GPIO_M2_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_M1_ALT",datas[l][0]))  GPIO_M1_ALT=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_M0_ALT",datas[l][0]))  GPIO_M0_ALT=atoi(datas[l][1]);  
+     // donnees de altitude
 
-   if(!strcmp("MCP_DIR_ALT",datas[l][0]))  MCP_DIR_ALT=atoi(datas[l][1])  ;  
-   if(!strcmp("MCP_CLK_ALT",datas[l][0]))  MCP_CLK_ALT=atoi(datas[l][1])  ;  
-   if(!strcmp("MCP_SLP_ALT",datas[l][0]))  MCP_SLP_ALT=atoi(datas[l][1])  ;  
-   if(!strcmp("MCP_RST_ALT",datas[l][0]))  MCP_RST_ALT=atoi(datas[l][1])  ;  
-   if(!strcmp("MCP_M2_ALT",datas[l][0]))   MCP_M2_ALT=atoi(datas[l][1])   ;  
-   if(!strcmp("MCP_M1_ALT",datas[l][0]))   MCP_M1_ALT=atoi(datas[l][1])   ;  
-   if(!strcmp("MCP_M0_ALT",datas[l][0]))   MCP_M0_ALT=atoi(datas[l][1])   ;  
-   
-   // donnees de azimut
+     if(!strcmp("ALT_R1",datas[l][0]))       ALT_R1 = atof(datas[l][1]);         
+     if(!strcmp("ALT_R2",datas[l][0]))       ALT_R2 = atof(datas[l][1]);
+     if(!strcmp("ALT_R3",datas[l][0]))       ALT_R3 = atof(datas[l][1]);         
+     if(!strcmp("ALT_R4",datas[l][0]))       ALT_R4 = atof(datas[l][1]);         
+     if(!strcmp("ALT_ACC",datas[l][0]))      ALT_ACC= atof(datas[l][1])      ;
 
-   if(!strcmp("AZI_R1",datas[l][0]))       AZI_R1 = atof(datas[l][1])      ; 
-   if(!strcmp("AZI_R2",datas[l][0]))       AZI_R2 = atof(datas[l][1])      ; 
-   if(!strcmp("AZI_R3",datas[l][0]))       AZI_R3 = atof(datas[l][1])      ; 
-   if(!strcmp("AZI_R4",datas[l][0]))       AZI_R4 = atof(datas[l][1])      ; 
-   if(!strcmp("AZI_ACC",datas[l][0]))      AZI_ACC= atof(datas[l][1])      ;
+     if(!strcmp("GPIO_DIR_ALT",datas[l][0])) GPIO_DIR_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_CLK_ALT",datas[l][0])) GPIO_CLK_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_SLP_ALT",datas[l][0])) GPIO_SLP_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_RST_ALT",datas[l][0])) GPIO_RST_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_MMM_ALT",datas[l][0])) GPIO_MMM_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_ENA_ALT",datas[l][0])) GPIO_ENA_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_M2_ALT",datas[l][0]))  GPIO_M2_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_M1_ALT",datas[l][0]))  GPIO_M1_ALT=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_M0_ALT",datas[l][0]))  GPIO_M0_ALT=atoi(datas[l][1]);  
 
-   if(!strcmp("GPIO_DIR_AZI",datas[l][0])) GPIO_DIR_AZI=atoi(datas[l][1]) ; 
-   if(!strcmp("GPIO_CLK_AZI",datas[l][0])) GPIO_CLK_AZI=atoi(datas[l][1]) ; 
-   if(!strcmp("GPIO_SLP_AZI",datas[l][0])) GPIO_SLP_AZI=atoi(datas[l][1]) ;
-   if(!strcmp("GPIO_RST_AZI",datas[l][0])) GPIO_RST_AZI=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_MMM_AZI",datas[l][0])) GPIO_MMM_AZI=atoi(datas[l][1]);  
-   if(!strcmp("GPIO_ENA_AZI",datas[l][0])) GPIO_ENA_AZI=atoi(datas[l][1]);
-   if(!strcmp("GPIO_M2_AZI",datas[l][0]))  GPIO_M2_AZI=atoi(datas[l][1])  ;
-   if(!strcmp("GPIO_M1_AZI",datas[l][0]))  GPIO_M1_AZI=atoi(datas[l][1])  ; 
-   if(!strcmp("GPIO_M0_AZI",datas[l][0]))  GPIO_M0_AZI=atoi(datas[l][1])  ; 
+     if(!strcmp("MCP_DIR_ALT",datas[l][0]))  MCP_DIR_ALT=atoi(datas[l][1])  ;  
+     if(!strcmp("MCP_CLK_ALT",datas[l][0]))  MCP_CLK_ALT=atoi(datas[l][1])  ;  
+     if(!strcmp("MCP_SLP_ALT",datas[l][0]))  MCP_SLP_ALT=atoi(datas[l][1])  ;  
+     if(!strcmp("MCP_RST_ALT",datas[l][0]))  MCP_RST_ALT=atoi(datas[l][1])  ;  
+     if(!strcmp("MCP_M2_ALT",datas[l][0]))   MCP_M2_ALT=atoi(datas[l][1])   ;  
+     if(!strcmp("MCP_M1_ALT",datas[l][0]))   MCP_M1_ALT=atoi(datas[l][1])   ;  
+     if(!strcmp("MCP_M0_ALT",datas[l][0]))   MCP_M0_ALT=atoi(datas[l][1])   ;  
+     
+     // donnees de azimut
 
-   if(!strcmp("MCP_DIR_AZI",datas[l][0]))  MCP_DIR_AZI=atoi(datas[l][1])   ;
-   if(!strcmp("MCP_CLK_AZI",datas[l][0]))  MCP_CLK_AZI=atoi(datas[l][1])   ;
-   if(!strcmp("MCP_SLP_AZI",datas[l][0]))  MCP_SLP_AZI=atoi(datas[l][1])   ;
-   if(!strcmp("MCP_RST_AZI",datas[l][0]))  MCP_RST_AZI=atoi(datas[l][1])   ; 
-   if(!strcmp("MCP_M2_AZI",datas[l][0]))   MCP_M2_AZI=atoi(datas[l][1])    ;
-   if(!strcmp("MCP_M1_AZI",datas[l][0]))   MCP_M1_AZI=atoi(datas[l][1])    ;
-   if(!strcmp("MCP_M0_AZI",datas[l][0]))   MCP_M0_AZI=atoi(datas[l][1])   ;
+     if(!strcmp("AZI_R1",datas[l][0]))       AZI_R1 = atof(datas[l][1])      ; 
+     if(!strcmp("AZI_R2",datas[l][0]))       AZI_R2 = atof(datas[l][1])      ; 
+     if(!strcmp("AZI_R3",datas[l][0]))       AZI_R3 = atof(datas[l][1])      ; 
+     if(!strcmp("AZI_R4",datas[l][0]))       AZI_R4 = atof(datas[l][1])      ; 
+     if(!strcmp("AZI_ACC",datas[l][0]))      AZI_ACC= atof(datas[l][1])      ;
 
-   // donnees de azimut et altitude (qui concernent les 2 en mm temps)
-   
-   if(!strcmp("ALTAZ_FORWARD",datas[l][0])) ALTAZ_FORWARD= atof(datas[l][1])      ;
-   if(!strcmp("ALTAZ_REWIND",datas[l][0]))  ALTAZ_REWIND= atof(datas[l][1])      ;
+     if(!strcmp("GPIO_DIR_AZI",datas[l][0])) GPIO_DIR_AZI=atoi(datas[l][1]) ; 
+     if(!strcmp("GPIO_CLK_AZI",datas[l][0])) GPIO_CLK_AZI=atoi(datas[l][1]) ; 
+     if(!strcmp("GPIO_SLP_AZI",datas[l][0])) GPIO_SLP_AZI=atoi(datas[l][1]) ;
+     if(!strcmp("GPIO_RST_AZI",datas[l][0])) GPIO_RST_AZI=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_MMM_AZI",datas[l][0])) GPIO_MMM_AZI=atoi(datas[l][1]);  
+     if(!strcmp("GPIO_ENA_AZI",datas[l][0])) GPIO_ENA_AZI=atoi(datas[l][1]);
+     if(!strcmp("GPIO_M2_AZI",datas[l][0]))  GPIO_M2_AZI=atoi(datas[l][1])  ;
+     if(!strcmp("GPIO_M1_AZI",datas[l][0]))  GPIO_M1_AZI=atoi(datas[l][1])  ; 
+     if(!strcmp("GPIO_M0_AZI",datas[l][0]))  GPIO_M0_AZI=atoi(datas[l][1])  ; 
 
-   if(!strcmp("ALTAZ_FORWARD_FAST",datas[l][0])) ALTAZ_FORWARD_FAST= atof(datas[l][1])      ;
-   if(!strcmp("ALTAZ_REWIND_FAST",datas[l][0]))  ALTAZ_REWIND_FAST= atof(datas[l][1])      ;
+     if(!strcmp("MCP_DIR_AZI",datas[l][0]))  MCP_DIR_AZI=atoi(datas[l][1])   ;
+     if(!strcmp("MCP_CLK_AZI",datas[l][0]))  MCP_CLK_AZI=atoi(datas[l][1])   ;
+     if(!strcmp("MCP_SLP_AZI",datas[l][0]))  MCP_SLP_AZI=atoi(datas[l][1])   ;
+     if(!strcmp("MCP_RST_AZI",datas[l][0]))  MCP_RST_AZI=atoi(datas[l][1])   ; 
+     if(!strcmp("MCP_M2_AZI",datas[l][0]))   MCP_M2_AZI=atoi(datas[l][1])    ;
+     if(!strcmp("MCP_M1_AZI",datas[l][0]))   MCP_M1_AZI=atoi(datas[l][1])    ;
+     if(!strcmp("MCP_M0_AZI",datas[l][0]))   MCP_M0_AZI=atoi(datas[l][1])   ;
+
+     // donnees de azimut et altitude (qui concernent les 2 en mm temps)
+     
+     if(!strcmp("ALTAZ_FORWARD",datas[l][0])) ALTAZ_FORWARD= atof(datas[l][1])      ;
+     if(!strcmp("ALTAZ_REWIND",datas[l][0]))  ALTAZ_REWIND= atof(datas[l][1])      ;
+
+     if(!strcmp("ALTAZ_FORWARD_FAST",datas[l][0])) ALTAZ_FORWARD_FAST= atof(datas[l][1])      ;
+     if(!strcmp("ALTAZ_REWIND_FAST",datas[l][0]))  ALTAZ_REWIND_FAST= atof(datas[l][1])      ;
+
+     // chemins des repertoires et fichiers (2021)
+
+    if(!strcmp("CONFIG_REP_CAT",datas[l][0])) strcpy( CONFIG_REP_CAT, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_CFG",datas[l][0])) strcpy( CONFIG_REP_CFG, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_LOG",datas[l][0])) strcpy( CONFIG_REP_LOG, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_IN",datas[l][0])) strcpy( CONFIG_REP_IN, datas[l][1]) ;
+    if(!strcmp("CONFIG_FIC_LOG",datas[l][0])) strcpy( CONFIG_FIC_LOG, datas[l][1]) ;
+    if(!strcmp("CONFIG_FIC_DATE",datas[l][0])) strcpy( CONFIG_FIC_DATE, datas[l][1]) ;
+    if(!strcmp("CONFIG_FIC_HHMM",datas[l][0])) strcpy( CONFIG_FIC_HHMM, datas[l][1]) ;  
+
+    TRACE("CONFIG_REP_CAT = %s", CONFIG_REP_CAT) ;
+    TRACE("CONFIG_REP_CFG = %s", CONFIG_REP_CFG) ;
+    TRACE("CONFIG_REP_LOG = %s", CONFIG_REP_LOG) ;
+    TRACE("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG) ;
+    TRACE("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE) ;
+    TRACE("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM) ;
   }
   //if ( ALT_R == 0 ) ALT_R = ALT_R1 * ALT_R2 * ALT_R3 * ALT_R4 ;
   //if ( AZI_R == 0 ) AZI_R = AZI_R1 * AZI_R2 * AZI_R3 * AZI_R4 ;
@@ -609,89 +638,81 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 //============================================================================
 void   CONFIG_AFFICHER_VARIABLES(void) {
    
-   TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
-   TRACE("LONGITUDE = %f",          LONGITUDE );
-   TRACE("LATITUDE  = %f",          LATITUDE );
-   TRACE("ALTITUDE  = %f",          ALTITUDE );
-   TRACE("=====================================================\n");
-   TRACE("ALT_ROT = %d", ALT_ROT);
-   TRACE("AZI_ROT = %d", AZI_ROT);
-   TRACE("=====================================================\n");
-
-   TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
-   TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
-   TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
-
    TRACE("DONNEES_CONTROLEUR = %d",  DONNEES_CONTROLEUR);
    TRACE("DONNEES_CAPTEURS = %d",  DONNEES_CAPTEURS);
    TRACE("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
    TRACE("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
    TRACE("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
 
-   TRACE("GPIO_RAQ_O  = %d",  GPIO_RAQ_O);
-   TRACE("GPIO_RAQ_E  = %d",  GPIO_RAQ_E);
-   TRACE("GPIO_RAQ_S  = %d",  GPIO_RAQ_S);
-   TRACE("GPIO_RAQ_N  = %d",  GPIO_RAQ_N);
-   TRACE("GPIO_RAQ_V  = %d",  GPIO_RAQ_V);
-   
-   TRACE("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
-   TRACE("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
-   TRACE("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
-   TRACE("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
-   
-   TRACE("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
-   TRACE("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
-   TRACE("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
-   TRACE("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
-   
-   TRACE("=====================================================\n");
+   TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
+   TRACE("LONGITUDE = %f",          LONGITUDE );
+   TRACE("LATITUDE  = %f",          LATITUDE );
+   TRACE("ALTITUDE  = %f",          ALTITUDE );
+   TRACE("ALT_ROT = %d", ALT_ROT);
+   TRACE("AZI_ROT = %d", AZI_ROT);
+   TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
+   TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
+   TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
    TRACE("ALT_R1 = %f",       ALT_R1);         
    TRACE("ALT_R2 = %f",       ALT_R2);
    TRACE("ALT_R3 = %f",       ALT_R3);         
    TRACE("ALT_R4 = %f",       ALT_R4);         
    TRACE("ALT_ROT = %d",      ALT_ROT);
    TRACE("ALT_ACC = %f",      ALT_ACC);
-   TRACE("=====================================================\n");
-   TRACE("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
-   TRACE("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
-   TRACE("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
-   TRACE("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
-   TRACE("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
-   TRACE("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
-   TRACE("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
-   TRACE("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
-   TRACE("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
-   TRACE("=====================================================\n");
    TRACE("AZI_R1 = %f",       AZI_R1)      ; 
    TRACE("AZI_R2 = %f",       AZI_R2)      ; 
    TRACE("AZI_R3 = %f",       AZI_R3)      ; 
    TRACE("AZI_R4 = %f",       AZI_R4)      ; 
    TRACE("AZI_ROT = %d",      AZI_ROT)     ;
    TRACE("AZI_ACC = %f",      AZI_ACC)     ; 
-   TRACE("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
-   TRACE("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
-   TRACE("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
-   TRACE("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
-   TRACE("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
-   TRACE("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
-   TRACE("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
-   TRACE("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
-   TRACE("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
-   TRACE("=====================================================\n");
-   TRACE("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
-   TRACE("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
-   TRACE("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
-   TRACE("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
-   TRACE("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
-   TRACE("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
-   TRACE("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
-   TRACE("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
-   TRACE("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
-   TRACE("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
-   TRACE("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
-   TRACE("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
-   TRACE("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
-   TRACE("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+
+   TRACE1("anciennes variables\n");
+   TRACE1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
+   TRACE1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
+   TRACE1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
+   TRACE1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
+   TRACE1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
+   TRACE1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
+   TRACE1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
+   TRACE1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
+   TRACE1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
+   TRACE1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
+   TRACE1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
+   TRACE1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
+   TRACE1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
+   TRACE1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
+   TRACE1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
+   TRACE1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
+   TRACE1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
+   TRACE1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
+   TRACE1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
+   TRACE1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
+   TRACE1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
+   TRACE1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
+   TRACE1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
+   TRACE1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
+   TRACE1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
+   TRACE1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
+   TRACE1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
+   TRACE1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
+   TRACE1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
+   TRACE1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
+   TRACE1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
+   TRACE1("=====================================================\n");
+   TRACE1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
+   TRACE1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
+   TRACE1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
+   TRACE1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
+   TRACE1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
+   TRACE1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
+   TRACE1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
+   TRACE1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
+   TRACE1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
+   TRACE1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
+   TRACE1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
+   TRACE1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
+   TRACE1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
+   TRACE1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
 }
 //============================================================================
 void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
@@ -705,7 +726,7 @@ void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BU
   //incrlog =10 ;
   
   memset(buf,ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s",CONFIG_REP,CONFIG_FIC) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_CFG,CONFIG_FIC_CFG) ;
   
   for(L=0;L<DATAS_NB_LIGNES;L++)
    for(C=0;C<DATAS_NB_COLONNES;C++)

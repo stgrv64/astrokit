@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * suite a ajout variables CONFIG_REP et CONFIG_FIC
+#                 il faut d'abord le fichier config.txt en priorite
+# -------------------------------------------------------------- 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -1044,11 +1055,12 @@ int main(int argc, char ** argv) {
   // LECTURE DES FICHIERS DE CONFIG
   // -----------------------------------------------------------------
   
-  CONFIG_INIT_LOG(); 
-    
+  
   CONFIG_READ       ( datas ) ;
   CONFIG_INIT_VAR   ( datas ) ;   
-  
+  // deplacement de cette fonction qui etait plus Haut, (2021) :
+  CONFIG_INIT_LOG(); 
+
   //GPIO_INIT_VAR2     ( datas) ;    // impacte les tableaux gpio_in[] et gpio_out[]
 
   if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
@@ -1056,7 +1068,7 @@ int main(int argc, char ** argv) {
   // -----------------------------------------------------------------
   
   // CONFIG_AFFICHER_DATAS( datas ) ;
-  // CONFIG_AFFICHER_VARIABLES() ;
+  CONFIG_AFFICHER_VARIABLES() ;
 
   TRACE("GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
   TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
