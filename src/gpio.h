@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 01/05/2021  | ajout entete
+# 01/05/2021  | mise en commentaire #define GPIO_FREQUENCE_PWM 
+#   suite a ajout de la variable du meme nom dans types.h
+# -------------------------------------------------------------- 
+*/
+
 #ifndef GPIO_H
 #define GPIO_H
 
@@ -51,7 +62,8 @@
 #define GPIO_SUIVI_MAIN_SCHED        SCHED_FIFO
 
 #define GPIO_MICROPAS_MAX           500
-#define GPIO_FREQUENCE_PWM          750 
+// FIXME : mise en commentaire de la ligne suivante (2021)
+// #define GPIO_FREQUENCE_PWM          750 
 #define GPIO_NB_PHASES_PAR_MOTEUR   4
 #define GPIO_FREQ_MAX               1000.0
 #define GPIO_VARG_STRING            115

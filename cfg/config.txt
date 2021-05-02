@@ -13,6 +13,17 @@
 MENU_PAR_DEFAUT  0 
 ASTRE_PAR_DEFAUT PLA0
 
+# ----------------------- parametres repertoires et fichiers
+
+CONFIG_REP_CAT       cat
+CONFIG_REP_CFG       cfg
+CONFIG_REP_LOG       log
+CONFIG_REP_IN        inp
+CONFIG_REP_OUT       out
+CONFIG_FIC_LOG       astrokit.log
+CONFIG_FIC_DATE      date.txt
+CONFIG_FIC_HHMM      hhmm.txt
+
 # ----------------------- parametres temporisation
 
 TEMPO_MENU      50000
@@ -36,15 +47,14 @@ LONGITUDE -0.39
 ALTITUDE   200
 
 # ----------------------- parametres gpios
-
-GPIO_LED_ETAT   4 
 # la led est parametree grace a :
 # insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
 # GPIO_LED_IR     27  
+# inutiles (2021) :
+# GPIO_INPUT      7,8 
+# GPIO_OUTPUT     14,15 
 
-GPIO_INPUT      7,8 
-GPIO_OUTPUT     14,15 
-GPIO_RESER      2,3 # reserve I2C
+GPIO_LED_ETAT   4 
 GPIO_ALT        21,26,19,13
 GPIO_AZI        6,5,7,11
 GPIO_MASQUE     3,1,0,2
@@ -77,16 +87,6 @@ ALTAZ_FORWARD        1.01   # acceleration globale        (azi + alt)
 ALTAZ_REWIND         1.01   # acceleration globale        (azi + alt)
 ALTAZ_FORWARD_FAST   1.5    # acceleration globale rapide (azi + alt)
 ALTAZ_REWIND_FAST    1.5    # acceleration globale rapide (azi + alt)
-
-# ----------------------- parametres repertoires et fichiers
-
-CONFIG_REP_CAT       /home/root/cat
-CONFIG_REP_CFG       /home/root/cfg
-CONFIG_REP_LOG       /home/root/log
-CONFIG_REP_IN        /home/root/in
-CONFIG_FIC_LOG       astrokit.log
-CONFIG_FIC_DATE      date.txt
-CONFIG_FIC_HHMM      hhmm.txt
 
 #===============================================================
 # anciens parametres qui ne servent plus (notamment avec 

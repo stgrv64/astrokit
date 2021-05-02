@@ -4,7 +4,16 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 03/04/2021  | * ajout entete
-#               * ajout entree chemins de config.txt
+#  * ajout entree chemins de config.txt
+# --------------------------------------------------------------
+# 01/05/2021  | 
+#       * modification chemin config.txt :
+#       * le chemin est directement le repertoire courant
+#         lue grace a getcwd, les autres chemins dependent
+#         de ce chemin getcwd
+#         ajoutee des valeurs lues dans config.txt
+#       * mise a jour de la fonction CONFIG_AFFICHER_VARIABLES 
+#         avec nouvelles variables
 # -------------------------------------------------------------- 
 */
 
@@ -29,7 +38,8 @@ void CONFIG_SYSTEM_LOG(int *incrlog) {
   (*incrlog)++ ;
   char cmd[255] ;
   if ( CONFIG_ASTROLOG ) {
-    sprintf(cmd,"echo %d >> %s/%s",*incrlog, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
+    // FIXME 01 mai 2021 : modification chemin relatif
+    sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     ret = system(cmd) ;
     if ( ret < 0 ) TRACE("Probleme avec %s : retourner avec error negative",cmd) ;
     //if ( ret == 0 ) TRACE("Probleme avec %s : shell non disponible",cmd) ;
@@ -61,7 +71,7 @@ void CONFIG_LOG(char *txt) {
         exit(EXIT_FAILURE);
     }
     sprintf( c_out, "%s : %s", s_date, txt ) ;
-    sprintf( cmd,"echo %s >> %s/%s",c_out, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
+    sprintf( cmd,"echo %s >> %s/%s/%s",c_out, CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     ret =  system(cmd) ;
     if ( ret < 0 ) TRACE("Probleme avec %s : retourner avec error negative",cmd) ;
     //if ( ret == 0 ) TRACE("Probleme avec %s : shell non disponible",cmd) ;
@@ -74,7 +84,7 @@ void CONFIG_INIT_LOG(void) {
   
   if ( CONFIG_ASTROLOG ) {
     memset(buf, ZERO_CHAR, sizeof(buf));
-    sprintf(buf,"%s/%s", CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
+    sprintf(buf,"%s/%s/%s", CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     
     if ( (flog=fopen(buf,"a")) == NULL) {
       // completer et modifier
@@ -221,7 +231,7 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
 	TRACE("buf = %s", buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s ", year, month, day, CONFIG_REP_CFG, CONFIG_FIC_DATE ) ;
+  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", year, month, day, CONFIG_REP_HOME, CONFIG_REP_CFG, CONFIG_FIC_DATE ) ;
   TRACE("buf = %s", buf) ;
 
   if ( system( buf ) < 0 ) perror( buf) ;
@@ -259,7 +269,7 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   if ( system( buf ) < 0 ) perror( buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  sprintf(buf, "/bin/echo %s:%s > %s/%s ", hou, min, CONFIG_REP_CFG, CONFIG_FIC_HHMM ) ;
+  sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", hou, min, CONFIG_REP_HOME, CONFIG_REP_CFG, CONFIG_FIC_HHMM ) ;
   TRACE("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 }
@@ -502,6 +512,8 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
    
   for(l=0;l<DATAS_NB_LIGNES;l++) {
      
+      // FIXME : note 2021 : les variables GPIO_xxx sont gérées dans le ficheir gpio.c
+
      if(!strcmp("ASTRE_PAR_DEFAUT",datas[l][0])) strcpy( ASTRE_PAR_DEFAUT, datas[l][1]) ;
      
      if(!strcmp("TEMPO_RAQ",datas[l][0]))      TEMPO_RAQ=atol(datas[l][1]);
@@ -512,6 +524,7 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
      
      if(!strcmp("MODE_EQUATORIAL",datas[l][0]))    MODE_EQUATORIAL=atoi(datas[l][1]);
      if(!strcmp("MENU_PAR_DEFAUT",datas[l][0]))    MENU_PAR_DEFAUT=atoi(datas[l][1]);
+
      if(!strcmp("GPIO_LED_ETAT",datas[l][0]))      GPIO_LED_ETAT=atoi(datas[l][1]);
 
      if(!strcmp("DONNEES_CONTROLEUR",datas[l][0]))  DONNEES_CONTROLEUR=atoi(datas[l][1]);
@@ -622,13 +635,8 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
     if(!strcmp("CONFIG_FIC_DATE",datas[l][0])) strcpy( CONFIG_FIC_DATE, datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_HHMM",datas[l][0])) strcpy( CONFIG_FIC_HHMM, datas[l][1]) ;  
 
-    TRACE("CONFIG_REP_CAT = %s", CONFIG_REP_CAT) ;
-    TRACE("CONFIG_REP_CFG = %s", CONFIG_REP_CFG) ;
-    TRACE("CONFIG_REP_LOG = %s", CONFIG_REP_LOG) ;
-    TRACE("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG) ;
-    TRACE("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE) ;
-    TRACE("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM) ;
   }
+
   //if ( ALT_R == 0 ) ALT_R = ALT_R1 * ALT_R2 * ALT_R3 * ALT_R4 ;
   //if ( AZI_R == 0 ) AZI_R = AZI_R1 * AZI_R2 * AZI_R3 * AZI_R4 ;
   
@@ -637,113 +645,161 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 }
 //============================================================================
 void   CONFIG_AFFICHER_VARIABLES(void) {
-   
-   TRACE("DONNEES_CONTROLEUR = %d",  DONNEES_CONTROLEUR);
-   TRACE("DONNEES_CAPTEURS = %d",  DONNEES_CAPTEURS);
-   TRACE("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
-   TRACE("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
-   TRACE("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
 
-   TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
-   TRACE("LONGITUDE = %f",          LONGITUDE );
-   TRACE("LATITUDE  = %f",          LATITUDE );
-   TRACE("ALTITUDE  = %f",          ALTITUDE );
-   TRACE("ALT_ROT = %d", ALT_ROT);
-   TRACE("AZI_ROT = %d", AZI_ROT);
-   TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
-   TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
-   TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
-   TRACE("ALT_R1 = %f",       ALT_R1);         
-   TRACE("ALT_R2 = %f",       ALT_R2);
-   TRACE("ALT_R3 = %f",       ALT_R3);         
-   TRACE("ALT_R4 = %f",       ALT_R4);         
-   TRACE("ALT_ROT = %d",      ALT_ROT);
-   TRACE("ALT_ACC = %f",      ALT_ACC);
-   TRACE("AZI_R1 = %f",       AZI_R1)      ; 
-   TRACE("AZI_R2 = %f",       AZI_R2)      ; 
-   TRACE("AZI_R3 = %f",       AZI_R3)      ; 
-   TRACE("AZI_R4 = %f",       AZI_R4)      ; 
-   TRACE("AZI_ROT = %d",      AZI_ROT)     ;
-   TRACE("AZI_ACC = %f",      AZI_ACC)     ; 
+  TRACE("TEMPO_RAQ = %ld",  TEMPO_RAQ);
+  TRACE("TEMPO_MENU = %ld",  TEMPO_MENU);
+  TRACE("TEMPO_IR = %ld",  TEMPO_IR);
+  TRACE("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
+  TRACE("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
 
-   TRACE1("anciennes variables\n");
-   TRACE1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
-   TRACE1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
-   TRACE1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
-   TRACE1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
-   TRACE1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
-   TRACE1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
-   TRACE1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
-   TRACE1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
-   TRACE1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
-   TRACE1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
-   TRACE1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
-   TRACE1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
-   TRACE1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
-   TRACE1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
-   TRACE1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
-   TRACE1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
-   TRACE1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
-   TRACE1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
-   TRACE1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
-   TRACE1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
-   TRACE1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
-   TRACE1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
-   TRACE1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
-   TRACE1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
-   TRACE1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
-   TRACE1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
-   TRACE1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
-   TRACE1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
-   TRACE1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
-   TRACE1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
-   TRACE1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
-   TRACE1("=====================================================\n");
-   TRACE1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
-   TRACE1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
-   TRACE1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
-   TRACE1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
-   TRACE1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
-   TRACE1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
-   TRACE1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
-   TRACE1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
-   TRACE1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
-   TRACE1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
-   TRACE1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
-   TRACE1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
-   TRACE1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
-   TRACE1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+  TRACE("DONNEES_CONTROLEUR = %d",  DONNEES_CONTROLEUR);
+  TRACE("DONNEES_CAPTEURS = %d",  DONNEES_CAPTEURS);
+  TRACE("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
+  TRACE("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
+  TRACE("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
+
+  TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
+  TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
+  TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
+
+  TRACE("LATITUDE  = %f",          LATITUDE );
+  TRACE("LONGITUDE = %f",          LONGITUDE );
+  TRACE("ALTITUDE  = %f",          ALTITUDE );
+
+  TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
+
+  TRACE("ALT_R1 = %f",       ALT_R1);         
+  TRACE("ALT_R2 = %f",       ALT_R2);
+  TRACE("ALT_R3 = %f",       ALT_R3);         
+  TRACE("ALT_R4 = %f",       ALT_R4);         
+  TRACE("ALT_ROT = %d",      ALT_ROT);
+  TRACE("ALT_ACC = %f",      ALT_ACC);
+
+  TRACE("AZI_R1 = %f",       AZI_R1)      ; 
+  TRACE("AZI_R2 = %f",       AZI_R2)      ; 
+  TRACE("AZI_R3 = %f",       AZI_R3)      ; 
+  TRACE("AZI_R4 = %f",       AZI_R4)      ; 
+  TRACE("AZI_ROT = %d",      AZI_ROT)     ;
+  TRACE("AZI_ACC = %f",      AZI_ACC)     ; 
+
+  TRACE("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;
+  TRACE("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 
+  TRACE("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
+  TRACE("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
+  TRACE("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
+  TRACE("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
+  TRACE("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
+
+  TRACE("GPIO_ALT = %s", GPIO_ALT)  ;  
+  TRACE("GPIO_AZI = %s", GPIO_AZI)  ;  
+  TRACE("GPIO_MASQUE = %s", GPIO_MASQUE)  ;  
+  TRACE("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;  
+
+  TRACE1("anciennes variables\n");
+  TRACE1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
+  TRACE1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
+  TRACE1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
+  TRACE1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
+  TRACE1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
+  TRACE1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
+  TRACE1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
+  TRACE1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
+  TRACE1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
+  TRACE1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
+  TRACE1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
+  TRACE1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
+  TRACE1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
+  TRACE1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
+  TRACE1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
+  TRACE1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
+  TRACE1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
+  TRACE1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
+  TRACE1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
+  TRACE1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
+  TRACE1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
+  TRACE1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
+  TRACE1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
+  TRACE1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
+  TRACE1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
+  TRACE1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
+  TRACE1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
+  TRACE1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
+  TRACE1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
+  TRACE1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
+  TRACE1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
+  TRACE1("=====================================================\n");
+  TRACE1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
+  TRACE1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
+  TRACE1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
+  TRACE1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
+  TRACE1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
+  TRACE1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
+  TRACE1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
+  TRACE1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
+  TRACE1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
+  TRACE1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
+  TRACE1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
+  TRACE1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
+  TRACE1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
+  TRACE1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
 }
 //============================================================================
-void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
+int CONFIG_GETCWD(char * c_getcwd) {
+
+  if (getcwd(c_getcwd, sizeof(c_getcwd)) != NULL) {
+     TRACE("Current working dir: %s\n", c_getcwd);
+  } else {
+     perror("getcwd() error");
+     return 1;
+  }
+  return 0 ;
+} 
+//============================================================================
+
+int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
 
   FILE *fin ;
   char buf   [CONFIG_TAILLE_BUFFER] ;
   char buffer[CONFIG_TAILLE_BUFFER] ;
   char c ;
   int i,C,L ;
-  //int incrlog ;
-  //incrlog =10 ;
+
+  // FIXME : initialisation du tableau de valeurs lues dans le fichier = datas
+
+  printf(" DATAS_NB_LIGNES=%d\n",   DATAS_NB_LIGNES) ;
+  printf(" DATAS_NB_COLONNES=%d\n", DATAS_NB_COLONNES) ;
+
+  for(L=0;L<DATAS_NB_LIGNES;L++) {
+    for(C=0;C<DATAS_NB_COLONNES;C++) { 
+      memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
+    }
+  }
   
+  // FIXME : construction du chemin du fichier de configuration
+  // FIXME : la variable CONFIG_REP_HOME doit etre lue auparavant (getcwd) (2021)
+
   memset(buf,ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s",CONFIG_REP_CFG,CONFIG_FIC_CFG) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_HOME, CONFIG_FIC_CFG) ;
   
-  for(L=0;L<DATAS_NB_LIGNES;L++)
-   for(C=0;C<DATAS_NB_COLONNES;C++)
-    memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
+  // FIXME : ouverture du fichier de configuration
+
 
   if ( (fin=fopen(buf,"r")) == NULL) {
    memset(buffer,ZERO_CHAR,CONFIG_TAILLE_BUFFER);
    sprintf(buffer,"Pbme ouverture %s",buf) ;
    //LOG(buffer) ;
-   TRACE("probleme ouverture %s",buf) ; 
+   printf("probleme ouverture %s\n",buf) ; 
    exit(2) ;
   }
+  else printf("open %s ok\n", buf) ;
+
   memset(buf,ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
   i=0;
   L=0;
   C=0;
   
+  // FIXME : lecture du fichier de configuration 
+
   while(1) {
    
    c=fgetc(fin) ;
@@ -757,16 +813,16 @@ void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BU
    }
    if (CONFIG_FIN_MOT(c)||(CONFIG_FIN_LIGNE(c)&& i!=0)||i==CONFIG_TAILLE_BUFFER) {
     
-    // TRACE("buffer = %s - C = %d - L = %d\n",buf,C,L) ;
-    
     if (CONFIG_FIN_MOT(c)) {
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
+      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );
       C++;
     }
     if ((CONFIG_FIN_LIGNE(c)&& i!=0)||i==CONFIG_TAILLE_BUFFER) {
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
+      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );
       L++;
       C=0;
     }
@@ -777,20 +833,33 @@ void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BU
    if (CONFIG_FORMAT_ADMIS(c)){buf[i]=(char)c;i++;}
   }
   fclose(fin);
+
+  return 0 ;
 }
 //============================================================================
 void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
-  int l, c ;
-  char buffer[ CONFIG_TAILLE_BUFFER * DATAS_NB_COLONNES ] ;
-  
-  for(l=0;l<DATAS_NB_LIGNES;l++) {
-   memset( buffer,ZERO_CHAR, CONFIG_TAILLE_BUFFER * DATAS_NB_COLONNES) ;
-   for(c=0;c<DATAS_NB_COLONNES;c++) {
-    sprintf( buffer, "%-10s %-10s", buffer, datas[l][c] ) ;
-   }
-   if (strlen(buffer)>1) TRACE("%5d = %s %d",l,buffer,buffer[0]) ;
+  int L, C ;  
+
+  for(L=0;L<DATAS_NB_LIGNES;L++) {
+    for(C=0;C<DATAS_NB_COLONNES;C++) { 
+      if ( C>0 )printf(" ") ;
+      if (strlen(datas[L][C])) printf("%s",datas[L][C]) ;
+    }
+    printf("\n") ;
   }
-  TRACE("- FIN") ;
+/*
+  for(l=0;l<DATAS_NB_LIGNES;l++) {
+
+     memset( buffer,ZERO_CHAR, CONFIG_TAILLE_BUFFER * DATAS_NB_COLONNES) ;
+
+     for(c=0;c<DATAS_NB_COLONNES;c++) {
+      sprintf( buffer, "%-10s %-10s", buffer, datas[l][c] ) ;
+     }
+     if (strlen(buffer)>1) {
+      TRACE("%s",buffer) ;
+     }
+  }
+*/
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_LIEU(LIEU *lieu) {

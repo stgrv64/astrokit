@@ -15,7 +15,7 @@
 // inclusion des librairies persos
 
 #define DEBUG     0
-#define DEBUG_LOG 1
+#define DEBUG_LOG 0
 
 // quelques macros de debugging
 
@@ -102,7 +102,7 @@
 #define  CONFIG_ETO           "ETO"
 #define  CONFIG_PLA           "PLA"
 
-#define  DATAS_NB_LIGNES         100 
+#define  DATAS_NB_LIGNES         200 
 #define  DATAS_NB_COLONNES       2
 
 #define  CONFIG_TAILLE_BUFFER_4  4
@@ -599,10 +599,23 @@ unsigned char MCP_M0_AZI   ;  // numero de port GPIO pour le choix du micro pas
 char CONFIG_REP_CAT  [ CONFIG_TAILLE_BUFFER_64 ] ;
 char CONFIG_REP_CFG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
 char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
-char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;            
+char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    
+        
 char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;        
+
+// ajout variable globale de chemin rep home lue (2021)
+// avec la commande getcwd 
+char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;
+
+// FIXME : ajout variables GPIO_xxx qui sont geres par gpio.c
+// uniquement pour affichage via CONFIG_AFFICHER_VARIABLES
+
+char GPIO_ALT [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_AZI [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_MASQUE [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_FREQUENCE_PWM [ CONFIG_TAILLE_BUFFER_64 ] ;
 
 #endif
 
