@@ -1,3 +1,12 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * remplacement key_mute par TIME
+# --------------------------------------------------------------  */
+
 #include <ir.h>
 
 //====================================================================================
@@ -62,7 +71,7 @@ void LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) {
   strcpy( irc->key[36],"KEY_VOLUMEUP") ;    strcpy( irc->code[36],"forward") ;
   strcpy( irc->key[37],"KEY_VOLUMEDOWN") ;  strcpy( irc->code[37],"rewind") ;
 
-  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code[38],"key_mute") ;
+  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code[38],"TIME") ;
   strcpy( irc->key[39],"KEY_SCREEN") ;      strcpy( irc->code[39],"key_screen") ; 
   strcpy( irc->key[40],"KEY_LIST") ;        strcpy( irc->code[40],"key_list") ;
   strcpy( irc->key[41],"KEY_INFO") ;        strcpy( irc->code[41],"key_info") ;

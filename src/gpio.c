@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | ajout entete
+# 01/05/2021  | ajout commentaire sur fonction GPIO_INIT_VAR2
+#               synthese traces sur une ligne (2021)
+# -------------------------------------------------------------- 
+*/
+
 #include <gpio.h>
 
 // ---------------------------------------------------------------------------------------
@@ -27,6 +38,11 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
   
   for(l=0;l<DATAS_NB_LIGNES;l++) {
    if(!strcmp("GPIO_ALT",datas[l][0])) {
+
+    // FIXME ajout stephane 2021
+    memset( GPIO_ALT,0,sizeof(GPIO_ALT)) ;
+    strcpy( GPIO_ALT, datas[l][1] ) ;
+
     for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gpio_in[j]=-1 ;
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
@@ -35,6 +51,11 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
     }
    }
    if(!strcmp("GPIO_AZI",datas[l][0])) {
+
+    // FIXME ajout stephane 2021
+    memset( GPIO_AZI,0,sizeof(GPIO_AZI)) ;
+    strcpy( GPIO_AZI, datas[l][1] ) ;
+
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_out[i]=-1 ;
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
@@ -43,6 +64,11 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
     }
    }
    if(!strcmp("GPIO_MASQUE",datas[l][0])) {
+
+    // FIXME ajout stephane 2021
+    memset( GPIO_MASQUE,0,sizeof(GPIO_MASQUE)) ;
+    strcpy( GPIO_MASQUE, datas[l][1] ) ;
+
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_masque[i]=-1 ;
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
@@ -51,6 +77,11 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
     }
    }
    if(!strcmp("GPIO_FREQUENCE_PWM",datas[l][0])) {
+
+    // FIXME ajout stephane 2021
+    memset( GPIO_FREQUENCE_PWM,0,sizeof(GPIO_FREQUENCE_PWM)) ;
+    strcpy( GPIO_FREQUENCE_PWM, datas[l][1] ) ;
+
     gpio_frequence_pwm = 1000 ;
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
@@ -66,6 +97,7 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
   TRACE1("GPIO_FREQUENCE_PWM=%f", gpio_frequence_pwm ) ;
 }
 // ---------------------------------------------------------------------------------------
+// FIXME : fonction ancienne : inutile (2021)
 void GPIO_INIT_VAR2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
   int l,i, j ;
   char *str1, *token, *sptr ;
@@ -88,8 +120,8 @@ void GPIO_INIT_VAR2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE
     }
    }
   }
-   for(i=0;i<GPIO_SIZE;i++) TRACE("gpio_in[%d] =%d\n",i,gpio_in[i]);
-   for(i=0;i<GPIO_SIZE;i++) TRACE("gpio_out[%d]=%d\n",i,gpio_out[i]);
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_in[%d] =%d\n",i,gpio_in[i]);
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_out[%d]=%d\n",i,gpio_out[i]);
 }
 // ---------------------------------------------------------------------------------------
 // Configuration du clavier (clavier matriciel en 4*4) en fonction des entrees de config :
@@ -410,8 +442,6 @@ void GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *gpwm) {
   TRACE1("dir=%s",dir);
   TRACE1("val=%s",val);
     
-  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val=%s",gpwm->gpio,dir,exp,val);
-    
   if ((f=fopen(exp,"w")) == NULL )                      { gpwm->gpio_open_statut = -4  ; }
   else if ((fprintf(f,"%d\n",gpwm->gpio))<=0)           { gpwm->gpio_open_statut = -5  ; }
   else if ((fclose(f)) != 0 )                           { gpwm->gpio_open_statut = -6  ; }
@@ -420,7 +450,13 @@ void GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *gpwm) {
   else if ((fclose(f)!=0))                              { gpwm->gpio_open_statut = -9  ; }
   else if ((gpwm->gpio_fd =open(val, O_WRONLY))<0)      { gpwm->gpio_open_statut = -10  ; }
   
-  TRACE("statut=%d",  gpwm->gpio_open_statut);
+  // FIXME : synthese traces sur une ligne (2021)
+  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val=%s statut=%d",\
+    gpwm->gpio,\
+    dir,\
+    exp,\
+    val,\
+    gpwm->gpio_open_statut);
 }
 //====================================================================================================
 int GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
@@ -935,7 +971,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
    
    int i=0 , sens=0 ;
    double deltat=0 ;
-   double tdiff=0 ;
+   //double tdiff=0 ;
    long   i_incr=0 ; 
    struct sched_param param;
    
@@ -1014,7 +1050,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
        // FIXME : calcule la duree reelle d une iteration dans la boucle
 
-       tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
+       //tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
        i_incr++ ;
    } // FIXME : fin boucle while 
 }

@@ -1,3 +1,13 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 0/045/2021  | * ajout entete
+#               * suppression CAT_REP
+# -------------------------------------------------------------- 
+*/
+
 #ifndef  CAT_H
 #define  CAT_H
 
@@ -39,8 +49,12 @@
 #include <types.h>
 
 // FIN INCLUDES =====================================
+// FIXME : 20210501 : mise en commentaire ligne suivante 
+// FIXME : inutile avec passage par /etc/config.txt pour lecture parametres
+// FIXME : de repertoires et de fichiers 
 
-#define   CAT_REP            "/root/catalogues"
+// #define   CAT_REP            "/root/catalogues"
+
 #define   CAT_NGC_TXT        "ngc.csv"
 #define   CAT_ETO_TXT        "eto.csv"
 #define   CAT_NB_LIGNES      10000

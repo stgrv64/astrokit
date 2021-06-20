@@ -1,10 +1,21 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * ajout variables entree chemins de config.txt
+#               * suppression des constantes associees
+# -------------------------------------------------------------- 
+*/
+
 #ifndef TYPES_H
 #define TYPES_H
 
 // inclusion des librairies persos
 
 #define DEBUG     0
-#define DEBUG_LOG 1
+#define DEBUG_LOG 0
 
 // quelques macros de debugging
 
@@ -67,6 +78,8 @@
 // Constantes
 // ------------------------------------------------------------------------
 
+#define  CONFIG_FIC_CFG        "config.txt"
+
 #define TEMPORISATION_RAQUETTE 5000
 #define TEMPORISATION_MENU     1000000
 
@@ -89,17 +102,7 @@
 #define  CONFIG_ETO           "ETO"
 #define  CONFIG_PLA           "PLA"
 
-#define  CONFIG_REP           "/root/conf"
-#define  CONFIG_REP_LOG       "/root/log"
-#define  CONFIG_FIC_LOG       "astrokit.log"
-#define  CONFIG_IN            "/root/in"
-
-#define  CONFIG_FIC           "config.txt"
-#define  CONFIG_DATE          "date.txt"
-#define  CONFIG_HHMM          "hhmm.txt"
-#define  CONFIG_MAJ           "maj.txt"
-
-#define  DATAS_NB_LIGNES         100 
+#define  DATAS_NB_LIGNES         200 
 #define  DATAS_NB_COLONNES       2
 
 #define  CONFIG_TAILLE_BUFFER_4  4
@@ -496,7 +499,6 @@ int GPIO_KEY_C2  ;
 int GPIO_KEY_C3  ;
 int GPIO_KEY_C4  ;
 
-
 // ------------ PRIORITES DES THREADS -------
 
 unsigned int suivi_menu_sched_priority ;
@@ -592,4 +594,31 @@ unsigned char MCP_M2_AZI    ; // numero de port GPIO pour le choix du micro pas
 unsigned char MCP_M1_AZI    ; // numero de port GPIO pour le choix du micro pas 
 unsigned char MCP_M0_AZI   ;  // numero de port GPIO pour le choix du micro pas
 
+// ajout entrees chemin de config.txt (2021)
+
+char CONFIG_REP_CAT  [ CONFIG_TAILLE_BUFFER_64 ] ;
+char CONFIG_REP_CFG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
+char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
+char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    
+        
+char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            
+char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            
+char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;        
+
+// ajout variable globale de chemin rep home lue (2021)
+// avec la commande getcwd 
+char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;
+
+// FIXME : ajout variables GPIO_xxx qui sont geres par gpio.c
+// uniquement pour affichage via CONFIG_AFFICHER_VARIABLES
+
+char GPIO_ALT [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_AZI [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_MASQUE [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_FREQUENCE_PWM [ CONFIG_TAILLE_BUFFER_64 ] ;
+
 #endif
+
+
+
+

@@ -23,8 +23,8 @@ GIT=git
 
 ARCH	= armv8
 PROJ	= astrokit
-FICH	= astroreel
-VERS	= 3.0
+FICH	= astrokit
+VERS	= 2021.0
 HOME	= /home/stef
 RM 		= rm -f
 EPHA	= libephe.a

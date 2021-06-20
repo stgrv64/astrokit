@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * suite a ajout variables CONFIG_REP et CONFIG_FIC
+#                 il faut d'abord le fichier config.txt en priorite
+# -------------------------------------------------------------- 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -229,6 +240,12 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
       GPIO_CLIGNOTE(GPIO_LED_ETAT, strlen( clavier->nombre ), 10) ;
 
       switch ( strlen( clavier->nombre ) ) {
+
+        case 2 : // Si longueur = 2 cela ne peut etre qu'un changement de mois
+          
+          TRACE("demande changement heure minutes : %s" , clavier->nombre) ;
+
+          CONFIG_SET_MONTH( clavier->nombre ) ;
 
         case 4 : // Si longueur = 4 cela ne peut etre qu'un changement d'heure et de minutes
           
@@ -1012,8 +1029,6 @@ int main(int argc, char ** argv) {
   pthread_t p_thread_m_azi ;
   // -----------------------------------------------------------------
   
-  system("/bin/date > /root/astrokit.begin.date.log") ;
-  
   incrlog=0 ;
   
   astre = &as ;
@@ -1041,23 +1056,31 @@ int main(int argc, char ** argv) {
   memset( suivi->p_threads_id, 0 , MAX_THREADS*sizeof(pthread_t)) ;
   
   // -----------------------------------------------------------------
-  // LECTURE DES FICHIERS DE CONFIG
+  // INITIALISATIONS
+  // FIXME : refonte (mai 2021)
   // -----------------------------------------------------------------
-  
-  CONFIG_INIT_LOG(); 
-    
+
+  getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) ;
+
   CONFIG_READ       ( datas ) ;
+  //CONFIG_AFFICHER_DATAS( datas ) ;
   CONFIG_INIT_VAR   ( datas ) ;   
-  
+  CONFIG_INIT_LOG(); 
+
+  // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OUTPUT (old)(2021)
   //GPIO_INIT_VAR2     ( datas) ;    // impacte les tableaux gpio_in[] et gpio_out[]
 
   if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
   
+  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[], gpio_azi[], gpio_masque[] et gpio_frequence_pwm[]
+  
+  CONFIG_AFFICHER_VARIABLES() ;
+
+  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_alt[i]) ; printf("\n") ;
+  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_azi[i]) ; printf("\n") ;
+  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpio_masque[i]) ; printf("\n") ;
   // -----------------------------------------------------------------
   
-  // CONFIG_AFFICHER_DATAS( datas ) ;
-  // CONFIG_AFFICHER_VARIABLES() ;
-
   TRACE("GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
   TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
   
@@ -1115,9 +1138,7 @@ int main(int argc, char ** argv) {
     CALCUL_TEMPS_SIDERAL  ( lieu, temps ) ;
     CALCUL_ANGLE_HORAIRE  ( lieu, astre ) ;
     CALCUL_AZIMUT         ( lieu, astre) ;
-    
     CONFIG_AFFICHER_ASTRE ( astre) ;
-
   }
   if ( suivi->alarme != 0 ) alarm( suivi->alarme) ;
       
@@ -1126,12 +1147,6 @@ int main(int argc, char ** argv) {
   
   pm_azi->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   pm_alt->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
-  
-  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[], gpio_azi[], gpio_masque[] et gpio_frequence_pwm[]
-  
-  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_alt[i]) ; printf("\n") ;
-  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_azi[i]) ; printf("\n") ;
-  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpio_masque[i]) ; printf("\n") ;
   
   GPIO_INIT_PWM_MOTEUR_2(\
     pm_alt,\
@@ -1167,10 +1182,10 @@ int main(int argc, char ** argv) {
 
   // ============================== gestion des threads  ===================================
   
-  TRACE("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRAROUGE) ;
-  TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
-  TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
-  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
+  TRACE1("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRAROUGE) ;
+  TRACE1("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
+  TRACE1("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
+  TRACE1("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
 
   TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
   
