@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 01/05/2021  | ajout entete
+# 01/05/2021  | mise en commentaire #define GPIO_FREQUENCE_PWM 
+#   suite a ajout de la variable du meme nom dans types.h
+# -------------------------------------------------------------- 
+*/
+
 #ifndef GPIO_H
 #define GPIO_H
 
@@ -51,7 +62,8 @@
 #define GPIO_SUIVI_MAIN_SCHED        SCHED_FIFO
 
 #define GPIO_MICROPAS_MAX           500
-#define GPIO_FREQUENCE_PWM          750 
+// FIXME : mise en commentaire de la ligne suivante (2021)
+// #define GPIO_FREQUENCE_PWM          750 
 #define GPIO_NB_PHASES_PAR_MOTEUR   4
 #define GPIO_FREQ_MAX               1000.0
 #define GPIO_VARG_STRING            115
@@ -86,6 +98,8 @@ typedef struct {
   int     gpio_fd ;
   
   double  deltat_m ;
+
+  struct timeval tval ;
 }
 GPIO_PWM_PHASE ;
 
@@ -102,15 +116,37 @@ typedef struct {
   int     pas ;
   double  deltat ;
   double  t ;
+
   double  Fm ;  
   double  Tm ;  
   double  Fpwm ;  
   double  Tpwm ; 
+
   double  upas ; 
   long    nbdeltat ;
   int     type_fonction ; 
+
   double  param0 ;
   double  param1 ;
+
+  // FIXME : la difference entre temps et  temps_reel : voir fonction *suivi_main_M
+  //         *  temps      : on utilise deltat , qui sert pour le usleep 
+  //         *  temps_reel : on utilise gettimeofday , qui sert a calculer la duree de la boucle while(en entier)
+
+  double  temps ;      // temps ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                       // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  double  temps_reel ; // temps REEL ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                       // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  double  temps_moyen ;       // temps ecoule moyen sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                              // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  double  temps_reel_moyen ;  // temps REEL ecoule moyen sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
+                              // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+
+  struct timeval tval ;
+
 }
 GPIO_PWM_MOTEUR ;
 

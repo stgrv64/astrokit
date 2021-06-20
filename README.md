@@ -22,3 +22,5 @@ Configured with: ../src/configure -v --with-pkgversion='Ubuntu/Linaro 7.4.0-1ubu
 Thread model: posix
 gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1) 
 
+stef@stef-Inspiron-7537:~/git/astrokit$ file astroreel.3.0 
+astroreel.3.0: ELF 32-bit LSB shared object, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-, for GNU/Linux 3.2.0, BuildID[sha1]=fbd70174ff8b6da7381c5856ce2bd9cf703716f2, with debug_info, not stripped

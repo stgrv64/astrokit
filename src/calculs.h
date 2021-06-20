@@ -103,4 +103,7 @@ void   SET_ASTRE( ASTRE *as,char *parametre, double valeur) ;
 void   SET_LIEU(  LIEU *lieu,char *parametre, double valeur) ;
 void   SET_VOUTE( VOUTE *voute,char *parametre, double valeur) ;
 
+double CALCUL_DUREE_MICROSEC           (struct timeval *) ;
+double CALCUL_DUREE_NANOSEC            (struct timeval *) ;
+
 #endif

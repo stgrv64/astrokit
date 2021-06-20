@@ -1,0 +1,1197 @@
+ 
+================================================================================
+README 2020 :
+================================================================================
+
+* le repertoire /root/conf (si construction depuis buildroot)
+             ou /home/root/conf 
+
+  doit exister sur la cible et contenir les fichiers
+
+  - config.txt
+  - date.txt
+  - hhmm.txt
+
+
+  Ce repertoire est sur le depot et porte le nom de cfg
+
+* le repertoire /root/catalogues soit exister sur la cible et contenir les fichiers
+
+  - ngc.csv   I.E  la recherche des messiers se fait dans ce catalogue
+  - eto.csv   I.E. la recherche des etoiles se fair dans ce catalogue
+
+================================================================================
+README 2021 :
+================================================================================
+
+Conclusion README : (20 JUIN 2021 )
+
+ * les devs sur armv7 l'emportent sur develop et rpi3a+
+ * idem pour les Makefile 
+ * idem pour la structure d arborescence
+
+=> MERGE sur develop depuis armv7 (20 juin 2021 )
+=> copie du contenu de armv7 sur rpi3a+ et develop (avant destruction) 
+=> sauvegarde uniquement de develop par la suite
+=> MERGE sur master quand tout sera OK 
+=> MERGE sur le depot distant ensuite
+
+=> il faudra songer a sauvegarder la CONF d une maniere ou d une autre : 
+  * buildroot (pour creation du noyau temps reel )
+  * yocto (astrokit dunfell avec support rpi3 aplus )
+
+ ================================================================================
+
+diff -ybEr --suppress-common-lines armv7/src/astro.c rpi3a+/src/astro.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * suite a ajout variables CONFIG_REP et CONFI <
+#                 il faut d'abord le fichier config.txt en pr <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+							      >	    case MENU_MANUEL_BRUT : ; break ;
+    case MENU_MANUEL_BRUT     : suivi->SUIVI_EQUATORIAL = 0 ; <
+      TRACE("== %s ==",astre->nom) ;			      |	      TRACE("%s a ete pris en compte",astre->nom) ;
+							      >	        LOG("%s a ete pris en compte",astre->nom) ;
+        case 2 : // Si longueur = 2 cela ne peut etre qu'un c <
+          						      <
+          TRACE("demande changement heure minutes : %s" , cla <
+							      <
+          CONFIG_SET_MONTH( clavier->nombre ) ;		      <
+							      <
+							      >	          LOG("demande changement heure minutes : %s" , clavi
+							      >	          LOG("demande changement annee : %s" , clavier->nomb
+							      >	      LOG("reset : Sh %d Sa %d pas_azi = %ld pas_alt = %ld ac
+							      >	           suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_
+							      >	           
+							      >	      LOG("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt =
+							      >	      LOG("acc*ALTAZ_FORWARD %.4f acc_azi %.4f acc_alt %.4f",
+							      >	      LOG("acc/ALTAZ_REWIND %.4f acc_azi %.4f acc_alt %.4f ",
+							      >	      LOG("acc*ALTAZ_FORWARD_FAST %.4f acc_azi %.4f acc_alt %
+							      >	      LOG("acc/ALTAZ_REWIND_FAST  %.4f acc_azi %.4f acc_alt %
+        TRACE("appel : %d : MENU_AZIMUTAL" , suivi->menu) ;   |	        LOG("appel : %d : MENU_AZIMUTAL" , suivi->menu) ;
+							      <
+							      <
+        suivi->SUIVI_VOUTE      = 1 ; 			      |	        //suivi->SUIVI_VOUTE      = 1 ; // TODO : verifier ut
+							      <
+				CALCUL_TOUT(lieu, temps, astr <
+							      <
+							      <
+							      <
+        suivi->SUIVI_VOUTE      = 0 ; 			      |	        //suivi->SUIVI_VOUTE      = 1 ; // TODO : verifier ut
+							      <
+				CALCUL_TOUT(lieu, temps, astr <
+							      <
+							      >	        LOG("appel : %d : MENU_MANUEL_BRUT" , suivi->menu) ;
+							      <
+							      <
+				CALCUL_TOUT(lieu, temps, astr <
+							      <
+							      >	        LOG("appel : %d : MENU_GOTO" , suivi->menu) ;
+							      >	        LOG("appel : %d : MENU_INFO" , suivi->menu) ;
+        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, vout |	        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre) ;
+							      >	        LOG("appel : %d : MENU_RESEAU_UP" , suivi->menu) ;
+							      >	        LOG("appel : %d : MENU_RESEAU_DOWN" , suivi->menu) ;
+							      >	        LOG("appel : %d : MENU_PROGRAMME_DOWN" , suivi->menu)
+							      >
+							      >	        LOG("appel : %d : MENU_DOWN" , suivi->menu) ;
+      if ( suivi->SUIVI_ALIGNEMENT )          { CONFIG_AFFICH |	      if ( suivi->SUIVI_ALIGNEMENT )          CONFIG_AFFICHER
+      if ( suivi->menu_old != suivi->menu  )  CONFIG_AFFICHER |	      if ( suivi->menu_old != suivi->menu  )  CONFIG_AFFICHER
+      voute->deb += voute->pas ;			      <
+							      <
+			voute->num ++ ;			      <
+      // system("/bin/date >> /root/astrokit.begin.log") ;    |	      // system("/bin/date >> /home/root/astrokit.begin.log")
+      // system("/bin/date >> /root/astrokit.begin.log") ;    |	      // system("/bin/date >> /home/root/astrokit.begin.log")
+							      >	  system("/bin/date > /home/root/astrokit.begin.date.log") ;
+							      >	  
+  // INITIALISATIONS					      |	  // LECTURE DES FICHIERS DE CONFIG
+  // FIXME : refonte (mai 2021)				      <
+  getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) ;	      |	  CONFIG_INIT_LOG(); 
+							      >	  LOG( "=== debut astrokit ===" ) ;
+  //CONFIG_AFFICHER_DATAS( datas ) ;			      <
+  CONFIG_INIT_LOG(); 					      <
+  // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OU <
+  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[] |	  // --------------------------------------------------------
+  CONFIG_AFFICHER_VARIABLES() ;				      |	  // CONFIG_AFFICHER_DATAS( datas ) ;
+							      >	  // CONFIG_AFFICHER_VARIABLES() ;
+  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpi |	  printf("==> GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
+  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpi |	  printf("==> ASTRE_PAR_DEFAUT, = %s\n", ASTRE_PAR_DEFAUT );
+  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpi <
+  // -------------------------------------------------------- <
+  TRACE("GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );	      |	  LOG("==> ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
+  TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;	      <
+							      >	    
+							      >
+							      >	  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[]
+							      >	  
+							      >	  printf("gpio_alt[x]=") ;    for(i=0;i<4;i++) printf("%d ",g
+							      >	  printf("gpio_azi[x]=") ;    for(i=0;i<4;i++) printf("%d ",g
+							      >	  printf("gpio_masque[x]=") ; for(i=0;i<4;i++) printf("%d ",g
+							      >	  
+							      >	  LOG("gpio_alt[x]=") ;    for(i=0;i<4;i++) LOG("%d ",gpio_al
+							      >	  
+  TRACE1("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFR |	  TRACE("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRA
+  TRACE1("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPT |	  TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTE
+  TRACE1("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQU |	  TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUE
+  TRACE1("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUE |	  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUET
+diff -ybEr --suppress-common-lines armv7/src/calculs.c rpi3a+/src/calculs.c
+// FIXME : CALCUL_DUREE_MICROSEC : 			      <
+// FIXME : * permet de calculer une duree depuis un dernier a <
+// FIXME : * resultat en microsecondes			      <
+// FIXME : * met a jour la structure appelee (pointeur)	      <
+// FIXME : * utlisation gettimeofday			      <
+//=========================================================== <
+							      <
+double CALCUL_DUREE_MICROSEC(struct timeval *t00) {	      <
+  							      <
+  struct timeval t01 ;					      <
+  double  t_diff ;					      <
+  							      <
+  gettimeofday(&t01,NULL) ;				      <
+							      <
+  t_diff = GPIO_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( <
+							      <
+  t00->tv_sec  = t01.tv_sec ; 				      <
+  t00->tv_usec = t01.tv_usec ;				      <
+							      <
+  return t_diff ;					      <
+}							      <
+//=========================================================== <
+// FIXME : CALCUL_DUREE_NANOSEC : 			      <
+// FIXME : * permet de calculer une duree depuis un dernier a <
+// FIXME : * resultat en nanosecondes			      <
+// FIXME : * met a jour la structure appelee (pointeur)	      <
+// FIXME : * utlisation FIXME : modifier et mettre a jour     <
+//=========================================================== <
+// TODO : a finir : modifier pour passer en nanosecondes      <
+							      <
+double CALCUL_DUREE_NANOSEC(struct timeval *t00) {	      <
+  							      <
+  struct timeval t01 ;					      <
+  double  t_diff ;					      <
+  							      <
+  gettimeofday(&t01,NULL) ;				      <
+							      <
+  t_diff = GPIO_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( <
+							      <
+  t00->tv_sec  = t01.tv_sec ; 				      <
+  t00->tv_usec = t01.tv_usec ;				      <
+							      <
+  return t_diff ;					      <
+}							      <
+//=========================================================== <
+  ASTRE_TYPES i_astre ;					      |	  ASTRE_TYPES i_planete ;
+  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = P |	  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_planete =
+  else                                            i_astre = C |	  else                                            i_planete =
+  switch (i_astre) {					      |	  switch (i_planete) {
+diff -ybEr --suppress-common-lines armv7/src/calculs.h rpi3a+/src/calculs.h
+double CALCUL_DUREE_MICROSEC           (struct timeval *) ;   <
+double CALCUL_DUREE_NANOSEC            (struct timeval *) ;   <
+							      <
+diff -ybEr --suppress-common-lines armv7/src/cat.c rpi3a+/src/cat.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * ajout entree chemins de config.txt	      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;	      |	  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+    TRACE("probleme ouverture %s\n",buf) ;		      |	    printf("probleme ouverture %s\n",buf) ;
+  // dans les catalogues, coordonnnees en H et MIN pour ascen |	  // dans les cat, coordonnnees en H et MIN pour ascension dr
+// et aussi un fichier dans le repertoire des catalogues      |	// et aussi un fichier dans le repertoire des cat
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;	      |	  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+    TRACE("probleme ouverture %s\n",buf) ;		      |	    printf("probleme ouverture %s\n",buf) ;
+// et aussi un fichier dans le repertoire des catalogues      |	// et aussi un fichier dans le repertoire des cat
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;	      |	  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+    TRACE("probleme ouverture %s\n",buf) ;		      |	    printf("probleme ouverture %s\n",buf) ;
+diff -ybEr --suppress-common-lines armv7/src/cat.h rpi3a+/src/cat.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 0/045/2021  | * ajout entete				      <
+#               * suppression CAT_REP			      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+// FIXME : 20210501 : mise en commentaire ligne suivante      <
+// FIXME : inutile avec passage par /etc/config.txt pour lect <
+// FIXME : de repertoires et de fichiers 		      <
+							      <
+// #define   CAT_REP            "/root/catalogues"	      <
+							      >	#define   CAT_REP            "/home/root/cat"
+							      >	#define   CAT_MES_TXT        "mes.csv"
+diff -ybEr --suppress-common-lines armv7/src/config.c rpi3a+/src/config.c
+/* ---------------------------------------------------------- |	/*
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      |	   astrokit - config.c
+# ----------------------------------------------------------- |
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#  * ajout entree chemins de config.txt			      <
+# ----------------------------------------------------------- <
+# 01/05/2021  | 					      <
+#       * modification chemin config.txt :		      <
+#       * le chemin est directement le repertoire courant     <
+#         lue grace a getcwd, les autres chemins dependent    <
+#         de ce chemin getcwd				      <
+#         ajoutee des valeurs lues dans config.txt	      <
+#       * mise a jour de la fonction CONFIG_AFFICHER_VARIABLE <
+#         avec nouvelles variables			      <
+# ----------------------------------------------------------- <
+    // FIXME 01 mai 2021 : modification chemin relatif	      |	    sprintf(cmd,"echo %d >> %s/%s",*incrlog, CONFIG_REP_LOG, 
+    sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, CONFIG_REP_HO <
+    sprintf( cmd,"echo %s >> %s/%s/%s",c_out, CONFIG_REP_HOME |	    sprintf( cmd,"echo %s >> %s/%s",c_out, CONFIG_REP_LOG, CO
+    sprintf(buf,"%s/%s/%s", CONFIG_REP_HOME, CONFIG_REP_LOG,  |	    sprintf(buf,"%s/%s", CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
+      TRACE("probleme ouverture %s\n",buf) ;		      |	      printf("probleme ouverture %s\n",buf) ;
+	TRACE("buf = %s", buf) ;			      <
+  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", year, month, |	  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s ", year, month, da
+  TRACE("Nouvelle date : %s", buf) ;			      |	  TRACE("prise en compte nouvelle date : %s", buf) ;
+							      |	    LOG("prise en compte nouvelle date : %s", buf) ;
+							      >	  TRACE("hh:mm= %s:%s", hou,min) ;
+							      >	  
+  sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", hou, min, CONFI |	  sprintf(buf, "/bin/echo %s:%s > %s/%s ", hou, min, CONFIG_R
+							      >
+							      >	  LOG("prise en compte nouvelle heure et minutes") ;
+	voute->num   = 0 ;				      <
+  voute->num                = 0 ;			      <
+  suivi->SUIVI_VOUTE      = 1 ;				      |	  suivi->SUIVI_VOUTE      = 0 ;
+							      <
+  suivi->temps_a = 0 ; 					      <
+  suivi->temps_h = 0 ; 					      <
+  							      <
+   gettimeofday(&suivi->tval,NULL) ;			      <
+   //-----------ASTRE_PAR_DEFAUT----------------------------- |	   //-----------ASTRE_PAR_DEFAUT-----------------------------
+  memset( CONFIG_REP_CAT, ZERO_CHAR, sizeof( CONFIG_REP_CAT ) <
+  memset( CONFIG_REP_CFG, ZERO_CHAR, sizeof( CONFIG_REP_CFG ) <
+  memset( CONFIG_REP_LOG, ZERO_CHAR, sizeof( CONFIG_REP_LOG ) <
+  memset( CONFIG_REP_IN, ZERO_CHAR, sizeof( CONFIG_REP_IN ) ) <
+  memset( CONFIG_FIC_LOG, ZERO_CHAR, sizeof( CONFIG_FIC_LOG ) <
+  memset( CONFIG_FIC_DATE, ZERO_CHAR, sizeof( CONFIG_FIC_DATE <
+  memset( CONFIG_FIC_HHMM, ZERO_CHAR, sizeof( CONFIG_FIC_HHMM <
+      // FIXME : note 2021 : les variables GPIO_xxx sont géré <
+							      <
+							      <
+							      <
+     // chemins des repertoires et fichiers (2021)	      <
+							      <
+    if(!strcmp("CONFIG_REP_CAT",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_REP_CFG",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_REP_LOG",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_REP_IN",datas[l][0])) strcpy( CONFIG_R <
+    if(!strcmp("CONFIG_FIC_LOG",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_FIC_DATE",datas[l][0])) strcpy( CONFIG <
+    if(!strcmp("CONFIG_FIC_HHMM",datas[l][0])) strcpy( CONFIG <
+							      <
+							      <
+  TRACE("TEMPO_RAQ = %ld",  TEMPO_RAQ);			      |	   TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
+  TRACE("TEMPO_MENU = %ld",  TEMPO_MENU);		      |	   TRACE("LONGITUDE = %f",          LONGITUDE );
+  TRACE("TEMPO_IR = %ld",  TEMPO_IR);			      |	   TRACE("LATITUDE  = %f",          LATITUDE );
+  TRACE("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);		      |	   TRACE("ALTITUDE  = %f",          ALTITUDE );
+  TRACE("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);	      |	   TRACE("===================================================
+							      >	   TRACE("ALT_ROT = %d", ALT_ROT);
+							      >	   TRACE("AZI_ROT = %d", AZI_ROT);
+							      >	   TRACE("===================================================
+							      >
+							      >	   TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
+							      >	   TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
+							      >	   TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
+  TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );	      |	   TRACE("GPIO_RAQ_O  = %d",  GPIO_RAQ_O);
+  TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);	      |	   TRACE("GPIO_RAQ_E  = %d",  GPIO_RAQ_E);
+  TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);	      |	   TRACE("GPIO_RAQ_S  = %d",  GPIO_RAQ_S);
+							      |	   TRACE("GPIO_RAQ_N  = %d",  GPIO_RAQ_N);
+  TRACE("LATITUDE  = %f",          LATITUDE );		      |	   TRACE("GPIO_RAQ_V  = %d",  GPIO_RAQ_V);
+  TRACE("LONGITUDE = %f",          LONGITUDE );		      |	   
+  TRACE("ALTITUDE  = %f",          ALTITUDE );		      |	   TRACE("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
+							      |	   TRACE("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
+  TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );		      |	   TRACE("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
+							      >	   TRACE("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
+							      >	   
+							      >	   TRACE("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
+							      >	   TRACE("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
+							      >	   TRACE("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
+							      >	   TRACE("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
+							      >	   TRACE("===================================================
+							      |	   TRACE("===================================================
+							      >	   TRACE("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
+							      >	   TRACE("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
+							      >	   TRACE("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
+							      >	   TRACE("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
+							      >	   TRACE("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
+							      >	   TRACE("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
+							      >	   TRACE("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
+							      >	   TRACE("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
+							      >	   TRACE("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
+							      >	   TRACE("===================================================
+							      |	   TRACE("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
+  TRACE("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;	      |	   TRACE("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
+  TRACE("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 	      |	   TRACE("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
+  TRACE("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 	      |	   TRACE("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
+  TRACE("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 	      |	   TRACE("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
+  TRACE("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 	      |	   TRACE("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
+  TRACE("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 	      |	   TRACE("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
+  TRACE("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  	      |	   TRACE("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
+							      |	   TRACE("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
+  TRACE("GPIO_ALT = %s", GPIO_ALT)  ;  			      |	   TRACE("===================================================
+  TRACE("GPIO_AZI = %s", GPIO_AZI)  ;  			      |	   TRACE("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
+  TRACE("GPIO_MASQUE = %s", GPIO_MASQUE)  ;  		      |	   TRACE("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
+  TRACE("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;     |	   TRACE("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
+							      |	   TRACE("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
+  TRACE1("anciennes variables\n");			      |	   TRACE("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
+  TRACE1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);		      |	   TRACE("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
+  TRACE1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);		      |	   TRACE("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
+  TRACE1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);		      |	   TRACE("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
+  TRACE1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);		      |	   TRACE("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
+  TRACE1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);		      |	   TRACE("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
+  TRACE1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);		      |	   TRACE("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
+  TRACE1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);		      |	   TRACE("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
+  TRACE1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);		      |	   TRACE("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
+  TRACE1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);		      |	   TRACE("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+  TRACE1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);		      <
+  TRACE1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);		      <
+  TRACE1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);		      <
+  TRACE1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);		      <
+  TRACE1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  		      <
+  TRACE1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  		      <
+  TRACE1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  		      <
+  TRACE1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  		      <
+  TRACE1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  		      <
+  TRACE1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  		      <
+  TRACE1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  		      <
+  TRACE1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  		      <
+  TRACE1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  		      <
+  TRACE1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 		      <
+  TRACE1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 		      <
+  TRACE1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;		      <
+  TRACE1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  		      <
+  TRACE1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  		      <
+  TRACE1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  		      <
+  TRACE1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;		      <
+  TRACE1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 		      <
+  TRACE1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 		      <
+  TRACE1("=================================================== <
+  TRACE1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;		      <
+  TRACE1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;		      <
+  TRACE1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;		      <
+  TRACE1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 		      <
+  TRACE1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;		      <
+  TRACE1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;		      <
+  TRACE1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;		      <
+  TRACE1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  		      <
+  TRACE1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  		      <
+  TRACE1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  		      <
+  TRACE1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  		      <
+  TRACE1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  		      <
+  TRACE1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  		      <
+  TRACE1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  		      <
+}							      <
+//=========================================================== <
+int CONFIG_GETCWD(char * c_getcwd) {			      <
+							      <
+  if (getcwd(c_getcwd, sizeof(c_getcwd)) != NULL) {	      <
+     TRACE("Current working dir: %s\n", c_getcwd);	      <
+  } else {						      <
+     perror("getcwd() error");				      <
+     return 1;						      <
+  }							      <
+  return 0 ;						      <
+							      |	void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNE
+int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES <
+							      |	  //int incrlog ;
+  // FIXME : initialisation du tableau de valeurs lues dans l |	  //incrlog =10 ;
+							      <
+  printf(" DATAS_NB_LIGNES=%d\n",   DATAS_NB_LIGNES) ;	      <
+  printf(" DATAS_NB_COLONNES=%d\n", DATAS_NB_COLONNES) ;      <
+							      <
+  for(L=0;L<DATAS_NB_LIGNES;L++) {			      <
+    for(C=0;C<DATAS_NB_COLONNES;C++) { 			      <
+      memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);   <
+    }							      <
+  }							      <
+  							      <
+  // FIXME : construction du chemin du fichier de configurati <
+  // FIXME : la variable CONFIG_REP_HOME doit etre lue aupara <
+  sprintf(buf,"%s/%s",CONFIG_REP_HOME, CONFIG_FIC_CFG) ;      |	  sprintf(buf,"%s/%s",CONFIG_REP,CONFIG_FIC) ;
+  							      <
+  // FIXME : ouverture du fichier de configuration	      <
+							      >	  for(L=0;L<DATAS_NB_LIGNES;L++)
+							      >	   for(C=0;C<DATAS_NB_COLONNES;C++)
+							      >	    memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
+   printf("probleme ouverture %s\n",buf) ; 		      |	   TRACE("probleme ouverture %s",buf) ; 
+  else printf("open %s ok\n", buf) ;			      <
+							      <
+  // FIXME : lecture du fichier de configuration 	      <
+							      <
+							      >	    // TRACE("buffer = %s - C = %d - L = %d\n",buf,C,L) ;
+							      >	    
+      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );	      <
+      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );	      <
+							      <
+  return 0 ;						      <
+  int L, C ;  						      |	  int l, c ;
+							      >	  char buffer[ CONFIG_TAILLE_BUFFER * DATAS_NB_COLONNES ] ;
+  for(L=0;L<DATAS_NB_LIGNES;L++) {			      <
+    for(C=0;C<DATAS_NB_COLONNES;C++) { 			      <
+      if ( C>0 )printf(" ") ;				      <
+      if (strlen(datas[L][C])) printf("%s",datas[L][C]) ;     <
+    }							      <
+    printf("\n") ;					      <
+  }							      <
+/*							      <
+							      <
+							      <
+     if (strlen(buffer)>1) {				      |	   if (strlen(buffer)>1) TRACE("%5d = %s %d",l,buffer,buffer[
+      TRACE("%s",buffer) ;				      <
+     }							      <
+*/							      |	  TRACE("- FIN") ;
+							      >	  LOG("lat %.2f lon %.2f alt %.2f JJ %.2f TS %.2f TSR %.2f JD
+							      >	          lieu->lat * DEGRES,\
+							      >	          lieu->lon * DEGRES,\
+							      >	          lieu->alt , lieu->JJ,
+							      >	          lieu->TS,\
+							      >	          lieu->TSR,\
+							      >	          lieu->JD ) ;
+							      >
+							      >	    LOG("%d %d %d %d %d %d : %f", temps->yy, temps->mm, temps
+							      >	  LOG("phrase %s mot %s symbole %s nombre %s premier %s valid
+							      >	    clavier->phrase,\
+							      >	    clavier->mot,\
+							      >	    clavier->symbole,\
+							      >	    clavier->nombre,\
+							      >	    clavier->premier,\
+							      >	    clavier->valider,\
+							      >	    clavier->menu) ;
+							      >
+  TRACE("ASTRE : %s\n - Va = %.2f -Vh = %.2f", as->nom, as->V |	  //for(C=0; C< 10;C++) {
+  TRACE(" azimut      = %.2f (rad)\t%.2f (degres) : %d.%d (hh |	  //  if (strcmp( as->plus_proche[C], "")) TRACE("astre->plus
+  TRACE(" altitude    = %.2f (rad)\t%.2f (degres) : %d.%d (hh |	  //}
+  TRACE(" ang-horaire = %.2f (rad)\t%.2f (degres) : %d.%d (hh |	  
+  TRACE(" declinaison = %.2f (rad)\t%.2f (degres) : %d.%d (hh |	  TRACE("nom %s : a %.2f h %.2f A %.2f H %.2f : Va %.2f Vh %.
+							      >	    
+							      >	  TRACE1("astre->a   = %f - %f - %dh%dmn",astre->a   , astre-
+							      >	  TRACE1("astre->h   = %f - %f - %dh%dmn",astre->h   , astre-
+							      >	  TRACE1("astre->A   = %f - %f - %dh%dmn",astre->A   , astre-
+							      >	  TRACE1("astre->H   = %f - %f - %dh%dmn",astre->H   , astre-
+void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {		      |	void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIE
+							      <
+	TRACE("voute->num %lld", voute->num) ;		      <
+}							      <
+//=========================================================== <
+void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIE <
+  CONFIG_AFFICHER_VOUTE( voute ) ;			      <
+							      >	      LOG("appel : %d : %s" , suivi->menu,s_menu) ;
+diff -ybEr --suppress-common-lines armv7/src/config.h rpi3a+/src/config.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | ajout entete				      <
+# 01/05/2021  | ajout fonction CONFIG_GETCWD		      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+int    CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLON |	void   CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLON
+int    CONFIG_GETCWD(char * ) ;				      <
+void   CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, L |	void   CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, L
+Seulement dans rpi3a+/src/: findc.tmp
+Seulement dans rpi3a+/src/: findh.tmp
+diff -ybEr --suppress-common-lines armv7/src/gpio.c rpi3a+/src/gpio.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | ajout entete				      <
+# 01/05/2021  | ajout commentaire sur fonction GPIO_INIT_VAR2 <
+#               synthese traces sur une ligne (2021)	      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_ALT,0,sizeof(GPIO_ALT)) ;		      <
+    strcpy( GPIO_ALT, datas[l][1] ) ;			      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_AZI,0,sizeof(GPIO_AZI)) ;		      <
+    strcpy( GPIO_AZI, datas[l][1] ) ;			      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_MASQUE,0,sizeof(GPIO_MASQUE)) ;	      <
+    strcpy( GPIO_MASQUE, datas[l][1] ) ;		      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_FREQUENCE_PWM,0,sizeof(GPIO_FREQUENCE_PWM))  <
+    strcpy( GPIO_FREQUENCE_PWM, datas[l][1] ) ;		      <
+							      <
+// FIXME : fonction ancienne : inutile (2021)		      <
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_in[%d] =%d\n",i,gpio |	   for(i=0;i<GPIO_SIZE;i++) TRACE("gpio_in[%d] =%d\n",i,gpio_
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_out[%d]=%d\n",i,gpio |	   for(i=0;i<GPIO_SIZE;i++) TRACE("gpio_out[%d]=%d\n",i,gpio_
+							      >	  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val=
+							      >	    
+  // FIXME : synthese traces sur une ligne (2021)	      |	  TRACE("statut=%d",  gpwm->gpio_open_statut);
+  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val= <
+    gpwm->gpio,\					      <
+    dir,\						      <
+    exp,\						      <
+    val,\						      <
+    gpwm->gpio_open_statut);				      <
+// Cette fonction, pour chaque phase, en parallele dans 4 thr <
+// module les etats hauts et bas de la phase		      <
+// avec les rapports cycliques calcules pour chaque micro pas <
+// et suivant une frequence fPWM superieure a la frequence ma <
+// ########################################################## <
+							      <
+   //double tdiff=0 ;					      <
+   long   i_incr=0 ; 					      <
+							      <
+							      <
+              pm->temps          += pm->deltat ;	      <
+              pm->suivi->temps_h  = pm->temps ;		      <
+							      <
+							      <
+              pm->temps          += pm->deltat ;	      <
+              pm->suivi->temps_a  = pm->temps  ;	      <
+							      <
+        						      |	      pm->t += pm->deltat ;
+							      |	   }
+       // FIXME : calcule la duree reelle d une iteration dan <
+							      <
+       //tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 	      <
+       i_incr++ ;					      <
+   } // FIXME : fin boucle while 			      <
+  pm->temps            = 0 ; 				      <
+  pm->temps_reel       = 0 ; 				      <
+  pm->temps_moyen      = 0 ; 				      <
+  pm->temps_reel_moyen = 0 ; 				      <
+							      <
+  gettimeofday(&pm->tval,NULL) ;			      <
+void main_(int argc, char **argv)			      |	void main21(int argc, char **argv)
+							      <
+							      <
+diff -ybEr --suppress-common-lines armv7/src/gpio.h rpi3a+/src/gpio.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 01/05/2021  | ajout entete				      <
+# 01/05/2021  | mise en commentaire #define GPIO_FREQUENCE_PW <
+#   suite a ajout de la variable du meme nom dans types.h     <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+// FIXME : mise en commentaire de la ligne suivante (2021)    |	#define GPIO_FREQUENCE_PWM          750 
+// #define GPIO_FREQUENCE_PWM          750 		      <
+							      <
+  struct timeval tval ;					      <
+							      <
+							      <
+							      <
+							      <
+  // FIXME : la difference entre temps et  temps_reel : voir  <
+  //         *  temps      : on utilise deltat , qui sert pou <
+  //         *  temps_reel : on utilise gettimeofday , qui se <
+							      <
+  double  temps ;      // temps ecoule sur azimut ou altitude <
+                       // recopie dans SUIVI* temps_a ou temp <
+							      <
+  double  temps_reel ; // temps REEL ecoule sur azimut ou alt <
+                       // recopie dans SUIVI* temps_a ou temp <
+							      <
+  double  temps_moyen ;       // temps ecoule moyen sur azimu <
+                              // recopie dans SUIVI* temps_a  <
+							      <
+  double  temps_reel_moyen ;  // temps REEL ecoule moyen sur  <
+                              // recopie dans SUIVI* temps_a  <
+							      <
+  struct timeval tval ;					      <
+							      <
+diff -ybEr --suppress-common-lines armv7/src/ir.c rpi3a+/src/ir.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * remplacement key_mute par TIME	      <
+# ----------------------------------------------------------- <
+							      <
+  strcpy( irc->key[26],"KEY_SOUND") ;        strcpy( irc->cod |	  strcpy( irc->key[26],"KEY_BACK") ;        strcpy( irc->code
+  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code |	  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code
+    TRACE("mot trouver = %s", clavier->mot ) ;		      |	    TRACE("mot trouver = %s\n", clavier->mot ) ;
+							      <
+		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;	      <
+diff -ybEr --suppress-common-lines armv7/src/types.h rpi3a+/src/types.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * ajout variables entree chemins de config.tx <
+#               * suppression des constantes associees	      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+  #define TRACE(fmt, args...)      while(0) { } 	      |	  #define TRACE(fmt, args...)      while(0) { fprintf(stderr,
+  #define TRACE1(fmt, args...)     while(0) { } 	      |	  #define TRACE1(fmt, args...)     while(0) { fprintf(stderr,
+  #define TRACE2(fmt, args...)     while(0) { } 	      |	  #define TRACE2(fmt, args...)     while(0) { fprintf(stderr,
+							      >	#endif
+							      >
+							      >	#ifndef DEBUG_LOG
+							      >	  #define LOG(fmt, args...)  while(0) { fprintf(flog, "\n%s :
+							      >	  #define LOG1(fmt, args...) while(0) { fprintf(flog, "\n%s :
+							      >	  #define LOG2(fmt, args...) while(0) { fprintf(flog, "\n%s :
+							      |	  #define TRACE(fmt, args...)           { \
+#if defined(DEBUG_LOG) && DEBUG_LOG == 1		      |	   fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n <
+  #define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n <
+  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n <
+#else 							      <
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n <
+							      >	#if defined(DEBUG_LOG) && DEBUG_LOG == 0 
+							      >	  #define LOG(fmt, args...)           { fprintf(flog, "\n%s :
+							      >	  #define LOG1(fmt, args...) while(0) { fprintf(flog, "\n%s :
+							      >	  #define LOG2(fmt, args...) while(0) { fprintf(flog, "\n%s :
+							      <
+#if defined(DEBUG_LOG) && DEBUG_LOG == 1		      <
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n <
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n <
+  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n <
+#else 							      <
+							      >	#if defined(DEBUG_LOG) && DEBUG_LOG == 1
+							      >	  #define LOG(fmt, args...)           { fprintf(flog, "\n%s :
+							      >	  #define LOG1(fmt, args...)          { fprintf(flog, "\n%s :
+							      >	  #define LOG2(fmt, args...) while(0) { fprintf(flog, "\n%s :
+							      |	  #define TRACE(fmt, args...)           { fprintf(stderr, "\n
+#if defined(DEBUG_LOG) && DEBUG_LOG == 1		      |	  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n |	  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n <
+  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n <
+#else 							      <
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n <
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n <
+  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n <
+							      >	#if defined(DEBUG_LOG) && DEBUG_LOG == 2
+							      >	  #define LOG(fmt, args...)           { fprintf(flog, "\n%s:%
+							      >	  #define LOG1(fmt, args...)          { fprintf(flog, "\n%s:%
+							      >	  #define LOG2(fmt, args...)          { fprintf(flog, "\n%s:%
+#define  CONFIG_FIC_CFG        "config.txt"		      <
+							      <
+#define  DATAS_NB_LIGNES         200 			      |	#define  CONFIG_REP           "/home/root/cfg"
+							      >	#define  CONFIG_REP_LOG       "/home/root/log"
+							      >	#define  CONFIG_FIC_LOG       "astrokit.log"
+							      >	#define  CONFIG_IN            "/home/root/in"
+							      >
+							      >	#define  CONFIG_FIC           "config.txt"
+							      >	#define  CONFIG_DATE          "date.txt"
+							      >	#define  CONFIG_HHMM          "hhmm.txt"
+							      >	#define  CONFIG_MAJ           "maj.txt"
+							      >
+							      >	#define  DATAS_NB_LIGNES         100 
+	SUIVI_MANUEL,					      <
+	SUIVI_EQUATORIAL,				      <
+	SUIVI_AZIMUTAL,					      <
+}							      <
+SUIVIS ;						      <
+							      <
+typedef enum { 						      <
+							      <
+  double       temps_a ;   // temps ecoule sur azimut , dedui <
+  double       temps_h ;   // temps ecoule sur azimut , dedui <
+							      <
+							      <
+							      <
+							      <
+							      <
+							      <
+							      <
+  struct timeval tval ; 				      <
+ long long num ; 					      <
+							      <
+							      >
+// ajout entrees chemin de config.txt (2021)		      <
+							      <
+char CONFIG_REP_CAT  [ CONFIG_TAILLE_BUFFER_64 ] ;	      <
+char CONFIG_REP_CFG  [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    	      <
+        						      <
+char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+							      <
+// ajout variable globale de chemin rep home lue (2021)	      <
+// avec la commande getcwd 				      <
+char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;	      <
+							      <
+// FIXME : ajout variables GPIO_xxx qui sont geres par gpio.c <
+// uniquement pour affichage via CONFIG_AFFICHER_VARIABLES    <
+							      <
+char GPIO_ALT [ CONFIG_TAILLE_BUFFER_64 ] ;		      <
+char GPIO_AZI [ CONFIG_TAILLE_BUFFER_64 ] ;		      <
+char GPIO_MASQUE [ CONFIG_TAILLE_BUFFER_64 ] ;		      <
+char GPIO_FREQUENCE_PWM [ CONFIG_TAILLE_BUFFER_64 ] ;	      <
+							      <
+							      <
+							      <
+							      <
+							      <
+diff -ybEr --suppress-common-lines armv7/src/astro.c develop/src/astro.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * suite a ajout variables CONFIG_REP et CONFI <
+#                 il faut d'abord le fichier config.txt en pr <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+        case 2 : // Si longueur = 2 cela ne peut etre qu'un c <
+          						      <
+          TRACE("demande changement heure minutes : %s" , cla <
+							      <
+          CONFIG_SET_MONTH( clavier->nombre ) ;		      <
+							      <
+							      >	  system("/bin/date > /root/astrokit.begin.date.log") ;
+							      >	  
+  // INITIALISATIONS					      |	  // LECTURE DES FICHIERS DE CONFIG
+  // FIXME : refonte (mai 2021)				      <
+  getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) ;	      |	  CONFIG_INIT_LOG(); 
+  //CONFIG_AFFICHER_DATAS( datas ) ;			      <
+  CONFIG_INIT_LOG(); 					      <
+  // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OU <
+  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[] <
+  							      <
+  CONFIG_AFFICHER_VARIABLES() ;				      <
+							      <
+  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpi <
+  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpi <
+  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpi <
+							      >	  // CONFIG_AFFICHER_DATAS( datas ) ;
+							      >	  // CONFIG_AFFICHER_VARIABLES() ;
+							      >
+							      >	    
+							      >
+							      >	  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[]
+							      >	  
+							      >	  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpi
+							      >	  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpi
+							      >	  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpi
+							      >	  
+  TRACE1("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFR |	  TRACE("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRA
+  TRACE1("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPT |	  TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTE
+  TRACE1("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQU |	  TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUE
+  TRACE1("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUE |	  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUET
+diff -ybEr --suppress-common-lines armv7/src/cat.c develop/src/cat.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * ajout entree chemins de config.txt	      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;	      |	  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+    TRACE("probleme ouverture %s\n",buf) ;		      |	    printf("probleme ouverture %s\n",buf) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;	      |	  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+    TRACE("probleme ouverture %s\n",buf) ;		      |	    printf("probleme ouverture %s\n",buf) ;
+  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;	      |	  sprintf(buf,"%s/%s",CAT_REP,catalogue_txt) ;
+    TRACE("probleme ouverture %s\n",buf) ;		      |	    printf("probleme ouverture %s\n",buf) ;
+diff -ybEr --suppress-common-lines armv7/src/cat.h develop/src/cat.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 0/045/2021  | * ajout entete				      <
+#               * suppression CAT_REP			      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+// FIXME : 20210501 : mise en commentaire ligne suivante      <
+// FIXME : inutile avec passage par /etc/config.txt pour lect <
+// FIXME : de repertoires et de fichiers 		      <
+							      <
+// #define   CAT_REP            "/root/catalogues"	      <
+							      >	#define   CAT_REP            "/root/catalogues"
+diff -ybEr --suppress-common-lines armv7/src/config.c develop/src/config.c
+/* ---------------------------------------------------------- |	/*
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      |	   astrokit - config.c
+# ----------------------------------------------------------- |
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#  * ajout entree chemins de config.txt			      <
+# ----------------------------------------------------------- <
+# 01/05/2021  | 					      <
+#       * modification chemin config.txt :		      <
+#       * le chemin est directement le repertoire courant     <
+#         lue grace a getcwd, les autres chemins dependent    <
+#         de ce chemin getcwd				      <
+#         ajoutee des valeurs lues dans config.txt	      <
+#       * mise a jour de la fonction CONFIG_AFFICHER_VARIABLE <
+#         avec nouvelles variables			      <
+# ----------------------------------------------------------- <
+    // FIXME 01 mai 2021 : modification chemin relatif	      |	    sprintf(cmd,"echo %d >> %s/%s",*incrlog, CONFIG_REP_LOG, 
+    sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, CONFIG_REP_HO <
+    sprintf( cmd,"echo %s >> %s/%s/%s",c_out, CONFIG_REP_HOME |	    sprintf( cmd,"echo %s >> %s/%s",c_out, CONFIG_REP_LOG, CO
+    sprintf(buf,"%s/%s/%s", CONFIG_REP_HOME, CONFIG_REP_LOG,  |	    sprintf(buf,"%s/%s", CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
+      TRACE("probleme ouverture %s\n",buf) ;		      |	      printf("probleme ouverture %s\n",buf) ;
+  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", year, month, |	  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s ", year, month, da
+  sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", hou, min, CONFI |	  sprintf(buf, "/bin/echo %s:%s > %s/%s ", hou, min, CONFIG_R
+   //-----------ASTRE_PAR_DEFAUT----------------------------- |	   //-----------ASTRE_PAR_DEFAUT-----------------------------
+  memset( CONFIG_REP_CAT, ZERO_CHAR, sizeof( CONFIG_REP_CAT ) <
+  memset( CONFIG_REP_CFG, ZERO_CHAR, sizeof( CONFIG_REP_CFG ) <
+  memset( CONFIG_REP_LOG, ZERO_CHAR, sizeof( CONFIG_REP_LOG ) <
+  memset( CONFIG_REP_IN, ZERO_CHAR, sizeof( CONFIG_REP_IN ) ) <
+  memset( CONFIG_FIC_LOG, ZERO_CHAR, sizeof( CONFIG_FIC_LOG ) <
+  memset( CONFIG_FIC_DATE, ZERO_CHAR, sizeof( CONFIG_FIC_DATE <
+  memset( CONFIG_FIC_HHMM, ZERO_CHAR, sizeof( CONFIG_FIC_HHMM <
+      // FIXME : note 2021 : les variables GPIO_xxx sont géré <
+							      <
+							      <
+							      <
+     // chemins des repertoires et fichiers (2021)	      <
+							      <
+    if(!strcmp("CONFIG_REP_CAT",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_REP_CFG",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_REP_LOG",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_REP_IN",datas[l][0])) strcpy( CONFIG_R <
+    if(!strcmp("CONFIG_FIC_LOG",datas[l][0])) strcpy( CONFIG_ <
+    if(!strcmp("CONFIG_FIC_DATE",datas[l][0])) strcpy( CONFIG <
+    if(!strcmp("CONFIG_FIC_HHMM",datas[l][0])) strcpy( CONFIG <
+							      <
+							      <
+  TRACE("TEMPO_RAQ = %ld",  TEMPO_RAQ);			      |	   TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
+  TRACE("TEMPO_MENU = %ld",  TEMPO_MENU);		      |	   TRACE("LONGITUDE = %f",          LONGITUDE );
+  TRACE("TEMPO_IR = %ld",  TEMPO_IR);			      |	   TRACE("LATITUDE  = %f",          LATITUDE );
+  TRACE("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);		      |	   TRACE("ALTITUDE  = %f",          ALTITUDE );
+  TRACE("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);	      |	   TRACE("===================================================
+							      >	   TRACE("ALT_ROT = %d", ALT_ROT);
+							      >	   TRACE("AZI_ROT = %d", AZI_ROT);
+							      >	   TRACE("===================================================
+							      >
+							      >	   TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
+							      >	   TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
+							      >	   TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
+  TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );	      |	   TRACE("GPIO_RAQ_O  = %d",  GPIO_RAQ_O);
+  TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);	      |	   TRACE("GPIO_RAQ_E  = %d",  GPIO_RAQ_E);
+  TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);	      |	   TRACE("GPIO_RAQ_S  = %d",  GPIO_RAQ_S);
+							      |	   TRACE("GPIO_RAQ_N  = %d",  GPIO_RAQ_N);
+  TRACE("LATITUDE  = %f",          LATITUDE );		      |	   TRACE("GPIO_RAQ_V  = %d",  GPIO_RAQ_V);
+  TRACE("LONGITUDE = %f",          LONGITUDE );		      |	   
+  TRACE("ALTITUDE  = %f",          ALTITUDE );		      |	   TRACE("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
+							      |	   TRACE("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
+  TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );		      |	   TRACE("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
+							      >	   TRACE("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
+							      >	   
+							      >	   TRACE("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
+							      >	   TRACE("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
+							      >	   TRACE("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
+							      >	   TRACE("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
+							      >	   TRACE("===================================================
+							      |	   TRACE("===================================================
+							      >	   TRACE("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
+							      >	   TRACE("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
+							      >	   TRACE("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
+							      >	   TRACE("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
+							      >	   TRACE("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
+							      >	   TRACE("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
+							      >	   TRACE("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
+							      >	   TRACE("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
+							      >	   TRACE("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
+							      >	   TRACE("===================================================
+							      |	   TRACE("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
+  TRACE("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;	      |	   TRACE("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
+  TRACE("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 	      |	   TRACE("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
+  TRACE("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 	      |	   TRACE("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
+  TRACE("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 	      |	   TRACE("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
+  TRACE("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 	      |	   TRACE("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
+  TRACE("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 	      |	   TRACE("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
+  TRACE("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  	      |	   TRACE("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
+							      |	   TRACE("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
+  TRACE("GPIO_ALT = %s", GPIO_ALT)  ;  			      |	   TRACE("===================================================
+  TRACE("GPIO_AZI = %s", GPIO_AZI)  ;  			      |	   TRACE("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
+  TRACE("GPIO_MASQUE = %s", GPIO_MASQUE)  ;  		      |	   TRACE("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
+  TRACE("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;     |	   TRACE("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
+							      |	   TRACE("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
+  TRACE1("anciennes variables\n");			      |	   TRACE("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
+  TRACE1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);		      |	   TRACE("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
+  TRACE1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);		      |	   TRACE("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
+  TRACE1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);		      |	   TRACE("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
+  TRACE1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);		      |	   TRACE("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
+  TRACE1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);		      |	   TRACE("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
+  TRACE1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);		      |	   TRACE("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
+  TRACE1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);		      |	   TRACE("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
+  TRACE1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);		      |	   TRACE("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
+  TRACE1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);		      |	   TRACE("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+  TRACE1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);		      <
+  TRACE1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);		      <
+  TRACE1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);		      <
+  TRACE1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);		      <
+  TRACE1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  		      <
+  TRACE1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  		      <
+  TRACE1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  		      <
+  TRACE1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  		      <
+  TRACE1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  		      <
+  TRACE1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  		      <
+  TRACE1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  		      <
+  TRACE1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  		      <
+  TRACE1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  		      <
+  TRACE1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 		      <
+  TRACE1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 		      <
+  TRACE1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;		      <
+  TRACE1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  		      <
+  TRACE1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  		      <
+  TRACE1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  		      <
+  TRACE1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;		      <
+  TRACE1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 		      <
+  TRACE1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 		      <
+  TRACE1("=================================================== <
+  TRACE1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;		      <
+  TRACE1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;		      <
+  TRACE1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;		      <
+  TRACE1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 		      <
+  TRACE1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;		      <
+  TRACE1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;		      <
+  TRACE1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;		      <
+  TRACE1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  		      <
+  TRACE1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  		      <
+  TRACE1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  		      <
+  TRACE1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  		      <
+  TRACE1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  		      <
+  TRACE1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  		      <
+  TRACE1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  		      <
+int CONFIG_GETCWD(char * c_getcwd) {			      |	void CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNE
+							      <
+  if (getcwd(c_getcwd, sizeof(c_getcwd)) != NULL) {	      <
+     TRACE("Current working dir: %s\n", c_getcwd);	      <
+  } else {						      <
+     perror("getcwd() error");				      <
+     return 1;						      <
+  }							      <
+  return 0 ;						      <
+} 							      <
+//=========================================================== <
+							      <
+int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES <
+							      |	  //int incrlog ;
+  // FIXME : initialisation du tableau de valeurs lues dans l |	  //incrlog =10 ;
+							      <
+  printf(" DATAS_NB_LIGNES=%d\n",   DATAS_NB_LIGNES) ;	      <
+  printf(" DATAS_NB_COLONNES=%d\n", DATAS_NB_COLONNES) ;      <
+							      <
+  for(L=0;L<DATAS_NB_LIGNES;L++) {			      <
+    for(C=0;C<DATAS_NB_COLONNES;C++) { 			      <
+      memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);   <
+    }							      <
+  }							      <
+  							      <
+  // FIXME : construction du chemin du fichier de configurati <
+  // FIXME : la variable CONFIG_REP_HOME doit etre lue aupara <
+  sprintf(buf,"%s/%s",CONFIG_REP_HOME, CONFIG_FIC_CFG) ;      |	  sprintf(buf,"%s/%s",CONFIG_REP,CONFIG_FIC) ;
+  							      <
+  // FIXME : ouverture du fichier de configuration	      <
+							      >	  for(L=0;L<DATAS_NB_LIGNES;L++)
+							      >	   for(C=0;C<DATAS_NB_COLONNES;C++)
+							      >	    memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
+   printf("probleme ouverture %s\n",buf) ; 		      |	   TRACE("probleme ouverture %s",buf) ; 
+  else printf("open %s ok\n", buf) ;			      <
+							      <
+  // FIXME : lecture du fichier de configuration 	      <
+							      <
+							      >	    // TRACE("buffer = %s - C = %d - L = %d\n",buf,C,L) ;
+							      >	    
+      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );	      <
+      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );	      <
+							      <
+  return 0 ;						      <
+  int L, C ;  						      |	  int l, c ;
+							      >	  char buffer[ CONFIG_TAILLE_BUFFER * DATAS_NB_COLONNES ] ;
+  for(L=0;L<DATAS_NB_LIGNES;L++) {			      <
+    for(C=0;C<DATAS_NB_COLONNES;C++) { 			      <
+      if ( C>0 )printf(" ") ;				      <
+      if (strlen(datas[L][C])) printf("%s",datas[L][C]) ;     <
+    }							      <
+    printf("\n") ;					      <
+  }							      <
+/*							      <
+							      <
+							      <
+     if (strlen(buffer)>1) {				      |	   if (strlen(buffer)>1) TRACE("%5d = %s %d",l,buffer,buffer[
+      TRACE("%s",buffer) ;				      <
+     }							      <
+*/							      |	  TRACE("- FIN") ;
+diff -ybEr --suppress-common-lines armv7/src/config.h develop/src/config.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | ajout entete				      <
+# 01/05/2021  | ajout fonction CONFIG_GETCWD		      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+int    CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLON |	void   CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLON
+int    CONFIG_GETCWD(char * ) ;				      <
+diff -ybEr --suppress-common-lines armv7/src/gpio.c develop/src/gpio.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | ajout entete				      <
+# 01/05/2021  | ajout commentaire sur fonction GPIO_INIT_VAR2 <
+#               synthese traces sur une ligne (2021)	      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_ALT,0,sizeof(GPIO_ALT)) ;		      <
+    strcpy( GPIO_ALT, datas[l][1] ) ;			      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_AZI,0,sizeof(GPIO_AZI)) ;		      <
+    strcpy( GPIO_AZI, datas[l][1] ) ;			      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_MASQUE,0,sizeof(GPIO_MASQUE)) ;	      <
+    strcpy( GPIO_MASQUE, datas[l][1] ) ;		      <
+							      <
+							      <
+    // FIXME ajout stephane 2021			      <
+    memset( GPIO_FREQUENCE_PWM,0,sizeof(GPIO_FREQUENCE_PWM))  <
+    strcpy( GPIO_FREQUENCE_PWM, datas[l][1] ) ;		      <
+							      <
+// FIXME : fonction ancienne : inutile (2021)		      <
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_in[%d] =%d\n",i,gpio |	   for(i=0;i<GPIO_SIZE;i++) TRACE("gpio_in[%d] =%d\n",i,gpio_
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_out[%d]=%d\n",i,gpio |	   for(i=0;i<GPIO_SIZE;i++) TRACE("gpio_out[%d]=%d\n",i,gpio_
+							      >	  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val=
+							      >	    
+  // FIXME : synthese traces sur une ligne (2021)	      |	  TRACE("statut=%d",  gpwm->gpio_open_statut);
+  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val= <
+    gpwm->gpio,\					      <
+    dir,\						      <
+    exp,\						      <
+    val,\						      <
+    gpwm->gpio_open_statut);				      <
+   //double tdiff=0 ;					      |	   double tdiff=0 ;
+       //tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 	      |	       tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
+diff -ybEr --suppress-common-lines armv7/src/gpio.h develop/src/gpio.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 01/05/2021  | ajout entete				      <
+# 01/05/2021  | mise en commentaire #define GPIO_FREQUENCE_PW <
+#   suite a ajout de la variable du meme nom dans types.h     <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+// FIXME : mise en commentaire de la ligne suivante (2021)    |	#define GPIO_FREQUENCE_PWM          750 
+// #define GPIO_FREQUENCE_PWM          750 		      <
+diff -ybEr --suppress-common-lines armv7/src/ir.c develop/src/ir.c
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * remplacement key_mute par TIME	      <
+# ----------------------------------------------------------- <
+							      <
+  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code |	  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code
+diff -ybEr --suppress-common-lines armv7/src/types.h develop/src/types.h
+/* ---------------------------------------------------------- <
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
+# ----------------------------------------------------------- <
+# date        | commentaires 				      <
+# ----------------------------------------------------------- <
+# 03/04/2021  | * ajout entete				      <
+#               * ajout variables entree chemins de config.tx <
+#               * suppression des constantes associees	      <
+# ----------------------------------------------------------- <
+*/							      <
+							      <
+#define DEBUG_LOG 0					      |	#define DEBUG_LOG 1
+#define  CONFIG_FIC_CFG        "config.txt"		      <
+							      <
+#define  DATAS_NB_LIGNES         200 			      |	#define  CONFIG_REP           "/root/conf"
+							      >	#define  CONFIG_REP_LOG       "/root/log"
+							      >	#define  CONFIG_FIC_LOG       "astrokit.log"
+							      >	#define  CONFIG_IN            "/root/in"
+							      >
+							      >	#define  CONFIG_FIC           "config.txt"
+							      >	#define  CONFIG_DATE          "date.txt"
+							      >	#define  CONFIG_HHMM          "hhmm.txt"
+							      >	#define  CONFIG_MAJ           "maj.txt"
+							      >
+							      >	#define  DATAS_NB_LIGNES         100 
+							      >
+// ajout entrees chemin de config.txt (2021)		      <
+							      <
+char CONFIG_REP_CAT  [ CONFIG_TAILLE_BUFFER_64 ] ;	      <
+char CONFIG_REP_CFG  [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    	      <
+        						      <
+char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;            <
+							      <
+// ajout variable globale de chemin rep home lue (2021)	      <
+// avec la commande getcwd 				      <
+char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;	      <
+							      <
+// FIXME : ajout variables GPIO_xxx qui sont geres par gpio.c <
+// uniquement pour affichage via CONFIG_AFFICHER_VARIABLES    <
+							      <
+char GPIO_ALT [ CONFIG_TAILLE_BUFFER_64 ] ;		      <
+char GPIO_AZI [ CONFIG_TAILLE_BUFFER_64 ] ;		      <
+char GPIO_MASQUE [ CONFIG_TAILLE_BUFFER_64 ] ;		      <
+char GPIO_FREQUENCE_PWM [ CONFIG_TAILLE_BUFFER_64 ] ;	      <
+							      <
+							      <
+							      <
+							      <
+							      <
+FICH	= astrokit					      |	FICH	= astroreel
+VERS	= 2021.0					      |	VERS	= 3.0
+#CC  = /usr/bin/aarch64-linux-gnu-gcc			      |	# CC    = /usr/bin/aarch64-linux-gnu-gcc
+FICH	= astrokit					      |	FICH	= astroreel
+VERS	= 2021.0					      |	VERS	= 3.0
+RLIB	= ${RPWD}/lib32					      |	RLIB		= ${RPWD}/lib
+GPIO	=	gpios					      <
+INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lir |	RMOD_LIRC	= /lib/modules/4.14.98-v7+/kernel/drivers/med
+LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_clien |	RLIB_LIRC	= /usr/lib/arm-linux-gnueabihf/
+							      >
+							      >	INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RPWD}/lib -I${RPWD}
+							      >	LIBS	= -L${RPWD}/lib/lirc -L${RPWD}/lib -L/usr/lib -L${REP
+							      <
+$(GPIO): $(OBJ)						      <
+	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${GPIO} $(LIBS)	      <

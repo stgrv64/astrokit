@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * ajout variables entree chemins de config.txt
+#               * suppression des constantes associees
+# -------------------------------------------------------------- 
+*/
+
 #ifndef TYPES_H
 #define TYPES_H
 
@@ -9,64 +20,65 @@
 // quelques macros de debugging
 
 #ifndef DEBUG
-  #define TRACE(fmt, args...)      while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE1(fmt, args...)     while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...)     while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#endif
-
-#ifndef DEBUG_LOG
-  #define LOG(fmt, args...)  while(0) { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define LOG1(fmt, args...) while(0) { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define LOG2(fmt, args...) while(0) { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE(fmt, args...)      while(0) { } 
+  #define TRACE1(fmt, args...)     while(0) { } 
+  #define TRACE2(fmt, args...)     while(0) { } 
 #endif
 
 // niveau 0
 
 #if defined(DEBUG) && DEBUG == 0 
-  #define TRACE(fmt, args...)           { \
-   fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+
+#if defined(DEBUG_LOG) && DEBUG_LOG == 1
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
+#else 
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
   #define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #endif
 
-#if defined(DEBUG_LOG) && DEBUG_LOG == 0 
-  #define LOG(fmt, args...)           { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
-  #define LOG1(fmt, args...) while(0) { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define LOG2(fmt, args...) while(0) { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-#endif
+#endif 
 
 
 // niveau 1
 
 #if defined(DEBUG) && DEBUG == 1
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#endif
 
 #if defined(DEBUG_LOG) && DEBUG_LOG == 1
-  #define LOG(fmt, args...)           { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
-  #define LOG1(fmt, args...)          { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define LOG2(fmt, args...) while(0) { fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
+#else 
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #endif
+
+#endif 
 
 // niveau 2
 
 #if defined(DEBUG) && DEBUG == 2
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args) ; }
-  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args) ; }
-  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args) ; }
+
+#if defined(DEBUG_LOG) && DEBUG_LOG == 1
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
+#else 
+  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #endif
 
-#if defined(DEBUG_LOG) && DEBUG_LOG == 2
-  #define LOG(fmt, args...)           { fprintf(flog, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args) ; }
-  #define LOG1(fmt, args...)          { fprintf(flog, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args) ; }
-  #define LOG2(fmt, args...)          { fprintf(flog, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args) ; }
-#endif	
+#endif 
 	
 // ------------------------------------------------------------------------
 // Constantes
 // ------------------------------------------------------------------------
+
+#define  CONFIG_FIC_CFG        "config.txt"
 
 #define TEMPORISATION_RAQUETTE 5000
 #define TEMPORISATION_MENU     1000000
@@ -90,17 +102,7 @@
 #define  CONFIG_ETO           "ETO"
 #define  CONFIG_PLA           "PLA"
 
-#define  CONFIG_REP           "/home/root/cfg"
-#define  CONFIG_REP_LOG       "/home/root/log"
-#define  CONFIG_FIC_LOG       "astrokit.log"
-#define  CONFIG_IN            "/home/root/in"
-
-#define  CONFIG_FIC           "config.txt"
-#define  CONFIG_DATE          "date.txt"
-#define  CONFIG_HHMM          "hhmm.txt"
-#define  CONFIG_MAJ           "maj.txt"
-
-#define  DATAS_NB_LIGNES         100 
+#define  DATAS_NB_LIGNES         200 
 #define  DATAS_NB_COLONNES       2
 
 #define  CONFIG_TAILLE_BUFFER_4  4
@@ -154,6 +156,13 @@ typedef enum {
   CIEL_PROFOND  
 }
 ASTRE_TYPES ;
+
+typedef enum { 
+	SUIVI_MANUEL,
+	SUIVI_EQUATORIAL,
+	SUIVI_AZIMUTAL,
+}
+SUIVIS ;
 
 typedef enum { 
 
@@ -295,21 +304,30 @@ typedef struct {
   long         pas_nord ;      // flag d'appui sur le touche NORD
   long         pas_sud ;       // flag d'appui sur le touche SUD
   
-  double       Ta ;  // periode de la frequence a injecter directement
-  double       Th ;  // periode de la frequence a injecter directement
+  double       Ta ;       // periode de la frequence a injecter directement
+  double       Th ;       // periode de la frequence a injecter directement
+
+  double       temps_a ;   // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
+  double       temps_h ;   // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
+
   double       Fa ;  // frequence a injecter directement 
   double       Fh ;  // frequence a injecter directement 
 
   double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
   double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
+
   double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
   double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
+
   unsigned long Ia ;              // nombre d'impulsions mesurees sur azimut
   unsigned long Ih ;              // nombre d'impulsions mesureees sur altitude
+
   unsigned long Ia_prec ;         // nombre d'impulsions mesurees sur azimut
   unsigned long Ih_prec ;         // nombre d'impulsions mesureees sur altitude 
+
   double        Ias ;             // somme sur nombres d'impulsions mesurees 
   double        Ihs ;             // somme sur nombres d'impulsions mesurees 
+
   unsigned long Iat[CONFIG_ASS] ; // tableau des nombres d'impulsions mesurees
   unsigned long Iht[CONFIG_ASS] ; // tableau des nombres d'impulsions mesurees
   
@@ -343,6 +361,8 @@ typedef struct {
   char         datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
   char         datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
   char         datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
+
+  struct timeval tval ; 
 } 
 SUIVI ;
 
@@ -419,7 +439,9 @@ typedef struct {
  double dt ;
  double acc ;
  double acc_old ;
- 
+
+ long long num ; 
+
  double DT ; // dt effectif en microsec en tenant compte de acceleration et de tous les autres parametres
 }
 VOUTE ;
@@ -476,7 +498,6 @@ int GPIO_KEY_C1  ;
 int GPIO_KEY_C2  ;
 int GPIO_KEY_C3  ;
 int GPIO_KEY_C4  ;
-
 
 // ------------ PRIORITES DES THREADS -------
 
@@ -573,4 +594,31 @@ unsigned char MCP_M2_AZI    ; // numero de port GPIO pour le choix du micro pas
 unsigned char MCP_M1_AZI    ; // numero de port GPIO pour le choix du micro pas 
 unsigned char MCP_M0_AZI   ;  // numero de port GPIO pour le choix du micro pas
 
+// ajout entrees chemin de config.txt (2021)
+
+char CONFIG_REP_CAT  [ CONFIG_TAILLE_BUFFER_64 ] ;
+char CONFIG_REP_CFG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
+char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
+char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    
+        
+char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            
+char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            
+char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;        
+
+// ajout variable globale de chemin rep home lue (2021)
+// avec la commande getcwd 
+char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;
+
+// FIXME : ajout variables GPIO_xxx qui sont geres par gpio.c
+// uniquement pour affichage via CONFIG_AFFICHER_VARIABLES
+
+char GPIO_ALT [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_AZI [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_MASQUE [ CONFIG_TAILLE_BUFFER_64 ] ;
+char GPIO_FREQUENCE_PWM [ CONFIG_TAILLE_BUFFER_64 ] ;
+
 #endif
+
+
+
+

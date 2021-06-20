@@ -1,3 +1,13 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | ajout entete
+# 01/05/2021  | ajout fonction CONFIG_GETCWD
+# -------------------------------------------------------------- 
+*/
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -73,9 +83,10 @@ int    CONFIG_FIN_FICHIER(char c) ;
 void   CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 void   CONFIG_AFFICHER_VARIABLES(void) ;
 void   CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
-void   CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+int    CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+int    CONFIG_GETCWD(char * ) ;
 
-void   CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre) ; // FIXME ajout 20191228
+void   CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre, VOUTE *voute) ; // FIXME ajout 20191228
 void   CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) ; // FIXME ajout 20200102
 
 #endif

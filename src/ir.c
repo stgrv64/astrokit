@@ -1,3 +1,12 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 03/04/2021  | * ajout entete
+#               * remplacement key_mute par TIME
+# --------------------------------------------------------------  */
+
 #include <ir.h>
 
 //====================================================================================
@@ -45,7 +54,7 @@ void LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) {
   strcpy( irc->key[24],"KEY_LEFT") ;        strcpy( irc->code[24],"o") ;
   strcpy( irc->key[25],"KEY_SETUP") ;       strcpy( irc->code[25],"SETUP") ;
   // strcpy( irc->key[26],"KEY_TIME") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
-  strcpy( irc->key[26],"KEY_BACK") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
+  strcpy( irc->key[26],"KEY_SOUND") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
 
   strcpy( irc->key[27],"KEY_FORWARD") ;     strcpy( irc->code[27],"forward") ;
   strcpy( irc->key[28],"KEY_REWIND") ;      strcpy( irc->code[28],"rewind") ;    // ajout du 26/11/2017
@@ -62,7 +71,7 @@ void LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) {
   strcpy( irc->key[36],"KEY_VOLUMEUP") ;    strcpy( irc->code[36],"forward") ;
   strcpy( irc->key[37],"KEY_VOLUMEDOWN") ;  strcpy( irc->code[37],"rewind") ;
 
-  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code[38],"key_mute") ;
+  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code[38],"TIME") ;
   strcpy( irc->key[39],"KEY_SCREEN") ;      strcpy( irc->code[39],"key_screen") ; 
   strcpy( irc->key[40],"KEY_LIST") ;        strcpy( irc->code[40],"key_list") ;
   strcpy( irc->key[41],"KEY_INFO") ;        strcpy( irc->code[41],"key_info") ;
@@ -182,8 +191,10 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
   
   if ( clavier->mot_en_cours && clavier->appui_en_cours == 0 ) {
   
-    TRACE("mot trouver = %s\n", clavier->mot ) ;
-    
+    TRACE("mot trouver = %s", clavier->mot ) ;
+		
+		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;
+
     //------------------------------------------------------------
     // On incremente la phrase avec le mot et
     // On incremente le nombre avec le mot si premier n'est pas vide
