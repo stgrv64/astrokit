@@ -245,7 +245,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
           
           TRACE("demande changement heure minutes : %s" , clavier->nombre) ;
 
-          CONFIG_SET_MONTH( clavier->nombre ) ;
+          /* CONFIG_SET_MONTH( clavier->nombre ) ; */
 
         case 4 : // Si longueur = 4 cela ne peut etre qu'un changement d'heure et de minutes
           
