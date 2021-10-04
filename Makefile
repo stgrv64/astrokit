@@ -15,7 +15,8 @@
 # CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
-CC	= /usr/bin/arm-linux-gnueabihf-gcc
+# pour rpi3 cortex A53 :
+CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
 #CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
