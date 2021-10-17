@@ -1,0 +1,629 @@
+#!/bin/bash
+# Stephane gravois - 2021 - tous droits reserves
+# ============================================================
+# Ce script permet de partitionner une carte sd automatiquement
+# avec comme arguments :
+#   - le nom du device
+#   - la taille du bootfs
+#   - la taille du rootfs
+#   - le repertoire d'accueil des composants bootfs et rootfs
+# ============================================================
+# TODO a terminer
+# yocto => adapter pour avoir les fichiers suivants 
+# stef@dell00:~/projet_astrokit/target/sdcard.bon.2020$ ls -lrt /media/stef/bootfs/
+# total 10002
+# -rw-r--r-- 1 stef stef   17900 févr.  1  2020 bootcode.bin
+# -rw-r--r-- 1 stef stef   11854 févr.  1  2020 bcm2709-rpi-2-b.dtb
+# -rw-r--r-- 1 stef stef 2730232 févr.  1  2020 start.elf
+# -rw-r--r-- 1 stef stef 3420160 févr.  1  2020 kernel.img.buildroot
+# -rw-r--r-- 1 stef stef 4038600 févr.  1  2020 kernel.img
+# -rw-r--r-- 1 stef stef    6446 févr.  1  2020 fixup.dat
+# -rw-r--r-- 1 stef stef      49 févr.  1  2020 cmdline.txt
+# drwxr-xr-x 2 stef stef    2048 févr.  1  2020 bootfs.base.br.OK
+# drwxr-xr-x 2 stef stef    6144 févr. 14  2020 bootfs.yocto.KO
+# -rw-r--r-- 1 stef stef     133 févr. 15  2020 README
+# ============================================================
+
+g_utiliser_partitions=0
+device_letter_supp=""
+
+# TODO : gerer homeroot en fonction de YOCTO ou BUILDROOT
+#        homeroot YOCTO     = /home/root (par defaut)
+#        homeroot BUILDROOT = /root (par defaut)
+
+homeroot=/root
+fsrootfs=/media/stef/rootfs
+fsbootfs=/media/stef/bootfs
+destproj=${fsrootfs}${homeroot}
+
+#================================================
+# Fichiers TAR eventuels a copier et a gerer
+#================================================
+
+s_find_overla=overlay
+s_find_dvtree=bcm2710-rpi-3-b-plus.dtb
+s_find_rootfs=rootfs.tar
+s_find_projet=astrokit.tar
+
+#================================================
+
+binaire=$0
+nombin=$(basename $binaire)
+mountssd=/media/stef/linemb_mirza
+
+declare -a USE_LABELS=("vauvert" "baie" "reseau" "local" "usb")
+declare -a USE_DEVICES=("1" "2" "3")
+
+# USE_FILES doit avoir la meme taille que USE_FILES_TEMPLATES
+
+declare -a USE_FILES=("" "" "" "" "" "" "" "" "" "" "")
+
+declare -a USE_FILES_TEMPLATES=(\
+ "zImage"\
+ "config.txt"\
+ "cmdline.txt"\
+ "start*.elf"\
+ "fixup*.dat"\
+ "bootcode.bin"\
+ "${s_find_dvtree}"\
+ "${s_find_rootfs}"\
+ "${s_find_projet}"\
+ "" )
+
+declare -a USE_FILES_YOCTO_RPI=("" "" "" "" "" "" "" "" "" "")
+declare -a USE_FILES_YOCTO_RPI_TEMPLATES=(\
+ "zImage"\
+ "config.txt"\
+ "cmdline.txt"\
+ "start*.elf"\
+ "fixup*.dat"\
+ "bootcode.bin"\
+ "${s_find_dvtree}"\
+ "${s_find_rootfs}"\
+ "${s_find_projet}"\
+ "" )
+
+declare -a USE_FILES_XILINX=("" "" "" "" "" "" "" "" "")
+declare -a USE_FILES_XILINX_TEMPLATES=(\
+ "uImage"\
+ "uEnv.txt"\
+ "u-boot.bin"\
+ "u-boot.img"\
+ "boot.bin"\
+ "*wrapper.bin"\
+ "*devicetree.dtb"\
+ "*image*.tar.gz"\
+ "" )
+
+declare -A USE_ARGS=(\
+ ['d']=""\
+ ['b']=""\
+ ['r']=""\
+ ['Y']=""\
+ ['B']=""\
+ ['X']=""\
+)
+
+#-------------------------------------------------------------
+# @fn :     CrerCheminsDevices
+# @author : stgrv64
+# @brief  : cette fonction tient compte d une lettre supp dans le 
+# @brief  : nom du device (ex : /dev/mmcblk0p1 )
+#-------------------------------------------------------------
+
+function CrerCheminsDevices() {
+
+  for ind in $(seq 0 2)
+  do
+    if [ "$device_letter_supp" != "" ]
+    then
+      use_device=${USE_DEVICES[$ind]}
+      USE_DEVICES[$ind]=${device_letter_supp}${use_device} ;
+    fi
+    printf "USE_DEVICES[%d]=%s\n" "$ind" "${USE_DEVICES[$ind]}"
+  done
+
+}
+#-------------------------------------------------------------
+# @fn :     VerifPresenceDevice
+# @author : stgrv64
+# @brief  : verifie la presence du device
+# @brief  : detecte si les partitions existent sur le device
+#-------------------------------------------------------------
+
+function VerifPresenceDevice() {
+
+  vpd_device=$1
+  # vpd_fsbootfs=$2
+  # vpd_fsrootfs=$3
+
+  device1=${vpd_device}${USE_DEVICES[0]}
+  device2=${vpd_device}${USE_DEVICES[1]}
+  device3=${vpd_device}${USE_DEVICES[2]}
+
+  logger -s "${nombin} - verification presence device $vpd_device"
+
+  ls $vpd_device 1>/dev/null 2>/dev/null
+
+  [ $? -ne 0 ]&& {
+    logger -s "${nombin} - device $vpd_device absent"
+    exit 1
+  }
+  # Si le device est present, proposer d utiliser les partitions 
+  # eventuellement existantes 
+  
+  sudo fdisk -l | grep $vpd_device
+
+  logger -s "${nombin} - Utiliser partitions existantes (y/n)? (tout le contenu sera efface)"
+
+  read reponse 
+
+  if [ "$reponse" == "y" ]
+  then
+   g_utiliser_partitions=1
+  fi
+
+  if [ $g_utiliser_partitions -eq 1 ]
+  then
+   if [ $(sudo fdisk -l | grep $device1 | wc -l) -lt 1 ]
+   then
+     logger -s "${nombin} - partition 1 de nom $device1 non vue avec fdisk"
+     g_utiliser_partitions=0
+   fi
+   if [ $(sudo fdisk -l | grep $device2 | wc -l) -lt 1 ]
+   then
+     logger -s "${nombin} - partition 2 de nom $device2 non vue avec fdisk"
+     g_utiliser_partitions=0
+   fi
+   if [ $(sudo fdisk -l | grep $device3 | wc -l) -lt 1 ]
+   then
+     logger -s "${nombin} - partition 3 de nom $device3 non vue avec fdisk"
+     g_utiliser_partitions=0
+   fi
+  fi
+}
+#-------------------------------------------------------------
+# @fn :     Partitionne_Vfat_Linux
+# @author : stgrv64
+# @brief  : partitionne automatiquement la sdcard
+# @brief  : partition numero 1 de type vfat
+# @brief  : partition numero 2 de type ext4
+#-------------------------------------------------------------
+
+function Partitionne_Vfat_Linux() {
+
+ device=$1
+ sizebootfs=$2
+ sizerootfs=$3
+
+  if [ $g_utiliser_partitions -eq 1 ]
+  then
+    logger -s "${nombin} - on utilise les partitions existantes"
+    return
+  fi
+
+ logger -s "${nombin} - partitionnement ${device}"
+
+sudo fdisk ${device} 1>/dev/null <<END
+o
+d
+
+d
+
+d
+
+d
+
+n
+p
+1
+
++${sizebootfs}M
+n
+p
+2
+
++${sizerootfs}M
+n
+p
+3
+
+
+t
+1
+c
+a
+1
+w
+END
+}
+#-------------------------------------------------------------
+function ECHOARGSTAB() {
+
+ args=""
+ echo "d=$d"
+ echo "b=$b"
+ echo "r=$r"
+ echo "Y=$Y"
+ echo "B=$B"
+ echo "X=$X"
+}
+#-------------------------------------------------------------
+function VerifierContenuTableau() {
+# FIXME : on n utilise pas les indices
+  tai=${#@}
+
+  logger -s "VerifierContenuTableau de taille $tai"
+
+  for arg in $*
+  do
+    echo $arg
+  done
+}
+#-------------------------------------------------------------
+function VerifierContenuTableau_a_corriger() {
+# FIXME : on utilise les indices
+# TODO corriger
+  tai=${#@}
+
+  for ind in $(seq 0 $((tai-1)))
+  do
+    t=${@[$ind]}
+    echo "indices $ind : ${@[$ind]}"
+  done
+}
+#-------------------------------------------------------------
+function CopierFichiers() {
+
+  cf_device=$1
+  cf_fsbootfs=$2
+  cf_fsrootfs=$3
+  cf_fsprojet=$4
+
+  tai=${#USE_FILES[@]}
+
+  nb=0
+
+  for pat in ${USE_FILES[@]}
+  do
+    echo "pat=$pat"
+    
+    #--------------------------------------
+    # Gestion du rootfs eventuel (-gt 0)
+    #--------------------------------------
+
+    [ $(echo $pat | egrep $s_find_rootfs | wc -l) -gt 0 ]&& {
+      logger -s "${nombin} - sudo tar xf $(basename $pat) -C $cf_fsrootfs"
+      sudo tar xf $pat -C $cf_fsrootfs
+    }
+
+    #--------------------------------------
+    # Gestion du projet et copie
+    #  dans le repertoire dedie 
+    #--------------------------------------
+
+    [ $(echo $pat | egrep $s_find_projet | wc -l) -gt 0 ]&& {
+      logger -s "${nombin} - sudo mkdir -p $cf_fsprojet"
+      sudo mkdir -p $cf_fsprojet
+      logger -s "${nombin} - sudo tar xf $(basename $pat) -C $cf_fsprojet"
+      sudo tar xf $pat -C $cf_fsprojet
+    }
+
+    #--------------------------------------
+    # Gestion des autres fichiers (-eq 0)
+    #--------------------------------------
+
+    [ $(echo $pat | egrep $s_find_rootfs | wc -l) -eq 0 ]&& {
+      logger -s "sudo cp $(basename $pat) $cf_fsbootfs"
+      sudo cp $pat $cf_fsbootfs
+    }
+
+    nb=$((nb+1))
+    [ $((nb+1)) -ge $tai ]&& { break ; }
+  done
+}
+#-------------------------------------------------------------
+function VerifierSiYoctoOuBuildroot() {
+
+  return 0
+}
+#-------------------------------------------------------------
+function VerifierContenuRepertoire() {
+
+  rep=$1
+  tai=${#USE_FILES_TEMPLATES[@]}
+  tai=$((tai-1))
+  USE_FILES_TEMPLATES[$tai]=$rep
+
+  printf "\nContenu USE_FILES_TEMPLATES\n----------------------\n"
+
+  VerifierContenuTableau "${USE_FILES_TEMPLATES[@]}"
+
+  printf "\n----------------------\nFin Contenu USE_FILES_TEMPLATES\n"
+
+  [ ! -d $rep ]&& { echo "repertoire $rep inexistant" ; exit 1 ; }
+
+  logger -s "${nombin} - verification contenu $rep"
+
+  printf "\nContenu $rep\n----------------------\n"
+  ls -l $rep
+  printf "\n----------------------\nFin Contenu rep\n"
+  nb=0
+  tai=${#USE_FILES_TEMPLATES[@]}
+
+  for fic in ${USE_FILES_TEMPLATES[@]}
+  do
+    pat="$rep/$fic"
+    nbfic=$(ls $pat 2>/dev/null | wc -l)
+    [ $nbfic -gt 0 ]&& { logger -s "${nombin} - fichier $fic existe : OK" ; }
+    [ $nbfic -eq 0 ]&& { 
+      logger -s "${nombin} - fichier $fic inexistant" ; 
+      while [ $nbfic -eq 0 ]
+      do 
+        logger -s "${nombin} - entrer nom fichier a la place de $fic"
+        read reponse
+        fic=$reponse
+        pat="$rep/$fic"
+        nbfic=$(ls $pat 2>/dev/null | wc -l)
+      done
+    }
+    [ $nbfic -gt 1 ]&& { pat=$(ls -lrt $pat | tail -1 | awk '{print $NF}') ; }
+    USE_FILES[$nb]=$pat ;
+    logger -s "${nombin} - fichier $(basename $pat) retenu pour copie"
+    nb=$((nb+1))
+    [ $((nb+1)) -ge $tai ]&& { break ; }
+  done
+
+  printf "\nContenu USE_FILES\n----------------------\n"
+  VerifierContenuTableau "${USE_FILES[@]}"
+}
+#-------------------------------------------------------------
+function ECHOARGS() {
+  echo "l=$l"
+  echo "d=$d"
+  echo "b=$b"
+  echo "r=$r"
+  echo "Y=$Y"
+  echo "B=$B"
+  echo "X=$X"
+}
+#-------------------------------------------------------------
+function EXAMPLE() {
+ d=/dev/sdd
+ b=50
+ r=500
+ Y="${mountssd}/yocto-magic-rocko/microzed-zynq7-rocko/tmp/deploy/images/microzed-zynq7"
+ B="${mountssd}/buildroot-2018.02-xilinx/output/images"
+ X="${mountssd}/"
+ echo "${nombin} " ;
+ echo "  -d $d" ;
+ echo "  -b $b" ;
+ echo "  -r $r" ;
+ echo "  -Y $Y" ;
+ echo "  -B $B" ;
+ echo "  -X $X" ;
+ exit 1 ;
+}
+#-------------------------------------------------------------
+function MOREINFO() {
+  cat <<END
+The files needed to populate the rootfs and bootfs are (for example) :
+
+- uImage
+- uEnv.txt
+- u-boot.bin
+- u-boot.img
+- boot.bin
+- <bitstream>.bin
+- <devicetree>.dtb
+- <rootfs>.tar.gz
+
+The file needed to populate the rootfs is for yocto build :
+- core-image-minimal-microzed-zynq7-<date>.rootfs.tar.gz
+
+The script should consider all files on the same repository or
+files on different repository.
+
+For finding files separatly, -Y -B -X options are needed.
+
+OTHERSIZE, -X is sufficient with ALL file inside.
+
+stef@POC:microzed-zynq7$ pwd
+/media/stef/linemb_mirza/yocto-magic-rocko/microzed-zynq7-rocko/tmp/deploy/images/microzed-zynq7
+stef@POC:microzed-zynq7$ find ! -type l -ls | grep rootfs.tar.gz
+   25566820  88396 -rw-r--r--   1 stef     stef     90512495 mars  8
+18:00 ./core-image-minimal-microzed-zynq7-20210308165352.rootfs.tar.gz
+
+THE SIMPLY WAY TO PRACTICE IS TO CONSIDER ONE ONLY FOLDER WITH ALL FILES
+and use -X option
+
+In this cas, the script will search the files by their extension on
+this folder :
+
+- uImage
+- uEnv.txt
+- u-boot.bin
+- u-boot.img
+- boot.bin
+- <bitstream>.bin
+- <devicetree>.dtb
+- <rootfs>.tar.gz
+
+
+END
+}
+#-------------------------------------------------------------
+function USAGE() {
+ binaire=$0
+ echo "USAGE   : $binaire <options obligatoires>" ;
+ echo "  -l lettre device      (caracter to add to /dev/<device> example : p when /dev/mmcblk0px" ;
+ echo "  -d device             (should be found by sudo fdisk -l)" ;
+ echo "  -b size bootfs in M   (should be 10(M) at least > total bootfs file size)" ;
+ echo "  -r size rootfs in M   (should be 500(M) at least > total rootfs file system size)" ;
+ echo "  -X extra folder       (entire path for <path_extra>)" ;
+ echo "  -Y yocto folder       (entire path for <path_yocto>/tmp/deploy/images/<machine>)" ;
+ echo "  -B buildroot folder   (entire path for <path_buildroot>/output/images)" ;
+ echo "  -I more informations"
+ echo "  -E example"
+ exit 1 ;
+}
+#-------------------------------------------------------------
+# Function Formate_Et_Monte :
+#  - formate automatiquement les partitions
+#  - créer, démonte, puis remonte le bootfs et le rootfs
+#-------------------------------------------------------------
+function Formate_Et_Monte() {
+
+  fem_device=$1
+  fem_fsbootfs=$2
+  fem_fsrootfs=$3
+
+  device1=${fem_device}${USE_DEVICES[0]}
+  device2=${fem_device}${USE_DEVICES[1]}
+  device3=${fem_device}${USE_DEVICES[2]}
+
+  #---------------------------------------------------------
+  # Formatage 
+  #---------------------------------------------------------
+
+  if [ $g_utiliser_partitions -eq 1 ]
+  then
+    logger -s "${nombin} - on ne reformate pas les partitions existantes"
+    
+  else 
+    logger -s "${nombin} - sudo mkfs.vfat -n bootfs -I ${device1}"
+    sudo mkfs.vfat -n bootfs -I "${device1}" || exit 1
+
+    logger -s "${nombin} - sudo mkfs.ext4 -L rootfs    ${device2}"
+    sudo mkfs.ext4 -L rootfs    "${device2}" || exit 1
+
+    logger -s "${nombin} - sudo mkfs.ext4 -L datas     ${device3}"
+    sudo mkfs.ext4 -L datas     "${device3}" || exit 1
+  fi
+  
+  #---------------------------------------------------------
+  # Demontage force des devices
+  #---------------------------------------------------------
+
+  logger -s "${nombin} - sudo umount -f ${device1}"
+  sudo umount -f ${device1}
+
+  logger -s "${nombin} - sudo umount -f ${device2}"
+  sudo umount -f ${device2}
+
+  logger -s "${nombin} - sudo umount -f ${device3}"
+  sudo umount -f ${device3}
+
+  #---------------------------------------------------------
+  # Creation des points de montage
+  #---------------------------------------------------------
+
+  logger -s "${nombin} - sudo mkdir $fem_fsbootfs 2>/dev/null"
+  sudo mkdir $fem_fsbootfs 2>/dev/null
+
+  logger -s "${nombin} - sudo mkdir $fem_fsrootfs 2>/dev/null"
+  sudo mkdir $fem_fsrootfs 2>/dev/null
+
+  #---------------------------------------------------------
+  # Re montage des points de montage
+  #---------------------------------------------------------
+
+  logger -s "${nombin} - sudo mount $device1 $fem_fsbootfs"
+  sudo mount $device1 $fem_fsbootfs || exit 1
+
+  logger -s "${nombin} - sudo mount $device2 $fem_fsrootfs"
+  sudo mount $device2 $fem_fsrootfs || exit 1
+
+  #---------------------------------------------------------
+  # Effacement des donnees si partitions existantes 
+  #---------------------------------------------------------
+
+  if [ $g_utiliser_partitions -eq 1 ]
+  then
+    logger -s "${nombin} - on efface le contenu"
+    logger -s "${nombin} - effacer contenu de $fem_fsbootfs et $fem_fsrootfs ? (y/n)"
+    read reponse
+    if [ "$reponse" == "y" ]
+    then
+      sudo rm -rf $fem_fsbootfs/* 2>/dev/null
+      sudo rm -rf $fem_fsrootfs/* 2>/dev/null 
+    fi
+  fi 
+}
+#-------------------------------------------------------------
+# Function Afficher_Et_Demonter :
+#  - formate automatiquement les partitions
+#  - créer, démonte, puis remonte le bootfs et le rootfs
+#-------------------------------------------------------------
+
+function Afficher_Et_Demonter {
+
+  aed_device=$1
+  aed_fsbootfs=$2
+  aed_fsrootfs=$3
+
+  device1=${aed_device}${USE_DEVICES[0]}
+  device2=${aed_device}${USE_DEVICES[1]}
+  device3=${aed_device}${USE_DEVICES[2]}
+
+  logger -s "${nombin} - contenu $aed_fsbootfs ------------------"
+  sudo ls -l $aed_fsbootfs
+  logger -s "${nombin} - contenu $aed_fsrootfs ------------------"
+  sudo ls -l $aed_fsrootfs
+  logger -s "${nombin} - demontage rootfs + bootfs -------"
+  sudo umount -f $aed_fsbootfs || exit 1
+  sudo umount -f $aed_fsrootfs || exit 1
+}
+
+#-------------------------------------------------------------
+# La prise d'argument ne peut pas se faire au travers d'une fonction
+# et doit se faire de preference au debut du shell en premier
+#-------------------------------------------------------------
+
+while getopts ":l:d:b:r:Y:B:X:" o; do
+  case "${o}" in
+    l) l=${OPTARG} ;;
+    d) d=${OPTARG} ;;
+    b) b=${OPTARG} ;;
+    r) r=${OPTARG} ;;
+    Y) Y=${OPTARG} ;;
+    B) B=${OPTARG} ;;
+    X) X=${OPTARG} ;;
+    I) MOREINFO ;;
+    E) EXAMPLE ;;
+    *) USAGE ;;
+  esac
+done
+shift $((OPTIND-1))
+# [ -z $d ]||[ -z $b ]||[ -z $r ]||[ -z $Y ]||[ -z $B ]||[ -z $X ]&& { ECHOARGS ; USAGE ;  }
+# Ligne suivante implique que les options d b r et X sont obligatoires
+[ -z $d ]||[ -z $b ]||[ -z $r ]||[ -z $X ]&& { ECHOARGS ; USAGE ;  }
+
+ECHOARGS
+
+device=$d
+device_letter_supp=""
+[ "$l" != "" ]&& {  device_letter_supp=$l ; }
+echo  "device_letter_supp=$device_letter_supp"
+CrerCheminsDevices
+
+sizerootfs=$r
+sizebootfs=$b
+
+USE_ARGS['d']=$d
+USE_ARGS['b']=$b
+USE_ARGS['r']=$r
+USE_ARGS['Y']=$Y
+USE_ARGS['B']=$B
+USE_ARGS['X']=$X
+
+VerifPresenceDevice       $device
+Partitionne_Vfat_Linux    $device $sizebootfs $sizerootfs
+Formate_Et_Monte          $device $fsbootfs   $fsrootfs
+VerifierContenuRepertoire $X
+CopierFichiers            $device $fsbootfs   $fsrootfs $destproj
+Afficher_Et_Demonter      $device $fsbootfs   $fsrootfs
+
+
+exit 0
+
