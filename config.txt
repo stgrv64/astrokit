@@ -10,8 +10,8 @@
 #            suppression des confs inutiles (mis a la fin)
 #--------------------------------------------------------------
 
-MENU_PAR_DEFAUT  0 
-ASTRE_PAR_DEFAUT PLA0
+MENU_PAR_DEFAUT  3
+ASTRE_PAR_DEFAUT NGC1001 
 
 # ----------------------- parametres repertoires et fichiers
 
@@ -54,10 +54,12 @@ ALTITUDE   200
 # GPIO_INPUT      7,8 
 # GPIO_OUTPUT     14,15 
 
-GPIO_LED_ETAT   4 
+GPIO_LED_ETAT   4
 GPIO_ALT        21,26,19,13
 GPIO_AZI        6,5,7,11
-GPIO_MASQUE     3,1,0,2
+#GPIO_MASQUE     3,1,0,2
+GPIO_MASQUE 0,1,2,3
+
 
 # ----------------------- parametres pwm
 

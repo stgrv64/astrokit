@@ -1061,6 +1061,7 @@ int main(int argc, char ** argv) {
   // -----------------------------------------------------------------
 
   getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) ;
+  TRACE("config_rep_home lu par getcwd = %s",CONFIG_REP_HOME);
 
   CONFIG_READ       ( datas ) ;
   //CONFIG_AFFICHER_DATAS( datas ) ;
