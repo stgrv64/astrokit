@@ -25,9 +25,9 @@ GIT=git
 ARCH	= armv8
 PROJ	= astrokit
 FICH	= astrokit
-VERS	= 2021.0
+VERS	= $(shell date +%B.%Y)
 HOME	= /home/stef
-RM 		= rm -f
+RM 	= rm -f
 EPHA	= libephe.a
 
 RPWD	= ${HOME}/${GIT}/${PROJ}

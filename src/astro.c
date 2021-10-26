@@ -112,8 +112,8 @@ void TRAP_SUIVI_CAPTEURS(int sig)  {
 
 void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 /*
-  MENU_MANUEL_0,   
-  MENU_MANUEL_1,
+  MENU_MANUEL_BRUT,   
+  MENU_MANUEL_DEDUCTION_VITESSES,
   MENU_AZIMUTAL,
   MENU_EQUATORIAL,
   MENU_GOTO,
@@ -127,12 +127,11 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 // TODO : voir la reelle utilite de SUIVI_MENU_PREALABLE et des variables suivi->SUIVI_MANUEL , suivi->SUIVI_EQUATORIAL , etc ..
 
   switch ( suivi->menu ) {
-    case MENU_MANUEL_0        : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_1        : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_BRUT                      : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_DEDUCTION_VITESSES        : suivi->SUIVI_MANUEL     = 1 ; break ;
     case MENU_AZIMUTAL        : suivi->SUIVI_EQUATORIAL = 0 ; break ;
     case MENU_EQUATORIAL      : suivi->SUIVI_EQUATORIAL = 1 ; break ;
     case MENU_GOTO            : suivi->SUIVI_GOTO       = 1 ; break ;
-    case MENU_MANUEL_BRUT     : suivi->SUIVI_EQUATORIAL = 0 ; break ;
     case MENU_INFO            : break ;
     case MENU_RESEAU_UP       : break ;
     case MENU_RESEAU_DOWN     : break ; 
@@ -160,11 +159,11 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   suivi->menu_old = suivi->menu ;
 
-  if ( ! strcmp( clavier->mot, "o" ))         { suivi->menu = MENU_MANUEL_0 ; strcpy(clavier->mot,"") ; }
-  if ( ! strcmp( clavier->mot, "e" ))         { suivi->menu = MENU_MANUEL_0 ; strcpy(clavier->mot,"") ; }
-  if ( ! strcmp( clavier->mot, "s" ))         { suivi->menu = MENU_MANUEL_0 ; strcpy(clavier->mot,"") ; }
-  if ( ! strcmp( clavier->mot, "n" ))         { suivi->menu = MENU_MANUEL_0 ; strcpy(clavier->mot,"") ; }
-  if ( ! strcmp( clavier->mot, "reset" ))     { suivi->menu = MENU_MANUEL_0 ; strcpy(clavier->mot,"") ; }
+  if ( ! strcmp( clavier->mot, "o" ))         { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }
+  if ( ! strcmp( clavier->mot, "e" ))         { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }
+  if ( ! strcmp( clavier->mot, "s" ))         { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }
+  if ( ! strcmp( clavier->mot, "n" ))         { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }
+  if ( ! strcmp( clavier->mot, "reset" ))     { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }
   if ( ! strcmp( clavier->mot, "stop" ))      { suivi->SUIVI_VOUTE = 0 ; strcpy(clavier->mot,"") ; }
   if ( ! strcmp( clavier->mot, "play" ))      { suivi->SUIVI_VOUTE = 1 ; strcpy(clavier->mot,"") ; }
 
@@ -654,21 +653,21 @@ void * SUIVI_MENU(SUIVI * suivi) {
     switch( suivi->menu ) {
 
       // -------------------------- SUIVI MANUEL PAR DEFAUT ------------------
-      case MENU_MANUEL_0 :
+      /*
+      case MENU_MANUEL_BRUT :
 
         // le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
         // simplement une acceleration / ralentissement / changement de direction
         // sur le N-S-E-O (pas de recalcul des periodes) 
         // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
-
         SUIVI_MANUEL_0(suivi, clavier) ;
-
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_0 ; 
+        suivi->menu             = MENU_MANUEL_BRUT ; 
+      */
 
       break ;
       // -------------------------- SUIVI MANUEL AVEC RE-CALCUL DES PERIODES  -----------------
-      case MENU_MANUEL_1 :
+      case MENU_MANUEL_DEDUCTION_VITESSES :
        
         // TODO : a modifier car cela marche pas tres bien (interraction avec le thread SUIVI_VOUTE)
         // TODO : le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
@@ -678,7 +677,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         CALCUL_PERIODES_SUIVI_MANUEL(astre,suivi,voute)  ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_1 ; 
+        suivi->menu             = MENU_MANUEL_DEDUCTION_VITESSES ; 
 
       break ;
       // ------------------------------- ALIGNEMENT - MODE AZIMUTAL ----------------------------
@@ -705,7 +704,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_0 ; 
+        suivi->menu             = MENU_MANUEL_BRUT ; 
 
       break ;
 
@@ -728,7 +727,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_0 ;
+        suivi->menu             = MENU_MANUEL_BRUT ;
 
       break ;
       // -------------------------- SMENU_MANUEL_BRUT : LE PLUS SIMPLE ------------------
@@ -752,7 +751,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_0 ; 
+        suivi->menu             = MENU_MANUEL_BRUT ; 
 
       break ;
       // ------------------------------  MODE GOTO --------------------------------------
@@ -762,7 +761,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         TRACE("appel : %d : MENU_GOTO" , suivi->menu) ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_0 ;
+        suivi->menu             = MENU_MANUEL_BRUT ;
 
       break ; 
 
@@ -775,7 +774,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_0 ;
+        suivi->menu             = MENU_MANUEL_BRUT ;
 
       break ; 
 
@@ -791,7 +790,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         }
 
         suivi->menu = suivi->menu_old ;
-        suivi->menu = MENU_MANUEL_0 ;
+        suivi->menu = MENU_MANUEL_BRUT ;
 
       break ;
 
@@ -807,7 +806,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         }
 
         suivi->menu = suivi->menu_old ;
-        suivi->menu = MENU_MANUEL_0 ;
+        suivi->menu = MENU_MANUEL_BRUT ;
 
       break ;
       // ------------------------------ ARRET DU PROGRAMME ------------------------------------
@@ -880,8 +879,14 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       
       CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
     
-      if ( suivi->SUIVI_ALIGNEMENT )          { CONFIG_AFFICHER_ASTRE(astre) ; suivi->SUIVI_ALIGNEMENT = 0 ; }
-      if ( suivi->menu_old != suivi->menu  )  CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
+      if ( suivi->SUIVI_ALIGNEMENT ) { 
+        CONFIG_AFFICHER_ASTRE(astre) ; 
+        suivi->SUIVI_ALIGNEMENT = 0 ;
+      }
+
+      if ( suivi->menu_old != suivi->menu  ) {
+        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
+      }
 
       astre->A   += voute->pas ;
       voute->deb += voute->pas ;
