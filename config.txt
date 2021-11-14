@@ -20,7 +20,7 @@ CONFIG_REP_CFG       cfg
 CONFIG_REP_LOG       log
 CONFIG_REP_IN        inp
 CONFIG_REP_OUT       out
-CONFIG_FIC_LOG       astrokit.log
+CONFIG_FIC_LOG       astrokit.log.new
 CONFIG_FIC_DATE      date.txt
 CONFIG_FIC_HHMM      hhmm.txt
 
@@ -69,10 +69,10 @@ GPIO_MASQUE     0,1,2,3
 # Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus)
 #--------------------------------------------------------------------------
 
-GPIO_LED_ETAT   4
-GPIO_ALT        21,26,19,13
-GPIO_AZI        6,5,7,11
-GPIO_MASQUE     3,1,0,2
+# GPIO_LED_ETAT   4
+# GPIO_ALT        21,26,19,13
+# GPIO_AZI        6,5,7,11
+# GPIO_MASQUE     3,1,0,2
 
 # ----------------------- parametres pwm
 
