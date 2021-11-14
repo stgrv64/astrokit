@@ -1,0 +1,10 @@
+/boot/lsmod.ajout.gpio-ir
+/boot/overlays/gpio-ir-tx.dtbo
+/boot/overlays/gpio-ir.dtbo
+/home/root/RASPBIAN_CONFIG_MASD_MAPI.RPI3A/bootfs/lsmod.ajout.gpio-ir
+/home/root/RASPBIAN_CONFIG_MASD_MAPI.RPI3A/bootfs/overlays/gpio-ir-tx.dtbo
+/home/root/RASPBIAN_CONFIG_MASD_MAPI.RPI3A/bootfs/overlays/gpio-ir.dtbo
+/lib/modules/4.19.66+/kernel/drivers/media/rc/gpio-ir-recv.ko
+/lib/modules/4.19.66+/kernel/drivers/media/rc/gpio-ir-tx.ko
+/lib/modules/4.19.66-v7+/kernel/drivers/media/rc/gpio-ir-recv.ko
+/lib/modules/4.19.66-v7+/kernel/drivers/media/rc/gpio-ir-tx.ko
