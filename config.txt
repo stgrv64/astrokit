@@ -10,7 +10,7 @@
 #            suppression des confs inutiles (mis a la fin)
 #--------------------------------------------------------------
 
-MENU_PAR_DEFAUT  3
+MENU_PAR_DEFAUT  2          # Menu azimutal
 ASTRE_PAR_DEFAUT NGC1001 
 
 # ----------------------- parametres repertoires et fichiers
@@ -47,6 +47,7 @@ LONGITUDE -0.39
 ALTITUDE   200
 
 # ----------------------- parametres gpios
+
 # la led est parametree grace a :
 # insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
 # GPIO_LED_IR     27  
@@ -54,12 +55,24 @@ ALTITUDE   200
 # GPIO_INPUT      7,8 
 # GPIO_OUTPUT     14,15 
 
+#--------------------------------------------------------------------------
+# Conf corecte pour carte essai carre (celle qui s enfiche sur rpi3aplus)
+# et moteurs en metal NEMA 11 (pas ceux qui sont sur la monture vixen gp)
+#--------------------------------------------------------------------------
+
 GPIO_LED_ETAT   4
 GPIO_ALT        21,26,19,13
 GPIO_AZI        6,5,7,11
-#GPIO_MASQUE     3,1,0,2
-GPIO_MASQUE 0,1,2,3
+GPIO_MASQUE     0,1,2,3
 
+#--------------------------------------------------------------------------
+# Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus)
+#--------------------------------------------------------------------------
+
+GPIO_LED_ETAT   4
+GPIO_ALT        21,26,19,13
+GPIO_AZI        6,5,7,11
+GPIO_MASQUE     3,1,0,2
 
 # ----------------------- parametres pwm
 
