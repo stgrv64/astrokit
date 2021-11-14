@@ -1,0 +1,6 @@
+begin
+    button = KEY_M
+    prog   = /usr/bin/irexec
+    config = echo "coucou" 
+    repeat = 1
+end
