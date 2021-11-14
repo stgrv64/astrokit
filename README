@@ -1,3 +1,34 @@
+# ===============================================================================================================
+Conclusion analyse Novembre 2021  : 
+
+ * configuration YOCTO pour les elements suivants OK : 
+
+   - wifi
+   - linux-rt
+   => reste a finaliser proprement utilisation lirc / gpio-ir
+   => tout est sauvegarde dans les depots
+     * depot procedures branche yocto / wpa_supplicant / etc...
+     * depot astrokit  
+
+ => la configuration YOCTO est sauvee sur le disque dur externe SSD
+    dans le repertoire yocto_astrokit-dunfell / rpi3
+ => une MAJ lubuntu sur 20.04 a ete necessaire
+ => cf conf/local.conf
+ => cf conf/bblayers.conf
+
+ * sur Raspbian : 
+
+   - wifi OK
+   - linux RT ko (normal c est fait grace a yocto )
+   - gpio-ir OK :
+     * report (ancien et deja effectue en 2020) de la conf du paquet lirc sur /etc/lirc
+     * modification fichier de boot config.txt (utilisation overlays)
+     * test rmmod / insmod module dynamique au lieu de overlays (OK) 
+     * test utilisation programme de base IRW
+     * test utilisation directe astrokit 
+       => il a fallu creer un fichier .lircrc dans la home directory (cf logs git astrokit branch develop)
+
+# ===============================================================================================================
 Conclusion README : (20 JUIN 2021 )
 
  * les devs sur armv7 l'emportent sur develop et rpi3a+
@@ -9,9 +40,9 @@ Conclusion README : (20 JUIN 2021 )
   * buildroot (pour creation du noyau temps reel )
   * yocto (astrokit dunfell avec support rpi3 aplus )
 
- ================================================================================
 
 diff -ybEr --suppress-common-lines armv7/src/astro.c rpi3a+/src/astro.c
+
 /* ---------------------------------------------------------- <
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 	      <
 # ----------------------------------------------------------- <
