@@ -327,7 +327,7 @@ void IR_ACTIONS_PARTICULIERES( SUIVI *suivi) {
 }
 //====================================================================================
 
-void mainIr(int argc, char *argv[])  // void main(int argc, char *argv[]) 
+void main(int argc, char *argv[])  // void main(int argc, char *argv[]) 
 {	
   
   SUIVI *suivi ;

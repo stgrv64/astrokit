@@ -35,9 +35,21 @@ RSRC	= ${RPWD}/src
 REPH	= ${RPWD}/eph
 RLIB	= ${RPWD}/lib32
 
+#--------------------------------------------------------------------------------------
 # la cible est ici EXEC pour make sans argument
+#--------------------------------------------------------------------------------------
+
 EXEC	= ${FICH}.${VERS}
-GPIO	=	gpios
+
+#--------------------------------------------------------------------------------------
+# Pour les cibles suivantes, il faut de commenter les main dans les fichiers .c
+# et renommer le main dans le fichier astro.c (entree prog astrokit)
+#--------------------------------------------------------------------------------------
+
+EXECIR	= ir 
+EXECGPIO= gpios
+
+#--------------------------------------------------------------------------------------
 
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
 LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
@@ -45,8 +57,11 @@ LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
-SRC	=	src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
+SRC	= src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
 OBJ	= $(SRC:.c=.o)
+
+SRCIR	= src/ir.c src/gpio.c
+OBJIR	= $(SRCIR:.c=.o)
 
 LEPH	= ${RLIB}/${EPHA}
 EPHS	= $(REPH)/*.c
@@ -60,6 +75,9 @@ OBJSUP	= $(LEPH)
 
 $(EXEC): $(OBJ)
 	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${EXEC} $(LIBS)
+
+$(EXECIR): $(OBJ)
+	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${EXECIR} $(LIBS)
 
 $(GPIO): $(OBJ)
 	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${GPIO} $(LIBS)

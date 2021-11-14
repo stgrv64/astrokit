@@ -1023,7 +1023,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
 // ####### DEBUT PROGRAMME - DEBUT PROGRAMME - DEBUT PROGRAMME - DEBUT PROGRAMME - #######
 // #######################################################################################
 
-int main(int argc, char ** argv) {
+int mainAstro(int argc, char ** argv) {
   
   int i ;
   struct sched_param param;
