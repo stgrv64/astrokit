@@ -1,0 +1,10 @@
+
+
+
+dtparam=i2c_arm=on
+
+dtparam=audio=on
+
+
+dtoverlay=gpio-ir,gpio_pin=27
+enable_uart=1

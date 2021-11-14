@@ -1,0 +1,4 @@
+   397808     12 -rw-r--r--   1 root     root         8496 août 19  2019 /lib/modules/4.19.66+/kernel/drivers/media/rc/gpio-ir-recv.ko
+   397809     12 -rw-r--r--   1 root     root         8920 août 19  2019 /lib/modules/4.19.66+/kernel/drivers/media/rc/gpio-ir-tx.ko
+   399744     12 -rw-r--r--   1 root     root         8808 août 19  2019 /lib/modules/4.19.66-v7+/kernel/drivers/media/rc/gpio-ir-recv.ko
+   399745     12 -rw-r--r--   1 root     root         9056 août 19  2019 /lib/modules/4.19.66-v7+/kernel/drivers/media/rc/gpio-ir-tx.ko

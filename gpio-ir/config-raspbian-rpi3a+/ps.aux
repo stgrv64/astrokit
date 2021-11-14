@@ -1,0 +1,33 @@
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.4  1.3  27080  6108 ?        Ss   16:08   0:02 /sbin/init splash
+root        99  0.1  0.9  20568  4332 ?        Ss   16:08   0:00 /lib/systemd/systemd-journald
+root       135  0.1  0.7  14704  3336 ?        Ss   16:08   0:00 /lib/systemd/systemd-udevd
+systemd+   298  0.0  0.7  17276  3512 ?        Ssl  16:08   0:00 /lib/systemd/systemd-timesyncd
+root       342  0.0  0.5   5292  2488 ?        Ss   16:08   0:00 /usr/sbin/cron -f
+root       346  0.0  0.2   4268  1136 ?        Ss   16:08   0:00 /usr/sbin/lircmd --nodaemon
+root       349  0.0  0.2  27600  1320 ?        SLsl 16:08   0:00 /usr/sbin/rngd -r /dev/hwrng
+message+   363  0.0  0.7   6516  3372 ?        Ss   16:08   0:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+root       381  0.0  0.9  10000  3992 ?        Ss   16:08   0:00 /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant
+root       384  0.0  0.5  23756  2412 ?        Ssl  16:08   0:00 /usr/sbin/rsyslogd -n
+root       387  0.0  0.2   4196  1096 ?        Ss   16:08   0:00 /usr/bin/irexec /etc/lirc/irexec.lircrc
+root       391  0.0  0.9   7380  4216 ?        Ss   16:08   0:00 /lib/systemd/systemd-logind
+nobody     394  0.0  0.5   5296  2384 ?        Ss   16:08   0:00 /usr/sbin/thd --triggers /etc/triggerhappy/triggers.d/ --socket /run/thd.socket --user nobody --deviceglob /dev/input/event*
+avahi      418  0.0  0.0   6396   316 ?        S    16:08   0:00 avahi-daemon: chroot helper
+root       423  0.0  0.3   2872  1720 ?        Ss   16:08   0:00 /sbin/dhcpcd -q -b
+root       442  0.0  0.8  10572  3784 ?        Ss   16:08   0:00 wpa_supplicant -B -c/etc/wpa_supplicant/wpa_supplicant.conf -iwlan0 -Dnl80211,wext
+root       472  0.0  0.6   7188  3080 ?        Ss   16:08   0:00 /usr/sbin/lircd --nodaemon
+root       474  0.0  0.2   4272  1132 ?        Ss   16:08   0:00 /usr/sbin/lircd-uinput
+root       495  0.0  0.4   3960  1808 ttyS0    Ss+  16:08   0:00 /sbin/agetty --keep-baud 115200,38400,9600 ttyS0 vt220
+root       498  0.0  0.6   5876  2936 tty1     Ss   16:08   0:00 /bin/login --
+root       508  0.0  0.0   2084   132 ?        S    16:08   0:00 /usr/bin/hciattach /dev/serial1 bcm43xx 3000000 flow - b8:27:eb:80:a6:cf
+root       518  0.0  0.8   7272  3680 ?        Ss   16:08   0:00 /usr/lib/bluetooth/bluetoothd
+root       521  0.0  0.8  35044  3620 ?        Ssl  16:08   0:00 /usr/bin/bluealsa
+stef       589  0.0  1.3   9656  5872 ?        Ss   16:08   0:00 /lib/systemd/systemd --user
+stef       593  0.0  0.3  11328  1388 ?        S    16:08   0:00 (sd-pam)
+stef       600  0.3  1.0   6240  4444 tty1     S    16:08   0:01 -bash
+root       641  0.0  0.3   4184  1392 tty2     Ss+  16:09   0:00 /sbin/agetty --noclear tty2 linux
+root       642  0.0  0.3   4184  1468 tty3     Ss+  16:09   0:00 /sbin/agetty --noclear tty3 linux
+root       643  0.0  0.3   4184  1460 tty4     Ss+  16:09   0:00 /sbin/agetty --noclear tty4 linux
+root       644  0.0  0.3   4184  1468 tty5     Ss+  16:09   0:00 /sbin/agetty --noclear tty5 linux
+root       645  0.0  0.3   4184  1388 tty6     Ss+  16:09   0:00 /sbin/agetty --noclear tty6 linux
+stef       722  0.0  0.6   7740  2936 tty1     R+   16:17   0:00 ps aux

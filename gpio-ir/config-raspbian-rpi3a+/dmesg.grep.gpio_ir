@@ -1,0 +1,3 @@
+[    3.412468] rc rc0: gpio_ir_recv as /devices/platform/ir-receiver@1b/rc/rc0
+[    3.412875] input: gpio_ir_recv as /devices/platform/ir-receiver@1b/rc/rc0/input4
+[    3.413181] rc rc0: lirc_dev: driver gpio_ir_recv registered at minor = 0, raw IR receiver, no transmitter

@@ -1,0 +1,4 @@
+ir_rc6_decoder         16384  0
+gpio_ir_recv           16384  0
+uio_pdrv_genirq        16384  0
+uio                    20480  1 uio_pdrv_genirq

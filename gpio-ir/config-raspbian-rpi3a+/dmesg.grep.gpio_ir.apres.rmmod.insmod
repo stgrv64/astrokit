@@ -1,0 +1,8 @@
+[    3.412468] rc rc0: gpio_ir_recv as /devices/platform/ir-receiver@1b/rc/rc0
+[    3.412875] input: gpio_ir_recv as /devices/platform/ir-receiver@1b/rc/rc0/input4
+[    3.413181] rc rc0: lirc_dev: driver gpio_ir_recv registered at minor = 0, raw IR receiver, no transmitter
+[ 1278.959450] gpio_ir_recv: disagrees about version of symbol module_layout
+[ 1515.139200] gpio_ir_recv: unknown parameter 'gpio_pin' ignored
+[ 1515.140053] rc rc0: gpio_ir_recv as /devices/platform/ir-receiver@1b/rc/rc0
+[ 1515.140305] input: gpio_ir_recv as /devices/platform/ir-receiver@1b/rc/rc0/input6
+[ 1515.140716] rc rc0: lirc_dev: driver gpio_ir_recv registered at minor = 0, raw IR receiver, no transmitter

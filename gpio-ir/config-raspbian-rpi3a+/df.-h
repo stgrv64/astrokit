@@ -1,0 +1,9 @@
+Sys. de fichiers Taille Utilisé Dispo Uti% Monté sur
+/dev/root           30G    5,9G   23G  21% /
+devtmpfs           211M       0  211M   0% /dev
+tmpfs              216M       0  216M   0% /dev/shm
+tmpfs              216M    5,9M  210M   3% /run
+tmpfs              5,0M    4,0K  5,0M   1% /run/lock
+tmpfs              216M       0  216M   0% /sys/fs/cgroup
+/dev/mmcblk0p1      43M     23M   20M  54% /boot
+tmpfs               44M       0   44M   0% /run/user/1001

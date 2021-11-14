@@ -1,0 +1,76 @@
+Ce repertoire precise la config gpio-ir sur la distro raspbian
+augmentee du paquet lirc, et configure pour demarrer le module 
+gpio-ir (remplacement de lirc) .
+
+Le mecanisme des overlays est remplace par le mecanisme de  insertion
+du module dynamique gpio_ir_recv.ko present dans /lib/modules
+
+La configuration /proc/config.gz n'est pas disponible pour les distros (...)
+
+- distro    : raspbian
+- uname     : Linux astrokit-4.14.98-armv7l-rpi3a 4.19.66-v7+ #1253 SMP Thu Aug 15 11:49:46 BST 2019 armv7l GNU/Linux
+- version   : 4.14.98 non RT
+- carte     : rpi3a+
+- shield    : carte carre ayant la LED IR fonctionnelle (elle avec le switchs bleu on/off )  
+- paquet    : lirc
+
+Le paquet lirc fournit le binaire /usr/sbin/lircd lance par le service lircd
+
+Historique : le module lirc avec ses depednances a ete remplace par gpio-ir-recv / gpio-ir-tx
+Principe   : verifier que le module gpio_ir-recv suffit a la gestion des signaux IR
+
+0 arret du service lircd-uinput  # ce service emet des signaux inutiles et derangeants sur le prompt ) 
+1 arret du service lircd         # service utile pour nos besoins
+2 arret du module gpio_ir_recv   # ce module se trouve dans /lib/modules/... => voir fichier find.lib.modules.xxx
+
+3 verification /utilsation de la configuration dans /boot/config.txt
+
+  => la ligne suivante dtoverlays=gpio-ir,gpio_pin=27 n'est pas utile une fois boote
+  => on peut inserer le module manuellement au lieu d utiliser les overlays
+  => pour cela il faut posseder le module gpio_ir_recv.ko (au bon format par rapport au noyau)
+  => ce module doit avoir ete compile avec les memes sources que ceux du noyau (meme version donc)
+  => il faut verifier par exemple via une unit systemd que le module peut se charger au demarrage
+     sans utiliser le mecanisme des overlays
+
+  => on fait donc : 
+    rmmod <module> 
+    insmod <module> gpio_pin=27
+
+  => le resultat dans les fichiers dans ce repertoire
+
+4 verification utilisation driver / device 
+
+  il s 'agit de donner les bonnes options au service lircd : 
+
+ 
+5 verification du repertoire /etc et /etc/lirc
+  
+  => le fichier lircd_options.conf doit etre modifie comme suit (ancienne conf)
+
+     #driver          = devinput
+      driver          = default
+
+     #device          = auto
+      device          = /dev/lirc0
+
+  => le fichier de configuration de la telecommance doit etre copie dans
+     
+1946  ls -rlt /etc/lirc/lircd.conf.d >> README 
+total 16
+-rw-r--r-- 1 root root  615 avril  6  2017 README.conf.d
+-rw-rw-r-- 1 root root 1901 avril  5  2020 code_1120.conf
+drwxr-xr-x 2 root root 4096 avril  5  2020 old
+drwxr-xr-x 2 root root 4096 avril  7  2020 record
+
+6 relancer le service lircd
+  
+  => sudo service lircd start
+
+7 verifier les signaux avec les utilitaires habituels :
+
+  mode2
+  irrecord
+  irw
+  ...
+
+

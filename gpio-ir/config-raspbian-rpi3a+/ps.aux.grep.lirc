@@ -1,0 +1,14 @@
+root       346  0.0  0.2   4268  1136 ?        Ss   16:08   0:00 /usr/sbin/lircmd --nodaemon
+root       387  0.0  0.2   4196  1096 ?        Ss   16:08   0:00 /usr/bin/irexec /etc/lirc/irexec.lircrc
+root       472  0.0  0.6   7188  3080 ?        Ss   16:08   0:00 /usr/sbin/lircd --nodaemon
+root       474  0.0  0.2   4272  1132 ?        Ss   16:08   0:00 /usr/sbin/lircd-uinput
+stef       731  0.0  0.1   4368   548 tty1     S+   16:17   0:00 grep --color=auto lirc
+
+1836  sudo service lircd-uinput stop
+1839  sudo service lircd-setup stop
+
+root       346  0.0  0.2   4268  1136 ?        Ss   16:08   0:00 /usr/sbin/lircmd --nodaemon
+root       387  0.0  0.2   4196  1096 ?        Ss   16:08   0:00 /usr/bin/irexec /etc/lirc/irexec.lircrc
+root       472  0.0  0.6   7188  3080 ?        Ss   16:08   0:00 /usr/sbin/lircd --nodaemon
+stef       849  0.0  0.1   4368   572 tty1     S+   16:18   0:00 grep --color=auto lirc
+
