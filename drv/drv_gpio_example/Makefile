@@ -27,7 +27,9 @@
 ################################################################################
 
 ARCH=arm
-CROSS_COMPILE=arm-buildroot-linux-gnueabihf-
+
+#CROSS_COMPILE=arm-buildroot-linux-gnueabihf-
+CROSS_COMPILE=arm-linux-gnueabihf-
 
 # KERNEL=/home/ndomblides/Documents/distri_AE_2016.2/src/linux-xlnx-xilinx-v2016.2/
 # KERNEL=/home/stef/buildroot-2018.02/output/build/linux-xilinx-v2017.3
@@ -37,8 +39,7 @@ CROSS_COMPILE=arm-buildroot-linux-gnueabihf-
 # KERNEL=/home/stef/linux-xilinx-v2017.3-src
 # KERNEL=/home/nico/eclipse-workspace/AE3666_LO01_ramdisk/buildroot-2018.02/output/build/linux-xlnx
 
-KERNEL=/media/stef/ssd/yocto-astrokit-dunfell/rpi3/tmp/work/raspberrypi3-poky-linux-gnueabi/\
-linux-raspberrypi/1_5.4.72+gitAUTOINC+5d52d9eea9_154de7bbd5-r0/linux-raspberrypi3-standard-build
+KERNEL=/media/stef/ssd/yocto-astrokit-dunfell/rpi3/tmp/work/raspberrypi3-poky-linux-gnueabi/linux-raspberrypi/1_5.4.72+gitAUTOINC+5d52d9eea9_154de7bbd5-r0/linux-raspberrypi3-standard-build
 
 OUTPUT=astrogpio
 SRC_DIR=../src
