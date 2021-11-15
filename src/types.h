@@ -3,9 +3,14 @@
 # --------------------------------------------------------------
 # date        | commentaires 
 # --------------------------------------------------------------
-# 03/04/2021  | * ajout entete
+# 15/04/2021  | * ajout entete
 #               * ajout variables entree chemins de config.txt
 #               * suppression des constantes associees
+# --------------------------------------------------------------
+# xx/yy/2021  | * remplacement certains types par typedef enum
+# --------------------------------------------------------------
+# 15/11/2021  | * modification des types enum et contenu enum
+#               * modification ordre des menus (MENU_AZIMUTAL=0)
 # -------------------------------------------------------------- 
 */
 
@@ -146,30 +151,30 @@
 // ------------------------------------------------------------------------
 
 typedef enum {
-  FAUX,
+  FAUX=0,
   VRAI  
 }
-BOOLEEN ;
+t_en_Booleen ;
 
 typedef enum {
-  PLANETE,
-  CIEL_PROFOND  
+  ASTRE_PLANETE=0,
+  ASTRE_CIEL_PROFOND  
 }
-ASTRE_TYPES ;
+t_en_Astre ;
 
 typedef enum { 
-	SUIVI_MANUEL,
+	SUIVI_MANUEL=0,
 	SUIVI_EQUATORIAL,
 	SUIVI_AZIMUTAL,
 }
-SUIVIS ;
+t_en_Suivis ;
 
 typedef enum { 
 
-  MENU_MANUEL_BRUT,   
-  MENU_MANUEL_DEDUCTION_VITESSES,
-  MENU_AZIMUTAL,
+  MENU_AZIMUTAL=0,
   MENU_EQUATORIAL,
+  MENU_MANUEL_BRUT,
+  MENU_MANUEL_ASSERVI,
   MENU_GOTO,
   MENU_INFO,
   MENU_RESEAU_UP,
@@ -177,7 +182,9 @@ typedef enum {
   MENU_PROGRAMME_DOWN,
   MENU_DOWN
 }
-MENUS ;
+t_en_Menus ;
+
+//=====================================================
 
 typedef struct {
 
@@ -340,8 +347,8 @@ typedef struct {
   double       Da ;  // nombre a injecter dans les diviseurs de frequence
   double       Dh ;  // nombre a injecter dans les diviseurs de frequence
   
-  MENUS          menu;      // valeur du menu courant 
-  MENUS          menu_old ; // sauvegarde du menu precedent
+  t_en_Menus   menu;      // valeur du menu courant 
+  t_en_Menus   menu_old ; // sauvegarde du menu precedent
 
   int          alarme ; // si different de 0 provoque une alarm(alarme) au debut de main
   int          reset ;  // sert de reset pour remettre les compteeurs a zero dans diverses parties du programme

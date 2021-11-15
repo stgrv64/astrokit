@@ -5,7 +5,11 @@
 # --------------------------------------------------------------
 # 03/04/2021  | * ajout entete
 #               * remplacement key_mute par TIME
-# --------------------------------------------------------------  */
+# --------------------------------------------------------------
+# 15/11/2021  | * modification nom fct mainXxxx() pour compilation
+#                 => mainIr <=> main
+# --------------------------------------------------------------  
+*/
 
 #include <ir.h>
 
@@ -326,8 +330,10 @@ void IR_ACTIONS_PARTICULIERES( SUIVI *suivi) {
   }
 }
 //====================================================================================
-
-void main(int argc, char *argv[])  // void main(int argc, char *argv[]) 
+/* 
+ TODO : modifier pour avoir le meme comportement que appel thread SUIVI_INFRAROUGE
+*/
+void mainIr(int argc, char *argv[])  // void main(int argc, char *argv[]) 
 {	
   
   SUIVI *suivi ;

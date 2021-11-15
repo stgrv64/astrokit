@@ -14,6 +14,10 @@
 #         ajoutee des valeurs lues dans config.txt
 #       * mise a jour de la fonction CONFIG_AFFICHER_VARIABLES 
 #         avec nouvelles variables
+# --------------------------------------------------------------
+# 15/11/2021  | * (types.h) modification des types enum et contenu enum
+#               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
+#  => modification ordre MENUS dans switch
 # -------------------------------------------------------------- 
 */
 
@@ -943,6 +947,7 @@ void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *ast
   CONFIG_AFFICHER_VOUTE( voute ) ;
 }
 //============================================================================
+// 15/11/2021 : modification ordre
 void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
 
   char s_menu[256] ;
@@ -951,18 +956,16 @@ void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
 
   switch(suivi->menu) {
      
-    case MENU_MANUEL_0          :strcpy(s_menu,"MENU_MANUEL_0") ; break ; 
-    case MENU_MANUEL_1          :strcpy(s_menu,"MENU_MANUEL_1") ; break ; 
     case MENU_AZIMUTAL          :strcpy(s_menu,"MENU_AZIMUTAL") ; break ; 
     case MENU_EQUATORIAL        :strcpy(s_menu,"MENU_EQUATORIAL") ; break ; 
+    case MENU_MANUEL_BRUT       :strcpy(s_menu,"MENU_MANUEL_BRUT") ; break ; 
+    case MENU_MANUEL_ASSERVI    :strcpy(s_menu,"MENU_MANUEL_ASSERVI") ; break ; 
     case MENU_GOTO              :strcpy(s_menu,"MENU_GOTO") ; break ; 
     case MENU_INFO              :strcpy(s_menu,"MENU_INFO") ; break ; 
     case MENU_RESEAU_UP         :strcpy(s_menu,"MENU_RESEAU_UP") ; break ; 
     case MENU_RESEAU_DOWN       :strcpy(s_menu,"MENU_RESEAU_DOWN") ; break ; 
     case MENU_PROGRAMME_DOWN    :strcpy(s_menu,"MENU_PROGRAMME_DOWN") ; break ; 
     case MENU_DOWN              :strcpy(s_menu,"MENU_DOWN") ; break ; 
-    case MENU_MANUEL_BRUT       :strcpy(s_menu,"MENU_MANUEL_BRUT") ; break ; 
-
   }
 
   if ( suivi->menu_old != suivi->menu ) {

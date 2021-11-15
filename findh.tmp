@@ -1,0 +1,8 @@
+./eph
+./inc
+./lib/lirc
+./lib32/lirc
+./lib64/lirc
+./src
+./src/OLD
+./src/SAVE

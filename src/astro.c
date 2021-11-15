@@ -113,7 +113,7 @@ void TRAP_SUIVI_CAPTEURS(int sig)  {
 void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 /*
   MENU_MANUEL_BRUT,   
-  MENU_MANUEL_DEDUCTION_VITESSES,
+  MENU_MANUEL_ASSERVI,
   MENU_AZIMUTAL,
   MENU_EQUATORIAL,
   MENU_GOTO,
@@ -127,8 +127,8 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 // TODO : voir la reelle utilite de SUIVI_MENU_PREALABLE et des variables suivi->SUIVI_MANUEL , suivi->SUIVI_EQUATORIAL , etc ..
 
   switch ( suivi->menu ) {
-    case MENU_MANUEL_BRUT                      : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_DEDUCTION_VITESSES        : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_BRUT     : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_ASSERVI  : suivi->SUIVI_MANUEL     = 1 ; break ;
     case MENU_AZIMUTAL        : suivi->SUIVI_EQUATORIAL = 0 ; break ;
     case MENU_EQUATORIAL      : suivi->SUIVI_EQUATORIAL = 1 ; break ;
     case MENU_GOTO            : suivi->SUIVI_GOTO       = 1 ; break ;
@@ -667,7 +667,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
       break ;
       // -------------------------- SUIVI MANUEL AVEC RE-CALCUL DES PERIODES  -----------------
-      case MENU_MANUEL_DEDUCTION_VITESSES :
+      case MENU_MANUEL_ASSERVI :
        
         // TODO : a modifier car cela marche pas tres bien (interraction avec le thread SUIVI_VOUTE)
         // TODO : le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
@@ -677,7 +677,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         CALCUL_PERIODES_SUIVI_MANUEL(astre,suivi,voute)  ;
 
         suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_DEDUCTION_VITESSES ; 
+        suivi->menu             = MENU_MANUEL_ASSERVI ; 
 
       break ;
       // ------------------------------- ALIGNEMENT - MODE AZIMUTAL ----------------------------
@@ -1023,7 +1023,11 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
 // ####### DEBUT PROGRAMME - DEBUT PROGRAMME - DEBUT PROGRAMME - DEBUT PROGRAMME - #######
 // #######################################################################################
 
-int mainAstro(int argc, char ** argv) {
+/* TODO : decommenter pour pouvoir compiler modules a part 
+  (deplacement fonctions main ailleurs que dans astro.c )
+  int mainAstro(int argc, char ** argv) {
+*/
+int main(int argc, char ** argv) {
   
   int i ;
   struct sched_param param;

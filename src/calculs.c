@@ -1,3 +1,13 @@
+/* -------------------------------------------------------------
+# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 15/11/2021  | * (types.h) modification des types enum et contenu enum
+#               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
+# -------------------------------------------------------------- 
+*/
+
 #include <calculs.h>
 
 double sqr(double x)                                    { return x*x ; }
@@ -681,16 +691,16 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
 
 void CALCUL_TOUT(LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *clavier ) {
   
-  ASTRE_TYPES i_astre ;
+  t_en_Astre i_astre ;
   
-  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = PLANETE ;
-  else                                            i_astre = CIEL_PROFOND ;
+  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = ASTRE_PLANETE ;
+  else                                            i_astre = ASTRE_CIEL_PROFOND ;
   
   switch (i_astre) {
 
     //---------------------------------------------------------------------------------------
     
-    case CIEL_PROFOND :
+    case ASTRE_CIEL_PROFOND :
     
       pthread_mutex_lock( & suivi->mutex_cal );
       
@@ -706,7 +716,7 @@ void CALCUL_TOUT(LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *
       
     //---------------------------------------------------------------------------------------
     
-    case PLANETE :
+    case ASTRE_PLANETE :
       
       pthread_mutex_lock( & suivi->mutex_cal );
             
