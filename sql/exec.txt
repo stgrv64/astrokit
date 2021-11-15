@@ -1,0 +1,16 @@
+[ $# -ne 3 ]&&{ echo "Usage : $0 <rep dest> <taille buffers> <nombre echantillons>" ;exit 1 ;}
+
+export path=$1
+rm -f ${path}/*
+./main ${path}/mes.txt ${path}/dat.txt $2 $3
+echo ""
+cat ${path}/mes.txt | tail -2 
+echo ""
+wc -c ${path}/dat.txt # taille en octets du fichier de datas
+wc -l ${path}/mes.txt 
+
+ecriture_duree=`cat ${path}/mes.txt | tail -1 | awk -F')' '{print $NF}' | cut -f1`
+ecriture_taille=`wc -c ${path}/dat.txt | cut -f1`
+
+printf "Duree  des ecritures = %s" $ecriture_duree
+printf "Taille des ecritures = %s" $ecriture_taille

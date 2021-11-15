@@ -1,0 +1,37 @@
+Ces routines montrent comment utiliser les primitives sqlite3_* : 
+
+sqlite3_open : ouverture d'une base
+sqlite3_close : fermeture d'une base
+sqlite3_errmsg : affichage messages erreur
+sqlite3_exec : execution d'une instruction SQL
+sqlite3_free : liberation ressources 
+
+
+sql (char *) passe en parametre de sqlite3_exec prend les formes suivantes :
+
+/* Create merged SQL statement */
+
+sql = "CREATE TABLE COMPANY("  \
+       "ID INT PRIMARY KEY     NOT NULL," \
+       "NAME           TEXT    NOT NULL," \
+       "AGE            INT     NOT NULL," \
+       "ADDRESS        CHAR(50)," \
+       "SALARY         REAL );";
+
+sql =    "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) "  \
+         "VALUES (1, 'Paul', 32, 'California', 20000.00 ); " \
+         "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) "  \
+         "VALUES (2, 'Allen', 25, 'Texas', 15000.00 ); "     \
+         "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)" \
+         "VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );" \
+         "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)" \
+         "VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
+
+sql = "UPDATE COMPANY set SALARY = 25000.00 where ID=1; SELECT * from COMPANY"; 
+sql = "SELECT * from COMPANY";
+
+
+
+
+  
+
