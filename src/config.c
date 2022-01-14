@@ -95,7 +95,7 @@ void CONFIG_INIT_LOG(void) {
       TRACE("probleme ouverture %s\n",buf) ;
       exit(2) ;
     }
-    else printf("open %s ok\n", buf) ;
+    else TRACE("open %s ok", buf) ;
   }
   return ;
 }
@@ -770,8 +770,8 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
 
   // FIXME : initialisation du tableau de valeurs lues dans le fichier = datas
 
-  printf(" DATAS_NB_LIGNES=%d\n",   DATAS_NB_LIGNES) ;
-  printf(" DATAS_NB_COLONNES=%d\n", DATAS_NB_COLONNES) ;
+  TRACE1(" DATAS_NB_LIGNES   = %d",   DATAS_NB_LIGNES) ;
+  TRACE1(" DATAS_NB_COLONNES = %d", DATAS_NB_COLONNES) ;
 
   for(L=0;L<DATAS_NB_LIGNES;L++) {
     for(C=0;C<DATAS_NB_COLONNES;C++) { 
@@ -792,10 +792,10 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
    memset(buffer,ZERO_CHAR,CONFIG_TAILLE_BUFFER);
    sprintf(buffer,"Pbme ouverture %s",buf) ;
    //LOG(buffer) ;
-   printf("probleme ouverture %s\n",buf) ; 
+   TRACE("probleme ouverture %s",buf) ; 
    exit(2) ;
   }
-  else printf("open %s ok\n", buf) ;
+  else TRACE("open %s ok", buf) ;
 
   memset(buf,ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
   i=0;
@@ -820,13 +820,17 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
     if (CONFIG_FIN_MOT(c)) {
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
-      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );
+
+      TRACE1("datas[%d][%d]=%s",L,C,datas[L][C] );
+      
       C++;
     }
     if ((CONFIG_FIN_LIGNE(c)&& i!=0)||i==CONFIG_TAILLE_BUFFER) {
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
-      printf("datas[%d][%d]=%s\n",L,C,datas[L][C] );
+      
+      TRACE1("datas[%d][%d]=%s",L,C,datas[L][C] );
+      
       L++;
       C=0;
     }
@@ -846,10 +850,14 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
 
   for(L=0;L<DATAS_NB_LIGNES;L++) {
     for(C=0;C<DATAS_NB_COLONNES;C++) { 
-      if ( C>0 )printf(" ") ;
-      if (strlen(datas[L][C])) printf("%s",datas[L][C]) ;
+      if ( C>0 ) {
+         TRACE1("") ;
+      }
+      if (strlen(datas[L][C])) {
+        TRACE1(" %s " , datas[L][C]) ;
+      }
     }
-    printf("\n") ;
+    TRACE1("") ;
   }
 /*
   for(l=0;l<DATAS_NB_LIGNES;l++) {
