@@ -127,16 +127,17 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 // TODO : voir la reelle utilite de SUIVI_MENU_PREALABLE et des variables suivi->SUIVI_MANUEL , suivi->SUIVI_EQUATORIAL , etc ..
 
   switch ( suivi->menu ) {
-    case MENU_MANUEL_BRUT     : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_ASSERVI  : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_AZIMUTAL        : suivi->SUIVI_EQUATORIAL = 0 ; break ;
-    case MENU_EQUATORIAL      : suivi->SUIVI_EQUATORIAL = 1 ; break ;
-    case MENU_GOTO            : suivi->SUIVI_GOTO       = 1 ; break ;
-    case MENU_INFO            : break ;
-    case MENU_RESEAU_UP       : break ;
-    case MENU_RESEAU_DOWN     : break ; 
-    case MENU_PROGRAMME_DOWN  : break ; 
-    case MENU_DOWN            : break ; 
+    case MENU_AZIMUTAL            : suivi->SUIVI_EQUATORIAL = 0 ; break ;
+    case MENU_EQUATORIAL          : suivi->SUIVI_EQUATORIAL = 1 ; break ;
+    case MENU_MANUEL_BRUT         : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_NON_ASSSERVI : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_ASSERVI      : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_GOTO                : suivi->SUIVI_GOTO       = 1 ; break ;
+    case MENU_INFO                : break ;
+    case MENU_RESEAU_UP           : break ;
+    case MENU_RESEAU_DOWN         : break ; 
+    case MENU_PROGRAMME_DOWN      : break ; 
+    case MENU_DOWN                : break ; 
   }
 }
 // #######################################################################################
@@ -293,14 +294,14 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   }
 }
 //==========================================================
-// MODE MANUEL 0 : le suivi etant effectue sur un astre (calcul des vitesses et periodes par suivi_voute)
+// SUIVI_MANUEL_BRUT : le suivi etant effectue sur un astre (calcul des vitesses et periodes par suivi_voute)
 // l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
 // avec une multiplication des vitesses N-S-E-O par un facteur ALT_ACC
 //==========================================================
 // Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
 //==========================================================
 
-void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) {
+void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   
   int flag = 0 ;
   int flag_calcul = 0 ;
@@ -652,34 +653,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
     switch( suivi->menu ) {
 
-      // -------------------------- SUIVI MANUEL PAR DEFAUT ------------------
-      /*
-      case MENU_MANUEL_BRUT :
-
-        // le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
-        // simplement une acceleration / ralentissement / changement de direction
-        // sur le N-S-E-O (pas de recalcul des periodes) 
-        // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
-        SUIVI_MANUEL_0(suivi, clavier) ;
-        suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_BRUT ; 
-      */
-
-      break ;
-      // -------------------------- SUIVI MANUEL AVEC RE-CALCUL DES PERIODES  -----------------
-      case MENU_MANUEL_ASSERVI :
-       
-        // TODO : a modifier car cela marche pas tres bien (interraction avec le thread SUIVI_VOUTE)
-        // TODO : le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
-        // TODO : les periodes / frequences en azimut et altitude
-
-        SUIVI_MANUEL_1(suivi, clavier) ; 
-        CALCUL_PERIODES_SUIVI_MANUEL(astre,suivi,voute)  ;
-
-        suivi->menu_old         = suivi->menu ;
-        suivi->menu             = MENU_MANUEL_ASSERVI ; 
-
-      break ;
       // ------------------------------- ALIGNEMENT - MODE AZIMUTAL ----------------------------
      
       case MENU_AZIMUTAL :
@@ -730,9 +703,30 @@ void * SUIVI_MENU(SUIVI * suivi) {
         suivi->menu             = MENU_MANUEL_BRUT ;
 
       break ;
-      // -------------------------- SMENU_MANUEL_BRUT : LE PLUS SIMPLE ------------------
+
+      // -------------------------- SUIVI MANUEL PAR DEFAUT ------------------
       
       case MENU_MANUEL_BRUT :
+
+        // le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
+        // simplement une acceleration / ralentissement / changement de direction
+        // sur le N-S-E-O (pas de recalcul des periodes) 
+        // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
+
+        SUIVI_MANUEL_BRUT(suivi, clavier) ;
+        
+        suivi->menu_old         = suivi->menu ;
+        suivi->menu             = MENU_MANUEL_BRUT ; 
+
+      break ;
+
+      /* -------------------------- MENU_MANUEL_NON_ASSSERVI : LE PLUS SIMPLE ------------------
+          TODO : a coder : juste appui des touches provoque le mouvement
+          TODO : mode le plus simple a priori
+          TODO : acc_azi_ et acc_alt doivent etre initialises a zero
+      */
+      
+      case MENU_MANUEL_NON_ASSSERVI :
 
         // Suivi le plus simple : seules les touches est nord sud ouest et reset sont prises en compte
         // TODO : verifier
@@ -754,6 +748,22 @@ void * SUIVI_MENU(SUIVI * suivi) {
         suivi->menu             = MENU_MANUEL_BRUT ; 
 
       break ;
+
+      // -------------------------- SUIVI MANUEL AVEC RE-CALCUL DES PERIODES  -----------------
+      case MENU_MANUEL_ASSERVI :
+       
+        // TODO : a modifier car cela marche pas tres bien (interraction avec le thread SUIVI_VOUTE)
+        // TODO : le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
+        // TODO : les periodes / frequences en azimut et altitude
+
+        SUIVI_MANUEL_1(suivi, clavier) ; 
+        CALCUL_PERIODES_SUIVI_MANUEL(astre,suivi,voute)  ;
+
+        suivi->menu_old         = suivi->menu ;
+        suivi->menu             = MENU_MANUEL_ASSERVI ; 
+
+      break ;
+
       // ------------------------------  MODE GOTO --------------------------------------
 
       case MENU_GOTO :
