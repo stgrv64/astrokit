@@ -978,6 +978,8 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
    long   i_incr=0 ; 
    struct sched_param param;
    
+   TRACE("start") ;
+   
    if ( priority > 0) {
      param.sched_priority = GPIO_SUIVI_MAIN_PRIORITY ;  
      if (pthread_setschedparam( pthread_self(), GPIO_SUIVI_MAIN_SCHED, & param) != 0) {perror("suivi_main_M");exit(EXIT_FAILURE);}
