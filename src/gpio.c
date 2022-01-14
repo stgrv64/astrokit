@@ -44,6 +44,7 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
     strcpy( GPIO_ALT, datas[l][1] ) ;
 
     for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gpio_in[j]=-1 ;
+
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
@@ -57,19 +58,21 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
     strcpy( GPIO_AZI, datas[l][1] ) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_out[i]=-1 ;
+
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_azi[j]=atoi(token);
     }
    }
-   if(!strcmp("gpio_mas",datas[l][0])) {
+   if(!strcmp("GPIO_MAS",datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_MAS,0,sizeof(GPIO_MAS)) ;
     strcpy( GPIO_MAS, datas[l][1] ) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_mas[i]=-1 ;
+    
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
