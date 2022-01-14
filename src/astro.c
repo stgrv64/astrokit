@@ -1097,9 +1097,9 @@ int main(int argc, char ** argv) {
 /*
   CONFIG_AFFICHER_VARIABLES() ;
 */
-  TRACE("gpio_alt         : %d %d %d %d\n", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
-  TRACE("gpio_azi         : %d %d %d %d\n", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
-  TRACE("gpio_mas         : %d %d %d %d\n", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
+  TRACE("gpio_alt         : %d %d %d %d", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
+  TRACE("gpio_azi         : %d %d %d %d", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
+  TRACE("gpio_mas         : %d %d %d %d", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
   TRACE("GPIO_LED_ETAT    : %d", GPIO_LED_ETAT );
   TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
   

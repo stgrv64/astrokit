@@ -28,7 +28,7 @@ void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFF
    for(c=0;c<CAT_NB_COLONNES;c++) {
     sprintf( buffer, "%-10s %-10s", buffer, catalogue[l][c] ) ;
    }
-   printf("%5d = %s\n",l,buffer) ;
+   TRACE("%5d = %s ",l,buffer) ;
    l++;
    if( l>=CAT_NB_LIGNES) break ;
   }
@@ -55,7 +55,7 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
     TRACE("probleme ouverture %s\n",buf) ;
     exit(2) ;
   }
-  else printf("open %s ok\n", buf) ;
+  else TRACE("open %s ok", buf) ;
 
   L=0;C=0;
   
@@ -86,7 +86,7 @@ void CAT_ZONE(ASTRE *astre, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
   dec = astre->H ;
   L=0 ;
   d_min=deg ;
-  printf("Recherche dans la zone de %s : ASC=%f DEC=%f\n", astre->nom, astre->ASC, astre->H) ;
+  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", astre->nom, astre->ASC, astre->H) ;
   
   while(strcmp(cat[L][3],"_") && strcmp(astre->nom,cat[L][0]) && strcmp(astre->nom,cat[L][1])) {
    
@@ -96,7 +96,7 @@ void CAT_ZONE(ASTRE *astre, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     
     if (  d_angulaire < d_min )     // si objet dans le cercle recherche
     if ( deg > d_angulaire )  {
-      // printf("dans la zone => %s=%s : ASC=%s DEC=%s DIST=%f\n",cat[L][0],cat[L][1],cat[L][2],cat[L][3], d_angulaire) ;
+      // TRACE("dans la zone => %s=%s : ASC=%s DEC=%s DIST=%f",cat[L][0],cat[L][1],cat[L][2],cat[L][3], d_angulaire) ;
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
@@ -107,7 +107,7 @@ void CAT_ZONE(ASTRE *astre, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     }
     L++;
   }
-  printf("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f\n",\
+  TRACE("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f",\
   astre->plus_proche[0], astre->plus_proche[1], astre->plus_proche[2], astre->plus_proche[3], d_min) ;
 }
 //============================================================================
