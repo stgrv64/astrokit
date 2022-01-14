@@ -63,17 +63,17 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
       gpio_azi[j]=atoi(token);
     }
    }
-   if(!strcmp("GPIO_MASQUE",datas[l][0])) {
+   if(!strcmp("gpio_mas",datas[l][0])) {
 
     // FIXME ajout stephane 2021
-    memset( GPIO_MASQUE,0,sizeof(GPIO_MASQUE)) ;
-    strcpy( GPIO_MASQUE, datas[l][1] ) ;
+    memset( GPIO_MAS,0,sizeof(GPIO_MAS)) ;
+    strcpy( GPIO_MAS, datas[l][1] ) ;
 
-    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_masque[i]=-1 ;
+    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_mas[i]=-1 ;
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_masque[j]=atoi(token);
+      gpio_mas[j]=atoi(token);
     }
    }
    if(!strcmp("GPIO_FREQUENCE_PWM",datas[l][0])) {
@@ -92,7 +92,7 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
   }
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_azi[%d] =%d",i,gpio_azi[i]);
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_alt[%d]=%d",i,gpio_alt[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_masque[%d]=%d",i,gpio_masque[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_mas[%d]=%d",i,gpio_mas[i]);
    
   TRACE1("GPIO_FREQUENCE_PWM=%f", gpio_frequence_pwm ) ;
 }
@@ -1102,7 +1102,7 @@ void GPIO_INIT_PWM_MOTEUR_2(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_M
       perror(cmd) ;
       system(cmd) ;
     }
-    TRACE("") ;
+    /* TRACE("") ; */
     usleep(100000) ;
   }
   GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES( pm )  ;

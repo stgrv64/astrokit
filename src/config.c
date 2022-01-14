@@ -696,7 +696,7 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
 
   TRACE("GPIO_ALT = %s", GPIO_ALT)  ;  
   TRACE("GPIO_AZI = %s", GPIO_AZI)  ;  
-  TRACE("GPIO_MASQUE = %s", GPIO_MASQUE)  ;  
+  TRACE("GPIO_MAS = %s", GPIO_MAS)  ;  
   TRACE("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;  
 
   TRACE1("anciennes variables\n");
@@ -919,11 +919,12 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
     
-  TRACE("ASTRE : %s\n - Va = %.2f -Vh = %.2f", as->nom, as->Va,  as->Vh  ) ;
-  TRACE(" azimut      = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->a , astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
-  TRACE(" altitude    = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->h , astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
-  TRACE(" ang-horaire = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->A , astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
-  TRACE(" declinaison = %.2f (rad)\t%.2f (degres) : %d.%d (hh.mm)",astre->H , astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
+  TRACE(" ASTRE       : %10s Va = %.2f Vh = %.2f", as->nom, as->Va,  as->Vh ) ; 
+  
+  TRACE(" azimut      : %.2f (degres) : %d.%d (hh.mm)", astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
+  TRACE(" altitude    : %.2f (degres) : %d.%d (hh.mm)", astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
+  TRACE(" ang-horaire : %.2f (degres) : %d.%d (hh.mm)", astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
+  TRACE(" declinaison : %.2f (degres) : %d.%d (hh.mm)", astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
   
   TRACE2("astre->AZI  = %f",astre->AZI) ;
   TRACE2("astre->AZI1 = %f",astre->AZI1) ;
@@ -956,16 +957,17 @@ void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
 
   switch(suivi->menu) {
      
-    case MENU_AZIMUTAL          :strcpy(s_menu,"MENU_AZIMUTAL") ; break ; 
-    case MENU_EQUATORIAL        :strcpy(s_menu,"MENU_EQUATORIAL") ; break ; 
-    case MENU_MANUEL_BRUT       :strcpy(s_menu,"MENU_MANUEL_BRUT") ; break ; 
-    case MENU_MANUEL_ASSERVI    :strcpy(s_menu,"MENU_MANUEL_ASSERVI") ; break ; 
-    case MENU_GOTO              :strcpy(s_menu,"MENU_GOTO") ; break ; 
-    case MENU_INFO              :strcpy(s_menu,"MENU_INFO") ; break ; 
-    case MENU_RESEAU_UP         :strcpy(s_menu,"MENU_RESEAU_UP") ; break ; 
-    case MENU_RESEAU_DOWN       :strcpy(s_menu,"MENU_RESEAU_DOWN") ; break ; 
-    case MENU_PROGRAMME_DOWN    :strcpy(s_menu,"MENU_PROGRAMME_DOWN") ; break ; 
-    case MENU_DOWN              :strcpy(s_menu,"MENU_DOWN") ; break ; 
+    case MENU_AZIMUTAL             :strcpy(s_menu,"MENU_AZIMUTAL") ; break ; 
+    case MENU_EQUATORIAL           :strcpy(s_menu,"MENU_EQUATORIAL") ; break ; 
+    case MENU_MANUEL_BRUT          :strcpy(s_menu,"MENU_MANUEL_BRUT") ; break ; 
+    case MENU_MANUEL_NON_ASSERVI   :strcpy(s_menu,"MENU_MANUEL_NON_ASSERVI") ; break ; 
+    case MENU_MANUEL_ASSERVI       :strcpy(s_menu,"MENU_MANUEL_ASSERVI") ; break ; 
+    case MENU_GOTO                 :strcpy(s_menu,"MENU_GOTO") ; break ; 
+    case MENU_INFO                 :strcpy(s_menu,"MENU_INFO") ; break ; 
+    case MENU_RESEAU_UP            :strcpy(s_menu,"MENU_RESEAU_UP") ; break ; 
+    case MENU_RESEAU_DOWN          :strcpy(s_menu,"MENU_RESEAU_DOWN") ; break ; 
+    case MENU_PROGRAMME_DOWN       :strcpy(s_menu,"MENU_PROGRAMME_DOWN") ; break ; 
+    case MENU_DOWN                 :strcpy(s_menu,"MENU_DOWN") ; break ; 
   }
 
   if ( suivi->menu_old != suivi->menu ) {

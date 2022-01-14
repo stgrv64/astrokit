@@ -130,7 +130,7 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
     case MENU_AZIMUTAL            : suivi->SUIVI_EQUATORIAL = 0 ; break ;
     case MENU_EQUATORIAL          : suivi->SUIVI_EQUATORIAL = 1 ; break ;
     case MENU_MANUEL_BRUT         : suivi->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_NON_ASSSERVI : suivi->SUIVI_MANUEL     = 1 ; break ;
+    case MENU_MANUEL_NON_ASSERVI : suivi->SUIVI_MANUEL     = 1 ; break ;
     case MENU_MANUEL_ASSERVI      : suivi->SUIVI_MANUEL     = 1 ; break ;
     case MENU_GOTO                : suivi->SUIVI_GOTO       = 1 ; break ;
     case MENU_INFO                : break ;
@@ -720,13 +720,13 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
       break ;
 
-      /* -------------------------- MENU_MANUEL_NON_ASSSERVI : LE PLUS SIMPLE ------------------
+      /* -------------------------- MENU_MANUEL_NON_ASSERVI : LE PLUS SIMPLE ------------------
           TODO : a coder : juste appui des touches provoque le mouvement
           TODO : mode le plus simple a priori
           TODO : acc_azi_ et acc_alt doivent etre initialises a zero
       */
       
-      case MENU_MANUEL_NON_ASSSERVI :
+      case MENU_MANUEL_NON_ASSERVI :
 
         // Suivi le plus simple : seules les touches est nord sud ouest et reset sont prises en compte
         // TODO : verifier
@@ -1092,13 +1092,13 @@ int main(int argc, char ** argv) {
 
   if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
   
-  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[], gpio_azi[], gpio_masque[] et gpio_frequence_pwm[]
-  
+  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[], gpio_azi[], gpio_mas[] et gpio_frequence_pwm[]
+/*
   CONFIG_AFFICHER_VARIABLES() ;
-
-  TRACE("gpio_alt[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_alt[i]) ; printf("\n") ;
-  TRACE("gpio_azi[x]=") ;    for(i=0;i<4;i++) TRACE("%d ",gpio_azi[i]) ; printf("\n") ;
-  TRACE("gpio_masque[x]=") ; for(i=0;i<4;i++) TRACE("%d ",gpio_masque[i]) ; printf("\n") ;
+*/
+  printf("gpio_alt = %d %d %d %d\n", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
+  printf("gpio_azi = %d %d %d %d\n", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
+  printf("gpio_mas = %d %d %d %d\n", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
   // -----------------------------------------------------------------
   
   TRACE("GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
@@ -1171,7 +1171,7 @@ int main(int argc, char ** argv) {
   GPIO_INIT_PWM_MOTEUR_2(\
     pm_alt,\
     gpio_alt,\
-    gpio_masque,\
+    gpio_mas,\
     ALT_R4 ,\
     100,\
     gpio_frequence_pwm, \
@@ -1183,7 +1183,7 @@ int main(int argc, char ** argv) {
   GPIO_INIT_PWM_MOTEUR_2(\
     pm_azi,\
     gpio_azi,\
-    gpio_masque,\
+    gpio_mas,\
     AZI_R4 ,\
     100,\
     gpio_frequence_pwm, \
