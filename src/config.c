@@ -92,7 +92,7 @@ void CONFIG_INIT_LOG(void) {
     
     if ( (flog=fopen(buf,"a")) == NULL) {
       // completer et modifier
-      TRACE("probleme ouverture %s\n",buf) ;
+      TRACE("probleme ouverture %s",buf) ;
       exit(2) ;
     }
     else TRACE("open %s ok", buf) ;
@@ -875,14 +875,9 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
-  
-  TRACE("lat %.2f lon %.2f alt %.2f JJ %.2f TS %.2f TSR %.2f JD %.2f",\
-          lieu->lat * DEGRES,\
-          lieu->lon * DEGRES,\
-          lieu->alt , lieu->JJ,
-          lieu->TS,\
-          lieu->TSR,\
-          lieu->JD ) ;
+
+  TRACE(" latitude    :  %.2f", lieu->lat * DEGRES ) ; 
+  TRACE(" longitude   :  %.2f", lieu->lon * DEGRES ) ;
 
   TRACE1("lieu->lat (degres) = %f",lieu->lat * DEGRES ) ;
   TRACE1("lieu->lon (degres) = %f",lieu->lon * DEGRES ) ;
@@ -895,7 +890,7 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
   
-  TRACE("%d %d %d %d %d %d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
+  TRACE(" DATE / HOUR : %d-%d-%d %d:%d:%d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
 
   TRACE1("temps->yy = %d", temps->yy ) ;
   TRACE1("temps->mm = %d", temps->mm ) ;

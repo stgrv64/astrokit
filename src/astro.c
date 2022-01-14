@@ -893,11 +893,11 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
         CONFIG_AFFICHER_ASTRE(astre) ; 
         suivi->SUIVI_ALIGNEMENT = 0 ;
       }
-
+/*
       if ( suivi->menu_old != suivi->menu  ) {
         CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
       }
-
+*/
       astre->A   += voute->pas ;
       voute->deb += voute->pas ;
 
@@ -1082,9 +1082,10 @@ int main(int argc, char ** argv) {
   getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) ;
   TRACE("config_rep_home lu par getcwd = %s",CONFIG_REP_HOME);
 
-  CONFIG_READ       ( datas ) ;
-  //CONFIG_AFFICHER_DATAS( datas ) ;
-  CONFIG_INIT_VAR   ( datas ) ;   
+  CONFIG_READ           ( datas ) ;
+  CONFIG_AFFICHER_DATAS ( datas ) ;
+  CONFIG_INIT_VAR       ( datas ) ;   
+
   CONFIG_INIT_LOG(); 
 
   // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OUTPUT (old)(2021)
@@ -1096,12 +1097,10 @@ int main(int argc, char ** argv) {
 /*
   CONFIG_AFFICHER_VARIABLES() ;
 */
-  printf("gpio_alt = %d %d %d %d\n", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
-  printf("gpio_azi = %d %d %d %d\n", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
-  printf("gpio_mas = %d %d %d %d\n", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
-  // -----------------------------------------------------------------
-  
-  TRACE("GPIO_LED_ETAT     = %d\n", GPIO_LED_ETAT );
+  TRACE("gpio_alt         : %d %d %d %d\n", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
+  TRACE("gpio_azi         : %d %d %d %d\n", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
+  TRACE("gpio_mas         : %d %d %d %d\n", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
+  TRACE("GPIO_LED_ETAT    : %d", GPIO_LED_ETAT );
   TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
   
   // -----------------------------------------------------------------
