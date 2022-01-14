@@ -1,0 +1,25 @@
+Configuration pour le noyau 5.10.63 - teste sur raspbian 11 2021
+
+-> avec le compte pi initial
+-> sudo apt install lirc
+-> cd /boot
+-> modifier config.txt
+-> ajouter ligne dtoverlay=gpio-ir,gpio_pin=27
+-> reboot
+-> /dev/lirc0 doit apparaitre
+-> module gpio-ir doit etre charge
+-> lsmod | grep gpio_ir_recv => 
+  pi@raspberrypi:/boot $ lsmod | grep gpio
+  gpio_ir_recv           16384  0
+-> ce comportement est deja attendu sur la distro Yocto avec IMAGE_INSTALL_append = " lirc"
+-> cat /dev/lirc0 doit faire apparaitre qqchose quand on appuie sur une telecommande IR (led 27 en enetree)
+-> modification fichier /etc/lirc/lirc_options.conf
+  #driver          = devinput
+  driver          = default
+  #device          = auto
+  device          = /dev/lirc0 
+-> relance service lircd 
+-> mode2 doit faire apparaitre des trames qd on appuie sur telecommande IR
+-> jusqu'ici le comportement attendu est OK pour distro Yocto
+-> 
+
