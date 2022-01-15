@@ -49,7 +49,7 @@ extern int    g3plan ( double J, struct plantbl *plan, double pobj[], int obj );
 extern int    kepler ( double J, struct orbit *e, double rect[], double polar[] );
 extern int    embofs ( double J, double emb[], double *r );
 extern int    kinit ( void );
-int           kinit_moi(double tlongg, double glatt, double heightt,double attempp, double atpresss, double jdflagg, double dtgivenn ) ;
+int           KINIT_ASTROKIT(double tlongg, double glatt, double heightt,double attempp, double atpresss, double jdflagg, double dtgivenn ) ;
 extern int    getorbit ( struct orbit *el );
 extern int    getstar ( struct star *el );
 extern FILE *fincat ( char *name, int n, char *str1, char *str2 );

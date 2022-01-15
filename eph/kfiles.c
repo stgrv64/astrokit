@@ -133,7 +133,7 @@ int kinit() // declaration fonction
 /* Program to read in a file containing orbital parameters */
 //=============================================================================
 
-int kinit_moi(double tlongg, double glatt, double heightt,double attempp, double atpresss, double jdflagg, double dtgivenn ) // declaration fonction
+int KINIT_ASTROKIT(double tlongg, double glatt, double heightt,double attempp, double atpresss, double jdflagg, double dtgivenn ) // declaration fonction
 {
   double a, b, fl, co, si, u;
   //char s[84];

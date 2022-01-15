@@ -374,7 +374,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 /*
     TRACE("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 */
-    TRACE("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "fleches.." , \
+    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "fleches.." , \
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 
     pthread_mutex_unlock(& suivi->mutex_azi );
@@ -400,7 +400,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 /*
     TRACE("acc*ALTAZ_FORWARD %.4f acc_azi %.4f acc_alt %.4f", ALTAZ_FORWARD, suivi->acc_azi, suivi->acc_alt ) ;
 */
-    TRACE("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward.." , \
+    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward.." , \
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 
     suivi->pas_forward = 0 ;
@@ -419,7 +419,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 /*
     TRACE("acc/ALTAZ_REWIND %.4f acc_azi %.4f acc_alt %.4f ", ALTAZ_REWIND, suivi->acc_azi, suivi->acc_alt ) ;
 */
-    TRACE("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "rewind.." , \
+    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "rewind.." , \
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 
 
@@ -445,7 +445,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 /*
     TRACE("acc*ALTAZ_FORWARD_FAST %.4f acc_azi %.4f acc_alt %.4f", ALTAZ_FORWARD_FAST, suivi->acc_azi, suivi->acc_alt ) ;
 */
-    TRACE("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
+    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 
     suivi->pas_forward_fast = 0 ;
@@ -465,9 +465,9 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 /*
     TRACE("acc/ALTAZ_REWIND_FAST  %.4f acc_azi %.4f acc_alt %.4f ", ALTAZ_REWIND_FAST, suivi->acc_azi, suivi->acc_alt ) ;
 */
-    TRACE("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "rewind fast.." , \
+    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
-
+               
     suivi->pas_rewind_fast  = 0 ;
     flag_calcul = 1 ;
   }

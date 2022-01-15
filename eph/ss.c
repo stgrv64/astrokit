@@ -325,7 +325,7 @@ void SOLAR_SYSTEM(char * nom,double * a, double * h,double lat, double lon, doub
   djd=0 ;
   ntab=1 ;
 
-  kinit_moi( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
+  KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
   //JD = zgetdate_moi( yearr, monthh, dayy) ; 
   //JD +=  gethms_moi( hourr, minn,   secc ) ;
   
@@ -419,7 +419,7 @@ void SOLAR_SYSTEM_NEW( char * nom, double * ASC, double * H, double * a, double 
   djd=0 ;
   ntab=1 ;
 
-  kinit_moi( tlongg,  glatt,  heightt, 10.0,  1015,  1,  0 ) ;
+  KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  1,  0 ) ;
 
   JD = zgetdate_moi( yearr, monthh, dayy) ; 
   JD +=  gethms_moi( hourr, minn,   secc ) ;
@@ -487,7 +487,7 @@ void SOLAR_SYSTEM_NEW( char * nom, double * ASC, double * H, double * a, double 
 // Main program starts here.
 //===========================================================================================
 
-int mainSS(int argc , char ** argv) {
+int main(int argc , char ** argv) {
 
   char nom[ 255 ] ;
   double *asc = NULL , aa ;
@@ -527,7 +527,7 @@ int mainSS(int argc , char ** argv) {
     djd  = 0 ;
     ntab = 1 ;
 
-    kinit_moi( tlongg,  glatt,  200, 10.0,  1015,  1,  0 ) ;
+    KINIT_ASTROKIT( tlongg,  glatt,  200, 10.0,  1015,  1,  0 ) ;
   }
   else if ( argc == 11 ) {
    
@@ -546,7 +546,7 @@ int mainSS(int argc , char ** argv) {
     djd=0 ;
     ntab=1 ;
 
-    kinit_moi( tlongg,  glatt,  heightt, 10.0,  1015,  1,  0 ) ;
+    KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  1,  0 ) ;
 
     JD = zgetdate_moi( yearr, monthh, dayy) ; 
     JD +=  gethms_moi( hourr, minn,   secc ) ;

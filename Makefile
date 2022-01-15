@@ -29,6 +29,7 @@ VERS	= $(shell date +%B.%Y)
 HOME	= /home/stef
 RM 	= rm -f
 EPHA	= libephe.a
+EPHX	= solarsystem
 
 RPWD	= ${HOME}/${GIT}/${PROJ}
 RSRC	= ${RPWD}/src
@@ -58,12 +59,15 @@ DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
 SRC	= src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
+
 OBJ	= $(SRC:.c=.o)
 
 SRCIR	= src/ir.c src/gpio.c
 OBJIR	= $(SRCIR:.c=.o)
 
 LEPH	= ${RLIB}/${EPHA}
+XEPH	= ${RLIB}/${EPHX}
+
 EPHS	= $(REPH)/*.c
 SRCS	= ${RSRC}/*.c
 OBJS	= $(SRCS:.c=.o)
@@ -83,7 +87,10 @@ $(GPIO): $(OBJ)
 	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${GPIO} $(LIBS)
 
 $(LEPH)	:
-	cd ${REPH} ; make clean ; make
+	cd ${REPH} ; make $(EPHA)
+
+$(XEPH)	:
+	cd ${REPH} ; make $(EPHX)
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -95,9 +102,14 @@ cleanlib:
 	${RM} ${REPH}/*.o
 	${RM} ${LEPH}
 
-cleanall: clean cleanlib
+cleansolarsystem:
+	${RM} ${REPH}/*.o
+	${RM} ${XEPH}	
+
+cleanall: clean cleanlib cleansolarsystem
 
 lib: $(LEPH)
+$(EPHX): $(XEPH)
 
 all: all-before cleanall $(LEPH) $(EXEC) all-after
 

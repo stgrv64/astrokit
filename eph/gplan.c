@@ -71,6 +71,11 @@ gplan (J, plan, pobj)
   register double su, cu, sv, cv, T;
   double t, sl, sb, sr;
   int i, j, k, m, n, k1, ip, np, nt;
+
+/*------------------------*/
+/* Linux is not  _MSC_VER */
+/*------------------------*/
+
 #ifdef _MSC_VER
   char FAR *p;
   double FAR *pl;
@@ -78,18 +83,28 @@ gplan (J, plan, pobj)
   double FAR *pr;
 #else
   /* On some systems such as Silicon Graphics, char is unsigned
-     by default.  */
+    by default.  */
 #ifdef vax
   /* VAX CC rejects "signed char."  */
   char *p;
 #else
-#ifdef __STDC__
+
+/*
+  FIXME : ajout #ifdef __GNUC__
+          stephane gravois jan 2022
+*/
+
+#ifdef __GNUC__
+  char *p;
+#elif __STDC__
   signed char *p;
 #else
   char *p;
 #endif
+
+
 #endif
-  double *pl, *pb, *pr;
+double *pl, *pb, *pr;
 #endif
 
   T = (J - J2000) / plan->timescale;
@@ -441,11 +456,20 @@ g3plan (J, plan, pobj, objnum)
   /* VAX CC rejects "signed char."  */
   char *p;
 #else
-#ifdef __STDC__
+
+/*
+  FIXME : ajout #ifdef __GNUC__
+          stephane gravois jan 2022
+*/
+
+#ifdef __GNUC__
+  char *p;
+#elif __STDC__
   signed char *p;
 #else
   char *p;
 #endif
+
 #endif
   long *pl, *pb, *pr;
 #endif
@@ -613,11 +637,20 @@ g2plan (J, plan, pobj)
   /* VAX CC rejects "signed char."  */
   char *p;
 #else
-#ifdef __STDC__
+
+/*
+  FIXME : ajout #ifdef __GNUC__
+          stephane gravois jan 2022
+*/
+
+#ifdef __GNUC__
+  char *p;
+#elif __STDC__
   signed char *p;
 #else
   char *p;
 #endif
+
 #endif
   long *pl, *pr;
 #endif
@@ -764,11 +797,20 @@ g1plan (J, plan)
   /* VAX CC rejects "signed char."  */
   char *p;
 #else
-#ifdef __STDC__
+
+/*
+  FIXME : ajout #ifdef __GNUC__
+          stephane gravois jan 2022
+*/
+
+#ifdef __GNUC__
+  char *p;
+#elif __STDC__
   signed char *p;
 #else
   char *p;
 #endif
+
 #endif
   long *pl;
 #endif

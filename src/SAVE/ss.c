@@ -333,7 +333,7 @@ int main(int argc , char ** argv) {
     djd=0 ;
     ntab=1 ;
 
-    kinit_moi( tlongg,  glatt,  200, 10.0,  1015,  2,  0 ) ;
+    KINIT_ASTROKIT( tlongg,  glatt,  200, 10.0,  1015,  2,  0 ) ;
   }
   else if ( argc == 11 ) {
 
@@ -354,7 +354,7 @@ int main(int argc , char ** argv) {
     djd=0 ;
     ntab=1 ;
 
-    kinit_moi( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
+    KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
 
     JD = zgetdate_moi( yearr, monthh, dayy) ; 
     JD +=  gethms_moi( hourr, minn,   secc ) ;
@@ -458,7 +458,7 @@ int AA_SOLAR_SYSTEM(int argc , char ** argv) {
     djd=0 ;
     ntab=1 ;
 
-    kinit_moi( tlongg,  glatt,  200, 10.0,  1015,  2,  0 ) ;
+    KINIT_ASTROKIT( tlongg,  glatt,  200, 10.0,  1015,  2,  0 ) ;
   }
   else if ( argc == 11 ) {
 
@@ -479,7 +479,7 @@ int AA_SOLAR_SYSTEM(int argc , char ** argv) {
     djd=0 ;
     ntab=1 ;
 
-    kinit_moi( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
+    KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
 
     JD = zgetdate_moi( yearr, monthh, dayy) ; 
     JD +=  gethms_moi( hourr, minn,   secc ) ;

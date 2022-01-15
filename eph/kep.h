@@ -114,7 +114,7 @@ extern double jvearth, vearth[];
 #define ANSIPROT
 #else
 int showrd(), showcor(), dms(), hms(), jtocal(), epsiln();
-int fk4fk5(), kepler(), kinit(), kinit_moi(), getnum(), getnum_moi(), deltap();
+int fk4fk5(), kepler(), kinit(), KINIT_ASTROKIT(), getnum(), getnum_moi(), deltap();
 int lonlat(), nutate(), precess(), reduce(), rstar();
 int lightt(), velearth(), diurpx(), diurab(), update();
 int relativity(), showcname(), annuab(), angles(), altaz();
