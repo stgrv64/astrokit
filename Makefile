@@ -11,6 +11,12 @@
 # Regles implicites (rappel) : 
 # * make va d'abord rechercher EXEC pui all puis ..
 
+# -------------------------------------------------------------------------------------
+#  HISTORIQUE MODIFICATION
+#  2022 : pouvoir compiler le binaire en plus de l archive 
+#         le nom de larchive est EPHA
+#         le nom de le executable est EPHX
+
 #--------------------------------------------------------------------------------------
 # CC	= gcc
 # CC	= armv6-gcc
@@ -111,7 +117,7 @@ cleanall: clean cleanlib cleansolarsystem
 lib: $(LEPH)
 $(EPHX): $(XEPH)
 
-all: all-before cleanall $(LEPH) $(EXEC) all-after
+all: all-before $(LEPH) $(EXEC) all-after
 
 
 # -----------------------------------------------------------------------------
