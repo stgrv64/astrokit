@@ -487,7 +487,7 @@ void SOLAR_SYSTEM_NEW( char * nom, double * ASC, double * H, double * a, double 
 // Main program starts here.
 //===========================================================================================
 
-int main(int argc , char ** argv) {
+int mainSS(int argc , char ** argv) {
 
   char nom[ 255 ] ;
   double *asc = NULL , aa ;
