@@ -152,11 +152,13 @@ void GPIO_KEYBOARD_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 // Lecture d'une touche sur le clavier matriciel 4*4
 // ---------------------------------------------------------------------------------------
 
-void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4][GPIO_TAILLE_BUFFER], CLAVIER* clavier) {
+void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) {
   int  i=0,j=0;
   int I=0, J=0  ;
   char val[255] ;
-  
+  /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+  char buffer_recopie [ CONFIG_TAILLE_BUFFER_32 ] ;
+
   I=-1; ; J=-1 ;
   
   for(i=0;i<4;i++) GPIO_SET( GPIO_KEY_C[i], 0) ;
@@ -182,9 +184,9 @@ void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
       if( GPIO_GET(GPIO_KEY_L[j])) {
         I=i; J=j ;
 	  memset( val, '\0', 255 );
-          strcpy( val, KEYBOARD[I][J] ) ;
+          strcpy( val, keyboard[I][J] ) ;
 	  if ( strcmp( val, "") ) {
-	    //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, KEYBOARD[i][j] ) ;
+	    //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, keyboard[i][j] ) ;
 	    strcpy( clavier->mot, val ) ; 
             clavier->appui_en_cours = 1 ;
 	    clavier->mot_en_cours = 1 ;
@@ -212,12 +214,21 @@ void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
     if ( strcmp( clavier->mot, clavier->valider) != 0 ) { 
       
       if ( strlen(clavier->phrase) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
-        sprintf(clavier->phrase,"%s%s",clavier->phrase, clavier->mot);
+
+        /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+        memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+        strcpy( buffer_recopie, clavier->phrase ) ;
+        /* sprintf( clavier->phrase,"%s%s", clavier->phrase, clavier->mot); */
+        sprintf( clavier->phrase,"%s%s", buffer_recopie, clavier->mot);
       
       if ( strcmp( clavier->premier, "")) {
         if ( strlen(clavier->nombre) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
         //printf("Si pas d'appui sur valider et premier non vide => on met le mot dans la phrase !!\n" ) ; 
-          sprintf(clavier->nombre,"%s%s",clavier->nombre,clavier->mot);
+          /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+          memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+          strcpy( buffer_recopie, clavier->nombre ) ;
+          /* sprintf(clavier->nombre,"%s%s", clavier->nombre, clavier->mot); */
+          sprintf(clavier->nombre,"%s%s", buffer_recopie, clavier->mot); 
       }
     }    
     //------------------------------------------------------------
@@ -276,7 +287,7 @@ void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
   }
 }
 //==========================================================
-void GPIO_KEYBOARD_RAQUETTE_READ(int GPIO_KEY_L[4],int GPIO_KEY_C[4], char raquette[4][4][GPIO_TAILLE_BUFFER], SUIVI *suivi) {
+void GPIO_KEYBOARD_RAQUETTE_READ(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) {
   int  i,j;
   char val[255] ;
   

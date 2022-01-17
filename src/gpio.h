@@ -150,6 +150,35 @@ typedef struct {
 }
 GPIO_PWM_MOTEUR ;
 
+/* ------------------------------------------------------------------------
+  - ajout definition "raquettes de commande" (obsolete : pour memoire)
+  - passage des const en static const car deplaces du .c dans le .h
+  ------------------------------------------------------------------------ */
+
+static const char  keyboard[4][4][GPIO_TAILLE_BUFFER] = \
+  {{"1","4",   "7", "MENU"},\
+  {"2" ,"5",   "8", "0"},\
+  {"3" ,"6",   "9", "."},\
+  {"MES" ,"NGC", "ETO", "valider"}} ;
+  
+static const char  raquette[4][4][GPIO_TAILLE_BUFFER] = \
+  {{"no" ,"o"    ,"so"     ,"MENU"},\
+  { "n"  ,"reset","s"      ,"0" },\
+  { "ne" ,"e"    ,"se"     ,"."},\
+  { "MES"  ,"NGC"  , "ETO", "valider"}} ;
+  
+static const char  keyboard_ir[4][4][GPIO_TAILLE_BUFFER] = \
+  {{"KEY_1" ,"KEY_4" , "KEY_7" , "KEY_MENU"}, \
+  { "KEY_2" ,"KEY_5" , "KEY_8" , "KEY_0" },\
+  { "KEY_3" ,"KEY_6" , "KEY_9" , "KEY_P"}, \
+  { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
+  
+static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
+  {{"KEY_1"  ,"KEY_LEFT"  , "KEY_7"  , "KEY_MENU"}, \
+  { "KEY_UP" ,"KEY_OK"    , "KEY_DOWN" , "KEY_0" },\
+  { "KEY_3"  ,"KEY_RIGHT" , "KEY_9" , "KEY_P"}, \
+  { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
+
 //==========================================================================
 
 int gpio_key_l[4] ;
@@ -183,19 +212,20 @@ int priority ;
 //==========================================================================
 
 
-void   GPIO_CLIGNOTE(int gpio, int nombre_clignotement, int duree_clignotement) ;
-void   GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
-void   GPIO_INIT_VAR2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
-void   GPIO_KEYBOARD_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) ;
-void   GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4][GPIO_TAILLE_BUFFER], CLAVIER* clavier) ;
-void   GPIO_KEYBOARD_RAQUETTE_READ(int GPIO_KEY_L[4],int GPIO_KEY_C[4], char raquette[4][4][GPIO_TAILLE_BUFFER], SUIVI *suivi) ;
-void   GPIO_TRAP(int sig) ;
+void   GPIO_CLIGNOTE         (int , int , int ) ;
+void   GPIO_INIT_VAR         (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+void   GPIO_INIT_VAR2        (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+void   GPIO_KEYBOARD_CONFIG  (int [4],int [4]) ;
+void   GPIO_KEYBOARD_READ    (int [4],int [4],CLAVIER* ) ;
+
+void   GPIO_KEYBOARD_RAQUETTE_READ(int [4],int [4], SUIVI *) ;
+void   GPIO_TRAP(int ) ;
 void   GPIO_STATUT(void) ;
-int    GPIO_GET(int gpio) ;
-int    GPIO_SET(int gpio,int val) ;
-int    GPIO_OPEN_BROCHE(int gpio,int output) ;
-void   GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *gpwm) ;
-int    GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) ;
+int    GPIO_GET(int ) ;
+int    GPIO_SET(int ,int ) ;
+int    GPIO_OPEN_BROCHE(int ,int ) ;
+void   GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *) ;
+int    GPIO_OPEN(int gpio_in[GPIO_SIZE],int [GPIO_SIZE]) ;
 int    GPIO_CLOSE_BROCHE(int gpio) ;
 int    GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) ;
 void   GPIO_SET_ALT(int dir, int slp, int clk, int rst, int mmm, int ena) ;

@@ -13,10 +13,10 @@
 
 # -------------------------------------------------------------------------------------
 #  HISTORIQUE MODIFICATION
-#  2022 : pouvoir compiler le binaire en plus de l archive 
-#         le nom de larchive est EPHA
-#         le nom de le executable est EPHX
-
+#  2022 : * pouvoir compiler le binaire en plus de l archive 
+#            - le nom de larchive est EPHA
+#            - le nom de le executable est EPHX
+#         * ajout librairie ncurses pour acces fonction getch (flux input keyboard)
 #--------------------------------------------------------------------------------------
 CC	= gcc
 # CC	= armv6-gcc
@@ -61,14 +61,14 @@ EXECGPIO= gpios
 #--------------------------------------------------------------------------------------
 
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
-LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
+LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses
 
 # ========================================
 # Prevoir la compilation avec GCC 
 # ========================================
 
 ifeq ($(CC),gcc)
-  LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
+  LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses
   EXEC = ${FICH}.${VERS}.host
 endif
 

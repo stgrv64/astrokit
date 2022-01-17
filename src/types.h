@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------
-# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
 # date        | commentaires 
 # --------------------------------------------------------------
@@ -11,6 +11,8 @@
 # --------------------------------------------------------------
 # 15/11/2021  | * modification des types enum et contenu enum
 #               * modification ordre des menus (MENU_AZIMUTAL=0)
+# 17/02/2022  | * ajout gestion touches clavier (*_CLAVIER)
+#               * nouveaux fichiers keyboard.h / .c
 # -------------------------------------------------------------- 
 */
 
@@ -249,7 +251,7 @@ typedef struct {
   int          DONNEES_INFRAROUGE ;
   int          DONNEES_RAQUETTE ;
   int          DONNEES_CONTROLEUR ; 
-
+  int          DONNEES_CLAVIER ; 
   int          init_capteurs ;
   
   pthread_mutex_t  mutex_alt  ;
@@ -261,6 +263,8 @@ typedef struct {
   pthread_t    p_suivi_infrarouge ;
   pthread_t    p_suivi_capteurs ;
   pthread_t    p_suivi_calculs ;
+  pthread_t    p_suivi_clavier ;
+
   pthread_t    p_suivi_alt ;
   pthread_t    p_suivi_azi ;
   pthread_t    p_menu ;
@@ -486,8 +490,9 @@ int MENU_PAR_DEFAUT ;
 int DONNEES_CAPTEURS    ;
 int DONNEES_RAQUETTE     ;
 int DONNEES_BLUETOOTH    ;
-int DONNEES_INFRAROUGE   ;
-int DONNEES_CONTROLEUR           ;
+int DONNEES_INFRAROUGE ;
+int DONNEES_CONTROLEUR ;
+int DONNEES_CLAVIER  ;
 
 int GPIO_RAQ_O  ;
 int GPIO_RAQ_E  ;

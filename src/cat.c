@@ -22,11 +22,17 @@ int CAT_FIN_MOT(char c) {
 void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
   int l, c ;
   char buffer[ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
+  /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+  char buffer_recopie [ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
   l=0 ;
   while( strcmp( catalogue[l][3], "_" ) ) {
    memset( buffer,ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
    for(c=0;c<CAT_NB_COLONNES;c++) {
-    sprintf( buffer, "%-10s %-10s", buffer, catalogue[l][c] ) ;
+    /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+    memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+    strcpy( buffer_recopie, buffer ) ;
+    /* sprintf( buffer, "%-10s %-10s", buffer, catalogue[l][c] ) ; */
+    sprintf( buffer, "%-10s %-10s", buffer_recopie, catalogue[l][c] ) ; 
    }
    TRACE("%5d = %s ",l,buffer) ;
    l++;

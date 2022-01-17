@@ -8,6 +8,7 @@
 # 04/2021  | ajout configuration des noms
 #            de repertoires et fichiers
 #            suppression des confs inutiles (mis a la fin)
+# 01/2022  | ajout parametre DONNEES_CLAVIER
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  2          # Menu azimutal
@@ -35,10 +36,12 @@ TEMPO_CAPTEURS  52000
 # ----------------------- parametres acquisitions
 
 DONNEES_CONTROLEUR   0  # flag qui indique utilisation des controleurs de moteur externes
-DONNEES_CAPTEURS     0  # flag qui indique utilisation de capteurs 
-DONNEES_RAQUETTE     0  # flag qui indique utilisation d une raquette 
-DONNEES_BLUETOOTH    0  # flag qui indique utilisation du bluetooth 
-DONNEES_INFRAROUGE   1  # flag qui indique utilisation de infrarouge
+DONNEES_CAPTEURS     0  # flag qui indique utilisation de capteurs comme source input
+DONNEES_RAQUETTE     0  # flag qui indique utilisation d une raquette (gpio) comme source input
+DONNEES_BLUETOOTH    0  # flag qui indique utilisation du bluetooth comme source input
+
+DONNEES_INFRAROUGE   1  # flag qui indique utilisation de infrarouge comme source input
+DONNEES_CLAVIER      1  # flag qui indique utilisation du clavier comme source input
 
 # ----------------------- parametres geographiques
 

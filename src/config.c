@@ -18,6 +18,7 @@
 # 15/11/2021  | * (types.h) modification des types enum et contenu enum
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
 #  => modification ordre MENUS dans switch
+# 17/01/2022  | * ajout DONNEES_CLAVIER pour utilisation du clavier
 # -------------------------------------------------------------- 
 */
 
@@ -335,6 +336,7 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->DONNEES_BLUETOOTH   = DONNEES_BLUETOOTH ;
   suivi->DONNEES_INFRAROUGE  = DONNEES_INFRAROUGE ;
   suivi->DONNEES_CONTROLEUR  = DONNEES_CONTROLEUR ;
+  suivi->DONNEES_CLAVIER     = DONNEES_CLAVIER ;
 
   suivi->init_capteurs = 0 ; 
   suivi->reset = 0 ;
@@ -494,11 +496,14 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
    
    ALT_R = 0 ;
    AZI_R = 0 ;
+   
    DONNEES_CAPTEURS = 0    ;
    DONNEES_RAQUETTE = 0    ;
    DONNEES_BLUETOOTH = 0   ;
    DONNEES_INFRAROUGE = 0  ;
    DONNEES_CONTROLEUR = 0 ;
+   DONNEES_CLAVIER = 0 ;
+
    GPIO_LED_ETAT=0;
 
    //----------------------------------------------------------------------
@@ -536,6 +541,7 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
      if(!strcmp("DONNEES_RAQUETTE",datas[l][0]))   DONNEES_RAQUETTE=atoi(datas[l][1]);
      if(!strcmp("DONNEES_BLUETOOTH",datas[l][0]))  DONNEES_BLUETOOTH=atoi(datas[l][1]);
      if(!strcmp("DONNEES_INFRAROUGE",datas[l][0])) DONNEES_INFRAROUGE=atoi(datas[l][1]);
+     if(!strcmp("DONNEES_CLAVIER",datas[l][0]))    DONNEES_CLAVIER=atoi(datas[l][1]);
 
      if(!strcmp("ALT_ROT",datas[l][0]))      ALT_ROT=atoi(datas[l][1]);
      if(!strcmp("AZI_ROT",datas[l][0]))      AZI_ROT=atoi(datas[l][1]);
@@ -661,6 +667,7 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   TRACE("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
   TRACE("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
   TRACE("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
+  TRACE("DONNEES_CLAVIER = %d",  DONNEES_CLAVIER);
 
   TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
   TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);

@@ -6,6 +6,8 @@
 # 03/04/2021  | * ajout entete
 #               * suite a ajout variables CONFIG_REP et CONFIG_FIC
 #                 il faut d'abord le fichier config.txt en priorite
+# 17/02/2022  | * ajout gestion touches clavier (*_CLAVIER)
+#               * nouveaux fichiers keyboard.h / .c
 # -------------------------------------------------------------- 
 */
 
@@ -21,32 +23,9 @@
 #include <sys/time.h>
 #include <sys/timeb.h>
 #include <sys/mman.h>
+#include <ncurses.h>
 
 #include <astro.h>
-
-char  keyboard[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"1","4",   "7", "MENU"},\
-  {"2" ,"5",   "8", "0"},\
-  {"3" ,"6",   "9", "."},\
-  {"MES" ,"NGC", "ETO", "valider"}} ;
-  
-char  raquette[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"no" ,"o"    ,"so"     ,"MENU"},\
-  { "n"  ,"reset","s"      ,"0" },\
-  { "ne" ,"e"    ,"se"     ,"."},\
-  { "MES"  ,"NGC"  , "ETO", "valider"}} ;
-  
-char  keyboard_ir[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"KEY_1" ,"KEY_4" , "KEY_7" , "KEY_MENU"}, \
-  { "KEY_2" ,"KEY_5" , "KEY_8" , "KEY_0" },\
-  { "KEY_3" ,"KEY_6" , "KEY_9" , "KEY_P"}, \
-  { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
-  
-char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"KEY_1"  ,"KEY_LEFT"  , "KEY_7"  , "KEY_MENU"}, \
-  { "KEY_UP" ,"KEY_OK"    , "KEY_DOWN" , "KEY_0" },\
-  { "KEY_3"  ,"KEY_RIGHT" , "KEY_9" , "KEY_P"}, \
-  { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
 
 int        incrlog ;
 int        id_thread ;  
@@ -107,7 +86,11 @@ void TRAP_SUIVI_CAPTEURS(int sig)  {
   printf("Signal trappe depuis thread suivi_capteurs= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_capteurs ) ;
 }
-
+void TRAP_SUIVI_CLAVIER(int sig)  {
+  
+  printf("Signal trappe depuis thread suivi_clavier= %d\n",sig) ;
+  pthread_cancel( suivi->p_suivi_clavier ) ;
+}
 // #######################################################################################
 
 void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
@@ -308,7 +291,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 
   TRACE1("start") ;
 
-  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, raquette, suivi) ;
+  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, suivi) ;
   if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
 
   // -----------------------------------------------------------
@@ -508,7 +491,7 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   azi = 0 ;
   alt = 0 ;
   
-  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, raquette, suivi) ;
+  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, suivi) ;
   if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
   
   // La determination de tempo_raq est tres importante
@@ -599,7 +582,7 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
     
     // on relit sur les claviers en mode manuel 
 
-    if ( suivi->DONNEES_RAQUETTE   ) GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, raquette, suivi) ;
+    if ( suivi->DONNEES_RAQUETTE   ) GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, suivi) ;
     if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
   }
   // =================================================================
@@ -660,7 +643,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
     usleep( suivi->temporisation_menu ) ;
 
-    if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_READ( gpio_key_l, gpio_key_c, keyboard, clavier) ;
+    if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_READ( gpio_key_l, gpio_key_c, clavier) ;
     if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_READ( suivi, clavier) ;
 
     // IR_ACTIONS_PARTICULIERES( suivi) ;
@@ -977,6 +960,29 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   return NULL ;
 }
 //==========================================================
+void * SUIVI_CLAVIER(SUIVI * suivi) {
+  char ch ;
+  struct sched_param param;
+  
+  TRACE("start") ;
+  
+  sleep(1) ;
+  
+  param.sched_priority = 1  ;
+  
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+  }
+  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
+  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  
+  if ( suivi->DONNEES_CLAVIER ) {
+    ch = getch() ;
+    TRACE("clavier -> %c-%d", ch, ch) ;
+  }
+  return NULL ;
+}
+//==========================================================
 void * SUIVI_CAPTEURS(SUIVI * suivi) {
    
   struct sched_param param;
@@ -1150,8 +1156,8 @@ int main(int argc, char ** argv) {
   
   // -----------------------------------------------------------------
 
-  ARGUMENTS_HELP    ( argc, argv) ;
-  ARGUMENTS_GERER   ( argc, argv, lieu, astre, voute, suivi) ;
+  ARGUMENTS_HELP    ( argc, argv ) ;
+  ARGUMENTS_GERER   ( argc, argv  ) ;
   
   // ouverture led etat ----------------------------------------------
 
@@ -1219,10 +1225,11 @@ int main(int argc, char ** argv) {
 
   // ============================== gestion des threads  ===================================
   
-  TRACE1("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRAROUGE) ;
-  TRACE1("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
-  TRACE1("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
-  TRACE1("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
+  TRACE("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRAROUGE) ;
+  TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
+  TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
+  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
+  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_CLAVIER) ;
 
   TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
   
@@ -1241,7 +1248,7 @@ int main(int argc, char ** argv) {
 
   if ( suivi->DONNEES_INFRAROUGE ) pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
   if ( suivi->DONNEES_CAPTEURS )   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
-  
+  if ( suivi->DONNEES_CLAVIER )    pthread_create( &suivi->p_suivi_clavier,   NULL, (void*)SUIVI_CLAVIER,  suivi ) ;
   // ============================== join des threads  ===================================
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
@@ -1257,7 +1264,8 @@ int main(int argc, char ** argv) {
 
   if ( suivi->DONNEES_INFRAROUGE ) pthread_join( suivi->p_suivi_infrarouge, NULL) ;
   if ( suivi->DONNEES_CAPTEURS )   pthread_join( suivi->p_suivi_capteurs, NULL) ;
-  
+  if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+
   return 0;
 }
 // #######################################################################################

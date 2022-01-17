@@ -38,26 +38,34 @@ void ARGUMENTS_HELP(int argc, char** argv) {
   memset(binaire, ZERO_CHAR,sizeof(binaire)) ;
   strcpy(binaire,argv[0]) ;
   
-  if ( argc == 2 )
+  /* janvier 2022 : ajout argument pour afficher les paramatres 
+       de la planete passee avec son numero en argument
+  */
+
+  if ( argc == 2 ) {
+
     if (!strcmp("-h",argv[1]) || !strcmp("--help",argv[1])) {
       printf("%s : USAGE : \n",binaire) ;
-      printf("%s alarm <arrete le main aubout de argv[1] secondes>\n",binaire) ;
-      printf("%s calendrier : afiche les caracteristiques du lieu et de la date : JOUR JULIEN et TEMPS SIDERAL\n", binaire) ;
-      printf("%s azimut <angle horaire(deg) <declinaison(deg)> : calcul l'azimut en fonction de AH et DEC\n",binaire) ;
-      printf("%s equateur <azimut(deg) <hauteur(deg)> : calcul l'angle horaire et la declinaison en fonction de azimut et altitude\n",binaire) ;
-      printf("%s astre <nom> : exemple %s NGC1234 : calcule et affiche en fonction de l'astre\n",binaire,binaire) ;
-      printf("%s test : test les moteurs\n",binaire) ;
-      printf("%s voute <resolution> <latitude> : genere un fichier de la voute entiere : voute.csv\n",binaire) ;
-      printf("%s calib <sens> <nombre de tours par minute> <nombre de tours> <atl/azi>: deplace les moteurs en fonction des 3 args suivants en altitude ou bien en azimut en fonction de la configuration\n",binaire) ;
-      printf("%s calibt <sens> <nombre de tours par minute> <nombre de tours> <atl/azi>: idem calib mais gerer par les threads (et donc un suivi meilleur de la periode SIC)\n",binaire) ;
+      printf("%s sys (numero planete)   : afficher les calculs concernant la planete\n",binaire) ;
+      printf("%s ala (alarm)            : arrete le main aubout de argv[1] secondes\n",binaire) ;
+      printf("%s car (caracteristiques) : afiche les caracteristiques du lieu et de la date : JOUR JULIEN et TEMPS SIDERAL\n", binaire) ;
+      printf("%s azi (azimut) <A> <H>   : <angle horaire(deg) <declinaison(deg)> : calcul l'azimut en fonction de AH et DEC\n",binaire) ;
+      printf("%s equ (equateur) <a> <h> : <azimut(deg) <hauteur(deg)> : calcul l'angle horaire et la declinaison en fonction de azimut et altitude\n",binaire) ;
+      printf("%s ast (astre) <nom>      : exemple %s NGC1234 : calcule et affiche en fonction de l'astre\n",binaire,binaire) ;
+      printf("%s mot (test moteurs)     : teste les moteurs\n",binaire) ;
+      printf("%s vou (voute) <r> <l>    : genere un fichier de la voute entiere : voute.csv (resolution,altitude))\n",binaire) ;
+      printf("\n") ;
+      printf("%s cal (calibration) <sens> <nombre de tours par minute> <nombre de tours> <atl/azi>: deplace les moteurs en fonction des 3 args suivants en altitude ou bien en azimut en fonction de la configuration\n",binaire) ;
+      printf("%s cat <sens> <nombre de tours par minute> <nombre de tours> <atl/azi>: idem calib mais gerer par les threads (et donc un suivi meilleur de la periode SIC)\n",binaire) ;
       printf("%s statut : affiche le statut des broches GPIO\n",binaire) ;
       printf("%s <LAT> <DEC> <deb voute> <fin voute> <pas voute> <acc voute>\n",binaire);
       exit(0) ;
     }
+  }
 }
 
 //================================================================================================
-void  ARGUMENTS_TEST_MOTEURS(SUIVI * suivi) {
+void  ARGUMENTS_TEST_MOTEURS(void ) {
 
   int i ;
   struct timeval t00,t01 ;
@@ -115,7 +123,7 @@ void  ARGUMENTS_TEST_MOTEURS(SUIVI * suivi) {
   GPIO_STATUT() ;
 }
 //================================================================================================
-void ARGUMENTS_VOUTE(LIEU *lieu,ASTRE *astre, VOUTE *voute, SUIVI *suivi ) {
+void ARGUMENTS_VOUTE(void ) {
   
   FILE   *fout ;
   // double A, H ;
@@ -178,7 +186,7 @@ void ARGUMENTS_VOUTE(LIEU *lieu,ASTRE *astre, VOUTE *voute, SUIVI *suivi ) {
 }
 
 //================================================================================================
-void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute, SUIVI *suivi) {
+void ARGUMENTS_GERER(int argc, char** argv) {
   
   long c_ir_0 = 0 , c_ir_1 = 0 ;
   int  ir_old, ir ;
@@ -188,11 +196,15 @@ void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute
   incrlog=30 ;
   
   // -----------------------------------------------------------------
-  if ( ( argc == 2  ) &&  ! strcmp("calendrier",argv[1]) ) {
+  if ( ( argc == 2  ) &&  ! strcmp("car",argv[1]) ) {
   
-     CALCUL_AFFICHER_HEURE( "Il est : ", temps ) ;
-     CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-     exit(0) ;
+    CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+    CONFIG_AFFICHER_ASTRE(astre) ;
+    CONFIG_AFFICHER_LIEU( lieu) ;
+    CALCUL_AFFICHER_HEURE( "Il est : ", temps ) ;
+    CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+
+    exit(0) ;
   }
   // -----------------------------------------------------------------
   if ( ( argc == 2  ) &&  ! strcmp("stop",argv[1]) ) {
@@ -229,16 +241,17 @@ void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute
     voute->pas = atof(argv[2]) / DEGRES ;
     lieu->lat  = atof(argv[3]) / DEGRES ; 
     
-    ARGUMENTS_VOUTE( lieu, astre, voute, suivi ) ;
+    ARGUMENTS_VOUTE( ) ;
     exit(0) ;
   }
-  // -----------------------------------------------------------------
-  
-  if ( ( argc == 3 ) &&  ! strcmp("test",argv[1]) ) {
+  /* -----------------------------------------------------------------
+    Teste les moteurs 
+  */
+  if ( ( argc == 3 ) &&  ! strcmp("mot",argv[1]) ) {
   
     suivi->l_NANO_MOINS = atol( argv[2]) ;
     
-    ARGUMENTS_TEST_MOTEURS( suivi ) ;
+    ARGUMENTS_TEST_MOTEURS(  ) ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
@@ -256,20 +269,20 @@ void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute
       //t_diff = (( t01.tv_sec - t00.tv_sec ) * GPIO_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
       //if ( (double)t_diff >= GPIO_MICRO_SEC / ARGUMENTS_FREQ_TRAME_INFRAROUGE ) {
         //	gettimeofday(&t00,NULL) ;
-	ir = GPIO_GET(21) ;
-	if ( ir == 0 && ir_old == 0 ) { c_ir_0++ ; }
-	if ( ir == 1 && ir_old == 1 ) { c_ir_1++ ; }
-	if ( ir == 0 && ir_old == 1 ) { printf("%ld ",c_ir_1) ; if(c_ir_1>1000) printf("\n"); c_ir_0 = 1 ; }
-	if ( ir == 1 && ir_old == 0 ) { printf("%ld ",c_ir_0) ; if(c_ir_0>1000) printf("\n"); c_ir_1 = 1 ; }
-	ir_old = ir ;
-	// t_diff=0 ;
+      ir = GPIO_GET(21) ;
+      if ( ir == 0 && ir_old == 0 ) { c_ir_0++ ; }
+      if ( ir == 1 && ir_old == 1 ) { c_ir_1++ ; }
+      if ( ir == 0 && ir_old == 1 ) { printf("%ld ",c_ir_1) ; if(c_ir_1>1000) printf("\n"); c_ir_0 = 1 ; }
+      if ( ir == 1 && ir_old == 0 ) { printf("%ld ",c_ir_0) ; if(c_ir_0>1000) printf("\n"); c_ir_1 = 1 ; }
+      ir_old = ir ;
+      // t_diff=0 ;
       //}
     }
     exit(0) ;
   }
   // -----------------------------------------------------------------
   
-  if ( ( argc == 3 ) &&  ! strcmp("astre",argv[1]) ) {
+  if ( ( argc == 3 ) &&  ! strcmp("ast",argv[1]) ) {
   
     printf("astre %s pris en compte\n",argv[2]);
     memset( astre->nom, 0, sizeof(astre->nom)) ;
@@ -277,7 +290,7 @@ void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute
   }
   // -----------------------------------------------------------------
   
-  if ( ( argc == 4 ) &&  ! strcmp("azimut",argv[1]) ) {
+  if ( ( argc == 4 ) &&  ! strcmp("azi",argv[1]) ) {
   
     astre->A = atof(argv[2]) / DEGRES ;
     astre->H = atof(argv[3]) / DEGRES ;
@@ -294,7 +307,7 @@ void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute
   }
   // -----------------------------------------------------------------
   
-  if ( ( argc == 4 ) &&  ! strcmp("equateur",argv[1]) ) {
+  if ( ( argc == 4 ) &&  ! strcmp("equ",argv[1]) ) {
   
     astre->a = atof(argv[2]) / DEGRES ;
     astre->h = atof(argv[3]) / DEGRES ;
@@ -309,20 +322,20 @@ void ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute
     exit(0) ;
   }
   // -----------------------------------------------------------------
-  if ( ( argc == 2 ) &&  ! strcmp("statut",argv[1]) ) {
+  if ( ( argc == 2 ) &&  ! strcmp("sta",argv[1]) ) {
     
     printf("ARGUMENTS_GERER : GPIO_STATUT demander\n") ;
     GPIO_STATUT() ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
-  if ( ( argc == 3 ) &&  ! strcmp("alarm",argv[1]) ) {
+  if ( ( argc == 3 ) &&  ! strcmp("ala",argv[1]) ) {
     
     suivi->alarme=atoi(argv[2]) ;
-    printf("ARGUMENTS_GERER : alarm = %d\n",suivi->alarme) ;
+    printf("ARGUMENTS_GERER : ala = %d\n",suivi->alarme) ;
   }
   // -----------------------------------------------------------------
-  if ( ( argc == 6 ) &&  ! strcmp("calib",argv[1]) ) {
+  if ( ( argc == 6 ) &&  ! strcmp("car",argv[1]) ) {
   
     printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
     printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;

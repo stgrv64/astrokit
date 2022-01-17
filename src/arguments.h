@@ -49,10 +49,13 @@
 int incrlog ;
 
 //extern void TRAP_MAIN(int sig) ;
-
-void  ARGUMENTS_HELP(int argc, char** argv) ;
-void  ARGUMENTS_GERER(int argc, char** argv,LIEU *lieu,ASTRE *astre, VOUTE *voute, SUIVI *suivi)  ;
-void  ARGUMENTS_TEST_MOTEURS(SUIVI * suivi) ;
-void  ARGUMENTS_VOUTE(LIEU *lieu,ASTRE *astre, VOUTE *voute, SUIVI *suivi ) ;
+/* janvier 2022 : 
+  remplacements des arguments de type var glob par void 
+  on considere que ASTRE* VOUTE* etc.. sont dorenavant var glob
+*/
+void  ARGUMENTS_HELP         (int argc, char** argv) ;
+void  ARGUMENTS_GERER        (int argc, char** argv)  ;
+void  ARGUMENTS_TEST_MOTEURS (void) ;
+void  ARGUMENTS_VOUTE        (void) ;
 
 #endif
