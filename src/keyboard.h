@@ -83,5 +83,6 @@
 
 void KEYBOARD_READ(void) ;
 void KEYBOARD_INIT(void) ;
+void KEYBOARD_END(void) ;
 
 #endif

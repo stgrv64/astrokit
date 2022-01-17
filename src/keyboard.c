@@ -87,19 +87,15 @@ void KEYBOARD_INIT(void) {
 }
 
 void KEYBOARD_READ(void) {
-  const char * name ;
-  bool escaped = FALSE;
-  int n = 0 ;
-  int ch = 0;    
-  struct timeval previous;
-
-
-  /*---------------------------------------
-    etant donne qu'on est dans un thread le while est inutile
     
-  */
-  /* while ((ch = getch()) != ERR) { */
-  
+    const char * name ;
+    bool escaped = FALSE;
+    int n = 0 ;
+    int ch = 0;    
+    struct timeval previous;
+
+    ch = getch() ;
+
     escaped = (ch >= MY_KEYS);
     name = keyname(escaped ? (ch - MY_KEYS) : ch);
     int          secs, msecs;
@@ -128,12 +124,10 @@ void KEYBOARD_READ(void) {
     KEYBOARD_log_last_line(stdscr); 
         
     clrtoeol();
-    
-  endwin();
-  exit(0) ;
-
 }
-
+void KEYBOARD_END(void) {
+  endwin();
+}
 /* Fin fichier - ----------------------------------------------
 ----------------------------------------------
 ----------------------------------------------
