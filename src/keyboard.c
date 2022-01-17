@@ -87,7 +87,7 @@ void KEYBOARD_INIT(void) {
 }
 
 void KEYBOARD_READ(void) {
-    
+
     const char * name ;
     bool escaped = FALSE;
     int n = 0 ;
@@ -95,7 +95,8 @@ void KEYBOARD_READ(void) {
     struct timeval previous;
 
     ch = getch() ;
-
+    if ( ch == ERR ) return ;
+    
     escaped = (ch >= MY_KEYS);
     name = keyname(escaped ? (ch - MY_KEYS) : ch);
     int          secs, msecs;
