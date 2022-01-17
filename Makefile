@@ -18,11 +18,11 @@
 #         le nom de le executable est EPHX
 
 #--------------------------------------------------------------------------------------
-# CC	= gcc
+CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
 # pour rpi3 cortex A53 :
-CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
+#CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
 # CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
@@ -40,7 +40,9 @@ EPHX	= solarsystem
 RPWD	= ${HOME}/${GIT}/${PROJ}
 RSRC	= ${RPWD}/src
 REPH	= ${RPWD}/eph
+
 RLIB	= ${RPWD}/lib32
+HLIB  = ${RPWD}/lib
 
 #--------------------------------------------------------------------------------------
 # la cible est ici EXEC pour make sans argument
@@ -60,6 +62,15 @@ EXECGPIO= gpios
 
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
 LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
+
+# ========================================
+# Prevoir la compilation avec GCC 
+# ========================================
+
+ifeq ($(CC),gcc)
+  LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client
+  EXEC = ${FICH}.${VERS}.host
+endif
 
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
@@ -93,10 +104,10 @@ $(GPIO): $(OBJ)
 	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${GPIO} $(LIBS)
 
 $(LEPH)	:
-	cd ${REPH} ; make $(EPHA)
+	cd ${REPH} ; make CC=$(CC) $(EPHA)
 
 $(XEPH)	:
-	cd ${REPH} ; make $(EPHX)
+	cd ${REPH} ; make CC=$(CC) $(EPHX)
 
 .PHONY: all all-before all-after clean clean-custom
 
