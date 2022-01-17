@@ -976,8 +976,14 @@ void * SUIVI_CLAVIER(SUIVI * suivi) {
   suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
+  KEYBOARD_INIT();
+
   if ( suivi->DONNEES_CLAVIER ) {
-    KEYBOARD_READ();
+
+    while(1) {
+      usleep( suivi->temporisation_clavier) ;
+      KEYBOARD_READ();
+    }
   }
   return NULL ;
 }

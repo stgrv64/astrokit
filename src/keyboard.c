@@ -40,17 +40,19 @@ static void KEYBOARD_log_last_line(WINDOW *win) {
   }
 }
 
-void KEYBOARD_READ(void) {
+void KEYBOARD_INIT(void) {
   const char * name ;
   bool escaped = FALSE;
   int n = 0 ;
   int ch = 0;    
   struct timeval previous;
 
+
   /* unlink(MY_LOGFILE); */
 
   if (newterm(0, stdout, stdin) == 0) {
     fprintf(stderr, "Cannot initialize terminal\n");
+    TRACE("Cannot initialize terminal") ;
     exit(2);
   }
   cbreak();		     /* take input chars one at a time, no wait for \n */
@@ -82,6 +84,15 @@ void KEYBOARD_READ(void) {
   }
 
   gettimeofday(&previous, 0);
+}
+
+void KEYBOARD_READ(void) {
+  const char * name ;
+  bool escaped = FALSE;
+  int n = 0 ;
+  int ch = 0;    
+  struct timeval previous;
+
 
   /*---------------------------------------
     etant donne qu'on est dans un thread le while est inutile

@@ -80,6 +80,6 @@
 
 
 void KEYBOARD_READ(void) ;
-
+void KEYBOARD_INIT(void) ;
 
 #endif
