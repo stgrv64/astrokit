@@ -47,7 +47,7 @@ void KEYBOARD_INIT(void) {
   int ch = 0;    
   struct timeval previous;
 
-
+  TRACE("start") ;
   /* unlink(MY_LOGFILE); */
 
   if (newterm(0, stdout, stdin) == 0) {

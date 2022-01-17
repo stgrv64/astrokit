@@ -40,6 +40,8 @@
 */
 /* #include <keyboard.h> */
 
+#include <types.h>
+
 #define NEED_TIME_H
 
 #if defined(NCURSES_VERSION) && NCURSES_EXT_FUNCS
