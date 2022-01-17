@@ -36,6 +36,7 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <keyboard.h>
 
 // FIN INCLUDES =====================================
 

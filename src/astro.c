@@ -977,8 +977,7 @@ void * SUIVI_CLAVIER(SUIVI * suivi) {
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
   if ( suivi->DONNEES_CLAVIER ) {
-    ch = getch() ;
-    TRACE("clavier -> %c-%d", ch, ch) ;
+    KEYBOARD_READ();
   }
   return NULL ;
 }
