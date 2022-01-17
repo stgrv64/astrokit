@@ -1229,7 +1229,7 @@ int main(int argc, char ** argv) {
   TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
   TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
   TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
-  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_CLAVIER) ;
+  TRACE("suivi->DONNEES_CLAVIER    = %d",suivi->DONNEES_CLAVIER) ;
 
   TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
   

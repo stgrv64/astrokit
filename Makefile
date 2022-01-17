@@ -18,11 +18,11 @@
 #            - le nom de le executable est EPHX
 #         * ajout librairie ncurses pour acces fonction getch (flux input keyboard)
 #--------------------------------------------------------------------------------------
-CC	= gcc
+# CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
 # pour rpi3 cortex A53 :
-#CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
+CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
 # CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
@@ -44,6 +44,8 @@ REPH	= ${RPWD}/eph
 RLIB	= ${RPWD}/lib32
 HLIB  = ${RPWD}/lib
 
+NCURSESLIB	= ${RPWD}/libncurses
+
 #--------------------------------------------------------------------------------------
 # la cible est ici EXEC pour make sans argument
 #--------------------------------------------------------------------------------------
@@ -61,7 +63,7 @@ EXECGPIO= gpios
 #--------------------------------------------------------------------------------------
 
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
-LIBS	= -L${RLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses
+LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
 
 # ========================================
 # Prevoir la compilation avec GCC 
