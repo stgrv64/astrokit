@@ -18,11 +18,11 @@
 #            - le nom de le executable est EPHX
 #         * ajout librairie ncurses pour acces fonction getch (flux input keyboard)
 #--------------------------------------------------------------------------------------
-# CC	= gcc
+CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
 # pour rpi3 cortex A53 :
-CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
+# CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
 # CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ EXECGPIO= gpios
 
 #--------------------------------------------------------------------------------------
 
-INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH}
+INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH} -I$(NCURSESLIB) 
 LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
 
 # ========================================
@@ -70,14 +70,17 @@ LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lnc
 # ========================================
 
 ifeq ($(CC),gcc)
-  LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses
+  LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
   EXEC = ${FICH}.${VERS}.host
 endif
 
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
-SRC	= src/arguments.c src/astro.c src/calculs.c src/cat.c src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c
+SRC	= \
+src/arguments.c src/astro.c src/calculs.c src/cat.c \
+src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c \
+src/keyboard.c
 
 OBJ	= $(SRC:.c=.o)
 
