@@ -544,15 +544,16 @@ int GPIO_CLOSE_BROCHE(int gpio) {
   
   memset(une,0,BUFFER);
   sprintf(une,"%s/unexport",GPIO_PATH) ;
+
+  Trace1("fermeture GPIO %d", gpio_fd [ gpio ] ) ;
 /*
-  TRACE1("fermeture GPIO %d", gpio_fd [ gpio ] ) ;
   sleep(3) ;
   SUIVICLAVIER() ;
 
   => appel a SUIVICLAVIER utilisane les ncurses ne fonctionne plus 
      apres appel systeme close suivant : TODO comprendre pkoi
 */
-  close( gpio_fd [ gpio ] ) ;
+  // close( gpio_fd [ gpio ] ) ;
 
   if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
   if ((fprintf(f,"%d\n",gpio))<=0) { return -2 ;}

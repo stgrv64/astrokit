@@ -444,7 +444,7 @@ int GPIO_CLOSE_BROCHE(int gpio) {
   
   memset(une,0,BUFFER);
   sprintf(une,"%s/unexport",GPIO_PATH) ;
-  close( gpio_fd [ gpio ] ) ;
+  //close( gpio_fd [ gpio ] ) ;
   if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
   if ((fprintf(f,"%d\n",gpio))<=0) { return -2 ;}
   if ((fclose(f)) != 0 ) { return -3 ;}
@@ -461,7 +461,7 @@ int GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
   while(gpio_out[++i]>0) {
     memset(une,0,BUFFER);
     sprintf(une,"%s/unexport",GPIO_PATH) ;
-    close( gpio_fd [ gpio_out [ i ] ] ) ;
+    //close( gpio_fd [ gpio_out [ i ] ] ) ;
     if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
     if ((fprintf(f,"%d\n",gpio_out[i]))<=0) { return -2 ;}
     if ((fclose(f)) != 0 ) { return -3 ;}
@@ -470,7 +470,7 @@ int GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
   while(gpio_in[++i]>0) {
     memset(une,0,BUFFER);
     sprintf(une,"%s/unexport",GPIO_PATH) ;
-    close( gpio_fd [ gpio_in [ i ] ] ) ;
+    //close( gpio_fd [ gpio_in [ i ] ] ) ;
     if ((f=fopen(une,"w")) == NULL )   { return -4 ;}
     if ((fprintf(f,"%d\n",gpio_in[i]))<=0) { return -5 ;}
     if ((fclose(f)) != 0 ) { return -6 ;}

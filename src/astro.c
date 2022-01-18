@@ -1060,23 +1060,24 @@ void *  SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   int ch =0 ;
   struct sched_param param;
   TRACE("start") ;
-  sleep(1) ;
+  sleep(3) ;
+  /*
   param.sched_priority = 1  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
-  
+  */
   if ( suivi->DONNEES_CLAVIER ) {
     KEYBOARD_TERMIOS_INIT() ;
 
-    while(ch!='q') {
-      // printf("boucle en cours\n") ;
+    while(1) {
+      /* printf("boucle en cours\n") ;*/
       usleep(50000) ;
       if ( KEYBOARD_TERMIOS_KBHIT()) {
         ch= KEYBOARD_TERMIOS_READCH() ;
-        printf("keycode %c => %d\n", ch, ch) ;
+        printf("keycode %d\n", ch, ch) ;
       }
     }
     KEYBOARD_TERMIOS_EXIT() ;
@@ -1333,8 +1334,6 @@ int main(int argc, char ** argv) {
   ARGUMENTS_HELP    ( argc, argv ) ;
   ARGUMENTS_GERER   ( argc, argv  ) ;
   
-  pthread_create( &suivi->p_suivi_clavier, NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
-
   // ouverture led etat ----------------------------------------------
 
   if ( GPIO_LED_ETAT != 0 ) {
@@ -1426,6 +1425,9 @@ int main(int argc, char ** argv) {
   if ( suivi->DONNEES_INFRAROUGE ) pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
   if ( suivi->DONNEES_CAPTEURS )   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
   
+  pthread_create( &suivi->p_suivi_clavier, NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
+  if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+
   // ============================== join des threads  ===================================
 
   if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
