@@ -544,13 +544,47 @@ int GPIO_CLOSE_BROCHE(int gpio) {
   
   memset(une,0,BUFFER);
   sprintf(une,"%s/unexport",GPIO_PATH) ;
+/*
+  TRACE1("fermeture GPIO %d", gpio_fd [ gpio ] ) ;
+  sleep(3) ;
+  SUIVICLAVIER() ;
+
+  => appel a SUIVICLAVIER utilisane les ncurses ne fonctionne plus 
+     apres appel systeme close suivant : TODO comprendre pkoi
+*/
   close( gpio_fd [ gpio ] ) ;
+
   if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
   if ((fprintf(f,"%d\n",gpio))<=0) { return -2 ;}
   if ((fclose(f)) != 0 ) { return -3 ;}
 
   return 0 ;
 }
+/* CODE pour memoire : 
+
+ void SUIVICLAVIER(void ) {
+
+  initscr() ;
+  cbreak();		     
+  noecho();		     
+  scrollok(stdscr, TRUE);
+  //keypad(stdscr, TRUE );
+  move(0,0);
+  printw("Fin initialisation\n");
+  refresh();
+  while ((ch = getch()) != ERR ) {
+
+    usleep( 100000 );
+    bool         escaped = (ch >= MY_KEYS);
+    const char * name = keyname(escaped ? (ch - MY_KEYS) : ch);
+    printw("Keycode %d\n",ch);
+  }
+  printw("appel endwin") ; sleep(1) ;
+  endwin();
+  
+  return  ;
+}
+*/
 //====================================================================================================
 int GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
   FILE *f ;
@@ -1220,8 +1254,8 @@ void main_(int argc, char **argv)
 
   if ( priority > 0)  {
     mlockall(MCL_CURRENT | MCL_FUTURE);
-    TRACE("mise en place temps reel : echo -1 > /proc/sys/kernel/sched_rt_runtime_us") ;
-    system("echo -1 > /proc/sys/kernel/sched_rt_runtime_us") ;
+    TRACE("mise en place temps reel : sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
+    system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
     if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }

@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <ncurses.h>
+#include <curses.h>
+#include <termios.h>
 
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -80,9 +82,15 @@
 #endif
 #endif
 
+void KEYBOARD_TERMIOS_INIT(void) ;
+void KEYBOARD_TERMIOS_EXIT(void) ;
+int  KEYBOARD_TERMIOS_KBHIT(void) ; 
+int  KEYBOARD_TERMIOS_READCH(void) ;
+int  KEYBOARD_TERMIOS_READ(void) ;
 
 void KEYBOARD_READ(void) ;
 void KEYBOARD_INIT(void) ;
 void KEYBOARD_END(void) ;
+void KEYBOARD_LOG_LAST_LINE(WINDOW *) ;
 
 #endif

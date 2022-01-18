@@ -13,7 +13,133 @@
 @fn 
 */
 
-static void KEYBOARD_log_last_line(WINDOW *win) {
+static struct termios config_initiale; 
+static struct termios config_finale ; 
+static int            peek_caractere = -1 ; 
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_INIT
+* @author : s.gravois
+* @brief  : sauvegarde la structure termios initiale (ouverture)
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+void KEYBOARD_TERMIOS_INIT() {
+
+ tcgetattr(0,&config_initiale); 
+ 
+ config_finale = config_initiale ; 
+ 
+ config_finale.c_lflag &= ~ICANON ;
+ config_finale.c_lflag &= ~ECHO ;
+ config_finale.c_lflag &= ~ISIG ;
+ config_finale.c_cc[VMIN]  = 1 ;
+ config_finale.c_cc[VTIME] = 0 ;
+ 
+ tcsetattr(0,TCSANOW, &config_initiale) ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_EXIT
+* @author : s.gravois
+* @brief  : retablit la structure termios initiale (fermeture)
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+void KEYBOARD_TERMIOS_EXIT() {
+ tcsetattr(0, TCSANOW, &config_initiale ) ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_KBHIT
+* @author : s.gravois
+* @brief  : detecte la frappe d'une touche sur le clavier via termios
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+int KEYBOARD_TERMIOS_KBHIT() {
+  char ch ;
+  int nread ; 
+
+  if ( peek_caractere != -1 ) {
+    return 1 ;
+  }
+  config_finale.c_cc[VMIN] = 0 ;
+  tcsetattr( 0, TCSANOW, &config_finale ) ;
+  nread = read(0, &ch,1 );
+  config_finale.c_cc[VMIN] = 1 ;
+  tcsetattr( 0, TCSANOW, &config_finale )  ;
+
+  if (nread == 1 ) {
+    peek_caractere = ch ; 
+    return -1 ;
+  }
+  return 0 ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_READCH
+* @author : s.gravois
+* @brief  : lit le prochain caractere dans le terminal 
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+int KEYBOARD_TERMIOS_READCH() {
+  char ch ;
+  if(peek_caractere != -1 ) {
+    ch = peek_caractere ;
+    peek_caractere = -1 ;
+    return ch ;
+  }
+  read( 0, &ch, 1)  ;
+  return ch ;
+}
+
+/*****************************************************************************************
+* @fn     : main
+* @author : s.gravois
+* @brief  : point de depart du programme 
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+int KEYBOARD_TERMIOS_READ(void) {
+
+  int ch =0 ;
+
+  KEYBOARD_TERMIOS_INIT() ;
+
+  while(ch!='q') {
+    // printf("boucle en cours\n") ;
+    usleep(50000) ;
+    if ( KEYBOARD_TERMIOS_KBHIT()) {
+      ch= KEYBOARD_TERMIOS_READCH() ;
+      printf("keycode %c => %d\n", ch, ch) ;
+    }
+  }
+  KEYBOARD_TERMIOS_EXIT() ;
+  exit(0) ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_LOG_LAST_LINE
+* @author : s.gravois
+* @brief  : log les traces de ncurses dans un fichier de log
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+void KEYBOARD_LOG_LAST_LINE(WINDOW *win) {
 
   FILE *fp;
 
@@ -40,13 +166,17 @@ static void KEYBOARD_log_last_line(WINDOW *win) {
   }
 }
 
-void KEYBOARD_INIT(void) {
-  const char * name ;
-  bool escaped = FALSE;
-  int n = 0 ;
-  int ch = 0;    
-  struct timeval previous;
+/*****************************************************************************************
+* @fn     : KEYBOARD_NCURSES_INIT
+* @author : s.gravois
+* @brief  : initialisation generique ncurses
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
 
+void KEYBOARD_NCURSES_INIT(void) {
+  int n = 0 ;
   TRACE("start") ;
   /* unlink(MY_LOGFILE); */
 
@@ -59,7 +189,7 @@ void KEYBOARD_INIT(void) {
   noecho();		     /* don't echo input */
   scrollok(stdscr, FALSE);
   keypad(stdscr, FALSE );
-  move(0, 0);
+  move(50, 50);
 
   /* we do the define_key() calls after keypad(), since the first call to
    * keypad() initializes the corresponding data.
@@ -82,21 +212,30 @@ void KEYBOARD_INIT(void) {
         free(value);
     }
   }
-
-  gettimeofday(&previous, 0);
 }
 
-void KEYBOARD_READ(void) {
+/*****************************************************************************************
+* @fn     : KEYBOARD_NCURSES_READ
+* @author : s.gravois
+* @brief  : lecture generique ncurses
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+void KEYBOARD_NCURSES_READ(void) {
 
     const char * name ;
     bool escaped = FALSE;
-    int n = 0 ;
+    
     int ch = 0;    
     struct timeval previous;
 
+    gettimeofday(&previous, 0);
+
     ch = getch() ;
     if ( ch == ERR ) return ;
-    
+
     escaped = (ch >= MY_KEYS);
     name = keyname(escaped ? (ch - MY_KEYS) : ch);
     int          secs, msecs;
@@ -122,11 +261,21 @@ void KEYBOARD_READ(void) {
         name != 0 ? name : "<null>" \
     );
 
-    KEYBOARD_log_last_line(stdscr); 
+    KEYBOARD_LOG_LAST_LINE(stdscr); 
         
     clrtoeol();
 }
+/*****************************************************************************************
+* @fn     : KEYBOARD_END
+* @author : s.gravois
+* @brief  : fermeture generique ncurses
+* @param  : 
+* @date   : 2022-01-18 creation
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
 void KEYBOARD_END(void) {
+
   endwin();
 }
 /* Fin fichier - ----------------------------------------------

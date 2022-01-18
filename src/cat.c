@@ -58,7 +58,7 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
   
   if ( (fin=fopen(buf,"r")) == NULL) {
     // completer et modifier
-    TRACE("probleme ouverture %s\n",buf) ;
+    TRACE("probleme ouverture 0 %s\n",buf) ;
     exit(2) ;
   }
   else TRACE("open %s ok", buf) ;
@@ -194,7 +194,7 @@ void CAT_FORMAT_DECIMAL( \
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
-    TRACE("probleme ouverture %s\n",buf) ;
+    TRACE("probleme ouverture 1 %s\n",buf) ;
     exit(2) ;
   }
   L=0 ;
@@ -262,7 +262,7 @@ void CAT_FORMAT_DECIMAL_2( \
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
-    TRACE("probleme ouverture %s\n",buf) ;
+    TRACE("probleme ouverture 2 %s\n",buf) ;
     exit(2) ;
   }
   L=0 ;

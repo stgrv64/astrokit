@@ -19,6 +19,10 @@
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
 #  => modification ordre MENUS dans switch
 # 17/01/2022  | * ajout DONNEES_CLAVIER pour utilisation du clavier
+# 18/01/2022  | * ajout CONFIG_SCR_KERNEL pour execution script avec droits
+#                 root via systemd / execve / execl
+#               * remplacement fonctions Trace par Trace 
+#                 (evite utilisation fichier log alors que celui ci n'est pas encore ouvert)
 # -------------------------------------------------------------- 
 */
 
@@ -37,6 +41,7 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 
 //==========================================================
 // cette fonction ecrit dans la log avec la commande system
+/* obsolete */
 
 void CONFIG_SYSTEM_LOG(int *incrlog) {
   int ret ;
@@ -46,12 +51,13 @@ void CONFIG_SYSTEM_LOG(int *incrlog) {
     // FIXME 01 mai 2021 : modification chemin relatif
     sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     ret = system(cmd) ;
-    if ( ret < 0 ) TRACE("Probleme avec %s : retourner avec error negative",cmd) ;
-    //if ( ret == 0 ) TRACE("Probleme avec %s : shell non disponible",cmd) ;
+    if ( ret < 0 ) Trace("Probleme avec %s : retourner avec error negative",cmd) ;
+    //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
   }
 }
 //==========================================================
 // cette fonction ecrit dans la log avec un fwrite
+/* obsolete */
 
 void CONFIG_LOG(char *txt) {
   int ret ;
@@ -78,8 +84,8 @@ void CONFIG_LOG(char *txt) {
     sprintf( c_out, "%s : %s", s_date, txt ) ;
     sprintf( cmd,"echo %s >> %s/%s/%s",c_out, CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     ret =  system(cmd) ;
-    if ( ret < 0 ) TRACE("Probleme avec %s : retourner avec error negative",cmd) ;
-    //if ( ret == 0 ) TRACE("Probleme avec %s : shell non disponible",cmd) ;
+    if ( ret < 0 ) Trace("Probleme avec %s : retourner avec error negative",cmd) ;
+    //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
   }
 }
 //==========================================================
@@ -93,10 +99,11 @@ void CONFIG_INIT_LOG(void) {
     
     if ( (flog=fopen(buf,"a")) == NULL) {
       // completer et modifier
-      TRACE("probleme ouverture %s",buf) ;
+      Trace("probleme ouverture 3 %s",buf) ;
+      SyslogFmt("probleme ouverture %s", buf) ;
       exit(2) ;
     }
-    else TRACE("open %s ok", buf) ;
+    else Trace("open %s ok", buf) ;
   }
   return ;
 }
@@ -217,9 +224,9 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
 
   if ( strlen(s_data) != 8 ){
 
-    TRACE("mauvais format : %s", s_data) ;
-    TRACE("la chaine de caractere doit etre composee de <annee><mois><jour>") ;
-    TRACE("Exemple : 20190822 = 22 aout 2019") ;
+    Trace("mauvais format : %s", s_data) ;
+    Trace("la chaine de caractere doit etre composee de <annee><mois><jour>") ;
+    Trace("Exemple : 20190822 = 22 aout 2019") ;
     return ;
   }
   memset( buf,   ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
@@ -233,15 +240,15 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
 
   sprintf(buf, "/bin/date -s %s-%s-%s", year, month, day ) ;
   if ( system( buf ) < 0 ) perror( buf) ;
-	TRACE("buf = %s", buf) ;
+	Trace("buf = %s", buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
   sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", year, month, day, CONFIG_REP_HOME, CONFIG_REP_CFG, CONFIG_FIC_DATE ) ;
-  TRACE("buf = %s", buf) ;
+  Trace("buf = %s", buf) ;
 
   if ( system( buf ) < 0 ) perror( buf) ;
 
-  TRACE("Nouvelle date : %s", buf) ;
+  Trace("Nouvelle date : %s", buf) ;
 
 }
 //---------------------------------------------------------------------------------------
@@ -252,13 +259,13 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   char min [ CONFIG_TAILLE_BUFFER_4] ;
   int i = 0 ;
   
-  // FIXME : 20190822 : ajout traces
+  // FIXME : 20190822 : ajout Traces
 
   if ( strlen(s_data) != 4 ){
 
-    TRACE("mauvais format : %s", s_data) ;
-    TRACE("la chaine de caractere doit etre composee de <heure><minutes>") ;
-    TRACE("Exemple : 0804 = 8 heures et 4 minutes") ;
+    Trace("mauvais format : %s", s_data) ;
+    Trace("la chaine de caractere doit etre composee de <heure><minutes>") ;
+    Trace("Exemple : 0804 = 8 heures et 4 minutes") ;
     return ;
   }
 
@@ -270,12 +277,12 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   for(i=0;i<2;i++) min[i]=s_data[i+2] ;
   
   sprintf(buf, "/bin/date -s %s:%s",hou, min ) ;
-  TRACE("buf = %s", buf) ;
+  Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 
   memset( buf, ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
   sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", hou, min, CONFIG_REP_HOME, CONFIG_REP_CFG, CONFIG_FIC_HHMM ) ;
-  TRACE("buf = %s", buf) ;
+  Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 }
 //---------------------------------------------------------------------------------------
@@ -511,14 +518,18 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
    //-----------ASTRE_PAR_DEFAUT-------------------------------------------
 
   memset( ASTRE_PAR_DEFAUT, ZERO_CHAR, sizeof( ASTRE_PAR_DEFAUT ) ) ;
+
   memset( CONFIG_REP_CAT, ZERO_CHAR, sizeof( CONFIG_REP_CAT ) ) ;
   memset( CONFIG_REP_CFG, ZERO_CHAR, sizeof( CONFIG_REP_CFG ) ) ;
   memset( CONFIG_REP_LOG, ZERO_CHAR, sizeof( CONFIG_REP_LOG ) ) ;
   memset( CONFIG_REP_IN, ZERO_CHAR, sizeof( CONFIG_REP_IN ) ) ;
+  memset( CONFIG_REP_SCR, ZERO_CHAR, sizeof( CONFIG_REP_SCR ) ) ;
+
   memset( CONFIG_FIC_LOG, ZERO_CHAR, sizeof( CONFIG_FIC_LOG ) ) ;
   memset( CONFIG_FIC_DATE, ZERO_CHAR, sizeof( CONFIG_FIC_DATE ) ) ;
   memset( CONFIG_FIC_HHMM, ZERO_CHAR, sizeof( CONFIG_FIC_HHMM ) ) ;
-   
+  memset( CONFIG_SCR_KERNEL, ZERO_CHAR, sizeof( CONFIG_SCR_KERNEL ) ) ;
+
   for(l=0;l<DATAS_NB_LIGNES;l++) {
      
       // FIXME : note 2021 : les variables GPIO_xxx sont gérées dans le ficheir gpio.c
@@ -645,6 +656,8 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
     if(!strcmp("CONFIG_FIC_DATE",datas[l][0])) strcpy( CONFIG_FIC_DATE, datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_HHMM",datas[l][0])) strcpy( CONFIG_FIC_HHMM, datas[l][1]) ;  
 
+    if(!strcmp("CONFIG_REP_SCR",datas[l][0])) strcpy( CONFIG_REP_SCR, datas[l][1]) ;  
+    if(!strcmp("CONFIG_SCR_KERNEL",datas[l][0])) strcpy( CONFIG_SCR_KERNEL, datas[l][1]) ;  
   }
 
   //if ( ALT_R == 0 ) ALT_R = ALT_R1 * ALT_R2 * ALT_R3 * ALT_R4 ;
@@ -656,109 +669,112 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 //============================================================================
 void   CONFIG_AFFICHER_VARIABLES(void) {
 
-  TRACE("TEMPO_RAQ = %ld",  TEMPO_RAQ);
-  TRACE("TEMPO_MENU = %ld",  TEMPO_MENU);
-  TRACE("TEMPO_IR = %ld",  TEMPO_IR);
-  TRACE("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
-  TRACE("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
+  Trace("TEMPO_RAQ = %ld",  TEMPO_RAQ);
+  Trace("TEMPO_MENU = %ld",  TEMPO_MENU);
+  Trace("TEMPO_IR = %ld",  TEMPO_IR);
+  Trace("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
+  Trace("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
 
-  TRACE("DONNEES_CONTROLEUR = %d",  DONNEES_CONTROLEUR);
-  TRACE("DONNEES_CAPTEURS = %d",  DONNEES_CAPTEURS);
-  TRACE("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
-  TRACE("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
-  TRACE("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
-  TRACE("DONNEES_CLAVIER = %d",  DONNEES_CLAVIER);
+  Trace("DONNEES_CONTROLEUR = %d",  DONNEES_CONTROLEUR);
+  Trace("DONNEES_CAPTEURS = %d",  DONNEES_CAPTEURS);
+  Trace("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
+  Trace("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
+  Trace("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
+  Trace("DONNEES_CLAVIER = %d",  DONNEES_CLAVIER);
 
-  TRACE("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
-  TRACE("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
-  TRACE("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
+  Trace("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
+  Trace("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
+  Trace("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
 
-  TRACE("LATITUDE  = %f",          LATITUDE );
-  TRACE("LONGITUDE = %f",          LONGITUDE );
-  TRACE("ALTITUDE  = %f",          ALTITUDE );
+  Trace("LATITUDE  = %f",          LATITUDE );
+  Trace("LONGITUDE = %f",          LONGITUDE );
+  Trace("ALTITUDE  = %f",          ALTITUDE );
 
-  TRACE("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
+  Trace("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
 
-  TRACE("ALT_R1 = %f",       ALT_R1);         
-  TRACE("ALT_R2 = %f",       ALT_R2);
-  TRACE("ALT_R3 = %f",       ALT_R3);         
-  TRACE("ALT_R4 = %f",       ALT_R4);         
-  TRACE("ALT_ROT = %d",      ALT_ROT);
-  TRACE("ALT_ACC = %f",      ALT_ACC);
+  Trace("ALT_R1 = %f",       ALT_R1);         
+  Trace("ALT_R2 = %f",       ALT_R2);
+  Trace("ALT_R3 = %f",       ALT_R3);         
+  Trace("ALT_R4 = %f",       ALT_R4);         
+  Trace("ALT_ROT = %d",      ALT_ROT);
+  Trace("ALT_ACC = %f",      ALT_ACC);
 
-  TRACE("AZI_R1 = %f",       AZI_R1)      ; 
-  TRACE("AZI_R2 = %f",       AZI_R2)      ; 
-  TRACE("AZI_R3 = %f",       AZI_R3)      ; 
-  TRACE("AZI_R4 = %f",       AZI_R4)      ; 
-  TRACE("AZI_ROT = %d",      AZI_ROT)     ;
-  TRACE("AZI_ACC = %f",      AZI_ACC)     ; 
+  Trace("AZI_R1 = %f",       AZI_R1)      ; 
+  Trace("AZI_R2 = %f",       AZI_R2)      ; 
+  Trace("AZI_R3 = %f",       AZI_R3)      ; 
+  Trace("AZI_R4 = %f",       AZI_R4)      ; 
+  Trace("AZI_ROT = %d",      AZI_ROT)     ;
+  Trace("AZI_ACC = %f",      AZI_ACC)     ; 
 
-  TRACE("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;
-  TRACE("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 
-  TRACE("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
-  TRACE("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
-  TRACE("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
-  TRACE("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
-  TRACE("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
+  Trace("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;
+  Trace("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 
+  Trace("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
+  Trace("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
+  Trace("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
+  Trace("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
+  Trace("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
 
-  TRACE("GPIO_ALT = %s", GPIO_ALT)  ;  
-  TRACE("GPIO_AZI = %s", GPIO_AZI)  ;  
-  TRACE("GPIO_MAS = %s", GPIO_MAS)  ;  
-  TRACE("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;  
+  Trace("CONFIG_REP_SCR = %s", CONFIG_REP_SCR)  ; 
+  Trace("CONFIG_SCR_KERNEL = %s", CONFIG_SCR_KERNEL)  ; 
 
-  TRACE1("anciennes variables\n");
-  TRACE1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
-  TRACE1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
-  TRACE1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
-  TRACE1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
-  TRACE1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
-  TRACE1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
-  TRACE1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
-  TRACE1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
-  TRACE1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
-  TRACE1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
-  TRACE1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
-  TRACE1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
-  TRACE1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
-  TRACE1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
-  TRACE1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
-  TRACE1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
-  TRACE1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
-  TRACE1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
-  TRACE1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
-  TRACE1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
-  TRACE1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
-  TRACE1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
-  TRACE1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
-  TRACE1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
-  TRACE1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
-  TRACE1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
-  TRACE1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
-  TRACE1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
-  TRACE1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
-  TRACE1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
-  TRACE1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
-  TRACE1("=====================================================\n");
-  TRACE1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
-  TRACE1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
-  TRACE1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
-  TRACE1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
-  TRACE1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
-  TRACE1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
-  TRACE1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
-  TRACE1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
-  TRACE1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
-  TRACE1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
-  TRACE1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
-  TRACE1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
-  TRACE1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
-  TRACE1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+  Trace("GPIO_ALT = %s", GPIO_ALT)  ;  
+  Trace("GPIO_AZI = %s", GPIO_AZI)  ;  
+  Trace("GPIO_MAS = %s", GPIO_MAS)  ;  
+  Trace("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;  
+
+  Trace1("anciennes variables\n");
+  Trace1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
+  Trace1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
+  Trace1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
+  Trace1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
+  Trace1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
+  Trace1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
+  Trace1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
+  Trace1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
+  Trace1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
+  Trace1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
+  Trace1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
+  Trace1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
+  Trace1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
+  Trace1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
+  Trace1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
+  Trace1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
+  Trace1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
+  Trace1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
+  Trace1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
+  Trace1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
+  Trace1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
+  Trace1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
+  Trace1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
+  Trace1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
+  Trace1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
+  Trace1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
+  Trace1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
+  Trace1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
+  Trace1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
+  Trace1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
+  Trace1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
+  Trace1("=====================================================\n");
+  Trace1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
+  Trace1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
+  Trace1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
+  Trace1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
+  Trace1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
+  Trace1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
+  Trace1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
+  Trace1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
+  Trace1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
+  Trace1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
+  Trace1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
+  Trace1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
+  Trace1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
+  Trace1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
 }
 //============================================================================
 int CONFIG_GETCWD(char * c_getcwd) {
 
   if (getcwd(c_getcwd, sizeof(c_getcwd)) != NULL) {
-     TRACE("Current working dir: %s\n", c_getcwd);
+     Trace("Current working dir: %s\n", c_getcwd);
   } else {
      perror("getcwd() error");
      return 1;
@@ -777,8 +793,8 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
 
   // FIXME : initialisation du tableau de valeurs lues dans le fichier = datas
 
-  TRACE1(" DATAS_NB_LIGNES   = %d",   DATAS_NB_LIGNES) ;
-  TRACE1(" DATAS_NB_COLONNES = %d", DATAS_NB_COLONNES) ;
+  Trace1(" DATAS_NB_LIGNES   = %d",   DATAS_NB_LIGNES) ;
+  Trace1(" DATAS_NB_COLONNES = %d", DATAS_NB_COLONNES) ;
 
   for(L=0;L<DATAS_NB_LIGNES;L++) {
     for(C=0;C<DATAS_NB_COLONNES;C++) { 
@@ -799,10 +815,10 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
    memset(buffer,ZERO_CHAR,CONFIG_TAILLE_BUFFER);
    sprintf(buffer,"Pbme ouverture %s",buf) ;
    //LOG(buffer) ;
-   TRACE("probleme ouverture %s",buf) ; 
+   Trace("probleme ouverture 4 %s",buf) ; 
    exit(2) ;
   }
-  else TRACE("open %s ok", buf) ;
+  else Trace("open %s ok", buf) ;
 
   memset(buf,ZERO_CHAR,CONFIG_TAILLE_BUFFER-1);
   i=0;
@@ -828,7 +844,7 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
 
-      TRACE1("datas[%d][%d]=%s",L,C,datas[L][C] );
+      Trace1("datas[%d][%d]=%s",L,C,datas[L][C] );
       
       C++;
     }
@@ -836,7 +852,7 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
       
-      TRACE1("datas[%d][%d]=%s",L,C,datas[L][C] );
+      Trace1("datas[%d][%d]=%s",L,C,datas[L][C] );
       
       L++;
       C=0;
@@ -858,13 +874,13 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
   for(L=0;L<DATAS_NB_LIGNES;L++) {
     for(C=0;C<DATAS_NB_COLONNES;C++) { 
       if ( C>0 ) {
-         TRACE1("") ;
+         Trace1("") ;
       }
       if (strlen(datas[L][C])) {
-        TRACE1(" %s " , datas[L][C]) ;
+        Trace1(" %s " , datas[L][C]) ;
       }
     }
-    TRACE1("") ;
+    Trace1("") ;
   }
 /*
   for(l=0;l<DATAS_NB_LIGNES;l++) {
@@ -875,7 +891,7 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
       sprintf( buffer, "%-10s %-10s", buffer, datas[l][c] ) ;
      }
      if (strlen(buffer)>1) {
-      TRACE("%s",buffer) ;
+      Trace("%s",buffer) ;
      }
   }
 */
@@ -883,34 +899,34 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
 
-  TRACE(" latitude    :  %.2f", lieu->lat * DEGRES ) ; 
-  TRACE(" longitude   :  %.2f", lieu->lon * DEGRES ) ;
+  Trace(" latitude    :  %.2f", lieu->lat * DEGRES ) ; 
+  Trace(" longitude   :  %.2f", lieu->lon * DEGRES ) ;
 
-  TRACE1("lieu->lat (degres) = %f",lieu->lat * DEGRES ) ;
-  TRACE1("lieu->lon (degres) = %f",lieu->lon * DEGRES ) ;
-  TRACE1("lieu->alt = %f",lieu->alt ) ;
-  TRACE1("lieu->JJ  = %f",lieu->JJ) ;
-  TRACE1("lieu->TS  = %f",lieu->TS) ;
-  TRACE1("lieu->TSR = %f",lieu->TSR) ;
-  TRACE1("lieu->JD  = %f",lieu->JD) ;
+  Trace1("lieu->lat (degres) = %f",lieu->lat * DEGRES ) ;
+  Trace1("lieu->lon (degres) = %f",lieu->lon * DEGRES ) ;
+  Trace1("lieu->alt = %f",lieu->alt ) ;
+  Trace1("lieu->JJ  = %f",lieu->JJ) ;
+  Trace1("lieu->TS  = %f",lieu->TS) ;
+  Trace1("lieu->TSR = %f",lieu->TSR) ;
+  Trace1("lieu->JD  = %f",lieu->JD) ;
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
   
-  TRACE(" DATE / HOUR : %d-%d-%d %d:%d:%d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
+  Trace(" DATE / HOUR : %d-%d-%d %d:%d:%d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
 
-  TRACE1("temps->yy = %d", temps->yy ) ;
-  TRACE1("temps->mm = %d", temps->mm ) ;
-  TRACE1("temps->dd = %d", temps->dd ) ;
-  TRACE1("temps->HH = %d", temps->HH ) ;
-  TRACE1("temps->MM = %d", temps->MM ) ;
-  TRACE1("temps->SS = %d", temps->SS ) ;
-  TRACE1("temps->hd = %f", temps->hd ) ;
+  Trace1("temps->yy = %d", temps->yy ) ;
+  Trace1("temps->mm = %d", temps->mm ) ;
+  Trace1("temps->dd = %d", temps->dd ) ;
+  Trace1("temps->HH = %d", temps->HH ) ;
+  Trace1("temps->MM = %d", temps->MM ) ;
+  Trace1("temps->SS = %d", temps->SS ) ;
+  Trace1("temps->hd = %f", temps->hd ) ;
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   
-  TRACE("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
+  Trace("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
     clavier->phrase,\
     clavier->mot,\
     clavier->symbole,\
@@ -919,34 +935,34 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
     clavier->valider,\
     clavier->menu) ;
 
-  TRACE1("clavier->mot         = %s",clavier->mot) ;
-  TRACE1("clavier->premier     = %s",clavier->premier) ;
-  TRACE1("clavier->phrase      = %s",clavier->phrase) ;
-  TRACE1("clavier->nombre      = %s",clavier->nombre) ;
-  TRACE1("clavier->symbole     = %s",clavier->symbole) ;
-  TRACE1("clavier->phrase_lue  = %d",clavier->phrase_lue) ;
+  Trace1("clavier->mot         = %s",clavier->mot) ;
+  Trace1("clavier->premier     = %s",clavier->premier) ;
+  Trace1("clavier->phrase      = %s",clavier->phrase) ;
+  Trace1("clavier->nombre      = %s",clavier->nombre) ;
+  Trace1("clavier->symbole     = %s",clavier->symbole) ;
+  Trace1("clavier->phrase_lue  = %d",clavier->phrase_lue) ;
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
     
-  TRACE(" ASTRE       : %10s Va = %.2f Vh = %.2f", as->nom, as->Va,  as->Vh ) ; 
+  Trace(" ASTRE       : %10s Va = %.2f Vh = %.2f", as->nom, as->Va,  as->Vh ) ; 
   
-  TRACE(" azimut      : %.2f (degres) : %d.%d (hh.mm)", astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
-  TRACE(" altitude    : %.2f (degres) : %d.%d (hh.mm)", astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
-  TRACE(" ang-horaire : %.2f (degres) : %d.%d (hh.mm)", astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
-  TRACE(" declinaison : %.2f (degres) : %d.%d (hh.mm)", astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
+  Trace(" azimut      : %.2f (degres) : %d.%d (hh.mm)", astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
+  Trace(" altitude    : %.2f (degres) : %d.%d (hh.mm)", astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
+  Trace(" ang-horaire : %.2f (degres) : %d.%d (hh.mm)", astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
+  Trace(" declinaison : %.2f (degres) : %d.%d (hh.mm)", astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
   
-  TRACE2("astre->AZI  = %f",astre->AZI) ;
-  TRACE2("astre->AZI1 = %f",astre->AZI1) ;
-  TRACE2("astre->ASC  = %f",astre->ASC) ;
-  TRACE2("astre->ASC1 = %f",astre->ASC1) ;
-  TRACE2("astre->ASC2 = %f",astre->ASC2) ;
-  TRACE2("astre->ASC = %f - %f (degres)",astre->ASC , astre->ASC * DEGRES) ;
+  Trace2("astre->AZI  = %f",astre->AZI) ;
+  Trace2("astre->AZI1 = %f",astre->AZI1) ;
+  Trace2("astre->ASC  = %f",astre->ASC) ;
+  Trace2("astre->ASC1 = %f",astre->ASC1) ;
+  Trace2("astre->ASC2 = %f",astre->ASC2) ;
+  Trace2("astre->ASC = %f - %f (degres)",astre->ASC , astre->ASC * DEGRES) ;
 }
 //============================================================================
 void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
 	
-	TRACE("voute->num %lld", voute->num) ;
+	Trace("voute->num %lld", voute->num) ;
 }
 //============================================================================
 void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre, VOUTE *voute) {
@@ -982,7 +998,7 @@ void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
 
   if ( suivi->menu_old != suivi->menu ) {
 
-    TRACE("appel : %d : %s" , suivi->menu,s_menu) ;
+    Trace("appel : %d : %s" , suivi->menu,s_menu) ;
 
    GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 

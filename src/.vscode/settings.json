@@ -4,6 +4,7 @@
     },
     "editor.hover.enabled": false,
     "files.associations": {
-        "astro.h": "c"
+        "astro.h": "c",
+        "ncurses.h": "c"
     }
 }

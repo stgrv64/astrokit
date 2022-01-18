@@ -8,6 +8,10 @@
 #                 il faut d'abord le fichier config.txt en priorite
 # 17/02/2022  | * ajout gestion touches clavier (*_CLAVIER)
 #               * nouveaux fichiers keyboard.h / .c
+# 18/02/2022  | * test de fonctions SUIVI_CLAVIER faisant inervenir
+#  (issue)        les appels ncurses : KO quand la fonction SUIVI_CLAVIER
+#                 est appelle apres la fonction close dans GPIO_CLOSE (???)
+#               * mise en commentaire des fonctions suivant doxygen
 # -------------------------------------------------------------- 
 */
 
@@ -26,25 +30,31 @@
 #include <ncurses.h>
 
 #include <astro.h>
+#include <keyboard.h>
 
-int        incrlog ;
-int        id_thread ;  
-int        retour ;
-int        incr ;
-int        alarme ;
+int        g_incrlog ;
+int        g_id_thread ;  
 
-//==========================================================
+/*****************************************************************************************
+* @fn     : TRAP_MAIN
+* @author : s.gravois
+* @brief  : fonction appelle quand un signal est trape dans main
+* @param  : int     sig
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : (completer)
+*****************************************************************************************/
+
 void TRAP_MAIN(int sig) {
   int i ;
   
-  TRACE("Signal trappe depuis main = %d",sig) ;
+  TRACE("Signal trappe de valeur (sig) %d",sig) ;
   TRACE("Envoi d'un signal %d (SIGTERM) aux threads",SIGTERM) ;
   
   GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 
   //printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
   
-  for(i=0;i<id_thread;i++)  {
+  for(i=0;i<g_id_thread;i++)  {
     TRACE("Abandon thread numero %d de p_thread_t = %d",i,(int)suivi->p_threads_id[i]) ;
     pthread_cancel(suivi->p_threads_id[i]);
   }
@@ -60,10 +70,15 @@ void TRAP_MAIN(int sig) {
   GPIO_SET( GPIO_LED_ETAT, 0 ) ;
   exit(0) ;
 }
-//========================================================================================
-// FIXME : TRAP_SUIVI_* : 
-// FIXME : * ce sont les fonctions de recuperation des signaux definis dans les threads
-//========================================================================================
+
+/*****************************************************************************************
+* @fn     : TRAP_SUIVI_MENU
+* @author : s.gravois
+* @brief  : fonctions appellees quand un signal est trape dans leur fonctions respectives
+* @param  : int     sig
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : (completer)
+*****************************************************************************************/
 
 void TRAP_SUIVI_MENU(int sig)  {
   
@@ -91,23 +106,17 @@ void TRAP_SUIVI_CLAVIER(int sig)  {
   printf("Signal trappe depuis thread suivi_clavier= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_clavier ) ;
 }
-// #######################################################################################
+/*****************************************************************************************
+* @fn     : SUIVI_MENU_PREALABLE
+* @author : s.gravois
+* @brief  : fonction qui initialise des attributs 
+* @param  : SUIVI *suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : analyser la reelle utilite de cette fonction
+            en diminuant le bombre de variable suivi->var
+*****************************************************************************************/
 
 void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
-/*
-  MENU_MANUEL_BRUT,   
-  MENU_MANUEL_ASSERVI,
-  MENU_AZIMUTAL,
-  MENU_EQUATORIAL,
-  MENU_GOTO,
-  MENU_INFO,
-  MENU_RESEAU_UP,
-  MENU_RESEAU_DOWN,
-  MENU_PROGRAMME_DOWN,
-  MENU_DOWN,
-  MENU_MANUEL_BRUT
-*/
-// TODO : voir la reelle utilite de SUIVI_MENU_PREALABLE et des variables suivi->SUIVI_MANUEL , suivi->SUIVI_EQUATORIAL , etc ..
 
   switch ( suivi->menu ) {
     case MENU_AZIMUTAL            : suivi->SUIVI_EQUATORIAL = 0 ; break ;
@@ -123,7 +132,15 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
     case MENU_DOWN                : break ; 
   }
 }
-// #######################################################################################
+/*****************************************************************************************
+* @fn     : SUIVI_TRAITEMENT_MOT
+* @author : s.gravois
+* @brief  : realise certaines actions particulieres apres appui sur une touche
+* @param  : SUIVI   *suivi
+* @param  : CLAVIER *clavier 
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : analyser pour simplification <=> avec suivi menu etc..
+*****************************************************************************************/
 
 void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   
@@ -276,13 +293,22 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
     strcpy( clavier->nombre, "" ) ;
   }
 }
-//==========================================================
-// SUIVI_MANUEL_BRUT : le suivi etant effectue sur un astre (calcul des vitesses et periodes par suivi_voute)
-// l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
-// avec une multiplication des vitesses N-S-E-O par un facteur ALT_ACC
-//==========================================================
-// Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
-//==========================================================
+/*****************************************************************************************
+* @fn     : SUIVI_MANUEL_BRUT
+* @author : s.gravois
+* @brief  : Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
+* @param  : SUIVI   *suivi
+* @param  : CLAVIER *clavier 
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : 
+*****************************************************************************************/
+/* FIXME :
+ SUIVI_MANUEL_BRUT : le suivi etant effectue sur un astre (calcul des vitesses et periodes par suivi_voute)
+ l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
+ avec une multiplication des vitesses N-S-E-O par un facteur ALT_ACC
+
+ Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
+*/
 
 void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   
@@ -608,9 +634,14 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   }
 
 }
-// #######################################################################################
-// ####### GESTION DU MENU - GESTION DU MENU - GESTION DU MENU - GESTION DU MENU - #######
-// #######################################################################################
+/*****************************************************************************************
+* @fn     : SUIVI_MENU
+* @author : s.gravois
+* @brief  : Ce mode permet de gerer les menus .
+* @param  : SUIVI   *suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : 
+*****************************************************************************************/
 
 void * SUIVI_MENU(SUIVI * suivi) {
   
@@ -637,7 +668,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
   //-------------------------------------------------------------------------------
   // FIXME : debut boucle infinie du thread SUIVI_MENU
   //-------------------------------------------------------------------------------
-  
   
   while(1) {
 
@@ -839,11 +869,20 @@ void * SUIVI_MENU(SUIVI * suivi) {
     }
   }
 }
-//=============================================================================
-// SUIVI_VOUTE :
-// le but de la fonction est de rafraichir a intervalles reguliers (1 seconde)
-// tous les calculs relatifs a la vitesse de l'astre suivi
-//=============================================================================
+/*****************************************************************************************
+* @fn     : SUIVI_VOUTE
+* @author : s.gravois
+* @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
+* @param  : SUIVI   *suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : 
+*****************************************************************************************/
+
+/*
+   SUIVI_VOUTE :
+   le but de la fonction est de rafraichir a intervalles reguliers (1 seconde)
+   tous les calculs relatifs a la vitesse de l'astre suivi
+*/
 
 void * SUIVI_VOUTE(SUIVI * suivi) {
   
@@ -863,7 +902,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   param.sched_priority = 1 ;
   
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {perror("setschedparam SUIVI_VOUTE"); exit(EXIT_FAILURE);}
-  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_VOUTE) ;
   
   suivi->d_temps = 0 ;
@@ -925,7 +964,15 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
     }
   }
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : SUIVI_INFRAROUGE
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi infrarouge
+* @param  : SUIVI * suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : supprimer argument qi est variable globale
+*****************************************************************************************/
+
 void * SUIVI_INFRAROUGE(SUIVI * suivi) {
    
   struct sched_param param;
@@ -944,7 +991,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   param.sched_priority = 1  ;
   
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { perror("setschedparam SUIVI_INFRAROUGE"); exit(EXIT_FAILURE);}
-  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
   
   if ( suivi->DONNEES_INFRAROUGE ) {
@@ -959,38 +1006,150 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   }
   return NULL ;
 }
-//==========================================================
-void * SUIVI_CLAVIER(SUIVI * suivi) {
-  char ch ;
+
+/*****************************************************************************************
+* @fn     : SUIVI_CLAVIER_getchar
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi clavier 
+*           qui utilise directement getchar (aucun effet)
+* @param  : SUIVI * suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : supprimer argument qui est variable globale
+*****************************************************************************************/
+
+void *  SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
+
+  int c = 0 ;
   struct sched_param param;
-  
   TRACE("start") ;
-  
-  sleep(2) ;
-  
+  sleep(1) ;
   param.sched_priority = 1  ;
-  
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
-  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
   if ( suivi->DONNEES_CLAVIER ) {
 
-    KEYBOARD_INIT();
-
-    while(1) {
-      usleep( suivi->temporisation_clavier) ;
-      KEYBOARD_READ();
+    while( ( c = getchar () ) > 0 ) {
+      usleep(100000) ;
+      TRACE("%c %d entre au clavier", c,c  ) ; 
     }
-
-    /* Normalement jamais atteint : */
-    KEYBOARD_END();
+    /*
+    LIRC_CONFIG_CODES( irc) ;
+    LIRC_OPEN( lircconfig ) ;
+    LIRC_READ( suivi ) ;
+    LIRC_CLOSE(lircconfig) ;*/
   }
   return NULL ;
 }
-//==========================================================
+
+/*****************************************************************************************
+* @fn     : SUIVI_CLAVIER_getchar
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi clavier 
+*           en mode termios
+* @param  : SUIVI * suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : supprimer argument qui est variable globale
+*****************************************************************************************/
+
+void *  SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
+
+  int ch =0 ;
+  struct sched_param param;
+  TRACE("start") ;
+  sleep(1) ;
+  param.sched_priority = 1  ;
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+  }
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  
+  if ( suivi->DONNEES_CLAVIER ) {
+    KEYBOARD_TERMIOS_INIT() ;
+
+    while(ch!='q') {
+      // printf("boucle en cours\n") ;
+      usleep(50000) ;
+      if ( KEYBOARD_TERMIOS_KBHIT()) {
+        ch= KEYBOARD_TERMIOS_READCH() ;
+        printf("keycode %c => %d\n", ch, ch) ;
+      }
+    }
+    KEYBOARD_TERMIOS_EXIT() ;
+  }
+  return NULL ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_CLAVIER_NCURSES
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi clavier en mode ncurses
+* @param  : SUIVI * suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : supprimer argument qui est variable globale
+*****************************************************************************************/
+
+void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
+  int ch = 0 ;
+  unsigned long l_incr=0 ;
+  struct sched_param param;
+  TRACE("start") ;
+  
+  param.sched_priority = 1  ;
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+  }
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  
+  sleep(2) ;
+
+  if ( suivi->DONNEES_CLAVIER ) {
+
+    initscr() ;
+    if (newterm(0, stdout, stdin) == 0) {
+    fprintf(stderr, "Cannot initialize terminal\n");
+    TRACE("Cannot initialize terminal") ;
+    exit(2);
+    }
+    cbreak();		    
+    echo();		     
+    scrollok(stdscr, TRUE);
+    move(0,0);
+    printw("Fin initialisation\n");
+    refresh();
+    l_incr=0;
+    while ((ch = getch())) {
+      l_incr++;
+      //refresh();
+      if ( ch != ERR ) {
+        printw("%-5d Keycode %d\n",l_incr,ch);
+        
+      }
+      //refresh();
+      // usleep( 100000 );
+    }
+
+    sleep(2) ;
+    printw("appel endwin") ; sleep(1) ;
+    endwin();
+    TRAP_MAIN(1) ;
+  }
+  return NULL ;
+}
+
+/*****************************************************************************************
+* @fn     : SUIVI_CAPTEURS
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi capteurs (non utilisee)
+* @param  : SUIVI * suivi
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : supprimer argument qui est variable globale
+*****************************************************************************************/
+
 void * SUIVI_CAPTEURS(SUIVI * suivi) {
    
   struct sched_param param;
@@ -1016,7 +1175,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
 
-  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   
   signal( SIGTERM, TRAP_SUIVI_CAPTEURS) ;
   
@@ -1061,9 +1220,15 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   TRACE("stop") ;
   return NULL ;
 }
-// #######################################################################################
-// ####### DEBUT PROGRAMME - DEBUT PROGRAMME - DEBUT PROGRAMME - DEBUT PROGRAMME - #######
-// #######################################################################################
+/*****************************************************************************************
+* @fn     : main
+* @author : s.gravois
+* @brief  : point entree su programme
+* @param  : int     argc
+* @param  : char ** argv
+* @date   : 2022-01-18 mise en commentaire
+* @todo   : revoir ordre appels des fonctions
+*****************************************************************************************/
 
 /* TODO : decommenter pour pouvoir compiler modules a part 
   (deplacement fonctions main ailleurs que dans astro.c )
@@ -1073,15 +1238,32 @@ int main(int argc, char ** argv) {
   
   int i ;
   struct sched_param param;
-
   pthread_t p_thread_p_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_p_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_m_alt ;
   pthread_t p_thread_m_azi ;
+
+  // -----------------------------------------------------------------
+  // recuperer le chemin courant avec getcwd
+  // -----------------------------------------------------------------
+
+  /* Attention, pas de TRACE avant d avoir ouvert le fichier de log */ 
+  /* car TRACE utilise ce fichier */
+  /* Alternative : Trace */ 
+
+  if ( getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) == NULL ) {
+    SyslogEno("getcwd") ;
+  }
+  Trace("config_rep_home lu par getcwd = %s",CONFIG_REP_HOME);
+
   // -----------------------------------------------------------------
   
-  incrlog=0 ;
-  
+  g_incrlog=0 ;
+  g_id_thread=0 ;
+  // -----------------------------------------------------------------
+  // fonctions initialisations des structures de donnees
+  // -----------------------------------------------------------------
+
   astre = &as ;
   lieu  = &li;
   voute = &vo ;
@@ -1089,62 +1271,46 @@ int main(int argc, char ** argv) {
   temps = &te ;
   clavier = &cl ;
   irc = &ir_codes ;
+
+  CONFIG_READ           ( datas ) ;
+  GPIO_INIT_VAR         ( datas ) ; 
+  CONFIG_AFFICHER_DATAS ( datas ) ;
+  CONFIG_INIT_VAR       ( datas ) ;
+
+  CONFIG_AFFICHER_VARIABLES() ;   
+  CONFIG_INIT_LOG(); 
+  // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OUTPUT (old)(2021)
+  //GPIO_INIT_VAR2     ( datas) ;    // impacte les tableaux gpio_in[] et gpio_out[]
+  if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
   
+  CONFIG_INIT_CLAVIER   ( clavier ) ;   
+  CONFIG_INIT_ASTRE     ( astre ) ;
+  CONFIG_INIT_LIEU      ( lieu  ) ;
+  CONFIG_INIT_VOUTE     ( voute ) ;
+  CONFIG_INIT_SUIVI     ( suivi ) ;
+  CONFIG_INIT_TEMPS     ( temps ) ;
+
   // -----------------------------------------------------------------
   // MISE EN PLACE DES PARAMETRES SYSTEMES (parallelisme, priorites, ..)
   // -----------------------------------------------------------------
- 
-  system("echo -1 > /proc/sys/kernel/sched_rt_runtime_us") ; 
-  mlockall(MCL_CURRENT | MCL_FUTURE);
    
+  system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ; 
+  mlockall(MCL_CURRENT | MCL_FUTURE);
+  
   param.sched_priority = 1 ;
   if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) {perror("setschedparam main");exit(EXIT_FAILURE);}
 
   signal(SIGINT,TRAP_MAIN) ;
   signal(SIGALRM,TRAP_MAIN) ;
 
-  id_thread=0 ;
+  
   memset( suivi->p_threads_id, 0 , MAX_THREADS*sizeof(pthread_t)) ;
-  
-  // -----------------------------------------------------------------
-  // INITIALISATIONS
-  // FIXME : refonte (mai 2021)
-  // -----------------------------------------------------------------
 
-  getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) ;
-  TRACE("config_rep_home lu par getcwd = %s",CONFIG_REP_HOME);
-
-  CONFIG_READ           ( datas ) ;
-  CONFIG_AFFICHER_DATAS ( datas ) ;
-  CONFIG_INIT_VAR       ( datas ) ;   
-
-  CONFIG_INIT_LOG(); 
-
-  // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OUTPUT (old)(2021)
-  //GPIO_INIT_VAR2     ( datas) ;    // impacte les tableaux gpio_in[] et gpio_out[]
-
-  if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
-  
-  GPIO_INIT_VAR( datas ) ; // impacte les tableaux gpio_alt[], gpio_azi[], gpio_mas[] et gpio_frequence_pwm[]
-/*
-  CONFIG_AFFICHER_VARIABLES() ;
-*/
   TRACE("gpio_alt         : %d %d %d %d", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
   TRACE("gpio_azi         : %d %d %d %d", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
   TRACE("gpio_mas         : %d %d %d %d", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
   TRACE("GPIO_LED_ETAT    : %d", GPIO_LED_ETAT );
   TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
-  
-  // -----------------------------------------------------------------
-  // fonctions initialisations des structures de donnees
-  // -----------------------------------------------------------------
-
-  CONFIG_INIT_CLAVIER ( clavier ) ;   
-  CONFIG_INIT_ASTRE   ( astre ) ;
-  CONFIG_INIT_LIEU    ( lieu  ) ;
-  CONFIG_INIT_VOUTE   ( voute ) ;
-  CONFIG_INIT_SUIVI   ( suivi ) ;
-  CONFIG_INIT_TEMPS   ( temps ) ;
   
   // -----------------------------------------------------------------
   // reglages variables particulieres
@@ -1167,6 +1333,8 @@ int main(int argc, char ** argv) {
   ARGUMENTS_HELP    ( argc, argv ) ;
   ARGUMENTS_GERER   ( argc, argv  ) ;
   
+  pthread_create( &suivi->p_suivi_clavier, NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
+
   // ouverture led etat ----------------------------------------------
 
   if ( GPIO_LED_ETAT != 0 ) {
@@ -1175,7 +1343,7 @@ int main(int argc, char ** argv) {
     GPIO_OPEN_BROCHE( GPIO_LED_ETAT, 1) ;
     GPIO_SET( GPIO_LED_ETAT, 0 ) ;
   }
-
+  
   // -----------------------------------------------------------------
   
   TRACE("==> astre->nom     = %s", astre->nom );
@@ -1199,6 +1367,7 @@ int main(int argc, char ** argv) {
   pm_azi->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   pm_alt->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   
+
   GPIO_INIT_PWM_MOTEUR_2(\
     pm_alt,\
     gpio_alt,\
@@ -1240,7 +1409,7 @@ int main(int argc, char ** argv) {
   TRACE("suivi->DONNEES_CLAVIER    = %d",suivi->DONNEES_CLAVIER) ;
 
   TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
-  
+
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     pthread_create( &p_thread_p_azi[i], NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[i] ) ;
   }
@@ -1256,9 +1425,11 @@ int main(int argc, char ** argv) {
 
   if ( suivi->DONNEES_INFRAROUGE ) pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
   if ( suivi->DONNEES_CAPTEURS )   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
-  if ( suivi->DONNEES_CLAVIER )    pthread_create( &suivi->p_suivi_clavier,   NULL, (void*)SUIVI_CLAVIER,  suivi ) ;
-  // ============================== join des threads  ===================================
   
+  // ============================== join des threads  ===================================
+
+  if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
   pthread_join( p_thread_p_azi[i], NULL) ; 
   pthread_join( p_thread_m_azi, NULL) ;
@@ -1272,10 +1443,205 @@ int main(int argc, char ** argv) {
 
   if ( suivi->DONNEES_INFRAROUGE ) pthread_join( suivi->p_suivi_infrarouge, NULL) ;
   if ( suivi->DONNEES_CAPTEURS )   pthread_join( suivi->p_suivi_capteurs, NULL) ;
-  if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+  
 
   return 0;
 }
 // #######################################################################################
 // ####### FIN PROGRAMME - FIN PROGRAMME - FIN PROGRAMME - FIN PROGRAMME         - #######
 // #######################################################################################
+
+/*
+void * SUIVI_CLAVIER_1(SUIVI * suivi) {
+//  char ch = 0 ;
+  struct sched_param param; 
+  struct timeval previous;
+  int n=0;
+  int ch=0;   
+  TRACE("start") ;
+  
+  param.sched_priority = 1  ;
+  
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+  }
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  
+  if ( suivi->DONNEES_CLAVIER ) {
+
+
+  // unlink(MY_LOGFILE);
+
+  TRACE("Initialisation newterm") ; 
+
+  if (newterm(0, stdout, stdin) == 0) {
+    fprintf(stderr, "Cannot initialize terminal\n");
+    TRACE("Cannot initialize terminal") ;
+    exit(2);
+  }
+  TRACE("Initialisation cbreak") ; 
+  cbreak();		     
+  TRACE("Initialisation noecho") ; 
+  noecho();		    
+  TRACE("Initialisation scrollok") ; 
+  scrollok(stdscr, FALSE);
+  TRACE("Initialisation keypad") ; 
+  keypad(stdscr, TRUE );
+  TRACE("Initialisation move") ; 
+  move(10, 10);
+
+  refresh();
+
+  // we do the define_key() calls after keypad(), since the first call to
+  // keypad() initializes the corresponding data.
+  //
+  
+  TRACE("Initialisation define_key") ; 
+
+  for (n = 0; n < 255; ++n) {
+    char temp[10];
+    _nc_SPRINTF(temp, _nc_SLIMIT(sizeof(temp)) "\033%c", n);
+    define_key(temp, n + MY_KEYS);
+  }
+  
+  TRACE("Initialisation define_key (suite)") ; 
+
+  for (n = KEY_MIN; n < KEY_MAX; ++n) {
+
+    char *value;
+    
+    if ((value = keybound(n, 0)) != 0) {
+        size_t need = strlen(value) + 2;
+        char *temp = typeMalloc(char, need);
+        _nc_SPRINTF(temp, _nc_SLIMIT(need) "\033%s", value);
+        define_key(temp, n + MY_KEYS);
+        free(temp);
+        free(value);
+    }
+  }
+  
+ 
+  // gettimeofday(&previous, 0);
+ 
+  TRACE("Initialisation while()") ; 
+
+  sleep(1) ;
+  clear() ;
+  refresh();
+
+  while ((ch = getch()) != 0 ) {
+  
+    usleep( suivi->temporisation_clavier );
+
+    bool         escaped = (ch >= MY_KEYS);
+    const char * name = keyname(escaped ? (ch - MY_KEYS) : ch);
+    int          secs, msecs;
+     struct timeval current; 
+
+    gettimeofday(&current, 0);
+    secs = (int) (current.tv_sec - previous.tv_sec);
+    msecs = (int) ((current.tv_usec - previous.tv_usec) / 1000);
+    if (msecs < 0) {
+      msecs += 1000;
+      --secs;
+    }
+    if (msecs >= 1000) {
+      secs += msecs / 1000;
+      msecs %= 1000;
+    }
+    
+    printw("%6d.%03d ", secs, msecs);
+    previous = current;
+
+
+    printw("Keycode %d, name %s%s\n",
+      ch,
+      escaped ? "ESC-" : "",
+      name != 0 ? name : "<null>");
+      KEYBOARD_LOG_LAST_LINE(stdscr);
+
+
+    clear() ;
+
+    if ( ch != ERR ) {
+      TRACE("ch = %c", ch) ;
+    }
+
+    printw("Keycode %d, name %s%s\n",
+      ch,
+      escaped ? "ESC-" : "",
+      name != 0 ? name : "<null>");
+    
+    refresh() ;
+
+    // KEYBOARD_LOG_LAST_LINE(stdscr);
+
+    // TRACE("appel clrtoeol") ; sleep(1) ; 
+    clrtoeol();
+    
+  }
+  TRACE("appel endwin") ; sleep(1) ;
+  endwin();
+  TRACE("appel exit(0)") ; sleep(1) ;
+  exit(0) ;
+  }
+  return NULL ;
+}
+//==========================================================
+
+void * SUIVI_CLAVIER_0(SUIVI * suivi) {
+//  char ch = 0 ;
+  struct sched_param param; 
+  struct timeval previous;
+  int n=0;
+  int ch=0;   
+  TRACE("start") ;
+  
+  param.sched_priority = 1  ;
+  
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+  }
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  
+  if ( suivi->DONNEES_CLAVIER ) {
+
+  if (newterm(0, stdout, stdin) == 0) {
+    fprintf(stderr, "Cannot initialize terminal\n");
+    SyslogEno("Cannot initialize terminal") ;
+    pthread_cancel( suivi->p_suivi_clavier ) ;
+  }
+
+  initscr() ;
+  cbreak();		     
+  noecho();		     
+  scrollok(stdscr, TRUE);
+  //keypad(stdscr, TRUE );
+  move(0,0);
+  sleep(1) ;
+  printw("Fin initialisation\n");
+  sleep(1) ;
+  refresh();
+  
+  while ((ch = getch()) != ERR ) {
+  
+    usleep( 500000 );
+
+    bool         escaped = (ch >= MY_KEYS);
+    const char * name = keyname(escaped ? (ch - MY_KEYS) : ch);
+
+    printw("Keycode %d, name %s%s\n",ch,escaped ? "ESC-" : "",name != 0 ? name : "<null>");
+    
+    refresh() ;
+
+  }
+  printw("appel endwin") ; sleep(1) ;
+  endwin();
+  TRACE("appel exit(0)") ; sleep(1) ;
+  exit(0) ;
+  }
+  return NULL ;
+}
+*/

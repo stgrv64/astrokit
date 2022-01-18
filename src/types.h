@@ -13,6 +13,10 @@
 #               * modification ordre des menus (MENU_AZIMUTAL=0)
 # 17/02/2022  | * ajout gestion touches clavier (*_CLAVIER)
 #               * nouveaux fichiers keyboard.h / .c
+# 18/02/2022  | * ajout parametre CONFIG_REP_SCR
+#               * ajout parametre CONFIG_SCR_KERNEL
+#               * remplacement fonctions TRACE par Trace 
+#               * refonte des macros de Trace
 # -------------------------------------------------------------- 
 */
 
@@ -32,54 +36,93 @@
   #define TRACE2(fmt, args...)     while(0) { } 
 #endif
 
-// niveau 0
+// ------------------------------------------------------------------------
+// Syslog
+// ----------------------------------------------------------------------
 
-#if defined(DEBUG) && DEBUG == 0 
+#define SyslogInf(string0) { syslog( LOG_INFO,    "%s : ligne %d : %s\n", __func__, __LINE__ ,string0); }
+#define SyslogErr(string0) { syslog( LOG_ERR,     "%s : ligne %d : %s\n", __func__, __LINE__ ,string0); }
+#define SyslogWar(string0) { syslog( LOG_WARNING, "%s : ligne %d : %s\n", __func__, __LINE__ ,string0); }
+#define SyslogEno(string0) { syslog( LOG_ERR,     "%s : ligne %d : %s : %s\n", __func__, __LINE__ ,strerror(errno), string0 ); }
+#define SyslogFmt(fmt, args...) { syslog( LOG_ERR,"%s %s " fmt, __func__, strerror(errno), ##args) ; }
 
-#if defined(DEBUG_LOG) && DEBUG_LOG == 1
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
-#else 
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-  #define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+// ------------------------------------------------------------------------
+// Niveau 0 
+// ------------------------------------------------------------------------
+
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
+
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+
 #endif
 
-#endif 
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG == 1
 
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
 
-// niveau 1
-
-#if defined(DEBUG) && DEBUG == 1
-
-#if defined(DEBUG_LOG) && DEBUG_LOG == 1
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
-#else 
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #endif
 
-#endif 
+// ------------------------------------------------------------------------
+// Niveau 1
+// ------------------------------------------------------------------------
 
-// niveau 2
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG < 1
 
-#if defined(DEBUG) && DEBUG == 2
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 
-#if defined(DEBUG_LOG) && DEBUG_LOG == 1
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
-#else 
-  #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-  #define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-  #define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #endif
 
-#endif 
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG == 1
+
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
+
+#endif
+
+// ------------------------------------------------------------------------
+// Niveau 2 
+// ------------------------------------------------------------------------
+
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG < 1
+
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+
+#endif
+
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG == 1
+
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(flog, "\n%s : " fmt, __func__, ##args) ; }
+
+#endif
 	
 // ------------------------------------------------------------------------
 // Constantes
@@ -611,7 +654,8 @@ char CONFIG_REP_CAT  [ CONFIG_TAILLE_BUFFER_64 ] ;
 char CONFIG_REP_CFG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
 char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;      
 char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    
-        
+char CONFIG_REP_SCR  [ CONFIG_TAILLE_BUFFER_64 ] ; 
+
 char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;        
@@ -620,6 +664,16 @@ char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;
 // avec la commande getcwd 
 char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;
 
+/*
+18/01/2022 :
+      ajout chemin du script execution par system avec droits root
+      qui permet de modifier ordonnancement temps teel
+      en remplacement de sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us
+      Ce script permet un sudo <script> , impossible lors de 
+      sudo sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us
+*/
+
+char CONFIG_SCR_KERNEL [ CONFIG_TAILLE_BUFFER_64 ] ;
 // FIXME : ajout variables GPIO_xxx qui sont geres par gpio.c
 // uniquement pour affichage via CONFIG_AFFICHER_VARIABLES
 
