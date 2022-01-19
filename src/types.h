@@ -11,12 +11,16 @@
 # --------------------------------------------------------------
 # 15/11/2021  | * modification des types enum et contenu enum
 #               * modification ordre des menus (MENU_AZIMUTAL=0)
-# 17/02/2022  | * ajout gestion touches clavier (*_CLAVIER)
+# 17/01/2022  | * ajout gestion touches clavier (*_CLAVIER)
 #               * nouveaux fichiers keyboard.h / .c
-# 18/02/2022  | * ajout parametre CONFIG_REP_SCR
+# 18/01/2022  | * ajout parametre CONFIG_REP_SCR
 #               * ajout parametre CONFIG_SCR_KERNEL
 #               * remplacement fonctions TRACE par Trace 
 #               * refonte des macros de Trace
+# 19/01/2022  | * ajout ASTRE_INDETERMINE pour pouvoir calculer
+#                 meme sans nom d astre => cela permettra a terme
+#                 d'entrer l azimut et l altitude directement
+#                 pour effectuer le suivi
 # -------------------------------------------------------------- 
 */
 
@@ -25,7 +29,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     0
+#define DEBUG     1
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -202,8 +206,11 @@ typedef enum {
 t_en_Booleen ;
 
 typedef enum {
-  ASTRE_PLANETE=0,
-  ASTRE_CIEL_PROFOND  
+  ASTRE_INDETERMINE=0,
+  ASTRE_PLANETE,
+  ASTRE_CIEL_PROFOND,
+  ASTRE_DETERMINE_PAR_COORDONNEES_AZIMUTALES,
+  ASTRE_DETERMINE_PAR_COORDONNEES_AZIMUTALES
 }
 t_en_Astre ;
 
@@ -684,6 +691,7 @@ char GPIO_FREQUENCE_PWM [ CONFIG_TAILLE_BUFFER_64 ] ;
 
 #endif
 
-
-
+//========================================================================================
+// FIXME : FIN FICHIER
+//========================================================================================
 

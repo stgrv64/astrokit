@@ -1,3 +1,15 @@
+/* -------------------------------------------------------------
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# Fichier     | arguments.h
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 19/01/2022  | * ajout entete
+#               * ajouts fonctions utilisant getopt
+# -------------------------------------------------------------- 
+*/
+
 #ifndef ARGUMENTS_H
 #define ARGUMENTS_H
 
@@ -44,8 +56,6 @@
 #define ARGUMENTS_VARG_CHAR     99
 #define ARGUMENTS_FREQ_TRAME_INFRAROUGE 10000000.0
 
-
-
 int incrlog ;
 
 //extern void TRAP_MAIN(int sig) ;
@@ -53,9 +63,19 @@ int incrlog ;
   remplacements des arguments de type var glob par void 
   on considere que ASTRE* VOUTE* etc.. sont dorenavant var glob
 */
-void  ARGUMENTS_HELP         (int argc, char** argv) ;
-void  ARGUMENTS_GERER        (int argc, char** argv)  ;
+void  ARGUMENTS_HELP_0       (int , char** ) ;
+void  ARGUMENTS_GERER_0      (int , char** )  ;
+
+void  ARGUMENTS_HELP_1       (int , char** ) ;
+void  ARGUMENTS_GERER_GETOPT (int , char** )  ;
+
 void  ARGUMENTS_TEST_MOTEURS (void) ;
 void  ARGUMENTS_VOUTE        (void) ;
 
 #endif
+
+//========================================================================================
+// FIXME : FIN FICHIER
+//========================================================================================
+
+

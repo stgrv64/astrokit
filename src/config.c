@@ -965,13 +965,13 @@ void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
 	Trace("voute->num %lld", voute->num) ;
 }
 //============================================================================
-void CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre, VOUTE *voute) {
+void CONFIG_AFFICHER_TOUT(void) {
 
   CONFIG_AFFICHER_CLAVIER( clavier ) ;   
-  CONFIG_AFFICHER_TEMPS( temps ) ;
-  CONFIG_AFFICHER_LIEU( lieu );
-  CONFIG_AFFICHER_ASTRE( astre ) ;
-  CONFIG_AFFICHER_VOUTE( voute ) ;
+  CONFIG_AFFICHER_TEMPS(   temps ) ;
+  CONFIG_AFFICHER_LIEU(    lieu );
+  CONFIG_AFFICHER_ASTRE(   astre ) ;
+  CONFIG_AFFICHER_VOUTE(   voute ) ;
 }
 //============================================================================
 // 15/11/2021 : modification ordre
@@ -1006,7 +1006,9 @@ void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
   }
   return ;
 }
-//============================================================================
+//========================================================================================
+// FIXME : FIN FICHIER
+//========================================================================================
 
 
 

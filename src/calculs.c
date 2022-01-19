@@ -5,6 +5,9 @@
 # --------------------------------------------------------------
 # 15/11/2021  | * (types.h) modification des types enum et contenu enum
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
+# 19/01/2022  | * gestion du cas ou l astre n a pas de nom
+#                 c'est a dire q'on effectue les calculs en fonction des coordonnees
+#                 sans l'information de nom (recherche catagues inutiles)
 # -------------------------------------------------------------- 
 */
 
@@ -198,13 +201,13 @@ void CALCUL_GEODE(ASTRE *astre) {
 
 void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
   
-  // transforme les coordonnees "sidérales" en coordonnees azimutales
+  // transforme les coordonnees "sidï¿½rales" en coordonnees azimutales
   // permet de trouver l'azimut et l'altitude en fonction de l'angle horaire
-  // par rapport au méridien (SUD) et la declinaison
-  // ATTENTION !! angle horaire = ascension droite sidérale corrigée
-  // avec le temps sidéral : une conversion doit etre faite pour trouver
+  // par rapport au mï¿½ridien (SUD) et la declinaison
+  // ATTENTION !! angle horaire = ascension droite sidï¿½rale corrigï¿½e
+  // avec le temps sidï¿½ral : une conversion doit etre faite pour trouver
   // astre->A  = TS - (asc droite absolue)
-  // Une fonction de calcul du temps sidéral doit etre faite ultérieurement 
+  // Une fonction de calcul du temps sidï¿½ral doit etre faite ultï¿½rieurement 
   
   double LAT,A,H,a,h,a1,af ;
   
@@ -244,11 +247,11 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
 void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
 
   // transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
-  // permet de trouver les coordonnées siderales en fonction de l'azimut et de l'altitude
-  // Pour avoir la correspondance avec les coordonnnées équatoriales brutes, il faut
+  // permet de trouver les coordonnï¿½es siderales en fonction de l'azimut et de l'altitude
+  // Pour avoir la correspondance avec les coordonnnï¿½es ï¿½quatoriales brutes, il faut
   // utiliser la conversion AH = TS - ASC
   // AH  : angle horaire
-  // TS  : temps sidéral
+  // TS  : temps sidï¿½ral
   // ASC : ascension droite brute
   
   double A2,A1,a,h,LAT,Af,A,H ;
@@ -689,14 +692,38 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
 // FIXME :  * a besoin de tous les calculs , ainsi que du mode 
 //========================================================================================
 
-void CALCUL_TOUT(LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *clavier ) {
+void CALCUL_TOUT(void) {
   
   t_en_Astre i_astre ;
   
-  if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = ASTRE_PLANETE ;
-  else                                            i_astre = ASTRE_CIEL_PROFOND ;
+  /*---------------- evolution 19/01/2022 ----------------
+  * prise en compte du fait que la astre n a pas de nom
+  * les calculs doivent se baser sur les coordonnees
+  -------------------------------------------------------*/
+
+  if (      strstr( astre->nom, CONFIG_MES ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = ASTRE_PLANETE ;
+  else                                                 i_astre = ASTRE_INDETERMINE ;
   
   switch (i_astre) {
+
+    //---------------------------------------------------------------------------------------
+
+    case ASTRE_INDETERMINE :
+    
+      pthread_mutex_lock( & suivi->mutex_cal );
+      
+      CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+      CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
+      CALCUL_AZIMUT       ( lieu, astre) ;
+      CALCUL_VITESSES     ( lieu, astre, suivi) ;
+      CALCUL_PERIODE      ( astre, suivi, voute) ;
+      
+      pthread_mutex_unlock( & suivi->mutex_cal ) ;
+      
+      break ;
 
     //---------------------------------------------------------------------------------------
     
@@ -721,7 +748,7 @@ void CALCUL_TOUT(LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *
       pthread_mutex_lock( & suivi->mutex_cal );
             
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-        
+      
       SOLAR_SYSTEM_NEW( astre->nom,\
                       & astre->ASC,\
                       & astre->H,\
@@ -734,6 +761,7 @@ void CALCUL_TOUT(LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *
       CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 
+      // FIXME : ainsi que coordonnees equatoriales / declinaison
       // FIXME : est directement retourner par la fonction SOLAR_SYSTEM_NEW
       // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordonnees siderales
       // TODO  : ne modifie pas azimut et altitude calcules par SOLAR_SYSTEM_NEW
@@ -769,7 +797,68 @@ case CAPTEURS :
       */
   }  
 }
-
+//================================================================================================
+void CALCUL_VOUTE(void ) {
+  
+  FILE   *fout ;
+  // double A, H ;
+  double a, h ;
+  
+  fout=fopen("voute.csv","w") ;
+  
+  // On fait varier les coordonnees HORAIRES
+  
+  for(h=-(PI/2)+(lieu->lat)+0.001;h<PI/2;h+=voute->pas)
+    if (h>=0) 
+    for(a=-PI +0.001 ;a<PI;a+=voute->pas){
+     
+     astre->a=a ;
+     astre->h=h ;
+     
+     CALCUL_EQUATEUR  ( lieu, astre) ; // calcul coordonnees horaires en fait
+     CALCUL_VITESSES  ( lieu, astre, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
+     
+     astre->V  = sqrt( sqr( astre->Va ) + sqr( astre->Vh )) ;
+     
+     if ( astre->Va != 0) 
+       astre->An = atan( astre->Vh / astre->Va ) ;
+     else
+       astre->An = PI/2 ;
+     
+     CALCUL_GEODE( astre ) ;
+     
+     Trace("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
+       astre->a * DEGRES, \
+       astre->h * DEGRES, \
+       astre->A * DEGRES, \
+       astre->H * DEGRES, \
+       astre->x , \
+       astre->y, \
+       astre->z, \
+       astre->Va, \
+       astre->Vh, \
+       astre->V, \
+       astre->An ) ;
+     
+     /*  	
+     printf("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
+       astre->xx , \
+       astre->yy , \
+       astre->zz , \
+       astre->V ) ;
+     
+     printf("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
+       astre->xx , \
+       astre->yy , \
+       astre->zz , \
+       astre->Va, \
+       astre->Vh, \
+       astre->V ) ;
+     */
+   }
+  
+  fclose(fout) ;
+}
 //========================================================================================
 // FIXME : FIN FICHIER
 //========================================================================================

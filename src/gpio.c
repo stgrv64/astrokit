@@ -1,11 +1,18 @@
 /* -------------------------------------------------------------
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
+# Fichier     | gpio.c
+# --------------------------------------------------------------
 # date        | commentaires 
 # --------------------------------------------------------------
 # 03/04/2021  | ajout entete
 # 01/05/2021  | ajout commentaire sur fonction GPIO_INIT_VAR2
 #               synthese traces sur une ligne (2021)
+# 18/01/2022  | * les lignes close( fd ) posent un probleme
+# (issue)  lors de utilisation de la librairie ncurses (getch)
+# ainsi que termios (cf fichier keyboard.c / .h ) :
+# mise en commentaire du reliquat de close dans le code
+#         
 # -------------------------------------------------------------- 
 */
 

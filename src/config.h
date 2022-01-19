@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------
-# astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
 # date        | commentaires 
 # --------------------------------------------------------------
@@ -86,7 +86,12 @@ void   CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONF
 int    CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_GETCWD(char * ) ;
 
-void   CONFIG_AFFICHER_TOUT(CLAVIER *clavier, TEMPS *temps, LIEU *lieu, ASTRE *astre, VOUTE *voute) ; // FIXME ajout 20191228
-void   CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) ; // FIXME ajout 20200102
+void   CONFIG_AFFICHER_TOUT(void) ; // FIXME ajout 20191228
+void   CONFIG_AFFICHER_CHANGEMENTS (void) ; // FIXME ajout 20200102
 
 #endif
+
+//========================================================================================
+// FIXME : FIN FICHIER
+//========================================================================================
+

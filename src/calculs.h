@@ -1,3 +1,15 @@
+/* -------------------------------------------------------------
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# Fichier     | arguments.h
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 19/01/2022  | * ajout entete
+#               * ajouts fonctions utilisant getopt
+# -------------------------------------------------------------- 
+*/
+
 #ifndef CALCULS_H
 #define CALCULS_H
 
@@ -84,8 +96,6 @@ void   CALCUL_VITESSES                ( LIEU *lieu, ASTRE *astre, SUIVI *suivi) 
 
 void   CALCUL_ANGLE_HORAIRE           ( LIEU *lieu, ASTRE *astre) ;
 
-void   CALCUL_TOUT                    (LIEU* lieu, TEMPS *temps, ASTRE *astre, SUIVI *suivi, CLAVIER *clavier ) ;
-
 void   CALCUL_D                       ( ASTRE *astre, SUIVI *suivi) ;   
 void   CALCUL_PERIODE                 ( ASTRE *astre, SUIVI* suivi,VOUTE *voute)  ;
 void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *astre, SUIVI* suivi, VOUTE *voute) ;
@@ -106,4 +116,11 @@ void   SET_VOUTE( VOUTE *voute,char *parametre, double valeur) ;
 double CALCUL_DUREE_MICROSEC           (struct timeval *) ;
 double CALCUL_DUREE_NANOSEC            (struct timeval *) ;
 
+void   CALCUL_TOUT                    (void) ;
+
 #endif
+
+//========================================================================================
+// FIXME : FIN FICHIER
+//========================================================================================
+

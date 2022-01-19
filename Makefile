@@ -18,11 +18,11 @@
 #            - le nom de le executable est EPHX
 #         * ajout librairie ncurses pour acces fonction getch (flux input keyboard)
 #--------------------------------------------------------------------------------------
-# CC	= gcc
+CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
 # pour rpi3 cortex A53 :
-CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
+# CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
 # CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 

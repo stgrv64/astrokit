@@ -1,17 +1,21 @@
 /* -------------------------------------------------------------
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
+# Fichier     | astro.c
+# --------------------------------------------------------------
 # date        | commentaires 
 # --------------------------------------------------------------
 # 03/04/2021  | * ajout entete
 #               * suite a ajout variables CONFIG_REP et CONFIG_FIC
 #                 il faut d'abord le fichier config.txt en priorite
-# 17/02/2022  | * ajout gestion touches clavier (*_CLAVIER)
+# 17/01/2022  | * ajout gestion touches clavier (*_CLAVIER)
 #               * nouveaux fichiers keyboard.h / .c
-# 18/02/2022  | * test de fonctions SUIVI_CLAVIER faisant inervenir
+# 18/01/2022  | * test de fonctions SUIVI_CLAVIER faisant inervenir
 #  (issue)        les appels ncurses : KO quand la fonction SUIVI_CLAVIER
 #                 est appelle apres la fonction close dans GPIO_CLOSE (???)
 #               * mise en commentaire des fonctions suivant doxygen
+# 19/01/2002  | * suppression passage arguments CONGI_AFFICHER_TOUT
+# (issue)         cela est justifie par le fait que les variables sont globales
 # -------------------------------------------------------------- 
 */
 
@@ -41,7 +45,8 @@ int        g_id_thread ;
 * @brief  : fonction appelle quand un signal est trape dans main
 * @param  : int     sig
 * @date   : 2022-01-18 mise en commentaire
-* @todo   : (completer)
+* @todo   : voir s il est preferable de faire un kill(getpid(),SIGKILL) 
+*           plutot qu un exit
 *****************************************************************************************/
 
 void TRAP_MAIN(int sig) {
@@ -68,6 +73,15 @@ void TRAP_MAIN(int sig) {
    } 
   }
   GPIO_SET( GPIO_LED_ETAT, 0 ) ;
+
+  closelog();
+
+  if ( i_exit==1 && signum == SIGINT ){
+		kill(getpid(),SIGKILL) ;
+	}
+	if ( i_exit==1 && signum == SIGKILL ){
+		kill(getpid(),SIGKILL) ;
+	}
   exit(0) ;
 }
 
@@ -705,7 +719,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         suivi->SUIVI_EQUATORIAL = 0 ;
         suivi->SUIVI_VOUTE      = 1 ; 
 
-				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+				CALCUL_TOUT( ) ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_BRUT ; 
@@ -728,7 +742,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         suivi->SUIVI_EQUATORIAL = 1 ;
         suivi->SUIVI_VOUTE      = 0 ; 
 
-				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+				CALCUL_TOUT() ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_BRUT ;
@@ -773,7 +787,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         pthread_mutex_unlock(& suivi->mutex_azi );   
         pthread_mutex_unlock(& suivi->mutex_alt );
 
-				CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+				CALCUL_TOUT() ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_BRUT ; 
@@ -812,7 +826,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
         TRACE("appel : %d : MENU_INFO" , suivi->menu) ;
 
-        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
+        CONFIG_AFFICHER_TOUT() ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_BRUT ;
@@ -927,7 +941,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       
       /* FIXME : modification 20121225 : tous les calculs generiques dans CALCUL_TOUT */
       
-      CALCUL_TOUT(lieu, temps, astre, suivi, clavier ) ;
+      CALCUL_TOUT() ;
     
       if ( suivi->SUIVI_ALIGNEMENT ) { 
         CONFIG_AFFICHER_ASTRE(astre) ; 
@@ -935,7 +949,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       }
 /*
       if ( suivi->menu_old != suivi->menu  ) {
-        CONFIG_AFFICHER_TOUT(clavier,temps, lieu, astre, voute) ;
+        CONFIG_AFFICHER_TOUT() ;
       }
 */
       astre->A   += voute->pas ;
@@ -1304,7 +1318,6 @@ int main(int argc, char ** argv) {
   signal(SIGINT,TRAP_MAIN) ;
   signal(SIGALRM,TRAP_MAIN) ;
 
-  
   memset( suivi->p_threads_id, 0 , MAX_THREADS*sizeof(pthread_t)) ;
 
   TRACE("gpio_alt         : %d %d %d %d", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
@@ -1331,9 +1344,13 @@ int main(int argc, char ** argv) {
   
   // -----------------------------------------------------------------
 
-  ARGUMENTS_HELP    ( argc, argv ) ;
-  ARGUMENTS_GERER   ( argc, argv  ) ;
+  ARGUMENTS_HELP_0   ( argc, argv ) ;
+  ARGUMENTS_GERER_0 ( argc, argv  ) ;
   
+  if ( suivi->alarme != 0 ) {
+    alarm( suivi->alarme) ;
+  }  
+
   // ouverture led etat ----------------------------------------------
 
   if ( GPIO_LED_ETAT != 0 ) {
@@ -1358,8 +1375,7 @@ int main(int argc, char ** argv) {
     CALCUL_AZIMUT         ( lieu, astre) ;
     CONFIG_AFFICHER_ASTRE ( astre) ;
   }
-  if ( suivi->alarme != 0 ) alarm( suivi->alarme) ;
-      
+
   pm_azi = &m_azi ;
   pm_alt = &m_alt ;
   
