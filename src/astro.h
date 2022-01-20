@@ -40,21 +40,51 @@
 
 // FIN INCLUDES =====================================
 
-void SUIVI_MENU_PREALABLE (SUIVI *suivi) ;
-void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) ;
+void   TRAP_MAIN(int ) ;
+void   TRAP_SUIVI_MENU(int )  ;
+void   TRAP_SUIVI_VOUTE(int )  ;
+void   TRAP_SUIVI_INFRAROUGE(int )  ;
+void   TRAP_SUIVI_CAPTEURS(int )  ;
+void   TRAP_SUIVI_CLAVIER(int )  ;
+void   SUIVI_MENU_PREALABLE (SUIVI *) ;
+void   SUIVI_TRAITEMENT_MOT( SUIVI *, CLAVIER * ) ;
+void   SUIVI_MANUEL_BRUT(SUIVI * , CLAVIER *) ;
+void   SUIVI_MANUEL_1(SUIVI * , CLAVIER *) ;
+void * SUIVI_MENU(SUIVI * ) ;
+void * SUIVI_VOUTE(SUIVI * ) ;
+void * SUIVI_INFRAROUGE(SUIVI * ) ;
+void * SUIVI_CLAVIER_getchar( SUIVI *  ) ;
+void * SUIVI_CLAVIER_TERMIOS( SUIVI *  ) ;
+void * SUIVI_CLAVIER_NCURSES(SUIVI*  ) ;
+void * SUIVI_CAPTEURS(SUIVI * ) ;
+void * SUIVI_CLAVIER_1(SUIVI * ) ;
+void * SUIVI_CLAVIER_0(SUIVI * ) ;
 
-void SUIVI_MANUEL_0(SUIVI * suivi, CLAVIER *clavier) ;
-void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier)  ;
-
-void * SUIVI_MENU(SUIVI * suivi) ;
-void * SUIVI_VOUTE(SUIVI * suivi) ;
-void * SUIVI_INFRAROUGE(SUIVI * suivi) ;
-void * SUIVI_CAPTEURS(SUIVI * suivi) ;
-
-// extern void SOLAR_SYSTEM(char * nom,double * a, double * h,double lat, double lon, double alt, double jd, int num) ;
-void SOLAR_SYSTEM_NEW( char * nom, double * ASC, double * H, double * a, double * h, double lat, double lon, double alt, \
-   int annee, int mois, int jour, int heure, int minute, int seconde, int num ) ;
-
-
+/* extern void SOLAR_SYSTEM(\
+ char   * nom,\
+ double * a, \
+ double * h, \
+ double   lat, \
+ double   lon, \
+ double   alt, \
+ double   jd, \
+ int      num) ;
+*/
+void SOLAR_SYSTEM( \
+ char   * nom, \
+ double * ASC, \
+ double * H, \
+ double * a, \
+ double * h, \
+ double   lat, \
+ double   lon, \
+ double   alt, \
+ int      annee, \
+ int      mois, \
+ int      jour, \
+ int      heure, \
+ int      minute, \
+ int      seconde, \
+ int      num ) ;
 
 #endif

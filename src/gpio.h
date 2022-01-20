@@ -4,7 +4,7 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 01/05/2021  | ajout entete
-# 01/05/2021  | mise en commentaire #define GPIO_FREQUENCE_PWM 
+# 01/05/2021  | creation entete de la fonction au format doxygen #define GPIO_FREQUENCE_PWM 
 #   suite a ajout de la variable du meme nom dans types.h
 # -------------------------------------------------------------- 
 */
@@ -62,7 +62,7 @@
 #define GPIO_SUIVI_MAIN_SCHED        SCHED_FIFO
 
 #define GPIO_MICROPAS_MAX           500
-// FIXME : mise en commentaire de la ligne suivante (2021)
+// FIXME : creation entete de la fonction au format doxygen de la ligne suivante (2021)
 // #define GPIO_FREQUENCE_PWM          750 
 #define GPIO_NB_PHASES_PAR_MOTEUR   4
 #define GPIO_FREQ_MAX               1000.0
@@ -213,12 +213,12 @@ int priority ;
 
 
 void   GPIO_CLIGNOTE         (int , int , int ) ;
-void   GPIO_INIT_VAR         (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
-void   GPIO_INIT_VAR2        (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
-void   GPIO_KEYBOARD_CONFIG  (int [4],int [4]) ;
-void   GPIO_KEYBOARD_READ    (int [4],int [4],CLAVIER* ) ;
+void   GPIO_READ         (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+void   GPIO_READ2        (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+void   GPIO_RAQUETTE_CONFIG  (int [4],int [4]) ;
+void   GPIO_RAQUETTE_READ    (int [4],int [4],CLAVIER* ) ;
 
-void   GPIO_KEYBOARD_RAQUETTE_READ(int [4],int [4], SUIVI *) ;
+void   GPIO_RAQUETTE_MAJ_SUIVI(int [4],int [4], SUIVI *) ;
 void   GPIO_TRAP(int ) ;
 void   GPIO_STATUT(void) ;
 int    GPIO_GET(int ) ;

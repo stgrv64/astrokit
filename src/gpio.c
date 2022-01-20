@@ -6,19 +6,30 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 03/04/2021  | ajout entete
-# 01/05/2021  | ajout commentaire sur fonction GPIO_INIT_VAR2
+# 01/05/2021  | ajout commentaire sur fonction GPIO_READ2
 #               synthese traces sur une ligne (2021)
 # 18/01/2022  | * les lignes close( fd ) posent un probleme
 # (issue)  lors de utilisation de la librairie ncurses (getch)
 # ainsi que termios (cf fichier keyboard.c / .h ) :
-# mise en commentaire du reliquat de close dans le code
+# creation entete de la fonction au format doxygen du reliquat de close dans le code
 #         
 # -------------------------------------------------------------- 
 */
 
 #include <gpio.h>
 
-// ---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : GPIO_CLIGNOTE
+* @author : s.gravois
+* @brief  : Cette fonction permet de faire clignoter la LED d ETAT 
+* @param  : int gpio
+* @param  : int nombre_clignotement
+* @param  : int duree_clignotement
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : effectuer la meme fonction mais avec variation continue PWM
+*           (necessite utiliser les threads rapports cycliques)
+*****************************************************************************************/
+
 void GPIO_CLIGNOTE(int gpio, int nombre_clignotement, int duree_clignotement) {
  int i ;
  i=-1; 
@@ -27,7 +38,18 @@ void GPIO_CLIGNOTE(int gpio, int nombre_clignotement, int duree_clignotement) {
   GPIO_SET( GPIO_LED_ETAT, 0 ) ; usleep(duree_clignotement*10000);
  }
 }
-// ---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : GPIO_TAB_TOKEN
+* @author : s.gravois
+* @brief  : Cette fonction permet de lire les entrees de type 0,1,2,3 (token)
+*           a deplacer eventuellement dans un fichier util.c / util.h
+* @param  : int    tab[4]
+* @param  : char * buffer
+* @param  : char * separator
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : voir si realisable sous forme de MACRO
+*****************************************************************************************/
+
 void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
   int j ;
   char *str1, *token, *sptr ;
@@ -38,8 +60,18 @@ void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
     tab[j]=atoi(token);
    }
 }
-// ---------------------------------------------------------------------------------------
-void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
+/*****************************************************************************************
+* @fn     : GPIO_READ
+* @author : s.gravois
+* @brief  : Cette fonction lit les parametres GPIO dans le fichier de configuration
+*           (GPIO_ALT / GPIO_AZI / GPIO_MASQUE )
+*           Initilise la frequence PWM a 1000 si aucune entree gpio_frequence_pwm
+* @param  : datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
+void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
   int l,i, j ;
   char *str1, *token, *sptr ;
   
@@ -93,6 +125,7 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
     strcpy( GPIO_FREQUENCE_PWM, datas[l][1] ) ;
 
     gpio_frequence_pwm = 1000 ;
+
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
@@ -106,9 +139,17 @@ void GPIO_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_
    
   TRACE1("GPIO_FREQUENCE_PWM=%f", gpio_frequence_pwm ) ;
 }
-// ---------------------------------------------------------------------------------------
-// FIXME : fonction ancienne : inutile (2021)
-void GPIO_INIT_VAR2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
+/*****************************************************************************************
+* @fn     : GPIO_READ
+* @author : s.gravois
+* @brief  : Cette fonction lit GPIO_INPUT et GPIO_OUTPUT
+* @param  : datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : (obsolete) fonction ancienne, remplace explicitement par GPIO_LED_xx etc..
+*****************************************************************************************/
+
+void GPIO_READ2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
+
   int l,i, j ;
   char *str1, *token, *sptr ;
   
@@ -133,37 +174,71 @@ void GPIO_INIT_VAR2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE
    for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_in[%d] =%d\n",i,gpio_in[i]);
    for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_out[%d]=%d\n",i,gpio_out[i]);
 }
-// ---------------------------------------------------------------------------------------
-// Configuration du clavier (clavier matriciel en 4*4) en fonction des entrees de config :
-// lecture ou ecriture premieres sur les gpios
-// GPIO_KEY_L* et GPIO_KEY_C* sont definies dans le fichier de config
-// ---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : GPIO_RAQUETTE_CONFIG
+* @author : s.gravois
+* @brief  : Cette fonction configure un clavier matriciel X lignes sur Y colonnes
+* @param  : int GPIO_KEY_L[4]
+* @param  : int GPIO_KEY_C[4]
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
+*****************************************************************************************/
 
-void GPIO_KEYBOARD_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
+/* ---------------------------------------------------------------------------------------
+* Configuration du clavier (clavier matriciel en 4*4) en fonction des entrees de config :
+* lecture ou ecriture premieres sur les gpios
+* GPIO_KEY_L* et GPIO_KEY_C* sont definies dans le fichier de config
+ ---------------------------------------------------------------------------------------*/
+
+void GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
   
   int  i,j ;
+  if ( donnees->DONNEES_RAQUETTE ) {
     
-  GPIO_KEY_L[0] = GPIO_KEY_L1 ; GPIO_KEY_L[1] = GPIO_KEY_L2 ; GPIO_KEY_L[2] = GPIO_KEY_L3 ; GPIO_KEY_L[3] = GPIO_KEY_L4 ;
-  GPIO_KEY_C[0] = GPIO_KEY_C1 ; GPIO_KEY_C[1] = GPIO_KEY_C2 ; GPIO_KEY_C[2] = GPIO_KEY_C3 ; GPIO_KEY_C[3] = GPIO_KEY_C4 ;
+    GPIO_KEY_L[0] = GPIO_KEY_L1 ; 
+    GPIO_KEY_L[1] = GPIO_KEY_L2 ; 
+    GPIO_KEY_L[2] = GPIO_KEY_L3 ; 
+    GPIO_KEY_L[3] = GPIO_KEY_L4 ;
 
-  for(i=0;i<4;i++) {
-    GPIO_SET( GPIO_KEY_C[i], 0) ;
-    for(j=0;j<4;j++)
-      if( GPIO_GET(GPIO_KEY_L[j])) {
-        TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d allumer\n",i,j,GPIO_KEY_C[i],GPIO_KEY_L[j]); }
-      else {
-        TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d eteint\n",i,j,GPIO_KEY_C[i],GPIO_KEY_L[j]); }
+    GPIO_KEY_C[0] = GPIO_KEY_C1 ; 
+    GPIO_KEY_C[1] = GPIO_KEY_C2 ; 
+    GPIO_KEY_C[2] = GPIO_KEY_C3 ; 
+    GPIO_KEY_C[3] = GPIO_KEY_C4 ;
+
+    for(i=0;i<4;i++) {
+
+      GPIO_SET( GPIO_KEY_C[i], 0) ;
+
+      for(j=0;j<4;j++)
+
+        if( GPIO_GET(GPIO_KEY_L[j])) {
+
+          TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d allumer\n",\
+            i,j,GPIO_KEY_C[i],GPIO_KEY_L[j]); }
+        else {
+          TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d eteint\n",\
+          i,j,GPIO_KEY_C[i],GPIO_KEY_L[j]); }
+    }
   }
 }
-// ---------------------------------------------------------------------------------------
-// Lecture d'une touche sur le clavier matriciel 4*4
-// ---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : GPIO_RAQUETTE_READ
+* @author : s.gravois
+* @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
+* @param  : int       GPIO_KEY_L[4]
+* @param  : int       GPIO_KEY_C[4]
+* @param  : CLAVIER * clavier
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
+* @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
+*****************************************************************************************/
 
-void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) {
+void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) {
+
   int  i=0,j=0;
   int I=0, J=0  ;
   char val[255] ;
-  /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+  
   char buffer_recopie [ CONFIG_TAILLE_BUFFER_32 ] ;
 
   I=-1; ; J=-1 ;
@@ -173,12 +248,12 @@ void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
   
   strcpy(val,"") ;     
   
-  // =======================================================================
-  // Lecture d'une touche au clavier matriciel 4*4
-  // Tant que une touche est appuyee la valeur appui_en_cours est a 1
-  // On passe plusieurs fois dans cette boucle en fonction de la fonction appelante
-  // qui est dans astro.c
-  // =======================================================================
+  /* =======================================================================
+  * Lecture d'une touche au clavier matriciel 4*4
+  * Tant que une touche est appuyee la valeur appui_en_cours est a 1
+  * On passe plusieurs fois dans cette boucle en fonction de la fonction appelante
+  * qui est dans astro.c
+   ======================================================================= */
   
   clavier->appui_en_cours = 0 ;
     
@@ -293,35 +368,113 @@ void GPIO_KEYBOARD_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
     // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
   }
 }
+/*****************************************************************************************
+* @fn     : GPIO_RAQUETTE_READ
+* @author : s.gravois
+* @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
+* @param  : int       GPIO_KEY_L[4]
+* @param  : int       GPIO_KEY_C[4]
+* @param  : CLAVIER * clavier
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
+* @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
+*****************************************************************************************/
+
 //==========================================================
-void GPIO_KEYBOARD_RAQUETTE_READ(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) {
+// FIXME : fonction appelee depuis SUIVI_MANUEL*
+
+void IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi) {
+
+  if ( donnees->DONNEES_INFRAROUGE ) {
+    
+    if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )     { suivi->pas_acc_plus  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )    { suivi->pas_acc_moins = 1 ; }
+    
+    if ( ! strcmp( suivi->datas_infrarouge, "forward" ) )  { suivi->pas_forward  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "rewind" ) )   { suivi->pas_rewind = 1 ; }
+
+    if ( ! strcmp( suivi->datas_infrarouge, "forwardfast" ) )  { suivi->pas_forward_fast  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "rewindfast" ) )   { suivi->pas_rewind_fast = 1 ; }
+
+    if ( ! strcmp( suivi->datas_infrarouge, "ne" ) )       { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "no" ) )       { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "se" ) )       { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "so" ) )       { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
+      
+    if ( ! strcmp( suivi->datas_infrarouge, "n" ) )        { suivi->pas_nord  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "o" ) )        { suivi->pas_ouest = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "e" ) )        { suivi->pas_est   = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "s" ) )        { suivi->pas_sud   = 1 ; }
+      
+    if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )    { suivi->reset   = 1 ; }
+    
+    TRACE1("%ld %ld %ld %ld %d %d\n", \
+      suivi->pas_ouest, \
+      suivi->pas_est, \
+      suivi->pas_nord, \
+      suivi->pas_sud, \
+      suivi->pas_acc_plus, \
+      suivi->pas_acc_moins );
+  }
+}
+
+/*****************************************************************************************
+* @fn     : GPIO_RAQUETTE_READ
+* @author : s.gravois
+* @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
+* @param  : int       GPIO_KEY_L[4]
+* @param  : int       GPIO_KEY_C[4]
+* @param  : CLAVIER * clavier
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
+* @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
+*****************************************************************************************/
+
+void GPIO_RAQUETTE_MAJ_SUIVI(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) {
+  
   int  i,j;
   char val[255] ;
   
-  for(i=0;i<4;i++) GPIO_SET( GPIO_KEY_C[i], 0) ;
+  if ( donnees->DONNEES_RAQUETTE ) {
+    
+    for(i=0;i<4;i++) {
+      GPIO_SET( GPIO_KEY_C[i], 0) ;
+    }
   
-  strcpy(val,"") ;       
-  // =======================================================================
-  for(i=0;i<4;i++) { GPIO_SET( GPIO_KEY_C[i], 1) ; 
-  for(j=0;j<4;j++)  { if( GPIO_GET(GPIO_KEY_L[j])) {
-   
-    if ( ! strcmp( raquette[i][j], "plus" ) ) {  suivi->pas_acc_plus =1 ; }
-    if ( ! strcmp( raquette[i][j], "moins" ) ) { suivi->pas_acc_moins=1 ; }
+    strcpy(val,"") ;       
+    
+    for(i=0;i<4;i++) { 
+      
+      GPIO_SET( GPIO_KEY_C[i], 1) ; 
+      
+      for(j=0;j<4;j++)  { 
 
-    if ( ! strcmp( raquette[i][j], "ne" ) ) { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
-    if ( ! strcmp( raquette[i][j], "no" ) ) { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
-    if ( ! strcmp( raquette[i][j], "se" ) ) { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
-    if ( ! strcmp( raquette[i][j], "so" ) ) { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
+        if( GPIO_GET(GPIO_KEY_L[j])) {
+   
+          if ( ! strcmp( raquette[i][j], "plus" ) )  {  suivi->pas_acc_plus =1 ; }
+          if ( ! strcmp( raquette[i][j], "moins" ) ) { suivi->pas_acc_moins=1 ; }
+          if ( ! strcmp( raquette[i][j], "ne" ) )    { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
+          if ( ! strcmp( raquette[i][j], "no" ) )    { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
+          if ( ! strcmp( raquette[i][j], "se" ) )    { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
+          if ( ! strcmp( raquette[i][j], "so" ) )    { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
+          if ( ! strcmp( raquette[i][j], "n" ) )     { suivi->pas_nord  = 1 ; }
+          if ( ! strcmp( raquette[i][j], "o" ) )     { suivi->pas_ouest = 1 ; }
+          if ( ! strcmp( raquette[i][j], "e" ) )     { suivi->pas_est   = 1 ; }
+          if ( ! strcmp( raquette[i][j], "s" ) )     { suivi->pas_sud   = 1 ; }
+          if ( ! strcmp( raquette[i][j], "reset" ) ) { suivi->reset   = 1 ; }
     
-    if ( ! strcmp( raquette[i][j], "n" ) ) { suivi->pas_nord  = 1 ; }
-    if ( ! strcmp( raquette[i][j], "o" ) ) { suivi->pas_ouest = 1 ; }
-    if ( ! strcmp( raquette[i][j], "e" ) ) { suivi->pas_est   = 1 ; }
-    if ( ! strcmp( raquette[i][j], "s" ) ) { suivi->pas_sud   = 1 ; }
+        }
+      } 
     
-    if ( ! strcmp( raquette[i][j], "reset" ) ) { suivi->reset   = 1 ; }
-    
-  }} GPIO_SET( GPIO_KEY_C[i], 0) ;  }
-  //printf("%ld %ld %ld %ld\n", suivi->pas_ouest, suivi->pas_est, suivi->pas_nord, suivi->pas_sud);
+      GPIO_SET( GPIO_KEY_C[i], 0) ;  
+    }
+    /* printf("%ld %ld %ld %ld\n", \
+      suivi->pas_ouest, \
+      suivi->pas_est, \
+      suivi->pas_nord, \
+      suivi->pas_sud);
+    */
+  }
 }
 //==========================================================
 void GPIO_TRAP(int sig) {
@@ -1175,7 +1328,7 @@ void * suivi_clavier() {
 //          ET choix de la fonction de rapport cyclique
 // ##########################################################################################################
 
-void main_(int argc, char **argv)
+void mainGpio(int argc, char **argv)
 {
   int         i, pid, nbcpus, nbm , type_fonction;
   double      param0, param1 ;
@@ -1226,7 +1379,7 @@ void main_(int argc, char **argv)
 
   pm0 = &m0 ;
   if(nbm) pm1 = &m1 ;
-  suivi = &su ;
+  suivi = &sui ;
   
   pm0->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   if(nbm)pm1->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR

@@ -21,6 +21,9 @@
 #                 meme sans nom d astre => cela permettra a terme
 #                 d'entrer l azimut et l altitude directement
 #                 pour effectuer le suivi
+# 20/01/2022  | * ajout de tous les types d 'astre a t_en_Astre_Type
+#               * ajout d'un enum t_en_ModeCalcul
+#               * ajout structure DONNEES et var don, *donnees ;
 # -------------------------------------------------------------- 
 */
 
@@ -149,8 +152,6 @@
 #define MAIN_FA_TRANSITOIRE   4
 #define MAIN_FH_TRANSITOIRE   4
 
-#define  CONFIG_ASTROLOG      1
-
 #define  CONFIG_MES           "MES"
 #define  CONFIG_NGC           "NGC"
 #define  CONFIG_ETO           "ETO"
@@ -205,19 +206,48 @@ typedef enum {
 }
 t_en_Booleen ;
 
-typedef enum {
-  ASTRE_INDETERMINE=0,
-  ASTRE_PLANETE,
-  ASTRE_CIEL_PROFOND
-}
-t_en_Astre ;
+/* ----------------------------------------------------
+* Le typededef enum suivant determine le type d astre
+* sur lequel on fait le suivi, ce qui peut, en fonction
+* des cas, necessiter de refaire un calcul, ou un calcul
+* specifique (exemple SOLAR_SYSTEM pour les planetes).
+* afin de determiner le position de l 'astre sur son orbite
+* et dans le ciel, et ensuite, ses vitesses de deplacements
+* sur la voute celeste en azimut et en altitude.
+* Pour le ciel profond est considere que l'astre est fige
+* sur la voute.
+* (TODO) impact frequence de rafraichissement des calculs
+* sur la precision du suivi.
+* ----------------------------------------------------
+* Ce type doit etre rattache a la structure ASTRE
+------------------------------------------------------*/
 
 typedef enum {
   ASTRE_INDETERMINE=0,
+  ASTRE_CIEL_PROFOND,
   ASTRE_PLANETE,
-  ASTRE_CIEL_PROFOND
+  ASTRE_COMETE,
+  ASTRE_ASTEROIDE,
+  ASTRE_SATELLITE
 }
-t_en_ ;
+t_en_Astre_Type ;
+
+/* ----------------------------------------------------
+* Le typededef enum suivant determine de quelle maniere
+* on doit effectuer les calculs pour arriver aux vitesses
+* la conversion MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL
+* est utilisee quand au depart on connait les coordonnes 
+* azimutales de l objet (par exemple via un capteur)
+* 
+* Dans le cas contraire, 
+------------------------------------------------------*/
+
+typedef enum {
+  MODE_CALCUL_INDETERMINE=0,  
+  MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL,
+  MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+}
+t_en_ModeCalcul ;
 
 typedef enum { 
 	SUIVI_MANUEL=0,
@@ -295,12 +325,6 @@ TEMPS ;
 //=====================================================
 typedef struct {
 
-  int          SUIVI_MANUEL ;
-  int          SUIVI_ALIGNEMENT ;
-  int          SUIVI_GOTO ;
-  int          SUIVI_VOUTE ;
-  int          SUIVI_EQUATORIAL ;
-
   int          DONNEES_BLUETOOTH ;
   int          DONNEES_CAPTEURS ;
   int          DONNEES_INFRAROUGE ;
@@ -308,6 +332,19 @@ typedef struct {
   int          DONNEES_CONTROLEUR ; 
   int          DONNEES_CLAVIER ; 
   int          init_capteurs ;
+}
+DONNEES ;
+
+//=====================================================
+typedef struct {
+
+  int          SUIVI_MANUEL ;
+  int          SUIVI_ALIGNEMENT ;
+  int          SUIVI_GOTO ;
+  int          SUIVI_VOUTE ;
+  int          SUIVI_EQUATORIAL ;
+
+
   
   pthread_mutex_t  mutex_alt  ;
   pthread_mutex_t  mutex_azi  ;
@@ -436,7 +473,6 @@ typedef struct {
 
  TEMPS  at ;
  TEMPS  ht ;
- 
  TEMPS  At ;
  TEMPS  Ht ;
  
@@ -490,7 +526,7 @@ typedef struct {
  double dVam ; // maximum du differentiel pour tests et calcul
  double dVhm ; // maximum du differentiel pour tests et calcul
 
-
+t_en_Astre_Type astre_type ; 
 }
 ASTRE ;
 
@@ -512,16 +548,19 @@ typedef struct {
 }
 VOUTE ;
 
-//=====================================================
+/*-------------------------------------------------------------
+* Definition des variables globales a partir des structures
+  ------------------------------------------------------------*/
 
-TEMPS      te, *temps ;
-LIEU       li, *lieu ;
-ASTRE      as, *astre ;
-VOUTE      vo, *voute ;
-SUIVI	     su, *suivi ;
-CLAVIER    cl, *clavier ;
+TEMPS      tem, *temps ;
+LIEU       lie, *lieu ;
+ASTRE      ast, *astre ;
+VOUTE      vou, *voute ;
+SUIVI	     sui, *suivi ;
+CLAVIER    cla, *clavier ;
+DONNEES    don, *donnees ;
 
-char   datas     [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
+char   datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
 FILE * flog ; 
 
 // ------------------------------------------------------------------------

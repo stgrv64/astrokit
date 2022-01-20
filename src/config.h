@@ -70,11 +70,6 @@ void   CONFIG_SET_HOUR_AND_MINUTES(char * s_data) ;
 
 void   CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) ;
 
-void   CONFIG_AFFICHER_TEMPS(TEMPS *temps) ; // FIXME ajout 20191228
-void   CONFIG_AFFICHER_ASTRE(ASTRE *as) ;
-void   CONFIG_AFFICHER_LIEU(LIEU *lieu) ;
-void   CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier)  ;
-
 int    CONFIG_FORMAT_ADMIS(char c) ;
 int    CONFIG_FIN_LIGNE(char c) ;
 int    CONFIG_DEB_COM(char c);
@@ -86,6 +81,10 @@ void   CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONF
 int    CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_GETCWD(char * ) ;
 
+void   CONFIG_AFFICHER_TEMPS(TEMPS *temps) ; // FIXME ajout 20191228
+void   CONFIG_AFFICHER_ASTRE(ASTRE *as) ;
+void   CONFIG_AFFICHER_LIEU(LIEU *lieu) ;
+void   CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier)  ;
 void   CONFIG_AFFICHER_TOUT(void) ; // FIXME ajout 20191228
 void   CONFIG_AFFICHER_CHANGEMENTS (void) ; // FIXME ajout 20200102
 

@@ -63,11 +63,9 @@ int incrlog ;
   remplacements des arguments de type var glob par void 
   on considere que ASTRE* VOUTE* etc.. sont dorenavant var glob
 */
-void  ARGUMENTS_HELP_0       (int , char** ) ;
-void  ARGUMENTS_GERER_0      (int , char** )  ;
-
-void  ARGUMENTS_HELP_1       (int , char** ) ;
-void  ARGUMENTS_GERER_GETOPT (int , char** )  ;
+void  ARGUMENTS_HELP                   (int , char** ) ;
+void  ARGUMENTS_GERER_FACON_CLASSIQUE  (int , char** )  ;
+void  ARGUMENTS_GERER_GETOPT           (int , char** )  ;
 
 void  ARGUMENTS_TEST_MOTEURS (void) ;
 void  ARGUMENTS_VOUTE        (void) ;

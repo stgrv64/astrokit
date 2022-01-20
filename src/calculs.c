@@ -279,6 +279,7 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
   
   astre->ASC = A ;
   astre->DEC = H ;
+
   astre->ASC1 = A1 ;
   astre->ASC2 = A2 ;
   
@@ -364,10 +365,10 @@ void CALCUL_PERIODE(ASTRE *astre,SUIVI* suivi, VOUTE *voute) {
   TRACE1("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, astre->Va, azi_rot);
   TRACE1("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, astre->Vh, alt_rot);
 
-  if ( suivi->DONNEES_CONTROLEUR )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
+  if ( donnees->DONNEES_CONTROLEUR )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
   else                              freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
 
-  if ( suivi->DONNEES_CONTROLEUR )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot / DIV / PIPI ;
+  if ( donnees->DONNEES_CONTROLEUR )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot / DIV / PIPI ;
   else                              freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
 
   pthread_mutex_lock(& suivi->mutex_azi );
@@ -694,7 +695,7 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
 
 void CALCUL_TOUT(void) {
   
-  t_en_Astre i_astre ;
+  t_en_Astre_Type i_astre ;
   
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la astre n a pas de nom
@@ -705,19 +706,28 @@ void CALCUL_TOUT(void) {
   else if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
   else if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
   else if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = ASTRE_PLANETE ;
-  else                                                 i_astre = ASTRE_AZIMUTAL ;
+  else                                                 i_astre = ASTRE_INDETERMINE ;
   
   switch (i_astre) {
 
-    //---------------------------------------------------------------------------------------
+    /* ----------------------------------------------------------------- */
 
     case ASTRE_INDETERMINE :
     
       pthread_mutex_lock( & suivi->mutex_cal );
       
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+      
+      /* pour un astre indetermine 
+         on calcule les coordonnees equatoriales 
+         necessaires au calcul des vitesses 
+      */
+
+      /* CALCUL_AZIMUT       ( lieu, astre) ; */
+
+      CALCUL_EQUATEUR     ( lieu, astre ) ;
       CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
-      CALCUL_AZIMUT       ( lieu, astre) ;
+
       CALCUL_VITESSES     ( lieu, astre, suivi) ;
       CALCUL_PERIODE      ( astre, suivi, voute) ;
       
@@ -725,15 +735,17 @@ void CALCUL_TOUT(void) {
       
       break ;
 
-    //---------------------------------------------------------------------------------------
-    
+    /* ----------------------------------------------------------------- */
+
     case ASTRE_CIEL_PROFOND :
     
       pthread_mutex_lock( & suivi->mutex_cal );
       
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+
       CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
       CALCUL_AZIMUT       ( lieu, astre) ;
+      
       CALCUL_VITESSES     ( lieu, astre, suivi) ;
       CALCUL_PERIODE      ( astre, suivi, voute) ;
       
@@ -741,7 +753,7 @@ void CALCUL_TOUT(void) {
       
       break ;
       
-    //---------------------------------------------------------------------------------------
+    /* ----------------------------------------------------------------- */
     
     case ASTRE_PLANETE :
       
@@ -749,7 +761,7 @@ void CALCUL_TOUT(void) {
             
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
       
-      SOLAR_SYSTEM_NEW( astre->nom,\
+      SOLAR_SYSTEM( astre->nom,\
                       & astre->ASC,\
                       & astre->H,\
                       & astre->a,\
@@ -762,9 +774,9 @@ void CALCUL_TOUT(void) {
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 
       // FIXME : ainsi que coordonnees equatoriales / declinaison
-      // FIXME : est directement retourner par la fonction SOLAR_SYSTEM_NEW
+      // FIXME : est directement retourner par la fonction SOLAR_SYSTEM
       // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordonnees siderales
-      // TODO  : ne modifie pas azimut et altitude calcules par SOLAR_SYSTEM_NEW
+      // TODO  : ne modifie pas azimut et altitude calcules par SOLAR_SYSTEM
       
       // CALCUL_AZIMUT  ( lieu, astre) ;
       
@@ -777,23 +789,44 @@ void CALCUL_TOUT(void) {
       
       //---------------------------------------------------------------------------------------
       
-      /*
-case CAPTEURS :
+      case ASTRE_SATELLITE :
+        /* TODO completer */
+        break ;
 
-  CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-  
-  // TODO : modifier / completer / corriger ..
-  
-  if ( suivi->DONNEES_CAPTEURS ) { 
-    astre->a = suivi->pitch ;         // FIXME : donne azimut
-    astre->h = suivi->heading ;       // FIXME : donne altitude 
-    CALCUL_EQUATEUR ( lieu, astre) ;  // FIXME : donnes ASC et DEC
-  }
-      
-  CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
-  CALCUL_AZIMUT  ( lieu, astre) ;
-  
-  break ;
+      //---------------------------------------------------------------------------------------
+
+      case ASTRE_COMETE :
+        /* TODO completer */
+        break ;
+
+      //---------------------------------------------------------------------------------------
+
+      default :
+        break ;
+
+      //---------------------------------------------------------------------------------------
+
+      /* Le cas suivant est ancien : considerer le type de calcul
+         (nouveau code 2022) MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL
+         ou bien MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL */
+
+      /* 
+      case CAPTEURS :
+
+        CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+        
+        // TODO : modifier / completer / corriger ..
+        
+        if ( donnees->DONNEES_CAPTEURS ) { 
+          astre->a = suivi->pitch ;         // FIXME : donne azimut
+          astre->h = suivi->heading ;       // FIXME : donne altitude 
+          CALCUL_EQUATEUR ( lieu, astre) ;  // FIXME : donnes ASC et DEC
+        }
+            
+        CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
+        CALCUL_AZIMUT  ( lieu, astre) ;
+        
+        break ;
       */
   }  
 }

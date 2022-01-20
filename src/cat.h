@@ -49,7 +49,7 @@
 #include <types.h>
 
 // FIN INCLUDES =====================================
-// FIXME : 20210501 : mise en commentaire ligne suivante 
+// FIXME : 20210501 : creation entete de la fonction au format doxygen ligne suivante 
 // FIXME : inutile avec passage par /etc/config.txt pour lecture parametres
 // FIXME : de repertoires et de fichiers 
 

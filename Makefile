@@ -17,6 +17,7 @@
 #            - le nom de larchive est EPHA
 #            - le nom de le executable est EPHX
 #         * ajout librairie ncurses pour acces fonction getch (flux input keyboard)
+#         * ajout clause -Wno-unused-variable
 #--------------------------------------------------------------------------------------
 CC	= gcc
 # CC	= armv6-gcc
@@ -74,7 +75,7 @@ ifeq ($(CC),gcc)
   EXEC = ${FICH}.${VERS}.host
 endif
 
-DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow
+DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow -Wno-unused-variable
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC
 
 SRC	= \

@@ -13,7 +13,7 @@
 # 18/01/2022  | * test de fonctions SUIVI_CLAVIER faisant inervenir
 #  (issue)        les appels ncurses : KO quand la fonction SUIVI_CLAVIER
 #                 est appelle apres la fonction close dans GPIO_CLOSE (???)
-#               * mise en commentaire des fonctions suivant doxygen
+#               * creation entete de la fonction au format doxygen des fonctions suivant doxygen
 # 19/01/2002  | * suppression passage arguments CONGI_AFFICHER_TOUT
 # (issue)         cela est justifie par le fait que les variables sont globales
 # -------------------------------------------------------------- 
@@ -44,7 +44,7 @@ int        g_id_thread ;
 * @author : s.gravois
 * @brief  : fonction appelle quand un signal est trape dans main
 * @param  : int     sig
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : voir s il est preferable de faire un kill(getpid(),SIGKILL) 
 *           plutot qu un exit
 *****************************************************************************************/
@@ -75,13 +75,13 @@ void TRAP_MAIN(int sig) {
   GPIO_SET( GPIO_LED_ETAT, 0 ) ;
 
   closelog();
-
-  if ( i_exit==1 && signum == SIGINT ){
+/*
+  if ( sig == SIGINT ){
 		kill(getpid(),SIGKILL) ;
 	}
-	if ( i_exit==1 && signum == SIGKILL ){
+	if ( sig == SIGKILL ){
 		kill(getpid(),SIGKILL) ;
-	}
+	} */
   exit(0) ;
 }
 
@@ -90,7 +90,7 @@ void TRAP_MAIN(int sig) {
 * @author : s.gravois
 * @brief  : fonctions appellees quand un signal est trape dans leur fonctions respectives
 * @param  : int     sig
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : (completer)
 *****************************************************************************************/
 
@@ -125,7 +125,7 @@ void TRAP_SUIVI_CLAVIER(int sig)  {
 * @author : s.gravois
 * @brief  : fonction qui initialise des attributs 
 * @param  : SUIVI *suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : analyser la reelle utilite de cette fonction
             en diminuant le bombre de variable suivi->var
 *****************************************************************************************/
@@ -152,7 +152,7 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 * @brief  : realise certaines actions particulieres apres appui sur une touche
 * @param  : SUIVI   *suivi
 * @param  : CLAVIER *clavier 
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : analyser pour simplification <=> avec suivi menu etc..
 *****************************************************************************************/
 
@@ -294,7 +294,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
         case 2 : // TODO : exemple d'une demande de capteur : a modifier / completer
           CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-          if ( suivi->DONNEES_CAPTEURS ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
+          if ( donnees->DONNEES_CAPTEURS ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
           CALCUL_EQUATEUR ( lieu, astre) ;
           suivi->menu_old = suivi->menu ;
           suivi->menu = MENU_AZIMUTAL ;
@@ -313,7 +313,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 * @brief  : Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
 * @param  : SUIVI   *suivi
 * @param  : CLAVIER *clavier 
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 /* FIXME :
@@ -331,8 +331,8 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 
   TRACE1("start") ;
 
-  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, suivi) ;
-  if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
+  GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
+  IR_KEYBOARD_MAJ_SUIVI( suivi) ;
 
   // -----------------------------------------------------------
   // reset = remise a zero des compteurs
@@ -531,8 +531,8 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   azi = 0 ;
   alt = 0 ;
   
-  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, suivi) ;
-  if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
+  GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
+  IR_KEYBOARD_MAJ_SUIVI  ( suivi) ;
   
   // La determination de tempo_raq est tres importante
   // Elle varie suivant la reduction total du moteur
@@ -622,8 +622,8 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
     
     // on relit sur les claviers en mode manuel 
 
-    if ( suivi->DONNEES_RAQUETTE   ) GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, suivi) ;
-    if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
+    GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
+    IR_KEYBOARD_MAJ_SUIVI( suivi) ;
   }
   // =================================================================
   // FIN DE LA BOUCLE : TANT QUE J'APPUIE SUR UN BOUTON DE LA RAQUETTE
@@ -653,7 +653,7 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
 * @author : s.gravois
 * @brief  : Ce mode permet de gerer les menus .
 * @param  : SUIVI   *suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
@@ -687,14 +687,14 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
     usleep( suivi->temporisation_menu ) ;
 
-    if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_READ( gpio_key_l, gpio_key_c, clavier) ;
-    if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_READ( suivi, clavier) ;
+    GPIO_RAQUETTE_READ( gpio_key_l, gpio_key_c, clavier) ;
+    IR_KEYBOARD_READ( suivi, clavier) ;
 
     // IR_ACTIONS_PARTICULIERES( suivi) ;
 
     SUIVI_TRAITEMENT_MOT( suivi, clavier ) ;
 
-    CONFIG_AFFICHER_CHANGEMENTS( suivi ) ;
+    CONFIG_AFFICHER_CHANGEMENTS() ;
 
     switch( suivi->menu ) {
 
@@ -888,7 +888,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 * @author : s.gravois
 * @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
 * @param  : SUIVI   *suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
@@ -984,7 +984,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
 * @author : s.gravois
 * @brief  : fonction de callback du thread suivi infrarouge
 * @param  : SUIVI * suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : supprimer argument qi est variable globale
 *****************************************************************************************/
 
@@ -1009,7 +1009,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
   
-  if ( suivi->DONNEES_INFRAROUGE ) {
+  if ( donnees->DONNEES_INFRAROUGE ) {
     
     LIRC_CONFIG_CODES( irc) ;
     LIRC_OPEN( lircconfig ) ;
@@ -1028,11 +1028,11 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 * @brief  : fonction de callback du thread suivi clavier 
 *           qui utilise directement getchar (aucun effet)
 * @param  : SUIVI * suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
-void *  SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
+void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 
   int c = 0 ;
   struct sched_param param;
@@ -1045,7 +1045,7 @@ void *  SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( suivi->DONNEES_CLAVIER ) {
+  if ( donnees->DONNEES_CLAVIER ) {
 
     while( ( c = getchar () ) > 0 ) {
       usleep(100000) ;
@@ -1066,11 +1066,11 @@ void *  SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 * @brief  : fonction de callback du thread suivi clavier 
 *           en mode termios
 * @param  : SUIVI * suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
-void *  SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
+void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
   int ch =0 ;
   struct sched_param param;
@@ -1084,7 +1084,7 @@ void *  SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   */
-  if ( suivi->DONNEES_CLAVIER ) {
+  if ( donnees->DONNEES_CLAVIER ) {
     KEYBOARD_TERMIOS_INIT() ;
 
     while(1) {
@@ -1092,7 +1092,7 @@ void *  SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
       usleep(50000) ;
       if ( KEYBOARD_TERMIOS_KBHIT()) {
         ch= KEYBOARD_TERMIOS_READCH() ;
-        printf("keycode %d\n", ch, ch) ;
+        printf("keycode %-5d : %c\n", ch, ch) ;
       }
     }
     KEYBOARD_TERMIOS_EXIT() ;
@@ -1104,7 +1104,7 @@ void *  SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 * @author : s.gravois
 * @brief  : fonction de callback du thread suivi clavier en mode ncurses
 * @param  : SUIVI * suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1123,7 +1123,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
   
   sleep(2) ;
 
-  if ( suivi->DONNEES_CLAVIER ) {
+  if ( donnees->DONNEES_CLAVIER ) {
 
     initscr() ;
     if (newterm(0, stdout, stdin) == 0) {
@@ -1162,7 +1162,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
 * @author : s.gravois
 * @brief  : fonction de callback du thread suivi capteurs (non utilisee)
 * @param  : SUIVI * suivi
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1198,15 +1198,15 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   // a modifier pour definir le choix de l'infrarouge ou pas (config.txt ? .h ? )
   
   while(1) {
-    if ( suivi->DONNEES_CAPTEURS ) {
-      if ( ! suivi->init_capteurs ) {
+    if ( donnees->DONNEES_CAPTEURS ) {
+      if ( ! donnees->init_capteurs ) {
         
         ret = I2C_INIT(ex, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
 	
         if ( ! ret ) {
-          printf("Pas de capteur disponible\n") ;
-          suivi->DONNEES_CAPTEURS = 0 ;
-          suivi->init_capteurs = 0 ;
+          printf("Pas de capteur disponible") ;
+          donnees->DONNEES_CAPTEURS = 0 ;
+          donnees->init_capteurs = 0 ;
           break ;
         }
         else {
@@ -1216,10 +1216,10 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
           I2C_SET( ex, REG_CTRL6, "0x20" ) ;
           I2C_SET( ex, REG_CTRL7, "0x00" ) ;
 	  
-          suivi->init_capteurs = 1 ;
+          donnees->init_capteurs = 1 ;
         }
       }
-      if ( suivi->init_capteurs ) {
+      if ( donnees->init_capteurs ) {
       
         I2C_GET_ACC( ex, am )   ;
         I2C_CALCULS_ACCMAG( am ) ;
@@ -1242,7 +1242,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
 * @brief  : point entree su programme
 * @param  : int     argc
 * @param  : char ** argv
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : revoir ordre appels des fonctions
 *****************************************************************************************/
 
@@ -1276,28 +1276,33 @@ int main(int argc, char ** argv) {
   
   g_incrlog=0 ;
   g_id_thread=0 ;
+
   // -----------------------------------------------------------------
-  // fonctions initialisations des structures de donnees
+  // Initialisations des structures de donnees
   // -----------------------------------------------------------------
 
-  astre = &as ;
-  lieu  = &li;
-  voute = &vo ;
-  suivi = &su ;
-  temps = &te ;
-  clavier = &cl ;
-  irc = &ir_codes ;
+  astre   = &ast ;
+  lieu    = &lie;
+  voute   = &vou ;
+  suivi   = &sui ;
+  temps   = &tem ;
+  clavier = &cla ;
+  irc     = &ir_codes ;
 
-  CONFIG_READ           ( datas ) ;
-  GPIO_INIT_VAR         ( datas ) ; 
+  // -----------------------------------------------------------------
+  // Initialisations diverses et variees
+  // -----------------------------------------------------------------
+
+  CONFIG_READ       ( datas ) ;
+  GPIO_READ         ( datas ) ; 
+
   CONFIG_AFFICHER_DATAS ( datas ) ;
   CONFIG_INIT_VAR       ( datas ) ;
 
   CONFIG_AFFICHER_VARIABLES() ;   
   CONFIG_INIT_LOG(); 
-  // FIXME : ancienne fonction qui gere GPIO_INPUT et GPIO_OUTPUT (old)(2021)
-  //GPIO_INIT_VAR2     ( datas) ;    // impacte les tableaux gpio_in[] et gpio_out[]
-  if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
+
+  GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
   
   CONFIG_INIT_CLAVIER   ( clavier ) ;   
   CONFIG_INIT_ASTRE     ( astre ) ;
@@ -1307,7 +1312,7 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_TEMPS     ( temps ) ;
 
   // -----------------------------------------------------------------
-  // MISE EN PLACE DES PARAMETRES SYSTEMES (parallelisme, priorites, ..)
+  // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)
   // -----------------------------------------------------------------
    
   system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ; 
@@ -1345,8 +1350,8 @@ int main(int argc, char ** argv) {
   
   // -----------------------------------------------------------------
 
-  ARGUMENTS_HELP_0   ( argc, argv ) ;
-  ARGUMENTS_GERER_0 ( argc, argv  ) ;
+  ARGUMENTS_HELP                  ( argc, argv ) ;
+  ARGUMENTS_GERER_FACON_CLASSIQUE ( argc, argv  ) ;
   
   if ( suivi->alarme != 0 ) {
     alarm( suivi->alarme) ;
@@ -1419,24 +1424,24 @@ int main(int argc, char ** argv) {
 
   // ============================== gestion des threads  ===================================
   
-  TRACE("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRAROUGE) ;
-  TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
-  TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
-  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
-  TRACE("suivi->DONNEES_CLAVIER    = %d",suivi->DONNEES_CLAVIER) ;
+  TRACE("donnees->DONNEES_INFRAROUGE = %d",donnees->DONNEES_INFRAROUGE) ;
+  TRACE("donnees->DONNEES_CAPTEURS   = %d",donnees->DONNEES_CAPTEURS) ;
+  TRACE("donnees->DONNEES_RAQUETTE   = %d",donnees->DONNEES_RAQUETTE) ;
+  TRACE("donnees->DONNEES_BLUETOOTH  = %d",donnees->DONNEES_BLUETOOTH) ;
+  TRACE("donnees->DONNEES_CLAVIER    = %d",donnees->DONNEES_CLAVIER) ;
 
   TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
 
-  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_create( &p_thread_p_azi[i], NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[i] ) ;
-  }
-  pthread_create( &p_thread_m_azi,    NULL, (void*)suivi_main_M, pm_azi ) ;
-  
-  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_create( &p_thread_p_alt[i], NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[i] ) ;
-  }
-  pthread_create( &p_thread_m_alt,    NULL, (void*)suivi_main_M, pm_alt ) ;
-  
+  pthread_create( &p_thread_p_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[0] ) ;
+  pthread_create( &p_thread_p_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[1] ) ;
+  pthread_create( &p_thread_p_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[2] ) ;
+  pthread_create( &p_thread_p_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[3] ) ;
+  pthread_create( &p_thread_p_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[0] ) ;
+  pthread_create( &p_thread_p_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[1] ) ;
+  pthread_create( &p_thread_p_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[2] ) ;
+  pthread_create( &p_thread_p_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[3] ) ;
+  pthread_create( &p_thread_m_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
+  pthread_create( &p_thread_m_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
   pthread_create( &suivi->p_menu,            NULL, (void*)SUIVI_MENU,      suivi ) ;
   pthread_create( &suivi->p_suivi_voute,     NULL, (void*)SUIVI_VOUTE,     suivi ) ;
   pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
@@ -1445,10 +1450,10 @@ int main(int argc, char ** argv) {
 
   // ============================== join des threads  ===================================
 
-  if ( suivi->DONNEES_CLAVIER )     pthread_join( suivi->p_suivi_clavier, NULL) ;
-  if ( suivi->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
-  if ( suivi->DONNEES_INFRAROUGE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
-  if ( suivi->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( donnees->DONNEES_CLAVIER )     pthread_join( suivi->p_suivi_clavier, NULL) ;
+  if ( donnees->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( donnees->DONNEES_INFRAROUGE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
+  if ( donnees->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     pthread_join( p_thread_p_azi[i], NULL) ; 
@@ -1486,7 +1491,7 @@ void * SUIVI_CLAVIER_1(SUIVI * suivi) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( suivi->DONNEES_CLAVIER ) {
+  if ( donnees->DONNEES_CLAVIER ) {
 
 
   // unlink(MY_LOGFILE);
@@ -1624,7 +1629,7 @@ void * SUIVI_CLAVIER_0(SUIVI * suivi) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( suivi->DONNEES_CLAVIER ) {
+  if ( donnees->DONNEES_CLAVIER ) {
 
   if (newterm(0, stdout, stdin) == 0) {
     fprintf(stderr, "Cannot initialize terminal\n");

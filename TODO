@@ -3,8 +3,17 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
 
 -------------------------------------------------------------------------------
 
+  => reprendre les fonctions de arguments.c / .h pour les consolider avec getopt
+     si besoin, et permettre de tester rapidement sous x86 les differents calculs
+  
   => verifier le code de SOLAR_SYSTEM pour obtenir les coordonnees des planetes 
      et leur precision en fonction des calculs flottant 32 ou 64 bits
+  
+  => mieux gerer le code entourant astre->nom : creer une fonction dediee :
+     - en fonction du nom (PLA0 / MES1 / AZI0 / TST5 / ... par exemple), en deduire : 
+       * le type de l'astre 
+       * le type de calculs pour aboutir aux vitesses
+       * rafraichir tous les calculs necessaires
   
   => refaire un thread de suivi du temps pour calcul precis 
      de la duree d un cycle de SUIVI_VOUTE (1 seconde en theorie)
@@ -29,7 +38,35 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
   
   => corriger MANUEL_BRUT pour que le suivi brut telecommande permette
      une approximation bonne des vitesses (reprendre les calculs differentiels)
+    
+  => etudier le retour des fonctions de callback de threads quand 
+     exemple donnees->DONNEES_xxx vaut FALSE (return NULL => join ? )
      
+  => consolider le contenu des fonctions SUIVI_CLAVIER_NCURSES et
+     SUIVI_CLAVIER_TERMIOS en passant par des pointeurs de fonctions (fusion)
+     dans une structure DONNEES (elle est en cours de codage actuellement) 
+     
+  => suite au point precedent , generaliser appels a des pointeurs de fonctions
+     en les definissant dans des structures (ASTRE, VOUTE, SUIVI, etc...)
+     avec des noms generiques (init / release / etc.. )
+     
+  => remplacer les printf par les focntions Syslog<xx> et Trace<x> / TRACE<x>
+  
+  => remplacer l'ensemble des TRACE longs par des fonctions dediees ou des macros
+  
+  => etudier passage en static des var glob puis utilisation avec extern
+  
+  => dans les temporisations , etudier utilisation des semaphores et fcts associees
+     sem_wait / sem_post / sem_timedwait (regarder code )
+     etudier la performance des attentes par rapport aux usleep / gettimeofday (etc..)
+     
+  => consolider la DEMANDE de SETUP ( strcmp( clavier->symbole, "SETUP" ) )
+     regarder si elle est utile 
+  
+  
+  
+  
+  
      
          
 

@@ -23,6 +23,7 @@
 #                 root via systemd / execve / execl
 #               * remplacement fonctions Trace par Trace 
 #                 (evite utilisation fichier log alors que celui ci n'est pas encore ouvert)
+# 20/01/2022  | * creation des entetes doxygen des fonctions
 # -------------------------------------------------------------- 
 */
 
@@ -39,15 +40,20 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 // cas particulier equateur omega = 2Pi / 86164 rad.s-1
 // ==> 86164.F = 2^N.D.R
 
-//==========================================================
-// cette fonction ecrit dans la log avec la commande system
-/* obsolete */
+/*****************************************************************************************
+* @fn     : CONFIG_SYSTEM_LOG_0
+* @author : s.gravois
+* @brief  : Cette fonction ecrit dans la log via un appel systeme avec system
+* @param  : int *incrlog
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : (obsolete)
+*****************************************************************************************/
 
-void CONFIG_SYSTEM_LOG(int *incrlog) {
+void CONFIG_SYSTEM_LOG_0(int *incrlog) {
   int ret ;
   (*incrlog)++ ;
   char cmd[255] ;
-  if ( CONFIG_ASTROLOG ) {
+  if ( DEBUG_LOG ) {
     // FIXME 01 mai 2021 : modification chemin relatif
     sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     ret = system(cmd) ;
@@ -55,11 +61,18 @@ void CONFIG_SYSTEM_LOG(int *incrlog) {
     //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
   }
 }
-//==========================================================
-// cette fonction ecrit dans la log avec un fwrite
+/*****************************************************************************************
+* @fn     : CONFIG_SYSTEM_LOG_1
+* @author : s.gravois
+* @brief  : Cette fonction ecrit dans la log via un strtime et system
+* @param  : int *incrlog
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : (obsolete)
+*****************************************************************************************/
 /* obsolete */
 
-void CONFIG_LOG(char *txt) {
+void CONFIG_SYSTEM_LOG_1(char *txt) {
+
   int ret ;
   char cmd[255] ;
   char c_out[255] ;
@@ -76,7 +89,7 @@ void CONFIG_LOG(char *txt) {
     exit(EXIT_FAILURE);
   }
 
-  if ( CONFIG_ASTROLOG ) {
+  if ( DEBUG_LOG ) {
     if ( strftime(s_date, sizeof(s_date), "%Y%m%d.%H%M", tmp) == 0 ) {
         fprintf(stderr, "strftime a renvoyé 0");
         exit(EXIT_FAILURE);
@@ -88,12 +101,23 @@ void CONFIG_LOG(char *txt) {
     //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
   }
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_LOG
+* @author : s.gravois
+* @brief  : Cette fonction ouvre le fichier de log defini par 
+*           CONFIG_REP_HOME / CONFIG_REP_LOG / CONFIG_FIC_LOG
+*           definis dans le fichier de configuration
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : rappatrier syslog init ICI ?
+*****************************************************************************************/
+
 void CONFIG_INIT_LOG(void) {
 
   char buf[255] ;
   
-  if ( CONFIG_ASTROLOG ) {
+  if ( DEBUG_LOG ) {
+    
     memset(buf, ZERO_CHAR, sizeof(buf));
     sprintf(buf,"%s/%s/%s", CONFIG_REP_HOME, CONFIG_REP_LOG, CONFIG_FIC_LOG) ;
     
@@ -107,7 +131,17 @@ void CONFIG_INIT_LOG(void) {
   }
   return ;
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_ASTRE
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure ASTRE * astre
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-01-20 ajout membres de la structure dans la fonction
+* @todo   : supprimer ASTRE *as (var blog) et remplacer par void
+*           passer par des pointeurs de fonctions dans un structure
+*****************************************************************************************/
+
 void CONFIG_INIT_ASTRE(ASTRE *as) {
 
   int C ;
@@ -118,27 +152,47 @@ void CONFIG_INIT_ASTRE(ASTRE *as) {
   }
   memset( as->nom,   ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   memset( as->infos, ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( as->plus_proche, ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   
-  as->a   = 0.0  ;
-  as->h   = 0.0  ;
-  as->a0  = 0.0 ;
-  as->h0  = 0.0 ;
-  as->A   = 0.0  ;
-  as->H   = 0.0   ;
-  as->A0  = 0.0 ;
-  as->H0  = 0.0 ;
-  as->da  = 0.0 ;
-  as->dh  = 0.0 ;
-  as->dA  = 0.0 ;
-  as->dH  = 0.0 ;
-  as->Va  = 0.0 ;
-  as->Vh  = 0.0 ;
-  as->dVa = 0.0 ;
-  as->dVh = 0.0 ;
-  as->dVam= 0.0 ;
-  as->dVhm= 0.0 ;
+  as->a   = 0  ;
+  as->h   = 0  ;
+  as->a0  = 0 ;
+  as->h0  = 0 ;
+  as->A   = 0  ;
+  as->H   = 0   ;
+  as->A0  = 0 ;
+  as->H0  = 0 ;
+  as->da  = 0 ;
+  as->dh  = 0 ;
+  as->dA  = 0 ;
+  as->dH  = 0 ;
+  as->Va  = 0 ;
+  as->Vh  = 0 ;
+  as->dVa = 0 ;
+  as->dVh = 0 ;
+  as->dVam= 0 ;
+  as->dVhm= 0 ;
+
+  as->x = 0 ;
+  as->xx = 0 ;
+  as->y  = 0 ;
+  as->yy =0;
+  as->z =0;
+  as->zz =0;
+  
+  as->astre_type = ASTRE_INDETERMINE ;
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_CLAVIER
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure CLAVIER * astre
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-01-20 ajout membres de la structure dans la fonction
+* @todo   : supprimer ASTRE *as (var blog) et remplacer par void
+*           passer par des pointeurs de fonctions dans un structure
+*****************************************************************************************/
+
 void CONFIG_INIT_CLAVIER(CLAVIER * clavier) {
 
  int i ;
@@ -168,7 +222,9 @@ void CONFIG_INIT_CLAVIER(CLAVIER * clavier) {
   // FIXME : definitions des actions : 
   // Les actions servent a 
   
-  for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )      memset( clavier->actions[i],     ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+  for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ ) {
+    memset( clavier->actions[i], ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+  }
   // for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )  memset( clavier->validations[i], ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
 
   strcpy( clavier->actions[0], "MENU" ) ;
@@ -180,7 +236,15 @@ void CONFIG_INIT_CLAVIER(CLAVIER * clavier) {
   strcpy( clavier->actions[6], "TIME" ) ;
    
 } 
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_LIEU
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure LIEU *lieu
+* @param  : LIEU *lieu
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : cf si JJ etc.. sont utiles dans la structure (parametres de temps)
+*****************************************************************************************/
+
 void CONFIG_INIT_LIEU(LIEU *lieu) {
  
   lieu->JJ  = 0 ; // jour julien
@@ -193,7 +257,7 @@ void CONFIG_INIT_LIEU(LIEU *lieu) {
 }
 //---------------------------------------------------------------------------------------
 // man date sur noyau compile 
-//Display time (using +FMT), or set time
+// Display time (using +FMT), or set time
 //
 //	[-s,--set] TIME	Set time to TIME
 //	-u,--utc	Work in UTC (don't convert to local time)
@@ -214,10 +278,19 @@ void CONFIG_INIT_LIEU(LIEU *lieu) {
 //	'date TIME' form accepts MMDDhhmm[[YY]YY][.ss] instead
 //---------------------------------------------------------------------------------------
 
+/*****************************************************************************************
+* @fn     : CONFIG_SET_YEAR_MONTH_AND_DAY
+* @author : s.gravois
+* @brief  : Cette fonction configure la date (annee mois jour)
+* @param  : char * s_data
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : remplacer fonction system par une fonction C (eviter passage par /bin/bash date)
+*****************************************************************************************/
+
 void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (unite de l'annee en premier)
  
-  char buf [   CONFIG_TAILLE_BUFFER_64 ]  ;
-  char year [ CONFIG_TAILLE_BUFFER_8] ;
+  char buf [   CONFIG_TAILLE_BUFFER_64 ] ;
+  char year [  CONFIG_TAILLE_BUFFER_8] ;
   char month [ CONFIG_TAILLE_BUFFER_4] ;
   char day [   CONFIG_TAILLE_BUFFER_4] ;
   int i = 0 ;
@@ -251,7 +324,15 @@ void CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des datas = 5 (uni
   Trace("Nouvelle date : %s", buf) ;
 
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_SET_HOUR_AND_MINUTES
+* @author : s.gravois
+* @brief  : Cette fonction configure l heure (heure et minutes)
+* @param  : char * s_data
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : remplacer fonction system par une fonction C (eviter passage par /bin/bash date)
+*****************************************************************************************/
+
 void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
 
   char buf [ CONFIG_TAILLE_BUFFER_64 ]  ;
@@ -285,7 +366,15 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
   Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_TEMPS
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure TEMPS * temps
+* @param  : TEMPS *temps
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : configurer directement heure locale (?)
+*****************************************************************************************/
+
 void CONFIG_INIT_TEMPS( TEMPS *temps) {
   
   temps->mm = 0 ;  // month
@@ -294,18 +383,26 @@ void CONFIG_INIT_TEMPS( TEMPS *temps) {
   temps->HH = 0 ;  // hour
   temps->MM = 0 ;  // minutes
   temps->SS = 0 ;  // secondes
-  temps->hd = 0 ;  // heure decimale
+  temps->hd = 0.0 ;  // heure decimale (double)
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_VOUTE
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure VOUTE *voute
+* @param  : VOUTE *voute
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : passer par une lecture de parametre dans config.txt pour \
+*           pourcentage_tempo et calibration_voute
+*****************************************************************************************/
+
 void CONFIG_INIT_VOUTE(VOUTE *voute) {
   
-  voute->dt                = dt  ;
+  voute->dt                = 0  ;
   voute->pourcentage_tempo = 0.96 ;   
   voute->calibration_voute = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
 	voute->num               = 0 ;
   voute->deb               = 0 ;
   voute->fin               = 0 ;
-  voute->dt                = 1  ;
   voute->acc_old           = 1 ;
   voute->acc               = 1 ;
   voute->pas               = voute->dt * ROT_RAD_SEC ;
@@ -313,7 +410,16 @@ void CONFIG_INIT_VOUTE(VOUTE *voute) {
 
   voute->DT = (unsigned long)( voute->dt * CONFIG_MICRO_SEC / voute->acc ) ;   
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_VOUTE
+* @author : s.gravois
+* @brief  : Cette fonction configure la structure VOUTE *voute
+* @param  : VOUTE *voute
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : passer par une lecture de parametre dans config.txt pour \
+*           pourcentage_tempo et calibration_voute
+*****************************************************************************************/
+
 void CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) {
   
   voute->dt                 = dt  ;
@@ -328,7 +434,37 @@ void CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) {
   /* dt en micro-sec */
   voute->DT = (unsigned long)( voute->dt * CONFIG_MICRO_SEC / voute->acc ) ;
 }
-//---------------------------------------------------------------------------------------
+
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_DONNEES
+* @author : s.gravois
+* @brief  : Cette fonction configure la structure DONNEES *donnees
+* @param  : DONNEES *donnees
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
+void CONFIG_INIT_DONNEES(DONNEES *donnees) {
+
+  donnees->DONNEES_CAPTEURS    = DONNEES_CAPTEURS ;
+  donnees->DONNEES_RAQUETTE    = DONNEES_RAQUETTE ;
+  donnees->DONNEES_BLUETOOTH   = DONNEES_BLUETOOTH ;
+  donnees->DONNEES_INFRAROUGE  = DONNEES_INFRAROUGE ;
+  donnees->DONNEES_CONTROLEUR  = DONNEES_CONTROLEUR ;
+  donnees->DONNEES_CLAVIER     = DONNEES_CLAVIER ;
+
+  donnees->init_capteurs = 0 ; 
+}
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_SUIVI
+* @author : s.gravois
+* @brief  : Cette fonction configure la structure SUIVI *suivi
+* @param  : SUIVI *suivi
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-01-20 passage d une partie de code dans CONFIG_INIT_DONNEES
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   
   int i ;
@@ -341,14 +477,6 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
 
   // a modifier  : instancier ces variables a l aide du fichier de config
 
-  suivi->DONNEES_CAPTEURS    = DONNEES_CAPTEURS ;
-  suivi->DONNEES_RAQUETTE    = DONNEES_RAQUETTE ;
-  suivi->DONNEES_BLUETOOTH   = DONNEES_BLUETOOTH ;
-  suivi->DONNEES_INFRAROUGE  = DONNEES_INFRAROUGE ;
-  suivi->DONNEES_CONTROLEUR  = DONNEES_CONTROLEUR ;
-  suivi->DONNEES_CLAVIER     = DONNEES_CLAVIER ;
-
-  suivi->init_capteurs = 0 ; 
   suivi->reset = 0 ;
   
   suivi->pas_azi        = 1 ;
@@ -358,14 +486,16 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->pas_acc_moins  = 0 ;
   suivi->pas_azi_old    = 0 ;
   suivi->pas_alt_old    = 0 ;
+
   suivi->pas_est        = 0 ;
   suivi->pas_ouest      = 0 ; 
   suivi->pas_nord       = 0 ;
   suivi->pas_sud        = 0 ;
-  suivi->pas_forward    = 0 ;
-  suivi->pas_rewind     = 0 ;
-  suivi->pas_forward_fast   = 0 ;
-  suivi->pas_rewind_fast  = 0 ;
+
+  suivi->pas_forward       = 0 ;
+  suivi->pas_rewind        = 0 ;
+  suivi->pas_forward_fast  = 0 ;
+  suivi->pas_rewind_fast   = 0 ;
 
   suivi->acc_azi   = 1.0 ;     // cette variable est utilisee dans le calcul des periodes
   suivi->acc_alt   = 1.0 ;     // cette variable est utilisee dans le calcul des periodes
@@ -373,16 +503,16 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->sgn_alt   = 1 ;
 
   suivi->t_diff = 0 ;
-  suivi->t_diff_sec = 0.0 ;
-  suivi->d_temps          = 0.0 ;   
-  suivi->d_appui_raq_azi  = 0.0 ;
-  suivi->d_appui_raq_alt  = 0.0 ;
+  suivi->t_diff_sec = 0 ;
+  suivi->d_temps          = 0 ;   
+  suivi->d_appui_raq_azi  = 0 ;
+  suivi->d_appui_raq_alt  = 0 ;
   
   suivi->Fa        = 30 ;
   suivi->Fh        = 30 ;
 
-  suivi->Ta        = 1/suivi->Fa ;
-  suivi->Th        = 1/suivi->Fh ;
+  suivi->Ta        = 1 / suivi->Fa ;
+  suivi->Th        = 1 / suivi->Fh ;
   
   suivi->Tac        = 1.0 ;
   suivi->Thc        = 1.0 ;
@@ -405,7 +535,7 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   //suivi->plus      =  1.02 ;
   //suivi->moins     =  1.0 / suivi->plus ;   
   
-  suivi->l_NANO_MOINS     = 0.0  ;     // a retirer sur les temporisations pour les tests
+  suivi->l_NANO_MOINS     = 0  ;     // a retirer sur les temporisations pour les tests
    
   suivi->pas_asc = 0 ;
   suivi->pas_dec = 0  ;
@@ -441,9 +571,17 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->temps_a = 0 ; 
   suivi->temps_h = 0 ; 
   
-   gettimeofday(&suivi->tval,NULL) ;
+  gettimeofday(&suivi->tval,NULL) ;
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_FORMAT_ADMIS
+* @author : s.gravois
+* @brief  : Cette fonction verifie si caractere lu est correct (CONFIG_READ)
+* @param  : char c
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int CONFIG_FORMAT_ADMIS(char c) {
   
   int i=(int)c ;
@@ -453,13 +591,22 @@ int CONFIG_FORMAT_ADMIS(char c) {
   
   if ( i>45 && i<58 )j=1;  // chiffres et le point
   if ( i>64 && i<91 )j=1;  // MAJUSCULES  
-  if ( i>96 && i<123)j=1; // minuscules
-  if ( i==95)j=1;         // underscore
-  if ( i==44)j=1;         // virgule
-  if ( i==45)j=1;         // signe -
+  if ( i>96 && i<123)j=1;  // minuscules
+  if ( i==95)j=1;          // underscore
+  if ( i==44)j=1;          // virgule
+  if ( i==45)j=1;          // signe -
+
   return j ; 
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_FIN_LIGNE
+* @author : s.gravois
+* @brief  : Cette fonction verifie si caractere est un caracter fin de ligne (\n=10)
+* @param  : char c
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int CONFIG_FIN_LIGNE(char c) {
   int i=(int)c ;
   int j ;
@@ -467,15 +614,31 @@ int CONFIG_FIN_LIGNE(char c) {
   if ( i==10)j=1;  // \n
   return j ; 
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_DEB_COM
+* @author : s.gravois
+* @brief  : Cette fonction verifie si caractere un debut de commentaire '#'
+* @param  : char c
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int CONFIG_DEB_COM(char c) {
   int i=(int)c ;
   int j ;
   j=0;
-  if ( i==35)j=1 ; // //
+  if ( i==35)j=1 ; 
   return j ; 
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_FIN_MOT
+* @author : s.gravois
+* @brief  : Cette fonction verifie si caractere est apres un mot (espace ou \t)
+* @param  : char c
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int CONFIG_FIN_MOT(char c) {
   int i=(int)c ;
   int j ;
@@ -484,7 +647,15 @@ int CONFIG_FIN_MOT(char c) {
   if ( i==32)j=1;  // space
   return j ; 
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_FIN_MOT
+* @author : s.gravois
+* @brief  : Cette fonction verifie si caractere est une fin de fichier (EOF) ou non admis
+* @param  : char c
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int CONFIG_FIN_FICHIER(char c) {
   int i=(int)c ;
   int j ;
@@ -495,7 +666,16 @@ int CONFIG_FIN_FICHIER(char c) {
   if ( i<32 && i!=9 && i!=10 ) j=1; // caracteres non admis ascii < 32
   return j ; 
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_VAR
+* @author : s.gravois
+* @brief  : Cette fonction initialise les parametres a l'aide d'un tableau precedemment lu
+            par CONFIG_READ / GPIO_READ
+* @param  : datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
 
   int l ;
@@ -669,7 +849,15 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
   if ( ALT_R == 0 ) ALT_R = ALT_R1 * ALT_R2 * ALT_R3  ;
   if ( AZI_R == 0 ) AZI_R = AZI_R1 * AZI_R2 * AZI_R3  ;
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_VARIABLES
+* @author : s.gravois
+* @brief  : Cette fonction affiche les parametres 
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void   CONFIG_AFFICHER_VARIABLES(void) {
 
   Trace("TEMPO_RAQ = %ld",  TEMPO_RAQ);
@@ -773,7 +961,16 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   Trace1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
   Trace1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_GETCWD
+* @author : s.gravois
+* @brief  : Cette fonction obtient le nom du repertoire courant d execution
+* @param  : char * c_getcwd
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : (obsolete) re-verifier mais a priori BUG lors de l'appel 
+*           => appel direct a getcwd dans astro.c
+*****************************************************************************************/
+
 int CONFIG_GETCWD(char * c_getcwd) {
 
   if (getcwd(c_getcwd, sizeof(c_getcwd)) != NULL) {
@@ -784,7 +981,14 @@ int CONFIG_GETCWD(char * c_getcwd) {
   }
   return 0 ;
 } 
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_READ
+* @author : s.gravois
+* @brief  : Cette fonction lit les parametres  dans le fichier de configuration
+* @param  : datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : voir si un passage par librairie JSON plus pratique (comme pour mesDep)
+*****************************************************************************************/
 
 int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
 
@@ -870,7 +1074,15 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
 
   return 0 ;
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_DATAS
+* @author : s.gravois
+* @brief  : Cette fonction affiche le tabeau de parametres lu a partir du fichier de config
+* @param  : char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
   int L, C ;  
 
@@ -885,21 +1097,16 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
     }
     Trace1("") ;
   }
-/*
-  for(l=0;l<DATAS_NB_LIGNES;l++) {
-
-     memset( buffer,ZERO_CHAR, CONFIG_TAILLE_BUFFER * DATAS_NB_COLONNES) ;
-
-     for(c=0;c<DATAS_NB_COLONNES;c++) {
-      sprintf( buffer, "%-10s %-10s", buffer, datas[l][c] ) ;
-     }
-     if (strlen(buffer)>1) {
-      Trace("%s",buffer) ;
-     }
-  }
-*/
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_LIEU
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations du lieu d observation
+* @param  : LIEU *lieu
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
 
   Trace(" latitude    :  %.2f", lieu->lat * DEGRES ) ; 
@@ -913,7 +1120,15 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
   Trace1("lieu->TSR = %f",lieu->TSR) ;
   Trace1("lieu->JD  = %f",lieu->JD) ;
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_TEMPS
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations de temps
+* @param  : LIEU *lieu
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
   
   Trace(" DATE / HOUR : %d-%d-%d %d:%d:%d : %f", temps->yy, temps->mm, temps->dd, temps->HH, temps->MM, temps->SS, temps->hd ) ;
@@ -926,7 +1141,15 @@ void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
   Trace1("temps->SS = %d", temps->SS ) ;
   Trace1("temps->hd = %f", temps->hd ) ;
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_CLAVIER
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations d entrees input ("clavier")
+* @param  : CLAVIER *clavier
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   
   Trace("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
@@ -945,9 +1168,17 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   Trace1("clavier->symbole     = %s",clavier->symbole) ;
   Trace1("clavier->phrase_lue  = %d",clavier->phrase_lue) ;
 }
-//---------------------------------------------------------------------------------------
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_ASTRE
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations relatives a l astre observee
+* @param  : CLAVIER *clavier
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
-    
+  
   Trace(" ASTRE       : %10s Va = %.2f Vh = %.2f", as->nom, as->Va,  as->Vh ) ; 
   
   Trace(" azimut      : %.2f (degres) : %d.%d (hh.mm)", astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
@@ -962,12 +1193,29 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   Trace2("astre->ASC2 = %f",astre->ASC2) ;
   Trace2("astre->ASC = %f - %f (degres)",astre->ASC , astre->ASC * DEGRES) ;
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_VOUTE
+* @author : s.gravois
+* @brief  : Cette fonction affiche les infos liees a la voute VOUTE *
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : a completer eventuellement
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
 	
 	Trace("voute->num %lld", voute->num) ;
+  Trace("voute->pas %lld", voute->num) ;
 }
-//============================================================================
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_TOUT
+* @author : s.gravois
+* @brief  : Cette fonction appelle toutes les autres fonctions d'affichage
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 void CONFIG_AFFICHER_TOUT(void) {
 
   CONFIG_AFFICHER_CLAVIER( clavier ) ;   
@@ -976,9 +1224,16 @@ void CONFIG_AFFICHER_TOUT(void) {
   CONFIG_AFFICHER_ASTRE(   astre ) ;
   CONFIG_AFFICHER_VOUTE(   voute ) ;
 }
-//============================================================================
-// 15/11/2021 : modification ordre
-void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_CHANGEMENTS
+* @author : s.gravois
+* @brief  : Cette fonction detecte et affiche les changements 
+* @param  : void
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : a consolider et voir utilite
+*****************************************************************************************/
+
+void CONFIG_AFFICHER_CHANGEMENTS (void) {
 
   char s_menu[256] ;
 
@@ -1001,11 +1256,8 @@ void CONFIG_AFFICHER_CHANGEMENTS (SUIVI *suivi) {
 
   if ( suivi->menu_old != suivi->menu ) {
 
-    Trace("appel : %d : %s" , suivi->menu,s_menu) ;
-
-   GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
-
-//    GPIO_CLIGNOTE(GPIO_LED_ETAT, suivi->menu, 2) ;
+    Trace("appel : %d : %s" , suivi->menu, s_menu) ;
+    GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
   }
   return ;
 }

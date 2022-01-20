@@ -38,11 +38,11 @@ astro.c:      suivi->menu     = atoi( clavier->nombre ) ;
 astro.c:      suivi->SUIVI_ALIGNEMENT = 1 ;
 astro.c:      //suivi->menu = MENU_AZIMUTAL ;
 astro.c:      // TRACE("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
-astro.c:          if ( suivi->DONNEES_CAPTEURS ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
+astro.c:          if ( donnees->DONNEES_CAPTEURS ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
 astro.c:          suivi->menu_old = suivi->menu ;
 astro.c:          suivi->menu = MENU_AZIMUTAL ;
-astro.c:  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, raquette, suivi) ;
-astro.c:  if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
+astro.c:  if ( donnees->DONNEES_RAQUETTE )   GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, raquette, suivi) ;
+astro.c:  if ( donnees->DONNEES_INFRAROUGE ) IR_KEYBOARD_MAJ_SUIVI( suivi) ;
 astro.c:  if ( suivi->reset ) {
 astro.c:    pthread_mutex_lock(& suivi->mutex_azi );
 astro.c:    pthread_mutex_lock(& suivi->mutex_alt );
@@ -122,8 +122,8 @@ astro.c:    pthread_mutex_lock( & suivi->mutex_cal );
 astro.c:    pthread_mutex_unlock( & suivi->mutex_cal );
 astro.c:  suivi->pas_azi_old = suivi->pas_azi ;
 astro.c:  suivi->pas_alt_old = suivi->pas_alt ;
-astro.c:  if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, raquette, suivi) ;
-astro.c:  if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
+astro.c:  if ( donnees->DONNEES_RAQUETTE )   GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, raquette, suivi) ;
+astro.c:  if ( donnees->DONNEES_INFRAROUGE ) IR_KEYBOARD_MAJ_SUIVI( suivi) ;
 astro.c:  if ( suivi->reset ) {
 astro.c:    suivi->pas_alt = 0 ;
 astro.c:    suivi->pas_azi = 0 ;
@@ -159,8 +159,8 @@ astro.c:    suivi->pas_ouest = 0 ;
 astro.c:    suivi->pas_nord  = 0 ;
 astro.c:    suivi->pas_sud   = 0 ;
 astro.c:    suivi->reset = 0 ;
-astro.c:    if ( suivi->DONNEES_RAQUETTE   ) GPIO_KEYBOARD_RAQUETTE_READ( gpio_key_l, gpio_key_c, raquette, suivi) ;
-astro.c:    if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_RAQUETTE_READ( suivi) ;
+astro.c:    if ( donnees->DONNEES_RAQUETTE   ) GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, raquette, suivi) ;
+astro.c:    if ( donnees->DONNEES_INFRAROUGE ) IR_KEYBOARD_MAJ_SUIVI( suivi) ;
 astro.c:  if ( azi ) { pthread_mutex_unlock( & suivi->mutex_azi ); }
 astro.c:  if ( alt ) { pthread_mutex_unlock( & suivi->mutex_alt ); }
 astro.c:  suivi->t_diff     = (( t01.tv_sec - t00.tv_sec ) * GPIO_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
@@ -174,8 +174,8 @@ astro.c:   // La temporisation dans les boucles du thread SUIVI_MENU depend de  
 astro.c:  usleep( suivi->temporisation_menu ) ;
 astro.c:  suivi->reset = 1 ;
 astro.c:    usleep( suivi->temporisation_menu ) ;
-astro.c:    if ( suivi->DONNEES_RAQUETTE )   GPIO_KEYBOARD_READ( gpio_key_l, gpio_key_c, keyboard, clavier) ;
-astro.c:    if ( suivi->DONNEES_INFRAROUGE ) IR_KEYBOARD_READ( suivi, clavier) ;
+astro.c:    if ( donnees->DONNEES_RAQUETTE )   GPIO_RAQUETTE_READ( gpio_key_l, gpio_key_c, keyboard, clavier) ;
+astro.c:    if ( donnees->DONNEES_INFRAROUGE ) IR_KEYBOARD_READ( suivi, clavier) ;
 astro.c:    TRACE1("suivi->menu=%d",suivi->menu) ;
 astro.c:    switch( suivi->menu ) {
 astro.c:        TRACE("changement de menu : %d : MENU_AZIMUTAL" , suivi->menu) ;
@@ -217,35 +217,35 @@ astro.c:        suivi->SUIVI_ALIGNEMENT = 0 ;
 astro.c:      suivi->d_temps += CALCUL_TEMPORISATION_VOUTE( voute, t00 ) ; 
 astro.c:  // La temporisation dans la boucle du thread SUIVI_INFRAROUGE depend de suivi->temporisation_ir (en us)
 astro.c:  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
-astro.c:  if ( suivi->DONNEES_INFRAROUGE ) {
+astro.c:  if ( donnees->DONNEES_INFRAROUGE ) {
 astro.c:  // La temporisation dans la boucle du thread SUIVI_CAPTEURS depend de suivi->temporisation_capteurs (en us)
 astro.c:  suivi->p_threads_id[ id_thread++ ] = pthread_self() ;
-astro.c:    if ( suivi->DONNEES_CAPTEURS ) {
-astro.c:      if ( ! suivi->init_capteurs ) {
-astro.c:          suivi->DONNEES_CAPTEURS = 0 ;
-astro.c:          suivi->init_capteurs = 0 ;
-astro.c:          suivi->init_capteurs = 1 ;
-astro.c:      if ( suivi->init_capteurs ) {
+astro.c:    if ( donnees->DONNEES_CAPTEURS ) {
+astro.c:      if ( ! donnees->init_capteurs ) {
+astro.c:          donnees->DONNEES_CAPTEURS = 0 ;
+astro.c:          donnees->init_capteurs = 0 ;
+astro.c:          donnees->init_capteurs = 1 ;
+astro.c:      if ( donnees->init_capteurs ) {
 astro.c:        suivi->roll    =  am->roll  ; 
 astro.c:        suivi->pitch   =  am->pitch ;
 astro.c:        suivi->heading =  am->heading ;
 astro.c:    usleep( suivi->temporisation_capteurs );
 astro.c:  memset( suivi->p_threads_id, 0 , MAX_THREADS) ;
-astro.c:  if ( suivi->DONNEES_RAQUETTE ) GPIO_KEYBOARD_CONFIG( gpio_key_l, gpio_key_c ) ;
+astro.c:  if ( donnees->DONNEES_RAQUETTE ) GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
 astro.c:  if ( suivi->alarme != 0 ) alarm( suivi->alarme) ;
-astro.c:  TRACE("suivi->DONNEES_INFRAROUGE = %d",suivi->DONNEES_INFRAROUGE) ;
-astro.c:  TRACE("suivi->DONNEES_CAPTEURS   = %d",suivi->DONNEES_CAPTEURS) ;
-astro.c:  TRACE("suivi->DONNEES_RAQUETTE   = %d",suivi->DONNEES_RAQUETTE) ;
-astro.c:  TRACE("suivi->DONNEES_BLUETOOTH  = %d",suivi->DONNEES_BLUETOOTH) ;
+astro.c:  TRACE("donnees->DONNEES_INFRAROUGE = %d",donnees->DONNEES_INFRAROUGE) ;
+astro.c:  TRACE("donnees->DONNEES_CAPTEURS   = %d",donnees->DONNEES_CAPTEURS) ;
+astro.c:  TRACE("donnees->DONNEES_RAQUETTE   = %d",donnees->DONNEES_RAQUETTE) ;
+astro.c:  TRACE("donnees->DONNEES_BLUETOOTH  = %d",donnees->DONNEES_BLUETOOTH) ;
 astro.c:  TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
 astro.c:  pthread_create( &suivi->p_suivi_voute,   NULL, (void*)SUIVI_VOUTE,     suivi ) ;
 astro.c:  pthread_create( &suivi->p_menu,            NULL, (void*)SUIVI_MENU,      suivi ) ;
-astro.c:  if ( suivi->DONNEES_INFRAROUGE ) pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
-astro.c:  if ( suivi->DONNEES_CAPTEURS )   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
+astro.c:  if ( donnees->DONNEES_INFRAROUGE ) pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
+astro.c:  if ( donnees->DONNEES_CAPTEURS )   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
 astro.c:  pthread_join( suivi->p_menu, NULL) ;
 astro.c:  pthread_join( suivi->p_suivi_voute, NULL) ;
-astro.c:  if ( suivi->DONNEES_INFRAROUGE ) pthread_join( suivi->p_suivi_infrarouge, NULL) ;
-astro.c:  if ( suivi->DONNEES_CAPTEURS )   pthread_join( suivi->p_suivi_capteurs, NULL) ;
+astro.c:  if ( donnees->DONNEES_INFRAROUGE ) pthread_join( suivi->p_suivi_infrarouge, NULL) ;
+astro.c:  if ( donnees->DONNEES_CAPTEURS )   pthread_join( suivi->p_suivi_capteurs, NULL) ;
 calculs.c:  usleep ( (long)(suivi->DTh * suivi->pourcentage_tempo) ) ;
 calculs.c:  while( t_diff < suivi->DTh ) {
 calculs.c:  usleep ( (long)(suivi->DTa * suivi->pourcentage_tempo) ) ;
@@ -255,9 +255,9 @@ calculs.c:  suivi->Da = AZI_F * 2.0 * PI / ( AZI_R * pow(2.0, AZI_N) * ( astre->
 calculs.c:  suivi->Dh = ALT_F * 2.0 * PI / ( ALT_R * pow(2.0, ALT_N) * ( astre->Vh / ( 60 * 60 * DEGRES ) )) ;
 calculs.c:  TRACE1("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, astre->Va, azi_rot);
 calculs.c:  TRACE1("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, astre->Vh, alt_rot);
-calculs.c:  if ( suivi->DONNEES_CONTROLEUR )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
+calculs.c:  if ( donnees->DONNEES_CONTROLEUR )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
 calculs.c:  else                              freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
-calculs.c:  if ( suivi->DONNEES_CONTROLEUR )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot / DIV / PIPI ;
+calculs.c:  if ( donnees->DONNEES_CONTROLEUR )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot / DIV / PIPI ;
 calculs.c:  else                              freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
 calculs.c:  pthread_mutex_lock(& suivi->mutex_azi );
 calculs.c:    suivi->Sa_old = suivi->Sa ; 
@@ -297,7 +297,7 @@ calculs.c:      pthread_mutex_lock( & suivi->mutex_cal );
 calculs.c:      pthread_mutex_unlock( & suivi->mutex_cal ) ;
 calculs.c:      pthread_mutex_lock( & suivi->mutex_cal );
 calculs.c:      pthread_mutex_unlock( & suivi->mutex_cal ) ;
-calculs.c:  if ( suivi->DONNEES_CAPTEURS ) { 
+calculs.c:  if ( donnees->DONNEES_CAPTEURS ) { 
 calculs.c:    astre->a = suivi->pitch ;         // FIXME : donne azimut
 calculs.c:    astre->h = suivi->heading ;       // FIXME : donne altitude 
 config.c:  suivi->SUIVI_MANUEL     = 0 ;
@@ -305,12 +305,12 @@ config.c:  suivi->SUIVI_ALIGNEMENT = 0 ;
 config.c:  suivi->SUIVI_GOTO       = 0 ;
 config.c:  suivi->SUIVI_VOUTE      = 0 ;
 config.c:  suivi->SUIVI_EQUATORIAL = 0 ;
-config.c:  suivi->DONNEES_CAPTEURS    = DONNEES_CAPTEURS ;
-config.c:  suivi->DONNEES_RAQUETTE    = DONNEES_RAQUETTE ;
-config.c:  suivi->DONNEES_BLUETOOTH   = DONNEES_BLUETOOTH ;
-config.c:  suivi->DONNEES_INFRAROUGE  = DONNEES_INFRAROUGE ;
-config.c:  suivi->DONNEES_CONTROLEUR  = DONNEES_CONTROLEUR ;
-config.c:  suivi->init_capteurs = 0 ; 
+config.c:  donnees->DONNEES_CAPTEURS    = DONNEES_CAPTEURS ;
+config.c:  donnees->DONNEES_RAQUETTE    = DONNEES_RAQUETTE ;
+config.c:  donnees->DONNEES_BLUETOOTH   = DONNEES_BLUETOOTH ;
+config.c:  donnees->DONNEES_INFRAROUGE  = DONNEES_INFRAROUGE ;
+config.c:  donnees->DONNEES_CONTROLEUR  = DONNEES_CONTROLEUR ;
+config.c:  donnees->init_capteurs = 0 ; 
 config.c:  suivi->reset = 0 ;
 config.c:  suivi->pas_azi        = 1 ;
 config.c:  suivi->pas_alt        = 1 ;

@@ -8,6 +8,7 @@
 # --------------------------------------------------------------
 # 15/11/2021  | * modification nom fct mainXxxx() pour compilation
 #                 => mainIr <=> main
+# 20/01/2022  | * ajout KEY_ZOOM (oubli) et action associee
 # --------------------------------------------------------------  
 */
 
@@ -76,12 +77,14 @@ void LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) {
   strcpy( irc->key[37],"KEY_VOLUMEDOWN") ;  strcpy( irc->code[37],"rewind") ;
 
   strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code[38],"TIME") ;
+
   strcpy( irc->key[39],"KEY_SCREEN") ;      strcpy( irc->code[39],"key_screen") ; 
-  strcpy( irc->key[40],"KEY_LIST") ;        strcpy( irc->code[40],"key_list") ;
+  strcpy( irc->key[40],"KEY_TV") ;          strcpy( irc->code[40],"key_tv") ;
   strcpy( irc->key[41],"KEY_INFO") ;        strcpy( irc->code[41],"key_info") ;
-  strcpy( irc->key[42],"KEY_TV") ;          strcpy( irc->code[42],"key_tv") ;
-  strcpy( irc->key[43],"KEY_MODE") ;        strcpy( irc->code[43],"key_mode") ; // ajout du 24/12/2019 - 20191224
-  strcpy( irc->key[44],"KEY_EXIT") ;        strcpy( irc->code[44],"key_exit") ; // ajout du 24/12/2019 - 20191224
+  strcpy( irc->key[42],"KEY_ZOOM") ;        strcpy( irc->code[42],"key_zoom") ;
+  strcpy( irc->key[43],"KEY_LIST") ;        strcpy( irc->code[43],"key_list") ;
+  strcpy( irc->key[44],"KEY_MODE") ;        strcpy( irc->code[44],"key_mode") ; 
+  strcpy( irc->key[45],"KEY_EXIT") ;        strcpy( irc->code[45],"key_exit") ;
   
   // codes VOUTE de la telecommande - joue sur la vitesse globale
 }
@@ -288,35 +291,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
     // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
   }
 }
-//==========================================================
-// FIXME : fonction appelee depuis SUIVI_MANUEL*
 
-void IR_KEYBOARD_RAQUETTE_READ( SUIVI *suivi) {
-
-  
-  if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )     { suivi->pas_acc_plus  = 1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )    { suivi->pas_acc_moins = 1 ; }
-  
-  if ( ! strcmp( suivi->datas_infrarouge, "forward" ) )  { suivi->pas_forward  = 1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "rewind" ) )   { suivi->pas_rewind = 1 ; }
-
-  if ( ! strcmp( suivi->datas_infrarouge, "forwardfast" ) )  { suivi->pas_forward_fast  = 1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "rewindfast" ) )   { suivi->pas_rewind_fast = 1 ; }
-
-  if ( ! strcmp( suivi->datas_infrarouge, "ne" ) )       { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "no" ) )       { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "se" ) )       { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "so" ) )       { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
-    
-  if ( ! strcmp( suivi->datas_infrarouge, "n" ) )        { suivi->pas_nord  = 1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "o" ) )        { suivi->pas_ouest = 1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "e" ) )        { suivi->pas_est   = 1 ; }
-  if ( ! strcmp( suivi->datas_infrarouge, "s" ) )        { suivi->pas_sud   = 1 ; }
-    
-  if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )    { suivi->reset   = 1 ; }
-  
-  TRACE1("%ld %ld %ld %ld %d %d\n", suivi->pas_ouest, suivi->pas_est, suivi->pas_nord, suivi->pas_sud, suivi->pas_acc_plus, suivi->pas_acc_moins );
-}
 //==========================================================
 void IR_ACTIONS_PARTICULIERES( SUIVI *suivi) {
     

@@ -90,7 +90,7 @@ int I2C_INIT( I2C_DEVICE *dev, char * device, char * adress) {
   dev->statut = ret ;  
   dev->usleep  = I2C_SLEEP_MICRO ;
   
-  printf("I2C_INIT : %ld : statut : %d\n", strtoul(adress,NULL,16) , ret);
+  TRACE("I2C_INIT : %ld : statut : %d\n", strtoul(adress,NULL,16) , ret);
   printf("I2C_INIT : fd = %d adress = %d statut : %d\n", dev->fd , dev->adress,  dev->statut);
   
   return ret ;

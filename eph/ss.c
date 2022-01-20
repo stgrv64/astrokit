@@ -308,7 +308,7 @@ TOPOCENTRIC inf, *infos ;
 // Fonction appelée depuis mes sources
 //===========================================================================================
 
-void SOLAR_SYSTEM(char * nom,double * a, double * h,double lat, double lon, double alt,double jd, int num) {
+void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, double alt,double jd, int num) {
 
   int     i;
   double  zgetdate(), gethms();
@@ -391,7 +391,7 @@ void SOLAR_SYSTEM(char * nom,double * a, double * h,double lat, double lon, doub
 // Les valeurs doivent etre entrees en degre et non en radian !! (lon lat)
 //===========================================================================================
 
-void SOLAR_SYSTEM_NEW( char * nom, double * ASC, double * H, double * a, double * h, double lat, double lon, double alt, \
+void SOLAR_SYSTEM( char * nom, double * ASC, double * H, double * a, double * h, double lat, double lon, double alt, \
    int annee, int mois, int jour, int heure, int minute, int seconde, int num ) {
 
   int i;
@@ -555,7 +555,7 @@ int mainSS(int argc , char ** argv) {
 */   
     TRACE("%f %f %f %d %d %d %d %d %d : %d : %f",tlongg, glatt,heightt, yearr, monthh, dayy, hourr, minn, secc, objnum,  JD ) ;
     
-    SOLAR_SYSTEM_NEW( nom, asc, h, azi, alt, glatt / RTD, tlongg / RTD, heightt, yearr, monthh, dayy, hourr, minn, secc, objnum ) ;
+    SOLAR_SYSTEM( nom, asc, h, azi, alt, glatt / RTD, tlongg / RTD, heightt, yearr, monthh, dayy, hourr, minn, secc, objnum ) ;
 
     exit(1) ;
   }

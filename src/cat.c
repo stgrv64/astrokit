@@ -139,14 +139,18 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
     //usleep(10000) ;
     TRACE1("L=%d %s %s %s %s" , L , cat[L][0], cat[L][1] , cat[L][2] , cat[L][3] );
     if(!strcmp(cat[L][0],astre->nom)) {
+
       astre->ASC = atof( cat[L][2] ) / DEGRES ;
       astre->H   = atof( cat[L][3] ) / DEGRES ;
+
       strcpy( astre->infos, cat[L][1] ) ;
       ligne = L ;break  ;
     }
     if(!strcmp(cat[L][1],astre->nom)) {
+
       astre->ASC = atof( cat[L][2] ) / DEGRES ;
       astre->H   = atof( cat[L][3] ) / DEGRES ;
+      
       strcpy( astre->infos, cat[L][1] ) ;
       ligne = L ; break ;
     }

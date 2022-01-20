@@ -2,7 +2,7 @@ reel23.save.20191225 et reel30 et suivant :
 
 - ajout de LOG en tant que macro referencant flog (FILE*) dans astro.h
 - passage au type enum a certains endroits du code (plus pratique!!)
-- mise en commentaire des fonctions de calcul.c
+- creation entete de la fonction au format doxygen des fonctions de calcul.c
 - regroupement des calculs dans une fonction CALCUL_TOUT
 - simplification du code
 - programmation de la touche A/D (KEY_MODE) pour switcher azimutal / equatorial en une fois

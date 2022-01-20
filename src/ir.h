@@ -76,7 +76,7 @@ void  LIRC_READ(SUIVI *suivi) ;
 void  LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) ;
 
 void  IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) ;
-void  IR_KEYBOARD_RAQUETTE_READ( SUIVI *suivi)  ;
+void  IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi)  ;
 void  IR_ACTIONS_PARTICULIERES( SUIVI *suivi) ;
 
 #endif

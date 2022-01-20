@@ -18,7 +18,7 @@
 * @brief  : point entree su programme
 * @param  : const char *fmt
 * @param  :  ...
-* @date   : 2022-01-19 mise en commentaire
+* @date   : 2022-01-19 creation entete de la fonction au format doxygen
 * @todo   : (obsolete voir dangereux a utiliser en embarque)
 *           => cf article sur le WEB (va_args / embedded)
 * @todo   : la bonne pratique est de passer par getopt 
@@ -55,7 +55,7 @@ void ARGUMENTS_VARIABLES(const char *fmt, ... ) {
 * @author : s.gravois
 * @brief  : fonction de test simple des moteurs
 * @param  : 
-* @date   : 2022-01-19 mise en commentaire
+* @date   : 2022-01-19 creation entete de la fonction au format doxygen
 * @todo   : completer
 *****************************************************************************************/
 
@@ -117,16 +117,16 @@ void  GPIO_TEST_MOTEURS(void ) {
   GPIO_STATUT() ;
 }
 /*****************************************************************************************
-* @fn     : ARGUMENTS_HELP_0
+* @fn     : ARGUMENTS_HELP
 * @author : s.gravois
 * @brief  : affiche l aide du programme facon "classique"
 * @param  : int argc
 * @param  : char ** argv
-* @date   : 2022-01-19 mise en commentaire
+* @date   : 2022-01-19 creation entete de la fonction au format doxygen
 * @todo   : a completer par passage par getopt
 *****************************************************************************************/
 
-void ARGUMENTS_HELP_0(int argc, char** argv) {
+void ARGUMENTS_HELP(int argc, char** argv) {
 
   char binaire[255] ;
   
@@ -178,7 +178,7 @@ void ARGUMENTS_HELP_0(int argc, char** argv) {
 * @brief  : Gere le passage des arguments de facon classique
 * @param  : int     argc
 * @param  : char ** argv
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
@@ -229,17 +229,15 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     CONFIG_AFFICHER_TOUT() ;   
   }
   /* ---------------------------------------------------------------
-  * Gestion du calcul de l azimut
+  * Gestion du calcul de l azimut en fonction des coordonnes
+  * equatoriales 
   * ---------------------------------------------------------------*/
 
   if ( ( argc == 4 ) &&  ! strcmp("azi",argv[1]) ) {
 
-    Trace("passage en mode azimutal : suivi->SUIVI_EQUATORIAL=0") ;
-    suivi->SUIVI_EQUATORIAL=0 ;
-
-    Trace("astre nom mis a la valeur TST0");
+    Trace("astre nom mis a la valeur AZI0");
     memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, "TST0" ) ;
+    strcpy( astre->nom, "AZI0" ) ;
 
     astre->A = atof(argv[2]) / DEGRES ;
     astre->H = atof(argv[3]) / DEGRES ;
@@ -253,9 +251,35 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 	   
     exit(0) ;
   }
+  /* ---------------------------------------------------------------
+  * Gestion du calcul des coordonnees equatoriales en fonction 
+  * des coordonnes azimutales et du gps (date heure lieu etc..)
+  * ---------------------------------------------------------------*/
+
+  if ( ( argc == 4 ) &&  ! strcmp("equ",argv[1]) ) {
+  
+    astre->a = atof(argv[2]) / DEGRES ;
+    astre->h = atof(argv[3]) / DEGRES ;
+    
+    CALCUL_EQUATEUR( lieu, astre ) ;
+    CALCUL_VITESSES( lieu, astre, suivi) ; 
+    CALCUL_PERIODE ( astre, suivi, voute) ;
+    
+    CONFIG_AFFICHER_ASTRE(astre) ;
+    CONFIG_AFFICHER_LIEU( lieu) ;
+	   
+    exit(0) ;
+  }
   // -----------------------------------------------------------------
   if ( ( argc == 2  ) &&  ! strcmp("tou",argv[1]) ) {
   
+    Trace("passage en mode azimutal : suivi->SUIVI_EQUATORIAL=0") ;
+    suivi->SUIVI_EQUATORIAL=0 ;
+
+    Trace("astre nom mis a la valeur TST0");
+    memset( astre->nom, 0, sizeof(astre->nom)) ;
+    strcpy( astre->nom, "AZI0" ) ;
+
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;    
 
@@ -269,6 +293,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   }
   // -----------------------------------------------------------------
   if ( argc == 7 ) {
+
     lieu->lat   = atof(argv[1]) / DEGRES ;
     astre->H    = atof(argv[2]) / DEGRES ;
     voute->deb  = atof(argv[3]) ;
@@ -280,7 +305,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     CONFIG_AFFICHER_TOUT() ;   
   }
   // -----------------------------------------------------------------
-  if ( ( argc == 4  ) &&  ! strcmp("voute",argv[1]) ) {
+  if ( ( argc == 4  ) &&  ! strcmp("vou",argv[1]) ) {
     /*
     printf("Generation d'un fichier de quadrillage de la voute avec une resolution de %f degres pour la latitude %d",\
      atof(argv[2]),\
@@ -322,20 +347,6 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
   // -----------------------------------------------------------------
   
-  if ( ( argc == 4 ) &&  ! strcmp("equ",argv[1]) ) {
-  
-    astre->a = atof(argv[2]) / DEGRES ;
-    astre->h = atof(argv[3]) / DEGRES ;
-    
-    CALCUL_EQUATEUR( lieu, astre ) ;
-    CALCUL_VITESSES( lieu, astre, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
-    CALCUL_PERIODE ( astre, suivi, voute) ;
-    
-    CONFIG_AFFICHER_ASTRE(astre) ;
-    CONFIG_AFFICHER_LIEU( lieu) ;
-	   
-    exit(0) ;
-  }
   // -----------------------------------------------------------------
   if ( ( argc == 2 ) &&  ! strcmp("sta",argv[1]) ) {
     
@@ -467,11 +478,13 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 * @brief  : Gere le passage des arguments de facon classique
 * @param  : int     argc
 * @param  : char ** argv
-* @date   : 2022-01-18 mise en commentaire
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
 void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
+
+  char c=0 ;
 
   while ((c = getopt (argc, argv, "a:A:Lq:f:l:")) != -1) {
       switch (c) {
@@ -504,7 +517,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
           exit(0) ;
 
         break ;
-
+/*
         case '' : 
         break ;
 
@@ -516,7 +529,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
 
         case '' : 
         break ;
-
+*/
         default :
         break ;
       }
