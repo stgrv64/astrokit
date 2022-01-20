@@ -705,7 +705,7 @@ void CALCUL_TOUT(void) {
   else if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
   else if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
   else if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = ASTRE_PLANETE ;
-  else                                                 i_astre = ASTRE_INDETERMINE ;
+  else                                                 i_astre = ASTRE_AZIMUTAL ;
   
   switch (i_astre) {
 

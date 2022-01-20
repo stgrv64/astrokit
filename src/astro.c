@@ -937,6 +937,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   //-------------------------------------------------------------------------------
   
   while(1) {
+    
     if ( suivi->SUIVI_VOUTE ) {
       
       /* FIXME : modification 20121225 : tous les calculs generiques dans CALCUL_TOUT */
