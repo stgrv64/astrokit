@@ -5,10 +5,11 @@
 # #--------------------------------------------------------------
 # date     | commentaires 
 # #--------------------------------------------------------------
-# 04/2021  | ajout configuration des noms
-#            de repertoires et fichiers
-#            suppression des confs inutiles (mis a la fin)
-# 01/2022  | ajout parametre DONNEES_CLAVIER
+# 04/2021     | ajout configuration des noms
+#               de repertoires et fichiers
+#               suppression des confs inutiles (mis a la fin)
+# 17/01/2022  | ajout parametre DONNEES_CLAVIER
+# 20/01/2022  | 
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  2          # Menu azimutal
@@ -21,8 +22,7 @@ CONFIG_REP_CFG       cfg
 CONFIG_REP_LOG       log
 CONFIG_REP_IN        inp
 CONFIG_REP_OUT       out
-CONFIG_REP_SCR       scr 
-
+CONFIG_REP_SCR       scr
 CONFIG_FIC_LOG       astrokit.log.new
 CONFIG_FIC_DATE      date.txt
 CONFIG_FIC_HHMM      hhmm.txt

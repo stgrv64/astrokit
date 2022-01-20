@@ -299,31 +299,34 @@ void CONFIG_INIT_TEMPS( TEMPS *temps) {
 //---------------------------------------------------------------------------------------
 void CONFIG_INIT_VOUTE(VOUTE *voute) {
   
+  voute->dt                = dt  ;
   voute->pourcentage_tempo = 0.96 ;   
   voute->calibration_voute = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
-  
-	voute->num   = 0 ;
-  voute->deb   = 0 ;
-  voute->fin   = 0 ;
-  voute->dt    = 1  ;
-  voute->pas   = voute->dt * ROT_RAD_SEC ;
-  voute->acc_old = 1 ;
-  voute->acc   = 1 ;
-  voute->DT    = (unsigned long)( voute->dt * CONFIG_MICRO_SEC / voute->acc ) ;   // dt en micro-sec
+	voute->num               = 0 ;
+  voute->deb               = 0 ;
+  voute->fin               = 0 ;
+  voute->dt                = 1  ;
+  voute->acc_old           = 1 ;
+  voute->acc               = 1 ;
+  voute->pas               = voute->dt * ROT_RAD_SEC ;
+  /* dt en micro-sec */
+
+  voute->DT = (unsigned long)( voute->dt * CONFIG_MICRO_SEC / voute->acc ) ;   
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) {
   
+  voute->dt                 = dt  ;
   voute->pourcentage_tempo  = percent ; 
   voute->calibration_voute  = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
   voute->deb                = 0 ;
   voute->num                = 0 ;
   voute->fin                = PIPI ;
-  voute->dt                 = dt  ;
-  voute->pas                = voute->dt * ROT_RAD_SEC ;
   voute->acc_old            = voute->acc ;
   voute->acc                = acc ;
-  voute->DT                 = (unsigned long)( voute->dt * CONFIG_MICRO_SEC / voute->acc ) ;   // dt en micro-sec
+  voute->pas                = voute->dt * ROT_RAD_SEC ;
+  /* dt en micro-sec */
+  voute->DT = (unsigned long)( voute->dt * CONFIG_MICRO_SEC / voute->acc ) ;
 }
 //---------------------------------------------------------------------------------------
 void CONFIG_INIT_SUIVI(SUIVI *suivi) {

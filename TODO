@@ -1,0 +1,35 @@
+20 Janvier 2020 - 
+identifications des points a travailler / ameliorer / effectuer / analyser ..
+
+-------------------------------------------------------------------------------
+
+  => verifier le code de SOLAR_SYSTEM pour obtenir les coordonnees des planetes 
+     et leur precision en fonction des calculs flottant 32 ou 64 bits
+  
+  => refaire un thread de suivi du temps pour calcul precis 
+     de la duree d un cycle de SUIVI_VOUTE (1 seconde en theorie)
+  
+  => analyser impact d'un rafraichissement plus lent / rapide  de SUIVI_VOUTE 
+
+  => mettre en place, suite a la correction du bug close gpio[ fd] impactant getch(),
+     une implementation NCURSES et TERMIOS et regarder les differences de comportement
+
+  => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales 
+     a partir de azimut, altitude, et donneees GPS (lat / lon / date / heure )
+     
+  => suite au point precedent, mettre en place le suivi direct a partir de :
+     * azimut
+     * altitude
+     --> soit entrer directement les coordonnees via la telecommande
+     --> soit utiliser un capteur type accelerometre
+  
+  => suite au point precedent , implementer le code du LSM303D (cf depot GIT)
+     dans le thread dedie a cet effet 
+     * utiliser 2 capteurs ci besoin
+  
+  => corriger MANUEL_BRUT pour que le suivi brut telecommande permette
+     une approximation bonne des vitesses (reprendre les calculs differentiels)
+     
+     
+         
+
