@@ -208,11 +208,16 @@ t_en_Booleen ;
 typedef enum {
   ASTRE_INDETERMINE=0,
   ASTRE_PLANETE,
-  ASTRE_CIEL_PROFOND,
-  ASTRE_DETERMINE_PAR_COORDONNEES_AZIMUTALES,
-  ASTRE_DETERMINE_PAR_COORDONNEES_AZIMUTALES
+  ASTRE_CIEL_PROFOND
 }
 t_en_Astre ;
+
+typedef enum {
+  ASTRE_INDETERMINE=0,
+  ASTRE_PLANETE,
+  ASTRE_CIEL_PROFOND
+}
+t_en_ ;
 
 typedef enum { 
 	SUIVI_MANUEL=0,
@@ -312,7 +317,7 @@ typedef struct {
 
   pthread_t    p_suivi_infrarouge ;
   pthread_t    p_suivi_capteurs ;
-  pthread_t    p_suivi_calculs ;
+  pthread_t    p_suivi_voute ;
   pthread_t    p_suivi_clavier ;
 
   pthread_t    p_suivi_alt ;
@@ -484,6 +489,7 @@ typedef struct {
  double dVh ;  // differentiel de la vitesse en altitude utilde pour calcul (acceleratnio en altitude)
  double dVam ; // maximum du differentiel pour tests et calcul
  double dVhm ; // maximum du differentiel pour tests et calcul
+
 
 }
 ASTRE ;

@@ -102,7 +102,7 @@ void TRAP_SUIVI_MENU(int sig)  {
 void TRAP_SUIVI_VOUTE(int sig)  {
   
   printf("Signal trappe depuis thread suivi_voute= %d\n",sig) ;
-  pthread_cancel( suivi->p_suivi_calculs ) ;
+  pthread_cancel( suivi->p_suivi_voute ) ;
 }
 void TRAP_SUIVI_INFRAROUGE(int sig)  {
   
@@ -1373,6 +1373,7 @@ int main(int argc, char ** argv) {
     CALCUL_TEMPS_SIDERAL  ( lieu, temps ) ;
     CALCUL_ANGLE_HORAIRE  ( lieu, astre ) ;
     CALCUL_AZIMUT         ( lieu, astre) ;
+
     CONFIG_AFFICHER_ASTRE ( astre) ;
   }
 
@@ -1435,33 +1436,31 @@ int main(int argc, char ** argv) {
   }
   pthread_create( &p_thread_m_alt,    NULL, (void*)suivi_main_M, pm_alt ) ;
   
-  pthread_create( &suivi->p_suivi_calculs,   NULL, (void*)SUIVI_VOUTE,     suivi ) ;
   pthread_create( &suivi->p_menu,            NULL, (void*)SUIVI_MENU,      suivi ) ;
-
-  if ( suivi->DONNEES_INFRAROUGE ) pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
-  if ( suivi->DONNEES_CAPTEURS )   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
-  
-  pthread_create( &suivi->p_suivi_clavier, NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
-  if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+  pthread_create( &suivi->p_suivi_voute,     NULL, (void*)SUIVI_VOUTE,     suivi ) ;
+  pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
+  pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
+  pthread_create( &suivi->p_suivi_clavier,   NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
 
   // ============================== join des threads  ===================================
 
-  if ( suivi->DONNEES_CLAVIER )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+  if ( suivi->DONNEES_CLAVIER )     pthread_join( suivi->p_suivi_clavier, NULL) ;
+  if ( suivi->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( suivi->DONNEES_INFRAROUGE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
+  if ( suivi->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
 
-  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
-  pthread_join( p_thread_p_azi[i], NULL) ; 
+  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+    pthread_join( p_thread_p_azi[i], NULL) ; 
+  }
   pthread_join( p_thread_m_azi, NULL) ;
   
-  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
-  pthread_join( p_thread_p_alt[i], NULL) ; 
+  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+    pthread_join( p_thread_p_alt[i], NULL) ; 
+  }
   pthread_join( p_thread_m_alt, NULL) ;
   
   pthread_join( suivi->p_menu, NULL) ;
-  pthread_join( suivi->p_suivi_calculs, NULL) ;
-
-  if ( suivi->DONNEES_INFRAROUGE ) pthread_join( suivi->p_suivi_infrarouge, NULL) ;
-  if ( suivi->DONNEES_CAPTEURS )   pthread_join( suivi->p_suivi_capteurs, NULL) ;
-  
+  pthread_join( suivi->p_suivi_voute, NULL) ;  
 
   return 0;
 }
