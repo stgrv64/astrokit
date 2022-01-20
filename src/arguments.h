@@ -14,6 +14,8 @@
 #define ARGUMENTS_H
 
 // INCLUDES =====================================
+#include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <math.h>
@@ -22,8 +24,6 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <types.h>
@@ -67,7 +67,7 @@ void  ARGUMENTS_HELP                   (int , char** ) ;
 void  ARGUMENTS_GERER_FACON_CLASSIQUE  (int , char** )  ;
 void  ARGUMENTS_GERER_GETOPT           (int , char** )  ;
 
-void  ARGUMENTS_TEST_MOTEURS (void) ;
+void  GPIO_TEST_MOTEURS      (void ) ;
 void  ARGUMENTS_VOUTE        (void) ;
 
 #endif

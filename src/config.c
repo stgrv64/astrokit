@@ -24,6 +24,7 @@
 #               * remplacement fonctions Trace par Trace 
 #                 (evite utilisation fichier log alors que celui ci n'est pas encore ouvert)
 # 20/01/2022  | * creation des entetes doxygen des fonctions
+#               * ajout mode et type de ASTRE dans CONFIG_INIT_ASTRE
 # -------------------------------------------------------------- 
 */
 
@@ -116,6 +117,8 @@ void CONFIG_INIT_LOG(void) {
 
   char buf[255] ;
   
+  Trace("start") ;
+  
   if ( DEBUG_LOG ) {
     
     memset(buf, ZERO_CHAR, sizeof(buf));
@@ -180,7 +183,8 @@ void CONFIG_INIT_ASTRE(ASTRE *as) {
   as->z =0;
   as->zz =0;
   
-  as->astre_type = ASTRE_INDETERMINE ;
+  as->type = ASTRE_INDETERMINE ;
+  as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CLAVIER
@@ -197,6 +201,8 @@ void CONFIG_INIT_CLAVIER(CLAVIER * clavier) {
 
  int i ;
   
+  Trace("") ;
+
   memset( clavier->phrase,  ZERO_CHAR, strlen( clavier->phrase ) );
   memset( clavier->valider, ZERO_CHAR, strlen( clavier->valider ) );
   memset( clavier->symbole, ZERO_CHAR, strlen( clavier->symbole ) );
@@ -730,7 +736,7 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 
      if(!strcmp("GPIO_LED_ETAT",datas[l][0]))      GPIO_LED_ETAT=atoi(datas[l][1]);
 
-     if(!strcmp("DONNEES_CONTROLEUR",datas[l][0]))  DONNEES_CONTROLEUR=atoi(datas[l][1]);
+     if(!strcmp("DONNEES_CONTROLEUR",datas[l][0])) DONNEES_CONTROLEUR=atoi(datas[l][1]);
      if(!strcmp("DONNEES_CAPTEURS",datas[l][0]))   DONNEES_CAPTEURS=atoi(datas[l][1]);
      if(!strcmp("DONNEES_RAQUETTE",datas[l][0]))   DONNEES_RAQUETTE=atoi(datas[l][1]);
      if(!strcmp("DONNEES_BLUETOOTH",datas[l][0]))  DONNEES_BLUETOOTH=atoi(datas[l][1]);
@@ -1089,13 +1095,13 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
   for(L=0;L<DATAS_NB_LIGNES;L++) {
     for(C=0;C<DATAS_NB_COLONNES;C++) { 
       if ( C>0 ) {
-         Trace1("") ;
+         Trace2("") ;
       }
       if (strlen(datas[L][C])) {
-        Trace1(" %s " , datas[L][C]) ;
+        Trace2(" %s " , datas[L][C]) ;
       }
     }
-    Trace1("") ;
+    Trace2("") ;
   }
 }
 /*****************************************************************************************
@@ -1179,8 +1185,8 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   
-  Trace(" ASTRE       : %10s Va = %.2f Vh = %.2f", as->nom, as->Va,  as->Vh ) ; 
-  
+  Trace(" ASTRE       : %10s type %d mode calcul %d", astre->nom , astre->type, astre->mode ) ;
+  Trace(" vitesses    : %.2f (Va) %.2f (Vh)", as->Va,  as->Vh ) ; 
   Trace(" azimut      : %.2f (degres) : %d.%d (hh.mm)", astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
   Trace(" altitude    : %.2f (degres) : %d.%d (hh.mm)", astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
   Trace(" ang-horaire : %.2f (degres) : %d.%d (hh.mm)", astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;

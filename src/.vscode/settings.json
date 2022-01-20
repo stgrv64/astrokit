@@ -5,6 +5,7 @@
     "editor.hover.enabled": false,
     "files.associations": {
         "astro.h": "c",
-        "ncurses.h": "c"
+        "ncurses.h": "c",
+        "arguments.h": "c"
     }
 }

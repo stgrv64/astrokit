@@ -10,7 +10,7 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      et leur precision en fonction des calculs flottant 32 ou 64 bits
   
   => mieux gerer le code entourant astre->nom : creer une fonction dediee :
-     - en fonction du nom (PLA0 / MES1 / AZI0 / TST5 / ... par exemple), en deduire : 
+     - en fonction du nom ( PLA0 / MES1 / AZI0 / TST5 / ... par exemple), en deduire : 
        * le type de l'astre 
        * le type de calculs pour aboutir aux vitesses
        * rafraichir tous les calculs necessaires
@@ -62,6 +62,8 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      
   => consolider la DEMANDE de SETUP ( strcmp( clavier->symbole, "SETUP" ) )
      regarder si elle est utile 
+     
+  => passer les double 64 bits en float 32 bits
   
   
   

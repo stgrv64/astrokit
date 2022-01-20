@@ -12,6 +12,76 @@
 
 #include <arguments.h>
 
+void ARGUMENTS_VOUTE(void) {
+  
+  int i_retour=0 ;
+  FILE   *fout ;
+  
+  double a, h ;
+  
+  if ( ( fout=fopen("voute.csv","w")) == NULL  ) {
+    SyslogErr("probleme ouverture voute.csv") ;
+    exit(2);
+  } 
+  
+  /* -------------------------------------------
+  *  On fait varier les coordonnees horaires / declinaison
+  * avec un pas = voute->pas
+  * -------------------------------------------*/
+  
+  for(h=-(PI/2)+(lieu->lat)+0.001;h<PI/2;h+=voute->pas)
+    if (h>=0) 
+
+    /* -------------------------------------------
+    *  On fait varier les coordonnees en ascension droite
+    * avec un pas = voute->pas
+    * -------------------------------------------*/
+
+    for(a=-PI +0.001 ;a<PI;a+=voute->pas){
+     
+     astre->a=a ;
+     astre->h=h ;
+     
+     CALCUL_EQUATEUR  ( lieu, astre) ;        // calcul coordonnees horaires en fait
+     CALCUL_VITESSES  ( lieu, astre, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
+     
+     /* Calcul de la norme de la vitesse */
+
+     astre->V  = sqrt( sqr( astre->Va ) + sqr( astre->Vh )) ;
+     
+     if ( astre->Va != 0) 
+       astre->An = atan( astre->Vh / astre->Va ) ;
+     else
+       astre->An = PI/2 ;
+     
+     CALCUL_GEODE( astre ) ;
+     
+     Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
+       astre->a * DEGRES, \
+       astre->h * DEGRES, \
+       astre->A * DEGRES, \
+       astre->H * DEGRES, \
+       astre->x , \
+       astre->y, \
+       astre->z, \
+       astre->Va, \
+       astre->Vh, \
+       astre->V, \
+       astre->An ) ;
+     
+     Trace1("xx %.1f yy %.1f zz %.1f Va %.1f Vh %.1f V %.1f", \
+       astre->xx , \
+       astre->yy , \
+       astre->zz , \
+       astre->Va, \
+       astre->Vh, \
+       astre->V ) ;
+     
+   }
+  
+  fclose(fout) ;
+}
+
 /*****************************************************************************************
 * @fn     : ARGUMENTS_VARIABLES
 * @author : s.gravois
@@ -21,7 +91,7 @@
 * @date   : 2022-01-19 creation entete de la fonction au format doxygen
 * @todo   : (obsolete voir dangereux a utiliser en embarque)
 *           => cf article sur le WEB (va_args / embedded)
-* @todo   : la bonne pratique est de passer par getopt 
+* @todo   : (obsolete) la bonne pratique est de passer par getopt 
 *****************************************************************************************/
 
 void ARGUMENTS_VARIABLES(const char *fmt, ... ) {
@@ -56,7 +126,7 @@ void ARGUMENTS_VARIABLES(const char *fmt, ... ) {
 * @brief  : fonction de test simple des moteurs
 * @param  : 
 * @date   : 2022-01-19 creation entete de la fonction au format doxygen
-* @todo   : completer
+* @todo   : completer et deplacer dans gpio.c / gpio.h
 *****************************************************************************************/
 
 void  GPIO_TEST_MOTEURS(void ) {
@@ -150,7 +220,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
       printf("%s -p / pla (planete)          : afficher les calculs concernant la planete (SOLAR_SYSTEM)\n",binaire) ;
       printf("%s -t / tou (tout)             : calcule et affiche toutes les caracteristiques\n", binaire) ;      
       printf("%s -m / mot (moteurs)          : effectue un test simple sur les moteurs\n",binaire) ;
-      printf("%s -v / vou (voute) <r> <l>    : genere un fichier de la voute entiere : voute.csv (resolution,altitude))\n",binaire) ;
+      printf("%s -v / vou (voute) <r(deg)> <l>  : genere un fichier de la voute entiere : voute.csv (resolution,latitude))\n",binaire) ;
       
       printf("\n") ;
       
@@ -242,12 +312,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     astre->A = atof(argv[2]) / DEGRES ;
     astre->H = atof(argv[3]) / DEGRES ;
     
-    CALCUL_AZIMUT(   lieu, astre ) ;
-    CALCUL_VITESSES( lieu, astre, suivi) ; 
-    CALCUL_PERIODE ( astre, suivi, voute) ;
-    
-    CONFIG_AFFICHER_ASTRE(astre) ;
-    CONFIG_AFFICHER_LIEU( lieu) ;
+    CALCUL_TOUT() ;
+    CONFIG_AFFICHER_TOUT() ; 
 	   
     exit(0) ;
   }
@@ -257,16 +323,16 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   * ---------------------------------------------------------------*/
 
   if ( ( argc == 4 ) &&  ! strcmp("equ",argv[1]) ) {
-  
+
+    Trace("astre nom mis a la valeur EQU0");
+    memset( astre->nom, 0, sizeof(astre->nom)) ;
+    strcpy( astre->nom, "EQU0" ) ;
+
     astre->a = atof(argv[2]) / DEGRES ;
     astre->h = atof(argv[3]) / DEGRES ;
     
-    CALCUL_EQUATEUR( lieu, astre ) ;
-    CALCUL_VITESSES( lieu, astre, suivi) ; 
-    CALCUL_PERIODE ( astre, suivi, voute) ;
-    
-    CONFIG_AFFICHER_ASTRE(astre) ;
-    CONFIG_AFFICHER_LIEU( lieu) ;
+    CALCUL_TOUT() ;
+    CONFIG_AFFICHER_TOUT() ; 
 	   
     exit(0) ;
   }

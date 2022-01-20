@@ -1287,8 +1287,9 @@ int main(int argc, char ** argv) {
   suivi   = &sui ;
   temps   = &tem ;
   clavier = &cla ;
+  donnees = &don ;
   irc     = &ir_codes ;
-
+  
   // -----------------------------------------------------------------
   // Initialisations diverses et variees
   // -----------------------------------------------------------------
@@ -1314,7 +1315,9 @@ int main(int argc, char ** argv) {
   // -----------------------------------------------------------------
   // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)
   // -----------------------------------------------------------------
-   
+  
+  Trace1("Mise en place temps reel et parallelisme ") ;
+
   system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ; 
   mlockall(MCL_CURRENT | MCL_FUTURE);
   

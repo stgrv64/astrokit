@@ -695,38 +695,56 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
 
 void CALCUL_TOUT(void) {
   
-  t_en_Astre_Type i_astre ;
-  
+
   /*---------------- evolution 19/01/2022 ----------------
-  * prise en compte du fait que la astre n a pas de nom
-  * les calculs doivent se baser sur les coordonnees
+  * prise en compte du fait que la astre peut avoir plusieurs
+  * prefixe dans son nom (PLA/NGC/MES/ETO mais aussi EQU/AZI)
+  * Cela permet de determine le mode de calculs de l'astre
+  * et le type de l'astre (CIEL_PROFOND etc...)
   -------------------------------------------------------*/
 
-  if (      strstr( astre->nom, CONFIG_MES ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
-  else if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
-  else if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) i_astre = ASTRE_CIEL_PROFOND ;
-  else if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) i_astre = ASTRE_PLANETE ;
-  else                                                 i_astre = ASTRE_INDETERMINE ;
-  
-  switch (i_astre) {
+  if      ( strstr( astre->nom, CONFIG_MES ) != NULL ) astre->type = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) astre->type = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) astre->type = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) astre->type = ASTRE_PLANETE ;
+  else if ( strstr( astre->nom, CONFIG_AZI ) != NULL ) astre->type = ASTRE_INDETERMINE ;
+  else if ( strstr( astre->nom, CONFIG_EQU ) != NULL ) astre->type = ASTRE_INDETERMINE ;
+  else                                                 astre->type = ASTRE_INDETERMINE ;
+  /* TODO : completer avec les types manquants */ 
+
+  if      ( strstr( astre->nom, CONFIG_MES ) != NULL ) astre->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) astre->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) astre->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( astre->nom, CONFIG_PLA ) != NULL ) astre->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( astre->nom, CONFIG_AZI ) != NULL ) astre->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( astre->nom, CONFIG_EQU ) != NULL ) astre->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ;
+  else                                                 astre->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
+  /* TODO : completer avec les types manquants */ 
+
+  switch (astre->type) {
 
     /* ----------------------------------------------------------------- */
+      /* pour un astre indetermine 
+         on calcule les coordonnees equatoriales 
+         necessaires au calcul des vitesses 
+      */
 
     case ASTRE_INDETERMINE :
     
       pthread_mutex_lock( & suivi->mutex_cal );
       
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-      
-      /* pour un astre indetermine 
-         on calcule les coordonnees equatoriales 
-         necessaires au calcul des vitesses 
-      */
-
       /* CALCUL_AZIMUT       ( lieu, astre) ; */
 
-      CALCUL_EQUATEUR     ( lieu, astre ) ;
-      CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
+      if ( astre->mode == MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ) {
+        
+        CALCUL_EQUATEUR     ( lieu, astre ) ;
+        CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
+      }
+      else {
+        CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
+        CALCUL_AZIMUT       ( lieu, astre) ;
+      }
 
       CALCUL_VITESSES     ( lieu, astre, suivi) ;
       CALCUL_PERIODE      ( astre, suivi, voute) ;
@@ -786,7 +804,7 @@ void CALCUL_TOUT(void) {
       pthread_mutex_unlock( & suivi->mutex_cal ) ;
       
       break ;
-      
+
       //---------------------------------------------------------------------------------------
       
       case ASTRE_SATELLITE :

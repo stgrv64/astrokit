@@ -22,8 +22,9 @@
 #                 d'entrer l azimut et l altitude directement
 #                 pour effectuer le suivi
 # 20/01/2022  | * ajout de tous les types d 'astre a t_en_Astre_Type
-#               * ajout d'un enum t_en_ModeCalcul
+#               * ajout d'un enum t_en_Mode_Calcul
 #               * ajout structure DONNEES et var don, *donnees ;
+#               * ajout CONFIG_AZI et CONFIG_EQU
 # -------------------------------------------------------------- 
 */
 
@@ -156,6 +157,8 @@
 #define  CONFIG_NGC           "NGC"
 #define  CONFIG_ETO           "ETO"
 #define  CONFIG_PLA           "PLA"
+#define  CONFIG_AZI           "AZI"
+#define  CONFIG_EQU           "EQU"
 
 #define  DATAS_NB_LIGNES         200 
 #define  DATAS_NB_COLONNES       2
@@ -223,6 +226,7 @@ t_en_Booleen ;
 ------------------------------------------------------*/
 
 typedef enum {
+
   ASTRE_INDETERMINE=0,
   ASTRE_CIEL_PROFOND,
   ASTRE_PLANETE,
@@ -232,6 +236,14 @@ typedef enum {
 }
 t_en_Astre_Type ;
 
+static const char * c_Astre_Type[] = {
+  "ASTRE_INDETERMINE"
+  "ASTRE_CIEL_PROFOND",
+  "ASTRE_PLANETE",
+  "ASTRE_COMETE",
+  "ASTRE_ASTEROIDE",
+  "ASTRE_SATELLITE"
+} ;
 /* ----------------------------------------------------
 * Le typededef enum suivant determine de quelle maniere
 * on doit effectuer les calculs pour arriver aux vitesses
@@ -239,7 +251,12 @@ t_en_Astre_Type ;
 * est utilisee quand au depart on connait les coordonnes 
 * azimutales de l objet (par exemple via un capteur)
 * 
-* Dans le cas contraire, 
+* Dans le cas contraire, si c'est un objet connu (exemple MES1)
+* alors on part des coordonnees equatoriales pour effectuer 
+* le calcul.
+*
+* ----------------------------------------------------
+* Ce type doit etre rattache a la structure ASTRE
 ------------------------------------------------------*/
 
 typedef enum {
@@ -247,7 +264,7 @@ typedef enum {
   MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL,
   MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
 }
-t_en_ModeCalcul ;
+t_en_Mode_Calcul ;
 
 typedef enum { 
 	SUIVI_MANUEL=0,
@@ -483,10 +500,22 @@ typedef struct {
  double a ;    // azimut
  double h ;    // altitude
  
+/* --------------------------------------------
+*  on deduit de l'azimut(h) et de l'altitude (a)
+*  les coordonnees x y et z dans la geode d'observation de rayon 1
+--------------------------------------------- */
+
  double x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
  double y ;    // cos(h)sin(a)  = ordonnee du point sur la sphere de rayon UN (voute celeste) 
  double z ;    // sin(h)        = z        du point sur la sphere de rayon UN (voute celeste) 
-  
+
+/* --------------------------------------------
+*  on deduit de l'azimut et de l'altitude
+*  les coordonnees xx yy et zz dans la geode d'observation
+* de rayon sqrt(xx²+yy²+zz²) 
+* => permet de representer la norme d'un vecteur par rapport a (a,h)<=>(x,y,z)
+--------------------------------------------- */
+
  double xx ;   // donneee permettant de representer une valeur par OM * val (sphere de unite UN multipliee par la valeur) _ abscisse
  double yy ;   // idem - ordonnee
  double zz ; 
@@ -526,7 +555,9 @@ typedef struct {
  double dVam ; // maximum du differentiel pour tests et calcul
  double dVhm ; // maximum du differentiel pour tests et calcul
 
-t_en_Astre_Type astre_type ; 
+  /* les 2 structures sont placees ici en attendant une structure dediee */
+  t_en_Astre_Type  type ;
+  t_en_Mode_Calcul mode ;
 }
 ASTRE ;
 

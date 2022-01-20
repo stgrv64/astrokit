@@ -1,2 +1,0 @@
-[CC] astro.c
-Makefile:57: recipe for target 'astro.o' failed

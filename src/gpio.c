@@ -193,6 +193,9 @@ void GPIO_READ2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
 void GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
   
   int  i,j ;
+
+  Trace("") ;
+
   if ( donnees->DONNEES_RAQUETTE ) {
     
     GPIO_KEY_L[0] = GPIO_KEY_L1 ; 
@@ -509,9 +512,9 @@ int GPIO_GET(int gpio) {
       if(sscanf(buf,"%d",&val)==1)
         return val ;
   }
-  else 
-    printf("GPIO non dispos : %d\n",gpio) ;
-    
+  else {
+    Trace2("GPIO non dispos : %d\n",gpio) ;
+  }
   return 0 ;
 }
 //====================================================================================================
@@ -522,8 +525,15 @@ int GPIO_SET(int gpio,int val) {
   retour=0 ;
   memset(buf,0,BUFFER);
   snprintf(buf,BUFFER,"%d\n",val) ;
-  if ( GPIO_OPEN_STATUT == 0 ) retour=pwrite(gpio_fd[gpio],buf,strlen(buf),0) ;
-  else printf("GPIO non dispo : simulation : gpio %d set %d\n",gpio_fd[gpio], val) ;
+
+ /* PWM :   pwrite( ph->gpio_fd,buf0,strlen(buf0),0) ; */
+
+  if ( GPIO_OPEN_STATUT == 0 ) {
+     retour=pwrite(gpio_fd[gpio],buf,strlen(buf),0) ;
+  }
+  else {
+    Trace2("GPIO non dispo : simulation : gpio %d set %d\n",gpio_fd[gpio], val) ;
+  }
   return retour ;
 }
 //====================================================================================================
@@ -1152,7 +1162,7 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
       rap   = ph->rap[ ph->pas ] ;
       TUpwm = (double)GPIO_MICRO_SEC * ph->Tpwm ;
     
-      TRACE1("id phase = %d\tpas_en_cours=%d \trapport_cyclique=%f",ph->id,ph->pas, ph->rap[ ph->pas ] ) ;
+      Trace2("id phase = %d\tpas_en_cours=%d \trapport_cyclique=%f",ph->id,ph->pas, ph->rap[ ph->pas ] ) ;
     
     pthread_mutex_unlock( & ph->mutex ) ;
     
@@ -1171,7 +1181,9 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
         pwrite( ph->gpio_fd,buf1,strlen(buf1),0) ;
 
     usleep( TUpwm_haut ) ;  
+
     pwrite( ph->gpio_fd,buf0,strlen(buf0),0) ;
+    
     usleep( TUpwm_bas ) ;
   }
 }
