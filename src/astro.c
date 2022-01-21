@@ -1317,8 +1317,12 @@ int main(int argc, char ** argv) {
   // -----------------------------------------------------------------
   
   Trace1("Mise en place temps reel et parallelisme ") ;
-
-  system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ; 
+  /* La commande suivante avec sudo et tee provoque un souvi sur la cible */
+  /* visible avec strace -x  */
+  /*
+  system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ; 
+  */
+  system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ; 
   mlockall(MCL_CURRENT | MCL_FUTURE);
   
   param.sched_priority = 1 ;

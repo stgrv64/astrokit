@@ -11,11 +11,13 @@
 #endif
 
 #if defined(DEBUG) && DEBUG == 0 
+#define Trace(fmt, args...)   fprintf(stderr, "\n%s : " fmt, __func__, ##args)
 #define TRACE(fmt, args...)   while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #define TRACE1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #endif
 
 #if defined(DEBUG) && DEBUG == 1
+#define Trace(fmt, args...)   fprintf(stderr, "\n%s : " fmt, __func__, ##args)
 #define TRACE(fmt, args...)   fprintf(stderr, "\n%s : " fmt, __func__, ##args)
 #define TRACE1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #endif

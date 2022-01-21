@@ -70,7 +70,7 @@ void * SUIVI_CLAVIER_0(SUIVI * ) ;
  double   jd, \
  int      num) ;
 */
-void SOLAR_SYSTEM( \
+extern void SOLAR_SYSTEM( \
  char   * nom, \
  double * ASC, \
  double * H, \

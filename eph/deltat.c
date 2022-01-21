@@ -324,9 +324,6 @@ if( Y < 1955.0 )
 return( ans );
 }
 
-
-
-
 /* Routine to fill in time values for TDT and UT.
  * These and the input date, JD are global variables.
  * jdflag is set up on reading the initialization file aa.ini.

@@ -334,6 +334,8 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
   update();        
   
   memset( infos->nom, 0, sizeof( infos->nom) ) ;
+
+  Trace("objnum=%d",objnum) ;
   
   switch(objnum) {
     case -1: exit(0);
@@ -355,6 +357,8 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
          if( i == 0 ) break;
     default: return ;
   }
+
+  Trace("infos->nom=%s",infos->nom) ;
 
   if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
   else if( elobject )                      TRACE( "\n\t%s", &elobject->obname[0] ); 
@@ -399,6 +403,7 @@ void SOLAR_SYSTEM( char * nom, double * ASC, double * H, double * a, double * h,
   double tlongg, glatt, heightt;
   int    yearr, monthh, dayy, hourr, minn, secc ;
   
+  TRACE("numero planete = %d", num) ;
   TRACE("RTD = %f", RTD) ;
   infos = &inf ;
 

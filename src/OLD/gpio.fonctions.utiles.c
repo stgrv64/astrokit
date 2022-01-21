@@ -1048,7 +1048,7 @@ void main5(int argc, char ** argv)
   printf("nb cppus      = %d\n", nbcpus ) ; 
 
   if ( priority > 0)  {
-    system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
+    system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
 
     param.sched_priority = priority ;
     if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
@@ -1608,8 +1608,8 @@ void main6(int argc, char **argv)
   TRACE1("nb cppus      = %d", nbcpus ) ; 
 
   if ( priority > 0)  {
-    TRACE("mise en place temps reel : sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
-    system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
+    TRACE("mise en place temps reel : echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
+    system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
     if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
@@ -1711,8 +1711,8 @@ void main(int argc, char **argv)
   TRACE("nb cppus      = %d", nbcpus ) ; 
 
   if ( priority > 0)  {
-    TRACE("mise en place temps reel : sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
-    system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
+    TRACE("mise en place temps reel : echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
+    system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
     if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }

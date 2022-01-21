@@ -66,8 +66,8 @@ void main(int argc, char **argv)
 
   if ( priority > 0)  {
     mlockall(MCL_CURRENT | MCL_FUTURE);
-    TRACE("mise en place temps reel : sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
-    system("sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us") ;
+    TRACE("mise en place temps reel : echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
+    system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
     if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }

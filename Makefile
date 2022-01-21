@@ -18,14 +18,21 @@
 #            - le nom de le executable est EPHX
 #         * ajout librairie ncurses pour acces fonction getch (flux input keyboard)
 #         * ajout clause -Wno-unused-variable
+#
+#  21/01/2022 : 
+#         * prise en compte CCHOST et CCTARG
+# 
 #--------------------------------------------------------------------------------------
-CC	= gcc
+# CC	= gcc
 # CC	= armv6-gcc
 # CC	=	/usr/bin/arm-linux-gnueabi-gcc
 # pour rpi3 cortex A53 :
 # CC	= /usr/bin/arm-linux-gnueabihf-gcc # pour rpi3 cortex A53
 # CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
+
+CCTARG=/usr/bin/arm-linux-gnueabihf-gcc
+CCHOST=gcc
 
 GIT=git
 
@@ -34,7 +41,7 @@ PROJ	= astrokit
 FICH	= astrokit
 VERS	= $(shell date +%B.%Y)
 HOME	= /home/stef
-RM 	= rm -f
+RM 		= rm -f
 EPHA	= libephe.a
 EPHX	= solarsystem
 
@@ -58,8 +65,8 @@ EXEC	= ${FICH}.${VERS}
 # et renommer le main dans le fichier astro.c (entree prog astrokit)
 #--------------------------------------------------------------------------------------
 
-EXECIR	= ir 
-EXECGPIO= gpios
+EXECIR		=	ir
+EXECGPIO	=	gpios
 
 #--------------------------------------------------------------------------------------
 
@@ -70,9 +77,20 @@ LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lnc
 # Prevoir la compilation avec GCC 
 # ========================================
 
+# make M=host host => compile pour le host
+# make M=targ targ => compile pour le host
+
+ifeq ($(M),host)
+	CC=$(CCHOST)
+else
+	CC=$(CCTARG)
+endif
+
 ifeq ($(CC),gcc)
   LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
   EXEC = ${FICH}.${VERS}.host
+else
+	EXEC = ${FICH}.${VERS}.targ
 endif
 
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow -Wno-unused-variable
@@ -97,7 +115,7 @@ OBJS	= $(SRCS:.c=.o)
 OBJSUP	= $(LEPH)
 
 .c.o:
-	@echo [CC] $<
+	@echo $(CC) [CC] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(EXEC): $(OBJ)
@@ -132,10 +150,14 @@ cleansolarsystem:
 cleanall: clean cleanlib cleansolarsystem
 
 lib: $(LEPH)
+
 $(EPHX): $(XEPH)
 
 all: all-before $(LEPH) $(EXEC) all-after
 
+host: cleanall lib $(EXEC)
+
+targ: cleanall lib $(EXEC)
 
 # -----------------------------------------------------------------------------
 # help -help - help - help - help - help - help - help - help - help - help -  
@@ -148,6 +170,8 @@ help:
 	@echo "make clean     : nettoie repertoire $RSRC et $(EXEC)"
 	@echo "make cleanlib  : nettoie repertoire ${REPH} et ${LEPH}"
 	@echo "make cleanall  : make clean et cleanall"
+	@echo "make M=host ...  : memes directives avec CC=gcc    ; nom final .host"
+	@echo "make M=targ ...  : memes directives avec CC=arm-xx ; nom final .targ"
 
 # ================================================================================
 #

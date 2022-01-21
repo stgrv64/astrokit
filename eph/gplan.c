@@ -95,7 +95,7 @@ gplan (J, plan, pobj)
 */
 
 #ifdef __GNUC__
-  char *p;
+  signed char *p;
 #elif __STDC__
   signed char *p;
 #else
@@ -463,7 +463,7 @@ g3plan (J, plan, pobj, objnum)
 */
 
 #ifdef __GNUC__
-  char *p;
+ signed char *p;
 #elif __STDC__
   signed char *p;
 #else
@@ -644,7 +644,7 @@ g2plan (J, plan, pobj)
 */
 
 #ifdef __GNUC__
-  char *p;
+  signed char *p;
 #elif __STDC__
   signed char *p;
 #else
@@ -804,7 +804,7 @@ g1plan (J, plan)
 */
 
 #ifdef __GNUC__
-  char *p;
+  signed char *p;
 #elif __STDC__
   signed char *p;
 #else

@@ -185,6 +185,7 @@ void CONFIG_INIT_ASTRE(ASTRE *as) {
   
   as->type = ASTRE_INDETERMINE ;
   as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  as->numero = 0 ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CLAVIER
@@ -1125,6 +1126,8 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
   Trace1("lieu->TS  = %f",lieu->TS) ;
   Trace1("lieu->TSR = %f",lieu->TSR) ;
   Trace1("lieu->JD  = %f",lieu->JD) ;
+
+  Trace("----------------------------") ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_TEMPS
@@ -1146,6 +1149,9 @@ void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
   Trace1("temps->MM = %d", temps->MM ) ;
   Trace1("temps->SS = %d", temps->SS ) ;
   Trace1("temps->hd = %f", temps->hd ) ;
+
+  Trace("----------------------------") ;
+
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_CLAVIER
@@ -1173,6 +1179,9 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   Trace1("clavier->nombre      = %s",clavier->nombre) ;
   Trace1("clavier->symbole     = %s",clavier->symbole) ;
   Trace1("clavier->phrase_lue  = %d",clavier->phrase_lue) ;
+
+  Trace("----------------------------") ;
+
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_ASTRE
@@ -1198,6 +1207,9 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   Trace2("astre->ASC1 = %f",astre->ASC1) ;
   Trace2("astre->ASC2 = %f",astre->ASC2) ;
   Trace2("astre->ASC = %f - %f (degres)",astre->ASC , astre->ASC * DEGRES) ;
+
+  Trace("----------------------------") ;
+
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_VOUTE
@@ -1212,6 +1224,9 @@ void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
 	
 	Trace("voute->num %lld", voute->num) ;
   Trace("voute->pas %lld", voute->num) ;
+
+  Trace("----------------------------") ;
+
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_TOUT

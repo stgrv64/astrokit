@@ -33,7 +33,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     1
+#define DEBUG     0
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -558,6 +558,7 @@ typedef struct {
   /* les 2 structures sont placees ici en attendant une structure dediee */
   t_en_Astre_Type  type ;
   t_en_Mode_Calcul mode ;
+  int              numero ; 
 }
 ASTRE ;
 
@@ -751,9 +752,9 @@ char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;
 18/01/2022 :
       ajout chemin du script execution par system avec droits root
       qui permet de modifier ordonnancement temps teel
-      en remplacement de sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us
+      en remplacement de echo -1 >/proc/sys/kernel/sched_rt_runtime_us
       Ce script permet un sudo <script> , impossible lors de 
-      sudo sudo echo -1 | sudo /usr/bin/tee -a /proc/sys/kernel/sched_rt_runtime_us
+      sudo echo -1 >/proc/sys/kernel/sched_rt_runtime_us
 */
 
 char CONFIG_SCR_KERNEL [ CONFIG_TAILLE_BUFFER_64 ] ;

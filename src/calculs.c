@@ -8,6 +8,8 @@
 # 19/01/2022  | * gestion du cas ou l astre n a pas de nom
 #                 c'est a dire q'on effectue les calculs en fonction des coordonnees
 #                 sans l'information de nom (recherche catagues inutiles)
+# 21/01/2022  | * recuperation numero objet (PLA5 => 5, MES10 -> 10, ..)
+#               * passage dernier arg de SOLAR_SYSTEM abec astre->numero
 # -------------------------------------------------------------- 
 */
 
@@ -695,6 +697,9 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
 
 void CALCUL_TOUT(void) {
   
+  int pos=3;
+  int len=0 ;
+  char c_sub[32];
 
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la astre peut avoir plusieurs
@@ -721,6 +726,14 @@ void CALCUL_TOUT(void) {
   else                                                 astre->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
   /* TODO : completer avec les types manquants */ 
 
+  /* recuperation du numero apres les 3 premiers caracteres */
+
+	len=strlen(astre->nom)-pos ;
+  memset( c_sub, 0, sizeof(c_sub));
+  memcpy( c_sub, &astre->nom[pos], len );
+  c_sub[len] = '\0';
+  astre->numero = atoi(c_sub) ;
+  
   switch (astre->type) {
 
     /* ----------------------------------------------------------------- */
@@ -786,7 +799,7 @@ void CALCUL_TOUT(void) {
                       & astre->h ,\
                         lieu->lat, lieu->lon, lieu->alt,\
                         temps->yy, temps->mm, temps->dd,temps->HH, temps->MM, temps->SS,\
-                        atoi(clavier->nombre)) ;
+                        astre->numero) ;
                         
       CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
       

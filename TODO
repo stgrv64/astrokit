@@ -65,6 +65,10 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      
   => passer les double 64 bits en float 32 bits
   
+  => modifier les droits du user stef et astrokit pour avec 
+     sudo setcap 'cap_sys_nice=eip' <application>
+     pour pouvoir executer les primitives pthread_setschedparam (param.sched_priority)
+  
   
   
   

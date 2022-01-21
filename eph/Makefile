@@ -15,6 +15,8 @@
 #  2022 : pouvoir compiler le binaire en plus de l archive 
 #         le nom de larchive est EPHA
 #         le nom de le executable est EPHX
+#  21/01/2022 : 
+#   ajout trace du compilateur lors de .c.o
 #-------------------------------------------------------------------------------------
 
 
@@ -64,7 +66,7 @@ LIBS	= -L. -lm
 
 .c.o:
 #	@echo $(CC) -c $(CFLAGS) $(INCS) $< -o $@
-	@echo [CC] $<
+	@echo $(CC) [CC] $<
 	@$(CC) -c $(CFLAGS) $(INCS) $< -o $@
 
 # ---------------------------------------------
