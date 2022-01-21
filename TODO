@@ -69,7 +69,7 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      sudo setcap 'cap_sys_nice=eip' <application>
      pour pouvoir executer les primitives pthread_setschedparam (param.sched_priority)
      
-   => verifier a quel moment on doit faire un CAT_FIND
+   => verifier a quel moment on doit faire un CAT_FIND 
   
   
   
