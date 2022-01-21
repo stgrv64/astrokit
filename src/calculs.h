@@ -7,6 +7,8 @@
 # --------------------------------------------------------------
 # 19/01/2022  | * ajout entete
 #               * ajouts fonctions utilisant getopt
+# 21/01/2022  | * ajout CALCUL_ASCENSION_DROITE
+#                 pour inverser les calculs quand on a azi et alt
 # -------------------------------------------------------------- 
 */
 
@@ -70,8 +72,8 @@ double max(double x1,double x2)                         ;
 double SGN(double x)                                    ;
 double DEC  (double LAT, double a, double h)            ;
 double ASC  (double H,   double a, double h)            ;
-double ASC1 (double LAT, double H, double a, double h)  ;
-double ASC2 (double LAT, double H, double h)            ;
+double ANGH1 (double LAT, double H, double a, double h)  ;
+double ANGH2 (double LAT, double H, double h)            ;
 double ALT  (double LAT, double A, double H)            ;
 double AZI  (double A, double H, double h)              ;
 double AZI1 (double LAT, double A, double H, double h)  ;
@@ -95,7 +97,7 @@ void   CALCUL_VITESSES_EQUATORIAL     (ASTRE *as) ;
 void   CALCUL_VITESSES                ( LIEU *lieu, ASTRE *astre, SUIVI *suivi) ;
 
 void   CALCUL_ANGLE_HORAIRE           ( LIEU *lieu, ASTRE *astre) ;
-
+void   CALCUL_ASCENSION_DROITE        ( LIEU *lieu, ASTRE *astre) ; 
 void   CALCUL_D                       ( ASTRE *astre, SUIVI *suivi) ;   
 void   CALCUL_PERIODE                 ( ASTRE *astre, SUIVI* suivi,VOUTE *voute)  ;
 void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *astre, SUIVI* suivi, VOUTE *voute) ;

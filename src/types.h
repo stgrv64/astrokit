@@ -36,7 +36,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     2
+#define DEBUG     0
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -507,8 +507,8 @@ typedef struct {
  TEMPS  ht ;
  TEMPS  DECt ;
  TEMPS  ASCt ; /* structure TEMPS pour ascension droite 0 (par defaut) */ 
- TEMPS  ASC1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
- TEMPS  ASC2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
+ TEMPS  ANGH1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
+ TEMPS  ANGH2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
  TEMPS  ANGHt ; /* structure TEMPS pour angle horaire (par defaut) */ 
 
  char   nom         [ ASTRE_TAILLE_BUFFER ] ;
@@ -546,8 +546,8 @@ typedef struct {
  
  double DEC  ;  // un resultat de calcul de declinaison
  double ASC  ;   // un resultat de calcul de asc
- double ASC1 ;  // un autre resultat de calcul de asc
- double ASC2 ;  // un autre resultat de calcul de asc
+ double ANGH1 ;  // un autre resultat de calcul de asc
+ double ANGH2 ;  // un autre resultat de calcul de asc
 
  double ALT ;   // un resultat de calcul de ALT
  double AZI ;   // un resultat de calcul de AZI

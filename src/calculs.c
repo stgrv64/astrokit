@@ -19,9 +19,9 @@ double sqr(double x)                                    { return x*x ; }
 double max(double x1,double x2)                         { if(fabs(x1)>fabs(x2)) return x1; else return x2 ; }
 double SGN(double x)                                    { if(x>=0.0) return 1.0; else return -1.0 ; }
 double DEC  (double LAT, double a, double h)            { return asin(sin(LAT)*sin(h)-cos(LAT)*cos(h)* cos(a));}
-double ASC  (double H,   double a, double h)            { return asin(sin(a)*cos(h)/cos(H));}
-double ASC1 (double LAT, double H, double a, double h)  { return acos((cos(a)*cos(h)+cos(LAT)*sin(H))/(sin(LAT)*cos(H))) ;}
-double ASC2 (double LAT, double H, double h)            { return acos((sin(h)-sin(H)*sin(LAT))/(cos(H)*cos(LAT))) ;}
+double ANGH0 (double H,   double a, double h)            { return asin(sin(a)*cos(h)/cos(H));}
+double ANGH1 (double LAT, double H, double a, double h)  { return acos((cos(a)*cos(h)+cos(LAT)*sin(H))/(sin(LAT)*cos(H))) ;}
+double ANGH2 (double LAT, double H, double h)            { return acos((sin(h)-sin(H)*sin(LAT))/(cos(H)*cos(LAT))) ;}
 double ALT  (double LAT, double A, double H)            { return asin(sin(LAT)*sin(H)+cos(LAT)*cos(H)*cos(A));}
 double AZI  (double A, double H, double h)              { return asin( sin(A) * cos(H) / cos(h));}
 double AZI1 (double LAT, double A, double H, double h)  { return acos((sin(LAT)*cos(H)*cos(A)-cos(LAT)*sin(H))/cos(h)) ;}
@@ -239,7 +239,7 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
 }
 //========================================================================================
 // FIXME : CALCUL_EQUATEUR : 
-// FIXME : * transforme les coordonnees azimutales en coordonnees siderales / equatoriales
+// FIXME : * transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
 // TODO :  * probleme : les calculs ne sont pas bons (a verifier)
 // TODO :  * cette fonction servira quand on devra avoir les coordonnees equatoriales
 //          en fonction des coordonnnees azimutales , pour le calcul des VITESSES,
@@ -256,7 +256,7 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
   // TS  : temps sid�ral
   // ASC : ascension droite brute
   
-  double A2,A1,a,h,LAT,Af,A,H ;
+  double A0,A2,A1,a,h,LAT,Af,A,H ;
 
   LAT      = lieu->lat ;
   a        = astre->a ;
@@ -271,23 +271,19 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
   // FIXME : obtention de declinaison et ascension droite (d'apres formules usuelles de Gauss)
   
   H  = DEC(LAT,a,h) ;
+  astre->DEC  = H ;
 
-  A  = ASC(a,h,H) ;
-  A1 = ASC1(LAT,H,a,h);
-  A2 = ASC2(LAT,H,h) ;
+  A0 = ANGH0(a,h,H) ;
+  A1 = ANGH1(LAT,H,a,h);
+  A2 = ANGH2(LAT,H,h) ;
   
-  Af = SGN(A)*A2 ;
-
-  astre->ANGH=Af ;
-  astre->DEC=H ;
+  astre->ANGH = SGN(A0)*A2 ;
   
   // resultats de calculs : pour tests (a modifier : supprimer)
-  
-  astre->DEC = H ;
 
-  astre->ASC  = A ;
-  astre->ASC1 = A1 ;
-  astre->ASC2 = A2 ;
+  astre->ANGH0 = A0 ;
+  astre->ANGH1 = A1 ;
+  astre->ANGH2 = A2 ;
   
   CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre) ;
   
@@ -520,11 +516,14 @@ void CALCUL_CONVERSION_ANGLE_EN_TEMPS(ASTRE *astre) {
   (astre->ASCt).hd  = astre->ASC * 24.0 / PIPI ;
   CALCUL_HMS(&astre->ASCt) ;
 
-  (astre->ASC1t).hd = astre->ASC1 * 24.0 / PIPI ;
-  CALCUL_HMS(&astre->ASC1t) ;
+  (astre->ANGH0t).hd = astre->ANGH0 * 24.0 / PIPI ;
+  CALCUL_HMS(&astre->ANGH1t) ;
 
-  (astre->ASC2t).hd = astre->ASC2 * 24.0 / PIPI ;
-  CALCUL_HMS(&astre->ASC2t) ;
+  (astre->ANGH1t).hd = astre->ANGH1 * 24.0 / PIPI ;
+  CALCUL_HMS(&astre->ANGH1t) ;
+
+  (astre->ANGH2t).hd = astre->ANGH2 * 24.0 / PIPI ;
+  CALCUL_HMS(&astre->ANGH2t) ;
 }
 //========================================================================================
 // FIXME : CALCUL_DATE : 
@@ -711,7 +710,22 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
   
   astre->ANGH = lieu->TSR - astre->ASC ;
   
-  TRACE1("lieu->JJ = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
+  TRACE1("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
+  TRACE1("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
+}
+//========================================================================================
+// FIXME : CALCUL_ASCENSION_DROITE
+// FIXME :  * calcul de l ascension droite de l astre en fonction de l'angle horaire
+// FIXME :  * a besoin de TSR et ASC , donc de CALCUL_TEMPS_SIDERAL
+//========================================================================================
+
+void CALCUL_ASCENSION_DROITE( LIEU *lieu, ASTRE *astre ) {
+  
+  // en radians 
+  
+  astre->ASC = lieu->TSR - astre->ANGH ;
+  
+  TRACE1("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
   TRACE1("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
 }
 //========================================================================================
@@ -822,7 +836,7 @@ void CALCUL_TOUT(void) {
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
       
       SOLAR_SYSTEM( astre->nom,\
-                      & astre->ASC,\
+                      & astre->ANGH0,\
                       & astre->DEC,\
                       & astre->a,\
                       & astre->h ,\

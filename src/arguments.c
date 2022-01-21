@@ -306,7 +306,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
     if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
     if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
-    
+
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;   
   }
@@ -322,7 +322,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     strcpy( astre->nom, "AZI0" ) ;
 
     astre->ASC = atof(argv[2]) / DEGRES ;
-    astre->DEC   = atof(argv[3]) / DEGRES ;
+    astre->DEC = atof(argv[3]) / DEGRES ;
     
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ; 

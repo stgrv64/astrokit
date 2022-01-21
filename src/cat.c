@@ -88,11 +88,11 @@ void CAT_ZONE(ASTRE *astre, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
   double d_angulaire ;
   double d_min ;
   
-  asc = astre->ASC ;
+  asc = astre->ANGH0 ;
   dec = astre->DEC ;
   L=0 ;
   d_min=deg ;
-  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", astre->nom, astre->ASC, astre->DEC) ;
+  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", astre->nom, astre->ANGH0, astre->DEC) ;
   
   while(strcmp(cat[L][3],"_") && strcmp(astre->nom,cat[L][0]) && strcmp(astre->nom,cat[L][1])) {
    
@@ -129,7 +129,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
   L=0 ;
   
   memset( astre->infos, 0 , sizeof( astre->infos) ) ;
-  astre->ASC=0;
+  astre->ANGH0=0;
   astre->DEC=0 ;
   ligne=0 ;
   
@@ -145,7 +145,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
        * dans la structure ASTRE 
        **************************************************/
 
-      astre->ASC = atof( cat[L][2] ) / DEGRES ;
+      astre->ANGH0 = atof( cat[L][2] ) / DEGRES ;
       astre->DEC = atof( cat[L][3] ) / DEGRES ;
 
       strcpy( astre->infos, cat[L][1] ) ;
@@ -153,7 +153,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
     }
     if(!strcmp(cat[L][1],astre->nom)) {
 
-      astre->ASC = atof( cat[L][2] ) / DEGRES ;
+      astre->ANGH0 = atof( cat[L][2] ) / DEGRES ;
       astre->DEC   = atof( cat[L][3] ) / DEGRES ;
       
       strcpy( astre->infos, cat[L][1] ) ;
@@ -162,11 +162,11 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
     L++;
   }
   if ( L < CAT_NB_LIGNES ) {
-    TRACE1("Objet %s trouve dans catalogue => infos : %s ligne : %d ASC = %f DEC = %f",astre->nom, astre->infos, ligne , astre->ASC, astre->DEC) ; 
+    TRACE1("Objet %s trouve dans catalogue => infos : %s ligne : %d ASC = %f DEC = %f",astre->nom, astre->infos, ligne , astre->ANGH0, astre->DEC) ; 
     // return VRAI ;
   }
   else {
-    TRACE1("Objet %s non trouve dans catalogue => infos : %s ligne : %d ASC = %f DEC = %f",astre->nom, astre->infos, ligne , astre->ASC, astre->DEC) ; 
+    TRACE1("Objet %s non trouve dans catalogue => infos : %s ligne : %d ASC = %f DEC = %f",astre->nom, astre->infos, ligne , astre->ANGH0, astre->DEC) ; 
     // return FAUX ;
   }
   TRACE("===========================================") ;
