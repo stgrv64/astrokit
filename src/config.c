@@ -161,8 +161,8 @@ void CONFIG_INIT_ASTRE(ASTRE *as) {
   as->h   = 0  ;
   as->a0  = 0 ;
   as->h0  = 0 ;
-  as->A   = 0  ;
-  as->H   = 0   ;
+  as->ANGH   = 0  ;
+  as->DEC   = 0   ;
   as->A0  = 0 ;
   as->H0  = 0 ;
   as->da  = 0 ;
@@ -1119,8 +1119,8 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
   Trace(" latitude    :  %.2f", lieu->lat * DEGRES ) ; 
   Trace(" longitude   :  %.2f", lieu->lon * DEGRES ) ;
 
-  Trace1("lieu->lat (degres) = %f",lieu->lat * DEGRES ) ;
-  Trace1("lieu->lon (degres) = %f",lieu->lon * DEGRES ) ;
+  Trace1("lieu->lat (deg) = %f",lieu->lat * DEGRES ) ;
+  Trace1("lieu->lon (deg) = %f",lieu->lon * DEGRES ) ;
   Trace1("lieu->alt = %f",lieu->alt ) ;
   Trace1("lieu->JJ  = %f",lieu->JJ) ;
   Trace1("lieu->TS  = %f",lieu->TS) ;
@@ -1194,19 +1194,42 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   
-  Trace(" ASTRE       : %10s type %d mode calcul %d", astre->nom , astre->type, astre->mode ) ;
-  Trace(" vitesses    : %.2f (Va) %.2f (Vh)", as->Va,  as->Vh ) ; 
-  Trace(" azimut      : %.2f (degres) : %d.%d (hh.mm)", astre->a * DEGRES, (astre->at).HH, (astre->at).MM ) ;
-  Trace(" altitude    : %.2f (degres) : %d.%d (hh.mm)", astre->h * DEGRES, (astre->ht).HH, (astre->ht).MM ) ;
-  Trace(" ang-horaire : %.2f (degres) : %d.%d (hh.mm)", astre->A * DEGRES, (astre->At).HH, (astre->At).MM ) ;
-  Trace(" declinaison : %.2f (degres) : %d.%d (hh.mm)", astre->H * DEGRES, (astre->Ht).HH, (astre->Ht).MM ) ;
+  const char * c_nom  = as->nom ;
+  const char * c_type = c_Astre_Type [ as->type ] ;
+  const char * c_mode = c_Mode_Calcul[ as->mode ] ;
+
+  char  c_hhmmss_asc0[ 16] ;
+  char  c_hhmmss_asc1[ 16] ;
+  char  c_hhmmss_asc2[ 16] ;
+  char  c_hhmmss_angh[ 16] ;
+
+  memset( c_hhmmss_asc0, 0, sizeof(c_hhmmss_asc0) ) ;
+  memset( c_hhmmss_asc1, 0, sizeof(c_hhmmss_asc1) ) ;
+  memset( c_hhmmss_asc2, 0, sizeof(c_hhmmss_asc2) ) ;
+  memset( c_hhmmss_angh, 0, sizeof(c_hhmmss_angh) ) ;
+
+  sprintf( c_hhmmss_angh, "%dh%dm%ds", as->ANGHt.HH, as->ANGHt.MM, as->ANGHt.SS  ) ;
+  sprintf( c_hhmmss_asc0, "%dh%dm%ds", as->ASCt.HH,  as->ASCt.MM,  as->ASCt.SS  ) ;
+  sprintf( c_hhmmss_asc1, "%dh%dm%ds", as->ASC1t.HH, as->ASC1t.MM, as->ASC1t.SS  ) ;
+  sprintf( c_hhmmss_asc2, "%dh%dm%ds", as->ASC2t.HH, as->ASC2t.MM, as->ASC2t.SS  ) ;
+
+  Trace(" %s : type          : %s", c_nom , c_type ) ;
+  Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
+  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, as->Va,  as->Vh ) ; 
+  Trace(" %s : azimut        : %.2f (deg) ", c_nom, as->a    * DEGRES ) ;
+  Trace(" %s : altitude      : %.2f (deg) ", c_nom, as->h    * DEGRES ) ;
+  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, as->DEC  * DEGRES  ) ;
+  Trace(" %s : ANGLE HORAIRE : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ANGH  * DEGRES, c_hhmmss_angh ) ;
+  Trace(" %s : ASC (calcul0) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ASC   * DEGRES, c_hhmmss_asc0 ) ;
+  Trace(" %s : ASC (calcul1) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ASC1  * DEGRES, c_hhmmss_asc1 ) ;
+  Trace(" %s : ASC (calcul2) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ASC2  * DEGRES, c_hhmmss_asc2 ) ;
   
-  Trace2("astre->AZI  = %f",astre->AZI) ;
-  Trace2("astre->AZI1 = %f",astre->AZI1) ;
-  Trace2("astre->ASC  = %f",astre->ASC) ;
-  Trace2("astre->ASC1 = %f",astre->ASC1) ;
-  Trace2("astre->ASC2 = %f",astre->ASC2) ;
-  Trace2("astre->ASC = %f - %f (degres)",astre->ASC , astre->ASC * DEGRES) ;
+  Trace2("as->AZI  = %f",as->AZI) ;
+  Trace2("as->AZI1 = %f",as->AZI1) ;
+  Trace2("as->ASC  = %f",as->ASC) ;
+  Trace2("as->ASC1 = %f",as->ASC1) ;
+  Trace2("as->ASC2 = %f",as->ASC2) ;
+  Trace2("as->ASC = %f - %f (deg)",as->ASC , as->ASC * DEGRES) ;
 
   Trace("----------------------------") ;
 
@@ -1239,11 +1262,13 @@ void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
 
 void CONFIG_AFFICHER_TOUT(void) {
 
-  CONFIG_AFFICHER_CLAVIER( clavier ) ;   
+
   CONFIG_AFFICHER_TEMPS(   temps ) ;
   CONFIG_AFFICHER_LIEU(    lieu );
   CONFIG_AFFICHER_ASTRE(   astre ) ;
   CONFIG_AFFICHER_VOUTE(   voute ) ;
+
+  Trace("\n") ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_CHANGEMENTS

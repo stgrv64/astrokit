@@ -236,6 +236,8 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
     
       TRACE("== %s ==",astre->nom) ;
       
+      /* Recherche de l'astre dans les catalgues */
+      
       if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
       if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
       if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
@@ -953,7 +955,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
         CONFIG_AFFICHER_TOUT() ;
       }
 */
-      astre->A   += voute->pas ;
+      astre->ANGH   += voute->pas ;
       voute->deb += voute->pas ;
 
       suivi->d_temps += CALCUL_TEMPORISATION_VOUTE( voute, t00 ) ; 
@@ -1375,21 +1377,6 @@ int main(int argc, char ** argv) {
   
   // -----------------------------------------------------------------
   
-  TRACE("==> astre->nom     = %s", astre->nom );
-
-  if ( strcmp(astre->nom,"") != 0 ) {
-
-    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
-
-    CALCUL_TEMPS_SIDERAL  ( lieu, temps ) ;
-    CALCUL_ANGLE_HORAIRE  ( lieu, astre ) ;
-    CALCUL_AZIMUT         ( lieu, astre) ;
-
-    CONFIG_AFFICHER_ASTRE ( astre) ;
-  }
-
   pm_azi = &m_azi ;
   pm_alt = &m_alt ;
   

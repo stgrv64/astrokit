@@ -41,11 +41,11 @@ int showrd( msg, p, pol ) char *msg; double p[], pol[]; {
 
   if (prtflg != 0) {
     
-    TRACE( "%s  R.A. ", msg );
+    TRACE1( "%s  R.A. ", msg );
     
     hms( x );
     
-    TRACE( "Dec. " );
+    TRACE1( "Dec. " );
     
     dms( y );
   }
@@ -66,7 +66,7 @@ int showcor( strng, p, dp ) char *strng; double p[], dp[]; {
   for( i=0; i<3; i++ ) p1[i] = p[i] + dp[i];
 
   deltap( p, p1, &dr, &dd );
-  TRACE( "%s dRA %.3fs dDec %.2f\"", strng, RTS*dr/15.0, RTS*dd );
+  TRACE1( "%s dRA %.3fs dDec %.2f\"", strng, RTS*dr/15.0, RTS*dd );
   
 return(0);
 }
@@ -76,24 +76,22 @@ return(0);
 // ================================================================================
 
 int dms( x ) double x; {
- double s;
- int d, m;
+  double s;
+  int d, m;
 
- s = x * RTD;
- if( s < 0.0 ) {
-  TRACE(" -");
-  s = -s;
- }
- else TRACE("  ");
+  s = x * RTD;
+  if( s < 0.0 ) {
+    s = -s;
+  }
 
- d = (int) s;
- s -= d;
- s *= 60;
- m = (int) s;
- s -= m;
- s *= 60;
- TRACE( "%3dd %02d\' %05.2f\"  ", d, m, s );
- return(0);
+  d = (int) s;
+  s -= d;
+  s *= 60;
+  m = (int) s;
+  s -= m;
+  s *= 60;
+  TRACE1( "%d %d %.2f", d, m, s );
+  return(0);
 }
 // ================================================================================
 /* Radians to hours, minutes, seconds
@@ -132,7 +130,7 @@ int hms( x ) double x; {
 
  sint = sfrac / 1000;
  sfrac -= sint * 1000;
- TRACE( "%3dh %02dm %02ld.%03lds  ", h, m, sint, sfrac );
+ TRACE1( "%3dh %02dm %02ld.%03lds  ", h, m, sint, sfrac );
  
 return(0);
 }

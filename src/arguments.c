@@ -59,8 +59,8 @@ void ARGUMENTS_VOUTE(void) {
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
        astre->a * DEGRES, \
        astre->h * DEGRES, \
-       astre->A * DEGRES, \
-       astre->H * DEGRES, \
+       astre->ANGH * DEGRES, \
+       astre->DEC * DEGRES, \
        astre->x , \
        astre->y, \
        astre->z, \
@@ -280,6 +280,12 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     memset( astre->nom, 0, sizeof(astre->nom)) ;
     strcpy( astre->nom, argv[2] ) ;
 
+    /* Recherche de l'astre dans les catalogues */
+    
+    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
+    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
+    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;   
 
@@ -295,12 +301,18 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     memset( astre->nom, 0, sizeof(astre->nom)) ;
     strcpy( astre->nom, argv[2] ) ;
 
+    /* Recherche de l'astre dans les catalogues */
+    
+    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
+    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
+    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+    
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;   
   }
   /* ---------------------------------------------------------------
-  * Gestion du calcul de l azimut en fonction des coordonnes
-  * equatoriales 
+  * Gestion du calcul de l azimut en fonction 
+  * des coordonnes equatoriales
   * ---------------------------------------------------------------*/
 
   if ( ( argc == 4 ) &&  ! strcmp("azi",argv[1]) ) {
@@ -309,8 +321,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     memset( astre->nom, 0, sizeof(astre->nom)) ;
     strcpy( astre->nom, "AZI0" ) ;
 
-    astre->A = atof(argv[2]) / DEGRES ;
-    astre->H = atof(argv[3]) / DEGRES ;
+    astre->ASC = atof(argv[2]) / DEGRES ;
+    astre->DEC   = atof(argv[3]) / DEGRES ;
     
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ; 
@@ -361,7 +373,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   if ( argc == 7 ) {
 
     lieu->lat   = atof(argv[1]) / DEGRES ;
-    astre->H    = atof(argv[2]) / DEGRES ;
+    astre->DEC    = atof(argv[2]) / DEGRES ;
     voute->deb  = atof(argv[3]) ;
     voute->fin  = atof(argv[4]) ;
     voute->pas  = atof(argv[5]) ;

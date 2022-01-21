@@ -25,6 +25,9 @@
 #               * ajout d'un enum t_en_Mode_Calcul
 #               * ajout structure DONNEES et var don, *donnees ;
 #               * ajout CONFIG_AZI et CONFIG_EQU
+# 21/01/2022  | * ajout constantes char * en fonction des enum
+#                 pour avoir une representation char de l enum
+#               * ajout ASCx comme TEMPS dans ASTRE
 # -------------------------------------------------------------- 
 */
 
@@ -33,7 +36,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     0
+#define DEBUG     2
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -60,12 +63,12 @@
 
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } 
+#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 
 #endif
 
@@ -192,7 +195,7 @@
 #define  ROT_DEG_SEC          0.004178079012116   // vitesse de rotation de la Terre (degres par seconde)
 
 #define  MAX_THREADS          10
-#define  ASTRE_TAILLE_BUFFER  20
+#define  ASTRE_TAILLE_BUFFER  256
 #define  ASTRE_NB_COLONNES    10000
 
 #define  CONFIG_ASS              3 
@@ -237,7 +240,7 @@ typedef enum {
 t_en_Astre_Type ;
 
 static const char * c_Astre_Type[] = {
-  "ASTRE_INDETERMINE"
+  "ASTRE_INDETERMINE",
   "ASTRE_CIEL_PROFOND",
   "ASTRE_PLANETE",
   "ASTRE_COMETE",
@@ -265,6 +268,12 @@ typedef enum {
   MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
 }
 t_en_Mode_Calcul ;
+
+static const char * c_Mode_Calcul[] = {
+  "MODE_CALCUL_INDETERMINE",  
+  "MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL",
+  "MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL"
+} ;
 
 typedef enum { 
 	SUIVI_MANUEL=0,
@@ -329,7 +338,13 @@ LIEU ;
 //=====================================================
 typedef struct {
   
+  /* L heure decimale sert pour la representation 
+   * d'un angle sous la forme  : 12h25mn05s 
+   * 360 degres = 24h
+   * -------------------------------------------- */
+   
   double hd ;   // heure decimale
+
   int mm ;      // month
   int yy ;      // year
   int dd ;      // day
@@ -490,9 +505,12 @@ typedef struct {
 
  TEMPS  at ;
  TEMPS  ht ;
- TEMPS  At ;
- TEMPS  Ht ;
- 
+ TEMPS  DECt ;
+ TEMPS  ASCt ; /* structure TEMPS pour ascension droite 0 (par defaut) */ 
+ TEMPS  ASC1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
+ TEMPS  ASC2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
+ TEMPS  ANGHt ; /* structure TEMPS pour angle horaire (par defaut) */ 
+
  char   nom         [ ASTRE_TAILLE_BUFFER ] ;
  char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
  char   plus_proche [ ASTRE_NB_COLONNES   ][ ASTRE_TAILLE_BUFFER ] ;
@@ -523,11 +541,11 @@ typedef struct {
  double a0 ;   // valeur precedente de l'azimut
  double h0 ;   // valeur precedente de l'altitude
  
- double A ;    // angle horaire  ( = lieu->temps sideral - ASC)
- double H ;    // declinaison
+ double ANGH ;    // angle horaire  ( = lieu->temps sideral - ASC)
+ double H    ;    // declinaison
  
  double DEC  ;  // un resultat de calcul de declinaison
- double ASC ;   // un resultat de calcul de asc
+ double ASC  ;   // un resultat de calcul de asc
  double ASC1 ;  // un autre resultat de calcul de asc
  double ASC2 ;  // un autre resultat de calcul de asc
 
