@@ -129,11 +129,9 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
   L=0 ;
   
   memset( astre->infos, 0 , sizeof( astre->infos) ) ;
-  astre->ANGH0=0;
+  astre->ASC=0;
   astre->DEC=0 ;
   ligne=0 ;
-  
-  TRACE1("Recherche de %s dans le catalogue", astre->nom) ;
   
   while( strcmp(cat[L][3],"_") && L < CAT_NB_LIGNES ) {
     //usleep(10000) ;
@@ -145,7 +143,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
        * dans la structure ASTRE 
        **************************************************/
 
-      astre->ANGH0 = atof( cat[L][2] ) / DEGRES ;
+      astre->ASC = atof( cat[L][2] ) / DEGRES ;
       astre->DEC = atof( cat[L][3] ) / DEGRES ;
 
       strcpy( astre->infos, cat[L][1] ) ;
@@ -153,7 +151,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
     }
     if(!strcmp(cat[L][1],astre->nom)) {
 
-      astre->ANGH0 = atof( cat[L][2] ) / DEGRES ;
+      astre->ASC = atof( cat[L][2] ) / DEGRES ;
       astre->DEC   = atof( cat[L][3] ) / DEGRES ;
       
       strcpy( astre->infos, cat[L][1] ) ;
@@ -162,14 +160,13 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
     L++;
   }
   if ( L < CAT_NB_LIGNES ) {
-    TRACE1("Objet %s trouve dans catalogue => infos : %s ligne : %d ASC = %f DEC = %f",astre->nom, astre->infos, ligne , astre->ANGH0, astre->DEC) ; 
+    TRACE(" %s : trouve dans catalogue",astre->nom) ;
+    TRACE(" %s : asc = %.2f dec = %.2f infos : %s",astre->nom , astre->ANGH0, astre->DEC, astre->infos) ; 
     // return VRAI ;
   }
   else {
-    TRACE1("Objet %s non trouve dans catalogue => infos : %s ligne : %d ASC = %f DEC = %f",astre->nom, astre->infos, ligne , astre->ANGH0, astre->DEC) ; 
-    // return FAUX ;
+    TRACE(" %s : non trouve dans catalogue",astre->nom) ;
   }
-  TRACE("===========================================") ;
 
   return ; 
 }

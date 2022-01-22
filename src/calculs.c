@@ -221,7 +221,6 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
 
   h  = ALT(LAT,A,H) ;
   a  = AZI(A,H,h) ;
-  
   a1 = AZI1(LAT,A,H,h) ;
   af = SGN(a)*a1 ;
   
@@ -460,7 +459,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *astre, SUIVI* suivi, VOUTE *voute) {
 
 void CALCUL_AFFICHER_HEURE( char * mesg, TEMPS *temps ) {
 
-  TRACE1("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
+  TRACE("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
 }
 //========================================================================================
 // FIXME : CALCUL_HDEC : 
@@ -694,8 +693,10 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   lieu->TS  = TSMH3.hd ;
   lieu->TSR = (TSMH3.hd / 24) * PIPI ;
   
-  TRACE1("lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  
+  TRACE("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  TRACE("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  TRACE("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+
   return 0 ;
 }
 //========================================================================================
@@ -794,8 +795,8 @@ void CALCUL_TOUT(void) {
 
       if ( astre->mode == MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ) {
         
-        CALCUL_EQUATEUR     ( lieu, astre ) ;
-        CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
+        CALCUL_EQUATEUR        ( lieu, astre ) ;
+        CALCUL_ASCENSION_DROITE( lieu, astre ) ;
       }
       else {
         CALCUL_ANGLE_HORAIRE( lieu, astre ) ;

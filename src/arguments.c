@@ -59,7 +59,7 @@ void ARGUMENTS_VOUTE(void) {
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
        astre->a * DEGRES, \
        astre->h * DEGRES, \
-       astre->ANGH * DEGRES, \
+       astre->ASC   * DEGRES, \
        astre->DEC * DEGRES, \
        astre->x , \
        astre->y, \
@@ -217,6 +217,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
       printf("%s -L / ala (aLarm)            : arrete le main aubout de argv[1] secondes\n",binaire) ;
       printf("%s -z / azi (aZimut) <A> <H>   : <angle horaire(deg) <declinaison(deg)> : calcul l'azimut en fonction de AH et DEC\n",binaire) ;
       printf("%s -q / equ (eQuateur) <a> <h> : <azimut(deg) <hauteur(deg)>            : calcul l'angle horaire et la declinaison en fonction de azimut et altitude\n",binaire) ;
+      printf("%s ast+equ                     : combinaison ast + equ , l idee est de retouver le calcul des vitesses en sens inverse", binaire) ;
       printf("%s -p / pla (planete)          : afficher les calculs concernant la planete (SOLAR_SYSTEM)\n",binaire) ;
       printf("%s -t / tou (tout)             : calcule et affiche toutes les caracteristiques\n", binaire) ;      
       printf("%s -m / mot (moteurs)          : effectue un test simple sur les moteurs\n",binaire) ;
@@ -346,6 +347,38 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ; 
 	   
+    exit(0) ;
+  }
+    /* ---------------------------------------------------------------
+  * Gestion du calcul successif suivants : 
+  * 1 - mode "ast" => recuperation des coordonnes / calcul altaz / vitesses
+  * 2 - mode "equ" => recalcul coordonnes horaires / 
+  * ---------------------------------------------------------------*/
+
+  if ( ( argc == 3 ) &&  ! strcmp("ast+equ",argv[1]) ) {
+
+    /* mode ast */
+
+    Trace("astre %s pris en compte\n",argv[2]);
+    memset( astre->nom, 0, sizeof(astre->nom)) ;
+    strcpy( astre->nom, argv[2] ) ;
+    
+    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
+    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
+    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+
+    CALCUL_TOUT() ;
+    CONFIG_AFFICHER_TOUT() ;   
+
+    /* mode equateur */
+
+    Trace("astre nom mis a la valeur EQU0");
+    memset( astre->nom, 0, sizeof(astre->nom)) ;
+    strcpy( astre->nom, "EQU0" ) ;
+    
+    CALCUL_TOUT() ;
+    CONFIG_AFFICHER_TOUT() ; 
+
     exit(0) ;
   }
   // -----------------------------------------------------------------

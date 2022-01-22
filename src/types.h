@@ -506,10 +506,11 @@ typedef struct {
  TEMPS  at ;
  TEMPS  ht ;
  TEMPS  DECt ;
- TEMPS  ASCt ; /* structure TEMPS pour ascension droite 0 (par defaut) */ 
+ TEMPS  ASCt ;   /* structure TEMPS pour ascension droite 0 (par defaut) */ 
+ TEMPS  ANGH0t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
  TEMPS  ANGH1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
  TEMPS  ANGH2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
- TEMPS  ANGHt ; /* structure TEMPS pour angle horaire (par defaut) */ 
+ TEMPS  ANGHt ;  /* structure TEMPS pour angle horaire (par defaut) */ 
 
  char   nom         [ ASTRE_TAILLE_BUFFER ] ;
  char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
@@ -546,6 +547,7 @@ typedef struct {
  
  double DEC  ;  // un resultat de calcul de declinaison
  double ASC  ;   // un resultat de calcul de asc
+ double ANGH0 ;  // un autre resultat de calcul de asc
  double ANGH1 ;  // un autre resultat de calcul de asc
  double ANGH2 ;  // un autre resultat de calcul de asc
 
