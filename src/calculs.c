@@ -459,7 +459,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *astre, SUIVI* suivi, VOUTE *voute) {
 
 void CALCUL_AFFICHER_HEURE( char * mesg, TEMPS *temps ) {
 
-  TRACE("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
+  TRACE1("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
 }
 //========================================================================================
 // FIXME : CALCUL_HDEC : 
@@ -693,9 +693,9 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   lieu->TS  = TSMH3.hd ;
   lieu->TSR = (TSMH3.hd / 24) * PIPI ;
   
-  TRACE("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  TRACE("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  TRACE("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  TRACE1("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  TRACE1("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  TRACE1("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
 
   return 0 ;
 }
@@ -741,7 +741,7 @@ void CALCUL_TOUT(void) {
   int len=0 ;
   char c_sub[32];
 
-  Trace("") ;
+  Trace1("") ;
 
   TRACE("==> astre->nom     = %s", astre->nom );
 
