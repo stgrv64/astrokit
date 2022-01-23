@@ -227,6 +227,8 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   // de menu (pour plus de rapidite)
   //-----------------------------------------------------------------
   
+  Trace("clavier->phrase_lue = %d", clavier->phrase_lue) ;
+
   if ( clavier->phrase_lue ) {
     
     //---------------------------------

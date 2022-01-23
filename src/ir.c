@@ -179,7 +179,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
   memset(val, 0, strlen(val)) ;     
   strcpy( val, suivi->datas_infrarouge ) ;
   
-  TRACE1("val = %s\n", val ) ;
+  Trace1("val = %s\n", val ) ;
   
   if ( strcmp( val, "") ) {
     
@@ -198,7 +198,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
   
   if ( clavier->mot_en_cours && clavier->appui_en_cours == 0 ) {
   
-    TRACE("mot trouver = %s", clavier->mot ) ;
+    Trace1("mot trouver = %s", clavier->mot ) ;
 		
 		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;
 
@@ -209,11 +209,11 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
     
     if ( strcmp( clavier->mot, clavier->valider) != 0 ) { 
       
-      TRACE1("Si mot != valider : on incremente la phrase avec le mot !!\n" ) ;
+      Trace1("Si mot != valider : on incremente la phrase avec le mot !!\n" ) ;
 
       if ( strlen(clavier->phrase) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32) {
 
-        TRACE1("on incremente la phrase %s avec le mot %s\n",clavier->phrase,  clavier->mot ) ;
+        Trace1("on incremente la phrase %s avec le mot %s\n",clavier->phrase,  clavier->mot ) ;
         // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
         memset( s_buffer, IR_ZERO_CHAR, strlen( s_buffer )) ;
@@ -221,15 +221,15 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
 
         sprintf(clavier->phrase,"%s%s",s_buffer, clavier->mot);
       }
-      TRACE1("resultat => phrase = %s \n",clavier->phrase ) ;
+      Trace1("resultat => phrase = %s \n",clavier->phrase ) ;
       
-      TRACE1("Si mot != valider et premier non vide => on met nombre + mot dans le nombre !!\n" ) ;
+      Trace1("Si mot != valider et premier non vide => on met nombre + mot dans le nombre !!\n" ) ;
 
       if ( strcmp( clavier->premier, "")) {
         
 	      if ( strlen(clavier->nombre) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32) {
 
-          TRACE1("on incremente le nombre %s avec le mot %s\n",clavier->nombre,  clavier->mot ) ;
+          Trace1("on incremente le nombre %s avec le mot %s\n",clavier->nombre,  clavier->mot ) ;
           // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
           memset( s_buffer, IR_ZERO_CHAR, strlen( s_buffer )) ;
@@ -238,7 +238,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
           sprintf(clavier->nombre,"%s%s", s_buffer, clavier->mot);
         }
       }
-      TRACE1("resultat => nombre = %s \n",clavier->nombre ) ;
+      Trace1("resultat => nombre = %s \n",clavier->nombre ) ;
     }    
     //------------------------------------------------------------
     // On met le mot dans premier si il est vide 
@@ -255,12 +255,10 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
     //  - en mettant clavier->phrase_lu à 1
     // on efface tout sauf SYMBOLE et NOMBRE qui sont determiner plus tot
     //------------------------------------------------------------
-    
-    // CONFIG_AFFICHER_CLAVIER( clavier ) ;
 
     for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )
     if ( ! strcmp( clavier->mot,    clavier->valider )  ) {
-      TRACE1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
+      Trace1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
 
       strcpy(clavier->premier,"") ;
       strcpy(clavier->phrase,"")  ;
@@ -275,7 +273,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
     
     for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )
     if ( ! strcmp( clavier->mot, clavier->actions[i] )) {
-        TRACE1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
+        Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
         strcpy(clavier->premier,clavier->mot) ;
         strcpy(clavier->symbole,clavier->mot)  ;
 
@@ -288,7 +286,7 @@ void IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) {
     clavier->mot_en_cours = 0 ;
     clavier->appui_en_cours = 0 ;
     
-    // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
+    CONFIG_AFFICHER_CLAVIER( clavier ) ;	
   }
 }
 

@@ -1179,7 +1179,7 @@ void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
 
 void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   
-  Trace("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
+  Trace1("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
     clavier->phrase,\
     clavier->mot,\
     clavier->symbole,\

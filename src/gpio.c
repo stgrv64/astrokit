@@ -12,7 +12,8 @@
 # (issue)  lors de utilisation de la librairie ncurses (getch)
 # ainsi que termios (cf fichier keyboard.c / .h ) :
 # creation entete de la fonction au format doxygen du reliquat de close dans le code
-#         
+# 23/01/2022  | * ajout condition pour entree dans GPIO_RAQUETTE_READ
+#   =>  if ( devices->DEVICE_RAQUETTE_USE ) {        
 # -------------------------------------------------------------- 
 */
 
@@ -260,131 +261,134 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
   
   char buffer_recopie [ CONFIG_TAILLE_BUFFER_32 ] ;
 
-  I=-1; ; J=-1 ;
-  
-  for(i=0;i<4;i++) GPIO_SET( GPIO_KEY_C[i], 0) ;
-  //for(j=0;j<4;j++) GPIO_SET( GPIO_KEY_L[i], 0) ;
-  
-  strcpy(val,"") ;     
-  
-  /* =======================================================================
-  * Lecture d'une touche au clavier matriciel 4*4
-  * Tant que une touche est appuyee la valeur appui_en_cours est a 1
-  * On passe plusieurs fois dans cette boucle en fonction de la fonction appelante
-  * qui est dans astro.c
-   ======================================================================= */
-  
-  clavier->appui_en_cours = 0 ;
-    
-  for(i=0;i<4;i++) {
-    GPIO_SET( GPIO_KEY_C[i], 1) ;
-    
-    usleep( clavier->temporisation_clavier ) ;
-    
-    for(j=0;j<4;j++)  {
-      if( GPIO_GET(GPIO_KEY_L[j])) {
-        I=i; J=j ;
-	  memset( val, '\0', 255 );
-          strcpy( val, keyboard[I][J] ) ;
-	  if ( strcmp( val, "") ) {
-	    //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, keyboard[i][j] ) ;
-	    strcpy( clavier->mot, val ) ; 
-            clavier->appui_en_cours = 1 ;
-	    clavier->mot_en_cours = 1 ;
-	  }
-      }
-    }
-    GPIO_SET( GPIO_KEY_C[i], 0) ; 
-  }
-  
-  // =======================================================================
-  // Quand la touche est relacheee, on traite
-  // ensuite appui en cours est remis a ZERO pour qu'on ne passe qu'une fois
-  // dans cette partie de code
-  // =======================================================================
-  
-  if ( clavier->mot_en_cours && ! clavier->appui_en_cours ) {
-  
-    // printf("mot trouver = %s\n", clavier->mot ) ;
-    
-    //------------------------------------------------------------
-    // On incremente la phrase avec le mot et
-    // On incremente le nombre avec le mot si premier n'est pas vide
-    //------------------------------------------------------------
-    
-    if ( strcmp( clavier->mot, clavier->valider) != 0 ) { 
-      
-      if ( strlen(clavier->phrase) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
+  if ( devices->DEVICE_RAQUETTE_USE ) {
 
-        /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
-        memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
-        strcpy( buffer_recopie, clavier->phrase ) ;
-        /* sprintf( clavier->phrase,"%s%s", clavier->phrase, clavier->mot); */
-        sprintf( clavier->phrase,"%s%s", buffer_recopie, clavier->mot);
+    I=-1; ; J=-1 ;
+    
+    for(i=0;i<4;i++) GPIO_SET( GPIO_KEY_C[i], 0) ;
+    //for(j=0;j<4;j++) GPIO_SET( GPIO_KEY_L[i], 0) ;
+    
+    strcpy(val,"") ;     
+    
+    /* =======================================================================
+    * Lecture d'une touche au clavier matriciel 4*4
+    * Tant que une touche est appuyee la valeur appui_en_cours est a 1
+    * On passe plusieurs fois dans cette boucle en fonction de la fonction appelante
+    * qui est dans astro.c
+    ======================================================================= */
+    
+    clavier->appui_en_cours = 0 ;
       
-      if ( strcmp( clavier->premier, "")) {
-        if ( strlen(clavier->nombre) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
-        //printf("Si pas d'appui sur valider et premier non vide => on met le mot dans la phrase !!\n" ) ; 
+    for(i=0;i<4;i++) {
+      GPIO_SET( GPIO_KEY_C[i], 1) ;
+      
+      usleep( clavier->temporisation_clavier ) ;
+      
+      for(j=0;j<4;j++)  {
+        if( GPIO_GET(GPIO_KEY_L[j])) {
+          I=i; J=j ;
+      memset( val, '\0', 255 );
+            strcpy( val, keyboard[I][J] ) ;
+      if ( strcmp( val, "") ) {
+        //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, keyboard[i][j] ) ;
+        strcpy( clavier->mot, val ) ; 
+              clavier->appui_en_cours = 1 ;
+        clavier->mot_en_cours = 1 ;
+      }
+        }
+      }
+      GPIO_SET( GPIO_KEY_C[i], 0) ; 
+    }
+    
+    // =======================================================================
+    // Quand la touche est relacheee, on traite
+    // ensuite appui en cours est remis a ZERO pour qu'on ne passe qu'une fois
+    // dans cette partie de code
+    // =======================================================================
+    
+    if ( clavier->mot_en_cours && ! clavier->appui_en_cours ) {
+    
+      // printf("mot trouver = %s\n", clavier->mot ) ;
+      
+      //------------------------------------------------------------
+      // On incremente la phrase avec le mot et
+      // On incremente le nombre avec le mot si premier n'est pas vide
+      //------------------------------------------------------------
+      
+      if ( strcmp( clavier->mot, clavier->valider) != 0 ) { 
+        
+        if ( strlen(clavier->phrase) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
+
           /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
           memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
-          strcpy( buffer_recopie, clavier->nombre ) ;
-          /* sprintf(clavier->nombre,"%s%s", clavier->nombre, clavier->mot); */
-          sprintf(clavier->nombre,"%s%s", buffer_recopie, clavier->mot); 
+          strcpy( buffer_recopie, clavier->phrase ) ;
+          /* sprintf( clavier->phrase,"%s%s", clavier->phrase, clavier->mot); */
+          sprintf( clavier->phrase,"%s%s", buffer_recopie, clavier->mot);
+        
+        if ( strcmp( clavier->premier, "")) {
+          if ( strlen(clavier->nombre) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
+          //printf("Si pas d'appui sur valider et premier non vide => on met le mot dans la phrase !!\n" ) ; 
+            /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+            memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+            strcpy( buffer_recopie, clavier->nombre ) ;
+            /* sprintf(clavier->nombre,"%s%s", clavier->nombre, clavier->mot); */
+            sprintf(clavier->nombre,"%s%s", buffer_recopie, clavier->mot); 
+        }
+      }    
+      //------------------------------------------------------------
+      // On met le mot dans premier si il est vide 
+      //------------------------------------------------------------
+      
+      if (   strcmp( clavier->premier, "") ==0 ){ 
+        // printf("Si premier est vide on met le mot en cours dedans\n" ) ; 
+        strcpy( clavier->premier, clavier->mot);
       }
-    }    
-    //------------------------------------------------------------
-    // On met le mot dans premier si il est vide 
-    //------------------------------------------------------------
-    
-    if (   strcmp( clavier->premier, "") ==0 ){ 
-      // printf("Si premier est vide on met le mot en cours dedans\n" ) ; 
-      strcpy( clavier->premier, clavier->mot);
-    }
-    
-    //------------------------------------------------------------
-    // Si la phrase en cours ou le mot en cours est une VALIDATION 
-    // Exemple : MENU - MES ou valider
-    // Alors on VALIDE la phrase en cours
-    //  - en mettant premier dans       SYMBOLE
-    //  - et le reste de la phrase dans NOMBRE    
-    // et on met le mot dans PREMIER (premier mot de la phrase)
-    //------------------------------------------------------------
-    
-    for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )
-    if ( ! strcmp( clavier->phrase, clavier->validations[i]) \
-      || ! strcmp( clavier->mot,    clavier->valider )  ) {
+      
+      //------------------------------------------------------------
+      // Si la phrase en cours ou le mot en cours est une VALIDATION 
+      // Exemple : MENU - MES ou valider
+      // Alors on VALIDE la phrase en cours
+      //  - en mettant premier dans       SYMBOLE
+      //  - et le reste de la phrase dans NOMBRE    
+      // et on met le mot dans PREMIER (premier mot de la phrase)
+      //------------------------------------------------------------
+      
+      for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )
+      if ( ! strcmp( clavier->phrase, clavier->validations[i]) \
+        || ! strcmp( clavier->mot,    clavier->valider )  ) {
 
-      TRACE1("APPUI sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
-      
-      strcpy(clavier->symbole, clavier->premier)  ;
-      
-      strcpy(clavier->premier,"") ;
-      strcpy(clavier->phrase,"")  ;
-      strcpy(clavier->mot,"") ;
-      
-      TRACE1("TROIS = symbole = %s nombre = %s\n", clavier->symbole, clavier->nombre ) ;
+        TRACE1("APPUI sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
+        
+        strcpy(clavier->symbole, clavier->premier)  ;
+        
+        strcpy(clavier->premier,"") ;
+        strcpy(clavier->phrase,"")  ;
+        strcpy(clavier->mot,"") ;
+        
+        TRACE1("TROIS = symbole = %s nombre = %s\n", clavier->symbole, clavier->nombre ) ;
 
-      clavier->phrase_lue=1 ;
+        clavier->phrase_lue=1 ;
+      }
+      
+      //------------------------------------------------------------
+      // Si le mot est une ACTION, on efface la phrase en cours    
+      // et on met le mot dans PREMIER (premier mot de la phrase)
+      //------------------------------------------------------------
+      
+      for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )
+      if ( ! strcmp( clavier->mot, clavier->actions[i] )) {
+          printf("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier") ;
+          strcpy(clavier->premier,clavier->mot) ;
+          strcpy(clavier->nombre,"")  ;
+          strcpy(clavier->phrase,"")  ;
+          strcpy(clavier->mot,"") ;
+      }
+      
+      clavier->mot_en_cours = 0 ;
+      clavier->appui_en_cours = 0 ;
+      
+      // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
     }
-    
-    //------------------------------------------------------------
-    // Si le mot est une ACTION, on efface la phrase en cours    
-    // et on met le mot dans PREMIER (premier mot de la phrase)
-    //------------------------------------------------------------
-    
-    for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )
-    if ( ! strcmp( clavier->mot, clavier->actions[i] )) {
-        printf("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier") ;
-	      strcpy(clavier->premier,clavier->mot) ;
-        strcpy(clavier->nombre,"")  ;
-	      strcpy(clavier->phrase,"")  ;
-	      strcpy(clavier->mot,"") ;
-    }
-    
-    clavier->mot_en_cours = 0 ;
-    clavier->appui_en_cours = 0 ;
-    
-    // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
   }
 }
 /*****************************************************************************************
@@ -438,7 +442,7 @@ void IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi) {
 }
 
 /*****************************************************************************************
-* @fn     : GPIO_RAQUETTE_READ
+* @fn     : GPIO_RAQUETTE_MAJ_SUIVI
 * @author : s.gravois
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
 * @param  : int       GPIO_KEY_L[4]
@@ -487,7 +491,7 @@ void GPIO_RAQUETTE_MAJ_SUIVI(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) 
     
       GPIO_SET( GPIO_KEY_C[i], 0) ;  
     }
-    /* printf("%ld %ld %ld %ld\n", \
+    /* Trace("%ld %ld %ld %ld\n", \
       suivi->pas_ouest, \
       suivi->pas_est, \
       suivi->pas_nord, \

@@ -1,0 +1,53 @@
+BUG : ** buffer overfow detected **
+---------------------------------------------------
+debugging avec gdb : 
+root@raspberrypi:/home/stef/git/astrokit# gdb ./astrokit.janvier.2022.targ
+
+....
+appui sur la telecommande infrarouge 
+puid BUG
+....
+
+SUIVI_TRAITEMENT_MOT : clavier->phrase_lue = 0
+Thread 13 "astrokit.janvie" received signal SIGABRT, Aborted.
+[Switching to Thread 0x7151b440 (LWP 832)]
+__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+50	../sysdeps/unix/sysv/linux/raise.c: Aucun fichier ou dossier de ce type.
+(gdb) 
+
+
+IRC_READ : suivi->datas_infrarouge = forwardfast
+LIRC_READ : suivi->temporisation_ir = 52000*** buffer overflow detected ***: terminated
+
+Thread 12 "astrokit.janvie" received signal SIGABRT, Aborted.
+[Switching to Thread 0x71d1c440 (LWP 1615)]
+__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+50	../sysdeps/unix/sysv/linux/raise.c: Aucun fichier ou dossier de ce type.
+(gdb) where
+#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+#1  0x76d55804 in __GI_abort () at abort.c:79
+#2  0x76da7af4 in __libc_message (action=action@entry=do_abort, fmt=<optimized out>) at ../sysdeps/posix/libc_fatal.c:155
+#3  0x76e29f10 in __GI___fortify_fail (msg=0x76e7532c "buffer overflow detected") at fortify_fail.c:26
+#4  0x76e2889c in __GI___chk_fail () at chk_fail.c:28
+#5  0x76d9f580 in _IO_str_chk_overflow (fp=<optimized out>, c=<optimized out>) at iovsprintf.c:35
+#6  0x76dac3d4 in __GI__IO_default_xsputn (n=<optimized out>, data=<optimized out>, f=<optimized out>) at genops.c:399
+#7  __GI__IO_default_xsputn (f=0x71d1bbb0, data=<optimized out>, n=11) at genops.c:370
+#8  0x76d932fc in __vfprintf_internal (s=0x71d1bbb0, s@entry=0x0, format=format@entry=0x419d91 "%s%s", ap=..., ap@entry=..., mode_flags=mode_flags@entry=6)
+    at ../libio/libioP.h:948
+#9  0x76d9f628 in __vsprintf_internal (string=string@entry=0xfe2784 <cla+96> "forwardfastforwardfastforwardfa", maxlen=maxlen@entry=32, format=0x419d91 "%s%s", 
+    format@entry=0x71d1bcbc "forwardfastforwardfast", args=..., args@entry=..., mode_flags=6) at iovsprintf.c:96
+#10 0x76e283c4 in ___sprintf_chk (s=s@entry=0xfe2784 <cla+96> "forwardfastforwardfastforwardfa", flag=flag@entry=1, slen=slen@entry=32, format=0x419d91 "%s%s")
+    at sprintf_chk.c:40
+#11 0x0040ca0a in sprintf (__fmt=0x419d91 "%s%s", __s=0xfe2784 <cla+96> "forwardfastforwardfastforwardfa") at /usr/arm-linux-gnueabihf/include/bits/stdio2.h:36
+#12 GPIO_RAQUETTE_READ (GPIO_KEY_L=GPIO_KEY_L@entry=0xfe2ad0 <gpio_key_l>, GPIO_KEY_C=GPIO_KEY_C@entry=0xa101a0 <gpio_key_c>, clavier=0xfe2724 <cla>) at src/gpio.c:323
+#13 0x00405f0a in SUIVI_MENU (suivi=0xfe21a0 <sui>) at src/astro.c:719
+#14 SUIVI_MENU (suivi=0xfe21a0 <sui>) at src/astro.c:689
+#15 0x76f7f300 in start_thread (arg=0x71d1c440) at pthread_create.c:477
+#16 0x76e1a208 in ?? () at ../sysdeps/unix/sysv/linux/arm/clone.S:73 from /lib/arm-linux-gnueabihf/libc.so.6
+Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+(gdb) 
+
+=> BUG vient de sprintf : 
+#11 0x0040ca0a in sprintf (__fmt=0x419d91 "%s%s", __s=0xfe2784 <cla+96> "forwardfastforwardfastforwardfa") at /usr/arm-linux-gnueabihf/include/bits/stdio2.h:36
+
+
