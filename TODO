@@ -79,6 +79,7 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
   => https://lwn.net/Articles/876471/ 
      * etudier la possibilite utlisation gpio-sim driver sur PC intel x86
        pour avoir un comportement le plus identiquement possible que sur RPI ARM
+       
   
   
   
