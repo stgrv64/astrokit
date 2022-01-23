@@ -286,7 +286,17 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
   
   CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre) ;
   
-  TRACE1("apres calcul =>a = %2.3f\th = %2.3f\t=>A = %2.3f\tH=%2.3f",(astre->a)*DEGRES,(astre->h)*DEGRES,(astre->ANGH)*DEGRES,(astre->DEC)*DEGRES) ;
+  TRACE("A0   (deg) = %f" , A0*DEGRES );
+  TRACE("A1   (deg) = %f" , A1*DEGRES );
+  TRACE("A2   (deg) = %f" , A2*DEGRES );
+  TRACE("DEC  (deg) = %f" , (astre->DEC)*DEGRES) ;
+  TRACE("ANGH (deg) = %f" , (astre->ANGH)*DEGRES ) ;
+
+  TRACE2("apres calcul =>a = %2.3f\th = %2.3f\t=>A = %2.3f\tH=%2.3f",\
+   (astre->a)*DEGRES,\
+   (astre->h)*DEGRES,\
+   (astre->ANGH)*DEGRES,\
+   (astre->DEC)*DEGRES) ;
 } 
 
 //========================================================================================
@@ -711,6 +721,8 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
   
   astre->ANGH = lieu->TSR - astre->ASC ;
   
+  CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre) ;
+
   Trace2("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
   Trace2("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
 }
@@ -725,6 +737,8 @@ void CALCUL_ASCENSION_DROITE( LIEU *lieu, ASTRE *astre ) {
   // en radians 
   
   astre->ASC = lieu->TSR - astre->ANGH ;
+  
+  CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre) ;
   
   Trace2("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
   Trace2("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;

@@ -227,7 +227,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   // de menu (pour plus de rapidite)
   //-----------------------------------------------------------------
   
-  Trace("clavier->phrase_lue = %d", clavier->phrase_lue) ;
+  Trace1("clavier->phrase_lue = %d", clavier->phrase_lue) ;
 
   if ( clavier->phrase_lue ) {
     
@@ -238,7 +238,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
     // autre qu'un switch electronique
     //---------------------------------
     
-    TRACE("symbole = %s nombre = %s\n", clavier->symbole, clavier->nombre ) ;
+    Trace1("symbole = %s nombre = %s\n", clavier->symbole, clavier->nombre ) ;
     
     //--------------------------------------------------------------------
     // ON CHANGE DE MENU VOLONTAIREMENT
@@ -260,7 +260,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
       memset( astre->nom, ZERO_CHAR, strlen(astre->nom)) ;
       sprintf( astre->nom, "%s%s", clavier->symbole, clavier->nombre) ;
     
-      TRACE("== %s ==",astre->nom) ;
+      Trace1("== %s ==",astre->nom) ;
       
       /* Recherche de l'astre dans les catalgues */
       
@@ -285,13 +285,13 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
         case 2 : // Si longueur = 2 cela ne peut etre qu'un changement de mois
           
-          TRACE("demande changement heure minutes : %s" , clavier->nombre) ;
+          Trace1("demande changement heure minutes : %s" , clavier->nombre) ;
 
           /* CONFIG_SET_MONTH( clavier->nombre ) ; */
 
         case 4 : // Si longueur = 4 cela ne peut etre qu'un changement d'heure et de minutes
           
-          TRACE("demande changement heure minutes : %s" , clavier->nombre) ;
+          Trace1("demande changement heure minutes : %s" , clavier->nombre) ;
     
           CONFIG_SET_HOUR_AND_MINUTES( clavier->nombre ) ;
           
@@ -301,7 +301,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
         case 8 : // Si longueur = 5 cela est un changement de mois jour avec verif de l'annee
 
-          TRACE("demande changement annee : %s" , clavier->nombre) ;
+          Trace1("demande changement annee : %s" , clavier->nombre) ;
           
           CONFIG_SET_YEAR_MONTH_AND_DAY( clavier->nombre ) ;
       
