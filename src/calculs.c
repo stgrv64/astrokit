@@ -743,8 +743,6 @@ void CALCUL_TOUT(void) {
 
   Trace1("") ;
 
-  TRACE("==> astre->nom     = %s", astre->nom );
-
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la astre peut avoir plusieurs
   * prefixe dans son nom (PLA/NGC/MES/ETO mais aussi EQU/AZI)
