@@ -25,7 +25,7 @@ void ARGUMENTS_VOUTE(void) {
   } 
   
   /* -------------------------------------------
-  *  On fait varier les coordonnees horaires / declinaison
+  *  On fait varier les coordevices horaires / declinaison
   * avec un pas = voute->pas
   * -------------------------------------------*/
   
@@ -33,7 +33,7 @@ void ARGUMENTS_VOUTE(void) {
     if (h>=0) 
 
     /* -------------------------------------------
-    *  On fait varier les coordonnees en ascension droite
+    *  On fait varier les coordevices en ascension droite
     * avec un pas = voute->pas
     * -------------------------------------------*/
 
@@ -42,7 +42,7 @@ void ARGUMENTS_VOUTE(void) {
      astre->a=a ;
      astre->h=h ;
      
-     CALCUL_EQUATEUR  ( lieu, astre) ;        // calcul coordonnees horaires en fait
+     CALCUL_EQUATEUR  ( lieu, astre) ;        // calcul coordevices horaires en fait
      CALCUL_VITESSES  ( lieu, astre, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
      
      /* Calcul de la norme de la vitesse */
@@ -331,7 +331,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     exit(0) ;
   }
   /* ---------------------------------------------------------------
-  * Gestion du calcul des coordonnees equatoriales en fonction 
+  * Gestion du calcul des coordevices equatoriales en fonction 
   * des coordonnes azimutales et du gps (date heure lieu etc..)
   * ---------------------------------------------------------------*/
 

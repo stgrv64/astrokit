@@ -63,6 +63,7 @@ void   CONFIG_INIT_ASTRE(ASTRE *as ) ;
 void   CONFIG_INIT_VOUTE(VOUTE *voute) ;
 void   CONFIG_INIT_SUIVI(SUIVI *suivi) ;
 void   CONFIG_INIT_TEMPS(TEMPS *temps) ;
+void   CONFIG_INIT_DEVICES(DEVICES *devices) ;
 
 void   CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) ; // FIXME ajout 20190822
 void   CONFIG_SET_MONTH_AND_DAY(char * s_data) ;

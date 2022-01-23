@@ -23,11 +23,14 @@
 #                 pour effectuer le suivi
 # 20/01/2022  | * ajout de tous les types d 'astre a t_en_Astre_Type
 #               * ajout d'un enum t_en_Mode_Calcul
-#               * ajout structure DONNEES et var don, *donnees ;
+#               * ajout structure DEVICES et var don, *devices ;
 #               * ajout CONFIG_AZI et CONFIG_EQU
 # 21/01/2022  | * ajout constantes char * en fonction des enum
 #                 pour avoir une representation char de l enum
 #               * ajout ASCx comme TEMPS dans ASTRE
+# 23/01/2022  | * suppression MODE_EQUATORIAL
+#               * changement type MENU_PAR_DEFAUT
+#               * ajout constantes char * en fonction c_Menus
 # -------------------------------------------------------------- 
 */
 
@@ -162,6 +165,7 @@
 #define  CONFIG_PLA           "PLA"
 #define  CONFIG_AZI           "AZI"
 #define  CONFIG_EQU           "EQU"
+#define  CONFIG_CAP           "CAP"
 
 #define  DATAS_NB_LIGNES         200 
 #define  DATAS_NB_COLONNES       2
@@ -203,7 +207,7 @@
 #define  CONFIG_VALIDATIONS_SIZE 10
 
 // ------------------------------------------------------------------------
-// definition des structures de donnees du programme
+// definition des structures de devices du programme
 // ------------------------------------------------------------------------
 
 typedef enum {
@@ -255,7 +259,7 @@ static const char * c_Astre_Type[] = {
 * azimutales de l objet (par exemple via un capteur)
 * 
 * Dans le cas contraire, si c'est un objet connu (exemple MES1)
-* alors on part des coordonnees equatoriales pour effectuer 
+* alors on part des coordevices equatoriales pour effectuer 
 * le calcul.
 *
 * ----------------------------------------------------
@@ -297,6 +301,20 @@ typedef enum {
   MENU_DOWN
 }
 t_en_Menus ;
+
+static const char * c_Menus[] = {
+  "MENU_AZIMUTAL",
+  "MENU_EQUATORIAL",
+  "MENU_MANUEL_BRUT",
+  "MENU_MANUEL_NON_ASSERVI",
+  "MENU_MANUEL_ASSERVI",
+  "MENU_GOTO",
+  "MENU_INFO",
+  "MENU_RESEAU_UP",
+  "MENU_RESEAU_DOWN",
+  "MENU_PROGRAMME_DOWN",
+  "MENU_DOWN"
+} ;
 
 //=====================================================
 
@@ -357,15 +375,15 @@ TEMPS ;
 //=====================================================
 typedef struct {
 
-  int          DONNEES_BLUETOOTH ;
-  int          DONNEES_CAPTEURS ;
-  int          DONNEES_INFRAROUGE ;
-  int          DONNEES_RAQUETTE ;
-  int          DONNEES_CONTROLEUR ; 
-  int          DONNEES_CLAVIER ; 
+  int          DEVICE_BLUETOOTH_USE ;
+  int          DEVICE_CAPTEURS_USE ;
+  int          DEVICE_INFRAROUGE_USE ;
+  int          DEVICE_RAQUETTE_USE ;
+  int          DEVICE_CONTROLEUR_MOTEUR_USE ; 
+  int          DEVICE_CLAVIER_USE ; 
   int          init_capteurs ;
 }
-DONNEES ;
+DEVICES ;
 
 //=====================================================
 typedef struct {
@@ -521,7 +539,7 @@ typedef struct {
  
 /* --------------------------------------------
 *  on deduit de l'azimut(h) et de l'altitude (a)
-*  les coordonnees x y et z dans la geode d'observation de rayon 1
+*  les coordevices x y et z dans la geode d'observation de rayon 1
 --------------------------------------------- */
 
  double x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
@@ -530,7 +548,7 @@ typedef struct {
 
 /* --------------------------------------------
 *  on deduit de l'azimut et de l'altitude
-*  les coordonnees xx yy et zz dans la geode d'observation
+*  les coordevices xx yy et zz dans la geode d'observation
 * de rayon sqrt(xx²+yy²+zz²) 
 * => permet de representer la norme d'un vecteur par rapport a (a,h)<=>(x,y,z)
 --------------------------------------------- */
@@ -610,7 +628,7 @@ ASTRE      ast, *astre ;
 VOUTE      vou, *voute ;
 SUIVI	     sui, *suivi ;
 CLAVIER    cla, *clavier ;
-DONNEES    don, *donnees ;
+DEVICES    dev, *devices ;
 
 char   datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
 FILE * flog ; 
@@ -634,12 +652,12 @@ int GPIO_LED_ETAT ;
 int MODE_EQUATORIAL ; 
 int MENU_PAR_DEFAUT ;
 
-int DONNEES_CAPTEURS    ;
-int DONNEES_RAQUETTE     ;
-int DONNEES_BLUETOOTH    ;
-int DONNEES_INFRAROUGE ;
-int DONNEES_CONTROLEUR ;
-int DONNEES_CLAVIER  ;
+int DEVICE_CAPTEURS_USE    ;
+int DEVICE_RAQUETTE_USE     ;
+int DEVICE_BLUETOOTH_USE    ;
+int DEVICE_INFRAROUGE_USE ;
+int DEVICE_CONTROLEUR_MOTEUR_USE ;
+int DEVICE_CLAVIER_USE  ;
 
 int GPIO_RAQ_O  ;
 int GPIO_RAQ_E  ;

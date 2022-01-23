@@ -124,7 +124,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
   // conversion en degres decimaux dans cat.dec
-  // Dans tout le programme, coordonnees en radians
+  // Dans tout le programme, coordevices en radians
   
   L=0 ;
   
@@ -139,7 +139,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
     if(!strcmp(cat[L][0],astre->nom)) {
 
       /* -----------------------------------------------
-       * Sauvegarde des coordonnees equatoriales du catalogue 
+       * Sauvegarde des coordevices equatoriales du catalogue 
        * dans la structure ASTRE 
        **************************************************/
 

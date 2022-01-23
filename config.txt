@@ -5,14 +5,25 @@
 # #--------------------------------------------------------------
 # date     | commentaires 
 # #--------------------------------------------------------------
-# 04/2021     | ajout configuration des noms
-#               de repertoires et fichiers
-#               suppression des confs inutiles (mis a la fin)
-# 17/01/2022  | ajout parametre DONNEES_CLAVIER
-# 20/01/2022  | 
+# 04/2021     | * ajout configuration des noms
+#   de repertoires et fichiers
+#               * suppression des confs inutiles (mis a la fin)
+# 17/01/2022  | * ajout parametre DEVICE_CLAVIER_USE
+# 23/01/2022  | * changement type MENU_PAR_DEFAUT int -> char*
+#       pour plus de lisibilite
+#               * modification nom CLAVIER en DONNEES puis 
+# DEVICES_xxx_USE              
+#--------------------------------------------------------------
+# Menus possibles par defaut : 
+#
+#  MENU_AZIMUTAL=0,
+#  MENU_EQUATORIAL,
+#  MENU_MANUEL_BRUT,
+#  MENU_MANUEL_NON_ASSERVI,
+#  MENU_MANUEL_ASSERVI,
 #--------------------------------------------------------------
 
-MENU_PAR_DEFAUT  2          # Menu azimutal
+MENU_PAR_DEFAUT  MENU_AZIMUTAL
 ASTRE_PAR_DEFAUT NGC1001 
 
 # ----------------------- parametres repertoires et fichiers
@@ -39,17 +50,17 @@ TEMPO_CAPTEURS  52000
 
 # ----------------------- parametres acquisitions
 
-DONNEES_CONTROLEUR   0  # flag qui indique utilisation des controleurs de moteur externes
-DONNEES_CAPTEURS     0  # flag qui indique utilisation de capteurs comme source input
-DONNEES_RAQUETTE     0  # flag qui indique utilisation d une raquette (gpio) comme source input
-DONNEES_BLUETOOTH    0  # flag qui indique utilisation du bluetooth comme source input
-DONNEES_INFRAROUGE   1  # flag qui indique utilisation de infrarouge comme source input
-DONNEES_CLAVIER      1  # flag qui indique utilisation du clavier comme source input
+DEVICE_CONTROLEUR_USE   0  # flag qui indique utilisation des controleurs de moteur externes
+DEVICE_CAPTEURS_USE     0  # flag qui indique utilisation de capteurs comme source input
+DEVICE_RAQUETTE_USE     0  # flag qui indique utilisation d une raquette (gpio) comme source input
+DEVICE_BLUETOOTH_USE    0  # flag qui indique utilisation du bluetooth comme source input
+DEVICE_INFRAROUGE_USE   1  # flag qui indique utilisation de infrarouge comme source input
+DEVICE_CLAVIER_USE      1  # flag qui indique utilisation du clavier comme source input
 
 # ----------------------- parametres geographiques
 
 LATITUDE   43.3
-LONGITUDE -0.39 
+LONGITUDE  -0.39 
 ALTITUDE   200
 
 # ----------------------- parametres gpios

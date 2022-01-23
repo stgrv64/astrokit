@@ -1,0 +1,118 @@
+Ici la libraiie au format armhf obtenue de a maniere suivante : 
+
+1- download raspbian :
+
+stef@raspberrypi:~/git/rt-tests $ uname -a
+
+Linux raspberrypi 5.10.63-v7+ #1488 SMP Thu Nov 18 16:14:44 GMT 2021 armv7l GNU/Linux
+
+stef@raspberrypi:~/git/rt-tests $ cat /etc/os-release 
+
+PRETTY_NAME="Raspbian GNU/Linux 11 (bullseye)"
+NAME="Raspbian GNU/Linux"
+VERSION_ID="11"
+VERSION="11 (bullseye)"
+VERSION_CODENAME=bullseye
+ID=raspbian
+ID_LIKE=debian
+HOME_URL="http://www.raspbian.org/"
+SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+
+2- sudo apt install ncurses*
+
+3- liste des librairies :
+
+stef@raspberrypi:~/git/rt-tests $ ls -l /usr/lib/arm-linux-gnueabihf/*ncurses*
+-rw-r--r-- 1 root root 134970  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncurses++.a
+-rw-r--r-- 1 root root 213328  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncurses.a
+-rw-r--r-- 1 root root     31  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncurses.so
+lrwxrwxrwx 1 root root     17  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncurses.so.6 -> libncurses.so.6.2
+-rw-r--r-- 1 root root 124224  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncurses.so.6.2
+-rw-r--r-- 1 root root 134970  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncurses++w.a
+-rw-r--r-- 1 root root 303240  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncursesw.a
+-rw-r--r-- 1 root root     32  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncursesw.so
+lrwxrwxrwx 1 root root     18  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncursesw.so.6 -> libncursesw.so.6.2
+-rw-r--r-- 1 root root 189760  1 janv.  2021 /usr/lib/arm-linux-gnueabihf/libncursesw.so.6.2
+
+4- rapatriement des librairies dans astrokit
+   recreation des liens
+
+mkdir /home/stef/git/astrokit/libncurses
+
+stef@stef-inspiron7537:~/git/astrokit/libncurses$ sudo chown stef:stef *
+
+stef@stef-inspiron7537:~/git/astrokit/libncurses$ pwd
+/home/stef/git/astrokit/libncurses
+
+stef@stef-inspiron7537:~/git/astrokit/libncurses$ ls -rtl
+total 1412
+-rw-r--r-- 1 stef stef 189760 janv.  1  2021 libncursesw.so.6.2
+-rw-r--r-- 1 stef stef 189760 janv.  1  2021 libncursesw.so.6
+-rw-r--r-- 1 stef stef     32 janv.  1  2021 libncursesw.so
+-rw-r--r-- 1 stef stef 303240 janv.  1  2021 libncursesw.a
+-rw-r--r-- 1 stef stef 134970 janv.  1  2021 libncurses++w.a
+-rw-r--r-- 1 stef stef 124224 janv.  1  2021 libncurses.so.6.2
+-rw-r--r-- 1 stef stef 124224 janv.  1  2021 libncurses.so.6
+-rw-r--r-- 1 stef stef     31 janv.  1  2021 libncurses.so
+-rw-r--r-- 1 stef stef 213328 janv.  1  2021 libncurses.a
+-rw-r--r-- 1 stef stef 134970 janv.  1  2021 libncurses++.a
+-rw-rw-r-- 1 stef stef   1768 janv. 17 16:20 README
+
+rm libncursesw.so libncurses.so
+
+stef@stef-inspiron7537:~/git/astrokit/libncurses$ ls -rtl
+total 1404
+-rw-r--r-- 1 stef stef 189760 janv.  1  2021 libncursesw.so.6.2
+-rw-r--r-- 1 stef stef 189760 janv.  1  2021 libncursesw.so.6
+-rw-r--r-- 1 stef stef 303240 janv.  1  2021 libncursesw.a
+-rw-r--r-- 1 stef stef 134970 janv.  1  2021 libncurses++w.a
+-rw-r--r-- 1 stef stef 124224 janv.  1  2021 libncurses.so.6.2
+-rw-r--r-- 1 stef stef 124224 janv.  1  2021 libncurses.so.6
+-rw-r--r-- 1 stef stef 213328 janv.  1  2021 libncurses.a
+-rw-r--r-- 1 stef stef 134970 janv.  1  2021 libncurses++.a
+-rw-rw-r-- 1 stef stef   2712 janv. 17 16:26 README
+lrwxrwxrwx 1 stef stef     18 janv. 17 16:34 libncursesw.so -> libncursesw.so.6.2
+lrwxrwxrwx 1 stef stef     17 janv. 17 16:34 libncurses.so -> libncurses.so.6.2
+
+mais :
+
+stef@raspberrypi:/usr/lib/ncurses/examples $ sudo ldd * | awk '{der=$(NF);if(index(der,"0x"))print $(NF-1)}' | sort -u > README.libs
+	n'est pas un exécutable dynamique
+	n'est pas un exécutable dynamique
+	n'est pas un exécutable dynamique
+	n'est pas un exécutable dynamique
+	n'est pas un exécutable dynamique
+	n'est pas un exécutable dynamique
+stef@raspberrypi:/usr/lib/ncurses/examples $ 
+stef@raspberrypi:/usr/lib/ncurses/examples $ cat README.libs 
+/lib/arm-linux-gnueabihf/libc.so.6
+/lib/arm-linux-gnueabihf/libdl.so.2
+/lib/arm-linux-gnueabihf/libformw.so.6
+/lib/arm-linux-gnueabihf/libmenuw.so.6
+/lib/arm-linux-gnueabihf/libm.so.6
+/lib/arm-linux-gnueabihf/libncursesw.so.6
+/lib/arm-linux-gnueabihf/libpanelw.so.6
+/lib/arm-linux-gnueabihf/libtinfo.so.6
+/lib/arm-linux-gnueabihf/libutil.so.1
+/lib/ld-linux-armhf.so.3
+linux-vdso.so.1
+/usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so
+
+=> on doit aussi copier les librairies suivantes : 
+
+/lib/arm-linux-gnueabihf/libc.so.6
+/lib/arm-linux-gnueabihf/libdl.so.2
+/lib/arm-linux-gnueabihf/libformw.so.6
+/lib/arm-linux-gnueabihf/libmenuw.so.6
+/lib/arm-linux-gnueabihf/libm.so.6
+/lib/arm-linux-gnueabihf/libncursesw.so.6
+/lib/arm-linux-gnueabihf/libpanelw.so.6
+/lib/arm-linux-gnueabihf/libtinfo.so.6
+/lib/arm-linux-gnueabihf/libutil.so.1
+/lib/ld-linux-armhf.so.3  
+
+
+5- modif Makefile ( LIBS  + -lncurses )
+
+

@@ -6,7 +6,7 @@
 # 15/11/2021  | * (types.h) modification des types enum et contenu enum
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
 # 19/01/2022  | * gestion du cas ou l astre n a pas de nom
-#                 c'est a dire q'on effectue les calculs en fonction des coordonnees
+#                 c'est a dire q'on effectue les calculs en fonction des coordevices
 #                 sans l'information de nom (recherche catagues inutiles)
 # 21/01/2022  | * recuperation numero objet (PLA5 => 5, MES10 -> 10, ..)
 #               * passage dernier arg de SOLAR_SYSTEM abec astre->numero
@@ -173,14 +173,14 @@ void CALCUL_TEMPORISATION_AZIMUT(SUIVI *suivi, struct timeval * pt00) {
 }
 //========================================================================================
 // FIXME : CALCUL_GEODE : 
-// FIXME : * calcule les coordonnees (x,y,z) dans R3 a partir de azimut et altitude
+// FIXME : * calcule les coordevices (x,y,z) dans R3 a partir de azimut et altitude
 // FIXME : * en supposant que la voute est de diametre = 1
 //========================================================================================
 
 void CALCUL_GEODE(ASTRE *astre) {
 
   // on deduit de l'azimut et de l'altitude
-  // les coordonnees x y et z dans la geode d'observation
+  // les coordevices x y et z dans la geode d'observation
   
   astre->x = cos( astre->h ) * cos( astre->a )  ;
   astre->y = cos( astre->h ) * sin( astre->a ) ;
@@ -198,12 +198,12 @@ void CALCUL_GEODE(ASTRE *astre) {
 }
 //========================================================================================
 // FIXME : CALCUL_AZIMUT : 
-// FIXME : * transforme les coordonnees siderales en coordonnees azimutales
+// FIXME : * transforme les coordevices siderales en coordevices azimutales
 //========================================================================================
 
 void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
   
-  // transforme les coordonnees "sid�rales" en coordonnees azimutales
+  // transforme les coordevices "sid�rales" en coordevices azimutales
   // permet de trouver l'azimut et l'altitude en fonction de l'angle horaire
   // par rapport au m�ridien (SUD) et la declinaison
   // ATTENTION !! angle horaire = ascension droite sid�rale corrig�e
@@ -238,16 +238,16 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
 }
 //========================================================================================
 // FIXME : CALCUL_EQUATEUR : 
-// FIXME : * transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
+// FIXME : * transforme les coordevices azimutales en coordevices siderales (angle horaire)
 // TODO :  * probleme : les calculs ne sont pas bons (a verifier)
-// TODO :  * cette fonction servira quand on devra avoir les coordonnees equatoriales
+// TODO :  * cette fonction servira quand on devra avoir les coordevices equatoriales
 //          en fonction des coordonnnees azimutales , pour le calcul des VITESSES,
-//          qui utilise les coordonnees equatoriales 
+//          qui utilise les coordevices equatoriales 
 //========================================================================================
 
 void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
 
-  // transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
+  // transforme les coordevices azimutales en coordevices siderales (angle horaire)
   // permet de trouver les coordonn�es siderales en fonction de l'azimut et de l'altitude
   // Pour avoir la correspondance avec les coordonnn�es �quatoriales brutes, il faut
   // utiliser la conversion AH = TS - ASC
@@ -366,10 +366,10 @@ void CALCUL_PERIODE(ASTRE *astre,SUIVI* suivi, VOUTE *voute) {
   TRACE1("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, astre->Va, azi_rot);
   TRACE1("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, astre->Vh, alt_rot);
 
-  if ( donnees->DONNEES_CONTROLEUR )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
+  if ( devices->DEVICE_CONTROLEUR_MOTEUR_USE )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
   else                              freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
 
-  if ( donnees->DONNEES_CONTROLEUR )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot / DIV / PIPI ;
+  if ( devices->DEVICE_CONTROLEUR_MOTEUR_USE )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot / DIV / PIPI ;
   else                              freq_alt     = suivi->acc_alt * voute->acc * ALT_R * astre->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
 
   pthread_mutex_lock(& suivi->mutex_azi );
@@ -782,7 +782,7 @@ void CALCUL_TOUT(void) {
 
     /* ----------------------------------------------------------------- */
       /* pour un astre indetermine 
-         on calcule les coordonnees equatoriales 
+         on calcule les coordevices equatoriales 
          necessaires au calcul des vitesses 
       */
 
@@ -848,9 +848,9 @@ void CALCUL_TOUT(void) {
       CALCUL_ANGLE_HORAIRE( lieu, astre ) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 
-      // FIXME : ainsi que coordonnees equatoriales / declinaison
+      // FIXME : ainsi que coordevices equatoriales / declinaison
       // FIXME : est directement retourner par la fonction SOLAR_SYSTEM
-      // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordonnees siderales
+      // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordevices siderales
       // TODO  : ne modifie pas azimut et altitude calcules par SOLAR_SYSTEM
       
       // CALCUL_AZIMUT  ( lieu, astre) ;
@@ -892,7 +892,7 @@ void CALCUL_TOUT(void) {
         
         // TODO : modifier / completer / corriger ..
         
-        if ( donnees->DONNEES_CAPTEURS ) { 
+        if ( devices->DEVICE_CAPTEURS_USE ) { 
           astre->a = suivi->pitch ;         // FIXME : donne azimut
           astre->h = suivi->heading ;       // FIXME : donne altitude 
           CALCUL_EQUATEUR ( lieu, astre) ;  // FIXME : donnes ASC et DEC
@@ -914,7 +914,7 @@ void CALCUL_VOUTE(void ) {
   
   fout=fopen("voute.csv","w") ;
   
-  // On fait varier les coordonnees HORAIRES
+  // On fait varier les coordevices HORAIRES
   
   for(h=-(PI/2)+(lieu->lat)+0.001;h<PI/2;h+=voute->pas)
     if (h>=0) 
@@ -923,7 +923,7 @@ void CALCUL_VOUTE(void ) {
      astre->a=a ;
      astre->h=h ;
      
-     CALCUL_EQUATEUR  ( lieu, astre) ; // calcul coordonnees horaires en fait
+     CALCUL_EQUATEUR  ( lieu, astre) ; // calcul coordevices horaires en fait
      CALCUL_VITESSES  ( lieu, astre, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
      
      astre->V  = sqrt( sqr( astre->Va ) + sqr( astre->Vh )) ;

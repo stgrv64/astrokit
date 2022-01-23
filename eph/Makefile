@@ -30,23 +30,26 @@
 
 GIT=git
 
-ARCH	= armv8
-PROJ	= astrokit
-FICH	= astroreel
-VERS	= 3.0
-HOME	= /home/stef
 RM 	= rm -f
 
 EPHA	= libephe.a
 EPHX	= solarsystem
 
-RPWD	= ${HOME}/${GIT}/${PROJ}
+RPWD	= ${PWD}/..
 RSRC	= ${RPWD}/src
 REPH	= ${RPWD}/eph
-RLIB	= ${RPWD}/lib32
+
 LEPH	= ${RLIB}/${EPHA}
 # la cible est ici EXEC pour make sans argument
 EXEC	= ${RLIB}/${EPHX}
+
+ifeq ($(CC),gcc)
+  RLIB	= ${RPWD}/libhost
+  EXEC	= ${RLIB}/${EPHX}.host
+else
+	RLIB	= ${RPWD}/libtarget
+	EXEC	= ${RLIB}/${EPHX}.targ
+endif
 
 SRC = altaz.c angles.c annuab.c constel.c deflec.c deltat.c diurab.c \
 diurpx.c dms.c epsiln.c fk4fk5.c kepler.c kfiles.c lightt.c lonlat.c \

@@ -196,7 +196,7 @@ void GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 
   Trace("") ;
 
-  if ( donnees->DONNEES_RAQUETTE ) {
+  if ( devices->DEVICE_RAQUETTE_USE ) {
     
     GPIO_KEY_L[0] = GPIO_KEY_L1 ; 
     GPIO_KEY_L[1] = GPIO_KEY_L2 ; 
@@ -388,7 +388,7 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
 
 void IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi) {
 
-  if ( donnees->DONNEES_INFRAROUGE ) {
+  if ( devices->DEVICE_INFRAROUGE_USE ) {
     
     if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )     { suivi->pas_acc_plus  = 1 ; }
     if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )    { suivi->pas_acc_moins = 1 ; }
@@ -438,7 +438,7 @@ void GPIO_RAQUETTE_MAJ_SUIVI(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) 
   int  i,j;
   char val[255] ;
   
-  if ( donnees->DONNEES_RAQUETTE ) {
+  if ( devices->DEVICE_RAQUETTE_USE ) {
     
     for(i=0;i<4;i++) {
       GPIO_SET( GPIO_KEY_C[i], 0) ;
@@ -1246,7 +1246,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         
         //printf("%d\t",pm->pas) ;
 
-        // On recopie les donnees de la structure moteur qui vont servir dans 
+        // On recopie les devices de la structure moteur qui vont servir dans 
         // la structure phase (4 phases a priori dans un moteur pas a pas)
 
         for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {

@@ -296,7 +296,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
         case 2 : // TODO : exemple d'une demande de capteur : a modifier / completer
           CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-          if ( donnees->DONNEES_CAPTEURS ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
+          if ( devices->DEVICE_CAPTEURS_USE ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
           CALCUL_EQUATEUR ( lieu, astre) ;
           suivi->menu_old = suivi->menu ;
           suivi->menu = MENU_AZIMUTAL ;
@@ -910,8 +910,8 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   // a completer / modifier :
   // il FAUT calculer / mettre a jour a,h,A,H de l'astre quand est utliser les menus
   // suivi manuel et suivi capteurs , qui renvoient l'azimut et l'altitude
-  // ==> CALCUL_EQUATEUR pour les donnees altitude et azimut venant du capteur
-  // ==> autre calcul plus complique quand on a les donnees de vitesses et periodes provenant de la raquette !!!!!
+  // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
+  // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
   
   TRACE("start") ;
   
@@ -1011,7 +1011,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
   
-  if ( donnees->DONNEES_INFRAROUGE ) {
+  if ( devices->DEVICE_INFRAROUGE_USE ) {
     
     LIRC_CONFIG_CODES( irc) ;
     LIRC_OPEN( lircconfig ) ;
@@ -1047,7 +1047,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( donnees->DONNEES_CLAVIER ) {
+  if ( devices->DEVICE_CLAVIER_USE ) {
 
     while( ( c = getchar () ) > 0 ) {
       usleep(100000) ;
@@ -1086,7 +1086,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   */
-  if ( donnees->DONNEES_CLAVIER ) {
+  if ( devices->DEVICE_CLAVIER_USE ) {
     KEYBOARD_TERMIOS_INIT() ;
 
     while(1) {
@@ -1125,7 +1125,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
   
   sleep(2) ;
 
-  if ( donnees->DONNEES_CLAVIER ) {
+  if ( devices->DEVICE_CLAVIER_USE ) {
 
     initscr() ;
     if (newterm(0, stdout, stdin) == 0) {
@@ -1200,15 +1200,15 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   // a modifier pour definir le choix de l'infrarouge ou pas (config.txt ? .h ? )
   
   while(1) {
-    if ( donnees->DONNEES_CAPTEURS ) {
-      if ( ! donnees->init_capteurs ) {
+    if ( devices->DEVICE_CAPTEURS_USE ) {
+      if ( ! devices->init_capteurs ) {
         
         ret = I2C_INIT(ex, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
 	
         if ( ! ret ) {
           printf("Pas de capteur disponible") ;
-          donnees->DONNEES_CAPTEURS = 0 ;
-          donnees->init_capteurs = 0 ;
+          devices->DEVICE_CAPTEURS_USE = 0 ;
+          devices->init_capteurs = 0 ;
           break ;
         }
         else {
@@ -1218,10 +1218,10 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
           I2C_SET( ex, REG_CTRL6, "0x20" ) ;
           I2C_SET( ex, REG_CTRL7, "0x00" ) ;
 	  
-          donnees->init_capteurs = 1 ;
+          devices->init_capteurs = 1 ;
         }
       }
-      if ( donnees->init_capteurs ) {
+      if ( devices->init_capteurs ) {
       
         I2C_GET_ACC( ex, am )   ;
         I2C_CALCULS_ACCMAG( am ) ;
@@ -1280,7 +1280,7 @@ int main(int argc, char ** argv) {
   g_id_thread=0 ;
 
   // -----------------------------------------------------------------
-  // Initialisations des structures de donnees
+  // Initialisations des structures de devices
   // -----------------------------------------------------------------
 
   astre   = &ast ;
@@ -1289,7 +1289,7 @@ int main(int argc, char ** argv) {
   suivi   = &sui ;
   temps   = &tem ;
   clavier = &cla ;
-  donnees = &don ;
+  devices = &dev ;
   irc     = &ir_codes ;
   
   // -----------------------------------------------------------------
@@ -1313,6 +1313,13 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_VOUTE     ( voute ) ;
   CONFIG_INIT_SUIVI     ( suivi ) ;
   CONFIG_INIT_TEMPS     ( temps ) ;
+  CONFIG_INIT_DEVICES   ( devices ) ;
+
+  TRACE("devices->DEVICE_INFRAROUGE_USE = %d",devices->DEVICE_INFRAROUGE_USE) ;
+  TRACE("devices->DEVICE_CAPTEURS_USE   = %d",devices->DEVICE_CAPTEURS_USE) ;
+  TRACE("devices->DEVICE_RAQUETTE_USE   = %d",devices->DEVICE_RAQUETTE_USE) ;
+  TRACE("devices->DEVICE_BLUETOOTH_USE  = %d",devices->DEVICE_BLUETOOTH_USE) ;
+  TRACE("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
 
   // -----------------------------------------------------------------
   // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)
@@ -1418,11 +1425,11 @@ int main(int argc, char ** argv) {
 
   // ============================== gestion des threads  ===================================
   
-  TRACE("donnees->DONNEES_INFRAROUGE = %d",donnees->DONNEES_INFRAROUGE) ;
-  TRACE("donnees->DONNEES_CAPTEURS   = %d",donnees->DONNEES_CAPTEURS) ;
-  TRACE("donnees->DONNEES_RAQUETTE   = %d",donnees->DONNEES_RAQUETTE) ;
-  TRACE("donnees->DONNEES_BLUETOOTH  = %d",donnees->DONNEES_BLUETOOTH) ;
-  TRACE("donnees->DONNEES_CLAVIER    = %d",donnees->DONNEES_CLAVIER) ;
+  TRACE("devices->DEVICE_INFRAROUGE_USE = %d",devices->DEVICE_INFRAROUGE_USE) ;
+  TRACE("devices->DEVICE_CAPTEURS_USE   = %d",devices->DEVICE_CAPTEURS_USE) ;
+  TRACE("devices->DEVICE_RAQUETTE_USE   = %d",devices->DEVICE_RAQUETTE_USE) ;
+  TRACE("devices->DEVICE_BLUETOOTH_USE  = %d",devices->DEVICE_BLUETOOTH_USE) ;
+  TRACE("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
 
   TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
 
@@ -1444,10 +1451,10 @@ int main(int argc, char ** argv) {
 
   // ============================== join des threads  ===================================
 
-  if ( donnees->DONNEES_CLAVIER )     pthread_join( suivi->p_suivi_clavier, NULL) ;
-  if ( donnees->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
-  if ( donnees->DONNEES_INFRAROUGE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
-  if ( donnees->DONNEES_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( devices->DEVICE_CLAVIER_USE )     pthread_join( suivi->p_suivi_clavier, NULL) ;
+  if ( devices->DEVICE_CAPTEURS_USE )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( devices->DEVICE_INFRAROUGE_USE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
+  if ( devices->DEVICE_CAPTEURS_USE )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     pthread_join( p_thread_p_azi[i], NULL) ; 
@@ -1485,7 +1492,7 @@ void * SUIVI_CLAVIER_1(SUIVI * suivi) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( donnees->DONNEES_CLAVIER ) {
+  if ( devices->DEVICE_CLAVIER_USE ) {
 
 
   // unlink(MY_LOGFILE);
@@ -1623,7 +1630,7 @@ void * SUIVI_CLAVIER_0(SUIVI * suivi) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( donnees->DONNEES_CLAVIER ) {
+  if ( devices->DEVICE_CLAVIER_USE ) {
 
   if (newterm(0, stdout, stdin) == 0) {
     fprintf(stderr, "Cannot initialize terminal\n");

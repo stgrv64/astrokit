@@ -36,21 +36,19 @@ CCHOST=gcc
 
 GIT=git
 
-ARCH	= armv8
-PROJ	= astrokit
 FICH	= astrokit
 VERS	= $(shell date +%B.%Y)
-HOME	= /home/stef
+
 RM 		= rm -f
 EPHA	= libephe.a
 EPHX	= solarsystem
 
-RPWD	= ${HOME}/${GIT}/${PROJ}
+RPWD	= ${PWD}
 RSRC	= ${RPWD}/src
 REPH	= ${RPWD}/eph
 
-RLIB	= ${RPWD}/lib32
-HLIB  = ${RPWD}/lib
+TLIB	= ${RPWD}/libtarget
+HLIB  = ${RPWD}/libhost
 
 NCURSESLIB	= ${RPWD}/libncurses
 
@@ -70,6 +68,14 @@ EXECGPIO	=	gpios
 
 #--------------------------------------------------------------------------------------
 
+ifeq ($(M),host)
+	CC=$(CCHOST)
+	RLIB=$(HLIB)
+else
+	CC=$(CCTARG)
+	RLIB=$(TLIB)
+endif
+
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH} -I$(NCURSESLIB) 
 LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
 
@@ -80,11 +86,6 @@ LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lnc
 # make M=host host => compile pour le host
 # make M=targ targ => compile pour le host
 
-ifeq ($(M),host)
-	CC=$(CCHOST)
-else
-	CC=$(CCTARG)
-endif
 
 ifeq ($(CC),gcc)
   LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo

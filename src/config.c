@@ -18,13 +18,15 @@
 # 15/11/2021  | * (types.h) modification des types enum et contenu enum
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
 #  => modification ordre MENUS dans switch
-# 17/01/2022  | * ajout DONNEES_CLAVIER pour utilisation du clavier
+# 17/01/2022  | * ajout DEVICE_CLAVIER_USE pour utilisation du clavier
 # 18/01/2022  | * ajout CONFIG_SCR_KERNEL pour execution script avec droits
 #                 root via systemd / execve / execl
 #               * remplacement fonctions Trace par Trace 
 #                 (evite utilisation fichier log alors que celui ci n'est pas encore ouvert)
 # 20/01/2022  | * creation des entetes doxygen des fonctions
 #               * ajout mode et type de ASTRE dans CONFIG_INIT_ASTRE
+# 23/01/2022  | * suppression MODE_EQUATORIAL
+#               * changement type MENU_PAR_DEFAUT
 # -------------------------------------------------------------- 
 */
 
@@ -444,24 +446,24 @@ void CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) {
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_INIT_DONNEES
+* @fn     : CONFIG_INIT_DEVICES
 * @author : s.gravois
-* @brief  : Cette fonction configure la structure DONNEES *donnees
-* @param  : DONNEES *donnees
+* @brief  : Cette fonction configure la structure DEVICES *devices
+* @param  : DEVICES *devices
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @todo   : 
+* @todo   : (obsolete) les devices sont lues depuis le fichier de configuration
 *****************************************************************************************/
 
-void CONFIG_INIT_DONNEES(DONNEES *donnees) {
+void CONFIG_INIT_DEVICES(DEVICES *devices) {
 
-  donnees->DONNEES_CAPTEURS    = DONNEES_CAPTEURS ;
-  donnees->DONNEES_RAQUETTE    = DONNEES_RAQUETTE ;
-  donnees->DONNEES_BLUETOOTH   = DONNEES_BLUETOOTH ;
-  donnees->DONNEES_INFRAROUGE  = DONNEES_INFRAROUGE ;
-  donnees->DONNEES_CONTROLEUR  = DONNEES_CONTROLEUR ;
-  donnees->DONNEES_CLAVIER     = DONNEES_CLAVIER ;
+  devices->DEVICE_CAPTEURS_USE    = DEVICE_CAPTEURS_USE ;
+  devices->DEVICE_RAQUETTE_USE    = DEVICE_RAQUETTE_USE ;
+  devices->DEVICE_BLUETOOTH_USE   = DEVICE_BLUETOOTH_USE ;
+  devices->DEVICE_INFRAROUGE_USE  = DEVICE_INFRAROUGE_USE ;
+  devices->DEVICE_CONTROLEUR_MOTEUR_USE  = DEVICE_CONTROLEUR_MOTEUR_USE ;
+  devices->DEVICE_CLAVIER_USE     = DEVICE_CLAVIER_USE ;
 
-  donnees->init_capteurs = 0 ; 
+  devices->init_capteurs = 0 ; 
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_SUIVI
@@ -469,7 +471,7 @@ void CONFIG_INIT_DONNEES(DONNEES *donnees) {
 * @brief  : Cette fonction configure la structure SUIVI *suivi
 * @param  : SUIVI *suivi
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @date   : 2022-01-20 passage d une partie de code dans CONFIG_INIT_DONNEES
+* @date   : 2022-01-20 passage d une partie de code dans CONFIG_INIT_DEVICES
 * @todo   : 
 *****************************************************************************************/
 
@@ -695,12 +697,12 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
    ALT_R = 0 ;
    AZI_R = 0 ;
    
-   DONNEES_CAPTEURS = 0    ;
-   DONNEES_RAQUETTE = 0    ;
-   DONNEES_BLUETOOTH = 0   ;
-   DONNEES_INFRAROUGE = 0  ;
-   DONNEES_CONTROLEUR = 0 ;
-   DONNEES_CLAVIER = 0 ;
+   DEVICE_CAPTEURS_USE = 0    ;
+   DEVICE_RAQUETTE_USE = 0    ;
+   DEVICE_BLUETOOTH_USE = 0   ;
+   DEVICE_INFRAROUGE_USE = 0  ;
+   DEVICE_CONTROLEUR_MOTEUR_USE = 0 ;
+   DEVICE_CLAVIER_USE = 0 ;
 
    GPIO_LED_ETAT=0;
 
@@ -726,24 +728,35 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
       // FIXME : note 2021 : les variables GPIO_xxx sont gérées dans le ficheir gpio.c
 
      if(!strcmp("ASTRE_PAR_DEFAUT",datas[l][0])) strcpy( ASTRE_PAR_DEFAUT, datas[l][1]) ;
-     
+
+     if(!strcmp("MENU_PAR_DEFAUT",datas[l][0])) {
+      if(!strcmp(datas[l][1],c_Menus[ MENU_AZIMUTAL ]))           MENU_PAR_DEFAUT = MENU_AZIMUTAL ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_EQUATORIAL ]))         MENU_PAR_DEFAUT = MENU_EQUATORIAL ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_MANUEL_BRUT ]))        MENU_PAR_DEFAUT = MENU_MANUEL_BRUT ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_MANUEL_NON_ASSERVI ])) MENU_PAR_DEFAUT = MENU_MANUEL_NON_ASSERVI ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_MANUEL_ASSERVI ]))     MENU_PAR_DEFAUT = MENU_MANUEL_ASSERVI ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_GOTO ]))               MENU_PAR_DEFAUT = MENU_GOTO ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_INFO ]))               MENU_PAR_DEFAUT = MENU_INFO ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_RESEAU_UP ]))          MENU_PAR_DEFAUT = MENU_RESEAU_UP ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_RESEAU_DOWN ]))        MENU_PAR_DEFAUT = MENU_RESEAU_DOWN ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_PROGRAMME_DOWN ]))     MENU_PAR_DEFAUT = MENU_PROGRAMME_DOWN ;
+      if(!strcmp(datas[l][1],c_Menus[ MENU_DOWN ]))               MENU_PAR_DEFAUT = MENU_DOWN ;
+     } 
+
      if(!strcmp("TEMPO_RAQ",datas[l][0]))      TEMPO_RAQ=atol(datas[l][1]);
      if(!strcmp("TEMPO_MENU",datas[l][0]))     TEMPO_MENU=atol(datas[l][1]);
      if(!strcmp("TEMPO_IR",datas[l][0]))       TEMPO_IR=atol(datas[l][1]);
      if(!strcmp("TEMPO_CLAVIER",datas[l][0]))  TEMPO_CLAVIER=atol(datas[l][1]);
      if(!strcmp("TEMPO_CAPTEURS",datas[l][0])) TEMPO_CAPTEURS=atol(datas[l][1]);
      
-     if(!strcmp("MODE_EQUATORIAL",datas[l][0]))    MODE_EQUATORIAL=atoi(datas[l][1]);
-     if(!strcmp("MENU_PAR_DEFAUT",datas[l][0]))    MENU_PAR_DEFAUT=atoi(datas[l][1]);
-
      if(!strcmp("GPIO_LED_ETAT",datas[l][0]))      GPIO_LED_ETAT=atoi(datas[l][1]);
 
-     if(!strcmp("DONNEES_CONTROLEUR",datas[l][0])) DONNEES_CONTROLEUR=atoi(datas[l][1]);
-     if(!strcmp("DONNEES_CAPTEURS",datas[l][0]))   DONNEES_CAPTEURS=atoi(datas[l][1]);
-     if(!strcmp("DONNEES_RAQUETTE",datas[l][0]))   DONNEES_RAQUETTE=atoi(datas[l][1]);
-     if(!strcmp("DONNEES_BLUETOOTH",datas[l][0]))  DONNEES_BLUETOOTH=atoi(datas[l][1]);
-     if(!strcmp("DONNEES_INFRAROUGE",datas[l][0])) DONNEES_INFRAROUGE=atoi(datas[l][1]);
-     if(!strcmp("DONNEES_CLAVIER",datas[l][0]))    DONNEES_CLAVIER=atoi(datas[l][1]);
+     if(!strcmp("DEVICE_CONTROLEUR_MOTEUR_USE",datas[l][0])) DEVICE_CONTROLEUR_MOTEUR_USE=atoi(datas[l][1]);
+     if(!strcmp("DEVICE_CAPTEURS_USE",datas[l][0]))   DEVICE_CAPTEURS_USE=atoi(datas[l][1]);
+     if(!strcmp("DEVICE_RAQUETTE_USE",datas[l][0]))   DEVICE_RAQUETTE_USE=atoi(datas[l][1]);
+     if(!strcmp("DEVICE_BLUETOOTH_USE",datas[l][0]))  DEVICE_BLUETOOTH_USE=atoi(datas[l][1]);
+     if(!strcmp("DEVICE_INFRAROUGE_USE",datas[l][0])) DEVICE_INFRAROUGE_USE=atoi(datas[l][1]);
+     if(!strcmp("DEVICE_CLAVIER_USE",datas[l][0]))    DEVICE_CLAVIER_USE=atoi(datas[l][1]);
 
      if(!strcmp("ALT_ROT",datas[l][0]))      ALT_ROT=atoi(datas[l][1]);
      if(!strcmp("AZI_ROT",datas[l][0]))      AZI_ROT=atoi(datas[l][1]);
@@ -777,7 +790,7 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
      if(!strcmp("LATITUDE",datas[l][0]))      LATITUDE=atof(datas[l][1]);
      if(!strcmp("ALTITUDE",datas[l][0]))      ALTITUDE=atof(datas[l][1]);
 
-     // donnees de altitude
+     // devices de altitude
 
      if(!strcmp("ALT_R1",datas[l][0]))       ALT_R1 = atof(datas[l][1]);         
      if(!strcmp("ALT_R2",datas[l][0]))       ALT_R2 = atof(datas[l][1]);
@@ -803,7 +816,7 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
      if(!strcmp("MCP_M1_ALT",datas[l][0]))   MCP_M1_ALT=atoi(datas[l][1])   ;  
      if(!strcmp("MCP_M0_ALT",datas[l][0]))   MCP_M0_ALT=atoi(datas[l][1])   ;  
      
-     // donnees de azimut
+     // devices de azimut
 
      if(!strcmp("AZI_R1",datas[l][0]))       AZI_R1 = atof(datas[l][1])      ; 
      if(!strcmp("AZI_R2",datas[l][0]))       AZI_R2 = atof(datas[l][1])      ; 
@@ -829,7 +842,7 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
      if(!strcmp("MCP_M1_AZI",datas[l][0]))   MCP_M1_AZI=atoi(datas[l][1])    ;
      if(!strcmp("MCP_M0_AZI",datas[l][0]))   MCP_M0_AZI=atoi(datas[l][1])   ;
 
-     // donnees de azimut et altitude (qui concernent les 2 en mm temps)
+     // devices de azimut et altitude (qui concernent les 2 en mm temps)
      
      if(!strcmp("ALTAZ_FORWARD",datas[l][0])) ALTAZ_FORWARD= atof(datas[l][1])      ;
      if(!strcmp("ALTAZ_REWIND",datas[l][0]))  ALTAZ_REWIND= atof(datas[l][1])      ;
@@ -874,16 +887,15 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   Trace("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
   Trace("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
 
-  Trace("DONNEES_CONTROLEUR = %d",  DONNEES_CONTROLEUR);
-  Trace("DONNEES_CAPTEURS = %d",  DONNEES_CAPTEURS);
-  Trace("DONNEES_BLUETOOTH = %d",  DONNEES_BLUETOOTH);
-  Trace("DONNEES_INFRAROUGE = %d",  DONNEES_INFRAROUGE);
-  Trace("DONNEES_RAQUETTE = %d",  DONNEES_RAQUETTE);
-  Trace("DONNEES_CLAVIER = %d",  DONNEES_CLAVIER);
+  Trace("DEVICE_CONTROLEUR_MOTEUR_USE = %d",  DEVICE_CONTROLEUR_MOTEUR_USE);
+  Trace("DEVICE_CAPTEURS_USE = %d",  DEVICE_CAPTEURS_USE);
+  Trace("DEVICE_BLUETOOTH_USE = %d",  DEVICE_BLUETOOTH_USE);
+  Trace("DEVICE_INFRAROUGE_USE = %d",  DEVICE_INFRAROUGE_USE);
+  Trace("DEVICE_RAQUETTE_USE = %d",  DEVICE_RAQUETTE_USE);
+  Trace("DEVICE_CLAVIER_USE = %d",  DEVICE_CLAVIER_USE);
 
   Trace("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
-  Trace("MODE_EQUATORIAL = %d",  MODE_EQUATORIAL);
-  Trace("MENU_PAR_DEFAUT = %d",  MENU_PAR_DEFAUT);
+  Trace("MENU_PAR_DEFAUT = %s",  c_Menus[MENU_PAR_DEFAUT]);
 
   Trace("LATITUDE  = %f",          LATITUDE );
   Trace("LONGITUDE = %f",          LONGITUDE );

@@ -114,7 +114,7 @@ void main(int argc, char ** argv) {
     am->A_norme_max = 0 ;
     am->M_norme_max = 0 ;
     
-    // creation du thread sonore : on passe la struture am des donnees du capteur
+    // creation du thread sonore : on passe la struture am des devices du capteur
     // dans le thread
     
     pthread_create( &p_thread_i2c,  NULL, (void*)SUIVI_I2C, am ) ;

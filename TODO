@@ -3,6 +3,11 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
 
 -------------------------------------------------------------------------------
 
+  => passer en DOXYGEN integralite du code
+  
+  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
+     pour dynamiquement modifier le comportement
+  
   => reprendre les fonctions de arguments.c / .h pour les consolider avec getopt
      si besoin, et permettre de tester rapidement sous x86 les differents calculs
   
@@ -50,7 +55,7 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      en les definissant dans des structures (ASTRE, VOUTE, SUIVI, etc...)
      avec des noms generiques (init / release / etc.. )
      
-  => remplacer les printf par les focntions Syslog<xx> et Trace<x> / TRACE<x>
+  => remplacer les printf par les fonctions Syslog<xx> et Trace<x> / TRACE<x>
   
   => remplacer l'ensemble des TRACE longs par des fonctions dediees ou des macros
   
@@ -71,6 +76,9 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      
    => verifier a quel moment on doit faire un CAT_FIND 
   
+  => https://lwn.net/Articles/876471/ 
+     * etudier la possibilite utlisation gpio-sim driver sur PC intel x86
+       pour avoir un comportement le plus identiquement possible que sur RPI ARM
   
   
   
