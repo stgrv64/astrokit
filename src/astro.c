@@ -50,27 +50,51 @@ int        g_id_thread ;
 *****************************************************************************************/
 
 void TRAP_MAIN(int sig) {
+
+  char c_cmd[ 64 ] ;
   int i ;
-  
+
   TRACE("Signal trappe de valeur (sig) %d",sig) ;
   TRACE("Envoi d'un signal %d (SIGTERM) aux threads",SIGTERM) ;
   
   GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 
   //printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
-  
+
+  /*--------------------------------------------------------*/
+  /* Si sig > positif on abandonne les threads et on quitte */
+  /*--------------------------------------------------------*/
+
   for(i=0;i<g_id_thread;i++)  {
     TRACE("Abandon thread numero %d de p_thread_t = %d",i,(int)suivi->p_threads_id[i]) ;
     pthread_cancel(suivi->p_threads_id[i]);
   }
-  
-  if (sig==0) {
-   GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 
-   if ( system("/sbin/halt") < 0 ) {
-     printf("Probleme avec /sbin/halt\n") ;
-     exit(2) ;
-   } 
+  /*----------------------------------*/
+  /* Rendre le terminal propre (sane) */
+  /*----------------------------------*/
+
+  memset( c_cmd, 0, sizeof(c_cmd)) ;
+  sprintf(c_cmd,"%s sane", PATH_CMD_STTY ) ;
+
+  if ( system( c_cmd ) < 0 ) {
+
+    SyslogErr("Probleme avec stty sane\n") ;
+    exit(2) ;
+  } 
+
+  /*----------------------------------*/
+  /* Si sig == 0 on arrete le systeme */
+  /*----------------------------------*/
+
+  if (sig==0) {
+
+    GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
+
+    if ( system("/sbin/halt") < 0 ) {
+      SyslogErr("Probleme avec /sbin/halt\n") ;
+      exit(2) ;
+    } 
   }
   GPIO_SET( GPIO_LED_ETAT, 0 ) ;
 
@@ -331,7 +355,8 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   int flag = 0 ;
   int flag_calcul = 0 ;
 
-  TRACE1("start") ;
+  
+  TRACE2("start") ;
 
   GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
   IR_KEYBOARD_MAJ_SUIVI( suivi) ;
@@ -1036,7 +1061,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 
 void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 
-  int c = 0 ;
+  int c_char = 0 ;
   struct sched_param param;
   TRACE("start") ;
   sleep(1) ;
@@ -1049,9 +1074,12 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   
   if ( devices->DEVICE_CLAVIER_USE ) {
 
-    while( ( c = getchar () ) > 0 ) {
+    while( ( c_char = getchar () ) != 'q' ) {
       usleep(100000) ;
-      TRACE("%c %d entre au clavier", c,c  ) ; 
+      TRACE("%c %d entre au clavier", c_char,c_char  ) ; 
+    }
+    if ( c_char == 'q' ) {
+      TRAP_MAIN(1) ;
     }
     /*
     LIRC_CONFIG_CODES( irc) ;
@@ -1063,7 +1091,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 }
 
 /*****************************************************************************************
-* @fn     : SUIVI_CLAVIER_getchar
+* @fn     : SUIVI_CLAVIER_TERMIOS
 * @author : s.gravois
 * @brief  : fonction de callback du thread suivi clavier 
 *           en mode termios
@@ -1074,7 +1102,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 
 void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
-  int ch =0 ;
+  int c_char =0 ;
   struct sched_param param;
   TRACE("start") ;
   sleep(3) ;
@@ -1089,15 +1117,20 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   if ( devices->DEVICE_CLAVIER_USE ) {
     KEYBOARD_TERMIOS_INIT() ;
 
-    while(1) {
+    while( c_char != 'q' ) {
       /* printf("boucle en cours\n") ;*/
       usleep(50000) ;
       if ( KEYBOARD_TERMIOS_KBHIT()) {
-        ch= KEYBOARD_TERMIOS_READCH() ;
-        printf("keycode %-5d : %c\n", ch, ch) ;
+        c_char = KEYBOARD_TERMIOS_READCH() ;
+        printf("keycode %-5d : %c\n", c_char, c_char) ;
       }
     }
+
     KEYBOARD_TERMIOS_EXIT() ;
+
+    if ( c_char == 'q' ) {
+      TRAP_MAIN(1) ;
+    }
   }
   return NULL ;
 }

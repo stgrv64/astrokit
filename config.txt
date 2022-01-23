@@ -43,8 +43,8 @@ CONFIG_SCR_KERNEL   script_kernel.sh
 # ----------------------- parametres temporisation
 
 TEMPO_MENU      50000
-TEMPO_RAQ       7000
-TEMPO_IR        70000 
+TEMPO_RAQ       70000
+TEMPO_IR        70000
 TEMPO_CLAVIER   52000
 TEMPO_CAPTEURS  52000
 
@@ -93,7 +93,7 @@ GPIO_MASQUE     0,1,2,3
 
 # ----------------------- parametres pwm
 
-GPIO_FREQUENCE_PWM  1500 
+GPIO_FREQUENCE_PWM  1500
 
 # ----------------------- parametres reductions altitude
 

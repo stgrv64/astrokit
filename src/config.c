@@ -1071,7 +1071,7 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
 
-      Trace1("datas[%d][%d]=%s",L,C,datas[L][C] );
+      Trace1("datas fin mot[%d][%d]=(%s)",L,C,datas[L][C] );
       
       C++;
     }
@@ -1079,7 +1079,7 @@ int CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUF
       memset(datas[L][C],ZERO_CHAR,CONFIG_TAILLE_BUFFER);
       strcpy(datas[L][C],buf);
       
-      Trace1("datas[%d][%d]=%s",L,C,datas[L][C] );
+      Trace1("datas fin lig[%d][%d]=(%s)",L,C,datas[L][C] );
       
       L++;
       C=0;

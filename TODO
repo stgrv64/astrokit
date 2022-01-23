@@ -79,7 +79,13 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
   => https://lwn.net/Articles/876471/ 
      * etudier la possibilite utlisation gpio-sim driver sur PC intel x86
        pour avoir un comportement le plus identiquement possible que sur RPI ARM
-       
+  
+  => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
+  
+  => prevoir lors de TRAP_MAIN un ssty sane avec system (pas besoin de sudo )
+  
+  
+  
   
   
   

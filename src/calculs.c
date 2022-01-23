@@ -363,8 +363,8 @@ void CALCUL_PERIODE(ASTRE *astre,SUIVI* suivi, VOUTE *voute) {
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  TRACE1("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, astre->Va, azi_rot);
-  TRACE1("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, astre->Vh, alt_rot);
+  TRACE2("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, astre->Va, azi_rot);
+  TRACE2("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, astre->Vh, alt_rot);
 
   if ( devices->DEVICE_CONTROLEUR_MOTEUR_USE )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot / DIV / PIPI ;
   else                              freq_azi     = suivi->acc_azi * voute->acc * AZI_R * astre->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
@@ -459,7 +459,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *astre, SUIVI* suivi, VOUTE *voute) {
 
 void CALCUL_AFFICHER_HEURE( char * mesg, TEMPS *temps ) {
 
-  TRACE1("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
+  Trace2("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
 }
 //========================================================================================
 // FIXME : CALCUL_HDEC : 
@@ -559,7 +559,7 @@ int CALCUL_DATE(TEMPS *temps) {
   CALCUL_HDEC (temps ) ;
   
   //printf("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
-  TRACE1("%d %d %d %d %d %d %f",temps->yy,temps->mm,temps->dd,temps->HH,temps->MM,temps->SS, temps->hd ) ;
+  Trace2("%d %d %d %d %d %d %f",temps->yy,temps->mm,temps->dd,temps->HH,temps->MM,temps->SS, temps->hd ) ;
   
   return 0 ;
 }
@@ -593,19 +593,19 @@ int CALCUL_JOUR_JULIEN(LIEU* lieu, TEMPS * temps) {
   C  = floor(yy / 100  ) ;  
   B  = 2-C+floor(C/4) ;
   
-  TRACE2("%d %d %d %d %d %d",temps->yy,temps->mm,temps->dd,temps->HH,temps->MM,temps->SS ) ;
+  Trace2("%d %d %d %d %d %d",temps->yy,temps->mm,temps->dd,temps->HH,temps->MM,temps->SS ) ;
   
   T  = (double)temps->HH / 24.0 + (double)temps->MM / 1440.0 + (double)temps->SS / 86400.0 ;
   
-  TRACE2("A B C T = %d %d %d %8.8f",A,B,C,T) ;
+  Trace2("A B C T = %d %d %d %8.8f",A,B,C,T) ;
   
   JJ = floor(365.25*(A+4716.0))+floor(30.6001*(mm+1))+(temps->dd)+T+B-1524.5 ;
   
-  TRACE1("Date Julienne (Jour Julien corriger avec le temps local) = %7.9f\n",JJ) ;
+  Trace2("Date Julienne (Jour Julien corriger avec le temps local) = %7.9f\n",JJ) ;
   
   JJ = 367*Y - 7*(Y + ( M + 9) / 12 ) / 4 + 275 * M / 9 + D + 1721014 - 0.5 + T ;
   
-  TRACE1("Date Julienne = %7.9f",JJ) ;
+  Trace2("Date Julienne = %7.9f",JJ) ;
   
   lieu->JJ = JJ ;
   
@@ -637,7 +637,7 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   T = d / 36525.0 ;
   T = ( lieu->JJ - P) / 36525.0 ; 
   
-  TRACE1("T = %f",T);
+  Trace2("T = %f",T);
   
   // =======================  Premiere methode ==========================
   
@@ -693,9 +693,9 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   lieu->TS  = TSMH3.hd ;
   lieu->TSR = (TSMH3.hd / 24) * PIPI ;
   
-  TRACE1("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  TRACE1("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  TRACE1("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  Trace2("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  Trace2("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  Trace2("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
 
   return 0 ;
 }
@@ -711,8 +711,8 @@ void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *astre ) {
   
   astre->ANGH = lieu->TSR - astre->ASC ;
   
-  TRACE1("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
-  TRACE1("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
+  Trace2("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
+  Trace2("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
 }
 //========================================================================================
 // FIXME : CALCUL_ASCENSION_DROITE
@@ -726,8 +726,8 @@ void CALCUL_ASCENSION_DROITE( LIEU *lieu, ASTRE *astre ) {
   
   astre->ASC = lieu->TSR - astre->ANGH ;
   
-  TRACE1("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
-  TRACE1("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
+  Trace2("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
+  Trace2("astre->ANGH = %f\tastre->ASC = %f", astre->ANGH, astre->ASC ) ;
 }
 //========================================================================================
 // FIXME : CALCUL_TOUT
@@ -741,7 +741,7 @@ void CALCUL_TOUT(void) {
   int len=0 ;
   char c_sub[32];
 
-  Trace1("") ;
+  Trace2("") ;
 
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la astre peut avoir plusieurs

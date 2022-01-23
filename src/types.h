@@ -39,7 +39,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     0
+#define DEBUG     1
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -75,7 +75,7 @@
 
 #endif
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG == 1
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG >= 1
 
 #define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
@@ -101,7 +101,7 @@
 
 #endif
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG == 1
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG >= 1
 
 #define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
@@ -127,7 +127,7 @@
 
 #endif
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG == 1
+#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG >= 1
 
 #define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
@@ -142,6 +142,7 @@
 // Constantes
 // ------------------------------------------------------------------------
 
+#define  PATH_CMD_STTY         "/usr/bin/stty"
 #define  CONFIG_FIC_CFG        "config.txt"
 
 #define TEMPORISATION_RAQUETTE 5000

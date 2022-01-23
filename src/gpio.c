@@ -75,12 +75,17 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
   int l,i, j ;
   char *str1, *token, *sptr ;
   
+  Trace("Lecture dans fichier de config") ;
+
   for(l=0;l<DATAS_NB_LIGNES;l++) {
+
    if(!strcmp("GPIO_ALT",datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_ALT,0,sizeof(GPIO_ALT)) ;
     strcpy( GPIO_ALT, datas[l][1] ) ;
+
+    Trace1("GPIO_ALT trouve ligne %d = (%s)", l,GPIO_ALT) ;
 
     for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gpio_in[j]=-1 ;
 
@@ -90,11 +95,14 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
       gpio_alt[j]=atoi(token);
     }
    }
+   
    if(!strcmp("GPIO_AZI",datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_AZI,0,sizeof(GPIO_AZI)) ;
     strcpy( GPIO_AZI, datas[l][1] ) ;
+
+    Trace1("GPIO_AZI trouve ligne %d = (%s)", l,GPIO_AZI) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_out[i]=-1 ;
 
@@ -104,11 +112,15 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
       gpio_azi[j]=atoi(token);
     }
    }
+   
+
    if(!strcmp("GPIO_MASQUE",datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_MAS,0,sizeof(GPIO_MAS)) ;
     strcpy( GPIO_MAS, datas[l][1] ) ;
+
+    Trace1("GPIO_MASQUE trouve ligne %d = (%s)", l,GPIO_MAS) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_mas[i]=-1 ;
 
@@ -118,6 +130,8 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
       gpio_mas[j]=atoi(token);
     }
    }
+   
+
    if(!strcmp("GPIO_FREQUENCE_PWM",datas[l][0])) {
 
     // FIXME ajout stephane 2021
@@ -126,6 +140,8 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
 
     gpio_frequence_pwm = 1000 ;
 
+    Trace1("GPIO_FREQUENCE_PWM trouve ligne %d = (%s)", l,GPIO_FREQUENCE_PWM) ;
+
     for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
@@ -133,9 +149,9 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
     }
    }
   }
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_azi[%d] =%d",i,gpio_azi[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_alt[%d]=%d",i,gpio_alt[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) TRACE1("gpio_mas[%d]=%d",i,gpio_mas[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gpio_azi[%d]=%d",i,gpio_azi[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gpio_alt[%d]=%d",i,gpio_alt[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gpio_mas[%d]=%d",i,gpio_mas[i]);
    
   TRACE1("GPIO_FREQUENCE_PWM=%f", gpio_frequence_pwm ) ;
 }
@@ -411,7 +427,7 @@ void IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi) {
       
     if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )    { suivi->reset   = 1 ; }
     
-    TRACE1("%ld %ld %ld %ld %d %d\n", \
+    TRACE2("%ld %ld %ld %ld %d %d\n", \
       suivi->pas_ouest, \
       suivi->pas_est, \
       suivi->pas_nord, \
