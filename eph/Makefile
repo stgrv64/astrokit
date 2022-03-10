@@ -61,7 +61,7 @@ OBJ	= $(SRC:.c=.o)
 
 WFLAGS	= -Wno-unused-result
 WFLAGS2	= -Wno-misleading-indentation -Wno-format-overflow
-DEBUG		= -g -Wall -O2 -Winline -pipe -fPIC 
+DEBUG		= -g -Wall -O2 -Winline -pipe -fPIC -static
 CFLAGS 	= $(DEBUG) $(WFLAGS)
 
 INCS 	= -I.

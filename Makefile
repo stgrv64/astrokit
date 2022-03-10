@@ -120,13 +120,13 @@ OBJSUP	= $(LEPH)
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(EXEC): $(OBJ)
-	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${EXEC} $(LIBS)
+	$(CC) $(OBJ) $(INCS) $(LEPH) $(CFLAGS) -o ${EXEC} $(LIBS)
 
 $(EXECIR): $(OBJ)
-	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${EXECIR} $(LIBS)
+	$(CC) $(OBJ) $(INCS) $(LEPH) $(CFLAGS) -o ${EXECIR} $(LIBS)
 
 $(GPIO): $(OBJ)
-	$(CC) $(OBJ) $(INCS) $(LEPH) -o ${GPIO} $(LIBS)
+	$(CC) $(OBJ) $(INCS) $(LEPH) $(CFLAGS) -o ${GPIO} $(LIBS)
 
 $(LEPH)	:
 	cd ${REPH} ; make CC=$(CC) $(EPHA)
