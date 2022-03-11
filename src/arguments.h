@@ -7,6 +7,7 @@
 # --------------------------------------------------------------
 # 19/01/2022  | * ajout entete
 #               * ajouts fonctions utilisant getopt
+# 11/03/2022  | * ajout fonction ARGUMENTS_GERER_REP_HOME
 # -------------------------------------------------------------- 
 */
 
@@ -66,6 +67,7 @@ int incrlog ;
 void  ARGUMENTS_HELP                   (int , char** ) ;
 void  ARGUMENTS_GERER_FACON_CLASSIQUE  (int , char** )  ;
 void  ARGUMENTS_GERER_GETOPT           (int , char** )  ;
+void  ARGUMENTS_GERER_REP_HOME         (int , char** ) ;
 
 void  GPIO_TEST_MOTEURS      (void ) ;
 void  ARGUMENTS_VOUTE        (void) ;

@@ -7,6 +7,9 @@
 # --------------------------------------------------------------
 # 19/01/2022  | * ajout entete
 #               * ajouts fonctions utilisant getopt
+# 11/03/2022  | * prise en compte option -p (facon classique)
+#               * renseignement CONFIG_REP_HOME par -p <path>
+# 11/03/2022  | * ajout fonction ARGUMENTS_GERER_REP_HOME
 # -------------------------------------------------------------- 
 */
 
@@ -243,6 +246,40 @@ void ARGUMENTS_HELP(int argc, char** argv) {
   }
 }
 
+/*****************************************************************************************
+* @fn     : ARGUMENTS_GERER_REP_HOME
+* @author : s.gravois
+* @brief  : Gere le passage des arguments de facon classique
+* @param  : int     argc
+* @param  : char ** argv
+* @date   : 2022-03-11 creation
+* @todo   : fusioner avec ARGUMENTS_GERER_FACON_CLASSIQUE
+*****************************************************************************************/
+
+void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
+  /* ---------------------------------------------------------------
+  * Gestion d un chemin externe (option -p <path>) si getcwd KO
+  * ---------------------------------------------------------------*/
+
+  if ( ( argc == 3 ) &&  ! strcmp( "-p" , argv[1]) ) {
+  
+    Trace("option -p = CONFIG_REP_HOME %s pris en compte\n",argv[2]);
+
+    memset( CONFIG_REP_HOME, 0, sizeof(CONFIG_REP_HOME)) ;
+    strcpy( CONFIG_REP_HOME, argv[2] ) ;
+  }
+  else {
+    Trace("pas de option -p => lecture CONFIG_REP_HOME avec getcwd");
+
+    if ( getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) == NULL ) {
+      SyslogEno("getcwd") ;
+    }
+    else {
+      Trace("CONFIG_REP_HOME lu par getcwd = %s",CONFIG_REP_HOME);
+    }
+  }
+  Trace("CONFIG_REP_HOME = %s",CONFIG_REP_HOME);
+}
 /*****************************************************************************************
 * @fn     : ARGUMENTS_GERER
 * @author : s.gravois

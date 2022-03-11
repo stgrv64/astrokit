@@ -16,6 +16,10 @@
 #               * creation entete de la fonction au format doxygen des fonctions suivant doxygen
 # 19/01/2002  | * suppression passage arguments CONGI_AFFICHER_TOUT
 # (issue)         cela est justifie par le fait que les variables sont globales
+# 
+# 11/03/2022  | * prise en compte option -p (facon classique)
+#               * renseignement CONFIG_REP_HOME par -p <path>
+# 11/03/2022  | * ajout appel fonction ARGUMENTS_GERER_REP_HOME
 # -------------------------------------------------------------- 
 */
 
@@ -1304,12 +1308,11 @@ int main(int argc, char ** argv) {
   /* car TRACE utilise ce fichier */
   /* Alternative : Trace */ 
 
-  if ( getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) == NULL ) {
-    SyslogEno("getcwd") ;
-  }
-  Trace("config_rep_home lu par getcwd = %s",CONFIG_REP_HOME);
+  /* ---------------------------------------------------------------
+  * Gestion d un chemin externe (option -p <path>) si getcwd KO
+  * ---------------------------------------------------------------*/
 
-  // -----------------------------------------------------------------
+  ARGUMENTS_GERER_REP_HOME(argc, argv) ;
   
   g_incrlog=0 ;
   g_id_thread=0 ;

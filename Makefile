@@ -77,7 +77,7 @@ else
 endif
 
 INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH} -I$(NCURSESLIB) 
-LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
+LIBS	= -L${RLIB} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo -lephe
 
 # ========================================
 # Prevoir la compilation avec GCC 
@@ -88,7 +88,6 @@ LIBS	= -L${RLIB} -L${REPH} -L$(NCURSESLIB) -lpthread -lm -lrt -llirc_client -lnc
 
 
 ifeq ($(CC),gcc)
-  LIBS = -L${HLIB} -L${REPH} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo
   EXEC = ${FICH}.${VERS}.host
 else
 	EXEC = ${FICH}.${VERS}.targ
@@ -120,13 +119,13 @@ OBJSUP	= $(LEPH)
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(EXEC): $(OBJ)
-	$(CC) $(OBJ) $(INCS) $(LEPH) $(CFLAGS) -o ${EXEC} $(LIBS)
+	$(CC) $(OBJ) $(LIBS) -o ${EXEC}
 
 $(EXECIR): $(OBJ)
-	$(CC) $(OBJ) $(INCS) $(LEPH) $(CFLAGS) -o ${EXECIR} $(LIBS)
+	$(CC) $(OBJ) $(LIBS) -o ${EXECIR}
 
 $(GPIO): $(OBJ)
-	$(CC) $(OBJ) $(INCS) $(LEPH) $(CFLAGS) -o ${GPIO} $(LIBS)
+	$(CC) $(OBJ) $(LIBS) -o ${GPIO}
 
 $(LEPH)	:
 	cd ${REPH} ; make CC=$(CC) $(EPHA)
