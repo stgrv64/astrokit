@@ -54,11 +54,11 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
     }
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
-  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;
+  sprintf(buf,"%s/%s/%s",CONFIG_REP_HOME, CONFIG_REP_CAT,catalogue_txt) ;
   
   if ( (fin=fopen(buf,"r")) == NULL) {
     // completer et modifier
-    TRACE("probleme ouverture 0 %s\n",buf) ;
+    SyslogErrFmt("probleme ouverture 0 %s\n",buf) ;
     exit(2) ;
   }
   else TRACE("open %s ok", buf) ;
@@ -119,7 +119,8 @@ void CAT_ZONE(ASTRE *astre, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
 //============================================================================
 void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
   
-  int    L, ligne ;
+  int    L=0 ;
+  int    i_ligne=0 ;
   
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
@@ -131,8 +132,9 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
   memset( astre->infos, 0 , sizeof( astre->infos) ) ;
   astre->ASC=0;
   astre->DEC=0 ;
-  ligne=0 ;
   
+  i_ligne = L ;
+
   while( strcmp(cat[L][3],"_") && L < CAT_NB_LIGNES ) {
     //usleep(10000) ;
     TRACE1("L=%d %s %s %s %s" , L , cat[L][0], cat[L][1] , cat[L][2] , cat[L][3] );
@@ -147,7 +149,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
       astre->DEC = atof( cat[L][3] ) / DEGRES ;
 
       strcpy( astre->infos, cat[L][1] ) ;
-      ligne = L ;break  ;
+      i_ligne = L ;break  ;
     }
     if(!strcmp(cat[L][1],astre->nom)) {
 
@@ -155,7 +157,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
       astre->DEC   = atof( cat[L][3] ) / DEGRES ;
       
       strcpy( astre->infos, cat[L][1] ) ;
-      ligne = L ; break ;
+      i_ligne = L ; break ;
     }
     L++;
   }
@@ -196,11 +198,11 @@ void CAT_FORMAT_DECIMAL( \
   } 
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;
+  sprintf(buf,"%s/%s/%s", CONFIG_REP_HOME, CONFIG_REP_CAT,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
-    TRACE("probleme ouverture 1 %s\n",buf) ;
+    SyslogErrFmt("probleme ouverture 1 %s\n",buf) ;
     exit(2) ;
   }
   L=0 ;
@@ -264,11 +266,11 @@ void CAT_FORMAT_DECIMAL_2( \
   } 
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s",CONFIG_REP_CAT,catalogue_txt) ;
+  sprintf(buf,"%s/%s/%s",CONFIG_REP_HOME,CONFIG_REP_CAT,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
-    TRACE("probleme ouverture 2 %s\n",buf) ;
+    SyslogErrFmt("probleme ouverture 2 %s\n",buf) ;
     exit(2) ;
   }
   L=0 ;

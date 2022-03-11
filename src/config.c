@@ -129,7 +129,7 @@ void CONFIG_INIT_LOG(void) {
     if ( (flog=fopen(buf,"a")) == NULL) {
       // completer et modifier
       Trace("probleme ouverture 3 %s",buf) ;
-      SyslogFmt("probleme ouverture %s", buf) ;
+      SyslogErrFmt("probleme ouverture %s", buf) ;
       exit(2) ;
     }
     else Trace("open %s ok", buf) ;
@@ -852,15 +852,15 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 
      // chemins des repertoires et fichiers (2021)
 
-    if(!strcmp("CONFIG_REP_CAT",datas[l][0])) strcpy( CONFIG_REP_CAT, datas[l][1]) ;
-    if(!strcmp("CONFIG_REP_CFG",datas[l][0])) strcpy( CONFIG_REP_CFG, datas[l][1]) ;
-    if(!strcmp("CONFIG_REP_LOG",datas[l][0])) strcpy( CONFIG_REP_LOG, datas[l][1]) ;
-    if(!strcmp("CONFIG_REP_IN",datas[l][0])) strcpy( CONFIG_REP_IN, datas[l][1]) ;
-    if(!strcmp("CONFIG_FIC_LOG",datas[l][0])) strcpy( CONFIG_FIC_LOG, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_CAT",datas[l][0]))  strcpy( CONFIG_REP_CAT, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_CFG",datas[l][0]))  strcpy( CONFIG_REP_CFG, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_LOG",datas[l][0]))  strcpy( CONFIG_REP_LOG, datas[l][1]) ;
+    if(!strcmp("CONFIG_REP_IN",datas[l][0]))   strcpy( CONFIG_REP_IN, datas[l][1]) ;
+    if(!strcmp("CONFIG_FIC_LOG",datas[l][0]))  strcpy( CONFIG_FIC_LOG, datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_DATE",datas[l][0])) strcpy( CONFIG_FIC_DATE, datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_HHMM",datas[l][0])) strcpy( CONFIG_FIC_HHMM, datas[l][1]) ;  
 
-    if(!strcmp("CONFIG_REP_SCR",datas[l][0])) strcpy( CONFIG_REP_SCR, datas[l][1]) ;  
+    if(!strcmp("CONFIG_REP_SCR",datas[l][0]))    strcpy( CONFIG_REP_SCR, datas[l][1]) ;  
     if(!strcmp("CONFIG_SCR_KERNEL",datas[l][0])) strcpy( CONFIG_SCR_KERNEL, datas[l][1]) ;  
   }
 
