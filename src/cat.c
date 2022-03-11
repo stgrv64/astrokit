@@ -138,6 +138,7 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
   while( strcmp(cat[L][3],"_") && L < CAT_NB_LIGNES ) {
     //usleep(10000) ;
     TRACE1("L=%d %s %s %s %s" , L , cat[L][0], cat[L][1] , cat[L][2] , cat[L][3] );
+
     if(!strcmp(cat[L][0],astre->nom)) {
 
       /* -----------------------------------------------
@@ -151,10 +152,11 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
       strcpy( astre->infos, cat[L][1] ) ;
       i_ligne = L ;break  ;
     }
+
     if(!strcmp(cat[L][1],astre->nom)) {
 
       astre->ASC = atof( cat[L][2] ) / DEGRES ;
-      astre->DEC   = atof( cat[L][3] ) / DEGRES ;
+      astre->DEC = atof( cat[L][3] ) / DEGRES ;
       
       strcpy( astre->infos, cat[L][1] ) ;
       i_ligne = L ; break ;
@@ -163,8 +165,25 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
   }
   if ( L < CAT_NB_LIGNES ) {
     TRACE(" %s : trouve dans catalogue",astre->nom) ;
-    TRACE(" %s : asc = %.2f dec = %.2f infos : %s",astre->nom , astre->ANGH0, astre->DEC, astre->infos) ; 
-    // return VRAI ;
+
+    CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre ) ;
+
+    TRACE(" %s : ASC = %.2f (rad) - %.2f (deg) - %d.%d.%d (hms)", \
+       astre->nom , \
+       astre->ASC, \
+       astre->ASC * DEGRES, \
+       astre->ASCt.HH, \
+       astre->ASCt.MM, \
+       astre->ASCt.SS ) ; 
+
+    TRACE(" %s : DEC = %.2f INFOS : %s", \
+       astre->nom , \
+       astre->DEC, \
+       astre->infos ) ; 
+
+    TRACE(" %s : INFOS : %s", \
+      astre->nom , \
+      astre->infos ) ; 
   }
   else {
     TRACE(" %s : non trouve dans catalogue",astre->nom) ;
