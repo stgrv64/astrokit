@@ -56,12 +56,12 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
   sprintf(buf,"%s/%s/%s",CONFIG_REP_HOME, CONFIG_REP_CAT,catalogue_txt) ;
   
-  if ( (fin=fopen(buf,"r")) == NULL) {
+  if ( (fin=fopen(buf,"r")) == NULL)  {
     // completer et modifier
     SyslogErrFmt("probleme ouverture 0 %s\n",buf) ;
     exit(2) ;
   }
-  else TRACE("open %s ok", buf) ;
+  else TRACE1("open %s ok", buf) ;
 
   L=0;C=0;
   
@@ -168,22 +168,25 @@ void  CAT_FIND(ASTRE *astre, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE
 
     CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre ) ;
 
-    TRACE(" %s : ASC = %.2f (rad) - %.2f (deg) - %d.%d.%d (hms)", \
+    TRACE(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
        astre->nom , \
-       astre->ASC, \
-       astre->ASC * DEGRES, \
        astre->ASCt.HH, \
        astre->ASCt.MM, \
-       astre->ASCt.SS ) ; 
+       astre->ASCt.SS, \
+       astre->ASC * DEGRES, \
+       astre->ASC \
+    ) ; 
 
-    TRACE(" %s : DEC = %.2f INFOS : %s", \
+    TRACE(" %s : DEC = %.2f  (deg) %.2f (rad)", \
        astre->nom , \
-       astre->DEC, \
-       astre->infos ) ; 
+       astre->DEC * DEGRES , \
+       astre->DEC \
+    ) ; 
 
     TRACE(" %s : INFOS : %s", \
       astre->nom , \
-      astre->infos ) ; 
+      astre->infos \
+    ) ; 
   }
   else {
     TRACE(" %s : non trouve dans catalogue",astre->nom) ;

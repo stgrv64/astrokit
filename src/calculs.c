@@ -10,6 +10,7 @@
 #                 sans l'information de nom (recherche catagues inutiles)
 # 21/01/2022  | * recuperation numero objet (PLA5 => 5, MES10 -> 10, ..)
 #               * passage dernier arg de SOLAR_SYSTEM abec astre->numero
+# 12/03/2022  | * correction calcul DEC (declinaison) - => + dans formule
 # -------------------------------------------------------------- 
 */
 
@@ -18,11 +19,13 @@
 double sqr(double x)                                    { return x*x ; }
 double max(double x1,double x2)                         { if(fabs(x1)>fabs(x2)) return x1; else return x2 ; }
 double SGN(double x)                                    { if(x>=0.0) return 1.0; else return -1.0 ; }
-double DEC  (double LAT, double a, double h)            { return asin(sin(LAT)*sin(h)-cos(LAT)*cos(h)* cos(a));}
-double ANGH0 (double H,   double a, double h)            { return asin(sin(a)*cos(h)/cos(H));}
-double ANGH1 (double LAT, double H, double a, double h)  { return acos((cos(a)*cos(h)+cos(LAT)*sin(H))/(sin(LAT)*cos(H))) ;}
-double ANGH2 (double LAT, double H, double h)            { return acos((sin(h)-sin(H)*sin(LAT))/(cos(H)*cos(LAT))) ;}
-double ALT  (double LAT, double A, double H)            { return asin(sin(LAT)*sin(H)+cos(LAT)*cos(H)*cos(A));}
+
+double DEC  (double LAT, double a, double h)            { return asin(sin(LAT)*sin(h)+cos(LAT)*cos(h) * cos(a));}
+double ALT  (double LAT, double A, double H)            { return asin(sin(LAT)*sin(H)+cos(LAT)*cos(H) * cos(A));}
+
+double ANGH0 (double H,   double a, double h)           { return asin(sin(a)  * cos(h)/cos(H));}
+double ANGH1 (double LAT, double H, double a, double h) { return acos((cos(a) * cos(h)+cos(LAT)*sin(H))/(sin(LAT)*cos(H))) ;}
+double ANGH2 (double LAT, double H, double h)           { return acos((sin(h) - sin(H)*sin(LAT))/(cos(H)*cos(LAT))) ;}
 double AZI  (double A, double H, double h)              { return asin( sin(A) * cos(H) / cos(h));}
 double AZI1 (double LAT, double A, double H, double h)  { return acos((sin(LAT)*cos(H)*cos(A)-cos(LAT)*sin(H))/cos(h)) ;}
 double RAD  (int degres, int minutes )                  { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / DEGRES ; }

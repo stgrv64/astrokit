@@ -1353,11 +1353,7 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_TEMPS     ( temps ) ;
   CONFIG_INIT_DEVICES   ( devices ) ;
 
-  TRACE("devices->DEVICE_INFRAROUGE_USE = %d",devices->DEVICE_INFRAROUGE_USE) ;
-  TRACE("devices->DEVICE_CAPTEURS_USE   = %d",devices->DEVICE_CAPTEURS_USE) ;
-  TRACE("devices->DEVICE_RAQUETTE_USE   = %d",devices->DEVICE_RAQUETTE_USE) ;
-  TRACE("devices->DEVICE_BLUETOOTH_USE  = %d",devices->DEVICE_BLUETOOTH_USE) ;
-  TRACE("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
+  CONFIG_AFFICHER_DEVICES_USE() ;
 
   // -----------------------------------------------------------------
   // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)
@@ -1399,6 +1395,7 @@ int main(int argc, char ** argv) {
   
   CAT_READ            ( CAT_NGC_TXT, cat) ;                     // CAT_AFFICHER ( cat ) ; 
   CAT_FORMAT_DECIMAL  ( "ngc.csv.dec" , cat, cat_dec) ;         // CAT_AFFICHER ( cat_dec ) ;
+
   CAT_READ            ( CAT_ETO_TXT, etoiles) ;                 // CAT_AFFICHER ( etoiles ) ;
   CAT_FORMAT_DECIMAL_2( "eto.csv.dec" , etoiles, etoiles_dec) ; // CAT_AFFICHER ( etoiles_dec ) ;
   

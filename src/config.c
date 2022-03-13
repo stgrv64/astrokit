@@ -881,105 +881,105 @@ void CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 
 void   CONFIG_AFFICHER_VARIABLES(void) {
 
-  Trace("TEMPO_RAQ = %ld",  TEMPO_RAQ);
-  Trace("TEMPO_MENU = %ld",  TEMPO_MENU);
-  Trace("TEMPO_IR = %ld",  TEMPO_IR);
-  Trace("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
-  Trace("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
+  Trace1("TEMPO_RAQ = %ld",  TEMPO_RAQ);
+  Trace1("TEMPO_MENU = %ld",  TEMPO_MENU);
+  Trace1("TEMPO_IR = %ld",  TEMPO_IR);
+  Trace1("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
+  Trace1("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
 
-  Trace("DEVICE_CONTROLEUR_MOTEUR_USE = %d",  DEVICE_CONTROLEUR_MOTEUR_USE);
-  Trace("DEVICE_CAPTEURS_USE = %d",  DEVICE_CAPTEURS_USE);
-  Trace("DEVICE_BLUETOOTH_USE = %d",  DEVICE_BLUETOOTH_USE);
-  Trace("DEVICE_INFRAROUGE_USE = %d",  DEVICE_INFRAROUGE_USE);
-  Trace("DEVICE_RAQUETTE_USE = %d",  DEVICE_RAQUETTE_USE);
-  Trace("DEVICE_CLAVIER_USE = %d",  DEVICE_CLAVIER_USE);
+  Trace1("DEVICE_CONTROLEUR_MOTEUR_USE = %d",  DEVICE_CONTROLEUR_MOTEUR_USE);
+  Trace1("DEVICE_CAPTEURS_USE = %d",  DEVICE_CAPTEURS_USE);
+  Trace1("DEVICE_BLUETOOTH_USE = %d",  DEVICE_BLUETOOTH_USE);
+  Trace1("DEVICE_INFRAROUGE_USE = %d",  DEVICE_INFRAROUGE_USE);
+  Trace1("DEVICE_RAQUETTE_USE = %d",  DEVICE_RAQUETTE_USE);
+  Trace1("DEVICE_CLAVIER_USE = %d",  DEVICE_CLAVIER_USE);
 
-  Trace("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
-  Trace("MENU_PAR_DEFAUT = %s",  c_Menus[MENU_PAR_DEFAUT]);
+  Trace1("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
+  Trace1("MENU_PAR_DEFAUT = %s",  c_Menus[MENU_PAR_DEFAUT]);
 
-  Trace("LATITUDE  = %f",          LATITUDE );
-  Trace("LONGITUDE = %f",          LONGITUDE );
-  Trace("ALTITUDE  = %f",          ALTITUDE );
+  Trace1("LATITUDE  = %f",          LATITUDE );
+  Trace1("LONGITUDE = %f",          LONGITUDE );
+  Trace1("ALTITUDE  = %f",          ALTITUDE );
 
-  Trace("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
+  Trace1("GPIO_LED_ETAT = %d", GPIO_LED_ETAT );
 
-  Trace("ALT_R1 = %f",       ALT_R1);         
-  Trace("ALT_R2 = %f",       ALT_R2);
-  Trace("ALT_R3 = %f",       ALT_R3);         
-  Trace("ALT_R4 = %f",       ALT_R4);         
-  Trace("ALT_ROT = %d",      ALT_ROT);
-  Trace("ALT_ACC = %f",      ALT_ACC);
+  Trace1("ALT_R1 = %f",       ALT_R1);         
+  Trace1("ALT_R2 = %f",       ALT_R2);
+  Trace1("ALT_R3 = %f",       ALT_R3);         
+  Trace1("ALT_R4 = %f",       ALT_R4);         
+  Trace1("ALT_ROT = %d",      ALT_ROT);
+  Trace1("ALT_ACC = %f",      ALT_ACC);
 
-  Trace("AZI_R1 = %f",       AZI_R1)      ; 
-  Trace("AZI_R2 = %f",       AZI_R2)      ; 
-  Trace("AZI_R3 = %f",       AZI_R3)      ; 
-  Trace("AZI_R4 = %f",       AZI_R4)      ; 
-  Trace("AZI_ROT = %d",      AZI_ROT)     ;
-  Trace("AZI_ACC = %f",      AZI_ACC)     ; 
+  Trace1("AZI_R1 = %f",       AZI_R1)      ; 
+  Trace1("AZI_R2 = %f",       AZI_R2)      ; 
+  Trace1("AZI_R3 = %f",       AZI_R3)      ; 
+  Trace1("AZI_R4 = %f",       AZI_R4)      ; 
+  Trace1("AZI_ROT = %d",      AZI_ROT)     ;
+  Trace1("AZI_ACC = %f",      AZI_ACC)     ; 
 
-  Trace("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;
-  Trace("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 
-  Trace("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
-  Trace("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
-  Trace("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
-  Trace("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
-  Trace("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
+  Trace1("CONFIG_REP_CAT = %s", CONFIG_REP_CAT)  ;
+  Trace1("CONFIG_REP_CFG = %s", CONFIG_REP_CFG)  ; 
+  Trace1("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
+  Trace1("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
+  Trace1("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
+  Trace1("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
+  Trace1("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
 
-  Trace("CONFIG_REP_SCR = %s", CONFIG_REP_SCR)  ; 
-  Trace("CONFIG_SCR_KERNEL = %s", CONFIG_SCR_KERNEL)  ; 
+  Trace1("CONFIG_REP_SCR = %s", CONFIG_REP_SCR)  ; 
+  Trace1("CONFIG_SCR_KERNEL = %s", CONFIG_SCR_KERNEL)  ; 
 
-  Trace("GPIO_ALT = %s", GPIO_ALT)  ;  
-  Trace("GPIO_AZI = %s", GPIO_AZI)  ;  
-  Trace("GPIO_MAS = %s", GPIO_MAS)  ;  
-  Trace("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;  
+  Trace1("GPIO_ALT = %s", GPIO_ALT)  ;  
+  Trace1("GPIO_AZI = %s", GPIO_AZI)  ;  
+  Trace1("GPIO_MAS = %s", GPIO_MAS)  ;  
+  Trace1("GPIO_FREQUENCE_PWM = %s", GPIO_FREQUENCE_PWM)  ;  
 
-  Trace1("anciennes variables\n");
-  Trace1("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
-  Trace1("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
-  Trace1("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
-  Trace1("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
-  Trace1("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
-  Trace1("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
-  Trace1("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
-  Trace1("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
-  Trace1("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
-  Trace1("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
-  Trace1("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
-  Trace1("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
-  Trace1("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
-  Trace1("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
-  Trace1("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
-  Trace1("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
-  Trace1("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
-  Trace1("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
-  Trace1("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
-  Trace1("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
-  Trace1("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
-  Trace1("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
-  Trace1("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
-  Trace1("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
-  Trace1("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
-  Trace1("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
-  Trace1("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
-  Trace1("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
-  Trace1("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
-  Trace1("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
-  Trace1("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
-  Trace1("=====================================================\n");
-  Trace1("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
-  Trace1("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
-  Trace1("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
-  Trace1("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
-  Trace1("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
-  Trace1("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
-  Trace1("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
-  Trace1("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
-  Trace1("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
-  Trace1("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
-  Trace1("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
-  Trace1("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
-  Trace1("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
-  Trace1("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+  Trace2("anciennes variables\n");
+  Trace2("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
+  Trace2("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
+  Trace2("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
+  Trace2("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
+  Trace2("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
+  Trace2("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
+  Trace2("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
+  Trace2("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
+  Trace2("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
+  Trace2("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
+  Trace2("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
+  Trace2("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
+  Trace2("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
+  Trace2("GPIO_DIR_ALT = %d", GPIO_DIR_ALT);  
+  Trace2("GPIO_CLK_ALT = %d", GPIO_CLK_ALT);  
+  Trace2("GPIO_SLP_ALT = %d", GPIO_SLP_ALT);  
+  Trace2("GPIO_RST_ALT = %d", GPIO_RST_ALT);  
+  Trace2("GPIO_MMM_ALT = %d", GPIO_MMM_ALT);  
+  Trace2("GPIO_ENA_ALT = %d", GPIO_ENA_ALT);  
+  Trace2("GPIO_M2_ALT = %d",  GPIO_M2_ALT)  ;  
+  Trace2("GPIO_M1_ALT = %d",  GPIO_M1_ALT)  ;  
+  Trace2("GPIO_M0_ALT = %d",  GPIO_M0_ALT)  ;  
+  Trace2("GPIO_DIR_AZI = %d", GPIO_DIR_AZI) ; 
+  Trace2("GPIO_CLK_AZI = %d", GPIO_CLK_AZI) ; 
+  Trace2("GPIO_SLP_AZI = %d", GPIO_SLP_AZI) ;
+  Trace2("GPIO_RST_AZI = %d", GPIO_RST_AZI);  
+  Trace2("GPIO_MMM_AZI = %d", GPIO_MMM_AZI);  
+  Trace2("GPIO_ENA_AZI = %d", GPIO_ENA_AZI);  
+  Trace2("GPIO_M2_AZI = %d",  GPIO_M2_AZI)  ;
+  Trace2("GPIO_M1_AZI = %d",  GPIO_M1_AZI)  ; 
+  Trace2("GPIO_M0_AZI = %d",  GPIO_M0_AZI)  ; 
+  Trace2("=====================================================\n");
+  Trace2("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
+  Trace2("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
+  Trace2("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
+  Trace2("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
+  Trace2("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
+  Trace2("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
+  Trace2("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
+  Trace2("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
+  Trace2("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
+  Trace2("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
+  Trace2("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
+  Trace2("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
+  Trace2("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
+  Trace2("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
 }
 /*****************************************************************************************
 * @fn     : CONFIG_GETCWD
@@ -1303,7 +1303,7 @@ void CONFIG_AFFICHER_TOUT(void) {
 * @todo   : a consolider et voir utilite
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_CHANGEMENTS (void) {
+void CONFIG_AFFICHER_CHANGEMENTS (void)  {
 
   char s_menu[256] ;
 
@@ -1329,6 +1329,25 @@ void CONFIG_AFFICHER_CHANGEMENTS (void) {
     Trace("appel : %d : %s" , suivi->menu, s_menu) ;
     GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
   }
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_DEVICES_USE
+* @author : s.gravois
+* @brief  : Cette fonction affiche le parametrage utilisation des devices 
+* @param  : void
+* @date   : 2022-03-12 creation 
+*****************************************************************************************/
+
+void CONFIG_AFFICHER_DEVICES_USE (void) {
+
+  Trace1("devices->DEVICE_INFRAROUGE_USE = %d",devices->DEVICE_INFRAROUGE_USE) ;
+  Trace1("devices->DEVICE_CAPTEURS_USE   = %d",devices->DEVICE_CAPTEURS_USE) ;
+  Trace1("devices->DEVICE_RAQUETTE_USE   = %d",devices->DEVICE_RAQUETTE_USE) ;
+  Trace1("devices->DEVICE_BLUETOOTH_USE  = %d",devices->DEVICE_BLUETOOTH_USE) ;
+  Trace1("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
+
   return ;
 }
 //========================================================================================

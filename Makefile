@@ -93,7 +93,7 @@ else
 	EXEC = ${FICH}.${VERS}.targ
 endif
 
-DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow -Wno-unused-variable
+DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow -Wno-unused-variable -Wno-unused-but-set-variable
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC -static
 
 SRC	= \

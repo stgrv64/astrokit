@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
-ASTRE_PAR_DEFAUT NGC1001 
+ASTRE_PAR_DEFAUT ETO5 
 
 # ----------------------- parametres repertoires et fichiers
 
@@ -60,8 +60,8 @@ DEVICE_CLAVIER_USE      1  # flag qui indique utilisation du clavier comme sourc
 # ----------------------- parametres geographiques
 
 LATITUDE   43.3
-LONGITUDE  -0.39 
-ALTITUDE   200
+LONGITUDE  -0.36 
+ALTITUDE   100
 
 # ----------------------- parametres gpios
 

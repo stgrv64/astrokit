@@ -3,6 +3,20 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
 
 -------------------------------------------------------------------------------
 
+  => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales 
+     a partir de azimut, altitude, et donneees GPS (lat / lon / date / heure )
+
+  => suite au point precedent, mettre en place le suivi direct a partir de :
+     * azimut
+     * altitude
+     
+     --> soit entrer directement les coordonnees via la telecommande
+     --> soit utiliser un capteur type accelerometre
+
+  => suite au point precedent , implementer le code du LSM303D (cf depot GIT)
+     dans le thread dedie a cet effet 
+     * utiliser 2 capteurs ci besoin
+     
   => passer en DOXYGEN integralite du code
   
   => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
@@ -27,19 +41,9 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
 
   => mettre en place, suite a la correction du bug close gpio[ fd] impactant getch(),
      une implementation NCURSES et TERMIOS et regarder les differences de comportement
-
-  => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales 
-     a partir de azimut, altitude, et donneees GPS (lat / lon / date / heure )
-     
-  => suite au point precedent, mettre en place le suivi direct a partir de :
-     * azimut
-     * altitude
-     --> soit entrer directement les coordonnees via la telecommande
-     --> soit utiliser un capteur type accelerometre
-  
-  => suite au point precedent , implementer le code du LSM303D (cf depot GIT)
-     dans le thread dedie a cet effet 
-     * utiliser 2 capteurs ci besoin
+     => fait (ok) on conserve le code TERMIOS
+     => prevoir interraction avec structure clavier et boucle comme c'est fait 
+        avec les focntions irread / iretc..
   
   => corriger MANUEL_BRUT pour que le suivi brut telecommande permette
      une approximation bonne des vitesses (reprendre les calculs differentiels)
@@ -73,6 +77,8 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
   => modifier les droits du user stef et astrokit pour avec 
      sudo setcap 'cap_sys_nice=eip' <application>
      pour pouvoir executer les primitives pthread_setschedparam (param.sched_priority)
+     => test KO (fin 2021)
+     => obligration de passer par sudo
      
    => verifier a quel moment on doit faire un CAT_FIND 
   
@@ -81,13 +87,15 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
        pour avoir un comportement le plus identiquement possible que sur RPI ARM
   
   => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
+     => OK , touche 'q'
   
   => prevoir lors de TRAP_MAIN un ssty sane avec system (pas besoin de sudo )
   
+  => corriger / verifier les calculs flottants notamment lors de la conversion
+     des fichiers eto.csv etc... / en eto.csv.dec
   
-  
-  
-  
+  => analyser l'interraction avec systemd , et diff avec sysVinit
+     notamment lors de la génération des traces à l'écran via la strcuture tty
   
   
      

@@ -263,19 +263,19 @@ void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
 
   if ( ( argc == 3 ) &&  ! strcmp( "-p" , argv[1]) ) {
   
-    Trace("option -p = CONFIG_REP_HOME %s pris en compte\n",argv[2]);
+    Trace1("option -p = CONFIG_REP_HOME %s pris en compte\n",argv[2]);
 
     memset( CONFIG_REP_HOME, 0, sizeof(CONFIG_REP_HOME)) ;
     strcpy( CONFIG_REP_HOME, argv[2] ) ;
   }
   else {
-    Trace("pas de option -p => lecture CONFIG_REP_HOME avec getcwd");
+    Trace1("pas de option -p => lecture CONFIG_REP_HOME avec getcwd");
 
     if ( getcwd(CONFIG_REP_HOME, sizeof(CONFIG_REP_HOME)) == NULL ) {
       SyslogEno("getcwd") ;
     }
     else {
-      Trace("CONFIG_REP_HOME lu par getcwd = %s",CONFIG_REP_HOME);
+      Trace1("CONFIG_REP_HOME lu par getcwd = %s",CONFIG_REP_HOME);
     }
   }
   Trace("CONFIG_REP_HOME = %s",CONFIG_REP_HOME);
@@ -359,6 +359,9 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     memset( astre->nom, 0, sizeof(astre->nom)) ;
     strcpy( astre->nom, "AZI0" ) ;
 
+    memset( astre->infos, 0, sizeof(astre->nom)) ;
+    strcpy( astre->infos, "calcul volontaire : equatorial => azimutal" ) ;
+
     astre->ASC = atof(argv[2]) / DEGRES ;
     astre->DEC = atof(argv[3]) / DEGRES ;
     
@@ -377,6 +380,9 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     Trace("astre nom mis a la valeur EQU0");
     memset( astre->nom, 0, sizeof(astre->nom)) ;
     strcpy( astre->nom, "EQU0" ) ;
+
+    memset( astre->infos, 0, sizeof(astre->nom)) ;
+    strcpy( astre->infos, "calcul volontaire : azimutal => equatorial" ) ;
 
     astre->a = atof(argv[2]) / DEGRES ;
     astre->h = atof(argv[3]) / DEGRES ;
