@@ -22,11 +22,11 @@ double SGN(double x)                                    { if(x>=0.0) return 1.0;
 
 /*
 double ASC  (double H,   double a, double h)            { return asin(sin(a)*cos(h)/cos(H));}
-double ASC1 (double LAT, double H, double a, double h)  { return acos((cos(a)*cos(h)+cos(LAT)*sin(H))/(sin(LAT)*cos(H))) ;}
-double ASC2 (double LAT, double H, double h)            { return acos((sin(h)-sin(H)*sin(LAT))/(cos(H)*cos(LAT))) ;}
-double ALT  (double LAT, double A, double H)            { return asin(sin(LAT)*sin(H)+cos(LAT)*cos(H)*cos(A));}
+double ASC1 (double lat, double H, double a, double h)  { return acos((cos(a)*cos(h)+cos(lat)*sin(H))/(sin(lat)*cos(H))) ;}
+double ASC2 (double lat, double H, double h)            { return acos((sin(h)-sin(H)*sin(lat))/(cos(H)*cos(lat))) ;}
+double ALT  (double lat, double A, double H)            { return asin(sin(lat)*sin(H)+cos(lat)*cos(H)*cos(A));}
 double AZI  (double A, double H, double h)              { return asin( sin(A) * cos(H) / cos(h));}
-double AZI1 (double LAT, double A, double H, double h)  { return acos((sin(LAT)*cos(H)*cos(A)-cos(LAT)*sin(H))/cos(h)) ;}
+double AZI1 (double lat, double A, double H, double h)  { return acos((sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h)) ;}
 double RAD  (int degres, int minutes )                  { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / DEGRES ; }
 double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
 
@@ -36,6 +36,7 @@ double DEG  (int degres, int minutes )                  { return (double)degres 
    => azimut            azi et altitude  alt
    => ascension droite  asc et déclinaison dec 
    => H = angle horaire
+
 equatorial => azimutal
 
 agh = t - asc
@@ -50,24 +51,27 @@ sin (agh) = - sin (azi) cos (alt) / cos ( dec )
 cos (agh) = {sin (alt) - sin (dec) sin (lat)} / cos (dec) cos (lat)
 asc = t - H
 
+*/ /* A : angle horaie
+      H : declinaison
+      a : azimut
+      h : altitude
+  h  = ALT(lat,A,H) ;
+  a0 = AZI(A,H,h) ;
+  a1 = AZI1(lat,A,H,h) ;
+  af = SGN(a0)*a1 ;
 */
-double DEC  (double LAT, double azi, double alt)            { return asin(sin(LAT)*sin(alt) + cos(LAT)*cos(alt)*cos(azi));}
-/*
-ouble  ALT  (double LAT, double A, double H)            { return asin(sin(LAT)*sin(H)+cos(LAT)*cos(H)*cos(A));}
-*/
-double ALT  (double LAT, double A, double H)            { return asin(sin(LAT)*sin(H)+cos(LAT)*cos(H)*cos(A));}
-/*
-double AGH0 (double H,   double azi, double alt)           { return asin( sin(azi) * cos(alt) / cos(H));}
-*/
-double AGH0 (double azi,  double alt, double H)            { return asin( sin(azi) * cos(alt) / cos(H));}
-double AZI   (double A,  double H, double alt)            { return asin( sin(A) * cos(H) / cos(alt));}
-/*
-double AGH1 (double LAT, double H, double azi, double alt) { return acos((cos(azi)  * cos(alt)+cos(LAT)*sin(H))/(sin(LAT)*cos(H))) ;}
-*/
-double AGH1  (double LAT, double azi, double alt, double H)  { return acos((sin(LAT)* cos(alt)*cos(azi)-cos(LAT)*sin(alt))/cos(H)) ;}
-double AZI1  (double LAT, double A, double H, double alt)  { return acos((sin(LAT)* cos(H)*cos(A)-cos(LAT)*sin(H))/cos(alt)) ;}
+double DEC  (double lat, double azi, double alt)     { return asin( sin(lat)*sin(alt) + cos(lat)*cos(alt)*cos(azi));}
+double ALT  (double lat, double agh, double dec)     { return asin( sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(agh));}
 
-double AGH2 (double LAT, double H, double alt)           { return acos((sin(alt) - sin(H)*sin(LAT))/(cos(H)*cos(LAT))) ;}
+double AGH (double azi,  double alt, double dec)     { return asin( -1.0 * sin(azi) * cos(alt) / cos(dec));}
+double AZI (double agh,  double dec, double alt)     { return asin( +1.0 * sin(agh) * cos(dec) / cos(alt));}
+/*
+double AGH1 (double lat, double H, double azi, double alt) { return acos((cos(azi)  * cos(alt)+cos(lat)*sin(H))/(sin(lat)*cos(H))) ;}
+*/
+double AGH1  (double lat, double azi, double alt, double dec)  { return acos((sin(lat)*cos(alt)*cos(azi)-cos(lat)*sin(alt))/cos(dec)) ;}
+double AZI1  (double lat, double agh, double dec, double alt)  { return acos((sin(lat)*cos(dec)*cos(agh)-cos(lat)*sin(dec))/cos(alt)) ;}
+
+double AGH2 (double lat, double dec, double alt)             { return acos((sin(alt) - sin(dec)*sin(lat))/(cos(dec)*cos(lat))) ;}
 
 double RAD  (int degres, int minutes )                  { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / DEGRES ; }
 double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
@@ -255,25 +259,25 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *astre) {
   // astre->AGH  = TS - (asc droite absolue)
   // Une fonction de calcul du temps sid�ral doit etre faite ult�rieurement 
   
-  double LAT,A,H,a,h,a1,af ;
+  double lat,A,H,a0,h,a1,af ;
   
-  LAT= lieu->lat ;
+  lat= lieu->lat ;
   A  = astre->AGH ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
   H  = astre->DEC ; // FIXME : declinaison - seule valeur qui ne change pas 
   
-  TRACE1("A = %2.3f\tH = %2.3f\t",(astre->AGH)*DEGRES,(astre->DEC)*DEGRES) ;
+  TRACE1("agh = %2.3f\tH = %2.3f\t",(astre->AGH)*DEGRES,(astre->DEC)*DEGRES) ;
 
-  h  = ALT(LAT,A,H) ;
-  a  = AZI(A,H,h) ;
-  a1 = AZI1(LAT,A,H,h) ;
-  af = SGN(a)*a1 ;
+  h  = ALT(lat,A,H) ;
+  a0 = AZI(A,H,h) ;
+  a1 = AZI1(lat,A,H,h) ;
+  af = SGN(a0)*a1 ;
   
   astre->a = af ;
   astre->h = h ;
   
    // resultats de calculs : pour tests (a modifier : supprimer)
   
-  astre->AZI = a ;
+  astre->AZI  = a ;
   astre->AZI1 = a1 ;
   
   CALCUL_CONVERSION_ANGLE_EN_TEMPS( astre) ;
@@ -299,30 +303,30 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
   // TS  : temps sid�ral
   // ASC : ascension droite brute
   
-  double A0,A2,A1,a,h,LAT,Af,A,H ;
+  double A0,A2,A1,a,h,lat,Af,agh,H ;
 
-  TRACE1("avant calcul => a = %2.3f\th = %2.3f\t=>A = %2.3f\tH=%2.3f",\
+  TRACE1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
     (astre->a)   * DEGRES,\
     (astre->h)   * DEGRES,\
     (astre->AGH)* DEGRES,\
     (astre->DEC) * DEGRES) ;
 
-  LAT      = lieu->lat ;
+  lat      = lieu->lat ;
   a        = astre->a ;
   h        = astre->h ;
   
   // FIXME : obtention de declinaison et ascension droite (d'apres formules usuelles de Gauss)
   
-  H  = DEC(LAT,a,h) ;
+  H  = DEC(lat,a,h) ;
   astre->DEC  = H ;
 
-  /* double AGH0 (double a, double h, double H)  { return asin( sin(a) * cos(h) / cos(H));} */
-  A0 = AGH0(a,h,H) ;
+  /* double AGH (double a, double h, double H)  { return asin( sin(a) * cos(h) / cos(H));} */
+  A0 = AGH(a,h,H) ;
   /* 
-  double AGH1  (double LAT, double a, double h, double H)  { return acos((sin(LAT)* cos(h)*cos(a)-cos(LAT)*sin(h))/cos(H)) ;}
+  double AGH1  (double lat, double a, double h, double H)  { return acos((sin(lat)* cos(h)*cos(a)-cos(lat)*sin(h))/cos(H)) ;}
   */
-  A1 = AGH1(LAT,a,h,H); 
-  A2 = AGH2(LAT,H,h) ;
+  A1 = AGH1(lat,a,h,H); 
+  A2 = AGH2(lat,H,h) ;
   
   astre->AGH = SGN(A0)*A1 + PI ;
   
@@ -357,7 +361,7 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *astre) {
 
   TRACE("DEC   (deg) = %f" , (astre->DEC)*DEGRES) ;
 
-  TRACE2("apres calcul =>a = %2.3f\th = %2.3f\t=>A = %2.3f\tH=%2.3f",\
+  TRACE2("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
    (astre->a)*DEGRES,\
    (astre->h)*DEGRES,\
    (astre->AGH)*DEGRES,\
