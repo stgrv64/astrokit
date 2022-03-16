@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
-ASTRE_PAR_DEFAUT ETO5 
+ASTRE_PAR_DEFAUT ETO9
 
 # ----------------------- parametres repertoires et fichiers
 

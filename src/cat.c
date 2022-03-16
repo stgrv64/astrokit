@@ -88,11 +88,11 @@ void CAT_ZONE(ASTRE *astre, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
   double d_angulaire ;
   double d_min ;
   
-  asc = astre->ANGH0 ;
+  asc = astre->AGH0 ;
   dec = astre->DEC ;
   L=0 ;
   d_min=deg ;
-  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", astre->nom, astre->ANGH0, astre->DEC) ;
+  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", astre->nom, astre->AGH0, astre->DEC) ;
   
   while(strcmp(cat[L][3],"_") && strcmp(astre->nom,cat[L][0]) && strcmp(astre->nom,cat[L][1])) {
    

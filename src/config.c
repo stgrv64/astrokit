@@ -163,7 +163,7 @@ void CONFIG_INIT_ASTRE(ASTRE *as) {
   as->h   = 0  ;
   as->a0  = 0 ;
   as->h0  = 0 ;
-  as->ANGH   = 0  ; 
+  as->AGH   = 0  ; 
   as->ASC   = 0  ;
   as->DEC   = 0   ;
   as->A0  = 0 ;
@@ -1229,11 +1229,11 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
 
   Trace("") ;
 
-  sprintf( c_hhmmss_angh, "%dh%dm%ds",  as->ANGHt.HH,  as->ANGHt.MM,  as->ANGHt.SS  ) ;
+  sprintf( c_hhmmss_angh, "%dh%dm%ds",  as->AGHt.HH,  as->AGHt.MM,  as->AGHt.SS  ) ;
   sprintf( c_hhmmss_asc,  "%dh%dm%ds",  as->ASCt.HH,   as->ASCt.MM,   as->ASCt.SS  ) ;
-  sprintf( c_hhmmss_angh0, "%dh%dm%ds", as->ANGH0t.HH, as->ANGH0t.MM, as->ANGH0t.SS  ) ;
-  sprintf( c_hhmmss_angh1, "%dh%dm%ds", as->ANGH1t.HH, as->ANGH1t.MM, as->ANGH1t.SS  ) ;
-  sprintf( c_hhmmss_angh2, "%dh%dm%ds", as->ANGH2t.HH, as->ANGH2t.MM, as->ANGH2t.SS  ) ;
+  sprintf( c_hhmmss_angh0, "%dh%dm%ds", as->AGH0t.HH, as->AGH0t.MM, as->AGH0t.SS  ) ;
+  sprintf( c_hhmmss_angh1, "%dh%dm%ds", as->AGH1t.HH, as->AGH1t.MM, as->AGH1t.SS  ) ;
+  sprintf( c_hhmmss_angh2, "%dh%dm%ds", as->AGH2t.HH, as->AGH2t.MM, as->AGH2t.SS  ) ;
 
   Trace(" %s : infos         : %s", c_nom , as->infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;
@@ -1243,16 +1243,16 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   Trace(" %s : altitude      : %.2f (deg) ", c_nom, as->h    * DEGRES ) ;
   Trace(" %s : declinaison   : %.2f (deg) ", c_nom, as->DEC  * DEGRES  ) ;
   Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ASC    * DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : ANGLE HORAIRE : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ANGH   * DEGRES, c_hhmmss_angh ) ;
-  Trace(" %s : ANG (calcul0) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ANGH0  * DEGRES, c_hhmmss_angh0 ) ;
-  Trace(" %s : ASC (calcul1) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ANGH1  * DEGRES, c_hhmmss_angh1 ) ;
-  Trace(" %s : ASC (calcul2) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ANGH2  * DEGRES, c_hhmmss_angh2 ) ;
+  Trace(" %s : ANGLE HORAIRE : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH   * DEGRES, c_hhmmss_angh ) ;
+  Trace(" %s : ANG (calcul0) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH0  * DEGRES, c_hhmmss_angh0 ) ;
+  Trace(" %s : ASC (calcul1) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH1  * DEGRES, c_hhmmss_angh1 ) ;
+  Trace(" %s : ASC (calcul2) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH2  * DEGRES, c_hhmmss_angh2 ) ;
   
   Trace2("as->AZI  = %f",as->AZI) ;
   Trace2("as->AZI1 = %f",as->AZI1) ;
   Trace2("as->ASC  = %f",as->ASC) ;
-  Trace2("as->ANGH1 = %f",as->ANGH1) ;
-  Trace2("as->ANGH2 = %f",as->ANGH2) ;
+  Trace2("as->AGH1 = %f",as->AGH1) ;
+  Trace2("as->AGH2 = %f",as->AGH2) ;
   Trace2("as->ASC = %f - %f (deg)",as->ASC , as->ASC * DEGRES) ;
 
   Trace("----------------------------") ;

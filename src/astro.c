@@ -986,7 +986,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
         CONFIG_AFFICHER_TOUT() ;
       }
 */
-      astre->ANGH   += voute->pas ;
+      astre->AGH   += voute->pas ;
       voute->deb += voute->pas ;
 
       suivi->d_temps += CALCUL_TEMPORISATION_VOUTE( voute, t00 ) ; 

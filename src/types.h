@@ -526,10 +526,10 @@ typedef struct {
  TEMPS  ht ;
  TEMPS  DECt ;
  TEMPS  ASCt ;   /* structure TEMPS pour ascension droite 0 (par defaut) */ 
- TEMPS  ANGH0t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
- TEMPS  ANGH1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
- TEMPS  ANGH2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
- TEMPS  ANGHt ;  /* structure TEMPS pour angle horaire (par defaut) */ 
+ TEMPS  AGH0t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
+ TEMPS  AGH1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
+ TEMPS  AGH2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
+ TEMPS  AGHt ;  /* structure TEMPS pour angle horaire (par defaut) */ 
 
  char   nom         [ ASTRE_TAILLE_BUFFER ] ;
  char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
@@ -561,14 +561,14 @@ typedef struct {
  double a0 ;   // valeur precedente de l'azimut
  double h0 ;   // valeur precedente de l'altitude
  
- double ANGH ;    // angle horaire  ( = lieu->temps sideral - ASC)
+ double AGH ;    // angle horaire  ( = lieu->temps sideral - ASC)
  double H    ;    // declinaison
  
  double DEC  ;  // un resultat de calcul de declinaison
  double ASC  ;   // un resultat de calcul de asc
- double ANGH0 ;  // un autre resultat de calcul de asc
- double ANGH1 ;  // un autre resultat de calcul de asc
- double ANGH2 ;  // un autre resultat de calcul de asc
+ double AGH0 ;  // un autre resultat de calcul de asc
+ double AGH1 ;  // un autre resultat de calcul de asc
+ double AGH2 ;  // un autre resultat de calcul de asc
 
  double ALT ;   // un resultat de calcul de ALT
  double AZI ;   // un resultat de calcul de AZI
