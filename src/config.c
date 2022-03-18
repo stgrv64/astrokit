@@ -139,7 +139,7 @@ void CONFIG_INIT_LOG(void) {
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_ASTRE
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure ASTRE * astre
+* @brief  : Cette fonction initialise la structure ASTRE * as
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 ajout membres de la structure dans la fonction
@@ -193,7 +193,7 @@ void CONFIG_INIT_ASTRE(ASTRE *as) {
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CLAVIER
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure CLAVIER * astre
+* @brief  : Cette fonction initialise la structure CLAVIER * as
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 ajout membres de la structure dans la fonction
@@ -1199,12 +1199,71 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 
 }
 /*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations a la sauce stellarium
+* @param  : 
+* @date   : 2022-03-18 creation
+*****************************************************************************************/
+
+void CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(ASTRE *as) {
+ 
+  const char * c_nom  = as->nom ;
+  const char * c_type = c_Astre_Type [ as->type ] ;
+  const char * c_mode = c_Mode_Calcul[ as->mode ] ;
+
+  char  c_hhmmss_agh[ 16] ;
+  char  c_hhmmss_asc[ 16] ;
+  char  c_hhmmss_azi[ 16] ;
+  char  c_hhmmss_alt[ 16] ;
+  char  c_hhmmss_dec[ 16] ;
+
+  char  c_ddmmss_agh[ 16] ;
+  char  c_ddmmss_asc[ 16] ;
+  char  c_ddmmss_azi[ 16] ;
+  char  c_ddmmss_alt[ 16] ;
+  char  c_ddmmss_dec[ 16] ;
+
+  Trace("") ;
+
+  memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
+  memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
+  memset( c_hhmmss_azi, 0, sizeof(c_hhmmss_azi) ) ;
+  memset( c_hhmmss_alt, 0, sizeof(c_hhmmss_alt) ) ;
+  memset( c_hhmmss_dec, 0, sizeof(c_hhmmss_dec) ) ;
+
+  memset( c_ddmmss_agh, 0, sizeof(c_ddmmss_agh) ) ;
+  memset( c_ddmmss_asc, 0, sizeof(c_ddmmss_asc) ) ;
+  memset( c_ddmmss_azi, 0, sizeof(c_ddmmss_azi) ) ;
+  memset( c_ddmmss_alt, 0, sizeof(c_ddmmss_alt) ) ;
+  memset( c_ddmmss_dec, 0, sizeof(c_ddmmss_dec) ) ;
+
+  Trace("") ;
+
+  sprintf( c_hhmmss_agh, "%dh%dm%ds",  as->AGHt.HH, as->AGHt.MM, as->AGHt.SS  ) ;
+  sprintf( c_hhmmss_asc, "%dh%dm%ds",  as->ASCt.HH, as->ASCt.MM, as->ASCt.SS  ) ;
+  sprintf( c_hhmmss_azi, "%dh%dm%ds",  as->AZIt.HH, as->AZIt.MM, as->AZIt.SS  ) ;
+  sprintf( c_hhmmss_alt, "%dh%dm%ds",  as->ALTt.HH, as->ALTt.MM, as->ALTt.SS  ) ;
+  sprintf( c_hhmmss_dec, "%dh%dm%ds",  as->DECt.HH, as->DECt.MM, as->DECt.SS  ) ;
+
+  sprintf( c_ddmmss_agh, "%d°%d'%d\"",  as->AGHa.DD, as->AGHa.MM, as->AGHa.SS  ) ;
+  sprintf( c_ddmmss_asc, "%d°%d'%d\"",  as->ASCa.DD, as->ASCa.MM, as->ASCa.SS  ) ;
+  sprintf( c_ddmmss_azi, "%d°%d'%d\"",  as->AZIa.DD, as->AZIa.MM, as->AZIa.SS  ) ;
+  sprintf( c_ddmmss_alt, "%d°%d'%d\"",  as->ALTa.DD, as->ALTa.MM, as->ALTa.SS  ) ;
+  sprintf( c_ddmmss_dec, "%d°%d'%d\"",  as->DECa.DD, as->DECa.MM, as->DECa.SS  ) ;
+
+  Trace("AD / Dec   : %s / %s" , c_hhmmss_asc, c_ddmmss_dec ) ;
+  Trace("AH / Dec   : %s / %s" , c_hhmmss_agh, c_ddmmss_dec ) ;
+  Trace("AZ./ Haut. : %s / %s" , c_ddmmss_azi, c_ddmmss_alt ) ;
+
+  Trace("----------------------------") ;
+}
+/*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_ASTRE
 * @author : s.gravois
-* @brief  : Cette fonction affiche les informations relatives a l astre observee
-* @param  : CLAVIER *clavier
+* @brief  : Cette fonction affiche les informations relatives a l as observee
+* @param  : ASTRE *as
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @todo   : 
 *****************************************************************************************/
 
 void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
@@ -1213,27 +1272,37 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   const char * c_type = c_Astre_Type [ as->type ] ;
   const char * c_mode = c_Mode_Calcul[ as->mode ] ;
 
-  char  c_hhmmss_angh0[ 16] ;
-  char  c_hhmmss_angh1[ 16] ;
-  char  c_hhmmss_angh2[ 16] ;
-  char  c_hhmmss_angh[ 16] ;
+  char  c_hhmmss_agh0[ 16] ;
+  char  c_hhmmss_agh1[ 16] ;
+  char  c_hhmmss_agh2[ 16] ;
+
+  char  c_hhmmss_azi0[ 16] ;
+  char  c_hhmmss_azi1[ 16] ;
+  char  c_hhmmss_azi2[ 16] ;
+
+  char  c_hhmmss_agh[ 16] ;
   char  c_hhmmss_asc[ 16] ;
 
   Trace("") ;
 
-  memset( c_hhmmss_angh0, 0, sizeof(c_hhmmss_angh0) ) ;
-  memset( c_hhmmss_angh1, 0, sizeof(c_hhmmss_angh1) ) ;
-  memset( c_hhmmss_angh2, 0, sizeof(c_hhmmss_angh2) ) ;
-  memset( c_hhmmss_angh, 0, sizeof(c_hhmmss_angh) ) ;
+  memset( c_hhmmss_agh0, 0, sizeof(c_hhmmss_agh0) ) ;
+  memset( c_hhmmss_agh1, 0, sizeof(c_hhmmss_agh1) ) ;
+  memset( c_hhmmss_agh2, 0, sizeof(c_hhmmss_agh2) ) ;
+  memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
 
   Trace("") ;
 
-  sprintf( c_hhmmss_angh, "%dh%dm%ds",  as->AGHt.HH,  as->AGHt.MM,  as->AGHt.SS  ) ;
+  sprintf( c_hhmmss_agh, "%dh%dm%ds",   as->AGHt.HH,  as->AGHt.MM,  as->AGHt.SS  ) ;
   sprintf( c_hhmmss_asc,  "%dh%dm%ds",  as->ASCt.HH,   as->ASCt.MM,   as->ASCt.SS  ) ;
-  sprintf( c_hhmmss_angh0, "%dh%dm%ds", as->AGH0t.HH, as->AGH0t.MM, as->AGH0t.SS  ) ;
-  sprintf( c_hhmmss_angh1, "%dh%dm%ds", as->AGH1t.HH, as->AGH1t.MM, as->AGH1t.SS  ) ;
-  sprintf( c_hhmmss_angh2, "%dh%dm%ds", as->AGH2t.HH, as->AGH2t.MM, as->AGH2t.SS  ) ;
+
+  sprintf( c_hhmmss_agh0, "%dh%dm%ds", as->AGH0t.HH, as->AGH0t.MM, as->AGH0t.SS  ) ;
+  sprintf( c_hhmmss_agh1, "%dh%dm%ds", as->AGH1t.HH, as->AGH1t.MM, as->AGH1t.SS  ) ;
+  sprintf( c_hhmmss_agh2, "%dh%dm%ds", as->AGH2t.HH, as->AGH2t.MM, as->AGH2t.SS  ) ;
+
+  sprintf( c_hhmmss_azi0, "%dh%dm%ds", as->AZI0t.HH, as->AZI0t.MM, as->AZI0t.SS  ) ;
+  sprintf( c_hhmmss_azi1, "%dh%dm%ds", as->AZI1t.HH, as->AZI1t.MM, as->AZI1t.SS  ) ;
+  sprintf( c_hhmmss_azi2, "%dh%dm%ds", as->AZI2t.HH, as->AZI2t.MM, as->AZI2t.SS  ) ;
 
   Trace(" %s : infos         : %s", c_nom , as->infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;
@@ -1243,17 +1312,17 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   Trace(" %s : altitude      : %.2f (deg) ", c_nom, as->h    * DEGRES ) ;
   Trace(" %s : declinaison   : %.2f (deg) ", c_nom, as->DEC  * DEGRES  ) ;
   Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, as->ASC    * DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : ANGLE HORAIRE : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH   * DEGRES, c_hhmmss_angh ) ;
-  Trace(" %s : ANG (calcul0) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH0  * DEGRES, c_hhmmss_angh0 ) ;
-  Trace(" %s : ASC (calcul1) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH1  * DEGRES, c_hhmmss_angh1 ) ;
-  Trace(" %s : ASC (calcul2) : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH2  * DEGRES, c_hhmmss_angh2 ) ;
-  
-  Trace2("as->AZI  = %f",as->AZI) ;
-  Trace2("as->AZI1 = %f",as->AZI1) ;
-  Trace2("as->ASC  = %f",as->ASC) ;
-  Trace2("as->AGH1 = %f",as->AGH1) ;
-  Trace2("as->AGH2 = %f",as->AGH2) ;
-  Trace2("as->ASC = %f - %f (deg)",as->ASC , as->ASC * DEGRES) ;
+  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH   * DEGRES, c_hhmmss_agh ) ;
+
+  CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(as) ;
+
+  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH0  * DEGRES, c_hhmmss_agh0 ) ;
+  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH1  * DEGRES, c_hhmmss_agh1 ) ;
+  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AGH2  * DEGRES, c_hhmmss_agh2 ) ;
+
+  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AZI0  * DEGRES, c_hhmmss_azi0 ) ;
+  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AZI1  * DEGRES, c_hhmmss_azi1 ) ;
+  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AZI2  * DEGRES, c_hhmmss_azi2 ) ;
 
   Trace("----------------------------") ;
 
@@ -1289,7 +1358,7 @@ void CONFIG_AFFICHER_TOUT(void) {
 
   CONFIG_AFFICHER_TEMPS(   temps ) ;
   CONFIG_AFFICHER_LIEU(    lieu );
-  CONFIG_AFFICHER_ASTRE(   astre ) ;
+  CONFIG_AFFICHER_ASTRE(   as ) ;
   CONFIG_AFFICHER_VOUTE(   voute ) ;
 
   Trace("\n") ;

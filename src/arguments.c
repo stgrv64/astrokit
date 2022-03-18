@@ -42,43 +42,43 @@ void ARGUMENTS_VOUTE(void) {
 
     for(a=-PI +0.001 ;a<PI;a+=voute->pas){
      
-     astre->a=a ;
-     astre->h=h ;
+     as->a=a ;
+     as->h=h ;
      
-     CALCUL_EQUATEUR  ( lieu, astre) ;        // calcul coordevices horaires en fait
-     CALCUL_VITESSES  ( lieu, astre, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
+     CALCUL_EQUATEUR  ( lieu, as) ;        // calcul coordevices horaires en fait
+     CALCUL_VITESSES  ( lieu, as, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
      
      /* Calcul de la norme de la vitesse */
 
-     astre->V  = sqrt( sqr( astre->Va ) + sqr( astre->Vh )) ;
+     as->V  = sqrt( sqr( as->Va ) + sqr( as->Vh )) ;
      
-     if ( astre->Va != 0) 
-       astre->An = atan( astre->Vh / astre->Va ) ;
+     if ( as->Va != 0) 
+       as->An = atan( as->Vh / as->Va ) ;
      else
-       astre->An = PI/2 ;
+       as->An = PI/2 ;
      
-     CALCUL_GEODE( astre ) ;
+     CALCUL_GEODE( as ) ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
-       astre->a * DEGRES, \
-       astre->h * DEGRES, \
-       astre->ASC   * DEGRES, \
-       astre->DEC * DEGRES, \
-       astre->x , \
-       astre->y, \
-       astre->z, \
-       astre->Va, \
-       astre->Vh, \
-       astre->V, \
-       astre->An ) ;
+       as->a * DEGRES, \
+       as->h * DEGRES, \
+       as->ASC   * DEGRES, \
+       as->DEC * DEGRES, \
+       as->x , \
+       as->y, \
+       as->z, \
+       as->Va, \
+       as->Vh, \
+       as->V, \
+       as->An ) ;
      
      Trace1("xx %.1f yy %.1f zz %.1f Va %.1f Vh %.1f V %.1f", \
-       astre->xx , \
-       astre->yy , \
-       astre->zz , \
-       astre->Va, \
-       astre->Vh, \
-       astre->V ) ;
+       as->xx , \
+       as->yy , \
+       as->zz , \
+       as->Va, \
+       as->Vh, \
+       as->V ) ;
      
    }
   
@@ -215,8 +215,8 @@ void ARGUMENTS_HELP(int argc, char** argv) {
     if (!strcmp("-h",argv[1]) || !strcmp("--help",argv[1])) {
 
       printf("%s : USAGE : \n",binaire) ;
-      printf("%s -a / ast (astre) <nom>      : calcule tout et affiche tout en fonction de l'astre\n",binaire) ;
-      printf("%s -A / AST (astre) <nom>      : idem -a mais continue et effectue le suivi\n",binaire) ;
+      printf("%s -a / ast (as) <nom>      : calcule tout et affiche tout en fonction de l'as\n",binaire) ;
+      printf("%s -A / AST (as) <nom>      : idem -a mais continue et effectue le suivi\n",binaire) ;
       printf("%s -L / ala (aLarm)            : arrete le main aubout de argv[1] secondes\n",binaire) ;
       printf("%s -z / azi (aZimut) <A> <H>   : <angle horaire(deg) <declinaison(deg)> : calcul l'azimut en fonction de AH et DEC\n",binaire) ;
       printf("%s -q / equ (eQuateur) <a> <h> : <azimut(deg) <hauteur(deg)>            : calcul l'angle horaire et la declinaison en fonction de azimut et altitude\n",binaire) ;
@@ -309,20 +309,20 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     Trace("ala = %d\n",suivi->alarme) ;
   }
   /* ---------------------------------------------------------------
-  * Gestion d un astre en particulier : uniquement calcul et aff
+  * Gestion d un as en particulier : uniquement calcul et aff
   * ---------------------------------------------------------------*/
 
   if ( ( argc == 3 ) &&  ! strcmp("ast",argv[1]) ) {
   
-    Trace("astre %s pris en compte\n",argv[2]);
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, argv[2] ) ;
+    Trace("as %s pris en compte\n",argv[2]);
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, argv[2] ) ;
 
-    /* Recherche de l'astre dans les catalogues */
+    /* Recherche de l'as dans les catalogues */
     
-    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+    if ( strstr( as->nom, CONFIG_MES ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_NGC ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_ETO ) != NULL ) CAT_FIND( as, etoiles_dec) ;
 
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;   
@@ -330,20 +330,20 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     exit(0) ;
   }
   /* ---------------------------------------------------------------
-  * Gestion d un astre en particulier : calcul, affichage et suivi
+  * Gestion d un as en particulier : calcul, affichage et suivi
   * ---------------------------------------------------------------*/
 
   if ( ( argc == 3  ) &&  ! strcmp("AST",argv[1]) ) {
   
-    Trace("astre %s pris en compte\n",argv[2]);
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, argv[2] ) ;
+    Trace("as %s pris en compte\n",argv[2]);
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, argv[2] ) ;
 
-    /* Recherche de l'astre dans les catalogues */
+    /* Recherche de l'as dans les catalogues */
     
-    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+    if ( strstr( as->nom, CONFIG_MES ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_NGC ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_ETO ) != NULL ) CAT_FIND( as, etoiles_dec) ;
 
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;   
@@ -355,15 +355,15 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
   if ( ( argc == 4 ) &&  ! strcmp("azi",argv[1]) ) {
 
-    Trace("astre nom mis a la valeur AZI0");
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, "AZI0" ) ;
+    Trace("as nom mis a la valeur AZI0");
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, "AZI0" ) ;
 
-    memset( astre->infos, 0, sizeof(astre->nom)) ;
-    strcpy( astre->infos, "calcul volontaire : equatorial => azimutal" ) ;
+    memset( as->infos, 0, sizeof(as->nom)) ;
+    strcpy( as->infos, "calcul volontaire : equatorial => azimutal" ) ;
 
-    astre->ASC = atof(argv[2]) / DEGRES ;
-    astre->DEC = atof(argv[3]) / DEGRES ;
+    as->ASC = atof(argv[2]) / DEGRES ;
+    as->DEC = atof(argv[3]) / DEGRES ;
     
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ; 
@@ -377,15 +377,15 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
   if ( ( argc == 4 ) &&  ! strcmp("equ",argv[1]) ) {
 
-    Trace("astre nom mis a la valeur EQU0");
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, "EQU0" ) ;
+    Trace("as nom mis a la valeur EQU0");
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, "EQU0" ) ;
 
-    memset( astre->infos, 0, sizeof(astre->nom)) ;
-    strcpy( astre->infos, "calcul volontaire : azimutal => equatorial" ) ;
+    memset( as->infos, 0, sizeof(as->nom)) ;
+    strcpy( as->infos, "calcul volontaire : azimutal => equatorial" ) ;
 
-    astre->a = atof(argv[2]) / DEGRES ;
-    astre->h = atof(argv[3]) / DEGRES ;
+    as->a = atof(argv[2]) / DEGRES ;
+    as->h = atof(argv[3]) / DEGRES ;
     
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ; 
@@ -402,22 +402,22 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     /* mode ast */
 
-    Trace("astre %s pris en compte\n",argv[2]);
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, argv[2] ) ;
+    Trace("as %s pris en compte\n",argv[2]);
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, argv[2] ) ;
     
-    if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
-    if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+    if ( strstr( as->nom, CONFIG_MES ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_NGC ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_ETO ) != NULL ) CAT_FIND( as, etoiles_dec) ;
 
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;   
 
     /* mode equateur */
 
-    Trace("astre nom mis a la valeur EQU0");
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, "EQU0" ) ;
+    Trace("as nom mis a la valeur EQU0");
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, "EQU0" ) ;
     
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ; 
@@ -430,9 +430,9 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     Trace("passage en mode azimutal : suivi->SUIVI_EQUATORIAL=0") ;
     suivi->SUIVI_EQUATORIAL=0 ;
 
-    Trace("astre nom mis a la valeur TST0");
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, "AZI0" ) ;
+    Trace("as nom mis a la valeur TST0");
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, "AZI0" ) ;
 
     CALCUL_TOUT() ;
     CONFIG_AFFICHER_TOUT() ;    
@@ -449,7 +449,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   if ( argc == 7 ) {
 
     lieu->lat   = atof(argv[1]) / DEGRES ;
-    astre->DEC    = atof(argv[2]) / DEGRES ;
+    as->DEC    = atof(argv[2]) / DEGRES ;
     voute->deb  = atof(argv[3]) ;
     voute->fin  = atof(argv[4]) ;
     voute->pas  = atof(argv[5]) ;
@@ -622,7 +622,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   }
   */
   // -----------------------------------------------------------------
-  TRACE("astre %s pris en compte",argv[1]);
+  TRACE("as %s pris en compte",argv[1]);
   printf("fin %s\n","ARGUMENTS_GERER") ;
 }
 
@@ -649,9 +649,9 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
         break ;
         
         case 'a' :
-          Trace("astre %s pris en compte\n",optarg);
-          memset( astre->nom, 0, sizeof(astre->nom)) ;
-          strcpy( astre->nom, optarg ) ;
+          Trace("as %s pris en compte\n",optarg);
+          memset( as->nom, 0, sizeof(as->nom)) ;
+          strcpy( as->nom, optarg ) ;
 
           CALCUL_TOUT() ;
           CONFIG_AFFICHER_TOUT() ;   
@@ -661,9 +661,9 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
         
         case 'A' :
 
-          Trace("astre %s pris en compte\n",optarg);
-          memset( astre->nom, 0, sizeof(astre->nom)) ;
-          strcpy( astre->nom, optarg ) ;
+          Trace("as %s pris en compte\n",optarg);
+          memset( as->nom, 0, sizeof(as->nom)) ;
+          strcpy( as->nom, optarg ) ;
 
           CALCUL_TOUT() ;
           CONFIG_AFFICHER_TOUT() ;   

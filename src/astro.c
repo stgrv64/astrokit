@@ -254,23 +254,23 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
     }
     
     //---------------------------------------------------------------------------------------------------------
-    // Si un nouvel astre a ete pris en compte
+    // Si un nouvel as a ete pris en compte
     //---------------------------------------------------------------------------------------------------------
     
     sprintf( s_buffer4, "%s%s%s%s", CONFIG_MES, CONFIG_NGC, CONFIG_ETO, CONFIG_PLA) ;
 
     if ( strstr( s_buffer4, clavier->symbole ) != NULL ) {
 
-      memset( astre->nom, ZERO_CHAR, strlen(astre->nom)) ;
-      sprintf( astre->nom, "%s%s", clavier->symbole, clavier->nombre) ;
+      memset( as->nom, ZERO_CHAR, strlen(as->nom)) ;
+      sprintf( as->nom, "%s%s", clavier->symbole, clavier->nombre) ;
     
-      Trace1("== %s ==",astre->nom) ;
+      Trace1("== %s ==",as->nom) ;
       
-      /* Recherche de l'astre dans les catalgues */
+      /* Recherche de l'as dans les catalgues */
       
-      if ( strstr( astre->nom, CONFIG_MES ) != NULL ) CAT_FIND( astre, cat_dec) ;
-      if ( strstr( astre->nom, CONFIG_NGC ) != NULL ) CAT_FIND( astre, cat_dec) ;
-      if ( strstr( astre->nom, CONFIG_ETO ) != NULL ) CAT_FIND( astre, etoiles_dec) ;
+      if ( strstr( as->nom, CONFIG_MES ) != NULL ) CAT_FIND( as, cat_dec) ;
+      if ( strstr( as->nom, CONFIG_NGC ) != NULL ) CAT_FIND( as, cat_dec) ;
+      if ( strstr( as->nom, CONFIG_ETO ) != NULL ) CAT_FIND( as, etoiles_dec) ;
       
       suivi->SUIVI_ALIGNEMENT = 1 ;
       //suivi->menu = MENU_AZIMUTAL ;
@@ -326,8 +326,8 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
         case 2 : // TODO : exemple d'une demande de capteur : a modifier / completer
           CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-          if ( devices->DEVICE_CAPTEURS_USE ) { astre->a = suivi->pitch ;astre->h = suivi->heading ; }
-          CALCUL_EQUATEUR ( lieu, astre) ;
+          if ( devices->DEVICE_CAPTEURS_USE ) { as->a = suivi->pitch ;as->h = suivi->heading ; }
+          CALCUL_EQUATEUR ( lieu, as) ;
           suivi->menu_old = suivi->menu ;
           suivi->menu = MENU_AZIMUTAL ;
           break ;
@@ -349,7 +349,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 * @todo   : 
 *****************************************************************************************/
 /* FIXME :
- SUIVI_MANUEL_BRUT : le suivi etant effectue sur un astre (calcul des vitesses et periodes par suivi_voute)
+ SUIVI_MANUEL_BRUT : le suivi etant effectue sur un as (calcul des vitesses et periodes par suivi_voute)
  l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
  avec une multiplication des vitesses N-S-E-O par un facteur ALT_ACC
 
@@ -535,8 +535,8 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   
     pthread_mutex_lock( & suivi->mutex_cal );
     
-    CALCUL_VITESSES( lieu, astre, suivi) ;
-    CALCUL_PERIODE ( astre, suivi, voute) ;
+    CALCUL_VITESSES( lieu, as, suivi) ;
+    CALCUL_PERIODE ( as, suivi, voute) ;
     
     pthread_mutex_unlock( & suivi->mutex_cal );
   }
@@ -676,7 +676,7 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   if ( suivi->pas_azi_old != suivi->pas_azi || suivi->pas_alt_old != suivi->pas_alt ) {
 
    TRACE(" : Va = %2.4f Vh = %2.4f Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f Fam = %ld Fhm = %ld",\
-        astre->Va,astre->Vh,suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh, \
+        as->Va,as->Vh,suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh, \
 	(suivi->Ia - suivi->Ia_prec),(suivi->Ih - suivi->Ih_prec )) ;  
   }
 
@@ -835,7 +835,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         // TODO : les periodes / frequences en azimut et altitude
 
         SUIVI_MANUEL_1(suivi, clavier) ; 
-        CALCUL_PERIODES_SUIVI_MANUEL(astre,suivi,voute)  ;
+        CALCUL_PERIODES_SUIVI_MANUEL(as,suivi,voute)  ;
 
         suivi->menu_old         = suivi->menu ;
         suivi->menu             = MENU_MANUEL_ASSERVI ; 
@@ -928,7 +928,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 /*
    SUIVI_VOUTE :
    le but de la fonction est de rafraichir a intervalles reguliers (1 seconde)
-   tous les calculs relatifs a la vitesse de l'astre suivi
+   tous les calculs relatifs a la vitesse de l'as suivi
 */
 
 void * SUIVI_VOUTE(SUIVI * suivi) {
@@ -939,7 +939,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   
   // La temporisation dans la boucle du thread SUIVI_VOUTE depend de voute->DT (en us)
   // a completer / modifier :
-  // il FAUT calculer / mettre a jour a,h,A,H de l'astre quand est utliser les menus
+  // il FAUT calculer / mettre a jour a,h,A,H de l'as quand est utliser les menus
   // suivi manuel et suivi capteurs , qui renvoient l'azimut et l'altitude
   // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
   // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
@@ -978,7 +978,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       CALCUL_TOUT() ;
     
       if ( suivi->SUIVI_ALIGNEMENT ) { 
-        CONFIG_AFFICHER_ASTRE(astre) ; 
+        CONFIG_AFFICHER_ASTRE(as) ; 
         suivi->SUIVI_ALIGNEMENT = 0 ;
       }
 /*
@@ -986,7 +986,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
         CONFIG_AFFICHER_TOUT() ;
       }
 */
-      astre->AGH   += voute->pas ;
+      as->AGH   += voute->pas ;
       voute->deb += voute->pas ;
 
       suivi->d_temps += CALCUL_TEMPORISATION_VOUTE( voute, t00 ) ; 
@@ -1321,7 +1321,7 @@ int main(int argc, char ** argv) {
   // Initialisations des structures de devices
   // -----------------------------------------------------------------
 
-  astre   = &ast ;
+  as   = &ast ;
   lieu    = &lie;
   voute   = &vou ;
   suivi   = &sui ;
@@ -1346,7 +1346,7 @@ int main(int argc, char ** argv) {
   GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
   
   CONFIG_INIT_CLAVIER   ( clavier ) ;   
-  CONFIG_INIT_ASTRE     ( astre ) ;
+  CONFIG_INIT_ASTRE     ( as ) ;
   CONFIG_INIT_LIEU      ( lieu  ) ;
   CONFIG_INIT_VOUTE     ( voute ) ;
   CONFIG_INIT_SUIVI     ( suivi ) ;
@@ -1388,8 +1388,8 @@ int main(int argc, char ** argv) {
 
   if ( strcmp(ASTRE_PAR_DEFAUT,"") != 0 ) {
 
-    memset( astre->nom, 0, sizeof(astre->nom)) ;
-    strcpy( astre->nom, ASTRE_PAR_DEFAUT ) ;
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, ASTRE_PAR_DEFAUT ) ;
   }
   // -----------------------------------------------------------------
   

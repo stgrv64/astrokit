@@ -89,28 +89,29 @@ long   CALCUL_TEMPORISATION_MICROSEC  ( double microsecondes, double percent, st
 void   CALCUL_TEMPORISATION_ALTITUDE  ( SUIVI *suivi, struct timeval * pt00)  ;
 void   CALCUL_TEMPORISATION_AZIMUT    ( SUIVI *suivi, struct timeval * pt00) ;
 
-void   CALCUL_GEODE                   ( ASTRE *astre) ;
-void   CALCUL_AZIMUT                  ( LIEU *lieu, ASTRE *astre) ;
-void   CALCUL_EQUATEUR                ( LIEU *lieu, ASTRE *astre) ;
+void   CALCUL_GEODE                   ( ASTRE *as) ;
+void   CALCUL_AZIMUT                  ( LIEU *lieu, ASTRE *as) ;
+void   CALCUL_EQUATEUR                ( LIEU *lieu, ASTRE *as) ;
 
 void   CALCUL_VITESSES_EQUATORIAL     (ASTRE *as) ;
-void   CALCUL_VITESSES                ( LIEU *lieu, ASTRE *astre, SUIVI *suivi) ;
+void   CALCUL_VITESSES                ( LIEU *lieu, ASTRE *as, SUIVI *suivi) ;
 
-void   CALCUL_ANGLE_HORAIRE           ( LIEU *lieu, ASTRE *astre) ;
-void   CALCUL_ASCENSION_DROITE        ( LIEU *lieu, ASTRE *astre) ; 
-void   CALCUL_D                       ( ASTRE *astre, SUIVI *suivi) ;   
-void   CALCUL_PERIODE                 ( ASTRE *astre, SUIVI* suivi,VOUTE *voute)  ;
-void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *astre, SUIVI* suivi, VOUTE *voute) ;
+void   CALCUL_ANGLE_HORAIRE           ( LIEU *lieu, ASTRE *as) ;
+void   CALCUL_ASCENSION_DROITE        ( LIEU *lieu, ASTRE *as) ; 
+void   CALCUL_D                       ( ASTRE *as, SUIVI *suivi) ;   
+void   CALCUL_PERIODE                 ( ASTRE *as, SUIVI* suivi,VOUTE *voute)  ;
+void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *as, SUIVI* suivi, VOUTE *voute) ;
 
 int    CALCUL_TEMPS_SIDERAL           ( LIEU* lieu, TEMPS *temps ) ;
 int    CALCUL_JOUR_JULIEN             ( LIEU* lieu, TEMPS *temps) ;
 int    CALCUL_DATE                    ( TEMPS *temps ) ;
 void   CALCUL_HDEC                    ( TEMPS *temps ) ;
-void   CALCUL_HMS                     ( TEMPS *temps ) ;
+void   CALCUL_TEMPS_VERS_HMS                     ( TEMPS *temps ) ;
 
-void   CALCUL_CONVERSION_ANGLE_EN_TEMPS ( ASTRE *astre) ;
+void   CALCUL_CONVERSIONS_ANGLES ( ASTRE *as) ;
 void   CALCUL_AFFICHER_HEURE            ( char * mesg, TEMPS *temps ) ;
- 
+void   CALCUL_AFFICHER_ANGLE            ( char * mesg, ANGLE *angle ) ;
+
 void   SET_ASTRE( ASTRE *as,char *parametre, double valeur) ;
 void   SET_LIEU(  LIEU *lieu,char *parametre, double valeur) ;
 void   SET_VOUTE( VOUTE *voute,char *parametre, double valeur) ;

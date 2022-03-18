@@ -18,10 +18,10 @@
 #               * remplacement fonctions TRACE par Trace 
 #               * refonte des macros de Trace
 # 19/01/2022  | * ajout ASTRE_INDETERMINE pour pouvoir calculer
-#                 meme sans nom d astre => cela permettra a terme
+#                 meme sans nom d as => cela permettra a terme
 #                 d'entrer l azimut et l altitude directement
 #                 pour effectuer le suivi
-# 20/01/2022  | * ajout de tous les types d 'astre a t_en_Astre_Type
+# 20/01/2022  | * ajout de tous les types d 'as a t_en_Astre_Type
 #               * ajout d'un enum t_en_Mode_Calcul
 #               * ajout structure DEVICES et var don, *devices ;
 #               * ajout CONFIG_AZI et CONFIG_EQU
@@ -31,6 +31,7 @@
 # 23/01/2022  | * suppression MODE_EQUATORIAL
 #               * changement type MENU_PAR_DEFAUT
 #               * ajout constantes char * en fonction c_Menus
+# 18/03/2022  | * ajout signe a structure TEMPS
 # -------------------------------------------------------------- 
 */
 
@@ -218,14 +219,14 @@ typedef enum {
 t_en_Booleen ;
 
 /* ----------------------------------------------------
-* Le typededef enum suivant determine le type d astre
+* Le typededef enum suivant determine le type d as
 * sur lequel on fait le suivi, ce qui peut, en fonction
 * des cas, necessiter de refaire un calcul, ou un calcul
 * specifique (exemple SOLAR_SYSTEM pour les planetes).
-* afin de determiner le position de l 'astre sur son orbite
+* afin de determiner le position de l 'as sur son orbite
 * et dans le ciel, et ensuite, ses vitesses de deplacements
 * sur la voute celeste en azimut et en altitude.
-* Pour le ciel profond est considere que l'astre est fige
+* Pour le ciel profond est considere que l'as est fige
 * sur la voute.
 * (TODO) impact frequence de rafraichissement des calculs
 * sur la precision du suivi.
@@ -363,7 +364,8 @@ typedef struct {
    * -------------------------------------------- */
    
   double hd ;   // heure decimale
-
+  
+  int si ;      // signe
   int mm ;      // month
   int yy ;      // year
   int dd ;      // day
@@ -372,6 +374,18 @@ typedef struct {
   int SS ;      // secondes
 }
 TEMPS ;
+
+//=====================================================
+typedef struct {
+  
+  double AD ;   // angle decimale en radians
+  double ad ;   // angle decimale en degres
+  int si ;      // signe
+  int DD ;      // degres
+  int MM ;      // minutes
+  int SS ;      // secondes
+}
+ANGLE ;
 
 //=====================================================
 typedef struct {
@@ -522,21 +536,44 @@ SUIVI ;
 //=====================================================
 typedef struct {
 
+/* structure TEMPS pour azimut et altitude */ 
+
  TEMPS  at ;
  TEMPS  ht ;
+
+/* structure ANGLE et TEMPS pour azimut et altitude */
+
+ ANGLE  AZIa ; 
+ ANGLE  ALTa ;
+
+ TEMPS  AZIt ;
+ TEMPS  ALTt ;
+ 
+/* structure TEMPS pour ascension droite, declinaison et angle horaire */ 
+
  TEMPS  DECt ;
- TEMPS  ASCt ;   /* structure TEMPS pour ascension droite 0 (par defaut) */ 
- TEMPS  AGH0t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
- TEMPS  AGH1t ; /* structure TEMPS pour ascension droite 1 (par defaut) */ 
- TEMPS  AGH2t ; /* structure TEMPS pour ascension droite 2 (par defaut) */ 
- TEMPS  AGHt ;  /* structure TEMPS pour angle horaire (par defaut) */ 
+ TEMPS  ASCt ;   
+ TEMPS  AGHt ;   
+
+/* structure ANGLE pour ascension droite, declinaison et angle horaire */
+
+ ANGLE  DECa ; 
+ ANGLE  ASCa ;
+ ANGLE  AGHa ;
+
+/* structure TEMPS pour calculs intermediares */ 
+
+ TEMPS  AGH0t ;  
+ TEMPS  AGH1t ; 
+ TEMPS  AGH2t ;  
+ 
+ TEMPS  AZI0t ;
+ TEMPS  AZI1t ;
+ TEMPS  AZI2t ;
 
  char   nom         [ ASTRE_TAILLE_BUFFER ] ;
  char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
  char   plus_proche [ ASTRE_NB_COLONNES   ][ ASTRE_TAILLE_BUFFER ] ;
- 
- double a ;    // azimut
- double h ;    // altitude
  
 /* --------------------------------------------
 *  on deduit de l'azimut(h) et de l'altitude (a)
@@ -558,6 +595,9 @@ typedef struct {
  double yy ;   // idem - ordonnee
  double zz ; 
  
+ double a ;    // azimut
+ double h ;    // altitude
+
  double a0 ;   // valeur precedente de l'azimut
  double h0 ;   // valeur precedente de l'altitude
  
@@ -566,14 +606,17 @@ typedef struct {
  
  double DEC  ;  // un resultat de calcul de declinaison
  double ASC  ;   // un resultat de calcul de asc
+
  double AGH0 ;  // un autre resultat de calcul de asc
  double AGH1 ;  // un autre resultat de calcul de asc
  double AGH2 ;  // un autre resultat de calcul de asc
 
  double ALT ;   // un resultat de calcul de ALT
- double AZI ;   // un resultat de calcul de AZI
+
+ double AZI0 ;   // un resultat de calcul de AZI
  double AZI1 ;  // un autre resultat de calcul de AZI
- 
+ double AZI2 ;  // un autre resultat de calcul de AZI
+
  double A0 ;   // valeur precedente de l'angle horaire
  double H0 ;   // valeur precedente de la declinaison
  
@@ -625,7 +668,7 @@ VOUTE ;
 
 TEMPS      tem, *temps ;
 LIEU       lie, *lieu ;
-ASTRE      ast, *astre ;
+ASTRE      ast, *as ;
 VOUTE      vou, *voute ;
 SUIVI	     sui, *suivi ;
 CLAVIER    cla, *clavier ;
