@@ -1,0 +1,29 @@
+Ce repertoire liste les caracteristiques des moteurs utilises 
+pour le projet et le test de astrokit ;
+
+moteur 14HM11-0404S -------------------------------- 400 pas
+
+* bipolaire
+* nombre de pas            = 400
+* alimentation ideale      = 10V 
+* resistance par phase     = 25 Ohms
+* courant par phase        = 0.4 A
+* inductance par phase     = 24 mH
+* couple de maintien       = 1.1 kg.cm
+* dimension de l axe       = 5 mm - 22mm
+* poids                    = 120 g
+* comportement tres bon en micro-stepping
+
+moteur 14HS13-0406S -------------------------------- 200 pas
+
+* unipolaire
+* nombre de pas            = 200
+* alimentation ideale      = 10V 
+* resistance par phase     = 25 Ohms
+* courant par phase        = 0.4 A
+* inductance par phase     = 17 mH
+* couple de maintien       = 1.0 kg.cm
+* dimension de l axe       = 5 mm - 22mm
+* poids                    = 170 g
+* comportement bon en micro-stepping
+
