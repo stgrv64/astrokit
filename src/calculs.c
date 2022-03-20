@@ -38,7 +38,7 @@ double DEG  (int degres, int minutes )                  { return (double)degres 
    => latitude lat 
    => azimut            azi et altitude  alt
    => ascension droite  asc et déclinaison dec 
-   => H = angle horaire
+   => agh = angle horaire
 
 azimutal => equatorial
 
@@ -66,6 +66,12 @@ cos (azi) = {sin (dec) - sin (alt) sin (lat)} / { cos (alt) cos (lat)}
   a1 = AZI1(lat,A,H,h) ;
   af = SGN(a0)*a1 ;
 */
+
+/* CONVENTIONS :
+- angle horaie midi au nord , 00h au sud 
+- azimut 0 / 360 au nord , 
+*/
+
 double DEC  (double lat, double azi, double alt)     { return asin( sin(lat)*sin(alt) + cos(lat)*cos(alt)*cos(azi));}
 double ALT  (double lat, double agh, double dec)     { return asin( sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(agh));}
 
@@ -279,10 +285,14 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *as) {
   a1 = AZI1(lat,A,H,h) ;
   a2 = AZI2(lat,h,H) ;
 
-  af = SGN(a0)*a2 ;
+  as->a = SGN(a0)*a2 ;
+
+  /* Si azimut negatif on ajoute 360 degres */  
   
-  as->a = af ;
-  
+  if ( as->a < 0 ) {
+    as->a += 2*PI ;
+  }
+
    // resultats de calculs : pour tests (a modifier : supprimer)
   
   as->AZI0 = a0 ;
@@ -351,12 +361,17 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
   H  = DEC(lat,a,h) ;
   as->DEC  = H ;
 
-  A0 = AGH0(a,h,H) ;
-  A1 = AGH1(lat,a,h,H); 
-  A2 = AGH2(lat,H,h) ;
+  A0 = AGH0(a,h,H) ;       /* correct , ajouter 2*PI si negatif */
+  A1 = AGH1(lat,a,h,H)+PI; /* correct , ajouter PI */ 
+  A2 = AGH2(lat,H,h) ;     /* a anlyser = mauvais */ 
   
-  as->AGH = SGN(A0)*A1 ;
-  
+  if ( A0 < 0 ) {
+    A0 += 2 * PI ;
+  }
+  // as->AGH = SGN(A0)*A1  ;
+
+  as->AGH = A0 ;
+
   // resultats de calculs : pour tests (a modifier : supprimer)
 
   as->AGH0 = A0 ;
@@ -388,7 +403,7 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
 
   TRACE("DEC   (deg) = %f" , (as->DEC)*DEGRES) ;
 
-  TRACE2("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
+  TRACE("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
    (as->a)*DEGRES,\
    (as->h)*DEGRES,\
    (as->AGH)*DEGRES,\

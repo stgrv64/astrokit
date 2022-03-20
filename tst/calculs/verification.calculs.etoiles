@@ -1,0 +1,100 @@
+Suite a la correction des calculs suivants :
+
+CALCUL_ASCENSION_DROITE * prise en compte si ASC ou AGH negatif (on ajout 360°)
+CALCUL_ANGLE_HORAIRE    * prise en compte si ASC ou AGH negatif (on ajout 360°)
+CALCUL_AZIMUT           * macros appelees reprises (souvent probleme de signe)
+CALCUL_EQUATEUR         * macros appelees reprises (souvent probleme de signe)
+
+puis ajout de la fonction affichage suivante : 
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM
+
+on affiche les calculs effectues pour les etoiles principales
+a la date du 20 mars 2022 a midi environ :
+
+ATTENTION !!
+
+le signe n'est pas affiche dans les expressions en degres 
+=> tenir compte des expressions sous la forme 
+- heure minutes secondes ou 
+- degres minutes secondes
+
+ATTENTION !!
+- stellarium fixe sur Pau (64)
+- astrokit fixe sur : 
+CONFIG_AFFICHER_LIEU	: latitude   :  43.30
+CONFIG_AFFICHER_LIEU	: longitude  :  -0.36
+
+ETO1;AlphaCanisMajorisSirius;06;45;-16.7
+ETO2;AlphaCarinaeCanopus;06;24;-52.7
+ETO3;AlphaCentauriRigilKentaurus;14;40;-60.8
+ETO4;AlphaBoötisArcturus;14;16;19.2
+ETO5;AlphaLyraeVega;18;37;38.8
+ETO6;AlphaAurigaeCapella;05;18;46.0
+ETO7;AlphaCanisMinorisProcyon;07;39;5.2
+ETO8;AlphaEridaniAchernar;01;38;-57.2
+ETO9;AlphaOrionisBetelgeuse;05;55;7.4
+ETO10;AlphaAquilaeAltair;19;51;8.9
+
+------------------------------------------ ETO1 SIRIUS --------------------------------------------
+
+sudo ./astrokit.mars.2022.host ast ETO1
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:29:41 : 11.494722
+
+CONFIG_AFFICHER_ASTRE	: ETO1 : infos         : AlphaCanisMajorisSirius
+CONFIG_AFFICHER_ASTRE	: ETO1 : type          : ASTRE_CIEL_PROFOND
+CONFIG_AFFICHER_ASTRE	: ETO1 : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: ETO1 : vitesses      : -10.47 (Va) -10.94 (Vh)
+CONFIG_AFFICHER_ASTRE	: ETO1 : azimut        : 88.40 (deg) 
+CONFIG_AFFICHER_ASTRE	: ETO1 : altitude      : -26.45 (deg) 
+CONFIG_AFFICHER_ASTRE	: ETO1 : declinaison   : -16.70 (deg) 
+CONFIG_AFFICHER_ASTRE	: ETO1 : ascension dro : 101.25 (deg) 6h45m0s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: ETO1 : angle horaire : 249.13 (deg) 16h36m30s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 6h45m0s / 16°41'59"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 16h36m30s / 16°41'59"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 88°24'17" / 26°27'8"
+
+=> correct
+=> leger decalage 3' sur declinaison 
+=> leger decalage 10' / 20' sur  asc / agh
+=> leger decalage 24 ' sur azi
+=> leger decalage 30 ' sur alt
+
+------------------------------------------ ETO2 CANOPUS --------------------------------------------
+
+
+
+------------------------------------------ ETO3 ALPHA CENTAURE --------------------------------------------
+
+
+
+------------------------------------------ ETO4 ARCTURUS --------------------------------------------
+
+
+
+------------------------------------------ ETO5 VEGA --------------------------------------------
+
+
+
+------------------------------------------ ETO6 CAPELLA --------------------------------------------
+
+
+
+------------------------------------------ ETO7 PROCYON --------------------------------------------
+
+
+
+------------------------------------------ ETO8 ACHERNAR --------------------------------------------
+
+
+
+------------------------------------------ ETO9 BETELGEUSE --------------------------------------------
+
+
+
+------------------------------------------ ETO10 ALTAIR --------------------------------------------
+
+
+

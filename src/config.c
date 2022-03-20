@@ -1129,8 +1129,8 @@ void CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG
 
 void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
 
-  Trace(" latitude   :  %.2f", lieu->lat * DEGRES ) ; 
-  Trace(" longitude  :  %.2f", lieu->lon * DEGRES ) ;
+  Trace1(" latitude   :  %.2f", lieu->lat * DEGRES ) ; 
+  Trace1(" longitude  :  %.2f", lieu->lon * DEGRES ) ;
   Trace1("lieu->JD    : %f",lieu->JD) ;
   Trace1("lieu->JJ    : %f",lieu->JJ) ;
   Trace1("lieu->TS    : %f",lieu->TS) ;
@@ -1142,7 +1142,7 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
   Trace1("lieu->lat (deg) = %f",lieu->lat * DEGRES ) ;
   Trace1("lieu->lon (deg) = %f",lieu->lon * DEGRES ) ;
 
-  Trace("----------------------------") ;
+  Trace1("----------------------------") ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_TEMPS
@@ -1283,15 +1283,11 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   char  c_hhmmss_agh[ 16] ;
   char  c_hhmmss_asc[ 16] ;
 
-  Trace("") ;
-
   memset( c_hhmmss_agh0, 0, sizeof(c_hhmmss_agh0) ) ;
   memset( c_hhmmss_agh1, 0, sizeof(c_hhmmss_agh1) ) ;
   memset( c_hhmmss_agh2, 0, sizeof(c_hhmmss_agh2) ) ;
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
-
-  Trace("") ;
 
   sprintf( c_hhmmss_agh, "%dh%dm%ds",   as->AGHt.HH,  as->AGHt.MM,  as->AGHt.SS  ) ;
   sprintf( c_hhmmss_asc,  "%dh%dm%ds",  as->ASCt.HH,   as->ASCt.MM,   as->ASCt.SS  ) ;
@@ -1338,10 +1334,10 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
 
 void CONFIG_AFFICHER_VOUTE( VOUTE * voute) {
 	
-	Trace("voute->num %lld", voute->num) ;
-  Trace("voute->pas %lld", voute->num) ;
+	Trace1("voute->num %lld", voute->num) ;
+  Trace1("voute->pas %lld", voute->num) ;
 
-  Trace("----------------------------") ;
+  Trace1("----------------------------") ;
 
 }
 /*****************************************************************************************
