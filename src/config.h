@@ -91,6 +91,8 @@ void   CONFIG_AFFICHER_TOUT(void) ;          /* FIXME ajout 20191228 */
 void   CONFIG_AFFICHER_CHANGEMENTS (void) ;  /* FIXME ajout 20200102 */
 void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 
+void   CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(ASTRE *)  ;
+
 #endif
 
 //========================================================================================

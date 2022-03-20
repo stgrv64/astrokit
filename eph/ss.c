@@ -395,7 +395,8 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
 // Les valeurs doivent etre entrees en degre et non en radian !! (lon lat)
 //===========================================================================================
 
-void SOLAR_SYSTEM( char * nom, double * ASC, double * H, double * a, double * h, double lat, double lon, double alt, \
+void SOLAR_SYSTEM( char * nom, \
+   double * ASC, double * H, double * a, double * h, double lat, double lon, double alt, \
    int annee, int mois, int jour, int heure, int minute, int seconde, int num ) {
 
   int i;

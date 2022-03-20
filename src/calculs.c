@@ -13,6 +13,7 @@
 # 12/03/2022  | * correction calcul DEC (declinaison) - => + dans formule
 # 
 # mars  2022  | * reprise des calculs et ajout de fonctions de conversions
+#               * correction deuxieme argument appel SOLAR_SYSTEM
 # -------------------------------------------------------------- 
 */
 
@@ -630,8 +631,8 @@ void CALCUL_TEMPS_VERS_HMS(TEMPS *temps) {
 void CALCUL_ANGLE_VERS_DMS(ANGLE *angle) {
   
   Trace1(""); 
-  Trace("angle decimal (radian)  = %.4f" , angle->AD) ;
-  Trace("angle decimal (degres)  = %.4f" , angle->ad) ;
+  Trace1("angle decimal (radian)  = %.4f" , angle->AD) ;
+  Trace1("angle decimal (degres)  = %.4f" , angle->ad) ;
 /*
   if ( angle->AD >=0 ) { 
     angle->si =  1 ;
@@ -641,13 +642,13 @@ void CALCUL_ANGLE_VERS_DMS(ANGLE *angle) {
   }
 */
   angle->DD = (int)fabs(  angle->ad ) ;
-  Trace("heure    decimale = %d" , angle->DD) ;
+  Trace1("heure    decimale = %d" , angle->DD) ;
   
   angle->MM = (int)fabs( (fabs(angle->ad) - angle->DD ) * 60.0 ) ;
-  Trace("minutes  decimale = %d" , angle->MM) ;
+  Trace1("minutes  decimale = %d" , angle->MM) ;
 
   angle->SS = (int)fabs(((fabs(angle->ad) - angle->DD ) * 60.0 - angle->MM ) * 60.0 ) ;
-  Trace("secondes decimale = %d" , angle->SS) ;
+  Trace1("secondes decimale = %d" , angle->SS) ;
 }
 
 /*****************************************************************************************
@@ -907,39 +908,81 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
 
   return 0 ;
 }
-//========================================================================================
-// FIXME : CALCUL_ANGLE_HORAIRE
-// FIXME :  * calcul de l angle horaire de l as 
-// FIXME :  * a besoin de TSR et ASC , donc de CALCUL_TEMPS_SIDERAL
-//========================================================================================
+/*****************************************************************************************
+* @fn     : CALCUL_ANGLE_HORAIRE
+* @author : s.gravois
+* @brief  : Convertit heure decimale en heure minutes secondes decimales
+* @param  : TEMPS *temps
+* @date   : 2022-03-19 correction valeur quand negatif 
+* @todo   : ras
+*****************************************************************************************/
 
-void CALCUL_ANGLE_HORAIRE( LIEU *lieu, ASTRE *as ) {
+void CALCUL_ANGLE_HORAIRE( LIEU *li, ASTRE *as ) {
   
   // en radians 
-  
-  as->AGH = lieu->TSR - as->ASC ;
-  
-  CALCUL_CONVERSIONS_ANGLES( as) ;
 
-  Trace2("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
-  Trace2("as->AGH = %f\tastre->ASC = %f", as->AGH, as->ASC ) ;
+  /* correction ascension droite si negatif (on ajoute 360 degres) */
+
+  if ( as->ASC < 0 ) {
+    as->ASC += 2*PI ;
+  }
+
+  /* calcul */ 
+
+  as->AGH = li->TSR - as->ASC ;
+  
+  /* correction angle horaire si negatif (on ajoute 360 degres) */
+
+  if ( as->AGH < 0 ) {
+    as->AGH += 2*PI ;
+  }
+
+  CALCUL_CONVERSIONS_ANGLES( as) ;
+  
+  Trace("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
+  Trace("temps sideral (rad)      = %.2f", li->TSR ) ;
+  Trace("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
+
+  CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(as) ;
 }
-//========================================================================================
-// FIXME : CALCUL_ASCENSION_DROITE
-// FIXME :  * calcul de l ascension droite de l as en fonction de l'angle horaire
-// FIXME :  * a besoin de TSR et ASC , donc de CALCUL_TEMPS_SIDERAL
-//========================================================================================
 
-void CALCUL_ASCENSION_DROITE( LIEU *lieu, ASTRE *as ) {
+/*****************************************************************************************
+* @fn     : CALCUL_ASCENSION_DROITE
+* @author : s.gravois
+* @brief  : Convertit heure decimale en heure minutes secondes decimales
+* @param  : TEMPS *temps
+* @date   : 2022-03-19 correction valeur quand negatif 
+* @date   : 2022-03-20 verification que angle horaire est positif
+* @todo   : ras
+*****************************************************************************************/
+
+void CALCUL_ASCENSION_DROITE( LIEU *li, ASTRE *as ) {
   
   // en radians 
   
-  as->ASC = lieu->TSR - as->AGH ;
+  /* correction angle horaire si negatif (on ajoute 360 degres) */
+
+  if ( as->AGH < 0 ) {
+    as->AGH += 2*PI ;
+  }
+
+  /* calcul */ 
+
+  as->ASC = li->TSR - as->AGH ;
   
+  /* correction ascension droite si negatif (on ajoute 360 degres) */
+
+  if ( as->ASC < 0 ) {
+    as->ASC += 2*PI ;
+  }
+
   CALCUL_CONVERSIONS_ANGLES( as) ;
   
-  Trace2("lieu->JJ    = %f\tlieu->TSR     = %f", lieu->JJ,    lieu->TSR ) ;
-  Trace2("as->AGH = %f\tastre->ASC = %f", as->AGH, as->ASC ) ;
+  Trace("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
+  Trace("temps sideral (rad)      = %.2f", li->TSR ) ;
+  Trace("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
+
+  CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(as) ;
 }
 //========================================================================================
 // FIXME : CALCUL_TOUT
@@ -1047,14 +1090,14 @@ void CALCUL_TOUT(void) {
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
       
       SOLAR_SYSTEM( as->nom,\
-                      & as->AGH0,\
+                      & as->ASC,\
                       & as->DEC,\
                       & as->a,\
                       & as->h ,\
                         lieu->lat, lieu->lon, lieu->alt,\
                         temps->yy, temps->mm, temps->dd,temps->HH, temps->MM, temps->SS,\
                         as->numero) ;
-                        
+      
       CALCUL_ANGLE_HORAIRE( lieu, as ) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 

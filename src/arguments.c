@@ -62,7 +62,7 @@ void ARGUMENTS_VOUTE(void) {
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
        as->a * DEGRES, \
        as->h * DEGRES, \
-       as->ASC   * DEGRES, \
+       as->ASC * DEGRES, \
        as->DEC * DEGRES, \
        as->x , \
        as->y, \

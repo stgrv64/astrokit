@@ -1131,10 +1131,10 @@ void CONFIG_AFFICHER_LIEU(LIEU *lieu) {
 
   Trace(" latitude   :  %.2f", lieu->lat * DEGRES ) ; 
   Trace(" longitude  :  %.2f", lieu->lon * DEGRES ) ;
-  Trace("lieu->JD    : %f",lieu->JD) ;
-  Trace("lieu->JJ    : %f",lieu->JJ) ;
-  Trace("lieu->TS    : %f",lieu->TS) ;
-  Trace("lieu->TSR   : %f",lieu->TSR) ;
+  Trace1("lieu->JD    : %f",lieu->JD) ;
+  Trace1("lieu->JJ    : %f",lieu->JJ) ;
+  Trace1("lieu->TS    : %f",lieu->TS) ;
+  Trace1("lieu->TSR   : %f",lieu->TSR) ;
 
   Trace1("lieu->alt = %f",lieu->alt ) ;
 

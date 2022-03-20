@@ -1,0 +1,230 @@
+Suite a la correction des calculs suivants :
+
+CALCUL_ASCENSION_DROITE * prise en compte si ASC ou AGH negatif (on ajout 360°)
+CALCUL_ANGLE_HORAIRE    * prise en compte si ASC ou AGH negatif (on ajout 360°)
+CALCUL_AZIMUT           * macros appelees reprises (souvent probleme de signe)
+CALCUL_EQUATEUR         * macros appelees reprises (souvent probleme de signe)
+
+puis ajout de la fonction affichage suivante : 
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM
+
+on affiche les calculs effectues pour toutes les planetes
+a la date du 20 mars 2022 a midi environ :
+
+ATTENTION !!
+
+le signe n'est pas affiche dans les expressions en degres 
+=> tenir compte des expressions sous la forme 
+- heure minutes secondes ou 
+- degres minutes secondes
+
+ATTENTION !!
+- stellarium fixe sur Pau (64)
+- astrokit fixe sur : 
+CONFIG_AFFICHER_LIEU	: latitude   :  43.30
+CONFIG_AFFICHER_LIEU	: longitude  :  -0.36
+
+------------------------------------------ SOLEIL --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 10:50:40 : 10.844444
+
+CONFIG_AFFICHER_ASTRE	: soleil : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: soleil : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: soleil : vitesses      : -19.52 (Va) -4.96 (Vh)
+CONFIG_AFFICHER_ASTRE	: soleil : azimut        : 152.26 (deg) 
+CONFIG_AFFICHER_ASTRE	: soleil : altitude      : 43.14 (deg) 
+CONFIG_AFFICHER_ASTRE	: soleil : declinaison   : -0.06 (deg) 
+CONFIG_AFFICHER_ASTRE	: soleil : ascension dro : 359.82 (deg) 23h59m15s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: soleil : angle horaire : 340.75 (deg) 22h43m0s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 23h59m15s / 0°3'47"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 22h43m0s / 0°3'47"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 152°15'18" / 43°8'9"
+
+=> correct
+
+------------------------------------------ MERCURE --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 10:54:1 : 10.900278
+
+CONFIG_AFFICHER_ASTRE	: mercure : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: mercure : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: mercure : vitesses      : -19.11 (Va) -1.90 (Vh)
+CONFIG_AFFICHER_ASTRE	: mercure : azimut        : 169.23 (deg) 
+CONFIG_AFFICHER_ASTRE	: mercure : altitude      : 39.12 (deg) 
+CONFIG_AFFICHER_ASTRE	: mercure : declinaison   : -7.01 (deg) 
+CONFIG_AFFICHER_ASTRE	: mercure : ascension dro : 349.20 (deg) 23h16m47s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: mercure : angle horaire : 352.21 (deg) 23h28m51s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 23h16m47s / 7°0'21"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 23h28m51s / 7°0'21"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 169°13'35" / 39°7'8"
+
+=> correct
+=> leger decalage sur angle horaire (4 mn)
+
+------------------------------------------ VENUS --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 10:59:42 : 10.995000
+
+CONFIG_AFFICHER_ASTRE	: venus : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: venus : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: venus : vitesses      : -15.04 (Va) 5.50 (Vh)
+CONFIG_AFFICHER_ASTRE	: venus : azimut        : 209.53 (deg) 
+CONFIG_AFFICHER_ASTRE	: venus : altitude      : 26.77 (deg) 
+CONFIG_AFFICHER_ASTRE	: venus : declinaison   : -14.86 (deg) 
+CONFIG_AFFICHER_ASTRE	: venus : ascension dro : 315.14 (deg) 21h0m32s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: venus : angle horaire : 27.70 (deg) 1h50m48s (HH.MM.SS)
+M	:
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 21h0m32s / 14°51'39"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 1h50m48s / 14°51'39"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 209°31'50" / 26°46'9"
+
+=> correct
+=> leger decalage sur les angles (entre 5 et 10 mn)
+
+------------------------------------------ LUNE --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:1:59 : 11.033056
+
+CONFIG_AFFICHER_ASTRE	: lune : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: lune : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: lune : vitesses      : -14.91 (Va) 9.45 (Vh)
+CONFIG_AFFICHER_ASTRE	: lune : azimut        : 299.73 (deg) 
+CONFIG_AFFICHER_ASTRE	: lune : altitude      : -39.33 (deg) 
+CONFIG_AFFICHER_ASTRE	: lune : declinaison   : -8.94 (deg) 
+CONFIG_AFFICHER_ASTRE	: lune : ascension dro : 205.64 (deg) 13h42m32s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: lune : angle horaire : 137.78 (deg) 9h11m6s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 13h42m32s / 8°56'40"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 9h11m6s / 8°56'40"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 299°43'42" / 39°19'40"
+
+=> correct
+=> moyen decalage sur les angles (entre 15' et 30')
+=> a analyser 
+
+------------------------------------------ MARS --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:4:12 : 11.070000
+
+CONFIG_AFFICHER_ASTRE	: mars : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: mars : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: mars : vitesses      : -14.11 (Va) 5.69 (Vh)
+CONFIG_AFFICHER_ASTRE	: mars : azimut        : 210.75 (deg) 
+CONFIG_AFFICHER_ASTRE	: mars : altitude      : 22.30 (deg) 
+CONFIG_AFFICHER_ASTRE	: mars : declinaison   : -18.57 (deg) 
+CONFIG_AFFICHER_ASTRE	: mars : ascension dro : 313.41 (deg) 20h53m38s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: mars : angle horaire : 30.56 (deg) 2h2m14s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 20h53m38s  / 18°34'6"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 2h2m14s    / 18°34'6"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 210°45'12" / 22°17'54" (attendu 211° 01' 52" / 22° 09' 12" )
+
+=> correct
+=> leger a moyen decalage sur les angles (entre 5' et 15')
+=> a analyser 
+
+------------------------------------------ JUPITER --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:9:40 : 11.161111
+
+CONFIG_AFFICHER_ASTRE	: jupiter : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: jupiter : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: jupiter : vitesses      : -19.82 (Va) -1.14 (Vh)
+CONFIG_AFFICHER_ASTRE	: jupiter : azimut        : 173.19 (deg) 
+CONFIG_AFFICHER_ASTRE	: jupiter : altitude      : 41.06 (deg) 
+CONFIG_AFFICHER_ASTRE	: jupiter : declinaison   : -5.42 (deg) 
+CONFIG_AFFICHER_ASTRE	: jupiter : ascension dro : 349.87 (deg) 23h19m29s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: jupiter : angle horaire : 355.47 (deg) 23h41m53s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 23h19m29s / 5°25'10"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 23h41m53s / 5°25'10"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 173°11'23" / 41°3'26"
+
+=> correct
+=> leger a moyen decalage sur les angles ( entre 5' et 25')
+
+------------------------------------------ SATURNE --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:12:1 : 11.200278
+
+CONFIG_AFFICHER_ASTRE	: saturne : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: saturne : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: saturne : vitesses      : -15.58 (Va) 4.53 (Vh)
+CONFIG_AFFICHER_ASTRE	: saturne : azimut        : 203.81 (deg) 
+CONFIG_AFFICHER_ASTRE	: saturne : altitude      : 28.06 (deg) 
+CONFIG_AFFICHER_ASTRE	: saturne : declinaison   : -15.36 (deg) 
+CONFIG_AFFICHER_ASTRE	: saturne : ascension dro : 323.62 (deg) 21h34m29s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: saturne : angle horaire : 22.31 (deg) 1h29m15s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 21h34m29s / 15°21'53"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 1h29m15s / 15°21'53"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 203°48'47" / 28°3'31"
+
+=> correct
+=> leger a moyen decalage sur les angles ( entre 5' et 25')
+
+------------------------------------------ URANUS --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:13:50 : 11.230556
+
+CONFIG_AFFICHER_ASTRE	: uranus : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: uranus : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: uranus : vitesses      : -12.36 (Va) -10.59 (Vh)
+CONFIG_AFFICHER_ASTRE	: uranus : azimut        : 104.06 (deg) 
+CONFIG_AFFICHER_ASTRE	: uranus : altitude      : 36.18 (deg) 
+CONFIG_AFFICHER_ASTRE	: uranus : declinaison   : 15.20 (deg) 
+CONFIG_AFFICHER_ASTRE	: uranus : ascension dro : 39.99 (deg) 2h39m56s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: uranus : angle horaire : 306.41 (deg) 20h25m37s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 2h39m56s / 15°11'52"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 20h25m37s / 15°11'52"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 104°3'51" / 36°11'4"
+
+=> bien
+=> leger decalage sur les angles azimut et altitude ( entre 5' et 20')
+
+------------------------------------------ NEPTUNE --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:15:52 : 11.264444
+
+CONFIG_AFFICHER_ASTRE	: neptune : infos         : 
+CONFIG_AFFICHER_ASTRE	: neptune : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: neptune : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: neptune : vitesses      : -20.20 (Va) -1.87 (Vh)
+CONFIG_AFFICHER_ASTRE	: neptune : azimut        : 169.33 (deg) 
+CONFIG_AFFICHER_ASTRE	: neptune : altitude      : 42.43 (deg) 
+CONFIG_AFFICHER_ASTRE	: neptune : declinaison   : -3.74 (deg) 
+CONFIG_AFFICHER_ASTRE	: neptune : ascension dro : 354.14 (deg) 23h36m33s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: neptune : angle horaire : 352.76 (deg) 23h31m2s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 23h36m33s / 3°44'9"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 23h31m2s / 3°44'9"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 169°20'4" / 42°25'51"
+
+=> bien
+=> leger decalage sur les angles azimut et altitude ( entre 5' et 20')
+
+------------------------------------------ PLUTON --------------------------------------------
+
+CONFIG_AFFICHER_TEMPS	: DATE / HOUR : 2022-3-20 11:19:32 : 11.325556
+
+CONFIG_AFFICHER_ASTRE	: pluton : type          : ASTRE_PLANETE
+CONFIG_AFFICHER_ASTRE	: pluton : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_ASTRE	: pluton : vitesses      : -11.92 (Va) 7.57 (Vh)
+CONFIG_AFFICHER_ASTRE	: pluton : azimut        : 223.22 (deg) 
+CONFIG_AFFICHER_ASTRE	: pluton : altitude      : 11.78 (deg) 
+CONFIG_AFFICHER_ASTRE	: pluton : declinaison   : -22.28 (deg) 
+CONFIG_AFFICHER_ASTRE	: pluton : ascension dro : 300.77 (deg) 20h3m3s (HH.MM.SS)
+CONFIG_AFFICHER_ASTRE	: pluton : angle horaire : 47.06 (deg) 3h8m14s (HH.MM.SS)
+
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AD / Dec   : 20h3m3s / 22°16'52"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AH / Dec   : 3h8m14s / 22°16'52"
+CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM	:AZ./ Haut. : 223°13'16" / 11°46'48"
+
+=> moyen
+=> leger decalage sur les angles azimut et altitude ( entre 10' et 15')
+=> leger decalage sur les autres angles ( environ 5mn )
+
