@@ -20,6 +20,9 @@
 # 11/03/2022  | * prise en compte option -p (facon classique)
 #               * renseignement CONFIG_REP_HOME par -p <path>
 # 11/03/2022  | * ajout appel fonction ARGUMENTS_GERER_REP_HOME
+#
+# 21/03/2022  | * ajout appel CONFIG_INIT_CODES dasn main 
+#                 en remaplacement de IR_INIT_CODES
 # -------------------------------------------------------------- 
 */
 
@@ -1044,7 +1047,6 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   
   if ( devices->DEVICE_INFRAROUGE_USE ) {
     
-    LIRC_CONFIG_CODES( irc) ;
     LIRC_OPEN( lircconfig ) ;
   
     // ATTENTION !!! la fonction LIRC_READ est bloquante (voir ir.c) !!!!!
@@ -1055,6 +1057,72 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   return NULL ;
 }
 
+/*****************************************************************************************
+* @fn     : SUIVI_CLAVIER_TERMIOS
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi clavier 
+*           en mode termios
+* @param  : SUIVI * suivi
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @todo   : supprimer argument qui est variable globale
+*****************************************************************************************/
+
+void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
+
+  int c_char =0 ;
+  int i_sum_char =0 ; 
+  char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ] ;
+  struct sched_param param;
+  struct timeval t00,t01 ;
+  TRACE("start") ;
+  sleep(3) ;
+  /*
+  param.sched_priority = 1  ;
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+  }
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  */
+  if ( devices->DEVICE_CLAVIER_USE ) {
+    KEYBOARD_TERMIOS_INIT() ;
+
+    while( c_char != 'q' ) {
+      
+      memset(ch_chaine, 0, sizeof(ch_chaine)) ;
+
+      if ( (int)c_char == TERMIOS_ESCAPE_CHAR )          { 
+        Trace("char TERMIOS_ESCAPE_CHAR detecte\n") ; 
+        i_sum_char=0 ;
+      }
+      else if ( (int)c_char == TERMIOS_CHARIAGE_RETURN_CHAR ) { 
+        Trace("char TERMIOS_CHARIAGE_RETURN_CHAR detecte\n") ; 
+        i_sum_char=0 ;
+      }
+
+      /* printf("boucle en cours\n") ;*/
+      usleep(5000) ;/*
+      if ( KEYBOARD_TERMIOS_KBHIT()) {
+        c_char = KEYBOARD_TERMIOS_READCH() ;
+        printf("keycode %-5d : %c %d\n", c_char, c_char, i_sum_char) ;
+        i_sum_char += (int)c_char ;
+      }*/
+      if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine)) {
+        c_char=ch_chaine[0] ;
+        printf("keycode %-5d : %c %d\n", c_char, c_char, i_sum_char) ;
+        i_sum_char += (int)c_char ;
+      }
+      
+    }
+
+    KEYBOARD_TERMIOS_EXIT() ;
+
+    if ( c_char == 'q' ) {
+      TRAP_MAIN(1) ;
+    }
+  }
+  return NULL ;
+}
 /*****************************************************************************************
 * @fn     : SUIVI_CLAVIER_getchar
 * @author : s.gravois
@@ -1087,8 +1155,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
     if ( c_char == 'q' ) {
       TRAP_MAIN(1) ;
     }
-    /*
-    LIRC_CONFIG_CODES( irc) ;
+    /* appels LIRC pour memoire : 
     LIRC_OPEN( lircconfig ) ;
     LIRC_READ( suivi ) ;
     LIRC_CLOSE(lircconfig) ;*/
@@ -1096,50 +1163,6 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   return NULL ;
 }
 
-/*****************************************************************************************
-* @fn     : SUIVI_CLAVIER_TERMIOS
-* @author : s.gravois
-* @brief  : fonction de callback du thread suivi clavier 
-*           en mode termios
-* @param  : SUIVI * suivi
-* @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @todo   : supprimer argument qui est variable globale
-*****************************************************************************************/
-
-void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
-
-  int c_char =0 ;
-  struct sched_param param;
-  TRACE("start") ;
-  sleep(3) ;
-  /*
-  param.sched_priority = 1  ;
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
-    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
-  }
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
-  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
-  */
-  if ( devices->DEVICE_CLAVIER_USE ) {
-    KEYBOARD_TERMIOS_INIT() ;
-
-    while( c_char != 'q' ) {
-      /* printf("boucle en cours\n") ;*/
-      usleep(50000) ;
-      if ( KEYBOARD_TERMIOS_KBHIT()) {
-        c_char = KEYBOARD_TERMIOS_READCH() ;
-        printf("keycode %-5d : %c\n", c_char, c_char) ;
-      }
-    }
-
-    KEYBOARD_TERMIOS_EXIT() ;
-
-    if ( c_char == 'q' ) {
-      TRAP_MAIN(1) ;
-    }
-  }
-  return NULL ;
-}
 /*****************************************************************************************
 * @fn     : SUIVI_CLAVIER_NCURSES
 * @author : s.gravois
@@ -1321,30 +1344,31 @@ int main(int argc, char ** argv) {
   // Initialisations des structures de devices
   // -----------------------------------------------------------------
 
-  as   = &ast ;
+  as      = &ast ;
   lieu    = &lie;
   voute   = &vou ;
   suivi   = &sui ;
   temps   = &tem ;
   clavier = &cla ;
   devices = &dev ;
-  irc     = &ir_codes ;
+  gp_Codes     = &g_Codes ;
   
   // -----------------------------------------------------------------
   // Initialisations diverses et variees
   // -----------------------------------------------------------------
 
-  CONFIG_READ       ( datas ) ;
-  GPIO_READ         ( datas ) ; 
+  CONFIG_READ       ( g_Datas ) ;
+  GPIO_READ         ( g_Datas ) ; 
 
-  CONFIG_AFFICHER_DATAS ( datas ) ;
-  CONFIG_INIT_VAR       ( datas ) ;
+  CONFIG_AFFICHER_DATAS ( g_Datas ) ;
+  CONFIG_INIT_VAR       ( g_Datas ) ;
 
   CONFIG_AFFICHER_VARIABLES() ;   
   CONFIG_INIT_LOG(); 
 
   GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
   
+  CONFIG_INIT_CODES     ( gp_Codes) ;
   CONFIG_INIT_CLAVIER   ( clavier ) ;   
   CONFIG_INIT_ASTRE     ( as ) ;
   CONFIG_INIT_LIEU      ( lieu  ) ;

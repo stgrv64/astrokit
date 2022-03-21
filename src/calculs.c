@@ -6,7 +6,7 @@
 # 15/11/2021  | * (types.h) modification des types enum et contenu enum
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
 # 19/01/2022  | * gestion du cas ou l as n a pas de nom
-#                 c'est a dire q'on effectue les calculs en fonction des coordevices
+#                 c'est a dire q'on effectue les calculs en fonction des coordonnees
 #                 sans l'information de nom (recherche catagues inutiles)
 # 21/01/2022  | * recuperation numero objet (PLA5 => 5, MES10 -> 10, ..)
 #               * passage dernier arg de SOLAR_SYSTEM abec as->numero
@@ -87,13 +87,27 @@ double AZI2 (double lat, double alt, double dec)   { return acos(( sin(dec) - si
 double RAD  (int degres, int minutes )                  { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / DEGRES ; }
 double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
 
-//========================================================================================
-// FIXME : CALCUL_DUREE_MICROSEC : 
-// FIXME : * permet de calculer une duree depuis un dernier appel a cette meme focntion
-// FIXME : * resultat en microsecondes
-// FIXME : * met a jour la structure appelee (pointeur)
-// FIXME : * utlisation gettimeofday
-//========================================================================================
+/*****************************************************************************************
+* @fn     : CALCUL_REDUCTION_TOTALE
+* @author : s.gravois
+* @brief  : permet de calculer unela reduction totale de la vitesse 
+* @param  : struct timeval *t00
+* @date   : 2022-03-20 creation entete
+*****************************************************************************************/
+
+double CALCUL_REDUCTION_TOTALE() {
+
+
+   return 0.0 ;
+}
+/*****************************************************************************************
+* @fn     : CALCUL_DUREE_MICROSEC
+* @author : s.gravois
+* @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
+* @brief  : resultat en microsecondes
+* @param  : struct timeval *t00
+* @date   : 2022-03-20 creation entete
+*****************************************************************************************/
 
 double CALCUL_DUREE_MICROSEC(struct timeval *t00) {
   
@@ -109,14 +123,16 @@ double CALCUL_DUREE_MICROSEC(struct timeval *t00) {
 
   return t_diff ;
 }
-//========================================================================================
-// FIXME : CALCUL_DUREE_NANOSEC : 
-// FIXME : * permet de calculer une duree depuis un dernier appel a cette meme focntion
-// FIXME : * resultat en nanosecondes
-// FIXME : * met a jour la structure appelee (pointeur)
-// FIXME : * utlisation FIXME : modifier et mettre a jour
-//========================================================================================
-// TODO : a finir : modifier pour passer en nanosecondes
+
+/*****************************************************************************************
+* @fn     : CALCUL_DUREE_NANOSEC
+* @author : s.gravois
+* @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
+* @brief  : resultat en nanosecondes
+* @param  : struct timeval *t00
+* @date   : 2022-03-20 creation entete
+* @todo   : finir ( modifier pour passer en nanosecondes)
+*****************************************************************************************/
 
 double CALCUL_DUREE_NANOSEC(struct timeval *t00) {
   
@@ -132,13 +148,17 @@ double CALCUL_DUREE_NANOSEC(struct timeval *t00) {
 
   return t_diff ;
 }
-//========================================================================================
-// FIXME : CALCUL_TEMPORISATION_VOUTE : 
-// FIXME : * permet de faire une temporisation (1s) dans la boucle infinie de SUIVI_VOUTE
-// FIXME : * utilise un usleep() sur 99% du temps de la temporisation (cf calibration_voute)
-// TODO  : * verifier si on peut augmenter la valeur de calibration_voute en augmentant 
-//           la priorite du thread egalement
-//========================================================================================
+
+/*****************************************************************************************
+* @fn     : CALCUL_TEMPORISATION_VOUTE
+* @author : s.gravois
+* @brief  : permet de faire une temporisation (1s) dans la boucle infinie de SUIVI_VOUTE
+* @brief  : utilise un usleep() sur 99% du temps de la temporisation (cf calibration_voute)
+* @param  : struct timeval *t00
+* @date   : 2022-03-20 creation entete
+* @todo   : verifier si on peut augmenter la valeur de calibration_voute en augmentant
+*           la priorite du thread egalement
+*****************************************************************************************/
 
 long CALCUL_TEMPORISATION_VOUTE(VOUTE *voute, struct timeval t00) {
   
@@ -232,14 +252,14 @@ void CALCUL_TEMPORISATION_AZIMUT(SUIVI *suivi, struct timeval * pt00) {
 }
 //========================================================================================
 // FIXME : CALCUL_GEODE : 
-// FIXME : * calcule les coordevices (x,y,z) dans R3 a partir de azimut et altitude
+// FIXME : * calcule les coordonnees (x,y,z) dans R3 a partir de azimut et altitude
 // FIXME : * en supposant que la voute est de diametre = 1
 //========================================================================================
 
 void CALCUL_GEODE(ASTRE *as) {
 
   // on deduit de l'azimut et de l'altitude
-  // les coordevices x y et z dans la geode d'observation
+  // les coordonnees x y et z dans la geode d'observation
   
   as->x = cos( as->h ) * cos( as->a )  ;
   as->y = cos( as->h ) * sin( as->a ) ;
@@ -257,12 +277,12 @@ void CALCUL_GEODE(ASTRE *as) {
 }
 //========================================================================================
 // FIXME : CALCUL_AZIMUT : 
-// FIXME : * transforme les coordevices siderales en coordevices azimutales
+// FIXME : * transforme les coordonnees siderales en coordonnees azimutales
 //========================================================================================
 
 void CALCUL_AZIMUT(LIEU *lieu, ASTRE *as) {
   
-  // transforme les coordevices "sid�rales" en coordevices azimutales
+  // transforme les coordonnees "sid�rales" en coordonnees azimutales
   // permet de trouver l'azimut et l'altitude en fonction de l'angle horaire
   // par rapport au m�ridien (SUD) et la declinaison
   // ATTENTION !! angle horaire = ascension droite sid�rale corrig�e
@@ -301,42 +321,42 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *as) {
 
   CALCUL_CONVERSIONS_ANGLES( as) ;
 
-  TRACE("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
     as->AZI0t.HH, \
     as->AZI0t.MM , \
     as->AZI0t.SS, \
     as->AZI0 * DEGRES );
 
-  TRACE("AZI1 = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AZI1 = %d.%d.%d (hms) %.2f (deg)", \
     as->AZI1t.HH, \
     as->AZI1t.MM , \
     as->AZI1t.SS, \
     as->AZI1 * DEGRES );
 
-  TRACE("AZI2 = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AZI2 = %d.%d.%d (hms) %.2f (deg)", \
     as->AZI2t.HH, \
     as->AZI2t.MM , \
     as->AZI2t.SS, \
     as->AZI2 * DEGRES );
 
-  TRACE("azi = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("azi = %d.%d.%d (hms) %.2f (deg)", \
     as->AGHt.HH, as->AGHt.MM , as->AGHt.SS, as->AGH * DEGRES );
 
-  TRACE("alt = %f (deg)" , (as->h)*DEGRES) ;
+  Trace1("alt = %f (deg)" , (as->h)*DEGRES) ;
 
 }
 //========================================================================================
 // FIXME : CALCUL_EQUATEUR : 
-// FIXME : * transforme les coordevices azimutales en coordevices siderales (angle horaire)
+// FIXME : * transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
 // TODO :  * probleme : les calculs ne sont pas bons (a verifier)
-// TODO :  * cette fonction servira quand on devra avoir les coordevices equatoriales
+// TODO :  * cette fonction servira quand on devra avoir les coordonnees equatoriales
 //          en fonction des coordonnnees azimutales , pour le calcul des VITESSES,
-//          qui utilise les coordevices equatoriales 
+//          qui utilise les coordonnees equatoriales 
 //========================================================================================
 
 void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
 
-  // transforme les coordevices azimutales en coordevices siderales (angle horaire)
+  // transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
   // permet de trouver les coordonn�es siderales en fonction de l'azimut et de l'altitude
   // Pour avoir la correspondance avec les coordonnn�es �quatoriales brutes, il faut
   // utiliser la conversion AH = TS - ASC
@@ -380,7 +400,7 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
   
   CALCUL_CONVERSIONS_ANGLES( as) ;
   
-  TRACE(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
+  Trace1(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
        as->nom , \
        as->ASCt.HH, \
        as->ASCt.MM, \
@@ -389,21 +409,21 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
        as->ASC \
   ) ; 
 
-  TRACE("AH0   (deg) = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AH0   (deg) = %d.%d.%d (hms) %.2f (deg)", \
     as->AGH0t.HH, as->AGH0t.MM , as->AGH0t.SS, as->AGH0 * DEGRES );
 
-  TRACE("AH1   (deg) = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AH1   (deg) = %d.%d.%d (hms) %.2f (deg)", \
     as->AGH1t.HH, as->AGH1t.MM , as->AGH1t.SS, as->AGH1 * DEGRES );
 
-  TRACE("AH2   (deg) = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AH2   (deg) = %d.%d.%d (hms) %.2f (deg)", \
     as->AGH2t.HH, as->AGH2t.MM , as->AGH2t.SS, as->AGH2 * DEGRES );
 
-  TRACE("AH    (deg) = %d.%d.%d (hms) %.2f (deg)", \
+  Trace1("AH    (deg) = %d.%d.%d (hms) %.2f (deg)", \
     as->AGHt.HH, as->AGHt.MM , as->AGHt.SS, as->AGH * DEGRES );
 
-  TRACE("DEC   (deg) = %f" , (as->DEC)*DEGRES) ;
+  Trace1("DEC   (deg) = %f" , (as->DEC)*DEGRES) ;
 
-  TRACE("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
+  Trace1("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
    (as->a)*DEGRES,\
    (as->h)*DEGRES,\
    (as->AGH)*DEGRES,\
@@ -616,14 +636,16 @@ void CALCUL_TEMPS_VERS_HMS(TEMPS *temps) {
   
   Trace1(""); 
   Trace1("TEMPS    decimal  = %.4f" , temps->hd) ;
-/*
+
   if ( temps->hd >=0 ) { 
-    temps->si =  1 ;
+    temps->si   =  1 ;
+    temps->c_si = '+' ;
   }
   else {
-    temps->si = -1 ;
+    temps->si   = -1 ;
+    temps->c_si = '-' ; 
   }
-  */
+  
   temps->HH = (int)fabs(  temps->hd ) ;
   Trace1("heure    decimale = %d" , temps->HH) ;
   
@@ -648,14 +670,16 @@ void CALCUL_ANGLE_VERS_DMS(ANGLE *angle) {
   Trace1(""); 
   Trace1("angle decimal (radian)  = %.4f" , angle->AD) ;
   Trace1("angle decimal (degres)  = %.4f" , angle->ad) ;
-/*
+
   if ( angle->AD >=0 ) { 
     angle->si =  1 ;
+    angle->c_si = '+' ;
   }
   else {
     angle->si = -1 ;
+    angle->c_si = '-' ;
   }
-*/
+
   angle->DD = (int)fabs(  angle->ad ) ;
   Trace1("heure    decimale = %d" , angle->DD) ;
   
@@ -954,11 +978,13 @@ void CALCUL_ANGLE_HORAIRE( LIEU *li, ASTRE *as ) {
 
   CALCUL_CONVERSIONS_ANGLES( as) ;
   
-  Trace("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
-  Trace("temps sideral (rad)      = %.2f", li->TSR ) ;
-  Trace("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
+  Trace1("temps sideral (rad)      = %.2f", li->TSR ) ;
+  Trace1("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
 
-  CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(as) ;
+  /*
+    CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
+  */
 }
 
 /*****************************************************************************************
@@ -993,11 +1019,13 @@ void CALCUL_ASCENSION_DROITE( LIEU *li, ASTRE *as ) {
 
   CALCUL_CONVERSIONS_ANGLES( as) ;
   
-  Trace("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
-  Trace("temps sideral (rad)      = %.2f", li->TSR ) ;
-  Trace("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
+  Trace1("temps sideral (rad)      = %.2f", li->TSR ) ;
+  Trace1("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
 
-  CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(as) ;
+  /*
+    CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
+  */
 }
 //========================================================================================
 // FIXME : CALCUL_TOUT
@@ -1050,7 +1078,7 @@ void CALCUL_TOUT(void) {
 
     /* ----------------------------------------------------------------- */
       /* pour un as indetermine 
-         on calcule les coordevices equatoriales 
+         on calcule les coordonnees equatoriales 
          necessaires au calcul des vitesses 
       */
 
@@ -1116,9 +1144,9 @@ void CALCUL_TOUT(void) {
       CALCUL_ANGLE_HORAIRE( lieu, as ) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 
-      // FIXME : ainsi que coordevices equatoriales / declinaison
+      // FIXME : ainsi que coordonnees equatoriales / declinaison
       // FIXME : est directement retourner par la fonction SOLAR_SYSTEM
-      // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordevices siderales
+      // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordonnees siderales
       // TODO  : ne modifie pas azimut et altitude calcules par SOLAR_SYSTEM
       
       // CALCUL_AZIMUT  ( lieu, as) ;
@@ -1174,15 +1202,31 @@ void CALCUL_TOUT(void) {
   }  
 }
 //================================================================================================
+/* On cherche a balayer la voute avec un pas de 1 degres par exemple
+   afin de verifier homogeneite des claculs entre 
+   azimutal <-> equatorial  et 
+  vice versa
+  Le fichier en sortie doit pouvoir se representer avec gnuplot et montrer 
+  des points de facon homogene sur la voute 3D
+*/
 void CALCUL_VOUTE(void ) {
   
   FILE   *fout ;
   // double A, H ;
   double a, h ;
-  
+
+/*
+  CALCUL_TEMPS_SIDERAL    ( lieu, temps ) ;
+  CALCUL_EQUATEUR         ( lieu, as ) ;
+  CALCUL_ASCENSION_DROITE ( lieu, as ) ;
+  CALCUL_VITESSES         ( lieu, as, suivi) ;
+  CALCUL_PERIODE          ( as, suivi, voute) ;
+*/
   fout=fopen("voute.csv","w") ;
   
-  // On fait varier les coordevices HORAIRES
+  CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+
+  // On fait varier les coordonnees azimutales
   
   for(h=-(PI/2)+(lieu->lat)+0.001;h<PI/2;h+=voute->pas)
     if (h>=0) 
@@ -1191,9 +1235,11 @@ void CALCUL_VOUTE(void ) {
      as->a=a ;
      as->h=h ;
      
-     CALCUL_EQUATEUR  ( lieu, as) ; // calcul coordevices horaires en fait
-     CALCUL_VITESSES  ( lieu, as, suivi) ; // TODO : verifier suivi->SUIVI_EQUATORIAL avant
-     
+     CALCUL_EQUATEUR          ( lieu, as) ; 
+     CALCUL_ASCENSION_DROITE  ( lieu, as ) ;
+     CALCUL_VITESSES          ( lieu, as, suivi) ;
+     CALCUL_PERIODE           ( as, suivi, voute) ;
+
      as->V  = sqrt( sqr( as->Va ) + sqr( as->Vh )) ;
      
      if ( as->Va != 0) 
@@ -1203,7 +1249,7 @@ void CALCUL_VOUTE(void ) {
      
      CALCUL_GEODE( as ) ;
      
-     Trace("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
+     Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
        as->a * DEGRES, \
        as->h * DEGRES, \
        as->AGH * DEGRES, \
@@ -1244,7 +1290,7 @@ void CALCUL_VOUTE(void ) {
       /*
       if ( suivi->SUIVI_ALIGNEMENT  ) {
 
-        TRACE("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta %.2f Th %.2f Fa=%.2f Fh %.2f",\
+        Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta %.2f Th %.2f Fa=%.2f Fh %.2f",\
           as->nom,\
           (int)((as->a)*DEGRES),\
           (int)((as->h)*DEGRES),\
@@ -1257,7 +1303,7 @@ void CALCUL_VOUTE(void ) {
           suivi->Fa,\
           suivi->Fh ) ;
 
-        TRACE("Va=%2.4f Vh=%2.4f Ta=%2.4f Th=%2.4f Fa=%2.4f Fh=%2.4f Fam = %ld Fhm = %ld Tac = %f Thc = %f\n",\
+        Trace1("Va=%2.4f Vh=%2.4f Ta=%2.4f Th=%2.4f Fa=%2.4f Fh=%2.4f Fam = %ld Fhm = %ld Tac = %f Thc = %f\n",\
               as->Va,\
               as->Vh,\
               suivi->Ta,\

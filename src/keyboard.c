@@ -15,7 +15,9 @@
 
 static struct termios config_initiale; 
 static struct termios config_finale ; 
-static int            peek_caractere = -1 ; 
+
+static int peek_caractere = -1 ; 
+static int peek_char[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] = { -1 } ; 
 
 /*****************************************************************************************
 * @fn     : KEYBOARD_TERMIOS_INIT
@@ -60,29 +62,91 @@ void KEYBOARD_TERMIOS_EXIT() {
 * @brief  : detecte la frappe d'une touche sur le clavier via termios
 * @param  : 
 * @date   : 2022-01-18 creation
+* @date   : passage du buffer de lecture de char a char[]
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
 int KEYBOARD_TERMIOS_KBHIT() {
+  char chaine[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
   if ( peek_caractere != -1 ) {
+    Trace("peek_caractere != -1") ;
     return 1 ;
   }
   config_finale.c_cc[VMIN] = 0 ;
   tcsetattr( 0, TCSANOW, &config_finale ) ;
-  nread = read(0, &ch,1 );
+
+  /* Lecture dans le file descriptor 0 (stdin) */
+
+  nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+
+  ch = chaine[0] ;
   config_finale.c_cc[VMIN] = 1 ;
   tcsetattr( 0, TCSANOW, &config_finale )  ;
 
+  if ( nread >0  ) {
+    Trace("nread = %d", nread) ;
+  }
   if (nread == 1 ) {
     peek_caractere = ch ; 
+    Trace("peek_caractere = ch = %c", ch) ;
     return -1 ;
   }
   return 0 ;
 }
 
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_KBHIT_NEW
+* @author : s.gravois
+* @brief  : detecte la frappe d'une touche sur le clavier via termios
+* @param  : 
+* @date   : 2022-01-18 creation
+* @date   : passage du buffer de lecture de char a char[]
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+*****************************************************************************************/
+
+int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine) {
+  char chaine[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
+  char ch ;
+  int nread ; 
+
+  memset(chaine, 0, sizeof(chaine)) ;
+
+  if ( peek_char[0] != -1 ) {
+    Trace("peek_char[0] != -1") ;
+    return 1 ;
+  }
+  config_finale.c_cc[VMIN] = 0 ;
+  tcsetattr( 0, TCSANOW, &config_finale ) ;
+
+  /* Lecture dans le file descriptor 0 (stdin) */
+
+  nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+
+  config_finale.c_cc[VMIN] = 1 ;
+  tcsetattr( 0, TCSANOW, &config_finale )  ;
+
+  if ( nread >0  ) {
+    Trace("nread = %d", nread) ;
+    for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
+      peek_char[i] = (int)chaine[i] ;
+      Trace("peek_chars[%d] = %c %d", i, peek_char[i], (int) peek_char[i]) ;
+      
+    }
+    strcpy( ch_chaine , chaine) ;  
+
+    memset(peek_char, 0, sizeof(peek_char)) ;
+    for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
+      peek_char[i]=-1;
+    }
+    memset(chaine, 0, sizeof(chaine)) ;
+
+    return -1 ;
+  }
+  return 0 ;
+}
 /*****************************************************************************************
 * @fn     : KEYBOARD_TERMIOS_READCH
 * @author : s.gravois
@@ -94,12 +158,19 @@ int KEYBOARD_TERMIOS_KBHIT() {
 
 int KEYBOARD_TERMIOS_READCH() {
   char ch ;
+  int nread =0 ; 
+
   if(peek_caractere != -1 ) {
     ch = peek_caractere ;
     peek_caractere = -1 ;
+    Trace("ch = %c (peek_caractere != -1)", ch) ;
     return ch ;
   }
-  read( 0, &ch, 1)  ;
+
+  // nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+  nread = read( 0, &ch, 1)  ;
+
+  Trace("ch = %c nread = %d", ch, nread) ;
   return ch ;
 }
 

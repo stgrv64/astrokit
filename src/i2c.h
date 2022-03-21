@@ -125,7 +125,7 @@ typedef struct  {
   int  fd ;                     // file descriptor pour le device utilise
   int  registre ;               // registre
   int  adress ;                 // adress du device (en hexa)
-  unsigned char buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des datas en read / write
+  unsigned char buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
     
 }
 I2C_DEVICE ;

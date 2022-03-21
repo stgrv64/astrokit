@@ -1,22 +1,22 @@
 #define _GNU_SOURCE
 #include <gpio.h>
 // ---------------------------------------------------------------------------------------
-void GPIO_INIT_GPIOS_CONTROLEUR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][DATAS_TAILLE_BUFFER]) {
+void GPIO_INIT_GPIOS_CONTROLEUR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][DATAS_TAILLE_BUFFER]) {
   int l,i, j ;
   char *str1, *token, *sptr ;
   
   for(l=0;l<DATAS_NB_LIGNES;l++) {
-   if(!strcmp("GPIO_ALT",datas[l][0])) {
+   if(!strcmp("GPIO_ALT",g_Datas[l][0])) {
     for(j=0;j<GPIO_CONTROLEUR_SIZE;j++) gpio_in[j]=-1 ;
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_alt[j]=atoi(token);
     }
    }
-   if(!strcmp("GPIO_AZI",datas[l][0])) {
+   if(!strcmp("GPIO_AZI",g_Datas[l][0])) {
     for(i=0; i < GPIO_CONTROLEUR_SIZE ; i++) gpio_out[i]=-1 ;
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_azi[j]=atoi(token);
@@ -27,22 +27,22 @@ void GPIO_INIT_GPIOS_CONTROLEUR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][D
    for(i=0;i<GPIO_CONTROLEUR_SIZE;i++) TRACE("GPIO_ALT[%d]=%d",i,gpio_alt[i]);
 }
 // ---------------------------------------------------------------------------------------
-void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][DATAS_TAILLE_BUFFER]) {
+void GPIO_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][DATAS_TAILLE_BUFFER]) {
   int l,i, j ;
   char *str1, *token, *sptr ;
   
   for(l=0;l<DATAS_NB_LIGNES;l++) {
-   if(!strcmp("GPIO_INPUT",datas[l][0])) {
+   if(!strcmp("GPIO_INPUT",g_Datas[l][0])) {
     for(j=0;j<GPIO_SIZE;j++) gpio_in[j]=-1 ;
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_in[j]=atoi(token);
     }
    }
-   if(!strcmp("GPIO_OUTPUT",datas[l][0])) {
+   if(!strcmp("GPIO_OUTPUT",g_Datas[l][0])) {
     for(i=0;i<GPIO_SIZE;i++) gpio_out[i]=-1 ;
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_out[j]=atoi(token);

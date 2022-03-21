@@ -40,7 +40,7 @@ void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFF
   }
 }
 //============================================================================
-void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+void CAT_READ(char * catalogue_txt, char g_Datas[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
 
   FILE *fin ;
   char buf[CAT_TAILLE_BUFFER * CAT_NB_COLONNES] ;
@@ -49,8 +49,8 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
   
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++) {
-      memset(datas[L][C],ZERO_CHAR,CAT_TAILLE_BUFFER);
-      strcpy(datas[L][C],"_") ;
+      memset(g_Datas[L][C],ZERO_CHAR,CAT_TAILLE_BUFFER);
+      strcpy(g_Datas[L][C],"_") ;
     }
   
   memset(buf,ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
@@ -69,7 +69,7 @@ void CAT_READ(char * catalogue_txt, char datas[CAT_NB_LIGNES][CAT_NB_COLONNES][C
     for (C = 0, str1 = buf ; ; C++, str1 = NULL) {
       token = strtok_r(str1, ";", &sptr);
       if (token == NULL) break ;
-      strcpy( datas[L][C],token);
+      strcpy( g_Datas[L][C],token);
     }
     L++;
     if( L>=CAT_NB_LIGNES) break ;
@@ -125,7 +125,7 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
   // conversion en degres decimaux dans cat.dec
-  // Dans tout le programme, coordevices en radians
+  // Dans tout le programme, coordonnees en radians
   
   L=0 ;
   
@@ -142,7 +142,7 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
     if(!strcmp(cat[L][0],as->nom)) {
 
       /* -----------------------------------------------
-       * Sauvegarde des coordevices equatoriales du catalogue 
+       * Sauvegarde des coordonnees equatoriales du catalogue 
        * dans la structure ASTRE 
        **************************************************/
 
@@ -203,7 +203,7 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
 
 void CAT_FORMAT_DECIMAL( \
   char * catalogue_txt, \
-  char datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
+  char g_Datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
   char datas_dec[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
   
   FILE * fout ;
@@ -228,16 +228,16 @@ void CAT_FORMAT_DECIMAL( \
     exit(2) ;
   }
   L=0 ;
-  while( strcmp(datas[L][0],"_") ) {
+  while( strcmp(g_Datas[L][0],"_") ) {
    
-   strcpy( datas_dec[L][0], datas[L][0]) ;
-   strcpy( datas_dec[L][1], datas[L][1]) ;
+   strcpy( datas_dec[L][0], g_Datas[L][0]) ;
+   strcpy( datas_dec[L][1], g_Datas[L][1]) ;
    
-   ASC_HH  = atoi( datas[L][2] ) ;
-   ASC_MM  = atoi( datas[L][3] ) ;
+   ASC_HH  = atoi( g_Datas[L][2] ) ;
+   ASC_MM  = atoi( g_Datas[L][3] ) ;
    
-   DEC_DEG = atoi( datas[L][4] ) ;
-   DEG_MIN = atoi( datas[L][5] ) ;
+   DEC_DEG = atoi( g_Datas[L][4] ) ;
+   DEG_MIN = atoi( g_Datas[L][5] ) ;
    
    asc = ( (double)ASC_HH + SGN(ASC_HH) *(double)ASC_MM  / 60.0) * 15.0 ; // conversion en degres decimaux de type double
    dec =  (double)DEC_DEG + SGN(DEC_DEG)*(double)DEG_MIN / 60.0 ;
@@ -272,7 +272,7 @@ void CAT_FORMAT_DECIMAL( \
 
 void CAT_FORMAT_DECIMAL_2( \
   char * catalogue_txt, \
-  char datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
+  char g_Datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
   char datas_dec[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
   
   FILE * fout ;
@@ -296,16 +296,16 @@ void CAT_FORMAT_DECIMAL_2( \
     exit(2) ;
   }
   L=0 ;
-  while( strcmp(datas[L][0],"_") ) {
+  while( strcmp(g_Datas[L][0],"_") ) {
    
-   strcpy(  datas_dec[L][0], datas[L][0]) ;
-   strcpy(  datas_dec[L][1], datas[L][1]) ;
+   strcpy(  datas_dec[L][0], g_Datas[L][0]) ;
+   strcpy(  datas_dec[L][1], g_Datas[L][1]) ;
    
-   ASC_HH  = atoi( datas[L][2] ) ;
-   ASC_MM  = atoi( datas[L][3] ) ;
+   ASC_HH  = atoi( g_Datas[L][2] ) ;
+   ASC_MM  = atoi( g_Datas[L][3] ) ;
    
-   dec = atof( datas[L][4] ) ;
-   //DEG_MIN = atoi( datas[L][5] ) ;
+   dec = atof( g_Datas[L][4] ) ;
+   //DEG_MIN = atoi( g_Datas[L][5] ) ;
    
    asc = ( ASC_HH + ( ASC_MM / 60.0 ) )   * 15.0 ; // conversion en degres decimaux de type double
    

@@ -67,12 +67,12 @@ void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
 * @brief  : Cette fonction lit les parametres GPIO dans le fichier de configuration
 *           (GPIO_ALT / GPIO_AZI / GPIO_MASQUE )
 *           Initilise la frequence PWM a 1000 si aucune entree gpio_frequence_pwm
-* @param  : datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
+* @param  : g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
+void GPIO_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
   int l,i, j ;
   char *str1, *token, *sptr ;
   
@@ -80,34 +80,34 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
 
   for(l=0;l<DATAS_NB_LIGNES;l++) {
 
-   if(!strcmp("GPIO_ALT",datas[l][0])) {
+   if(!strcmp("GPIO_ALT",g_Datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_ALT,0,sizeof(GPIO_ALT)) ;
-    strcpy( GPIO_ALT, datas[l][1] ) ;
+    strcpy( GPIO_ALT, g_Datas[l][1] ) ;
 
     Trace1("GPIO_ALT trouve ligne %d = (%s)", l,GPIO_ALT) ;
 
     for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gpio_in[j]=-1 ;
 
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_alt[j]=atoi(token);
     }
    }
    
-   if(!strcmp("GPIO_AZI",datas[l][0])) {
+   if(!strcmp("GPIO_AZI",g_Datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_AZI,0,sizeof(GPIO_AZI)) ;
-    strcpy( GPIO_AZI, datas[l][1] ) ;
+    strcpy( GPIO_AZI, g_Datas[l][1] ) ;
 
     Trace1("GPIO_AZI trouve ligne %d = (%s)", l,GPIO_AZI) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_out[i]=-1 ;
 
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_azi[j]=atoi(token);
@@ -115,17 +115,17 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
    }
    
 
-   if(!strcmp("GPIO_MASQUE",datas[l][0])) {
+   if(!strcmp("GPIO_MASQUE",g_Datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_MAS,0,sizeof(GPIO_MAS)) ;
-    strcpy( GPIO_MAS, datas[l][1] ) ;
+    strcpy( GPIO_MAS, g_Datas[l][1] ) ;
 
     Trace1("GPIO_MASQUE trouve ligne %d = (%s)", l,GPIO_MAS) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_mas[i]=-1 ;
 
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_mas[j]=atoi(token);
@@ -133,17 +133,17 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
    }
    
 
-   if(!strcmp("GPIO_FREQUENCE_PWM",datas[l][0])) {
+   if(!strcmp("GPIO_FREQUENCE_PWM",g_Datas[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( GPIO_FREQUENCE_PWM,0,sizeof(GPIO_FREQUENCE_PWM)) ;
-    strcpy( GPIO_FREQUENCE_PWM, datas[l][1] ) ;
+    strcpy( GPIO_FREQUENCE_PWM, g_Datas[l][1] ) ;
 
     gpio_frequence_pwm = 1000 ;
 
     Trace1("GPIO_FREQUENCE_PWM trouve ligne %d = (%s)", l,GPIO_FREQUENCE_PWM) ;
 
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_frequence_pwm=(double)atoi(token);
@@ -160,28 +160,28 @@ void GPIO_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFF
 * @fn     : GPIO_READ
 * @author : s.gravois
 * @brief  : Cette fonction lit GPIO_INPUT et GPIO_OUTPUT
-* @param  : datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
+* @param  : g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : (obsolete) fonction ancienne, remplace explicitement par GPIO_LED_xx etc..
 *****************************************************************************************/
 
-void GPIO_READ2(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
+void GPIO_READ2(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
 
   int l,i, j ;
   char *str1, *token, *sptr ;
   
   for(l=0;l<DATAS_NB_LIGNES;l++) {
-   if(!strcmp("GPIO_INPUT",datas[l][0])) {
+   if(!strcmp("GPIO_INPUT",g_Datas[l][0])) {
     for(j=0;j<GPIO_SIZE;j++) gpio_in[j]=-1 ;
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_in[j]=atoi(token);
     }
    }
-   if(!strcmp("GPIO_OUTPUT",datas[l][0])) {
+   if(!strcmp("GPIO_OUTPUT",g_Datas[l][0])) {
     for(i=0;i<GPIO_SIZE;i++) gpio_out[i]=-1 ;
-    for (j = 0, str1 = datas[l][1]; ; j++, str1 = NULL) {
+    for (j = 0, str1 = g_Datas[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
       gpio_out[j]=atoi(token);

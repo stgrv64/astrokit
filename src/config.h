@@ -5,6 +5,7 @@
 # --------------------------------------------------------------
 # 03/04/2021  | ajout entete
 # 01/05/2021  | ajout fonction CONFIG_GETCWD
+# 21/03/2022  | ajout fonctions initialisations des codes 
 # -------------------------------------------------------------- 
 */
 
@@ -65,6 +66,13 @@ void   CONFIG_INIT_SUIVI(SUIVI *suivi) ;
 void   CONFIG_INIT_TEMPS(TEMPS *temps) ;
 void   CONFIG_INIT_DEVICES(DEVICES *devices) ;
 
+/* ajout mars 2022 */
+
+void CONFIG_INIT_CODE ( t_st_Codes *, int, const char * ,const char * , const char *  ) ;
+void CONFIG_INIT_CODES( t_st_Codes *) ;
+
+/* fin ajout mars 2022 */
+
 void   CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) ; // FIXME ajout 20190822
 void   CONFIG_SET_MONTH_AND_DAY(char * s_data) ;
 void   CONFIG_SET_HOUR_AND_MINUTES(char * s_data) ;
@@ -76,10 +84,10 @@ int    CONFIG_FIN_LIGNE(char c) ;
 int    CONFIG_DEB_COM(char c);
 int    CONFIG_FIN_MOT(char c) ;
 int    CONFIG_FIN_FICHIER(char c) ;
-void   CONFIG_INIT_VAR(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+void   CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 void   CONFIG_AFFICHER_VARIABLES(void) ;
-void   CONFIG_AFFICHER_DATAS(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
-int    CONFIG_READ(char datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+void   CONFIG_AFFICHER_DATAS(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
+int    CONFIG_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_GETCWD(char * ) ;
 
 void   CONFIG_AFFICHER_TEMPS(TEMPS *temps) ; /* FIXME ajout 20191228 */
@@ -91,7 +99,7 @@ void   CONFIG_AFFICHER_TOUT(void) ;          /* FIXME ajout 20191228 */
 void   CONFIG_AFFICHER_CHANGEMENTS (void) ;  /* FIXME ajout 20200102 */
 void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 
-void   CONFIG_AFFICHER_ASTRE_MODE_STELLARIUM(ASTRE *)  ;
+void   CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *)  ;
 
 #endif
 

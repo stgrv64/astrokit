@@ -1,22 +1,48 @@
 20 Janvier 2020 - 
-identifications des points a travailler / ameliorer / effectuer / analyser ..
+
+ * identifications des points a travailler / ameliorer / effectuer / analyser ..
 
 -------------------------------------------------------------------------------
 
-  => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales 
+20 mars 2022 - 
+
+ * correction problemes de signe dans les MACROS de calcul (AGHx , AZIx, etc..)
+ * correction et verification des calculs de toutes les planetes (equatorial -> azimutal)
+ * correction de la fonction CALCUL_EQUATEUR
+ * correction de l'azimut ( 180 degres au sud)
+ * ajout fonction angle vers ddmmss
+ 
+-------------------------------------------------------------------------------
+
+KO => modifier les droits du user stef et astrokit pour avec 
+     sudo setcap 'cap_sys_nice=eip' <application>
+     pour pouvoir executer les primitives pthread_setschedparam (param.sched_priority)
+     => test KO (fin 2021)
+     => obligration de passer par sudo
+     (probleme en suspens)
+     
+OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales 
      a partir de azimut, altitude, et donneees GPS (lat / lon / date / heure )
+     (OK, traite )
 
-  => suite au point precedent, mettre en place le suivi direct a partir de :
-     * azimut
-     * altitude
-     
-     --> soit entrer directement les coordonnees via la telecommande
-     --> soit utiliser un capteur type accelerometre
+** => ajouter un facteur de reduction prenant en compte les engrenages / poulies 
 
-  => suite au point precedent , implementer le code du LSM303D (cf depot GIT)
-     dans le thread dedie a cet effet 
-     * utiliser 2 capteurs ci besoin
+** => mettre en place, suite a la correction du bug close gpio[ fd] impactant getch(),
+     une implementation NCURSES et TERMIOS et regarder les differences de comportement
+     => fait (ok) on conserve le code TERMIOS
+     => prevoir interraction avec structure clavier et boucle comme c'est fait 
+        avec les fonctions irread / iretc..
+
+** => verifier coeffcient de reduction des moteurs NEQ3.2
+
+* => refaire un thread de suivi du temps pour calcul precis 
+     de la duree d un cycle de SUIVI_VOUTE (1 seconde en theorie)
      
+* => suite au point precedent, mettre en place le suivi direct a partir de :
+     azimut et altitude : 
+     => soit entrer directement les coordonnees via la telecommande
+     => soit utiliser un capteur type accelerometre
+   
   => passer en DOXYGEN integralite du code
   
   => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
@@ -24,6 +50,7 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
   
   => reprendre les fonctions de arguments.c / .h pour les consolider avec getopt
      si besoin, et permettre de tester rapidement sous x86 les differents calculs
+     notamment CALCUL_VOUTE, voir comment optimiser cette fonction
   
   => verifier le code de SOLAR_SYSTEM pour obtenir les coordonnees des planetes 
      et leur precision en fonction des calculs flottant 32 ou 64 bits
@@ -33,18 +60,10 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
        * le type de l'astre 
        * le type de calculs pour aboutir aux vitesses
        * rafraichir tous les calculs necessaires
-  
-  => refaire un thread de suivi du temps pour calcul precis 
-     de la duree d un cycle de SUIVI_VOUTE (1 seconde en theorie)
+     (traite partiellement)
   
   => analyser impact d'un rafraichissement plus lent / rapide  de SUIVI_VOUTE 
 
-  => mettre en place, suite a la correction du bug close gpio[ fd] impactant getch(),
-     une implementation NCURSES et TERMIOS et regarder les differences de comportement
-     => fait (ok) on conserve le code TERMIOS
-     => prevoir interraction avec structure clavier et boucle comme c'est fait 
-        avec les focntions irread / iretc..
-  
   => corriger MANUEL_BRUT pour que le suivi brut telecommande permette
      une approximation bonne des vitesses (reprendre les calculs differentiels)
     
@@ -73,12 +92,6 @@ identifications des points a travailler / ameliorer / effectuer / analyser ..
      regarder si elle est utile 
      
   => passer les double 64 bits en float 32 bits
-  
-  => modifier les droits du user stef et astrokit pour avec 
-     sudo setcap 'cap_sys_nice=eip' <application>
-     pour pouvoir executer les primitives pthread_setschedparam (param.sched_priority)
-     => test KO (fin 2021)
-     => obligration de passer par sudo
      
    => verifier a quel moment on doit faire un CAT_FIND 
   

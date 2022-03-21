@@ -41,8 +41,6 @@
 
 #define IR_GAP          120000
 #define IR_SEPARATEUR   '='
-#define IR_BUFFER_SIZE  255 
-#define IR_NB_CODES     50 
 #define IR_ZERO_CHAR    '\0'
 
 // c est le code min et max des touches autorisees a etre repetees 
@@ -52,18 +50,10 @@
 #define IR_CODE_REPETE_AUTORISE_MIN 21 
 #define IR_CODE_REPETE_AUTORISE_MAX 24
 
-//------------------------------------------------------------------------------
-typedef struct  {
-  
-  char code[ IR_NB_CODES][IR_BUFFER_SIZE] ;
-  char key [ IR_NB_CODES][IR_BUFFER_SIZE] ;
-  
-}
-IR_LIRC_CODES ;
+
 //------------------------------------------------------------------------------
 
 struct lirc_config *lircconfig;
-IR_LIRC_CODES ir_codes, *irc ;
 
 //------------------------------------------------------------------------------
 // Prototype des fonctions
@@ -73,7 +63,7 @@ int   LIRC_OPEN(struct lirc_config *lircconfig) ;
 void  LIRC_CLOSE(struct lirc_config *lircconfig) ;
 void  LIRC_READ(SUIVI *suivi) ;
 
-void  LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) ;
+void  CONFIG_INIT_CODES(t_st_Codes *gp_Codes) ;
 
 void  IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) ;
 void  IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi)  ;

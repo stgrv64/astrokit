@@ -31,7 +31,8 @@
 # 23/01/2022  | * suppression MODE_EQUATORIAL
 #               * changement type MENU_PAR_DEFAUT
 #               * ajout constantes char * en fonction c_Menus
-# 18/03/2022  | * ajout signe a structure TEMPS
+# mars  2022  | * ajout signe a structure TEMPS
+#               * ajout c_si signe sous forme char
 # -------------------------------------------------------------- 
 */
 
@@ -208,6 +209,74 @@
 #define  CONFIG_ACTIONS_SIZE     7
 #define  CONFIG_VALIDATIONS_SIZE 10
 
+#define CONFIG_CODE_BUFFER_SIZE  255 
+#define CONFIG_CODE_NB_CODES     50 
+
+
+//------------------------------------------------------------------------------
+typedef struct  {
+  
+  char in_term [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
+  char in_lirc [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
+  char out_act [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
+}
+t_st_Codes ;
+
+static const char *g_char_Codes[][3] = {
+
+{ "48","KEY_0","0" }, /* 48 ascii = 0 */
+{ "49","KEY_1","1"},
+{ "50","KEY_2","2"},
+{ "51","KEY_3","3"},
+{ "52","KEY_4","4"},
+{ "53","KEY_5","5"},
+{ "54","KEY_6","6"},
+{ "55","KEY_7","7"},
+{ "56","KEY_8","8"},
+{ "57","KEY_9","9"},
+{ "77","KEY_M","MES"},  /* 77 ascii = lettre 'M' */
+{ "78","KEY_N","NGC"},
+{ "69","KEY_E","ETO"},
+{ "80","KEY_P","PLA"},
+{ "p","KEY_PREVIOUS","previous"},
+{ "v","KEY_PLAY",    "valider"},
+{ "n","KEY_NEXT",    "plus"},
+{ "32","KEY_STOP",    "stop"},
+{ "m","KEY_MENU",    "MENU"},
+{ "pp", "KEY_PAUSE",  "pause"},
+/* touches gauche droite haut bas ok */ 
+{ "10","KEY_OK",     "reset"},
+{ "65","KEY_UP",     "n"},
+{ "67","KEY_RIGHT",  "e"},
+{ "66","KEY_DOWN",   "s"},
+{ "68","KEY_LEFT",   "o"},
+
+{ "s","KEY_SETUP",  "SETUP"},
+{ "t","KEY_SOUND",   "TIME"  },  
+{ "f","KEY_FORWARD","forward"},
+/* touches suivantes ne sont plus utilisess */
+{ "rewind","KEY_REWIND", "rewind"   },
+{ "red",   "KEY_RED",    "red"},
+{ "blue",  "KEY_BLUE",   "blue"},
+{ "yellow","KEY_YELLOW", "yellow"},
+{ "green", "KEY_GREEN",  "green"},   // ajout ulterieurs.. pour etre idem que reel 25 et superieur ...
+{ "escape","KEY_POWER",  "key_power"},
+
+{ "a_configurer", "KEY_CHANNELUP"   "forwardfast"},
+{ "a_configurer", "KEY_CHANNELDOWN" "rewindfast"},
+{ "a_configurer", "KEY_VOLUMEUP"    "forward"},
+{ "a_configurer", "KEY_VOLUMEDOWN"  "rewind"},
+
+{ "a_configurer", "KEY_MUTE",   "TIME"},
+{ "a_configurer", "KEY_SCREEN", "key_screen" },
+{ "a_configurer", "KEY_TV",     "key_tv"},
+{ "a_configurer", "KEY_INFO",   "key_info"},
+{ "a_configurer", "KEY_ZOOM",   "key_zoom"},
+{ "a_configurer", "KEY_LIST",   "key_list"},
+{ "a_configurer", "KEY_MODE",   "key_mode" },
+{ "a_configurer", "KEY_EXIT",   "key_exit" }};
+
+
 // ------------------------------------------------------------------------
 // definition des structures de devices du programme
 // ------------------------------------------------------------------------
@@ -217,6 +286,30 @@ typedef enum {
   VRAI  
 }
 t_en_Booleen ;
+
+typedef enum {
+
+  REDUCTION_INDETERMINE=0,
+  REDUCTION_MONTURE_NB_DENTS,
+  REDUCTION_POULIE_MONTURE_NB_DENTS,
+  REDUCTION_POULIE_MOTEUR_NB_DENTS,
+  REDUCTION_REDUCTEUR_PLANETAIRE,
+  REDUCTION_MOTEUR_NB_PAS,
+  REDUCTION_MOTEUR_NB_MICROPAS,
+  REDUCTION_CPU_CORRECTION
+}
+t_en_Reduction_Type ;
+
+static const char * c_Reduction_Type[] = {
+  "REDUCTION_INDETERMINE",
+  "REDUCTION_MONTURE_NB_DENTS",
+  "REDUCTION_POULIE_MONTURE_NB_DENTS",
+  "REDUCTION_POULIE_MOTEUR_NB_DENTS",
+  "REDUCTION_REDUCTEUR_PLANETAIRE",
+  "REDUCTION_MOTEUR_NB_PAS",
+  "REDUCTION_MOTEUR_NB_MICROPAS",
+  "REDUCTION_CPU_CORRECTION"
+} ;
 
 /* ----------------------------------------------------
 * Le typededef enum suivant determine le type d as
@@ -261,7 +354,7 @@ static const char * c_Astre_Type[] = {
 * azimutales de l objet (par exemple via un capteur)
 * 
 * Dans le cas contraire, si c'est un objet connu (exemple MES1)
-* alors on part des coordevices equatoriales pour effectuer 
+* alors on part des coordonnees equatoriales pour effectuer 
 * le calcul.
 *
 * ----------------------------------------------------
@@ -364,7 +457,8 @@ typedef struct {
    * -------------------------------------------- */
    
   double hd ;   // heure decimale
-  
+  char c_si ; /* signe */ 
+
   int si ;      // signe
   int mm ;      // month
   int yy ;      // year
@@ -378,6 +472,7 @@ TEMPS ;
 //=====================================================
 typedef struct {
   
+  char c_si ; /* signe */ 
   double AD ;   // angle decimale en radians
   double ad ;   // angle decimale en degres
   int si ;      // signe
@@ -577,7 +672,7 @@ typedef struct {
  
 /* --------------------------------------------
 *  on deduit de l'azimut(h) et de l'altitude (a)
-*  les coordevices x y et z dans la geode d'observation de rayon 1
+*  les coordonnees x y et z dans la geode d'observation de rayon 1
 --------------------------------------------- */
 
  double x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
@@ -586,7 +681,7 @@ typedef struct {
 
 /* --------------------------------------------
 *  on deduit de l'azimut et de l'altitude
-*  les coordevices xx yy et zz dans la geode d'observation
+*  les coordonnees xx yy et zz dans la geode d'observation
 * de rayon sqrt(xx²+yy²+zz²) 
 * => permet de representer la norme d'un vecteur par rapport a (a,h)<=>(x,y,z)
 --------------------------------------------- */
@@ -674,8 +769,10 @@ SUIVI	     sui, *suivi ;
 CLAVIER    cla, *clavier ;
 DEVICES    dev, *devices ;
 
-char   datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
-FILE * flog ; 
+char       g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
+t_st_Codes g_Codes, *gp_Codes ;
+
+FILE      * flog ; 
 
 // ------------------------------------------------------------------------
 // definition des variables dependant du fichier de conf
@@ -745,20 +842,33 @@ unsigned long TEMPO_CAPTEURS ;
 unsigned long ALT_F ;    // frequence de reference (utile si on utilise CALCUL_D)
 unsigned int  ALT_N ;    // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
 double        ALT_R ;    // reduction totale
+
 double        ALT_R1 ;   // reduction liee a la monture
 double        ALT_R2 ;   // reducteur du moteur
 double        ALT_R3 ;   // nombre de pas du moteur en azimut
 double        ALT_R4 ;   // mode micro pas utilisee (1/R4)
+double        ALT_R5 ;   // reduction liee a la poulie
+double        ALT_R6 ;   // reduction liee au cpu
+double        ALT_R7 ;   // reduction non decrite plus haut
+
+double        ALT_Rx[ REDUCTION_CPU_CORRECTION + 1 ] ; /* tableau des reductions en altittue */
+double        AZI_Rx[ REDUCTION_CPU_CORRECTION + 1 ] ; /* tableau des reductions en azimut */
+
 int           ALT_ROT ;  // Flag de reversibilitee du sens de rotation (en cas d'erreur)
 double        ALT_ACC ;  // Facteur de multiplication en mode MANUEL_0
 
 unsigned long AZI_F ;    // frequence de reference (utile si on utilise CALCUL_D)
 unsigned int  AZI_N ;    // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
 double        AZI_R ;    // reduction totale
+
 double        AZI_R1 ;   // reduction liee\A0l axe en azimut
 double        AZI_R2 ;   // reducteur du moteur
 double        AZI_R3 ;   // nombre de pas du moteur en azimut
 double        AZI_R4 ;   // mode micro pas utilisee (1/R4)
+double        AZI_R5 ;   // reduction liee a la poulie
+double        AZI_R6 ;   // reduction liee au cpu
+double        AZI_R7 ;   // reduction non decrite plus haut
+
 int           AZI_ROT ;  // Flag de reversibilitee du sens de rotation (en cas d'erreur)
 double        AZI_ACC ;  // Facteur de multiplication en mode MANUEL_0
 

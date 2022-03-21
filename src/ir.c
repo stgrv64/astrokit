@@ -9,85 +9,15 @@
 # 15/11/2021  | * modification nom fct mainXxxx() pour compilation
 #                 => mainIr <=> main
 # 20/01/2022  | * ajout KEY_ZOOM (oubli) et action associee
+#
+# 21/03/2022  | * mise en place structure g_Codes (t_st_Codes)
+#               * deport du code dans fichier config.c /.h
+#               * renommage fonction LIRC_CODE => COPNFIG_INIT_CODE
 # --------------------------------------------------------------  
 */
 
 #include <ir.h>
 
-//====================================================================================
-// etablie la correspondance entre les KEY du fichier lircd.conf
-// et les codes utilises dans le programme principal
-// (car pas de hachage en c) modifier : completer avec une fonction de hachage
-//------------------------------------------------------------------------------------
-
-void LIRC_CONFIG_CODES(IR_LIRC_CODES *irc) {
-
-  int i ;
-  
-  for( i=0 ; i<IR_NB_CODES ; i++ ) memset( irc->code[i], IR_ZERO_CHAR, strlen(irc->code[i]) ) ;
-  for( i=0 ; i<IR_NB_CODES ; i++ ) memset( irc->key[i],  IR_ZERO_CHAR, strlen(irc->key[i]) ) ;
-
-  // FIXME :  ATTENTION !!! 
-  // le nom des irc codes en MAJUSCULE servent a definir des actions dans config.c et le reste du programme
-
-  strcpy( irc->key[0], "KEY_0") ;           strcpy( irc->code[0], "0") ;
-  strcpy( irc->key[1], "KEY_1") ;           strcpy( irc->code[1], "1") ;
-  strcpy( irc->key[2], "KEY_2") ;           strcpy( irc->code[2], "2") ;
-  strcpy( irc->key[3], "KEY_3") ;           strcpy( irc->code[3], "3") ;
-  strcpy( irc->key[4], "KEY_4") ;           strcpy( irc->code[4], "4") ;
-  strcpy( irc->key[5], "KEY_5") ;           strcpy( irc->code[5], "5") ;
-  strcpy( irc->key[6], "KEY_6") ;           strcpy( irc->code[6], "6") ;
-  strcpy( irc->key[7], "KEY_7") ;           strcpy( irc->code[7], "7") ;
-  strcpy( irc->key[8], "KEY_8") ;           strcpy( irc->code[8], "8") ;
-  strcpy( irc->key[9], "KEY_9") ;           strcpy( irc->code[9], "9") ;
-
-  strcpy( irc->key[10],"KEY_M") ;           strcpy( irc->code[10],"MES") ;
-  strcpy( irc->key[11],"KEY_N") ;           strcpy( irc->code[11],"NGC") ;
-  strcpy( irc->key[12],"KEY_E") ;           strcpy( irc->code[12],"ETO") ;
-  strcpy( irc->key[13],"KEY_P") ;           strcpy( irc->code[13],"PLA") ;
-
-  strcpy( irc->key[14],"KEY_PREVIOUS");     strcpy( irc->code[14],"previous") ;
-  strcpy( irc->key[15],"KEY_PLAY") ;        strcpy( irc->code[15],"valider") ;
-  strcpy( irc->key[16],"KEY_NEXT") ;        strcpy( irc->code[16],"plus") ;
-  strcpy( irc->key[17],"KEY_STOP") ;        strcpy( irc->code[17],"stop") ;
-  strcpy( irc->key[18],"KEY_MENU") ;        strcpy( irc->code[18],"MENU") ;
-  strcpy( irc->key[19],"KEY_PAUSE") ;       strcpy( irc->code[19],"pause") ;
-  strcpy( irc->key[20],"KEY_OK") ;          strcpy( irc->code[20],"reset") ;
-  strcpy( irc->key[21],"KEY_UP") ;          strcpy( irc->code[21],"n") ;
-  strcpy( irc->key[22],"KEY_RIGHT") ;       strcpy( irc->code[22],"e") ;
-  strcpy( irc->key[23],"KEY_DOWN") ;        strcpy( irc->code[23],"s") ;
-  strcpy( irc->key[24],"KEY_LEFT") ;        strcpy( irc->code[24],"o") ;
-  strcpy( irc->key[25],"KEY_SETUP") ;       strcpy( irc->code[25],"SETUP") ;
-  // strcpy( irc->key[26],"KEY_TIME") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
-  strcpy( irc->key[26],"KEY_SOUND") ;        strcpy( irc->code[26],"TIME") ;    // ajout du 10/10/2016
-
-  strcpy( irc->key[27],"KEY_FORWARD") ;     strcpy( irc->code[27],"forward") ;
-  strcpy( irc->key[28],"KEY_REWIND") ;      strcpy( irc->code[28],"rewind") ;    // ajout du 26/11/2017
-
-  strcpy( irc->key[29],"KEY_RED") ;         strcpy( irc->code[29],"red") ;
-  strcpy( irc->key[30],"KEY_BLUE") ;        strcpy( irc->code[30],"blue") ;
-  strcpy( irc->key[31],"KEY_YELLOW") ;      strcpy( irc->code[31],"yellow") ;
-  strcpy( irc->key[32],"KEY_GREEN") ;       strcpy( irc->code[32],"green") ;   // ajout ulterieurs.. pour etre idem que reel 25 et superieur ...
-
-  strcpy( irc->key[33],"KEY_POWER") ;       strcpy( irc->code[33],"key_power") ;
-
-  strcpy( irc->key[34],"KEY_CHANNELUP") ;   strcpy( irc->code[34],"forwardfast") ;
-  strcpy( irc->key[35],"KEY_CHANNELDOWN") ; strcpy( irc->code[35],"rewindfast") ;
-  strcpy( irc->key[36],"KEY_VOLUMEUP") ;    strcpy( irc->code[36],"forward") ;
-  strcpy( irc->key[37],"KEY_VOLUMEDOWN") ;  strcpy( irc->code[37],"rewind") ;
-
-  strcpy( irc->key[38],"KEY_MUTE") ;        strcpy( irc->code[38],"TIME") ;
-
-  strcpy( irc->key[39],"KEY_SCREEN") ;      strcpy( irc->code[39],"key_screen") ; 
-  strcpy( irc->key[40],"KEY_TV") ;          strcpy( irc->code[40],"key_tv") ;
-  strcpy( irc->key[41],"KEY_INFO") ;        strcpy( irc->code[41],"key_info") ;
-  strcpy( irc->key[42],"KEY_ZOOM") ;        strcpy( irc->code[42],"key_zoom") ;
-  strcpy( irc->key[43],"KEY_LIST") ;        strcpy( irc->code[43],"key_list") ;
-  strcpy( irc->key[44],"KEY_MODE") ;        strcpy( irc->code[44],"key_mode") ; 
-  strcpy( irc->key[45],"KEY_EXIT") ;        strcpy( irc->code[45],"key_exit") ;
-  
-  // codes VOUTE de la telecommande - joue sur la vitesse globale
-}
 //====================================================================================
 int LIRC_OPEN(struct lirc_config *lircconfig) {
 
@@ -140,8 +70,8 @@ void LIRC_READ(SUIVI *suivi) {
        TRACE1("token i j k = %s %d %d %d",token, i,j,k); 
        if ( j==1 ) k=atoi(token) ;
        if ( j==2 ) {  
-         while(strcmp(irc->key[i],token) && ( i < IR_NB_CODES ) ){ 
-           TRACE1("%s = %s ?", token, irc->key[i]) ;  
+         while(strcmp(gp_Codes->in_lirc[i],token) && ( i < CONFIG_CODE_NB_CODES ) ){ 
+           TRACE1("%s = %s ?", token, gp_Codes->in_lirc[i]) ;  
            i++ ; 
          }
        }
@@ -149,17 +79,21 @@ void LIRC_READ(SUIVI *suivi) {
     TRACE1("i j k = %d %d %d", i,j,k); 
     memset( suivi->datas_infrarouge, '\0', strlen( suivi->datas_infrarouge ) ) ;
        
-    if ( k == 0 && i < IR_NB_CODES ) strcpy( suivi->datas_infrarouge, irc->code[i] ) ;
-    if ( k > 0 && i < IR_NB_CODES && i <= IR_CODE_REPETE_AUTORISE_MAX && i >= IR_CODE_REPETE_AUTORISE_MIN )  
-         strcpy( suivi->datas_infrarouge, irc->code[i] ) ;
+    if ( k == 0 && i < CONFIG_CODE_NB_CODES ) {
+      strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i] ) ;
+    }
+
+    if ( k > 0 && i < CONFIG_CODE_NB_CODES && i <= IR_CODE_REPETE_AUTORISE_MAX && i >= IR_CODE_REPETE_AUTORISE_MIN ) {
+      strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i] ) ;
+    }
     
     // tres important !!
     // le usleep suivant permet de garder l information !!!!!!
     // suivi->datas_infrarouge fonctionne comme un TAMPON
     // il va etre lu par les threads du programme principal
     
-    TRACE1("suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-    TRACE1("suivi->temporisation_ir = %ld", suivi->temporisation_ir ) ;
+    Trace("suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+    Trace("suivi->temporisation_ir = %ld", suivi->temporisation_ir ) ;
     
     usleep( suivi->temporisation_ir ) ;
     
@@ -312,12 +246,12 @@ void mainIr(int argc, char *argv[])  // void main(int argc, char *argv[])
   SUIVI *suivi ;
   SUIVI su ;   
   
-  irc   = &ir_codes ;
+  gp_Codes   = &g_Codes ;
   suivi = &su ;
   
   suivi->temporisation_ir = 10000 ;
   
-  LIRC_CONFIG_CODES( irc ) ;
+  CONFIG_INIT_CODES( gp_Codes ) ;
   LIRC_OPEN( lircconfig ) ;
   LIRC_READ( suivi ) ;
   LIRC_CLOSE( lircconfig ) ;

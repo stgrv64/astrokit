@@ -1,3 +1,13 @@
+/* -------------------------------------------------------------
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 21/03/2022  | * ajout entete
+#               * ajout const TERMIOS_ESCAPE_CHAR
+# -------------------------------------------------------------- 
+*/
+
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
@@ -44,6 +54,11 @@
 
 #include <types.h>
 
+/* definition du character d echappement */ 
+#define TERMIOS_ESCAPE_CHAR            27
+#define TERMIOS_CHARIAGE_RETURN_CHAR   10
+#define TERMIOS_KBHIT_SIZE_BUFFER_READ 5
+
 #define NEED_TIME_H
 
 #if defined(NCURSES_VERSION) && NCURSES_EXT_FUNCS
@@ -85,6 +100,7 @@
 void KEYBOARD_TERMIOS_INIT(void) ;
 void KEYBOARD_TERMIOS_EXIT(void) ;
 int  KEYBOARD_TERMIOS_KBHIT(void) ; 
+int KEYBOARD_TERMIOS_KBHIT_NEW(char * ) ;
 int  KEYBOARD_TERMIOS_READCH(void) ;
 int  KEYBOARD_TERMIOS_READ(void) ;
 
