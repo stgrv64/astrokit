@@ -133,7 +133,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
     Trace("nread = %d", nread) ;
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
-      Trace("peek_chars[%d] = %c %d", i, peek_char[i], (int) peek_char[i]) ;
+      Trace("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
       *i_sum_ascii+=(int)peek_char[i] ;
     }
     strcpy( ch_chaine , chaine) ;  

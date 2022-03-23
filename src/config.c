@@ -459,15 +459,24 @@ void CONFIG_INIT_CODE( \
 
 void CONFIG_INIT_CODES(t_st_Codes *gp_Codes) {
 
-  int i ;
+  int i_pos ;
   
-  for( i=0 ; i<CONFIG_CODE_NB_CODES ; i++ ) memset( gp_Codes->out_act[i], IR_ZERO_CHAR, strlen(gp_Codes->out_act[i]) ) ;
-  for( i=0 ; i<CONFIG_CODE_NB_CODES ; i++ ) memset( gp_Codes->in_lirc[i],  IR_ZERO_CHAR, strlen(gp_Codes->in_lirc[i]) ) ;
+  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) memset( gp_Codes->out_act[i_pos], IR_ZERO_CHAR, strlen(gp_Codes->out_act[i_pos]) ) ;
+  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) memset( gp_Codes->in_lirc[i_pos],  IR_ZERO_CHAR, strlen(gp_Codes->in_lirc[i_pos]) ) ;
 
+  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) {
+    memset( gp_Codes->in_term[i_pos],  IR_ZERO_CHAR, strlen(gp_Codes->in_term[i_pos]) ) ;
+    memset( gp_Codes->in_lirc[i_pos],  IR_ZERO_CHAR, strlen(gp_Codes->in_lirc[i_pos]) ) ;
+    memset( gp_Codes->out_act[i_pos],  IR_ZERO_CHAR, strlen(gp_Codes->out_act[i_pos]) ) ;
+  }
+  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) {
+
+    CONFIG_INIT_CODE( gp_Codes ) ; 
+  }
   // FIXME :  ATTENTION !!! 
   // le nom des gp_Codes codes en MAJUSCULE servent a definir des actions dans config.c et le reste du programme
 
-  
+  /*
   strcpy( gp_Codes->in_lirc[0], "KEY_0") ;           strcpy( gp_Codes->out_act[0], "0") ;
   strcpy( gp_Codes->in_lirc[1], "KEY_1") ;           strcpy( gp_Codes->out_act[1], "1") ;
   strcpy( gp_Codes->in_lirc[2], "KEY_2") ;           strcpy( gp_Codes->out_act[2], "2") ;
@@ -525,6 +534,8 @@ void CONFIG_INIT_CODES(t_st_Codes *gp_Codes) {
   strcpy( gp_Codes->in_lirc[45],"KEY_EXIT") ;        strcpy( gp_Codes->out_act[45],"key_exit") ;
   
   // codes VOUTE de la telecommande - joue sur la vitesse globale
+
+  */
 }
 /*****************************************************************************************
 * @fn     : CONFIG_VOUTE

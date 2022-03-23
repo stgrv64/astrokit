@@ -223,7 +223,7 @@ typedef struct  {
 t_st_Codes ;
 
 static const char *g_char_Codes[][3] = {
-
+/* clavier numerique */ 
 { "48","KEY_0","0" }, /* 48 ascii = 0 */
 { "49","KEY_1","1"},
 { "50","KEY_2","2"},
@@ -234,48 +234,51 @@ static const char *g_char_Codes[][3] = {
 { "55","KEY_7","7"},
 { "56","KEY_8","8"},
 { "57","KEY_9","9"},
-{ "77","KEY_M","MES"},  /* 77 ascii = lettre 'M' */
-{ "78","KEY_N","NGC"},
-{ "69","KEY_E","ETO"},
-{ "80","KEY_P","PLA"},
-{ "p","KEY_PREVIOUS","previous"},
-{ "v","KEY_PLAY",    "valider"},
-{ "n","KEY_NEXT",    "plus"},
-{ "32","KEY_STOP",    "stop"},
-{ "m","KEY_MENU",    "MENU"},
-{ "pp", "KEY_PAUSE",  "pause"},
+/* objets MES NGC ETO PLA */
+{ "47","KEY_M","MES"},  /* 47 ascii = lettre '/' */
+{ "42","KEY_N","NGC"},  /* 42 ascii = lettre '*' */
+{ "45","KEY_E","ETO"},  /* 45 ascii = lettre '-' */
+{ "43","KEY_P","PLA"},  /* 43 ascii = lettre '+' */
+/* touches de MENUS */
+{ "obsolete",  "KEY_PREVIOUS","previous"}, /* 60  ascii = lettre '<' */
+{ "10",        "KEY_PLAY",    "valider"},  /* 10  ascii = touche 'ENTER' */
+{ "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = lettre '>' */
+{ "obsolete",  "KEY_STOP",   "stop"},      /* 188 ascii = touche 'FIN' */
+{ "109",  "KEY_MENU",   "MENU"},      /* 109  ascii = touche 'm' */
+{ "32",   "KEY_PAUSE",  "pause"},     /* 32 ascii = espace = pause */
 /* touches gauche droite haut bas ok */ 
-{ "10","KEY_OK",     "reset"},
-{ "65","KEY_UP",     "n"},
-{ "67","KEY_RIGHT",  "e"},
-{ "66","KEY_DOWN",   "s"},
-{ "68","KEY_LEFT",   "o"},
-
-{ "s","KEY_SETUP",  "SETUP"},
-{ "t","KEY_SOUND",   "TIME"  },  
-{ "f","KEY_FORWARD","forward"},
+{ "10",   "KEY_OK",    "reset"}, /* ascii  */
+{ "183",  "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
+{ "184",  "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
+{ "185",  "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
+{ "186",  "KEY_LEFT",  "o"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
+/* touches obsoletes */
+{ "obsolete","KEY_SETUP",  "SETUP"},
+{ "obsolete","KEY_SOUND",   "TIME"  },  
+{ "obsolete","KEY_FORWARD","forward"},
 /* touches suivantes ne sont plus utilisess */
-{ "rewind","KEY_REWIND", "rewind"   },
-{ "red",   "KEY_RED",    "red"},
-{ "blue",  "KEY_BLUE",   "blue"},
-{ "yellow","KEY_YELLOW", "yellow"},
-{ "green", "KEY_GREEN",  "green"},   // ajout ulterieurs.. pour etre idem que reel 25 et superieur ...
-{ "escape","KEY_POWER",  "key_power"},
-
-{ "a_configurer", "KEY_CHANNELUP"   "forwardfast"},
-{ "a_configurer", "KEY_CHANNELDOWN" "rewindfast"},
-{ "a_configurer", "KEY_VOLUMEUP"    "forward"},
-{ "a_configurer", "KEY_VOLUMEDOWN"  "rewind"},
-
-{ "a_configurer", "KEY_MUTE",   "TIME"},
+{ "obsolete", "KEY_REWIND", "rewind"   },
+{ "obsolete", "KEY_RED",    "red"},
+{ "obsolete", "KEY_BLUE",   "blue"},
+{ "obsolete", "KEY_YELLOW", "yellow"},
+{ "obsolete", "KEY_GREEN",  "green"},   
+/* arret de la carte */
+{ "27",  "KEY_POWER",      "key_power"}, /* ascii 27 => touch ESC */
+/* rattrapages rapides et lents */
+{ "297", "KEY_CHANNELUP"   "forwardfast"}, /* ascii 297 (nread=3) => page up */
+{ "298", "KEY_CHANNELDOWN" "rewindfast"},  /* ascii 298 (nread=3) => page down */
+{ "45",  "KEY_VOLUMEUP"    "forward"},      /* ascii 45 => - */
+{ "43",  "KEY_VOLUMEDOWN"  "rewind"},       /* ascii 43 => + */
+/* gestion du temps */
+{ "116", "KEY_MUTE",   "TIME"}, /* 116 ascii = lettre 't' */
 { "a_configurer", "KEY_SCREEN", "key_screen" },
 { "a_configurer", "KEY_TV",     "key_tv"},
-{ "a_configurer", "KEY_INFO",   "key_info"},
+{ "105", "KEY_INFO",   "key_info"}, /* 105  ascii = touche 'i' */
 { "a_configurer", "KEY_ZOOM",   "key_zoom"},
 { "a_configurer", "KEY_LIST",   "key_list"},
 { "a_configurer", "KEY_MODE",   "key_mode" },
-{ "a_configurer", "KEY_EXIT",   "key_exit" }};
-
+/* arret du programme */
+{ "113", "KEY_EXIT",   "key_exit" }}; /* ascii 113 => touch 'q' */
 
 // ------------------------------------------------------------------------
 // definition des structures de devices du programme

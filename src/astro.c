@@ -1096,7 +1096,8 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
       if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine,&i_sum_ascii)) {
         c_char=ch_chaine[0] ;
-        Trace("keycode %-5d : %c %d\n", c_char, c_char, i_sum_ascii) ;
+        Trace("keycode %d %s", i_sum_ascii, ch_chaine) ;
+        if ( i_sum_ascii == 27 ) Trace("exit detecte %d", i_sum_ascii) ;
       }
     }
 

@@ -4,6 +4,8 @@
 #===============================================
 
 fic_commandes=package.commandes.necessaires
+fic_out=${fic_commandes}.paquets.a.ajouter.a.yocto
+
 declare -a USE_PATHS=("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin")
 
 # On sauvegarde le chemin
@@ -39,12 +41,16 @@ do
 	[ $res -eq 0 ]&& {
 		for alt in $(locate -r /${com}$ | xargs ls | xargs readlink); do
 		  dpkg -S $alt 2>/dev/null
-		  [ $? -eq 0 ]&& { echo "dpkg -S $alt (OK)" ; dpkg -S $alt ; res=1 ; }
+		  [ $? -eq 0 ]&& { 
+		  	echo "dpkg -S $alt (OK)" ; 
+		  	dpkg -S $alt  | tee -a $fic_out ; 
+		  	res=1 ; 
+		  }
 		done
 	}
  else
   echo "dpkg -S $che (OK)" ; 
- 	dpkg -S $che
+ 	dpkg -S $che | tee -a $fic_out
  fi
  
  
