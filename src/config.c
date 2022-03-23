@@ -467,6 +467,7 @@ void CONFIG_INIT_CODES(t_st_Codes *gp_Codes) {
   // FIXME :  ATTENTION !!! 
   // le nom des gp_Codes codes en MAJUSCULE servent a definir des actions dans config.c et le reste du programme
 
+  
   strcpy( gp_Codes->in_lirc[0], "KEY_0") ;           strcpy( gp_Codes->out_act[0], "0") ;
   strcpy( gp_Codes->in_lirc[1], "KEY_1") ;           strcpy( gp_Codes->out_act[1], "1") ;
   strcpy( gp_Codes->in_lirc[2], "KEY_2") ;           strcpy( gp_Codes->out_act[2], "2") ;

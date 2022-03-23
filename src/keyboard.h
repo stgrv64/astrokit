@@ -97,16 +97,15 @@
 #endif
 #endif
 
-void KEYBOARD_TERMIOS_INIT(void) ;
-void KEYBOARD_TERMIOS_EXIT(void) ;
-int  KEYBOARD_TERMIOS_KBHIT(void) ; 
-int KEYBOARD_TERMIOS_KBHIT_NEW(char * ) ;
-int  KEYBOARD_TERMIOS_READCH(void) ;
-int  KEYBOARD_TERMIOS_READ(void) ;
-
-void KEYBOARD_READ(void) ;
-void KEYBOARD_INIT(void) ;
-void KEYBOARD_END(void) ;
-void KEYBOARD_LOG_LAST_LINE(WINDOW *) ;
+void KEYBOARD_TERMIOS_INIT     (void) ;
+void KEYBOARD_TERMIOS_EXIT     (void) ;
+int  KEYBOARD_TERMIOS_KBHIT    (void) ; 
+int  KEYBOARD_TERMIOS_KBHIT_NEW(char *, int * ) ;
+int  KEYBOARD_TERMIOS_READCH   (void) ;
+int  KEYBOARD_TERMIOS_READ     (void) ;
+void KEYBOARD_READ             (void) ;
+void KEYBOARD_INIT             (void) ;
+void KEYBOARD_END              (void) ;
+void KEYBOARD_LOG_LAST_LINE    (WINDOW *) ;
 
 #endif

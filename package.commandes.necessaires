@@ -1,0 +1,14 @@
+dtc
+kmod
+strace
+gdb
+ntpdate
+lspci
+cksum
+iwconfig
+iwlist
+updatedb
+locate
+loadkmap
+tree
+dpkg

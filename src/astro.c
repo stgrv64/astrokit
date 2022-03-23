@@ -66,7 +66,7 @@ void TRAP_MAIN(int sig) {
   
   GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 
-  //printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
+  //Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
 
   /*--------------------------------------------------------*/
   /* Si sig > positif on abandonne les threads et on quitte */
@@ -127,28 +127,28 @@ void TRAP_MAIN(int sig) {
 
 void TRAP_SUIVI_MENU(int sig)  {
   
-  printf("Signal trappe depuis thread suivi_menu = %d\n",sig) ;
+  Trace("Signal trappe depuis thread suivi_menu = %d\n",sig) ;
   pthread_cancel( suivi->p_menu ) ;
 }
 void TRAP_SUIVI_VOUTE(int sig)  {
   
-  printf("Signal trappe depuis thread suivi_voute= %d\n",sig) ;
+  Trace("Signal trappe depuis thread suivi_voute= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_voute ) ;
 }
 void TRAP_SUIVI_INFRAROUGE(int sig)  {
   
-  printf("Signal trappe depuis thread suivi_infrarouge= %d\n",sig) ;
+  Trace("Signal trappe depuis thread suivi_infrarouge= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_infrarouge ) ;
   TRAP_MAIN(1) ;
 }
 void TRAP_SUIVI_CAPTEURS(int sig)  {
   
-  printf("Signal trappe depuis thread suivi_capteurs= %d\n",sig) ;
+  Trace("Signal trappe depuis thread suivi_capteurs= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_capteurs ) ;
 }
 void TRAP_SUIVI_CLAVIER(int sig)  {
   
-  printf("Signal trappe depuis thread suivi_clavier= %d\n",sig) ;
+  Trace("Signal trappe depuis thread suivi_clavier= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_clavier ) ;
 }
 /*****************************************************************************************
@@ -877,7 +877,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
         if ( system("/etc/init.d/OLD/S40network start")) {
          perror("Probleme avec system(/etc/init.d/OLD/S40network start)"); 
-         printf("Probleme avec system(/etc/init.d/OLD/S40network start)\n") ;
+         Trace("Probleme avec system(/etc/init.d/OLD/S40network start)\n") ;
         }
 
         suivi->menu = suivi->menu_old ;
@@ -893,7 +893,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
         if ( system("/etc/init.d/OLD/S40network stop")) {
           perror("Probleme avec system(/etc/init.d/OLD/S40network stop)"); 
-          printf("Probleme avec system(/etc/init.d/OLD/S40network stop)\n") ;
+          Trace("Probleme avec system(/etc/init.d/OLD/S40network stop)\n") ;
         }
 
         suivi->menu = suivi->menu_old ;
@@ -1070,7 +1070,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
   int c_char =0 ;
-  int i_sum_char =0 ; 
+  int i_sum_ascii =0 ; 
   char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ] ;
   struct sched_param param;
   struct timeval t00,t01 ;
@@ -1089,30 +1089,15 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
     while( c_char != 'q' ) {
       
+      memset(&c_char,0,sizeof(c_char)) ;
       memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
-      if ( (int)c_char == TERMIOS_ESCAPE_CHAR )          { 
-        Trace("char TERMIOS_ESCAPE_CHAR detecte\n") ; 
-        i_sum_char=0 ;
-      }
-      else if ( (int)c_char == TERMIOS_CHARIAGE_RETURN_CHAR ) { 
-        Trace("char TERMIOS_CHARIAGE_RETURN_CHAR detecte\n") ; 
-        i_sum_char=0 ;
-      }
+      usleep(50000) ;
 
-      /* printf("boucle en cours\n") ;*/
-      usleep(5000) ;/*
-      if ( KEYBOARD_TERMIOS_KBHIT()) {
-        c_char = KEYBOARD_TERMIOS_READCH() ;
-        printf("keycode %-5d : %c %d\n", c_char, c_char, i_sum_char) ;
-        i_sum_char += (int)c_char ;
-      }*/
-      if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine)) {
+      if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine,&i_sum_ascii)) {
         c_char=ch_chaine[0] ;
-        printf("keycode %-5d : %c %d\n", c_char, c_char, i_sum_char) ;
-        i_sum_char += (int)c_char ;
+        Trace("keycode %-5d : %c %d\n", c_char, c_char, i_sum_ascii) ;
       }
-      
     }
 
     KEYBOARD_TERMIOS_EXIT() ;
@@ -1268,7 +1253,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
         ret = I2C_INIT(ex, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
 	
         if ( ! ret ) {
-          printf("Pas de capteur disponible") ;
+          Trace("Pas de capteur disponible") ;
           devices->DEVICE_CAPTEURS_USE = 0 ;
           devices->init_capteurs = 0 ;
           break ;

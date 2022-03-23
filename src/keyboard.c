@@ -107,11 +107,12 @@ int KEYBOARD_TERMIOS_KBHIT() {
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine) {
+int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
   char chaine[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
+  *i_sum_ascii=0 ;
   memset(chaine, 0, sizeof(chaine)) ;
 
   if ( peek_char[0] != -1 ) {
@@ -133,7 +134,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine) {
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
       Trace("peek_chars[%d] = %c %d", i, peek_char[i], (int) peek_char[i]) ;
-      
+      *i_sum_ascii+=(int)peek_char[i] ;
     }
     strcpy( ch_chaine , chaine) ;  
 
