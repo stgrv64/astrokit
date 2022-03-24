@@ -205,6 +205,7 @@
 #define  ASTRE_TAILLE_BUFFER  256
 #define  ASTRE_NB_COLONNES    10000
 
+#define  CONFIG_CODES_NB_IN_OUT  3
 #define  CONFIG_ASS              3 
 #define  CONFIG_ACTIONS_SIZE     7
 #define  CONFIG_VALIDATIONS_SIZE 10
@@ -214,6 +215,14 @@
 
 
 //------------------------------------------------------------------------------
+
+typedef enum {
+  CODES_POS_IN_TERM=0,
+  CODES_POS_IN_LIRC,
+  CODES_POS_OUT_ACT  
+}
+t_en_Codes_Pos ;
+
 typedef struct  {
   
   char in_term [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
@@ -222,55 +231,55 @@ typedef struct  {
 }
 t_st_Codes ;
 
-static const char *g_char_Codes[][3] = {
+ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /* clavier numerique */ 
-{ "48","KEY_0","0" }, /* 48 ascii = 0 */
-{ "49","KEY_1","1"},
-{ "50","KEY_2","2"},
-{ "51","KEY_3","3"},
-{ "52","KEY_4","4"},
-{ "53","KEY_5","5"},
-{ "54","KEY_6","6"},
-{ "55","KEY_7","7"},
-{ "56","KEY_8","8"},
-{ "57","KEY_9","9"},
+{ "48",        "KEY_0","0" }, /* 48 ascii = 0 */
+{ "49",        "KEY_1","1"},
+{ "50",        "KEY_2","2"},
+{ "51",        "KEY_3","3"},
+{ "52",        "KEY_4","4"},
+{ "53",        "KEY_5","5"},
+{ "54",        "KEY_6","6"},
+{ "55",        "KEY_7","7"},
+{ "56",        "KEY_8","8"},
+{ "57",        "KEY_9","9"},
 /* objets MES NGC ETO PLA */
-{ "47","KEY_M","MES"},  /* 47 ascii = lettre '/' */
-{ "42","KEY_N","NGC"},  /* 42 ascii = lettre '*' */
-{ "45","KEY_E","ETO"},  /* 45 ascii = lettre '-' */
-{ "43","KEY_P","PLA"},  /* 43 ascii = lettre '+' */
+{ "47",        "KEY_M","MES"},  /* 47 ascii = lettre '/' */
+{ "42",        "KEY_N","NGC"},  /* 42 ascii = lettre '*' */
+{ "45",        "KEY_E","ETO"},  /* 45 ascii = lettre '-' */
+{ "43",        "KEY_P","PLA"},  /* 43 ascii = lettre '+' */
 /* touches de MENUS */
 { "obsolete",  "KEY_PREVIOUS","previous"}, /* 60  ascii = lettre '<' */
 { "10",        "KEY_PLAY",    "valider"},  /* 10  ascii = touche 'ENTER' */
 { "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = lettre '>' */
 { "obsolete",  "KEY_STOP",   "stop"},      /* 188 ascii = touche 'FIN' */
-{ "109",  "KEY_MENU",   "MENU"},      /* 109  ascii = touche 'm' */
-{ "32",   "KEY_PAUSE",  "pause"},     /* 32 ascii = espace = pause */
+{ "109",       "KEY_MENU",   "MENU"},      /* 109  ascii = touche 'm' */
+{ "32",        "KEY_PAUSE",  "pause"},     /* 32 ascii = espace = pause */
 /* touches gauche droite haut bas ok */ 
-{ "10",   "KEY_OK",    "reset"}, /* ascii  */
-{ "183",  "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
-{ "184",  "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
-{ "185",  "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
-{ "186",  "KEY_LEFT",  "o"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
+{ "10",        "KEY_OK",    "reset"}, /* ascii  */
+{ "183",       "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
+{ "184",       "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
+{ "185",       "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
+{ "186",       "KEY_LEFT",  "o"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
 /* touches obsoletes */
-{ "obsolete","KEY_SETUP",  "SETUP"},
-{ "obsolete","KEY_SOUND",   "TIME"  },  
-{ "obsolete","KEY_FORWARD","forward"},
+{ "obsolete",  "KEY_SETUP",  "SETUP"},
+{ "obsolete",  "KEY_SOUND",   "TIME"  },  
+{ "obsolete",  "KEY_FORWARD","forward"},
 /* touches suivantes ne sont plus utilisess */
-{ "obsolete", "KEY_REWIND", "rewind"   },
-{ "obsolete", "KEY_RED",    "red"},
-{ "obsolete", "KEY_BLUE",   "blue"},
-{ "obsolete", "KEY_YELLOW", "yellow"},
-{ "obsolete", "KEY_GREEN",  "green"},   
+{ "obsolete",  "KEY_REWIND", "rewind"   },
+{ "obsolete",  "KEY_RED",    "red"},
+{ "obsolete",  "KEY_BLUE",   "blue"},
+{ "obsolete",  "KEY_YELLOW", "yellow"},
+{ "obsolete",  "KEY_GREEN",  "green"},   
 /* arret de la carte */
-{ "27",  "KEY_POWER",      "key_power"}, /* ascii 27 => touch ESC */
+{ "27",        "KEY_POWER",      "key_power"}, /* ascii 27 => touch ESC */
 /* rattrapages rapides et lents */
-{ "297", "KEY_CHANNELUP"   "forwardfast"}, /* ascii 297 (nread=3) => page up */
-{ "298", "KEY_CHANNELDOWN" "rewindfast"},  /* ascii 298 (nread=3) => page down */
-{ "45",  "KEY_VOLUMEUP"    "forward"},      /* ascii 45 => - */
-{ "43",  "KEY_VOLUMEDOWN"  "rewind"},       /* ascii 43 => + */
+{ "297",       "KEY_CHANNELUP" ,  "forwardfast"}, /* ascii 297 (nread=3) => page up */
+{ "298",       "KEY_CHANNELDOWN", "rewindfast"},  /* ascii 298 (nread=3) => page down */
+{ "45",        "KEY_VOLUMEUP"  ,  "forward"},      /* ascii 45 => - */
+{ "43",        "KEY_VOLUMEDOWN" , "rewind"},       /* ascii 43 => + */
 /* gestion du temps */
-{ "116", "KEY_MUTE",   "TIME"}, /* 116 ascii = lettre 't' */
+{ "116",          "KEY_MUTE",   "TIME"}, /* 116 ascii = lettre 't' */
 { "a_configurer", "KEY_SCREEN", "key_screen" },
 { "a_configurer", "KEY_TV",     "key_tv"},
 { "105", "KEY_INFO",   "key_info"}, /* 105  ascii = touche 'i' */
@@ -278,7 +287,15 @@ static const char *g_char_Codes[][3] = {
 { "a_configurer", "KEY_LIST",   "key_list"},
 { "a_configurer", "KEY_MODE",   "key_mode" },
 /* arret du programme */
-{ "113", "KEY_EXIT",   "key_exit" }}; /* ascii 113 => touch 'q' */
+{ "113", "KEY_EXIT",   "key_exit" },\
+{ "non_defini", "non_defini",   "non_defini" },\
+{ "non_defini", "non_defini",   "non_defini" },\
+{ "non_defini", "non_defini",   "non_defini" },\
+{ "non_defini", "non_defini",   "non_defini" },\
+{ "non_defini", "non_defini",   "non_defini" },\
+}; /* ascii 113 => touch 'q' */
+
+/* TAILLE TABLEAU 50 = CONFIG_CODE_NB_CODES */
 
 // ------------------------------------------------------------------------
 // definition des structures de devices du programme
@@ -620,6 +637,7 @@ typedef struct {
   unsigned long temporisation_menu  ;
   unsigned long temporisation_raq  ;
   unsigned long temporisation_ir   ; 
+  unsigned long temporisation_termios   ; 
   unsigned long temporisation_capteurs  ; 
   unsigned long temporisation_clavier   ; 
   
@@ -836,7 +854,7 @@ double ALTITUDE ;
 
 unsigned long TEMPO_MENU ;
 unsigned long TEMPO_RAQ ;
-unsigned long TEMPO_IR ;
+unsigned long TEMPO_IR_AND_TERMIOS ;
 unsigned long TEMPO_CLAVIER ;
 unsigned long TEMPO_CAPTEURS ;
 

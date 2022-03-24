@@ -6,6 +6,8 @@
 # 03/04/2021  | ajout entete
 # 01/05/2021  | ajout fonction CONFIG_GETCWD
 # 21/03/2022  | ajout fonctions initialisations des codes 
+# 22/03/2022  | ajout fonction CONFIG_MAJ_SUIVI_PAS (anciennement 
+#               dans ir.c / .h)
 # -------------------------------------------------------------- 
 */
 
@@ -67,9 +69,12 @@ void   CONFIG_INIT_TEMPS(TEMPS *temps) ;
 void   CONFIG_INIT_DEVICES(DEVICES *devices) ;
 
 /* ajout mars 2022 */
+/* fonctions anciennement dans ir.c /.h */
 
-void CONFIG_INIT_CODE ( t_st_Codes *, int, const char * ,const char * , const char *  ) ;
-void CONFIG_INIT_CODES( t_st_Codes *) ;
+void  CONFIG_INIT_CODE     ( t_st_Codes *, int, const char * [][CONFIG_CODES_NB_IN_OUT] ) ;
+void  CONFIG_INIT_CODES    ( t_st_Codes *) ;
+void  CONFIG_MAJ_SUIVI_PAS ( SUIVI *) ;
+void  CONFIG_INPUTS_GESTION_APPUIS(SUIVI *, CLAVIER *) ;
 
 /* fin ajout mars 2022 */
 

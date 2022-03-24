@@ -367,8 +367,8 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   
   TRACE2("start") ;
 
-  GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
-  IR_KEYBOARD_MAJ_SUIVI( suivi) ;
+  GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, suivi) ;
+  CONFIG_MAJ_SUIVI_PAS( suivi) ;
 
   // -----------------------------------------------------------
   // reset = remise a zero des compteurs
@@ -567,8 +567,8 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   azi = 0 ;
   alt = 0 ;
   
-  GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
-  IR_KEYBOARD_MAJ_SUIVI  ( suivi) ;
+  GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, suivi) ;
+  CONFIG_MAJ_SUIVI_PAS  ( suivi) ;
   
   // La determination de tempo_raq est tres importante
   // Elle varie suivant la reduction total du moteur
@@ -658,8 +658,8 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
     
     // on relit sur les claviers en mode manuel 
 
-    GPIO_RAQUETTE_MAJ_SUIVI( gpio_key_l, gpio_key_c, suivi) ;
-    IR_KEYBOARD_MAJ_SUIVI( suivi) ;
+    GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, suivi) ;
+    CONFIG_MAJ_SUIVI_PAS( suivi) ;
   }
   // =================================================================
   // FIN DE LA BOUCLE : TANT QUE J'APPUIE SUR UN BOUTON DE LA RAQUETTE
@@ -724,7 +724,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
     usleep( suivi->temporisation_menu ) ;
 
     GPIO_RAQUETTE_READ( gpio_key_l, gpio_key_c, clavier) ;
-    IR_KEYBOARD_READ( suivi, clavier) ;
+    CONFIG_INPUTS_GESTION_APPUIS( suivi, clavier) ;
 
     // IR_ACTIONS_PARTICULIERES( suivi) ;
 
@@ -1069,8 +1069,10 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 
 void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
+  int i_indice_code=0 ;
   int c_char =0 ;
   int i_sum_ascii =0 ; 
+  char c_sum_ascii[8] ;
   char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ] ;
   struct sched_param param;
   struct timeval t00,t01 ;
@@ -1092,12 +1094,43 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
       memset(&c_char,0,sizeof(c_char)) ;
       memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
-      usleep(50000) ;
-
       if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine,&i_sum_ascii)) {
+
         c_char=ch_chaine[0] ;
-        Trace("keycode %d %s", i_sum_ascii, ch_chaine) ;
+        Trace1("keycode %d %s", i_sum_ascii, ch_chaine) ;
         if ( i_sum_ascii == 27 ) Trace("exit detecte %d", i_sum_ascii) ;
+        memset(c_sum_ascii,0, sizeof(c_sum_ascii));
+        sprintf(c_sum_ascii,"%d",i_sum_ascii);
+        i_indice_code=0 ;
+        while(strcmp(gp_Codes->in_term[i_indice_code],c_sum_ascii) && ( i_indice_code < CONFIG_CODE_NB_CODES ) ){ 
+           Trace1("%s = %s ?", c_sum_ascii, gp_Codes->in_term[i_indice_code]) ;  
+           i_indice_code++ ; 
+        }
+        memset( suivi->datas_infrarouge, '\0', strlen( suivi->datas_infrarouge ) ) ;
+
+        if ( i_indice_code < CONFIG_CODE_NB_CODES ) {
+          strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+        }
+
+        if ( i_indice_code < CONFIG_CODE_NB_CODES && \
+             i_indice_code <= IR_CODE_REPETE_AUTORISE_MAX && \
+             i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
+
+          strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+        }
+
+        // tres important !!
+        // le usleep suivant permet de garder l information !!!!!!
+        // suivi->datas_infrarouge fonctionne comme un TAMPON
+        // il va etre lu par les threads du programme principal
+
+        Trace("suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+        Trace1("suivi->temporisation_ir = %ld", suivi->temporisation_ir ) ;
+
+        usleep( suivi->temporisation_ir ) ;
+
+        memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
+        strcpy( suivi->datas_infrarouge, "") ;
       }
     }
 

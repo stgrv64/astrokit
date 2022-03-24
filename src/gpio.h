@@ -218,7 +218,7 @@ void   GPIO_READ2        (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 void   GPIO_RAQUETTE_CONFIG  (int [4],int [4]) ;
 void   GPIO_RAQUETTE_READ    (int [4],int [4],CLAVIER* ) ;
 
-void   GPIO_RAQUETTE_MAJ_SUIVI(int [4],int [4], SUIVI *) ;
+void   GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int [4],int [4], SUIVI *) ;
 void   GPIO_TRAP(int ) ;
 void   GPIO_STATUT(void) ;
 int    GPIO_GET(int ) ;

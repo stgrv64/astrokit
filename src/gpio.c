@@ -392,7 +392,7 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
   }
 }
 /*****************************************************************************************
-* @fn     : GPIO_RAQUETTE_READ
+* @fn     : GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS
 * @author : s.gravois
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
 * @param  : int       GPIO_KEY_L[4]
@@ -403,57 +403,7 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
 * @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
 *****************************************************************************************/
 
-//==========================================================
-// FIXME : fonction appelee depuis SUIVI_MANUEL*
-
-void IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi) {
-
-  if ( devices->DEVICE_INFRAROUGE_USE ) {
-    
-    if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )     { suivi->pas_acc_plus  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )    { suivi->pas_acc_moins = 1 ; }
-    
-    if ( ! strcmp( suivi->datas_infrarouge, "forward" ) )  { suivi->pas_forward  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "rewind" ) )   { suivi->pas_rewind = 1 ; }
-
-    if ( ! strcmp( suivi->datas_infrarouge, "forwardfast" ) )  { suivi->pas_forward_fast  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "rewindfast" ) )   { suivi->pas_rewind_fast = 1 ; }
-
-    if ( ! strcmp( suivi->datas_infrarouge, "ne" ) )       { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "no" ) )       { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "se" ) )       { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "so" ) )       { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
-      
-    if ( ! strcmp( suivi->datas_infrarouge, "n" ) )        { suivi->pas_nord  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "o" ) )        { suivi->pas_ouest = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "e" ) )        { suivi->pas_est   = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "s" ) )        { suivi->pas_sud   = 1 ; }
-      
-    if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )    { suivi->reset   = 1 ; }
-    
-    TRACE2("%ld %ld %ld %ld %d %d\n", \
-      suivi->pas_ouest, \
-      suivi->pas_est, \
-      suivi->pas_nord, \
-      suivi->pas_sud, \
-      suivi->pas_acc_plus, \
-      suivi->pas_acc_moins );
-  }
-}
-
-/*****************************************************************************************
-* @fn     : GPIO_RAQUETTE_MAJ_SUIVI
-* @author : s.gravois
-* @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
-* @param  : int       GPIO_KEY_L[4]
-* @param  : int       GPIO_KEY_C[4]
-* @param  : CLAVIER * clavier
-* @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
-* @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
-*****************************************************************************************/
-
-void GPIO_RAQUETTE_MAJ_SUIVI(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) {
+void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], SUIVI *suivi) {
   
   int  i,j;
   char val[255] ;

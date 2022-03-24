@@ -45,6 +45,177 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 // cas particulier equateur omega = 2Pi / 86164 rad.s-1
 // ==> 86164.F = 2^N.D.R
 
+
+/*****************************************************************************************
+* @fn     : CONFIG_MAJ_SUIVI_PAS
+* @author : s.gravois
+* @brief  : Cette fonction met a jour les valeurs de suivi->pas* en fonction
+* @brief  : du contenu de suivi->datas_infrarouge
+* @param  : SUIVI *suivi
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
+*****************************************************************************************/
+
+void CONFIG_MAJ_SUIVI_PAS( SUIVI *suivi) {
+
+  if ( devices->DEVICE_INFRAROUGE_USE ) {
+    
+    if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )         { suivi->pas_acc_plus  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )        { suivi->pas_acc_moins = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "forward" ) )      { suivi->pas_forward  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "rewind" ) )       { suivi->pas_rewind = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "forwardfast" ) )  { suivi->pas_forward_fast  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "rewindfast" ) )   { suivi->pas_rewind_fast = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "ne" ) )           { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "no" ) )           { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "se" ) )           { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "so" ) )           { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "n" ) )            { suivi->pas_nord  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "o" ) )            { suivi->pas_ouest = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "e" ) )            { suivi->pas_est   = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "s" ) )            { suivi->pas_sud   = 1 ; }
+    
+    if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )    { suivi->reset   = 1 ; }
+    
+    TRACE2("%ld %ld %ld %ld %d %d\n", \
+      suivi->pas_ouest, \
+      suivi->pas_est, \
+      suivi->pas_nord, \
+      suivi->pas_sud, \
+      suivi->pas_acc_plus, \
+      suivi->pas_acc_moins );
+  }
+}
+/*****************************************************************************************
+* @fn     : CONFIG_INPUTS_GESTION_APPUIS
+* @author : s.gravois
+* @brief  : Cette fonction gere les appuis sur les "touches" (clavier, ir, ..)
+* @brief  : et en deduit le contenu de la structure clavier (mot, action, etc..)
+* @param  : SUIVI *suivi
+* @param  : CLAVIER *clavier
+* @date   : 2022-03-22 creation entete de la fonction au format doxygen
+* @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
+*****************************************************************************************/
+
+void CONFIG_INPUTS_GESTION_APPUIS(SUIVI *suivi, CLAVIER *clavier) {
+
+  int  i = 0 ;
+  char val[255] ;
+  char s_buffer[CONFIG_TAILLE_BUFFER_32] ;
+
+  memset(val, 0, strlen(val)) ;     
+  strcpy( val, suivi->datas_infrarouge ) ;
+  
+  Trace1("val = %s\n", val ) ;
+  
+  if ( strcmp( val, "") ) {
+    
+    //printf("val = %s\n", val ) ;
+    strcpy( clavier->mot, val ) ; 
+    clavier->appui_en_cours = 1 ;
+    clavier->mot_en_cours = 1 ;    
+  }
+  else clavier->appui_en_cours = 0 ; 
+  
+  // =======================================================================
+  // Quand la touche est relacheee, on traite
+  // ensuite appui en cours est remis a ZERO pour qu'on ne passe qu'une fois
+  // dans cette partie de code
+  // =======================================================================
+  
+  if ( clavier->mot_en_cours && clavier->appui_en_cours == 0 ) {
+  
+    Trace1("mot trouver = %s", clavier->mot ) ;
+		
+		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;
+
+    //------------------------------------------------------------
+    // On incremente la phrase avec le mot et
+    // On incremente le nombre avec le mot si premier n'est pas vide
+    //------------------------------------------------------------
+    
+    if ( strcmp( clavier->mot, clavier->valider) != 0 ) { 
+      
+      Trace1("Si mot != valider : on incremente la phrase avec le mot !!\n" ) ;
+
+      if ( strlen(clavier->phrase) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32) {
+
+        Trace1("on incremente la phrase %s avec le mot %s\n",clavier->phrase,  clavier->mot ) ;
+        // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
+
+        memset( s_buffer, IR_ZERO_CHAR, strlen( s_buffer )) ;
+        strcpy( s_buffer, clavier->phrase ) ;
+
+        sprintf(clavier->phrase,"%s%s",s_buffer, clavier->mot);
+      }
+      Trace1("resultat => phrase = %s \n",clavier->phrase ) ;
+      
+      Trace1("Si mot != valider et premier non vide => on met nombre + mot dans le nombre !!\n" ) ;
+
+      if ( strcmp( clavier->premier, "")) {
+        
+	      if ( strlen(clavier->nombre) + strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32) {
+
+          Trace1("on incremente le nombre %s avec le mot %s\n",clavier->nombre,  clavier->mot ) ;
+          // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
+
+          memset( s_buffer, IR_ZERO_CHAR, strlen( s_buffer )) ;
+          strcpy( s_buffer, clavier->nombre ) ;
+
+          sprintf(clavier->nombre,"%s%s", s_buffer, clavier->mot);
+        }
+      }
+      Trace1("resultat => nombre = %s \n",clavier->nombre ) ;
+    }    
+    //------------------------------------------------------------
+    // On met le mot dans premier si il est vide 
+    //------------------------------------------------------------
+    
+    if ( ! strcmp( clavier->premier, "")){ 
+      if ( strlen(clavier->mot) < CONFIG_TAILLE_BUFFER_32)
+      strcpy( clavier->premier, clavier->mot);
+    }
+    //------------------------------------------------------------
+    // Si le mot en cours est une VALIDATION 
+    // Exemple : valider
+    // Alors on VALIDE la phrase en cours
+    //  - en mettant clavier->phrase_lu à 1
+    // on efface tout sauf SYMBOLE et NOMBRE qui sont determiner plus tot
+    //------------------------------------------------------------
+
+    for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )
+    if ( ! strcmp( clavier->mot,    clavier->valider )  ) {
+      Trace1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
+
+      strcpy(clavier->premier,"") ;
+      strcpy(clavier->phrase,"")  ;
+      strcpy(clavier->mot,"") ;
+      clavier->phrase_lue=1 ;
+    }
+    //------------------------------------------------------------
+    // Si le mot est une ACTION, on efface la phrase en cours    
+    // on met le mot dans PREMIER (premier mot de la phrase) 
+    // on met le mot dans SYMBOLE (symbole utilise dans prog main) 
+    //------------------------------------------------------------
+    
+    for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )
+    if ( ! strcmp( clavier->mot, clavier->actions[i] )) {
+        Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
+        strcpy(clavier->premier,clavier->mot) ;
+        strcpy(clavier->symbole,clavier->mot)  ;
+
+        strcpy(clavier->nombre,"")  ;
+        strcpy(clavier->phrase,"")  ;
+        strcpy(clavier->mot,"") ;
+        clavier->phrase_lue=0 ;
+    }
+    
+    clavier->mot_en_cours = 0 ;
+    clavier->appui_en_cours = 0 ;
+    
+    CONFIG_AFFICHER_CLAVIER( clavier ) ;	
+  }
+}
 /*****************************************************************************************
 * @fn     : CONFIG_SYSTEM_LOG_0
 * @author : s.gravois
@@ -436,13 +607,18 @@ void CONFIG_INIT_VOUTE(VOUTE *voute) {
 void CONFIG_INIT_CODE( \
  t_st_Codes * gp_Codes, \
  int          li_pos, \
- const char * lc_code_lirc, \
- const char * lc_code_termios, \
- const char * lc_code_action ) {
+ const char * gl_char_Codes[][CONFIG_CODES_NB_IN_OUT] ) {
 
-  strcpy( gp_Codes->in_lirc[ li_pos ], lc_code_lirc ) ;
-  strcpy( gp_Codes->in_term[ li_pos ], lc_code_termios ) ;
-  strcpy( gp_Codes->out_act[ li_pos ], lc_code_action ) ;
+  Trace1("li_pos %d %-16s %-16s %-16s", \
+    li_pos, \
+    gl_char_Codes[li_pos][ CODES_POS_IN_TERM ], \
+    gl_char_Codes[li_pos][ CODES_POS_IN_LIRC], \
+    gl_char_Codes[li_pos][ CODES_POS_OUT_ACT] \
+  );
+
+  strcpy( gp_Codes->in_term[ li_pos ], gl_char_Codes[li_pos][ CODES_POS_IN_TERM ] ) ;
+  strcpy( gp_Codes->in_lirc[ li_pos ], gl_char_Codes[li_pos][ CODES_POS_IN_LIRC] ) ;
+  strcpy( gp_Codes->out_act[ li_pos ], gl_char_Codes[li_pos][ CODES_POS_OUT_ACT] ) ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CODES
@@ -471,7 +647,8 @@ void CONFIG_INIT_CODES(t_st_Codes *gp_Codes) {
   }
   for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) {
 
-    CONFIG_INIT_CODE( gp_Codes ) ; 
+    usleep(100000);
+    CONFIG_INIT_CODE( gp_Codes, i_pos, g_char_Codes  ) ; 
   }
   // FIXME :  ATTENTION !!! 
   // le nom des gp_Codes codes en MAJUSCULE servent a definir des actions dans config.c et le reste du programme
@@ -684,7 +861,8 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   
   suivi->temporisation_menu     = TEMPO_MENU ;
   suivi->temporisation_raq      = TEMPO_RAQ ;
-  suivi->temporisation_ir       = TEMPO_IR ;  
+  suivi->temporisation_ir       = TEMPO_IR_AND_TERMIOS ;  
+  suivi->temporisation_termios  = TEMPO_IR_AND_TERMIOS ;
   suivi->temporisation_clavier  = TEMPO_CLAVIER ; 
   suivi->temporisation_capteurs = TEMPO_CAPTEURS ;
   
@@ -881,7 +1059,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
 
      if(!strcmp("TEMPO_RAQ",g_Datas[l][0]))      TEMPO_RAQ=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_MENU",g_Datas[l][0]))     TEMPO_MENU=atol(g_Datas[l][1]);
-     if(!strcmp("TEMPO_IR",g_Datas[l][0]))       TEMPO_IR=atol(g_Datas[l][1]);
+     if(!strcmp("TEMPO_IR",g_Datas[l][0]))       TEMPO_IR_AND_TERMIOS=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_CLAVIER",g_Datas[l][0]))  TEMPO_CLAVIER=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_CAPTEURS",g_Datas[l][0])) TEMPO_CAPTEURS=atol(g_Datas[l][1]);
      
@@ -1035,7 +1213,7 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
 
   Trace1("TEMPO_RAQ = %ld",  TEMPO_RAQ);
   Trace1("TEMPO_MENU = %ld",  TEMPO_MENU);
-  Trace1("TEMPO_IR = %ld",  TEMPO_IR);
+  Trace1("TEMPO_IR_AND_TERMIOS = %ld",  TEMPO_IR_AND_TERMIOS);
   Trace1("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
   Trace1("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
 

@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
+# --------------------------------------------------------------
+# date        | commentaires 
+# --------------------------------------------------------------
+# 22/03/2022  | ajout entete
+# 22/03/2022  | deplacement de 2 fonctions IR_xxx_
+#  dans config.c / .h (aucun lien avec infrarouge)
+# -------------------------------------------------------------- 
+*/
+
 #ifndef IR_H
 #define IR_H
 
@@ -65,8 +76,6 @@ void  LIRC_READ(SUIVI *suivi) ;
 
 void  CONFIG_INIT_CODES(t_st_Codes *gp_Codes) ;
 
-void  IR_KEYBOARD_READ(SUIVI *suivi, CLAVIER *clavier) ;
-void  IR_KEYBOARD_MAJ_SUIVI( SUIVI *suivi)  ;
 void  IR_ACTIONS_PARTICULIERES( SUIVI *suivi) ;
 
 #endif
