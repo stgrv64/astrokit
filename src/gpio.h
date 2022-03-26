@@ -54,8 +54,8 @@
 #define GPIO_CURRENT_FONCTION_PARAM0   0.65    // ce parametre deforme la fonction 2 et 3
 #define GPIO_CURRENT_FONCTION_PARAM1   1.0     // ce parametre multiplie la fonction pour l'ajuster a 1 (5v)
 
-#define GPIO_SUIVI_PWM_PHASE_PRIORITY  5
-#define GPIO_SUIVI_MAIN_PRIORITY       2
+#define GPIO_SUIVI_PWM_PHASE_PRIORITY  10
+#define GPIO_SUIVI_MAIN_PRIORITY       5
 #define GPIO_SUIVI_MAIN_ATTENTE_MAX    0.3     // attente maximum exprimee en seconde pour non blocage
 
 #define GPIO_SUIVI_PWM_PHASE_SCHED   SCHED_RR

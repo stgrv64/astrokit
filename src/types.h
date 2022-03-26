@@ -855,7 +855,8 @@ double ALTITUDE ;
 
 unsigned long TEMPO_MENU ;
 unsigned long TEMPO_RAQ ;
-unsigned long TEMPO_IR_AND_TERMIOS ;
+unsigned long TEMPO_IR ;
+unsigned long TEMPO_TERMIOS ;
 unsigned long TEMPO_CLAVIER ;
 unsigned long TEMPO_CAPTEURS ;
 

@@ -577,7 +577,7 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   
   // La determination de tempo_raq est tres importante
   // Elle varie suivant la reduction total du moteur
-  
+  /* TODO : a expliquer */
   tempo_raq_alt = (double)TEMPO_RAQ * 1000000 / ALT_R ;
   tempo_raq_azi = (double)TEMPO_RAQ * 1000000 / AZI_R ;
   
@@ -717,7 +717,6 @@ void * SUIVI_MENU(SUIVI * suivi) {
   
   SUIVI_MENU_PREALABLE ( suivi) ;
 
-  usleep( suivi->temporisation_menu ) ;
   suivi->reset = 1 ;
 
   //-------------------------------------------------------------------------------
@@ -1044,7 +1043,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   
   sleep(1) ;
   
-  param.sched_priority = 1  ;
+  param.sched_priority = 2  ;
   
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { perror("setschedparam SUIVI_INFRAROUGE"); exit(EXIT_FAILURE);}
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
@@ -1082,9 +1081,9 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   struct sched_param param;
   struct timeval t00,t01 ;
   TRACE("start") ;
-  sleep(3) ;
+  sleep(1) ;
   
-  param.sched_priority = 1  ;
+  param.sched_priority = 2  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
   }
@@ -1130,9 +1129,9 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
         // il va etre lu par les threads du programme principal
 
         Trace("suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-        Trace1("suivi->temporisation_ir = %ld", suivi->temporisation_ir ) ;
+        Trace1("suivi->temporisation_termios = %ld", suivi->temporisation_termios ) ;
 
-        usleep( suivi->temporisation_ir ) ;
+        usleep( suivi->temporisation_termios ) ;
 
         memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
         strcpy( suivi->datas_infrarouge, "") ;
@@ -1163,7 +1162,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   struct sched_param param;
   TRACE("start") ;
   sleep(1) ;
-  param.sched_priority = 1  ;
+  param.sched_priority = 2  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
@@ -1209,7 +1208,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  sleep(2) ;
+  sleep(1) ;
 
   if ( devices->DEVICE_CLAVIER_USE ) {
 
@@ -1264,6 +1263,8 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   
   TRACE("start") ;
   
+  sleep(1) ;
+
   ex = & exemple ;
   am = & accmag ;
   ex->fd = 0 ;

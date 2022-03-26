@@ -861,8 +861,8 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   
   suivi->temporisation_menu     = TEMPO_MENU ;
   suivi->temporisation_raq      = TEMPO_RAQ ;
-  suivi->temporisation_ir       = TEMPO_IR_AND_TERMIOS ;  
-  suivi->temporisation_termios  = TEMPO_IR_AND_TERMIOS ;
+  suivi->temporisation_ir       = TEMPO_IR ;  
+  suivi->temporisation_termios  = TEMPO_TERMIOS ;
   suivi->temporisation_clavier  = TEMPO_CLAVIER ; 
   suivi->temporisation_capteurs = TEMPO_CAPTEURS ;
   
@@ -1020,6 +1020,15 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
 
    GPIO_LED_ETAT=0;
 
+   /* Definition de valeurs par defauts pour les TEMPO */ 
+
+  TEMPO_RAQ      =  10000; /* est utilisee uniquement dans SUIVI_MANUEL_1 */
+  TEMPO_MENU     =  50000;
+  TEMPO_IR       =  40000;
+  TEMPO_TERMIOS  =  40000;
+  TEMPO_CLAVIER  =  25000;
+  TEMPO_CAPTEURS =  50000;
+
    //----------------------------------------------------------------------
    // Lecture des variables dans la config lue dans le fichier de config
    //-----------ASTRE_PAR_DEFAUT-------------------------------------------
@@ -1056,10 +1065,11 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
       if(!strcmp(g_Datas[l][1],c_Menus[ MENU_PROGRAMME_DOWN ]))     MENU_PAR_DEFAUT = MENU_PROGRAMME_DOWN ;
       if(!strcmp(g_Datas[l][1],c_Menus[ MENU_DOWN ]))               MENU_PAR_DEFAUT = MENU_DOWN ;
      } 
-
+      /* Definition de valeurs par defauts pour les TEMPO */ 
      if(!strcmp("TEMPO_RAQ",g_Datas[l][0]))      TEMPO_RAQ=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_MENU",g_Datas[l][0]))     TEMPO_MENU=atol(g_Datas[l][1]);
-     if(!strcmp("TEMPO_IR",g_Datas[l][0]))       TEMPO_IR_AND_TERMIOS=atol(g_Datas[l][1]);
+     if(!strcmp("TEMPO_IR",g_Datas[l][0]))       TEMPO_IR=atol(g_Datas[l][1]);
+     if(!strcmp("TEMPO_TERMIOS",g_Datas[l][0]))  TEMPO_TERMIOS=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_CLAVIER",g_Datas[l][0]))  TEMPO_CLAVIER=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_CAPTEURS",g_Datas[l][0])) TEMPO_CAPTEURS=atol(g_Datas[l][1]);
      
@@ -1213,7 +1223,8 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
 
   Trace1("TEMPO_RAQ = %ld",  TEMPO_RAQ);
   Trace1("TEMPO_MENU = %ld",  TEMPO_MENU);
-  Trace1("TEMPO_IR_AND_TERMIOS = %ld",  TEMPO_IR_AND_TERMIOS);
+  Trace1("TEMPO_IR = %ld",  TEMPO_IR);
+  Trace1("TEMPO_TERMIOS = %ld",  TEMPO_TERMIOS);
   Trace1("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
   Trace1("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
 
