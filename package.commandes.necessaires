@@ -16,6 +16,7 @@ lsusb
 modprobe
 insmod
 ntpdate
+nmap
 strace
 tree
 updatedb
