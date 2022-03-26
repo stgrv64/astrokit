@@ -256,7 +256,7 @@ t_st_Codes ;
 { "109",       "KEY_MENU",   "MENU"},      /* 109  ascii = touche 'm' */
 { "32",        "KEY_PAUSE",  "pause"},     /* 32 ascii = espace = pause */
 /* touches gauche droite haut bas ok */ 
-{ "10",        "KEY_OK",    "reset"}, /* ascii  */
+{ "188",       "KEY_OK",    "reset"}, /* ascii 188 = touche 'FIN' */
 { "183",       "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
 { "184",       "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
 { "185",       "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
@@ -536,6 +536,7 @@ typedef struct {
   pthread_t    p_suivi_capteurs ;
   pthread_t    p_suivi_voute ;
   pthread_t    p_suivi_clavier ;
+  pthread_t    p_suivi_termios ;
 
   pthread_t    p_suivi_alt ;
   pthread_t    p_suivi_azi ;

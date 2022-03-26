@@ -592,9 +592,9 @@ void GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *gpwm) {
   sprintf(dir,"%s/gpio%d/direction",GPIO_PATH, gpwm->gpio) ;
   sprintf(val,"%s/gpio%d/value",    GPIO_PATH, gpwm->gpio) ;
   
-  TRACE1("exp=%s",exp);
-  TRACE1("dir=%s",dir);
-  TRACE1("val=%s",val);
+  Trace1("exp=%s",exp);
+  Trace1("dir=%s",dir);
+  Trace1("val=%s",val);
     
   if ((f=fopen(exp,"w")) == NULL )                      { gpwm->gpio_open_statut = -4  ; }
   else if ((fprintf(f,"%d\n",gpwm->gpio))<=0)           { gpwm->gpio_open_statut = -5  ; }
@@ -605,12 +605,17 @@ void GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *gpwm) {
   else if ((gpwm->gpio_fd =open(val, O_WRONLY))<0)      { gpwm->gpio_open_statut = -10  ; }
   
   // FIXME : synthese traces sur une ligne (2021)
-  TRACE("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val=%s statut=%d",\
+  Trace1("ouverture du gpio %d en OUTPUT : dir= %s exp=%s val=%s statut=%d",\
     gpwm->gpio,\
     dir,\
     exp,\
     val,\
     gpwm->gpio_open_statut);
+  
+  if ( gpwm->gpio_open_statut != 0 ) {
+    SyslogErrFmt("ouverture du gpio %d en erreur %d",gpwm->gpio,gpwm->gpio_open_statut);
+    Trace("ouverture du gpio %d en erreur %d",gpwm->gpio,gpwm->gpio_open_statut)
+  }
 }
 //====================================================================================================
 int GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
@@ -1172,8 +1177,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
      param.sched_priority = GPIO_SUIVI_MAIN_PRIORITY ;  
      if (pthread_setschedparam( pthread_self(), GPIO_SUIVI_MAIN_SCHED, & param) != 0) {perror("suivi_main_M");exit(EXIT_FAILURE);}
    }
-   
-   TRACE("") ;
       
    pm->pas = 0 ;
    pm->t = 0 ;
@@ -1209,10 +1212,23 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         //TRACE("deltat=%f",deltat) ;
         // correction bug 26/08/2016 :
         // incorrect : if ( sens > 0 ) { if ( pm->pas == pm->upas ) { pm->pas = 0 ; }         else { pm->pas++ ; }}
-        if ( sens > 0 ) { if ( pm->pas == pm->upas - 1 ) { pm->pas = 0 ; }         else { pm->pas++ ; }}
-        else            { if ( pm->pas == 0 )        { pm->pas = pm->upas-1 ;} else { pm->pas-- ; }}
         
-        
+        if ( sens > 0 ) { 
+          if ( pm->pas == pm->upas - 1 ) { 
+            pm->pas = 0 ; 
+          }
+          else { 
+            pm->pas++ ; 
+          }
+        }
+        else { 
+          if ( pm->pas == 0 ) { 
+            pm->pas = pm->upas-1 ;
+          } 
+          else { 
+            pm->pas-- ; 
+          }
+        }
         
         //printf("%d\t",pm->pas) ;
 
@@ -1289,12 +1305,12 @@ void GPIO_INIT_PWM_MOTEUR_2(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_M
     pm->phase[i]->gpio_fd          = 0 ;
     
     GPIO_OPEN_BROCHE_PWM( pm->phase[i] ) ;
-    
+    /*
     if ( pm->phase[i]->gpio_open_statut < 0 )  {
-      sprintf(cmd,"printf \"GPIO_OPEN_BROCHE_PWM : ouverture gpio = %d\" > /tmp/astrokit.log", pm->phase[i]->gpio_open_statut ) ;
+      sprintf(cmd,"printf \"GPIO_OPEN_BROCHE_PWM : ouverture gpio %d = %d\" > /tmp/astrokit.log", i, pm->phase[i]->gpio_open_statut ) ;
       perror(cmd) ;
       system(cmd) ;
-    }
+    }*/
     /* TRACE("") ; */
     usleep(100000) ;
   }

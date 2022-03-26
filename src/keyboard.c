@@ -116,7 +116,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
   memset(chaine, 0, sizeof(chaine)) ;
 
   if ( peek_char[0] != -1 ) {
-    Trace("peek_char[0] != -1") ;
+    Trace1("peek_char[0] != -1") ;
     return 1 ;
   }
   config_finale.c_cc[VMIN] = 0 ;
@@ -130,10 +130,10 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
   tcsetattr( 0, TCSANOW, &config_finale )  ;
 
   if ( nread >0  ) {
-    Trace("nread = %d", nread) ;
+    Trace1("nread = %d", nread) ;
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
-      Trace("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
+      Trace1("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
       *i_sum_ascii+=(int)peek_char[i] ;
     }
     strcpy( ch_chaine , chaine) ;  

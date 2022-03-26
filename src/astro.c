@@ -151,6 +151,11 @@ void TRAP_SUIVI_CLAVIER(int sig)  {
   Trace("Signal trappe depuis thread suivi_clavier= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_clavier ) ;
 }
+void TRAP_SUIVI_TERMIOS(int sig)  {
+  
+  Trace("Signal trappe depuis thread suivi_termios= %d\n",sig) ;
+  pthread_cancel( suivi->p_suivi_clavier ) ;
+}
 /*****************************************************************************************
 * @fn     : SUIVI_MENU_PREALABLE
 * @author : s.gravois
@@ -1078,14 +1083,14 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   struct timeval t00,t01 ;
   TRACE("start") ;
   sleep(3) ;
-  /*
+  
   param.sched_priority = 1  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
-    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+    perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
   }
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
-  */
+  
   if ( devices->DEVICE_CLAVIER_USE ) {
     KEYBOARD_TERMIOS_INIT() ;
 
@@ -1272,7 +1277,8 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   
   param.sched_priority = 2  ;
   
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
+  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {
+    perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
 
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   
@@ -1412,7 +1418,8 @@ int main(int argc, char ** argv) {
   mlockall(MCL_CURRENT | MCL_FUTURE);
   
   param.sched_priority = 1 ;
-  if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) {perror("setschedparam main");exit(EXIT_FAILURE);}
+  if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) {
+    perror("setschedparam main");exit(EXIT_FAILURE);}
 
   signal(SIGINT,TRAP_MAIN) ;
   signal(SIGALRM,TRAP_MAIN) ;
