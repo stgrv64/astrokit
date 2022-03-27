@@ -96,21 +96,23 @@ GPIO_MASQUE     0,1,2,3
 GPIO_FREQUENCE_PWM  1500
 
 # ----------------------- parametres reductions altitude
+# Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760 
+# mesure precisemebnt sur 5 tours en 28800 pas avec le binaire /usr/local/bin/gpio23 
 
 ALT_R1  144      # reduction liee a la monture ( = 65 dents / 1.5 = 43.333)
-ALT_R2  266      # reducteur du moteur = 28.75
-ALT_R3  22       # nombre de pas du moteur en altitude
-ALT_R4  51       # mode micro pas utilise (1/x)
+ALT_R2  64       # reducteur du moteur =  5760 (64*90) (32*180)
+ALT_R3  90       # nombre de pas du moteur en altitude
+ALT_R4  255      # mode micro pas utilise (1/x)
 ALT_ROT 0        # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
 ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions azimut
 
 AZI_R1   144     # reduction lee a la monture ( = 130 dents)
-AZI_R2   266     # reducteur du moteur = 28.75
-AZI_R3   22      # nombre de pas du moteur en azimut
-AZI_R4   51      # mode micro pas utilise (1/x)
-AZI_ROT  0       # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
+AZI_R2   64      # reducteur du moteur = 28.75
+AZI_R3   90      # nombre de pas du moteur en azimut
+AZI_R4   255     # mode micro pas utilise (1/x)
+AZI_ROT  1       # Flag de reversibilite du sens de rotation 1 <=> gauche->droite
 AZI_ACC  2       # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions altaz

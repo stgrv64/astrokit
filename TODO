@@ -11,7 +11,15 @@
  * correction de la fonction CALCUL_EQUATEUR
  * correction de l'azimut ( 180 degres au sud)
  * ajout fonction angle vers ddmmss
- 
+
+22 mars 2022 : 
+
+ * parametrer eclairage LED (important) suite appui touche
+ * RPI3B+ probleme alim : remettre un regulateur de tension
+   => tester chez moi sur breadboards
+ * nombre de pas moteurs NEQ teste precisement a 5760 (32*180) ou 64*90 ) 
+   => teste avec /usr/local/bin/gpio23 21,26,19,13 50 28800 1 1 (5 tours)
+   => modifier le fichier cxonfig.txt
 -------------------------------------------------------------------------------
 
 KO => modifier les droits du user stef et astrokit pour avec 

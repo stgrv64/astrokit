@@ -1043,7 +1043,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   
   sleep(1) ;
   
-  param.sched_priority = 2  ;
+  param.sched_priority = 1  ;
   
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { perror("setschedparam SUIVI_INFRAROUGE"); exit(EXIT_FAILURE);}
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
@@ -1083,7 +1083,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   TRACE("start") ;
   sleep(1) ;
   
-  param.sched_priority = 2  ;
+  param.sched_priority = 1  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
   }
@@ -1162,7 +1162,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   struct sched_param param;
   TRACE("start") ;
   sleep(1) ;
-  param.sched_priority = 2  ;
+  param.sched_priority = 1  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
@@ -1276,7 +1276,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   // notamment pour arriver dans la fonction SUIVI_TRAITEMENT_MENU
   // qui initialise a 1 SUIVI_CAPTEURS
   
-  param.sched_priority = 2  ;
+  param.sched_priority = 1  ;
   
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {
     perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
