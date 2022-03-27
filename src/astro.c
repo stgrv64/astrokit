@@ -1114,6 +1114,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
         if ( i_indice_code < CONFIG_CODE_NB_CODES ) {
           strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+          GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
         }
 
         if ( i_indice_code < CONFIG_CODE_NB_CODES && \
@@ -1121,6 +1122,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
              i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
           strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+          GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
         }
 
         // tres important !!

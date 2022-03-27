@@ -82,8 +82,9 @@ void LIRC_READ(SUIVI *suivi) {
     memset( suivi->datas_infrarouge, '\0', strlen( suivi->datas_infrarouge ) ) ;
        
     if ( k == 0 && i_indice_code < CONFIG_CODE_NB_CODES ) {
-
+      
       strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+      GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
     }
 
     if ( k > 0 && \
@@ -92,6 +93,7 @@ void LIRC_READ(SUIVI *suivi) {
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
       strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+      GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
     }
     
     // tres important !!
