@@ -20,6 +20,10 @@
  * nombre de pas moteurs NEQ teste precisement a 5760 (32*180) ou 64*90 ) 
    => teste avec /usr/local/bin/gpio23 21,26,19,13 50 28800 1 1 (5 tours)
    => modifier le fichier cxonfig.txt
+
+27 mars 2022 :
+
+ * essayer PREFERRED_VERSION_lirc pour avoir lirc ancien
 -------------------------------------------------------------------------------
 
 KO => modifier les droits du user stef et astrokit pour avec 
