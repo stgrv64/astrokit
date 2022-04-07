@@ -1,0 +1,55 @@
+
+------- /etc/systemd/system/multi-user.target.wants
+lrwxrwxrwx 1 root root   35 Mar  9  2018 hciuart.service -> /lib/systemd/system/hciuart.service
+lrwxrwxrwx 1 root root   42 Mar  9  2018 busybox-syslog.service -> /lib/systemd/system/busybox-syslog.service
+lrwxrwxrwx 1 root root   41 Mar  9  2018 busybox-klogd.service -> /lib/systemd/system/busybox-klogd.service
+lrwxrwxrwx 1 root root   43 Sep 20  2020 wpa_supplicant@wlan0.service -> /lib/systemd/system/wpa_supplicant@.service
+lrwxrwxrwx 1 root root   41 Sep 20  2020 astrokit-init.service -> /etc/systemd/system/astrokit-init.service
+
+
+------- /etc/systemd/system
+lrwxrwxrwx 1 root root   33 Mar  9  2018 ctrl-alt-del.target -> /lib/systemd/system/reboot.target
+drwxr-xr-x 2 root root 4096 Mar  9  2018 bluetooth.target.wants
+drwxr-xr-x 2 root root 4096 Sep 20  2020 sysinit.target.wants
+-rw-r--r-- 1 root root  206 Sep 20  2020 astrokit-init.service
+drwxr-xr-x 3 root root 4096 Apr  5 07:45 multi-user.target.wants
+
+
+------- /etc/wpa_supplicant
+total 8
+-rw-r--r-- 1 root root  326 Sep 20  2020 wpa_supplicant-wlan0.conf
+
+
+------- /etc
+drwxr-xr-x 2 root root  4096 Apr  4 20:41 ssh
+-r--r----- 1 root root  3193 Apr  4 20:43 sudoers
+-rw-r--r-- 1 root root    53 Apr  4 20:44 hostname
+drwxr-xr-x 4 root root  4096 Apr  6 17:08 lirc
+-r-------- 1 root root   766 Apr  6 17:11 shadow
+
+
+------- /etc/lirc
+-rw-r--r-- 1 root root 1124 Mar  9  2018 irexec.lircrc
+-rw-r--r-- 1 root root  647 Apr  5 07:47 lirc_options.conf
+-rw-r--r-- 1 root root 1134 Apr  5 07:54 code.lircd.conf
+drwxr-xr-x 3 root root 4096 Apr  5 07:56 lircd.conf.d
+-rw------- 1 root root 1092 Apr  6 17:10 irrecord-tmp-FjbrmW
+
+
+------- /etc/lirc/lircd.conf.d
+total 12
+-rw-r--r-- 1 root root  615 Mar  9  2018 README.conf.d
+-rw-r--r-- 1 root root 1901 Apr  5 07:43 code_1120.conf
+
+
+------- /usr/local/bin
+total 8
+-rwxr-xr-x 1 root root   42 Sep 20  2020 script_astrokit_init_loadfrkmap.sh
+
+
+------- /lib/firmware
+total 24
+-rw-r--r-- 1 root root 8914 Mar  9  2018 LICENCE.cypress
+drwxr-xr-x 2 stef 1001 4096 Apr  4 17:08 brcm
+drwxr-xr-x 2 stef 1001 4096 Apr  4 17:08 cypress
+
