@@ -24,7 +24,26 @@
 27 mars 2022 :
 
  * essayer PREFERRED_VERSION_lirc pour avoir lirc ancien
+
+05 avril 2022 : 
+
+ * utilisation ecran LCD1602 avec succes grace a conf raspbian (paquets python*)
+   => cf clone depot git clone https://github.com/the-raspberry-pi-guy/lcd
+   => dans drivers apres un setup.sh (sur raspbian) doit apparaitre les fichiers __init__.pyc et i2c_dev.pyc
+   => il faut essayer de reproduire cette conf apartir de yocto (installation python / python* et smbus
+   => ensuite lancement sudo ./demo_scrolling_text.py avec succes
+
+07 avril 2022 :
+
+   => resolu 
+   => passage par branche hardknott qui instaure le patch lirc-gpio-ir-0.10.patch
+   => un diff entre hardknott et dunfell montre que ce patch a ete mis en place recemment
+   => cela permet a irrecord et les commandes lirc de fonctionner avec le pilote gpio-ir-recv
+   => il faut egalement copier le contenu de code_1120.conf (?) dans /etc/lirc/lircd.conf (!!)
 -------------------------------------------------------------------------------
+
+  => ajouter les outils de perf CPU vcgencmd et sysbench  
+     retrouver les paquets dans lesquels ils se trouvent
 
 KO => modifier les droits du user stef et astrokit pour avec 
      sudo setcap 'cap_sys_nice=eip' <application>

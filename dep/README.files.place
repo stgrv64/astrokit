@@ -26,7 +26,7 @@ drwxr-xr-x 2 root root  4096 Apr  4 20:41 ssh
 -rw-r--r-- 1 root root    53 Apr  4 20:44 hostname
 drwxr-xr-x 4 root root  4096 Apr  6 17:08 lirc
 -r-------- 1 root root   766 Apr  6 17:11 shadow
-
+# ajouter profile
 
 ------- /etc/lirc
 -rw-r--r-- 1 root root 1124 Mar  9  2018 irexec.lircrc
