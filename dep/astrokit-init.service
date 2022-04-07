@@ -1,0 +1,12 @@
+[Unit]
+Description=astrokit init script : load fr kmap
+After=getty.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/script_astrokit_init_loadfrkmap.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target
+
