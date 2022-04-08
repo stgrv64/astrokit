@@ -310,6 +310,30 @@ void CONFIG_INIT_LOG(void) {
   return ;
 }
 /*****************************************************************************************
+* @fn     : CONFIG_INIT_LCD
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure lcd *l
+* @param  : LIEU *lieu
+* @date   : 2022-04-08 creation
+*****************************************************************************************/
+
+void CONFIG_INIT_LCD(LCD *lcd) {
+
+  memset( lcd->c_line_0, 0 , sizeof( lcd->c_line_0 )) ;
+  memset( lcd->c_line_1, 0 , sizeof( lcd->c_line_1 )) ;
+  memset( lcd->c_line_0_old, 0 , sizeof( lcd->c_line_0_old )) ;
+  memset( lcd->c_line_1_old, 0 , sizeof( lcd->c_line_1_old )) ;
+
+  strcpy( lcd->c_line_0, "") ; 
+  strcpy( lcd->c_line_1, "") ; 
+  strcpy( lcd->c_line_0_old, "") ; 
+  strcpy( lcd->c_line_1_old, "") ; 
+
+  lcd->i_board = 0 ;
+  lcd->i_fd = 0 ;
+  lcd->i_i2c_num = 1 ; 
+}
+/*****************************************************************************************
 * @fn     : CONFIG_INIT_ASTRE
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure ASTRE * as
@@ -605,7 +629,7 @@ void CONFIG_INIT_VOUTE(VOUTE *voute) {
 *****************************************************************************************/
 
 void CONFIG_INIT_CODE( \
- t_st_Codes * gp_Codes, \
+ CODES * gp_Codes, \
  int          li_pos, \
  const char * gl_char_Codes[][CONFIG_CODES_NB_IN_OUT] ) {
 
@@ -623,17 +647,17 @@ void CONFIG_INIT_CODE( \
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CODES
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure des codes *t_st_Codes
+* @brief  : Cette fonction initialise la structure des codes *CODES
 * @brief  : etablie la correspondance entre les KEY du fichier lircd.conf (partie LIRC)
 * @brief  : et les codes utilises dans le programme principal (car pas de hachage en c)
 * @brief  : etablie aussi la correspondance entre les KEY du clavier termios (partie TERMIOS)
 * @brief  : et les codes utilises dans le programme principal (code_action)
-* @param  : t_st_Codes *gp_Codes
+* @param  : CODES *gp_Codes
 * @date   : 2022-03-21 creation entete
 * @todo   : modifier : completer avec une fonction de hachage (regarder si API sur net)
 *****************************************************************************************/
 
-void CONFIG_INIT_CODES(t_st_Codes *gp_Codes) {
+void CONFIG_INIT_CODES(CODES *gp_Codes) {
 
   int i_pos ;
   
@@ -1759,6 +1783,11 @@ void CONFIG_AFFICHER_DEVICES_USE (void) {
   Trace1("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
 
   return ;
+}
+void CONFIG_LCD_AFFICHER_TEMPS(LIEU* lieu, TEMPS *temps, LCD *lcd) {
+
+  CALCUL_TEMPS_SIDERAL(lieu, temps) ;
+
 }
 //========================================================================================
 // FIXME : FIN FICHIER

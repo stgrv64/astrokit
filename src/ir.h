@@ -74,7 +74,7 @@ int   LIRC_OPEN(struct lirc_config *lircconfig) ;
 void  LIRC_CLOSE(struct lirc_config *lircconfig) ;
 void  LIRC_READ(SUIVI *suivi) ;
 
-void  CONFIG_INIT_CODES(t_st_Codes *gp_Codes) ;
+void  CONFIG_INIT_CODES(CODES *gp_Codes) ;
 
 void  IR_ACTIONS_PARTICULIERES( SUIVI *suivi) ;
 

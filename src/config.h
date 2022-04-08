@@ -60,19 +60,20 @@
 
 void   CONFIG_INIT_LOG(void)  ;
 
-void   CONFIG_INIT_CLAVIER(CLAVIER * clavier)  ;
-void   CONFIG_INIT_LIEU(LIEU *lieu) ;
-void   CONFIG_INIT_ASTRE(ASTRE *as ) ;
-void   CONFIG_INIT_VOUTE(VOUTE *voute) ;
-void   CONFIG_INIT_SUIVI(SUIVI *suivi) ;
-void   CONFIG_INIT_TEMPS(TEMPS *temps) ;
-void   CONFIG_INIT_DEVICES(DEVICES *devices) ;
+void   CONFIG_INIT_CLAVIER ( CLAVIER * clavier)  ;
+void   CONFIG_INIT_LIEU    ( LIEU    * lieu) ;
+void   CONFIG_INIT_ASTRE   ( ASTRE   * as ) ;
+void   CONFIG_INIT_VOUTE   ( VOUTE   * voute) ;
+void   CONFIG_INIT_SUIVI   ( SUIVI   * suivi) ;
+void   CONFIG_INIT_TEMPS   ( TEMPS   * temps) ;
+void   CONFIG_INIT_DEVICES ( DEVICES * devices) ;
+void   CONFIG_INIT_LCD     ( LCD     * lcd) ;
 
 /* ajout mars 2022 */
 /* fonctions anciennement dans ir.c /.h */
 
-void  CONFIG_INIT_CODE     ( t_st_Codes *, int, const char * [][CONFIG_CODES_NB_IN_OUT] ) ;
-void  CONFIG_INIT_CODES    ( t_st_Codes *) ;
+void  CONFIG_INIT_CODE     ( CODES *, int, const char * [][CONFIG_CODES_NB_IN_OUT] ) ;
+void  CONFIG_INIT_CODES    ( CODES *) ;
 void  CONFIG_MAJ_SUIVI_PAS ( SUIVI *) ;
 void  CONFIG_INPUTS_GESTION_APPUIS(SUIVI *, CLAVIER *) ;
 
@@ -105,6 +106,8 @@ void   CONFIG_AFFICHER_CHANGEMENTS (void) ;  /* FIXME ajout 20200102 */
 void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 
 void   CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *)  ;
+
+void CONFIG_LCD_AFFICHER_TEMPS(LIEU* , TEMPS *, LCD *)  ;
 
 #endif
 

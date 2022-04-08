@@ -10,7 +10,7 @@
 #                 => mainIr <=> main
 # 20/01/2022  | * ajout KEY_ZOOM (oubli) et action associee
 #
-# 21/03/2022  | * mise en place structure g_Codes (t_st_Codes)
+# 21/03/2022  | * mise en place structure g_Codes (CODES)
 #               * deport du code dans fichier config.c /.h
 #               * renommage fonction LIRC_CODE => CONFIG_INIT_CODE
 #

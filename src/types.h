@@ -33,6 +33,8 @@
 #               * ajout constantes char * en fonction c_Menus
 # mars  2022  | * ajout signe a structure TEMPS
 #               * ajout c_si signe sous forme char
+# avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
+#               *
 # -------------------------------------------------------------- 
 */
 
@@ -213,7 +215,18 @@
 #define CONFIG_CODE_BUFFER_SIZE  255 
 #define CONFIG_CODE_NB_CODES     50 
 
+#define CONFIG_LCD_LINES_CHAR_NUMBERS 16
 
+typedef struct {
+ int  i_fd ; 
+ int  i_board ; 
+ int  i_i2c_num ; 
+ char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
+ char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
+ char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
+ char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
+} 
+LCD ;
 //------------------------------------------------------------------------------
 
 typedef enum {
@@ -229,7 +242,7 @@ typedef struct  {
   char in_lirc [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
   char out_act [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
 }
-t_st_Codes ;
+CODES ;
 
  static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /* clavier numerique */ 
@@ -792,7 +805,9 @@ CLAVIER    cla, *clavier ;
 DEVICES    dev, *devices ;
 
 char       g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
-t_st_Codes g_Codes, *gp_Codes ;
+
+CODES      g_Codes, *gp_Codes ;
+LCD        g_Lcd,   *gp_Lcd ;
 
 FILE      * flog ; 
 

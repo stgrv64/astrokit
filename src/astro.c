@@ -1083,7 +1083,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   TRACE("start") ;
   sleep(1) ;
   
-  param.sched_priority = 1  ;
+  param.sched_priority = 0  ;
   if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
   }
@@ -1352,26 +1352,6 @@ int main(int argc, char ** argv) {
   pthread_t p_thread_m_alt ;
   pthread_t p_thread_m_azi ;
   int i2cDev = 1;
-
-  if ((devFD = LCD1602Init(i2cDev)) == -1) {
-      printf("Fail to init LCD1602\n");
-      return -1;
-  }
-  if (LCD1602Clear(devFD) == -1) {
-      printf("Fail to Clear\n");
-  }
-  printf("clearing LCD1602\n");
-  sleep(1);
-  if (LCD1602DispLines(devFD, "Welcome to Astrokit", "--by stgrv64") == -1) {
-      printf("Fail to Display String\n");
-  }
-  printf("displaying LCD1602\n");
-  LCD1602DeInit(devFD);
-  // -----------------------------------------------------------------
-  // test ecran LCD
-  // -----------------------------------------------------------------
-
-
   // -----------------------------------------------------------------
   // recuperer le chemin courant avec getcwd
   // -----------------------------------------------------------------
@@ -1400,8 +1380,10 @@ int main(int argc, char ** argv) {
   temps   = &tem ;
   clavier = &cla ;
   devices = &dev ;
-  gp_Codes     = &g_Codes ;
-  
+
+  gp_Codes  = &g_Codes ;
+  gp_Lcd    = &g_Lcd ;
+
   // -----------------------------------------------------------------
   // Initialisations diverses et variees
   // -----------------------------------------------------------------
@@ -1417,7 +1399,8 @@ int main(int argc, char ** argv) {
 
   GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
   
-  CONFIG_INIT_CODES     ( gp_Codes) ;
+  CONFIG_INIT_LCD       ( gp_Lcd ) ;
+  CONFIG_INIT_CODES     ( gp_Codes ) ;
   CONFIG_INIT_CLAVIER   ( clavier ) ;   
   CONFIG_INIT_ASTRE     ( as ) ;
   CONFIG_INIT_LIEU      ( lieu  ) ;
@@ -1427,6 +1410,35 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_DEVICES   ( devices ) ;
 
   CONFIG_AFFICHER_DEVICES_USE() ;
+
+  // -----------------------------------------------------------------
+  // test ecran LCD
+  // -----------------------------------------------------------------
+
+  if ((devFD = LCD1602Init(i2cDev)) == -1) {
+      printf("Fail to init LCD1602\n");
+      return -1;
+  }
+  if (LCD1602Clear(devFD) == -1) {
+      printf("Fail to Clear\n");
+  }
+  printf("clearing LCD1602\n");
+  for(int i=0;i<100;i++) {
+
+    CALCUL_TEMPS_SIDERAL(lieu, temps) ;
+
+    sprintf(gp_Lcd->c_line_0, "%d-%d %d:%d:%d", \
+    temps->mm, temps->dd, temps->HH, temps->MM, temps->SS ) ;
+    
+    sprintf(gp_Lcd->c_line_1, "JJ : %.2f", lieu->JJ ) ;
+
+    if (LCD1602DispLines(devFD, gp_Lcd->c_line_0, gp_Lcd->c_line_1 ) == -1) {
+        printf("Fail to Display String\n");
+    }
+    usleep(100000) ;
+  }
+  printf("displaying LCD1602\n");
+  LCD1602DeInit(devFD);
 
   // -----------------------------------------------------------------
   // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)
