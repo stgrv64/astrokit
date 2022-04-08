@@ -1345,11 +1345,32 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
 int main(int argc, char ** argv) {
   
   int i ;
+  int devFD, board;
   struct sched_param param;
   pthread_t p_thread_p_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_p_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_m_alt ;
   pthread_t p_thread_m_azi ;
+  int i2cDev = 1;
+
+  if ((devFD = LCD1602Init(i2cDev)) == -1) {
+      printf("Fail to init LCD1602\n");
+      return -1;
+  }
+  if (LCD1602Clear(devFD) == -1) {
+      printf("Fail to Clear\n");
+  }
+  printf("clearing LCD1602\n");
+  sleep(1);
+  if (LCD1602DispLines(devFD, "Welcome to Astrokit", "--by stgrv64") == -1) {
+      printf("Fail to Display String\n");
+  }
+  printf("displaying LCD1602\n");
+  LCD1602DeInit(devFD);
+  // -----------------------------------------------------------------
+  // test ecran LCD
+  // -----------------------------------------------------------------
+
 
   // -----------------------------------------------------------------
   // recuperer le chemin courant avec getcwd

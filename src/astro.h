@@ -25,9 +25,9 @@
 
 #include <linux/i2c-dev.h>
 #include <lirc_client.h>
+#include <libfahw.h>
 
 #include <arguments.h>
-//#include <astro.h>
 #include <calculs.h>
 #include <cat.h>
 #include <config.h>

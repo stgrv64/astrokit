@@ -21,7 +21,9 @@
 #
 #  21/01/2022 : 
 #         * prise en compte CCHOST et CCTARG
-# 
+#
+#  08/04/2022 : 
+#         * ajout compilation pour lcd1602 (git matrix adapter)
 #--------------------------------------------------------------------------------------
 # CC	= gcc
 # CC	= armv6-gcc
@@ -41,11 +43,12 @@ VERS	= $(shell date +%B.%Y)
 
 RM 		= rm -f
 EPHA	= libephe.a
+LCDA  = libfahw.a
 EPHX	= solarsystem
-
 RPWD	= ${PWD}
 RSRC	= ${RPWD}/src
 REPH	= ${RPWD}/eph
+RLCD	= ${RPWD}/lcd
 
 TLIB	= ${RPWD}/libtarget
 HLIB  = ${RPWD}/libhost
@@ -76,8 +79,8 @@ else
 	RLIB=$(TLIB)
 endif
 
-INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH} -I$(NCURSESLIB) 
-LIBS	= -L${RLIB} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo -lephe
+INCS 	= -I. -I${RSRC} -I${RPWD}/inc -I${RLIB} -I${RLIB}/lirc -I${REPH} -I$(NCURSESLIB) -I${RPWD}/lcd/lib/includes
+LIBS	= -L${RLIB} -lpthread -lm -lrt -llirc_client -lncurses -ltinfo -lephe -lfahw
 
 # ========================================
 # Prevoir la compilation avec GCC 
@@ -106,6 +109,7 @@ OBJ	= $(SRC:.c=.o)
 SRCIR	= src/ir.c src/gpio.c
 OBJIR	= $(SRCIR:.c=.o)
 
+LLCD  = ${RLIB}/${LCDA}
 LEPH	= ${RLIB}/${EPHA}
 XEPH	= ${RLIB}/${EPHX}
 
@@ -130,6 +134,10 @@ $(GPIO): $(OBJ)
 $(LEPH)	:
 	cd ${REPH} ; make CC=$(CC) $(EPHA)
 
+$(LLCD)	:
+	cd ${RLCD} ; make CC=$(CC) lib
+	cp ${RLCD}/lib/${LCDA} ${RLIB}
+	
 $(XEPH)	:
 	cd ${REPH} ; make CC=$(CC) $(EPHX)
 
@@ -138,7 +146,12 @@ $(XEPH)	:
 clean: clean-custom
 	${RM} $(OBJS) 
 	${RM} $(EXEC)
-
+	
+cleanlcd:
+	${RM} ${RLCD}/*.a
+	${RM} ${RLCD}/*.o
+	${RM} ${RLIB}/${LCDA}
+	
 cleanlib:
 	${RM} ${REPH}/*.o
 	${RM} ${LEPH}
@@ -147,13 +160,15 @@ cleansolarsystem:
 	${RM} ${REPH}/*.o
 	${RM} ${XEPH}	
 
-cleanall: clean cleanlib cleansolarsystem
+cleanall: clean cleanlib cleansolarsystem cleanlcd
 
 lib: $(LEPH)
 
+lcd: $(LLCD)
+
 $(EPHX): $(XEPH)
 
-all: all-before $(LEPH) $(EXEC) all-after
+all: all-before $(LLCD) $(LEPH) $(EXEC) all-after
 
 host: cleanall lib $(EXEC)
 

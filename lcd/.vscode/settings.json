@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "libfahw.h": "c",
+        "libfahw-pcf8574.h": "c"
+    }
+}
