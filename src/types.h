@@ -34,7 +34,7 @@
 # mars  2022  | * ajout signe a structure TEMPS
 #               * ajout c_si signe sous forme char
 # avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
-#               *
+#               * ajout type enum pour les mois (affichage LCD)
 # -------------------------------------------------------------- 
 */
 
@@ -215,16 +215,40 @@
 #define CONFIG_CODE_BUFFER_SIZE  255 
 #define CONFIG_CODE_NB_CODES     50 
 
-#define CONFIG_LCD_LINES_CHAR_NUMBERS 16
+#define CONFIG_LCD_LINES_CHAR_NUMBERS        16
+#define CONFIG_LCD_LINES_CHAR_NUMBERS_secure 8
+#define CONFIG_LCD_USLEEP_AFTER_CLEARING     5000
+#define CONFIG_LCD_I2C_DEFAULT_DEV_PORT      1
+//------------------------------------------------------------------------------
+
+typedef enum {
+LCD_MONTH_1=0,
+LCD_MONTH_2,
+LCD_MONTH_3,
+LCD_MONTH_4,
+LCD_MONTH_5,
+LCD_MONTH_6,
+LCD_MONTH_7,
+LCD_MONTH_8,
+LCD_MONTH_9,
+LCD_MONTH_10,
+LCD_MONTH_11,
+LCD_MONTH_12,
+}
+t_en_Lcd_Display_Months ;
+
+static const char * c_Lcd_Display_Months[] = {
+ "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
+} ;
 
 typedef struct {
  int  i_fd ; 
  int  i_board ; 
  int  i_i2c_num ; 
- char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
- char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
- char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
- char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS +1 ] ;
+ char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+ char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+ char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+ char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
 } 
 LCD ;
 //------------------------------------------------------------------------------

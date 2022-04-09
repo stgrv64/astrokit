@@ -1,5 +1,5 @@
-# CC = gcc 
-CC = arm-linux-gnueabihf-gcc 
+CC = gcc 
+#CC = arm-linux-gnueabihf-gcc 
 
 TARGET	=  $(patsubst Matrix-%.c,matrix-%, $(wildcard *.c))
 SRC 	=  $(wildcard *.c)

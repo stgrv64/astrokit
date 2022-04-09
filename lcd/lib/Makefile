@@ -1,5 +1,14 @@
+# stgrv64 - Projet astrokit - Tous droits reserves - 2022
+# -------------------------------------------------------------------------------------
+# HISTORIQUE MODIFICATION
+#  09/04/2022 : 
+#     * ajout prise en compte argument M= comme pour Makefile astrokit
+#       make M=targ => compilation avec arm-gcc
+#       make M=host => compilation avec gcc
+# --------------------------------------------------------
+
 # CROSS_COMPILE ?= 
-CROSS_COMPILE ?= arm-linux-gnueabihf-
+# CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
@@ -13,8 +22,8 @@ RANLIB	= $(CROSS_COMPILE)ranlib
 
 CFLAGS	= -Wall -Os -Wno-format-overflow
 LDFLAGS	= -lpthread
-LIB		= libfahw.so
-SLIB	= libfahw.a
+LIBSO		= libfahw.so
+LIBA	= libfahw.a
 CFLAGS	+= -fPIC
 
 OBJDIR	= .obj
@@ -23,9 +32,9 @@ LIBSRC	= $(wildcard *.c)
 LIBOBJ	= $(addprefix $(OBJDIR)/, $(addsuffix .o, $(basename $(LIBSRC))))
 DEPS	= $(patsubst %.c,$(DEPDIR)/%.Po,$(LIBSRC))
 
-all: $(LIB) $(SLIB)
-lib: $(LIB)
-slib: $(SLIB)
+all: $(LIBSO) $(LIBA)
+lib: $(LIBSO)
+slib: $(LIBA)
 $(OBJDIR)/%.o: %.c
 	@test -d $(DEPDIR) || mkdir -p $(DEPDIR)
 	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
@@ -33,16 +42,17 @@ $(OBJDIR)/%.o: %.c
 	@mv $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 	
 -include $(DEPS)
-$(LIB): $(LIBOBJ)
+$(LIBSO): $(LIBOBJ)
 	$(CC) $(LDFLAGS) -shared -o $@ $^
-$(SLIB): $(LIBOBJ)
+	
+$(LIBA): $(LIBOBJ)
 	$(AR) rcu $@ $^
 	$(RANLIB) $@
 	
-install: $(LIB)
+install: $(LIBSO)
 	install ./includes/libfahw*.h /usr/local/include
 	install --mode=644 libfahw.so /usr/local/lib
 	install --mode=644 libfahw.a /usr/local/lib
 	ldconfig
 clean:
-	rm -rf $(LIB) $(LIBOBJ) $(SLIB) $(DEPS) $(OBJDIR) $(DEPDIR)
+	rm -rf $(LIBSO) $(LIBOBJ) $(LIBA) $(DEPS) $(OBJDIR) $(DEPDIR)

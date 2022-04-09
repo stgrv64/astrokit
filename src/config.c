@@ -330,8 +330,34 @@ void CONFIG_INIT_LCD(LCD *lcd) {
   strcpy( lcd->c_line_1_old, "") ; 
 
   lcd->i_board = 0 ;
-  lcd->i_fd = 0 ;
-  lcd->i_i2c_num = 1 ; 
+  lcd->i_i2c_num = CONFIG_LCD_I2C_DEFAULT_DEV_PORT ; 
+  
+  if ((lcd->i_fd = LCD1602Init(lcd->i_i2c_num)) == -1) {
+     SyslogErr("Fail to init LCD1602Init\n");
+     return ;
+  }
+  else {
+    CALCUL_TEMPS_SIDERAL(lieu, temps) ;
+
+    sprintf(lcd->c_line_0, "%d %s %d %d:%d", \
+      temps->yy , c_Lcd_Display_Months[ temps->mm -1  ] , temps->dd, temps->HH, temps->MM ) ;
+    
+    sprintf(lcd->c_line_1, "%.2f %.2f", \
+      lieu->lat * DEGRES,  lieu->lon * DEGRES ) ;
+
+    if ( LCD1602Clear(lcd->i_fd) == -1) {
+      SyslogErr("Fail to LCD1602Clear\n");
+      return ;
+    }
+    usleep(CONFIG_LCD_USLEEP_AFTER_CLEARING) ;
+
+    if (LCD1602DispLines(lcd->i_fd, lcd->c_line_0, lcd->c_line_1 ) == -1) {
+        SyslogErr("Fail to LCD1602DispLines\n");
+    }
+    LCD1602DeInit(lcd->i_fd); 
+  }
+  
+  return ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_ASTRE
@@ -1789,6 +1815,75 @@ void CONFIG_LCD_AFFICHER_TEMPS(LIEU* lieu, TEMPS *temps, LCD *lcd) {
   CALCUL_TEMPS_SIDERAL(lieu, temps) ;
 
 }
+
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER
+* @author : s.gravois
+* @brief  : Cette fonction affiche deux chaines sur ecran LCD  
+* @param  : LCD * lcd
+* @param  : char* c_line_0
+* @param  : char* c_line_1
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_AFFICHER(LCD * lcd, char* c_line_0, char * c_line_1) {
+/*
+  if ((lcd->i_fd = LCD1602Init(I2C_DEV)) == -1) {printf("Fail to init LCD1602\n");return -1;}
+  else { printf("LCD1602Init (OK)\n"); }
+*/  
+
+  strcpy( lcd->c_line_0, c_line_0 ) ;
+  strcpy( lcd->c_line_1, c_line_1 ) ;
+
+  if ( LCD1602Clear(lcd->i_fd) == -1) {
+    SyslogErr("Fail to LCD1602Clear\n");
+    return ;
+  }
+  /* entre 2500 et 5000 semble une bonne valeur de usleep */
+  /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
+  usleep( CONFIG_LCD_USLEEP_AFTER_CLEARING ) ;
+    
+  if ( LCD1602DispLines(lcd->i_fd, c_line_0, c_line_1) == -1) { 
+    SyslogErr("Fail to Display String\n");
+    return ;
+  }
+
+  LCD1602DeInit(lcd->i_fd);
+  
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_PROVISOIREMENT
+* @author : s.gravois
+* @brief  : Cette fonction affiche provisoirement 2 chaines pendant une duree en us 
+* @param  : void
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_AFFICHER_PROVISOIREMENT(LCD * lcd, char* c_line_0, char * c_line_1, int i_duree) {
+
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_PERMUTER_OLD_NEW
+* @author : s.gravois
+* @brief  : Cette fonction permute les anciennes valeurs d affichage avec les nouvelles 
+* @param  : void
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_PERMUTER_OLD_NEW(LCD * lcd, char* c_line_0, char * c_line_1) {
+
+  strcpy( lcd->c_line_0_old, lcd->c_line_0 ) ;
+  strcpy( lcd->c_line_1_old, lcd->c_line_1 ) ;
+  strcpy( lcd->c_line_0,     c_line_0 ) ;
+  strcpy( lcd->c_line_1,     c_line_1 ) ;
+
+  return ;
+}
+
 //========================================================================================
 // FIXME : FIN FICHIER
 //========================================================================================

@@ -1399,7 +1399,6 @@ int main(int argc, char ** argv) {
 
   GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
   
-  CONFIG_INIT_LCD       ( gp_Lcd ) ;
   CONFIG_INIT_CODES     ( gp_Codes ) ;
   CONFIG_INIT_CLAVIER   ( clavier ) ;   
   CONFIG_INIT_ASTRE     ( as ) ;
@@ -1409,36 +1408,9 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_TEMPS     ( temps ) ;
   CONFIG_INIT_DEVICES   ( devices ) ;
 
+  CONFIG_INIT_LCD       ( gp_Lcd ) ;
+  
   CONFIG_AFFICHER_DEVICES_USE() ;
-
-  // -----------------------------------------------------------------
-  // test ecran LCD
-  // -----------------------------------------------------------------
-
-  if ((devFD = LCD1602Init(i2cDev)) == -1) {
-      printf("Fail to init LCD1602\n");
-      return -1;
-  }
-  if (LCD1602Clear(devFD) == -1) {
-      printf("Fail to Clear\n");
-  }
-  printf("clearing LCD1602\n");
-  for(int i=0;i<100;i++) {
-
-    CALCUL_TEMPS_SIDERAL(lieu, temps) ;
-
-    sprintf(gp_Lcd->c_line_0, "%d-%d %d:%d:%d", \
-    temps->mm, temps->dd, temps->HH, temps->MM, temps->SS ) ;
-    
-    sprintf(gp_Lcd->c_line_1, "JJ : %.2f", lieu->JJ ) ;
-
-    if (LCD1602DispLines(devFD, gp_Lcd->c_line_0, gp_Lcd->c_line_1 ) == -1) {
-        printf("Fail to Display String\n");
-    }
-    usleep(100000) ;
-  }
-  printf("displaying LCD1602\n");
-  LCD1602DeInit(devFD);
 
   // -----------------------------------------------------------------
   // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)

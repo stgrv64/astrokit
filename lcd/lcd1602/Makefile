@@ -12,50 +12,35 @@ CCTARG=/usr/bin/arm-linux-gnueabihf-gcc
 CCHOST=gcc
 CROSS_COMPILE ?= 
 REPLIB=lib
+EXTENSION=
 
 ifeq ($(M),host)
+	EXTENSION=host
 	REPLIB=libhost
 	CC=$(CCHOST)
 #	RLIB=$(HLIB)
 else
+	EXTENSION=targ
 	REPLIB=libtarget
 	CROSS_COMPILE = /usr/bin/arm-linux-gnueabihf-
 	CC=$(CCTARG)
 #	RLIB=$(TLIB)
 endif
 
-AS			= $(CROSS_COMPILE)as
-LD			= $(CROSS_COMPILE)ld
-#CC			= $(CROSS_COMPILE)gcc
-AR			= $(CROSS_COMPILE)ar
-NM			= $(CROSS_COMPILE)nm
-STRIP		= $(CROSS_COMPILE)strip
-OBJCOPY		= $(CROSS_COMPILE)objcopy
-OBJDUMP		= $(CROSS_COMPILE)objdump
-RANLIB		= $(CROSS_COMPILE)ranlib
+TARGET	= $(patsubst %.c,%, $(wildcard *.c))
+SRC 	= $(wildcard *.c)
+SRC 	+= $(wildcard *.h)
 
-export AS LD CC AR NM STRIP OBJCOPY OBJDUMP RANLIB CROSS_COMPILE
+LIBS = -L ../$(REPLIB)
+INCS = -I ../lib/includes
 
-# SUBDIRS		= lib demo 
-SUBDIRS		= lib lcd1602
+$(TARGET):$(SRC)
+	$(CC) -o $@ $(LIBS) $(INCS) $^ -lfahw -lm -Wall
+	cp $(TARGET) $(TARGET).$(EXTENSION)
+	install --mode=755 $(TARGET).$(EXTENSION) ..
+	install --mode=755 $(TARGET).$(EXTENSION) ../..
+	install --mode=755 $(TARGET).$(EXTENSION) ../../bin
 
-TARGET		= subdirs
-PHONY		+= $(TARGET) $(SUBDIRS) %.clean
-
-all: $(TARGET)
-
-subdirs: $(SUBDIRS)
-
-$(SUBDIRS):
-	$(MAKE) -C $@
-
-%.clean:
-	@(cd $(patsubst %.clean, %, $@) && $(MAKE) clean)
-
-clean distclean: $(patsubst %, %.clean, $(SUBDIRS))
-
-install:
-	make -C ./demo install 
-	make -C ./lib install
-
-.PHONY: $(PHONY) install clean distclean
+.PHONY: clean 
+clean:
+	rm -f $(TARGET)
