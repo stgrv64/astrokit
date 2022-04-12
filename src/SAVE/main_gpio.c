@@ -70,7 +70,7 @@ void main(int argc, char **argv)
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   } 
   pm0 = &m0 ;

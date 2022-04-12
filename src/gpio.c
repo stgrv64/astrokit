@@ -13,7 +13,7 @@
 # ainsi que termios (cf fichier keyboard.c / .h ) :
 # creation entete de la fonction au format doxygen du reliquat de close dans le code
 # 23/01/2022  | * ajout condition pour entree dans GPIO_RAQUETTE_READ
-#   =>  if ( devices->DEVICE_RAQUETTE_USE ) {        
+#   =>  if ( devices->DEVICE_USE_RAQUETTE ) {        
 # -------------------------------------------------------------- 
 */
 
@@ -213,7 +213,7 @@ void GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 
   Trace("") ;
 
-  if ( devices->DEVICE_RAQUETTE_USE ) {
+  if ( devices->DEVICE_USE_RAQUETTE ) {
     
     GPIO_KEY_L[0] = GPIO_KEY_L1 ; 
     GPIO_KEY_L[1] = GPIO_KEY_L2 ; 
@@ -261,7 +261,7 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
   
   char buffer_recopie [ CONFIG_TAILLE_BUFFER_32 ] ;
 
-  if ( devices->DEVICE_RAQUETTE_USE ) {
+  if ( devices->DEVICE_USE_RAQUETTE ) {
 
     I=-1; ; J=-1 ;
     
@@ -386,8 +386,6 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* clavier) 
       
       clavier->mot_en_cours = 0 ;
       clavier->appui_en_cours = 0 ;
-      
-      // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
     }
   }
 }
@@ -408,7 +406,9 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], S
   int  i,j;
   char val[255] ;
   
-  if ( devices->DEVICE_RAQUETTE_USE ) {
+  if ( devices->DEVICE_USE_RAQUETTE ) {
+    
+    Trace("");
     
     for(i=0;i<4;i++) {
       GPIO_SET( GPIO_KEY_C[i], 0) ;
@@ -1120,8 +1120,10 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
   struct sched_param param;
   
   if ( priority > 0) {
-    param.sched_priority = GPIO_SUIVI_PWM_PHASE_PRIORITY ;  
-    if (pthread_setschedparam( pthread_self(), GPIO_SUIVI_PWM_PHASE_SCHED, & param) != 0) {perror("GPIO_SUIVI_PWM_PHASE");exit(EXIT_FAILURE);}
+    param.sched_priority = PTHREAD_POLICY_10 ;  
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_PHASES, & param) != 0) {
+      perror("GPIO_SUIVI_PWM_PHASE");
+      exit(EXIT_FAILURE);}
   }
   TUpwm = TUpwm_haut  = TUpwm_bas = rap = 0 ;
 
@@ -1174,8 +1176,11 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
    TRACE("start") ;
    
    if ( priority > 0) {
-     param.sched_priority = GPIO_SUIVI_MAIN_PRIORITY ;  
-     if (pthread_setschedparam( pthread_self(), GPIO_SUIVI_MAIN_SCHED, & param) != 0) {perror("suivi_main_M");exit(EXIT_FAILURE);}
+    param.sched_priority = PTHREAD_POLICY_5 ;  
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_MAIN, & param) != 0) {
+      perror("suivi_main_M");
+      exit(EXIT_FAILURE);
+    }
    }
       
    pm->pas = 0 ;
@@ -1417,7 +1422,7 @@ void mainGpio(int argc, char **argv)
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   } 
   pm0 = &m0 ;

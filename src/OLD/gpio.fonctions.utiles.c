@@ -186,8 +186,6 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
     
     clavier->mot_en_cours = 0 ;
     clavier->appui_en_cours = 0 ;
-    
-    // CONFIG_AFFICHER_CLAVIER( clavier ) ;	
   }
 }
 //==========================================================
@@ -821,7 +819,7 @@ void main2(int argc, char ** argv)
   
   if ( priority > 0)  {
     param.sched_priority = priority ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   }  
   if ( cpu >= 0 ) {   
@@ -920,7 +918,7 @@ void main3(int argc, char ** argv)
   
   if ( priority > 0)  {
     param.sched_priority = priority ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   }  
   if ( cpu >= 0 ) {   
@@ -1051,7 +1049,7 @@ void main5(int argc, char ** argv)
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
 
     param.sched_priority = priority ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   }  
   // ==============================================================
@@ -1612,7 +1610,7 @@ void main6(int argc, char **argv)
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   }  
   // ==============================================================
@@ -1715,7 +1713,7 @@ void main(int argc, char **argv)
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
     TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
-    if ( sched_setscheduler( pid, SCHED_FIFO, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
+    if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   } 
   

@@ -40,7 +40,17 @@ void LIRC_CLOSE(struct lirc_config *lircconfig) {
   // lirc_deinit() closes the connection to lircd and does some internal clean-up stuff.
   lirc_deinit();
 }
-//====================================================================================
+/*****************************************************************************************
+* @fn     : LIRC_READ
+* @author : s.gravois
+* @brief  : lecture de donnees sur le port infrarouge, doit etre appelle depuis un thread
+* @brief  :  car on utilise la fonction bloquante suivante : lirc_nextcode()
+* @param  : SUIVI * suivi
+* @date   : 2022-04-12 creation entete de la fonction au format doxygen
+* @date   : 2022-04-12 mutex_lock sur suivi->datas_infrarouge
+* @todo   : 
+*****************************************************************************************/
+
 void LIRC_READ(SUIVI *suivi) {
 
   char *code;
@@ -51,39 +61,46 @@ void LIRC_READ(SUIVI *suivi) {
   // de plus elle conserve dans un tampon les touches lues
   // au fil de l'eau 
   
-  TRACE("start\n");
+  Trace("start");
 
   while(lirc_nextcode(&code)==0) {
     
-    TRACE1("on a lu quelquechose ..") ;
+    Trace1("on a lu quelquechose ..") ;
     //GPIO_CLIGNOTE(GPIO_LED_ETAT, 2, 2) ;
 
     if ( code == NULL ) { 
-      TRACE1("code NULL lu ..") ;
+      Trace1("code NULL lu ..") ;
       continue; 
     }
-    TRACE1("code = %s", code);
+    Trace1("code = %s", code);
    
     i_indice_code=k=0 ; 
     for (j = 0, str1 = code ; ; j++, str1 = NULL) {
      
        token = strtok_r(str1, " ", &sptr);
        if (token == NULL) break ;
-       TRACE1("token i_indice_code j k = %s %d %d %d",token, i_indice_code,j,k); 
+       Trace1("token i_indice_code j k = %s %d %d %d",token, i_indice_code,j,k); 
        if ( j==1 ) k=atoi(token) ;
        if ( j==2 ) {  
          while(strcmp(gp_Codes->in_lirc[i_indice_code],token) && ( i_indice_code < CONFIG_CODE_NB_CODES ) ){ 
-           TRACE1("%s = %s ?", token, gp_Codes->in_lirc[i_indice_code]) ;  
+           Trace1("%s = %s ?", token, gp_Codes->in_lirc[i_indice_code]) ;  
            i_indice_code++ ; 
          }
        }
     }  
-    TRACE1("i_indice_code j k = %d %d %d", i_indice_code,j,k); 
+    Trace1("i_indice_code j k = %d %d %d", i_indice_code,j,k); 
+
+    pthread_mutex_lock(& suivi->mutex_infrarouge );
     memset( suivi->datas_infrarouge, '\0', strlen( suivi->datas_infrarouge ) ) ;
-       
+    pthread_mutex_unlock(& suivi->mutex_infrarouge );
+
     if ( k == 0 && i_indice_code < CONFIG_CODE_NB_CODES ) {
       
+      pthread_mutex_lock(& suivi->mutex_infrarouge );
+      Trace2("AA maj suivi->datas_infrarouge") ;
       strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+      pthread_mutex_unlock(& suivi->mutex_infrarouge );
+
       GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
     }
 
@@ -92,7 +109,11 @@ void LIRC_READ(SUIVI *suivi) {
          i_indice_code <= IR_CODE_REPETE_AUTORISE_MAX && \
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
+      pthread_mutex_lock(& suivi->mutex_infrarouge );
+      Trace2("BB maj suivi->datas_infrarouge") ;
       strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+      pthread_mutex_unlock(& suivi->mutex_infrarouge );
+
       GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
     }
     
@@ -108,8 +129,11 @@ void LIRC_READ(SUIVI *suivi) {
     
     free(code);
 
+    pthread_mutex_lock(& suivi->mutex_infrarouge );
+    Trace2("h remise a zero de suivi->datas_infrarouge") ;
     memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
     strcpy( suivi->datas_infrarouge, "") ;
+    pthread_mutex_unlock(& suivi->mutex_infrarouge );
   }
 }
 

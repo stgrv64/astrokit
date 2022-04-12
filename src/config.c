@@ -18,17 +18,21 @@
 # 15/11/2021  | * (types.h) modification des types enum et contenu enum
 #               * (types.h) modification ordre des menus (MENU_AZIMUTAL=0)
 #  => modification ordre MENUS dans switch
-# 17/01/2022  | * ajout DEVICE_CLAVIER_USE pour utilisation du clavier
+# 17/01/2022  | * ajout DEVICE_USE_KEYBOARD pour utilisation du clavier
 # 18/01/2022  | * ajout CONFIG_SCR_KERNEL pour execution script avec droits
 #                 root via systemd / execve / execl
 #               * remplacement fonctions Trace par Trace 
 #                 (evite utilisation fichier log alors que celui ci n'est pas encore ouvert)
-# 20/01/2022  | * creation des entetes doxygen des fonctions
-#               * ajout mode et type de ASTRE dans CONFIG_INIT_ASTRE
-# 23/01/2022  | * suppression MODE_EQUATORIAL
-#               * changement type MENU_PAR_DEFAUT
-# 21/03/2022  | * creation fonction CONFIG_INTI_CODES (deport depuis ir.c/h)
-#               * creation fonction CONFIG_INIT_CODE
+# 20/01/2022  |  * creation des entetes doxygen des fonctions
+#                * ajout mode et type de ASTRE dans CONFIG_INIT_ASTRE
+# 23/01/2022  |  * suppression MODE_EQUATORIAL
+#                * changement type MENU_PAR_DEFAUT
+# 21/03/2022  |  * creation fonction CONFIG_INTI_CODES (deport depuis ir.c/h)
+#                * creation fonction CONFIG_INIT_CODE
+# avril 2002  |  * debut codage fonctionnalites LCD1602 :
+#                * fonctions CONFIG_LCD_xxxx
+#                * ajout mutex init sur mutex_datas_infrarouge
+#                * => protection zone de code avec datas_infrarouge
 # -------------------------------------------------------------- 
 */
 
@@ -58,25 +62,37 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 
 void CONFIG_MAJ_SUIVI_PAS( SUIVI *suivi) {
 
-  if ( devices->DEVICE_INFRAROUGE_USE ) {
+  char c_act = '0' ;
+
+  if ( devices->DEVICE_USE_INFRAROUGE ) {
     
-    if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )         { suivi->pas_acc_plus  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )        { suivi->pas_acc_moins = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "forward" ) )      { suivi->pas_forward  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "rewind" ) )       { suivi->pas_rewind = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "forwardfast" ) )  { suivi->pas_forward_fast  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "rewindfast" ) )   { suivi->pas_rewind_fast = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "ne" ) )           { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "no" ) )           { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "se" ) )           { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "so" ) )           { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "n" ) )            { suivi->pas_nord  = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "o" ) )            { suivi->pas_ouest = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "e" ) )            { suivi->pas_est   = 1 ; }
-    if ( ! strcmp( suivi->datas_infrarouge, "s" ) )            { suivi->pas_sud   = 1 ; }
-    
-    if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )    { suivi->reset   = 1 ; }
-    
+    pthread_mutex_lock(& suivi->mutex_infrarouge );
+
+    if ( ! strcmp( suivi->datas_infrarouge, "plus" ) )         { c_act='1'; suivi->pas_acc_plus  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "moins" ) )        { c_act='1'; suivi->pas_acc_moins = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "forward" ) )      { c_act='1'; suivi->pas_forward  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "rewind" ) )       { c_act='1'; suivi->pas_rewind = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "forwardfast" ) )  { c_act='1'; suivi->pas_forward_fast  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "rewindfast" ) )   { c_act='1'; suivi->pas_rewind_fast = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "ne" ) )           { c_act='1'; suivi->pas_nord=1 ; suivi->pas_est=1   ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "no" ) )           { c_act='1'; suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "se" ) )           { c_act='1'; suivi->pas_sud=1  ; suivi->pas_est=1   ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "so" ) )           { c_act='1'; suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "n" ) )            { c_act='1'; suivi->pas_nord  = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "o" ) )            { c_act='1'; suivi->pas_ouest = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "e" ) )            { c_act='1'; suivi->pas_est   = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "s" ) )            { c_act='1'; suivi->pas_sud   = 1 ; }
+    if ( ! strcmp( suivi->datas_infrarouge, "reset" ) )        { c_act='1'; suivi->reset   = 1 ; }
+
+    /* Si suivi->datas_infrarouge a ete utilise, il peut etre remis a zero */
+
+    if ( c_act == '1' ) {
+      Trace2("g remise a zero de suivi->datas_infrarouge") ;
+      memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
+      strcpy( suivi->datas_infrarouge, "") ;
+    }
+    pthread_mutex_unlock(& suivi->mutex_infrarouge );
+
     TRACE2("%ld %ld %ld %ld %d %d\n", \
       suivi->pas_ouest, \
       suivi->pas_est, \
@@ -85,6 +101,7 @@ void CONFIG_MAJ_SUIVI_PAS( SUIVI *suivi) {
       suivi->pas_acc_plus, \
       suivi->pas_acc_moins );
   }
+
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INPUTS_GESTION_APPUIS
@@ -95,6 +112,7 @@ void CONFIG_MAJ_SUIVI_PAS( SUIVI *suivi) {
 * @param  : CLAVIER *clavier
 * @date   : 2022-03-22 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
+* @date   : 2022-04-12 protection zone de code datas_infrarouge
 *****************************************************************************************/
 
 void CONFIG_INPUTS_GESTION_APPUIS(SUIVI *suivi, CLAVIER *clavier) {
@@ -104,8 +122,11 @@ void CONFIG_INPUTS_GESTION_APPUIS(SUIVI *suivi, CLAVIER *clavier) {
   char s_buffer[CONFIG_TAILLE_BUFFER_32] ;
 
   memset(val, 0, strlen(val)) ;     
+
+  pthread_mutex_lock(& suivi->mutex_infrarouge );
   strcpy( val, suivi->datas_infrarouge ) ;
-  
+  pthread_mutex_unlock(& suivi->mutex_infrarouge );
+
   Trace1("val = %s\n", val ) ;
   
   if ( strcmp( val, "") ) {
@@ -212,8 +233,6 @@ void CONFIG_INPUTS_GESTION_APPUIS(SUIVI *suivi, CLAVIER *clavier) {
     
     clavier->mot_en_cours = 0 ;
     clavier->appui_en_cours = 0 ;
-    
-    CONFIG_AFFICHER_CLAVIER( clavier ) ;	
   }
 }
 /*****************************************************************************************
@@ -800,13 +819,13 @@ void CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) {
 
 void CONFIG_INIT_DEVICES(DEVICES *devices) {
 
-  devices->DEVICE_CAPTEURS_USE    = DEVICE_CAPTEURS_USE ;
-  devices->DEVICE_RAQUETTE_USE    = DEVICE_RAQUETTE_USE ;
-  devices->DEVICE_BLUETOOTH_USE   = DEVICE_BLUETOOTH_USE ;
-  devices->DEVICE_INFRAROUGE_USE  = DEVICE_INFRAROUGE_USE ;
-  devices->DEVICE_CONTROLEUR_MOTEUR_USE  = DEVICE_CONTROLEUR_MOTEUR_USE ;
-  devices->DEVICE_CLAVIER_USE     = DEVICE_CLAVIER_USE ;
-
+  devices->DEVICE_USE_CAPTEURS    = DEVICE_USE_CAPTEURS ;
+  devices->DEVICE_USE_RAQUETTE    = DEVICE_USE_RAQUETTE ;
+  devices->DEVICE_USE_BLUETOOTH   = DEVICE_USE_BLUETOOTH ;
+  devices->DEVICE_USE_INFRAROUGE  = DEVICE_USE_INFRAROUGE ;
+  devices->DEVICE_USE_CONTROLER   = DEVICE_USE_CONTROLER ;
+  devices->DEVICE_USE_KEYBOARD    = DEVICE_USE_KEYBOARD ;
+  devices->DEVICE_USE_LCD         = DEVICE_USE_LCD ; 
   devices->init_capteurs = 0 ; 
 }
 /*****************************************************************************************
@@ -915,13 +934,17 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->temporisation_termios  = TEMPO_TERMIOS ;
   suivi->temporisation_clavier  = TEMPO_CLAVIER ; 
   suivi->temporisation_capteurs = TEMPO_CAPTEURS ;
-  
+  suivi->temporisation_lcd      = TEMPO_LCD ;
+
+  suivi->temporisation_voute    = voute->DT ;
+
   suivi->DTh = suivi->Th * CONFIG_MICRO_SEC ;
   suivi->DTa = suivi->Ta * CONFIG_MICRO_SEC ;
 
   pthread_mutex_init( & suivi->mutex_alt, NULL ) ;
   pthread_mutex_init( & suivi->mutex_azi, NULL ) ;
   pthread_mutex_init( & suivi->mutex_cal, NULL ) ;
+  pthread_mutex_init( & suivi->mutex_infrarouge , NULL ) ;
 
   suivi->temps_a = 0 ; 
   suivi->temps_h = 0 ; 
@@ -1061,24 +1084,26 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
    AZI_R6 = 1.0;   // reduction liee au cpu
    AZI_R7 = 1.0;   // reduction non decrite plus haut
 
-   DEVICE_CAPTEURS_USE = 0    ;
-   DEVICE_RAQUETTE_USE = 0    ;
-   DEVICE_BLUETOOTH_USE = 0   ;
-   DEVICE_INFRAROUGE_USE = 0  ;
-   DEVICE_CONTROLEUR_MOTEUR_USE = 0 ;
-   DEVICE_CLAVIER_USE = 0 ;
+   DEVICE_USE_CAPTEURS = 0    ;
+   DEVICE_USE_RAQUETTE = 0    ;
+   DEVICE_USE_BLUETOOTH = 0   ;
+   DEVICE_USE_INFRAROUGE = 0  ;
+   DEVICE_USE_CONTROLER = 0 ;
+   DEVICE_USE_KEYBOARD = 0 ;
+   DEVICE_USE_LCD = 0 ;
 
    GPIO_LED_ETAT=0;
 
    /* Definition de valeurs par defauts pour les TEMPO */ 
 
-  TEMPO_RAQ      =  10000; /* est utilisee uniquement dans SUIVI_MANUEL_1 */
   TEMPO_MENU     =  50000;
-  TEMPO_IR       =  40000;
-  TEMPO_TERMIOS  =  40000;
+  TEMPO_RAQ      =  51000; /* est utilisee uniquement dans SUIVI_MANUEL_1 */
+  TEMPO_IR       =  52000;
+  TEMPO_TERMIOS  =  53000;
   TEMPO_CLAVIER  =  25000;
   TEMPO_CAPTEURS =  50000;
-
+  TEMPO_LCD      =  2000000 ; 
+  
    //----------------------------------------------------------------------
    // Lecture des variables dans la config lue dans le fichier de config
    //-----------ASTRE_PAR_DEFAUT-------------------------------------------
@@ -1122,15 +1147,17 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
      if(!strcmp("TEMPO_TERMIOS",g_Datas[l][0]))  TEMPO_TERMIOS=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_CLAVIER",g_Datas[l][0]))  TEMPO_CLAVIER=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_CAPTEURS",g_Datas[l][0])) TEMPO_CAPTEURS=atol(g_Datas[l][1]);
+     if(!strcmp("TEMPO_LCD",g_Datas[l][0]))      TEMPO_LCD=atol(g_Datas[l][1]);
      
      if(!strcmp("GPIO_LED_ETAT",g_Datas[l][0]))      GPIO_LED_ETAT=atoi(g_Datas[l][1]);
 
-     if(!strcmp("DEVICE_CONTROLEUR_MOTEUR_USE",g_Datas[l][0])) DEVICE_CONTROLEUR_MOTEUR_USE=atoi(g_Datas[l][1]);
-     if(!strcmp("DEVICE_CAPTEURS_USE",g_Datas[l][0]))   DEVICE_CAPTEURS_USE=atoi(g_Datas[l][1]);
-     if(!strcmp("DEVICE_RAQUETTE_USE",g_Datas[l][0]))   DEVICE_RAQUETTE_USE=atoi(g_Datas[l][1]);
-     if(!strcmp("DEVICE_BLUETOOTH_USE",g_Datas[l][0]))  DEVICE_BLUETOOTH_USE=atoi(g_Datas[l][1]);
-     if(!strcmp("DEVICE_INFRAROUGE_USE",g_Datas[l][0])) DEVICE_INFRAROUGE_USE=atoi(g_Datas[l][1]);
-     if(!strcmp("DEVICE_CLAVIER_USE",g_Datas[l][0]))    DEVICE_CLAVIER_USE=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_CONTROLER",g_Datas[l][0]))  DEVICE_USE_CONTROLER=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_CAPTEURS",g_Datas[l][0]))   DEVICE_USE_CAPTEURS=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_RAQUETTE",g_Datas[l][0]))   DEVICE_USE_RAQUETTE=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_BLUETOOTH",g_Datas[l][0]))  DEVICE_USE_BLUETOOTH=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_INFRAROUGE",g_Datas[l][0])) DEVICE_USE_INFRAROUGE=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_KEYBOARD",g_Datas[l][0]))   DEVICE_USE_KEYBOARD=atoi(g_Datas[l][1]);
+     if(!strcmp("DEVICE_USE_LCD",g_Datas[l][0]))        DEVICE_USE_LCD=atoi(g_Datas[l][1]);
 
      if(!strcmp("ALT_ROT",g_Datas[l][0]))      ALT_ROT=atoi(g_Datas[l][1]);
      if(!strcmp("AZI_ROT",g_Datas[l][0]))      AZI_ROT=atoi(g_Datas[l][1]);
@@ -1271,19 +1298,21 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
 
 void   CONFIG_AFFICHER_VARIABLES(void) {
 
-  Trace1("TEMPO_RAQ = %ld",  TEMPO_RAQ);
-  Trace1("TEMPO_MENU = %ld",  TEMPO_MENU);
-  Trace1("TEMPO_IR = %ld",  TEMPO_IR);
-  Trace1("TEMPO_TERMIOS = %ld",  TEMPO_TERMIOS);
-  Trace1("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
-  Trace1("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
+  Trace("TEMPO_RAQ = %ld",  TEMPO_RAQ);
+  Trace("TEMPO_MENU = %ld",  TEMPO_MENU);
+  Trace("TEMPO_IR = %ld",  TEMPO_IR);
+  Trace("TEMPO_TERMIOS = %ld",  TEMPO_TERMIOS);
+  Trace("TEMPO_CLAVIER = %ld",  TEMPO_CLAVIER);
+  Trace("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
+  Trace("TEMPO_LCD = %ld",  TEMPO_LCD);
 
-  Trace1("DEVICE_CONTROLEUR_MOTEUR_USE = %d",  DEVICE_CONTROLEUR_MOTEUR_USE);
-  Trace1("DEVICE_CAPTEURS_USE = %d",  DEVICE_CAPTEURS_USE);
-  Trace1("DEVICE_BLUETOOTH_USE = %d",  DEVICE_BLUETOOTH_USE);
-  Trace1("DEVICE_INFRAROUGE_USE = %d",  DEVICE_INFRAROUGE_USE);
-  Trace1("DEVICE_RAQUETTE_USE = %d",  DEVICE_RAQUETTE_USE);
-  Trace1("DEVICE_CLAVIER_USE = %d",  DEVICE_CLAVIER_USE);
+  Trace1("DEVICE_USE_CONTROLER = %d",  DEVICE_USE_CONTROLER);
+  Trace1("DEVICE_USE_CAPTEURS = %d",  DEVICE_USE_CAPTEURS);
+  Trace1("DEVICE_USE_BLUETOOTH = %d",  DEVICE_USE_BLUETOOTH);
+  Trace1("DEVICE_USE_INFRAROUGE = %d",  DEVICE_USE_INFRAROUGE);
+  Trace1("DEVICE_USE_RAQUETTE = %d",  DEVICE_USE_RAQUETTE);
+  Trace1("DEVICE_USE_KEYBOARD = %d",  DEVICE_USE_KEYBOARD);
+  Trace1("DEVICE_USE_LCD = %d",  DEVICE_USE_LCD);
 
   Trace1("ASTRE_PAR_DEFAUT = %s",  ASTRE_PAR_DEFAUT );
   Trace1("MENU_PAR_DEFAUT = %s",  c_Menus[MENU_PAR_DEFAUT]);
@@ -1570,7 +1599,7 @@ void CONFIG_AFFICHER_TEMPS(TEMPS *temps) {
 
 void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   
-  Trace1("phrase %s mot %s symbole %s nombre %s premier %s valider %s menu %s",\
+  Trace1("phr %s mot %s sym %s nom %s pre %s val %s menu %s",\
     clavier->phrase,\
     clavier->mot,\
     clavier->symbole,\
@@ -1585,23 +1614,15 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
   Trace1("clavier->nombre      = %s",clavier->nombre) ;
   Trace1("clavier->symbole     = %s",clavier->symbole) ;
   Trace1("clavier->phrase_lue  = %d",clavier->phrase_lue) ;
-
-  Trace("----------------------------") ;
-
 }
 /*****************************************************************************************
-* @fn     : CONFIG_AFFICHER_MODE_STELLARIUM
+* @fn     : CONFIG_FORMATE_DONNEES_AFFICHAGE
 * @author : s.gravois
-* @brief  : Cette fonction affiche les informations a la sauce stellarium
-* @param  : 
-* @date   : 2022-03-18 creation
+* @brief  : Cette fonction formate divers string en vue d un affichage pertinent
+* @param  : ASTRE *as
+* @date   : 2022-04-12 creation
 *****************************************************************************************/
-
-void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *as) {
- 
-  const char * c_nom  = as->nom ;
-  const char * c_type = c_Astre_Type [ as->type ] ;
-  const char * c_mode = c_Mode_Calcul[ as->mode ] ;
+void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
 
   char  c_hhmmss_agh[ 16] ;
   char  c_hhmmss_asc[ 16] ;
@@ -1614,12 +1635,6 @@ void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *as) {
   char  c_ddmmss_azi[ 16] ;
   char  c_ddmmss_alt[ 16] ;
   char  c_ddmmss_dec[ 16] ;
-
-  char c_vit_alt[16] ;
-  char c_vit_azi[16] ;
-
-  memset( c_vit_alt, 0, sizeof(c_vit_alt) ) ;
-  memset( c_vit_azi, 0, sizeof(c_vit_azi) ) ;
 
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
@@ -1645,23 +1660,54 @@ void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *as) {
   sprintf( c_ddmmss_alt, "%c %d°%d'%d\"", as->ALTa.c_si, as->ALTa.DD, as->ALTa.MM, as->ALTa.SS  ) ;
   sprintf( c_ddmmss_dec, "%c %d°%d'%d\"", as->DECa.c_si, as->DECa.DD, as->DECa.MM, as->DECa.SS  ) ;
 
+  /* Sauvegarde des donnees formatees dans la structure astre */
+  
+  strcpy( as->c_hhmmss_agh, c_hhmmss_agh)  ;
+  strcpy( as->c_hhmmss_asc, c_hhmmss_asc)  ;
+  strcpy( as->c_hhmmss_azi, c_hhmmss_azi)  ;
+  strcpy( as->c_hhmmss_alt, c_hhmmss_alt)  ;
+  strcpy( as->c_hhmmss_dec, c_hhmmss_dec)  ;
+
+  strcpy( as->c_ddmmss_agh, c_ddmmss_agh)  ;
+  strcpy( as->c_ddmmss_asc, c_ddmmss_asc)  ;
+  strcpy( as->c_ddmmss_azi, c_ddmmss_azi)  ;
+  strcpy( as->c_ddmmss_alt, c_ddmmss_alt)  ;
+  strcpy( as->c_ddmmss_dec, c_ddmmss_dec)  ;
+
+}
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_MODE_STELLARIUM
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations a la sauce stellarium
+* @param  : 
+* @date   : 2022-03-18 creation
+*****************************************************************************************/
+
+void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *as) {
+
+  char c_vit_alt[16] ;
+  char c_vit_azi[16] ;
+
+  memset( c_vit_alt, 0, sizeof(c_vit_alt) ) ;
+  memset( c_vit_azi, 0, sizeof(c_vit_azi) ) ;
+
   sprintf( c_vit_alt, "%3.2f", as->Vh) ;
   sprintf( c_vit_azi, "%3.2f", as->Va) ;
 
-  Trace("Va / Vh    : %s / %s" , c_vit_azi , c_vit_alt ) ;
-  Trace("AD / Dec   : %s / %s" , c_hhmmss_asc, c_ddmmss_dec ) ;
-  Trace("AH / Dec   : %s / %s" , c_hhmmss_agh, c_ddmmss_dec ) ;
-  Trace("AZ./ Haut. : %s / %s" , c_ddmmss_azi, c_ddmmss_alt ) ;
+  Trace("Va / Vh    : %s / %s" , c_vit_azi        , c_vit_alt ) ;
+  Trace("AD / Dec   : %s / %s" , as->c_hhmmss_asc , as->c_ddmmss_dec ) ;
+  Trace("AH / Dec   : %s / %s" , as->c_hhmmss_agh , as->c_ddmmss_dec ) ;
+  Trace("AZ./ Haut. : %s / %s" , as->c_ddmmss_azi , as->c_ddmmss_alt ) ;
 }
 /*****************************************************************************************
-* @fn     : CONFIG_AFFICHER_ASTRE
+* @fn     : CONFIG_AFFICHER_MODE_LONG
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations relatives a l as observee
 * @param  : ASTRE *as
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
+void CONFIG_AFFICHER_MODE_LONG(ASTRE *as) {
   
   const char * c_nom  = as->nom ;
   const char * c_type = c_Astre_Type [ as->type ] ;
@@ -1713,10 +1759,7 @@ void CONFIG_AFFICHER_ASTRE(ASTRE *as) {
   Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AZI1  * DEGRES, c_hhmmss_azi1 ) ;
   Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, as->AZI2  * DEGRES, c_hhmmss_azi2 ) ;
 
-  CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
-
   Trace("----------------------------") ;
-
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_VOUTE
@@ -1749,7 +1792,7 @@ void CONFIG_AFFICHER_TOUT(void) {
 
   CONFIG_AFFICHER_TEMPS(   temps ) ;
   CONFIG_AFFICHER_LIEU(    lieu );
-  CONFIG_AFFICHER_ASTRE(   as ) ;
+  CONFIG_AFFICHER_MODE_LONG(   as ) ;
   CONFIG_AFFICHER_VOUTE(   voute ) ;
 
   Trace("\n") ;
@@ -1802,22 +1845,137 @@ void CONFIG_AFFICHER_CHANGEMENTS (void)  {
 
 void CONFIG_AFFICHER_DEVICES_USE (void) {
 
-  Trace1("devices->DEVICE_INFRAROUGE_USE = %d",devices->DEVICE_INFRAROUGE_USE) ;
-  Trace1("devices->DEVICE_CAPTEURS_USE   = %d",devices->DEVICE_CAPTEURS_USE) ;
-  Trace1("devices->DEVICE_RAQUETTE_USE   = %d",devices->DEVICE_RAQUETTE_USE) ;
-  Trace1("devices->DEVICE_BLUETOOTH_USE  = %d",devices->DEVICE_BLUETOOTH_USE) ;
-  Trace1("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
+  Trace("devices->DEVICE_USE_INFRAROUGE = %d",devices->DEVICE_USE_INFRAROUGE) ;
+  Trace("devices->DEVICE_USE_CAPTEURS   = %d",devices->DEVICE_USE_CAPTEURS) ;
+  Trace("devices->DEVICE_USE_RAQUETTE   = %d",devices->DEVICE_USE_RAQUETTE) ;
+  Trace("devices->DEVICE_USE_BLUETOOTH  = %d",devices->DEVICE_USE_BLUETOOTH) ;
+  Trace("devices->DEVICE_USE_KEYBOARD   = %d",devices->DEVICE_USE_KEYBOARD) ;
+  Trace("devices->DEVICE_USE_CONTROLER  = %d",devices->DEVICE_USE_CONTROLER) ;
+  Trace("devices->DEVICE_USE_LCD        = %d",devices->DEVICE_USE_LCD) ;
 
   return ;
 }
-void CONFIG_LCD_AFFICHER_TEMPS(LIEU* lieu, TEMPS *temps, LCD *lcd) {
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_EMPILER
+* @author : s.gravois
+* @brief  : Cette fonction decale les buffers d'affichage telle une PILE vers le bas
+* @brief  : les valeurs courantes a afficher sont lcd->c_line*
+* @param  : void
+* @date   : 2022-04-11 creation 
+*****************************************************************************************/
 
-  CALCUL_TEMPS_SIDERAL(lieu, temps) ;
+void CONFIG_LCD_EMPILER(LCD * lcd, char* c_line_0, char * c_line_1) {
 
+  if ( devices->DEVICE_USE_LCD ) {
+
+    memset( lcd->c_line_0_old, 0, sizeof( lcd->c_line_0_old )) ;
+    memset( lcd->c_line_1_old, 0, sizeof( lcd->c_line_1_old )) ;
+
+    strcpy( lcd->c_line_0_old, lcd->c_line_0 ) ;
+    strcpy( lcd->c_line_1_old, lcd->c_line_1 ) ;
+
+    memset( lcd->c_line_0, 0, sizeof( lcd->c_line_0 )) ;
+    memset( lcd->c_line_1, 0, sizeof( lcd->c_line_1 )) ;
+
+    strcpy( lcd->c_line_0, c_line_0 ) ;
+    strcpy( lcd->c_line_1, c_line_1 ) ;
+  }
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_DEPILER
+* @author : s.gravois
+* @brief  : Cette fonction decale les buffers d'affichage telle une PILE vers le haut
+* @brief  : les valeurs courantes a afficher sont lcd->c_line*
+* @param  : void
+* @date   : 2022-04-11 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_DEPILER(LCD * lcd) {
+
+  if ( devices->DEVICE_USE_LCD ) {
+
+    memset( lcd->c_line_0, 0, sizeof( lcd->c_line_0 )) ;
+    memset( lcd->c_line_1, 0, sizeof( lcd->c_line_1 )) ;
+
+    strcpy( lcd->c_line_0, lcd->c_line_0_old ) ;
+    strcpy( lcd->c_line_1, lcd->c_line_1_old ) ;
+  }
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les deux chaines de la struct LCD* sur ecran LCD  
+* @brief  : fonction de BASE pour les autres fonctions
+* @param  : LCD * lcd
+* @param  : char* c_line_0
+* @param  : char* c_line_1
+* @date   : 2022-04-09 creation 
+* @todo   : verifier la valeur de usleep (parametrer ?)
+*****************************************************************************************/
+
+void CONFIG_LCD_DISPLAY(LCD * lcd) {
+
+  if ( devices->DEVICE_USE_LCD ) {
+
+    if ((lcd->i_fd = LCD1602Init(lcd->i_i2c_num)) == -1) {
+      SyslogErr("Failed to init LCD1602Init\n");
+      return ;
+    }
+
+    if ( LCD1602Clear(lcd->i_fd) == -1) {
+      SyslogErr("Failed to LCD1602Clear\n");
+      return ;
+    }
+    /* entre 2500 et 5000 semble une bonne valeur de usleep */
+    /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
+    usleep( CONFIG_LCD_USLEEP_AFTER_CLEARING ) ;
+      
+    if ( LCD1602DispLines(\
+        lcd->i_fd, \
+        lcd->c_line_0, \
+        lcd->c_line_1 ) \
+    == -1) { 
+
+      SyslogErr("Failed to Display String\n");
+      return ;
+    }
+
+    LCD1602DeInit(lcd->i_fd);
+  }
+  return ;
 }
 
 /*****************************************************************************************
 * @fn     : CONFIG_LCD_AFFICHER
+* @author : s.gravois
+* @brief  : Cette fonction affiche deux chaines sur ecran LCD  
+* @param  : LCD * lcd
+* @param  : int i_duree  => si 0  affichage definitif
+*                        => si >0 affichage de la duree correspodante
+* @param  : char* c_line_0
+* @param  : char* c_line_1
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_AFFICHER(LCD * lcd, int i_duree, char * c_line_0, char * c_line_1) {
+
+  CONFIG_LCD_EMPILER( lcd, c_line_0, c_line_1 ) ;
+  CONFIG_LCD_DISPLAY( lcd ) ;
+
+  if ( i_duree > 0 ) {
+
+    sleep(i_duree  ) ;
+
+    CONFIG_LCD_DEPILER(lcd) ;
+    CONFIG_LCD_DISPLAY( lcd ) ;
+  }
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_STRINGS
 * @author : s.gravois
 * @brief  : Cette fonction affiche deux chaines sur ecran LCD  
 * @param  : LCD * lcd
@@ -1826,60 +1984,99 @@ void CONFIG_LCD_AFFICHER_TEMPS(LIEU* lieu, TEMPS *temps, LCD *lcd) {
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER(LCD * lcd, char* c_line_0, char * c_line_1) {
-/*
-  if ((lcd->i_fd = LCD1602Init(I2C_DEV)) == -1) {printf("Fail to init LCD1602\n");return -1;}
-  else { printf("LCD1602Init (OK)\n"); }
-*/  
+void CONFIG_LCD_AFFICHER_STRINGS(LCD * lcd, int i_duree , char* c_line_0, char * c_line_1) {
 
-  strcpy( lcd->c_line_0, c_line_0 ) ;
-  strcpy( lcd->c_line_1, c_line_1 ) ;
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
 
-  if ( LCD1602Clear(lcd->i_fd) == -1) {
-    SyslogErr("Fail to LCD1602Clear\n");
-    return ;
-  }
-  /* entre 2500 et 5000 semble une bonne valeur de usleep */
-  /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
-  usleep( CONFIG_LCD_USLEEP_AFTER_CLEARING ) ;
-    
-  if ( LCD1602DispLines(lcd->i_fd, c_line_0, c_line_1) == -1) { 
-    SyslogErr("Fail to Display String\n");
-    return ;
-  }
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_TEMPS_LIEU
+* @author : s.gravois
+* @brief  : Cette fonction calcule le temps sideral en cours puis affiche sur LCD
+* @brief  : la date et l heure ainsi que la latitude et la longitude
+* @param  : LCD * lcd
+* @param  : char* c_line_0
+* @param  : char* c_line_1
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
 
-  LCD1602DeInit(lcd->i_fd);
+void CONFIG_LCD_AFFICHER_TEMPS_LIEU( LCD *lcd, int i_duree, LIEU* lieu, TEMPS *temps) {
+
+  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_line_0, 0, sizeof(c_line_0) ) ; 
+  memset( c_line_1, 0, sizeof(c_line_1) ) ; 
+
+  CALCUL_TEMPS_SIDERAL(lieu, temps) ;
+
+  /* Remplissage de line 0 et line 1 */
+
+  sprintf( c_line_0, "%d %s %d %d:%d", \
+    temps->yy ,\
+    c_Lcd_Display_Months[ temps->mm -1  ] , \
+    temps->dd, \
+    temps->HH, \
+    temps->MM ) ;
   
-  return ;
-}
-/*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_PROVISOIREMENT
-* @author : s.gravois
-* @brief  : Cette fonction affiche provisoirement 2 chaines pendant une duree en us 
-* @param  : void
-* @date   : 2022-04-09 creation 
-*****************************************************************************************/
+  sprintf( c_line_1, "%.2f %.2f", \
+    lieu->lat * DEGRES, \
+    lieu->lon * DEGRES ) ;
 
-void CONFIG_LCD_AFFICHER_PROVISOIREMENT(LCD * lcd, char* c_line_0, char * c_line_1, int i_duree) {
-
+  CONFIG_LCD_AFFICHER( lcd, i_duree, c_line_0, c_line_1 ) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_PERMUTER_OLD_NEW
+* @fn     : CONFIG_LCD_AFFICHER_ASTRE_VITESSES
 * @author : s.gravois
-* @brief  : Cette fonction permute les anciennes valeurs d affichage avec les nouvelles 
-* @param  : void
+* @brief  : Cette fonction affiche le nom de l 'astre et les vitesses
+* @param  : LCD * lcd
+* @param  : char* c_line_0
+* @param  : char* c_line_1
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_PERMUTER_OLD_NEW(LCD * lcd, char* c_line_0, char * c_line_1) {
+void CONFIG_LCD_AFFICHER_ASTRE_VITESSES(LCD * lcd, int i_duree, ASTRE* as ) {
 
-  strcpy( lcd->c_line_0_old, lcd->c_line_0 ) ;
-  strcpy( lcd->c_line_1_old, lcd->c_line_1 ) ;
-  strcpy( lcd->c_line_0,     c_line_0 ) ;
-  strcpy( lcd->c_line_1,     c_line_1 ) ;
+  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_line_0, 0, sizeof(c_line_0)) ; 
+  memset( c_line_1, 0, sizeof(c_line_1)) ;
+
+  strcpy(  c_line_0, as->nom ) ;
+  sprintf( c_line_1,"%.2f %.2f", as->Va, as->Vh);
+
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE
+* @author : s.gravois
+* @brief  : Cette fonction affiche les coordonnees azimutales en cours
+* @param  : LCD * lcd
+* @param  : char* c_line_0
+* @param  : char* c_line_1
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(LCD * lcd, int i_duree, ASTRE* as ) {
+
+  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_line_0, 0, sizeof(c_line_0)) ; 
+  memset( c_line_1, 0, sizeof(c_line_1)) ;
+
+  sprintf( c_line_0, "(AZI) %s", as->c_ddmmss_azi ) ;
+  sprintf( c_line_1, "(ALT) %s", as->c_ddmmss_alt );
+
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
 
   return ;
 }

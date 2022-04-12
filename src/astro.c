@@ -23,6 +23,9 @@
 #
 # 21/03/2022  | * ajout appel CONFIG_INIT_CODES dasn main 
 #                 en remaplacement de IR_INIT_CODES
+# avril 2002   | * debut codage fonctionnalites LCD1602
+#                * suppressione appel GPIO_RAQUETTE_READ
+#                * correction BUG ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
 # -------------------------------------------------------------- 
 */
 
@@ -156,6 +159,11 @@ void TRAP_SUIVI_TERMIOS(int sig)  {
   Trace("Signal trappe depuis thread suivi_termios= %d\n",sig) ;
   pthread_cancel( suivi->p_suivi_clavier ) ;
 }
+void TRAP_SUIVI_LCD(int sig)  {
+  
+  Trace("Signal trappe depuis thread suivi_termios= %d\n",sig) ;
+  pthread_cancel( suivi->p_suivi_clavier ) ;
+}
 /*****************************************************************************************
 * @fn     : SUIVI_MENU_PREALABLE
 * @author : s.gravois
@@ -202,7 +210,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   
   //---------------------------------------------------------------------------------------------------------
   // TRAITEMENT DES ACTIONS SANS NECESSAIREMENT UNE VALIDATION
-  // exemple : on appuie sur la touche ouest est sud nors : appel
+  // exemple : on appuie sur la touche ouest est sud nors : appel MENU_MANUEL_BRUT
   //---------------------------------------------------------------------------------------------------------
   
   // On change de MENU si on appuie sur EST OUEST NORD ou SUD => 
@@ -220,7 +228,11 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   //  appel a la volee
 
-  if ( ! strcmp( clavier->mot, "key_screen"))     { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }  
+  if ( ! strcmp( clavier->mot, "key_screen"))     { 
+     CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(gp_Lcd, 0, as ) ;
+     suivi->menu = MENU_MANUEL_BRUT ; 
+     strcpy(clavier->mot,"") ; 
+  }  
   //if ( ! strcmp( clavier->mot, "key_tv"))         { suivi->menu = MENU_MANUEL_BRUT ; strcpy(clavier->mot,"") ; }  
   if ( ! strcmp( clavier->mot, "key_info" ))      { suivi->menu = MENU_INFO ; strcpy(clavier->mot,"") ; }     // mode info
 
@@ -284,6 +296,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
       //suivi->menu = MENU_AZIMUTAL ;
 
       GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
+      
     }
     //---------------------------------------------------------------------------------------------------------
     // Si une DEMANDE de MISE A JOUR relative au temps (sauf mois et jour)
@@ -334,8 +347,13 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
         case 2 : // TODO : exemple d'une demande de capteur : a modifier / completer
           CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-          if ( devices->DEVICE_CAPTEURS_USE ) { as->a = suivi->pitch ;as->h = suivi->heading ; }
+
+          if ( devices->DEVICE_USE_CAPTEURS ) { 
+            as->a = suivi->pitch ;
+            as->h = suivi->heading ; 
+          }
           CALCUL_EQUATEUR ( lieu, as) ;
+
           suivi->menu_old = suivi->menu ;
           suivi->menu = MENU_AZIMUTAL ;
           break ;
@@ -366,15 +384,18 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
 void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   
-  int flag = 0 ;
+  int flag_nord_sud_est_ouest = 0 ;
   int flag_calcul = 0 ;
 
-  
   TRACE2("start") ;
 
-  GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, suivi) ;
+  // GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, suivi) ;
+
   CONFIG_MAJ_SUIVI_PAS( suivi) ;
 
+  if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+    Trace1("0 suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+  }
   // -----------------------------------------------------------
   // reset = remise a zero des compteurs
   //------------------------------------------------------------
@@ -406,12 +427,15 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   // actions a faire suivant appui sur NORD / SUD / OUEST /EST
   //------------------------------------------------------------
 
-  if ( suivi->pas_nord || suivi->pas_sud || suivi->pas_est || suivi->pas_ouest ) flag = 1 ;
+  if ( suivi->pas_nord || suivi->pas_sud || suivi->pas_est || suivi->pas_ouest ) {
+    flag_nord_sud_est_ouest = 1 ;
+  }
 
-  // flag = 1 = on a appuye sur N-S-E-O
+  // flag_nord_sud_est_ouest = 1 = on a appuye sur N-S-E-O
 
-  if (flag ) { 
+  if (flag_nord_sud_est_ouest ) { 
   
+    Trace("flag_nord_sud_est_ouest") ;
     pthread_mutex_lock(& suivi->mutex_azi );
     pthread_mutex_lock(& suivi->mutex_alt );
 
@@ -436,9 +460,10 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
     suivi->pas_sud     = 0 ;
     suivi->reset = 0 ;
 /*
-    TRACE("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
+    Trace("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", \
+         suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 */
-    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "fleches.." , \
+    Trace("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "fleches.." , \
            suivi->Sh , suivi->Sa, suivi->pas_azi, suivi->pas_alt, suivi->acc_azi , suivi->acc_alt) ;
 
     pthread_mutex_unlock(& suivi->mutex_azi );
@@ -567,7 +592,7 @@ void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
   
   gettimeofday(&t00,NULL) ;
   
-  TRACE1("start") ;
+  Trace("start") ;
   
   azi = 0 ;
   alt = 0 ;
@@ -704,11 +729,11 @@ void * SUIVI_MENU(SUIVI * suivi) {
   
    // La temporisation dans les boucles du thread SUIVI_MENU depend de  suivi->temporisation_menu
    
-  TRACE("start") ;
+  Trace("start with tempo %ld", suivi->temporisation_menu) ;
     
-  param.sched_priority = 1 ;
+  param.sched_priority = PTHREAD_POLICY_1 ;
 
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_MENU, & param) != 0) { 
     perror("setschedparam SUIVI_MENU");
     exit(EXIT_FAILURE); 
   }
@@ -727,14 +752,37 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
     usleep( suivi->temporisation_menu ) ;
 
-    GPIO_RAQUETTE_READ( gpio_key_l, gpio_key_c, clavier) ;
+    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+      Trace2("A suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+    }
+
+    /* GPIO_RAQUETTE_READ( gpio_key_l, gpio_key_c, clavier) ; */
     CONFIG_INPUTS_GESTION_APPUIS( suivi, clavier) ;
 
-    // IR_ACTIONS_PARTICULIERES( suivi) ;
+    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+      Trace2("B suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+    }
 
+    /* IR_ACTIONS_PARTICULIERES( suivi) ; */
     SUIVI_TRAITEMENT_MOT( suivi, clavier ) ;
 
+
+    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+      Trace2("C suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+    }
+
     CONFIG_AFFICHER_CHANGEMENTS() ;
+
+
+    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+      Trace2("D suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+    }
+
+    CONFIG_AFFICHER_CLAVIER( clavier ) ;	
+
+    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+      Trace2("E suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+    }
 
     switch( suivi->menu ) {
 
@@ -797,6 +845,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
         // simplement une acceleration / ralentissement / changement de direction
         // sur le N-S-E-O (pas de recalcul des periodes) 
         // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
+
+        if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
+          Trace2("1 suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
+        }
 
         SUIVI_MANUEL_BRUT(suivi, clavier) ;
         
@@ -922,6 +974,9 @@ void * SUIVI_MENU(SUIVI * suivi) {
       break ;
     }
   }
+  Trace("Stop") ;
+
+  return NULL ;
 }
 /*****************************************************************************************
 * @fn     : SUIVI_VOUTE
@@ -943,7 +998,9 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   unsigned long  incr ;
   struct timeval t00 ;
   struct sched_param param;
-  
+  /*
+  char   c_Vitesses[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure] ;
+  */
   // La temporisation dans la boucle du thread SUIVI_VOUTE depend de voute->DT (en us)
   // a completer / modifier :
   // il FAUT calculer / mettre a jour a,h,A,H de l'as quand est utliser les menus
@@ -951,11 +1008,14 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
   // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
   
-  TRACE("start") ;
+  Trace("start with tempo %ld", suivi->temporisation_voute) ;
   
-  param.sched_priority = 1 ;
+  param.sched_priority = PTHREAD_POLICY_1 ;
   
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {perror("setschedparam SUIVI_VOUTE"); exit(EXIT_FAILURE);}
+  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_VOUTE, & param) != 0) {
+     perror("setschedparam SUIVI_VOUTE"); 
+     exit(EXIT_FAILURE);
+  }
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_VOUTE) ;
   
@@ -983,9 +1043,14 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       /* FIXME : modification 20121225 : tous les calculs generiques dans CALCUL_TOUT */
       
       CALCUL_TOUT() ;
-    
+      /* Exceptionnellement , utilisation variables globales */ 
+      /* CONFIG_LCD_AFFICHER_TEMPS_LIEU(gp_Lcd,0,lieu,temps) ;*/
+
       if ( suivi->SUIVI_ALIGNEMENT ) { 
-        CONFIG_AFFICHER_ASTRE(as) ; 
+        CONFIG_FORMATE_DONNEES_AFFICHAGE(as) ;
+        CONFIG_AFFICHER_MODE_LONG(as) ; 
+        CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
+        CONFIG_LCD_AFFICHER_ASTRE_VITESSES(gp_Lcd,4,as) ;
         suivi->SUIVI_ALIGNEMENT = 0 ;
       }
 /*
@@ -1018,6 +1083,9 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       usleep( voute->DT );
     }
   }
+  Trace("Stop") ;
+
+  return NULL ; 
 }
 /*****************************************************************************************
 * @fn     : SUIVI_INFRAROUGE
@@ -1032,7 +1100,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
    
   struct sched_param param;
   
-  TRACE("start") ;
+  Trace("start with tempo %ld", suivi->temporisation_ir) ;
   
   // La temporisation dans la boucle du thread SUIVI_INFRAROUGE depend de suivi->temporisation_ir (en us)
   // present dans la fonction bloquante LIRC_READ 
@@ -1043,14 +1111,17 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
   
   sleep(1) ;
   
-  param.sched_priority = 1  ;
-  
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { perror("setschedparam SUIVI_INFRAROUGE"); exit(EXIT_FAILURE);}
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
-  signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
-  
-  if ( devices->DEVICE_INFRAROUGE_USE ) {
+  if ( devices->DEVICE_USE_INFRAROUGE ) {
+
+    param.sched_priority = PTHREAD_POLICY_1  ;
     
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_INFRA, & param) != 0) { 
+      perror("setschedparam SUIVI_INFRAROUGE"); 
+      exit(EXIT_FAILURE);
+    }
+    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
+  
     LIRC_OPEN( lircconfig ) ;
   
     // ATTENTION !!! la fonction LIRC_READ est bloquante (voir ir.c) !!!!!
@@ -1058,9 +1129,48 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
     LIRC_READ( suivi ) ;
     LIRC_CLOSE(lircconfig) ;
   }
+
+  Trace("Stop") ;
+
   return NULL ;
 }
+/*****************************************************************************************
+* @fn     : SUIVI_LCD
+* @author : s.gravois
+* @brief  : fonction de callback du thread suivi ecran LCD
+* @param  : SUIVI * suivi
+* @date   : 2022-04-12 creation 
+* @todo   : 
+*****************************************************************************************/
 
+void * SUIVI_LCD(SUIVI * suivi) {
+   
+  struct sched_param param;
+  
+  Trace("start with tempo %ld", suivi->temporisation_lcd) ;
+  
+  if ( devices->DEVICE_USE_LCD ) {
+
+    param.sched_priority = PTHREAD_POLICY_1  ;
+    
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_LCD, & param) != 0) { 
+      perror("setschedparam SUIVI_LCD"); 
+      exit(EXIT_FAILURE);
+    }
+    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    signal( SIGTERM, TRAP_SUIVI_LCD) ;
+
+    while(1) {
+
+      CONFIG_LCD_AFFICHER_TEMPS_LIEU( gp_Lcd,0 , lieu, temps ) ;
+      usleep( suivi->temporisation_lcd );
+    }
+  }
+
+  Trace("Stop") ;
+
+  return NULL ;
+}
 /*****************************************************************************************
 * @fn     : SUIVI_CLAVIER_TERMIOS
 * @author : s.gravois
@@ -1068,6 +1178,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 *           en mode termios
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-04-12 correction code ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1080,17 +1191,20 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ] ;
   struct sched_param param;
   struct timeval t00,t01 ;
-  TRACE("start") ;
+  
+  Trace("start with tempo %ld", suivi->temporisation_termios) ;
+  
   sleep(1) ;
   
-  param.sched_priority = 0  ;
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
-    perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
-  }
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
-  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  if ( devices->DEVICE_USE_KEYBOARD ) {
+
+    param.sched_priority = PTHREAD_POLICY_1  ;
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
+      perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
+    }
+    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( devices->DEVICE_CLAVIER_USE ) {
     KEYBOARD_TERMIOS_INIT() ;
 
     while( c_char != 'q' ) {
@@ -1101,30 +1215,29 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
       if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine,&i_sum_ascii)) {
 
         c_char=ch_chaine[0] ;
+
         Trace1("keycode %d %s", i_sum_ascii, ch_chaine) ;
+
         if ( i_sum_ascii == 27 ) Trace("exit detecte %d", i_sum_ascii) ;
         memset(c_sum_ascii,0, sizeof(c_sum_ascii));
         sprintf(c_sum_ascii,"%d",i_sum_ascii);
         i_indice_code=0 ;
         while(strcmp(gp_Codes->in_term[i_indice_code],c_sum_ascii) && ( i_indice_code < CONFIG_CODE_NB_CODES ) ){ 
-           Trace1("%s = %s ?", c_sum_ascii, gp_Codes->in_term[i_indice_code]) ;  
+           Trace("%s = %s ?", c_sum_ascii, gp_Codes->in_term[i_indice_code]) ;  
            i_indice_code++ ; 
         }
+        pthread_mutex_lock(& suivi->mutex_infrarouge );
         memset( suivi->datas_infrarouge, '\0', strlen( suivi->datas_infrarouge ) ) ;
+        pthread_mutex_unlock(& suivi->mutex_infrarouge );
 
         if ( i_indice_code < CONFIG_CODE_NB_CODES ) {
+          pthread_mutex_lock(& suivi->mutex_infrarouge );
+          Trace2("A maj suivi->datas_infrarouge") ;
           strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
+          pthread_mutex_unlock(& suivi->mutex_infrarouge );
+
           GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
         }
-
-        if ( i_indice_code < CONFIG_CODE_NB_CODES && \
-             i_indice_code <= IR_CODE_REPETE_AUTORISE_MAX && \
-             i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
-
-          strcpy( suivi->datas_infrarouge, gp_Codes->out_act[i_indice_code] ) ;
-          GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
-        }
-
         // tres important !!
         // le usleep suivant permet de garder l information !!!!!!
         // suivi->datas_infrarouge fonctionne comme un TAMPON
@@ -1135,8 +1248,11 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 
         usleep( suivi->temporisation_termios ) ;
 
+        pthread_mutex_lock(& suivi->mutex_infrarouge );
         memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
+        Trace2("F remise a zero suivi->datas_infrarouge") ;
         strcpy( suivi->datas_infrarouge, "") ;
+        pthread_mutex_unlock(& suivi->mutex_infrarouge );
       }
     }
 
@@ -1146,6 +1262,8 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
       TRAP_MAIN(1) ;
     }
   }
+  Trace("Stop") ;
+
   return NULL ;
 }
 /*****************************************************************************************
@@ -1162,16 +1280,18 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 
   int c_char = 0 ;
   struct sched_param param;
-  TRACE("start") ;
+  Trace("start") ;
+
   sleep(1) ;
-  param.sched_priority = 1  ;
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
-    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
-  }
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
-  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
-  
-  if ( devices->DEVICE_CLAVIER_USE ) {
+
+  if ( devices->DEVICE_USE_KEYBOARD ) {
+
+    param.sched_priority = PTHREAD_POLICY_1  ;
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
+      perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+    }
+    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
 
     while( ( c_char = getchar () ) != 'q' ) {
       usleep(100000) ;
@@ -1185,6 +1305,8 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
     LIRC_READ( suivi ) ;
     LIRC_CLOSE(lircconfig) ;*/
   }
+  Trace("Stop") ;
+
   return NULL ;
 }
 
@@ -1201,18 +1323,20 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
   int ch = 0 ;
   unsigned long l_incr=0 ;
   struct sched_param param;
-  TRACE("start") ;
-  
-  param.sched_priority = 1  ;
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
-    perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
-  }
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
-  signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+  Trace("start") ;
   
   sleep(1) ;
+  
+  if ( devices->DEVICE_USE_KEYBOARD ) {
 
-  if ( devices->DEVICE_CLAVIER_USE ) {
+    param.sched_priority = PTHREAD_POLICY_1  ;
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
+      perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
+    }
+    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+    
+    sleep(1) ;
 
     initscr() ;
     if (newterm(0, stdout, stdin) == 0) {
@@ -1243,6 +1367,8 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
     endwin();
     TRAP_MAIN(1) ;
   }
+  Trace("Stop") ;
+
   return NULL ;
 }
 
@@ -1263,7 +1389,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   I2C_DEVICE   exemple, *ex ;
   I2C_ACC_MAG  accmag,  *am ;
   
-  TRACE("start") ;
+  Trace("start") ;
   
   sleep(1) ;
 
@@ -1271,33 +1397,35 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   am = & accmag ;
   ex->fd = 0 ;
   
-  // La temporisation dans la boucle du thread SUIVI_CAPTEURS depend de suivi->temporisation_capteurs (en us)
-  // present dans la fonction bloquante LIRC_READ 
-  
-  // on laisse le temps aux autres threads de demarrer
-  // notamment pour arriver dans la fonction SUIVI_TRAITEMENT_MENU
-  // qui initialise a 1 SUIVI_CAPTEURS
-  
-  param.sched_priority = 1  ;
-  
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) {
-    perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
+  if ( devices->DEVICE_USE_CAPTEURS ) {
+      
+    // La temporisation dans la boucle du thread SUIVI_CAPTEURS depend de suivi->temporisation_capteurs (en us)
+    // present dans la fonction bloquante LIRC_READ 
+    
+    // on laisse le temps aux autres threads de demarrer
+    // notamment pour arriver dans la fonction SUIVI_TRAITEMENT_MENU
+    // qui initialise a 1 SUIVI_CAPTEURS
+    
+    param.sched_priority = PTHREAD_POLICY_1  ;
+    
+    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CAPTEUR, & param) != 0) {
+      perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
 
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
-  
-  signal( SIGTERM, TRAP_SUIVI_CAPTEURS) ;
-  
-  // a modifier pour definir le choix de l'infrarouge ou pas (config.txt ? .h ? )
-  
-  while(1) {
-    if ( devices->DEVICE_CAPTEURS_USE ) {
+    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    
+    signal( SIGTERM, TRAP_SUIVI_CAPTEURS) ;
+    
+    // a modifier pour definir le choix de l'infrarouge ou pas (config.txt ? .h ? )
+    
+    while(1) {
+      
       if ( ! devices->init_capteurs ) {
         
         ret = I2C_INIT(ex, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
-	
+
         if ( ! ret ) {
           Trace("Pas de capteur disponible") ;
-          devices->DEVICE_CAPTEURS_USE = 0 ;
+          devices->DEVICE_USE_CAPTEURS = 0 ;
           devices->init_capteurs = 0 ;
           break ;
         }
@@ -1307,7 +1435,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
           I2C_SET( ex, REG_CTRL5, "0x64" ) ;
           I2C_SET( ex, REG_CTRL6, "0x20" ) ;
           I2C_SET( ex, REG_CTRL7, "0x00" ) ;
-	  
+    
           devices->init_capteurs = 1 ;
         }
       }
@@ -1322,10 +1450,12 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
       
         TRACE1("%.0f\t%.0f\t%.0f\n", am->pitch * I2C_DEGRAD, am->roll * I2C_DEGRAD, am->heading * I2C_DEGRAD) ;
       }	
+      
+      usleep( suivi->temporisation_capteurs );
     }
-    usleep( suivi->temporisation_capteurs );
   }
-  TRACE("stop") ;
+  Trace("Stop") ;
+
   return NULL ;
 }
 /*****************************************************************************************
@@ -1399,17 +1529,17 @@ int main(int argc, char ** argv) {
 
   GPIO_RAQUETTE_CONFIG( gpio_key_l, gpio_key_c ) ;
   
+  CONFIG_INIT_VOUTE     ( voute ) ; /* soit etre place avant CONFIG_INIT_SUIVI */
   CONFIG_INIT_CODES     ( gp_Codes ) ;
   CONFIG_INIT_CLAVIER   ( clavier ) ;   
   CONFIG_INIT_ASTRE     ( as ) ;
   CONFIG_INIT_LIEU      ( lieu  ) ;
-  CONFIG_INIT_VOUTE     ( voute ) ;
   CONFIG_INIT_SUIVI     ( suivi ) ;
   CONFIG_INIT_TEMPS     ( temps ) ;
   CONFIG_INIT_DEVICES   ( devices ) ;
 
   CONFIG_INIT_LCD       ( gp_Lcd ) ;
-  
+
   CONFIG_AFFICHER_DEVICES_USE() ;
 
   // -----------------------------------------------------------------
@@ -1425,9 +1555,12 @@ int main(int argc, char ** argv) {
   system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ; 
   mlockall(MCL_CURRENT | MCL_FUTURE);
   
-  param.sched_priority = 1 ;
-  if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) {
-    perror("setschedparam main");exit(EXIT_FAILURE);}
+  param.sched_priority = PTHREAD_POLICY_1 ;
+
+  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_MAIN, & param) != 0) {
+    perror("setschedparam main");
+    exit(EXIT_FAILURE);
+  }
 
   signal(SIGINT,TRAP_MAIN) ;
   signal(SIGALRM,TRAP_MAIN) ;
@@ -1517,37 +1650,33 @@ int main(int argc, char ** argv) {
   }
 
   // ============================== gestion des threads  ===================================
-  
-  TRACE("devices->DEVICE_INFRAROUGE_USE = %d",devices->DEVICE_INFRAROUGE_USE) ;
-  TRACE("devices->DEVICE_CAPTEURS_USE   = %d",devices->DEVICE_CAPTEURS_USE) ;
-  TRACE("devices->DEVICE_RAQUETTE_USE   = %d",devices->DEVICE_RAQUETTE_USE) ;
-  TRACE("devices->DEVICE_BLUETOOTH_USE  = %d",devices->DEVICE_BLUETOOTH_USE) ;
-  TRACE("devices->DEVICE_CLAVIER_USE    = %d",devices->DEVICE_CLAVIER_USE) ;
-
-  TRACE("MAIN avant THREADS = Ta=%2.6f Th=%2.6f Fa=%2.6f Fh=%2.6f\n",suivi->Ta,suivi->Th,suivi->Fa,suivi->Fh) ;
 
   pthread_create( &p_thread_p_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[0] ) ;
   pthread_create( &p_thread_p_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[1] ) ;
   pthread_create( &p_thread_p_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[2] ) ;
   pthread_create( &p_thread_p_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[3] ) ;
+
   pthread_create( &p_thread_p_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[0] ) ;
   pthread_create( &p_thread_p_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[1] ) ;
   pthread_create( &p_thread_p_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[2] ) ;
   pthread_create( &p_thread_p_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[3] ) ;
+  
   pthread_create( &p_thread_m_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
   pthread_create( &p_thread_m_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
+
   pthread_create( &suivi->p_menu,            NULL, (void*)SUIVI_MENU,      suivi ) ;
   pthread_create( &suivi->p_suivi_voute,     NULL, (void*)SUIVI_VOUTE,     suivi ) ;
   pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
   pthread_create( &suivi->p_suivi_clavier,   NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
+  pthread_create( &suivi->p_suivi_lcd,       NULL, (void*)SUIVI_LCD,  suivi ) ;
 
   // ============================== join des threads  ===================================
 
-  if ( devices->DEVICE_CLAVIER_USE )     pthread_join( suivi->p_suivi_clavier, NULL) ;
-  if ( devices->DEVICE_CAPTEURS_USE )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
-  if ( devices->DEVICE_INFRAROUGE_USE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
-  if ( devices->DEVICE_CAPTEURS_USE )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( devices->DEVICE_USE_LCD )         pthread_join( suivi->p_suivi_lcd, NULL) ;
+  if ( devices->DEVICE_USE_KEYBOARD )    pthread_join( suivi->p_suivi_clavier, NULL) ;
+  if ( devices->DEVICE_USE_CAPTEURS )    pthread_join( suivi->p_suivi_capteurs, NULL) ;
+  if ( devices->DEVICE_USE_INFRAROUGE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     pthread_join( p_thread_p_azi[i], NULL) ; 
@@ -1575,17 +1704,17 @@ void * SUIVI_CLAVIER_1(SUIVI * suivi) {
   struct timeval previous;
   int n=0;
   int ch=0;   
-  TRACE("start") ;
+  Trace("start") ;
   
-  param.sched_priority = 1  ;
+  param.sched_priority = PTHREAD_POLICY_1  ;
   
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+  if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( devices->DEVICE_CLAVIER_USE ) {
+  if ( devices->DEVICE_USE_KEYBOARD ) {
 
 
   // unlink(MY_LOGFILE);
@@ -1713,17 +1842,17 @@ void * SUIVI_CLAVIER_0(SUIVI * suivi) {
   struct timeval previous;
   int n=0;
   int ch=0;   
-  TRACE("start") ;
+  Trace("start") ;
   
-  param.sched_priority = 1  ;
+  param.sched_priority = PTHREAD_POLICY_1  ;
   
-  if (pthread_setschedparam( pthread_self(), SCHED_FIFO, & param) != 0) { 
+  if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
-  if ( devices->DEVICE_CLAVIER_USE ) {
+  if ( devices->DEVICE_USE_KEYBOARD ) {
 
   if (newterm(0, stdout, stdin) == 0) {
     fprintf(stderr, "Cannot initialize terminal\n");

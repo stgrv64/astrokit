@@ -393,6 +393,7 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
 // Fonction appelee depuis mes sources : on entre la date et l heure plutot que le jour julien
 // ATTENTION !!!! 
 // Les valeurs doivent etre entrees en degre et non en radian !! (lon lat)
+// ajout 2022 avril : verification numero planete (<10)
 //===========================================================================================
 
 void SOLAR_SYSTEM( char * nom, \
@@ -404,7 +405,10 @@ void SOLAR_SYSTEM( char * nom, \
   double tlongg, glatt, heightt;
   int    yearr, monthh, dayy, hourr, minn, secc ;
   
-  TRACE("numero planete = %d", num) ;
+  Trace("numero planete = %d", num) ;
+  
+  if ( num > 9 ) return ;
+
   TRACE("RTD = %f", RTD) ;
   infos = &inf ;
 

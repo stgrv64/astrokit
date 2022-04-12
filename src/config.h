@@ -97,7 +97,7 @@ int    CONFIG_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILL
 int    CONFIG_GETCWD(char * ) ;
 
 void   CONFIG_AFFICHER_TEMPS(TEMPS *temps) ; /* FIXME ajout 20191228 */
-void   CONFIG_AFFICHER_ASTRE(ASTRE *as) ;
+void   CONFIG_AFFICHER_MODE_LONG(ASTRE *as) ;
 void   CONFIG_AFFICHER_LIEU(LIEU *lieu) ;
 void   CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier)  ;
 
@@ -105,9 +105,17 @@ void   CONFIG_AFFICHER_TOUT(void) ;          /* FIXME ajout 20191228 */
 void   CONFIG_AFFICHER_CHANGEMENTS (void) ;  /* FIXME ajout 20200102 */
 void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 
-void   CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *)  ;
+void   CONFIG_FORMATE_DONNEES_AFFICHAGE ( ASTRE * ) ;
+void   CONFIG_AFFICHER_MODE_STELLARIUM  ( ASTRE * )  ;
 
-void CONFIG_LCD_AFFICHER_TEMPS(LIEU* , TEMPS *, LCD *)  ;
+void   CONFIG_LCD_DISPLAY                  ( LCD * ) ;
+void   CONFIG_LCD_AFFICHER                 ( LCD *, int , char* , char * ) ;
+void   CONFIG_LCD_AFFICHER_STRINGS         ( LCD *, int , char* , char * ) ;
+void   CONFIG_LCD_AFFICHER_TEMPS_LIEU      ( LCD *, int , LIEU* , TEMPS *) ;
+void   CONFIG_LCD_AFFICHER_ASTRE_VITESSES  ( LCD *, int , ASTRE* )  ;
+void   CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE ( LCD *, int , ASTRE* ) ;
+void   CONFIG_LCD_EMPILER                  ( LCD * , char* , char * ) ;
+void   CONFIG_LCD_DEPILER                  ( LCD * ) ;
 
 #endif
 

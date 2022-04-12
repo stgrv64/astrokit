@@ -43,19 +43,23 @@ CONFIG_SCR_KERNEL   script_kernel.sh
 # ----------------------- parametres temporisation
 
 TEMPO_MENU      50000
-TEMPO_RAQ       70000
-TEMPO_IR        70000
-TEMPO_CLAVIER   52000
-TEMPO_CAPTEURS  52000
+TEMPO_RAQ       51000
+TEMPO_IR        52000
+TEMPO_TERMIOS   53000
+TEMPO_CLAVIER   54000
+TEMPO_CAPTEURS  55000
+TEMPO_LCD       2000000
+
 
 # ----------------------- parametres acquisitions
 
-DEVICE_CONTROLEUR_USE   0  # flag qui indique utilisation des controleurs de moteur externes
-DEVICE_CAPTEURS_USE     0  # flag qui indique utilisation de capteurs comme source input
-DEVICE_RAQUETTE_USE     0  # flag qui indique utilisation d une raquette (gpio) comme source input
-DEVICE_BLUETOOTH_USE    0  # flag qui indique utilisation du bluetooth comme source input
-DEVICE_INFRAROUGE_USE   1  # flag qui indique utilisation de infrarouge comme source input
-DEVICE_CLAVIER_USE      1  # flag qui indique utilisation du clavier comme source input
+DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
+DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
+DEVICE_USE_LCD              1  # flag qui indique utilisation de ecran LCD1602 / PCA8574
+DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
+DEVICE_USE_CAPTEURS         0  # flag qui indique utilisation de capteurs comme source input
+DEVICE_USE_RAQUETTE         0  # flag qui indique utilisation d une raquette (gpio) comme source input
+DEVICE_USE_BLUETOOTH        0  # flag qui indique utilisation du bluetooth comme source input
 
 # ----------------------- parametres geographiques
 

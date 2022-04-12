@@ -507,10 +507,10 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   TRACE2("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, as->Va, azi_rot);
   TRACE2("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, as->Vh, alt_rot);
 
-  if ( devices->DEVICE_CONTROLEUR_MOTEUR_USE )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI ;
+  if ( devices->DEVICE_USE_CONTROLER )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI ;
   else                              freq_azi     = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
 
-  if ( devices->DEVICE_CONTROLEUR_MOTEUR_USE )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI ;
+  if ( devices->DEVICE_USE_CONTROLER )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI ;
   else                              freq_alt     = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
 
   pthread_mutex_lock(& suivi->mutex_azi );
@@ -1132,6 +1132,12 @@ void CALCUL_TOUT(void) {
             
       CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
       
+      if ( as->numero > 9 ) {
+        Trace("numero de planete interdit = %d", as->numero ) ;
+        Trace("=> forçage a zero (soleil)"
+         ) ;
+        as->numero = 0 ; 
+      }
       SOLAR_SYSTEM( as->nom,\
                       & as->ASC,\
                       & as->DEC,\
@@ -1188,7 +1194,7 @@ void CALCUL_TOUT(void) {
         
         // TODO : modifier / completer / corriger ..
         
-        if ( devices->DEVICE_CAPTEURS_USE ) { 
+        if ( devices->DEVICE_USE_CAPTEURS ) { 
           as->a = suivi->pitch ;         // FIXME : donne azimut
           as->h = suivi->heading ;       // FIXME : donne altitude 
           CALCUL_EQUATEUR ( lieu, as) ;  // FIXME : donnes ASC et DEC

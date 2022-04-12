@@ -35,6 +35,10 @@
 #               * ajout c_si signe sous forme char
 # avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
 #               * ajout type enum pour les mois (affichage LCD)
+#               * ajout temporisation_voute et temporisation_lcd
+#               * ajout c_hhmmss_agh etc... a strcuture ASTRE
+#               * ajout mutex mutex_infrarouge pour proteger
+#                 lecture / exriture sur cette donnee
 # -------------------------------------------------------------- 
 */
 
@@ -219,21 +223,49 @@
 #define CONFIG_LCD_LINES_CHAR_NUMBERS_secure 8
 #define CONFIG_LCD_USLEEP_AFTER_CLEARING     5000
 #define CONFIG_LCD_I2C_DEFAULT_DEV_PORT      1
+
+//------------------------------------------------------------------------------
+/* LA valeur dans le nom de champs enum est arbitraite , seule compte une valeur < ou > */
+/* En effet , une policy N+1 aura toujours l'avantage */
+typedef enum {
+  PTHREAD_POLICY_0=0,
+  PTHREAD_POLICY_1,
+  PTHREAD_POLICY_2,
+  PTHREAD_POLICY_5,
+  PTHREAD_POLICY_10,
+  PTHREAD_POLICY_50,
+  PTHREAD_POLICY_99
+}
+t_en_Pthreads_Policy ;
+
+typedef enum {
+  PTHREAD_SCHED_PARAM_SUIVI_PWM_PHASES = SCHED_RR,
+  PTHREAD_SCHED_PARAM_SUIVI_PWM_MAIN   = SCHED_RR,
+  PTHREAD_SCHED_PARAM_SUIVI_MENU       = SCHED_FIFO,
+  PTHREAD_SCHED_PARAM_SUIVI_VOUTE      = SCHED_FIFO,
+  PTHREAD_SCHED_PARAM_SUIVI_INFRA      = SCHED_FIFO,
+  PTHREAD_SCHED_PARAM_SUIVI_LCD        = SCHED_FIFO,
+  PTHREAD_SCHED_PARAM_SUIVI_CLAVIER    = SCHED_FIFO,
+  PTHREAD_SCHED_PARAM_SUIVI_CAPTEUR    = SCHED_FIFO,
+  PTHREAD_SCHED_PARAM_SUIVI_MAIN       = SCHED_FIFO
+}
+t_en_Pthreads_Sched_Param ;
+
 //------------------------------------------------------------------------------
 
 typedef enum {
-LCD_MONTH_1=0,
-LCD_MONTH_2,
-LCD_MONTH_3,
-LCD_MONTH_4,
-LCD_MONTH_5,
-LCD_MONTH_6,
-LCD_MONTH_7,
-LCD_MONTH_8,
-LCD_MONTH_9,
-LCD_MONTH_10,
-LCD_MONTH_11,
-LCD_MONTH_12,
+  LCD_MONTH_1=0,
+  LCD_MONTH_2,
+  LCD_MONTH_3,
+  LCD_MONTH_4,
+  LCD_MONTH_5,
+  LCD_MONTH_6,
+  LCD_MONTH_7,
+  LCD_MONTH_8,
+  LCD_MONTH_9,
+  LCD_MONTH_10,
+  LCD_MONTH_11,
+  LCD_MONTH_12
 }
 t_en_Lcd_Display_Months ;
 
@@ -241,12 +273,21 @@ static const char * c_Lcd_Display_Months[] = {
  "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
 } ;
 
+typedef enum {
+ LCD_AFFICHAGE_DEFINITIF=0,
+ LCD_AFFICHAGE_PROVISOIRE
+}
+t_en_Lcd_Type_Affichage ; 
+
 typedef struct {
+ int  i_type_affichage ; 
  int  i_fd ; 
  int  i_board ; 
  int  i_i2c_num ; 
+
  char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
  char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+
  char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
  char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
 } 
@@ -319,7 +360,7 @@ CODES ;
 { "116",          "KEY_MUTE",   "TIME"}, /* 116 ascii = lettre 't' */
 { "a_configurer", "KEY_SCREEN", "key_screen" },
 { "a_configurer", "KEY_TV",     "key_tv"},
-{ "105", "KEY_INFO",   "key_info"}, /* 105  ascii = touche 'i' */
+{ "105",          "KEY_INFO",   "key_info"}, /* 105  ascii = touche 'i' */
 { "a_configurer", "KEY_ZOOM",   "key_zoom"},
 { "a_configurer", "KEY_LIST",   "key_list"},
 { "a_configurer", "KEY_MODE",   "key_mode" },
@@ -542,13 +583,14 @@ ANGLE ;
 //=====================================================
 typedef struct {
 
-  int          DEVICE_BLUETOOTH_USE ;
-  int          DEVICE_CAPTEURS_USE ;
-  int          DEVICE_INFRAROUGE_USE ;
-  int          DEVICE_RAQUETTE_USE ;
-  int          DEVICE_CONTROLEUR_MOTEUR_USE ; 
-  int          DEVICE_CLAVIER_USE ; 
-  int          init_capteurs ;
+  int  DEVICE_USE_BLUETOOTH ;
+  int  DEVICE_USE_CAPTEURS ;
+  int  DEVICE_USE_INFRAROUGE ;
+  int  DEVICE_USE_RAQUETTE ;
+  int  DEVICE_USE_CONTROLER ; 
+  int  DEVICE_USE_KEYBOARD ;
+  int  DEVICE_USE_LCD ; 
+  int  init_capteurs ;
 }
 DEVICES ;
 
@@ -561,8 +603,12 @@ typedef struct {
   int          SUIVI_VOUTE ;
   int          SUIVI_EQUATORIAL ;
 
+  char datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
+  char datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
+  char datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
 
-  
+  pthread_mutex_t  mutex_infrarouge  ;
+
   pthread_mutex_t  mutex_alt  ;
   pthread_mutex_t  mutex_azi  ;
   pthread_mutex_t  mutex_cal  ;
@@ -574,6 +620,7 @@ typedef struct {
   pthread_t    p_suivi_voute ;
   pthread_t    p_suivi_clavier ;
   pthread_t    p_suivi_termios ;
+  pthread_t    p_suivi_lcd ;
 
   pthread_t    p_suivi_alt ;
   pthread_t    p_suivi_azi ;
@@ -673,16 +720,13 @@ typedef struct {
   double       DTa ;
   
   unsigned long temporisation_menu  ;
+  unsigned long temporisation_voute   ;
   unsigned long temporisation_raq  ;
   unsigned long temporisation_ir   ; 
   unsigned long temporisation_termios   ; 
   unsigned long temporisation_capteurs  ; 
   unsigned long temporisation_clavier   ; 
-  
-  char         datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
-  char         datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
-  char         datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
-
+  unsigned long temporisation_lcd ;
   struct timeval tval ; 
 } 
 SUIVI ;
@@ -795,6 +839,18 @@ typedef struct {
   t_en_Astre_Type  type ;
   t_en_Mode_Calcul mode ;
   int              numero ; 
+
+  char  c_hhmmss_agh[ 16] ;
+  char  c_hhmmss_asc[ 16] ;
+  char  c_hhmmss_azi[ 16] ;
+  char  c_hhmmss_alt[ 16] ;
+  char  c_hhmmss_dec[ 16] ;
+
+  char  c_ddmmss_agh[ 16] ;
+  char  c_ddmmss_asc[ 16] ;
+  char  c_ddmmss_azi[ 16] ;
+  char  c_ddmmss_alt[ 16] ;
+  char  c_ddmmss_dec[ 16] ;
 }
 ASTRE ;
 
@@ -854,12 +910,13 @@ int GPIO_LED_ETAT ;
 int MODE_EQUATORIAL ; 
 int MENU_PAR_DEFAUT ;
 
-int DEVICE_CAPTEURS_USE    ;
-int DEVICE_RAQUETTE_USE     ;
-int DEVICE_BLUETOOTH_USE    ;
-int DEVICE_INFRAROUGE_USE ;
-int DEVICE_CONTROLEUR_MOTEUR_USE ;
-int DEVICE_CLAVIER_USE  ;
+int DEVICE_USE_CAPTEURS    ;
+int DEVICE_USE_RAQUETTE     ;
+int DEVICE_USE_BLUETOOTH    ;
+int DEVICE_USE_INFRAROUGE ;
+int DEVICE_USE_CONTROLER ;
+int DEVICE_USE_KEYBOARD  ;
+int DEVICE_USE_LCD ; 
 
 int GPIO_RAQ_O  ;
 int GPIO_RAQ_E  ;
@@ -898,6 +955,7 @@ unsigned long TEMPO_IR ;
 unsigned long TEMPO_TERMIOS ;
 unsigned long TEMPO_CLAVIER ;
 unsigned long TEMPO_CAPTEURS ;
+unsigned long TEMPO_LCD ;
 
 // ------ PARAMETRES DE ALT ou AZI   ------------
 

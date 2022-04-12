@@ -59,7 +59,7 @@
 #define GPIO_SUIVI_MAIN_ATTENTE_MAX    0.3     // attente maximum exprimee en seconde pour non blocage
 
 #define GPIO_SUIVI_PWM_PHASE_SCHED   SCHED_RR
-#define GPIO_SUIVI_MAIN_SCHED        SCHED_FIFO
+#define GPIO_SUIVI_MAIN_SCHED        SCHED_RR
 
 #define GPIO_MICROPAS_MAX           500
 // FIXME : creation entete de la fonction au format doxygen de la ligne suivante (2021)
