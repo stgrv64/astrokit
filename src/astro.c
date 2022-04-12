@@ -1190,7 +1190,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   char c_sum_ascii[8] ;
   char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ] ;
   struct sched_param param;
-  struct timeval t00,t01 ;
+  struct timeval t00,t01  ;
   
   Trace("start with tempo %ld", suivi->temporisation_termios) ;
   
