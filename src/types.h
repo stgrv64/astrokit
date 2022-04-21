@@ -357,13 +357,14 @@ CODES ;
 { "45",        "KEY_VOLUMEUP"  ,  "forward"},      /* ascii 45 => - */
 { "43",        "KEY_VOLUMEDOWN" , "rewind"},       /* ascii 43 => + */
 /* gestion du temps */
-{ "116",          "KEY_MUTE",   "TIME"}, /* 116 ascii = lettre 't' */
-{ "a_configurer", "KEY_SCREEN", "key_screen" },
-{ "a_configurer", "KEY_TV",     "key_tv"},
-{ "105",          "KEY_INFO",   "key_info"}, /* 105  ascii = touche 'i' */
-{ "a_configurer", "KEY_ZOOM",   "key_zoom"},
-{ "a_configurer", "KEY_LIST",   "key_list"},
-{ "a_configurer", "KEY_MODE",   "key_mode" },
+{ "116",          "KEY_MUTE",   "TIME"},        /* 116 ascii = lettre 't' */
+/* TODO : pour afficher les informations utiliser touches Fx du clavier */
+{ "97",           "KEY_SCREEN", "key_screen" }, /* 97  ascii = lettre 'F1' */ /* info 0 */
+{ "98",           "KEY_TV",     "key_tv"},      /* 98  ascii = lettre 'b' */ /* info 1 */
+{ "99",           "KEY_INFO",   "key_info"},    /* 99  ascii = lettre 'c' */ /* info 2 */
+{ "100",          "KEY_ZOOM",   "key_zoom"},    /* 100 ascii = lettre 'd' */ /* info 3 */
+{ "97",           "KEY_LIST",   "key_list"},    /* a=azimutal   => lettre 'a' */
+{ "122",          "KEY_MODE",   "key_mode" },   /* z=equatorial => lettre 'z' */ 
 /* arret du programme */
 { "113", "KEY_EXIT",   "key_exit" },\
 { "non_defini", "non_defini",   "non_defini" },\

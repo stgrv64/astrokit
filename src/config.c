@@ -1621,6 +1621,7 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 * @brief  : Cette fonction formate divers string en vue d un affichage pertinent
 * @param  : ASTRE *as
 * @date   : 2022-04-12 creation
+* @date   : 2022-04-21 remplacement ° par o (affichage ° impossible)
 *****************************************************************************************/
 void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
 
@@ -1654,11 +1655,11 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   sprintf( c_hhmmss_alt, "  %3dh%2dm%2ds",  as->ALTt.HH, as->ALTt.MM, as->ALTt.SS  ) ;
   sprintf( c_hhmmss_dec, "  %3dh%2dm%2ds",  as->DECt.HH, as->DECt.MM, as->DECt.SS  ) ;
 
-  sprintf( c_ddmmss_agh, "%c %d°%d'%d\"", as->AGHa.c_si, as->AGHa.DD, as->AGHa.MM, as->AGHa.SS  ) ;
-  sprintf( c_ddmmss_asc, "%c %d°%d'%d\"", as->ASCa.c_si, as->ASCa.DD, as->ASCa.MM, as->ASCa.SS  ) ;
-  sprintf( c_ddmmss_azi, "%c %d°%d'%d\"", as->AZIa.c_si, as->AZIa.DD, as->AZIa.MM, as->AZIa.SS  ) ;
-  sprintf( c_ddmmss_alt, "%c %d°%d'%d\"", as->ALTa.c_si, as->ALTa.DD, as->ALTa.MM, as->ALTa.SS  ) ;
-  sprintf( c_ddmmss_dec, "%c %d°%d'%d\"", as->DECa.c_si, as->DECa.DD, as->DECa.MM, as->DECa.SS  ) ;
+  sprintf( c_ddmmss_agh, "%c %-3do%d'%d\"", as->AGHa.c_si, as->AGHa.DD, as->AGHa.MM, as->AGHa.SS  ) ;
+  sprintf( c_ddmmss_asc, "%c %-do%d'%d\"", as->ASCa.c_si, as->ASCa.DD, as->ASCa.MM, as->ASCa.SS  ) ;
+  sprintf( c_ddmmss_azi, "%c %-do%d'%d\"", as->AZIa.c_si, as->AZIa.DD, as->AZIa.MM, as->AZIa.SS  ) ;
+  sprintf( c_ddmmss_alt, "%c %-do%d'%d\"", as->ALTa.c_si, as->ALTa.DD, as->ALTa.MM, as->ALTa.SS  ) ;
+  sprintf( c_ddmmss_dec, "%c %-do%d'%d\"", as->DECa.c_si, as->DECa.DD, as->DECa.MM, as->DECa.SS  ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   

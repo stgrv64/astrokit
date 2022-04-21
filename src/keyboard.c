@@ -131,7 +131,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
 
   if ( nread >0  ) {
 
-    Trace("nread positif = %d", nread) ;
+    Trace1("nread positif = %d", nread) ;
     
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
@@ -146,6 +146,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
     }
     memset(chaine, 0, sizeof(chaine)) ;
 
+    Trace("nread %-3d i_sum_ascii %-5d ch_chaine %-10s", nread, *i_sum_ascii, ch_chaine ) ;
     return -1 ;
   }
   else {

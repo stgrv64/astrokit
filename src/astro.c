@@ -1036,6 +1036,8 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   // FIXME : debut boucle infinie du thread SUIVI_VOUTE
   //-------------------------------------------------------------------------------
   
+  suivi->SUIVI_ALIGNEMENT=1 ;
+
   while(1) {
     
     if ( suivi->SUIVI_VOUTE ) {
@@ -1047,10 +1049,12 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       /* CONFIG_LCD_AFFICHER_TEMPS_LIEU(gp_Lcd,0,lieu,temps) ;*/
 
       if ( suivi->SUIVI_ALIGNEMENT ) { 
+
         CONFIG_FORMATE_DONNEES_AFFICHAGE(as) ;
         CONFIG_AFFICHER_MODE_LONG(as) ; 
         CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
         CONFIG_LCD_AFFICHER_ASTRE_VITESSES(gp_Lcd,4,as) ;
+        
         suivi->SUIVI_ALIGNEMENT = 0 ;
       }
 /*
