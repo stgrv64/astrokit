@@ -334,6 +334,7 @@ void CONFIG_INIT_LOG(void) {
 * @brief  : Cette fonction initialise la structure lcd *l
 * @param  : LIEU *lieu
 * @date   : 2022-04-08 creation
+* @date   : 2022-04-27 mise en commentaire de CALCUL_TEMPS_SIDERAL
 *****************************************************************************************/
 
 void CONFIG_INIT_LCD(LCD *lcd) {
@@ -356,7 +357,6 @@ void CONFIG_INIT_LCD(LCD *lcd) {
      return ;
   }
   else {
-    CALCUL_TEMPS_SIDERAL(lieu, temps) ;
 
     sprintf(lcd->c_line_0, "%d %s %d %d:%d", \
       temps->yy , c_Lcd_Display_Months[ temps->mm -1  ] , temps->dd, temps->HH, temps->MM ) ;
@@ -771,12 +771,12 @@ void CONFIG_INIT_CODES(CODES *gp_Codes) {
 
   strcpy( gp_Codes->in_lirc[38],"KEY_MUTE") ;        strcpy( gp_Codes->out_act[38],"TIME") ;
 
-  strcpy( gp_Codes->in_lirc[39],"KEY_SCREEN") ;      strcpy( gp_Codes->out_act[39],"key_screen") ; 
-  strcpy( gp_Codes->in_lirc[40],"KEY_TV") ;          strcpy( gp_Codes->out_act[40],"key_tv") ;
-  strcpy( gp_Codes->in_lirc[41],"KEY_INFO") ;        strcpy( gp_Codes->out_act[41],"key_info") ;
+  strcpy( gp_Codes->in_lirc[39],"KEY_SCREEN") ;      strcpy( gp_Codes->out_act[39],"aff_azi_alt") ; 
+  strcpy( gp_Codes->in_lirc[40],"KEY_TV") ;          strcpy( gp_Codes->out_act[40],"aff_time") ;
+  strcpy( gp_Codes->in_lirc[41],"KEY_INFO") ;        strcpy( gp_Codes->out_act[41],"aff_info") ;
   strcpy( gp_Codes->in_lirc[42],"KEY_ZOOM") ;        strcpy( gp_Codes->out_act[42],"key_zoom") ;
-  strcpy( gp_Codes->in_lirc[43],"KEY_LIST") ;        strcpy( gp_Codes->out_act[43],"key_list") ;
-  strcpy( gp_Codes->in_lirc[44],"KEY_MODE") ;        strcpy( gp_Codes->out_act[44],"key_mode") ; 
+  strcpy( gp_Codes->in_lirc[43],"KEY_LIST") ;        strcpy( gp_Codes->out_act[43],"key_azi") ;
+  strcpy( gp_Codes->in_lirc[44],"KEY_MODE") ;        strcpy( gp_Codes->out_act[44],"key_equ") ; 
   strcpy( gp_Codes->in_lirc[45],"KEY_EXIT") ;        strcpy( gp_Codes->out_act[45],"key_exit") ;
   
   // codes VOUTE de la telecommande - joue sur la vitesse globale
@@ -1945,6 +1945,7 @@ void CONFIG_LCD_DISPLAY(LCD * lcd) {
     }
 
     LCD1602DeInit(lcd->i_fd);
+
   }
   return ;
 }
@@ -2016,6 +2017,7 @@ void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *lcd, int i_duree, char* c_line
 * @param  : char* c_line_0
 * @param  : char* c_line_1
 * @date   : 2022-04-09 creation 
+* @date   : 2022-04-27 corrrection longueur de c_line_0
 *****************************************************************************************/
 
 void CONFIG_LCD_AFFICHER_TEMPS_LIEU( LCD *lcd, int i_duree, LIEU* lieu, TEMPS *temps) {
@@ -2030,7 +2032,7 @@ void CONFIG_LCD_AFFICHER_TEMPS_LIEU( LCD *lcd, int i_duree, LIEU* lieu, TEMPS *t
 
   /* Remplissage de line 0 et line 1 */
 
-  sprintf( c_line_0, "%d %s %d %d:%d", \
+  sprintf( c_line_0, "%d%s%d %d:%d", \
     temps->yy ,\
     c_Lcd_Display_Months[ temps->mm -1  ] , \
     temps->dd, \
@@ -2098,6 +2100,19 @@ void CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(LCD * lcd, int i_duree, ASTRE* as ) {
   return ;
 }
 
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_INFORMATIONS
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations qu on souhaite
+* @param  : LCD * lcd
+* @param  : int i_duree
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void   CONFIG_LCD_AFFICHER_INFORMATIONS    ( LCD * lcd, int i_duree) {
+
+  return ;
+}
 //========================================================================================
 // FIXME : FIN FICHIER
 //========================================================================================

@@ -221,7 +221,7 @@
 
 #define CONFIG_LCD_LINES_CHAR_NUMBERS        16
 #define CONFIG_LCD_LINES_CHAR_NUMBERS_secure 8
-#define CONFIG_LCD_USLEEP_AFTER_CLEARING     5000
+#define CONFIG_LCD_USLEEP_AFTER_CLEARING     10000
 #define CONFIG_LCD_I2C_DEFAULT_DEV_PORT      1
 
 //------------------------------------------------------------------------------
@@ -359,12 +359,17 @@ CODES ;
 /* gestion du temps */
 { "116",          "KEY_MUTE",   "TIME"},        /* 116 ascii = lettre 't' */
 /* TODO : pour afficher les informations utiliser touches Fx du clavier */
-{ "97",           "KEY_SCREEN", "key_screen" }, /* 97  ascii = lettre 'F1' */ /* info 0 */
-{ "98",           "KEY_TV",     "key_tv"},      /* 98  ascii = lettre 'b' */ /* info 1 */
-{ "99",           "KEY_INFO",   "key_info"},    /* 99  ascii = lettre 'c' */ /* info 2 */
-{ "100",          "KEY_ZOOM",   "key_zoom"},    /* 100 ascii = lettre 'd' */ /* info 3 */
-{ "97",           "KEY_LIST",   "key_list"},    /* a=azimutal   => lettre 'a' */
-{ "122",          "KEY_MODE",   "key_mode" },   /* z=equatorial => lettre 'z' */ 
+/* FIXME : teste sur la cible , sum des codes ascii pour les touches Fx : */
+
+/* F1 : 274  F2 : 275  F3 : 276  F4  : 277  F5  : 278  F6  : 348 */
+/* F7 : 349  F8 : 350  F9 : 342  F10 : 343  F11 : 345  F12 : 346 */
+
+{ "274",          "KEY_SCREEN", "aff_azi_alt" },  /* 274  ascii = lettre 'F1' */ /* info 0 */
+{ "275",          "KEY_TV",     "aff_agh_dec" },  /* 274  ascii = lettre 'F2' */ /* info 1 */
+{ "276",          "KEY_INFO",   "aff_time"},      /* 275  ascii = lettre 'F3' */ /* info 2 */
+{ "277",          "KEY_ZOOM",   "aff_time"},      /* 276  ascii = lettre 'F4' */ /* info 3 */
+{ "97",           "KEY_LIST",   "key_azi"},    /* a=azimutal   => lettre 'a' */
+{ "122",          "KEY_MODE",   "key_equ" },   /* z=equatorial => lettre 'z' */ 
 /* arret du programme */
 { "113", "KEY_EXIT",   "key_exit" },\
 { "non_defini", "non_defini",   "non_defini" },\
