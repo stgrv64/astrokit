@@ -847,11 +847,11 @@ typedef struct {
   char  c_hhmmss_alt[ 16] ;
   char  c_hhmmss_dec[ 16] ;
 
-  char  c_ddmmss_agh[ 16] ;
-  char  c_ddmmss_asc[ 16] ;
-  char  c_ddmmss_azi[ 16] ;
-  char  c_ddmmss_alt[ 16] ;
-  char  c_ddmmss_dec[ 16] ;
+  char  c_ddmm_agh[ 16] ;
+  char  c_ddmm_asc[ 16] ;
+  char  c_ddmm_azi[ 16] ;
+  char  c_ddmm_alt[ 16] ;
+  char  c_ddmm_dec[ 16] ;
 }
 ASTRE ;
 

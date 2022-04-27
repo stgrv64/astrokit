@@ -1,0 +1,7 @@
+Fichiers de configuration network pour systemd sur la cible
+
+/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+/etc/systemd/network/wlan.network
+
+le service doit etre active via systemctl enable  
+

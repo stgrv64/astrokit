@@ -131,6 +131,7 @@ void TRAP_MAIN(int sig) {
 void TRAP_SUIVI_MENU(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_menu = %d\n",sig) ;
+  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Sig. trap. ", sig) ;
   pthread_cancel( suivi->p_menu ) ;
 }
 void TRAP_SUIVI_VOUTE(int sig)  {

@@ -111,6 +111,7 @@ void   CONFIG_AFFICHER_MODE_STELLARIUM  ( ASTRE * )  ;
 void   CONFIG_LCD_DISPLAY                  ( LCD * ) ;
 void   CONFIG_LCD_AFFICHER                 ( LCD *, int , char* , char * ) ;
 void   CONFIG_LCD_AFFICHER_STRINGS         ( LCD *, int , char* , char * ) ;
+void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *, int , char* , int ) ;
 void   CONFIG_LCD_AFFICHER_TEMPS_LIEU      ( LCD *, int , LIEU* , TEMPS *) ;
 void   CONFIG_LCD_AFFICHER_ASTRE_VITESSES  ( LCD *, int , ASTRE* )  ;
 void   CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE ( LCD *, int , ASTRE* ) ;

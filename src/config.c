@@ -1631,11 +1631,11 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   char  c_hhmmss_alt[ 16] ;
   char  c_hhmmss_dec[ 16] ;
 
-  char  c_ddmmss_agh[ 16] ;
-  char  c_ddmmss_asc[ 16] ;
-  char  c_ddmmss_azi[ 16] ;
-  char  c_ddmmss_alt[ 16] ;
-  char  c_ddmmss_dec[ 16] ;
+  char  c_ddmm_agh[ 16] ;
+  char  c_ddmm_asc[ 16] ;
+  char  c_ddmm_azi[ 16] ;
+  char  c_ddmm_alt[ 16] ;
+  char  c_ddmm_dec[ 16] ;
 
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
@@ -1643,11 +1643,11 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   memset( c_hhmmss_alt, 0, sizeof(c_hhmmss_alt) ) ;
   memset( c_hhmmss_dec, 0, sizeof(c_hhmmss_dec) ) ;
 
-  memset( c_ddmmss_agh, 0, sizeof(c_ddmmss_agh) ) ;
-  memset( c_ddmmss_asc, 0, sizeof(c_ddmmss_asc) ) ;
-  memset( c_ddmmss_azi, 0, sizeof(c_ddmmss_azi) ) ;
-  memset( c_ddmmss_alt, 0, sizeof(c_ddmmss_alt) ) ;
-  memset( c_ddmmss_dec, 0, sizeof(c_ddmmss_dec) ) ;
+  memset( c_ddmm_agh, 0, sizeof(c_ddmm_agh) ) ;
+  memset( c_ddmm_asc, 0, sizeof(c_ddmm_asc) ) ;
+  memset( c_ddmm_azi, 0, sizeof(c_ddmm_azi) ) ;
+  memset( c_ddmm_alt, 0, sizeof(c_ddmm_alt) ) ;
+  memset( c_ddmm_dec, 0, sizeof(c_ddmm_dec) ) ;
 
   sprintf( c_hhmmss_agh, "  %3dh%2dm%2ds",  as->AGHt.HH, as->AGHt.MM, as->AGHt.SS  ) ;
   sprintf( c_hhmmss_asc, "  %3dh%2dm%2ds",  as->ASCt.HH, as->ASCt.MM, as->ASCt.SS  ) ;
@@ -1655,11 +1655,11 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   sprintf( c_hhmmss_alt, "  %3dh%2dm%2ds",  as->ALTt.HH, as->ALTt.MM, as->ALTt.SS  ) ;
   sprintf( c_hhmmss_dec, "  %3dh%2dm%2ds",  as->DECt.HH, as->DECt.MM, as->DECt.SS  ) ;
 
-  sprintf( c_ddmmss_agh, "%c %-3do%d'%d\"", as->AGHa.c_si, as->AGHa.DD, as->AGHa.MM, as->AGHa.SS  ) ;
-  sprintf( c_ddmmss_asc, "%c %-do%d'%d\"", as->ASCa.c_si, as->ASCa.DD, as->ASCa.MM, as->ASCa.SS  ) ;
-  sprintf( c_ddmmss_azi, "%c %-do%d'%d\"", as->AZIa.c_si, as->AZIa.DD, as->AZIa.MM, as->AZIa.SS  ) ;
-  sprintf( c_ddmmss_alt, "%c %-do%d'%d\"", as->ALTa.c_si, as->ALTa.DD, as->ALTa.MM, as->ALTa.SS  ) ;
-  sprintf( c_ddmmss_dec, "%c %-do%d'%d\"", as->DECa.c_si, as->DECa.DD, as->DECa.MM, as->DECa.SS  ) ;
+  sprintf( c_ddmm_agh, "%c %-3d d %d'", as->AGHa.c_si, as->AGHa.DD, as->AGHa.MM ) ;
+  sprintf( c_ddmm_asc, "%c %-3d d %d'", as->ASCa.c_si, as->ASCa.DD, as->ASCa.MM ) ;
+  sprintf( c_ddmm_azi, "%c %-3d d %d'", as->AZIa.c_si, as->AZIa.DD, as->AZIa.MM ) ;
+  sprintf( c_ddmm_alt, "%c %-3d d %d'", as->ALTa.c_si, as->ALTa.DD, as->ALTa.MM ) ;
+  sprintf( c_ddmm_dec, "%c %-3d d %d'", as->DECa.c_si, as->DECa.DD, as->DECa.MM ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   
@@ -1669,11 +1669,11 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   strcpy( as->c_hhmmss_alt, c_hhmmss_alt)  ;
   strcpy( as->c_hhmmss_dec, c_hhmmss_dec)  ;
 
-  strcpy( as->c_ddmmss_agh, c_ddmmss_agh)  ;
-  strcpy( as->c_ddmmss_asc, c_ddmmss_asc)  ;
-  strcpy( as->c_ddmmss_azi, c_ddmmss_azi)  ;
-  strcpy( as->c_ddmmss_alt, c_ddmmss_alt)  ;
-  strcpy( as->c_ddmmss_dec, c_ddmmss_dec)  ;
+  strcpy( as->c_ddmm_agh, c_ddmm_agh)  ;
+  strcpy( as->c_ddmm_asc, c_ddmm_asc)  ;
+  strcpy( as->c_ddmm_azi, c_ddmm_azi)  ;
+  strcpy( as->c_ddmm_alt, c_ddmm_alt)  ;
+  strcpy( as->c_ddmm_dec, c_ddmm_dec)  ;
 
 }
 /*****************************************************************************************
@@ -1696,9 +1696,9 @@ void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *as) {
   sprintf( c_vit_azi, "%3.2f", as->Va) ;
 
   Trace("Va / Vh    : %s / %s" , c_vit_azi        , c_vit_alt ) ;
-  Trace("AD / Dec   : %s / %s" , as->c_hhmmss_asc , as->c_ddmmss_dec ) ;
-  Trace("AH / Dec   : %s / %s" , as->c_hhmmss_agh , as->c_ddmmss_dec ) ;
-  Trace("AZ./ Haut. : %s / %s" , as->c_ddmmss_azi , as->c_ddmmss_alt ) ;
+  Trace("AD / Dec   : %s / %s" , as->c_hhmmss_asc , as->c_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s" , as->c_hhmmss_agh , as->c_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s" , as->c_ddmm_azi , as->c_ddmm_alt ) ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_MODE_LONG
@@ -1992,6 +1992,22 @@ void CONFIG_LCD_AFFICHER_STRINGS(LCD * lcd, int i_duree , char* c_line_0, char *
   return ;
 }
 /*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_STRINGS
+* @author : s.gravois
+* @brief  : Cette fonction affiche une chaine et un entier sur ecran LCD  
+* @param  : LCD * lcd
+* @param  : char* c_line_0
+* @param  : char* c_line_1
+* @date   : 2022-04-09 creation 
+*****************************************************************************************/
+
+void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *lcd, int i_duree, char* c_line_0, int i) {
+  char c_line_1[16] = {0} ;
+  memset(c_line_1,0,sizeof(c_line_1));
+  sprintf( c_line_1, "%d", i) ;
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
+}
+/*****************************************************************************************
 * @fn     : CONFIG_LCD_AFFICHER_TEMPS_LIEU
 * @author : s.gravois
 * @brief  : Cette fonction calcule le temps sideral en cours puis affiche sur LCD
@@ -2074,8 +2090,8 @@ void CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(LCD * lcd, int i_duree, ASTRE* as ) {
   memset( c_line_0, 0, sizeof(c_line_0)) ; 
   memset( c_line_1, 0, sizeof(c_line_1)) ;
 
-  sprintf( c_line_0, "(AZI) %s", as->c_ddmmss_azi ) ;
-  sprintf( c_line_1, "(ALT) %s", as->c_ddmmss_alt );
+  sprintf( c_line_0, "(AZI) %s", as->c_ddmm_azi ) ;
+  sprintf( c_line_1, "(ALT) %s", as->c_ddmm_alt );
 
   CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
 
