@@ -8,6 +8,9 @@
 # 21/03/2022  | ajout fonctions initialisations des codes 
 # 22/03/2022  | ajout fonction CONFIG_MAJ_SUIVI_PAS (anciennement 
 #               dans ir.c / .h)
+# 2022-04-28  | ajout de 2 resolutions plus simple (affichage contraint par LCD) :
+# 2022-04-28  | - c_hhmm_*
+# 2022-04-28  | - c_dd_*  
 # -------------------------------------------------------------- 
 */
 
@@ -114,8 +117,13 @@ void   CONFIG_LCD_AFFICHER_STRINGS         ( LCD *, int , char* , char * ) ;
 void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *, int , char* , int ) ;
 void   CONFIG_LCD_AFFICHER_TEMPS_LIEU      ( LCD *, int , LIEU* , TEMPS *) ;
 void   CONFIG_LCD_AFFICHER_ASTRE_VITESSES  ( LCD *, int , ASTRE* )  ;
-void   CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE ( LCD *, int , ASTRE* ) ;
+
+void   CONFIG_LCD_AFFICHER_AZI_ALT         ( LCD *, int , ASTRE* ) ;
+void   CONFIG_LCD_AFFICHER_AGH_DEC         ( LCD *, int , ASTRE* ) ;
+void   CONFIG_LCD_AFFICHER_EQU_DEC         ( LCD *, int , ASTRE* ) ;
+void   CONFIG_AFFICHER_LCD_MODE_STELLARIUM ( LCD *, int , ASTRE *) ;
 void   CONFIG_LCD_AFFICHER_INFORMATIONS    ( LCD *, int ) ;
+
 
 void   CONFIG_LCD_EMPILER                  ( LCD * , char* , char * ) ;
 void   CONFIG_LCD_DEPILER                  ( LCD * ) ;

@@ -290,6 +290,8 @@ typedef struct {
 
  char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
  char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+
+ pthread_mutex_t mutex_lcd ;
 } 
 LCD ;
 //------------------------------------------------------------------------------
@@ -308,11 +310,18 @@ typedef struct  {
   char out_act [ CONFIG_CODE_NB_CODES][CONFIG_CODE_BUFFER_SIZE] ;
 }
 CODES ;
+/*----------------------------------------------*/
+/* DEFINITION DES CODES d INTERRACTION en INPUT */ 
+/*----------------------------------------------*/
 
- static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
-/* clavier numerique */ 
+static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
+
+/*--------------------------------*/
+/* clavier numerique              */ 
+/*--------------------------------*/
+
 { "48",        "KEY_0","0" }, /* 48 ascii = 0 */
-{ "49",        "KEY_1","1"},
+{ "49",        "KEY_1","1"},  
 { "50",        "KEY_2","2"},
 { "51",        "KEY_3","3"},
 { "52",        "KEY_4","4"},
@@ -321,65 +330,108 @@ CODES ;
 { "55",        "KEY_7","7"},
 { "56",        "KEY_8","8"},
 { "57",        "KEY_9","9"},
-/* objets MES NGC ETO PLA */
+
+/*--------------------------------*/
+/* objets MES NGC ETO PLA         */
+/*--------------------------------*/
+
 { "47",        "KEY_M","MES"},  /* 47 ascii = lettre '/' */
 { "42",        "KEY_N","NGC"},  /* 42 ascii = lettre '*' */
 { "45",        "KEY_E","ETO"},  /* 45 ascii = lettre '-' */
 { "43",        "KEY_P","PLA"},  /* 43 ascii = lettre '+' */
-/* touches de MENUS */
-{ "obsolete",  "KEY_PREVIOUS","previous"}, /* 60  ascii = lettre '<' */
+
+/*--------------------------------*/
+/* touches de MENUS               */
+/*--------------------------------*/
+
 { "10",        "KEY_PLAY",    "valider"},  /* 10  ascii = touche 'ENTER' */
-{ "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = lettre '>' */
-{ "obsolete",  "KEY_STOP",   "stop"},      /* 188 ascii = touche 'FIN' */
-{ "109",       "KEY_MENU",   "MENU"},      /* 109  ascii = touche 'm' */
-{ "32",        "KEY_PAUSE",  "pause"},     /* 32 ascii = espace = pause */
+{ "obsolete",  "KEY_STOP",    "stop"},     /* 188 ascii = touche 'FIN' */
+{ "109",       "KEY_MENU",    "MENU"},     /* 109  ascii = touche 'm' */
+{ "32",        "KEY_PAUSE",   "pause"},    /* 32 ascii = espace = pause */
+
+/*--------------------------------*/
 /* touches gauche droite haut bas ok */ 
+/*--------------------------------*/
+
 { "188",       "KEY_OK",    "reset"}, /* ascii 188 = touche 'FIN' */
 { "183",       "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
 { "184",       "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
 { "185",       "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
 { "186",       "KEY_LEFT",  "o"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
-/* touches obsoletes */
-{ "obsolete",  "KEY_SETUP",  "SETUP"},
-{ "obsolete",  "KEY_SOUND",   "TIME"  },  
-{ "obsolete",  "KEY_FORWARD","forward"},
-/* touches suivantes ne sont plus utilisess */
-{ "obsolete",  "KEY_REWIND", "rewind"   },
-{ "obsolete",  "KEY_RED",    "red"},
-{ "obsolete",  "KEY_BLUE",   "blue"},
-{ "obsolete",  "KEY_YELLOW", "yellow"},
-{ "obsolete",  "KEY_GREEN",  "green"},   
-/* arret de la carte */
-{ "27",        "KEY_POWER",      "key_power"}, /* ascii 27 => touch ESC */
-/* rattrapages rapides et lents */
+
+/*--------------------------------*/
+/* touche rattrapages             */
+/*--------------------------------*/
+
 { "297",       "KEY_CHANNELUP" ,  "forwardfast"}, /* ascii 297 (nread=3) => page up */
 { "298",       "KEY_CHANNELDOWN", "rewindfast"},  /* ascii 298 (nread=3) => page down */
-{ "45",        "KEY_VOLUMEUP"  ,  "forward"},      /* ascii 45 => - */
-{ "43",        "KEY_VOLUMEDOWN" , "rewind"},       /* ascii 43 => + */
-/* gestion du temps */
-{ "116",          "KEY_MUTE",   "TIME"},        /* 116 ascii = lettre 't' */
-/* TODO : pour afficher les informations utiliser touches Fx du clavier */
-/* FIXME : teste sur la cible , sum des codes ascii pour les touches Fx : */
+{ "45",        "KEY_VOLUMEUP"  ,  "forward"},     /* ascii 45 => - */
+{ "43",        "KEY_VOLUMEDOWN" , "rewind"},      /* ascii 43 => + */
 
+/*--------------------------------*/
+/* touches de gestion du temps    */
+/*--------------------------------*/
+
+{ "116",       "KEY_MUTE",   "TIME"},        /* 116 ascii = lettre 't' */
+
+/*--------------------------------*/
+/* touches affichage informations */
+/*--------------------------------*/
+
+/* TODO : pour afficher les informations utiliser touches Fx du clavier   */
+/* FIXME : teste sur la cible , sum des codes ascii pour les touches Fx : */
 /* F1 : 274  F2 : 275  F3 : 276  F4  : 277  F5  : 278  F6  : 348 */
 /* F7 : 349  F8 : 350  F9 : 342  F10 : 343  F11 : 345  F12 : 346 */
 
-{ "274",          "KEY_SCREEN", "aff_azi_alt" },  /* 274  ascii = lettre 'F1' */ /* info 0 */
-{ "275",          "KEY_TV",     "aff_agh_dec" },  /* 274  ascii = lettre 'F2' */ /* info 1 */
-{ "276",          "KEY_INFO",   "aff_time"},      /* 275  ascii = lettre 'F3' */ /* info 2 */
-{ "277",          "KEY_ZOOM",   "aff_time"},      /* 276  ascii = lettre 'F4' */ /* info 3 */
+{ "274",       "KEY_SCREEN", "aff_azi_alt" },  /* 274  ascii = lettre 'F1' */ /* info 0 */
+{ "275",       "KEY_TV",     "aff_agh_dec" },  /* 274  ascii = lettre 'F2' */ /* info 1 */
+{ "276",       "KEY_INFO",   "aff_time"},      /* 275  ascii = lettre 'F3' */ /* info 2 */
+{ "277",       "KEY_ZOOM",   "aff_time"},      /* 276  ascii = lettre 'F4' */ /* info 3 */
+
+/*--------------------------------*/
+/* touches de permutations        */
+/*--------------------------------*/
+
 { "97",           "KEY_LIST",   "key_azi"},    /* a=azimutal   => lettre 'a' */
 { "122",          "KEY_MODE",   "key_equ" },   /* z=equatorial => lettre 'z' */ 
-/* arret du programme */
-{ "113", "KEY_EXIT",   "key_exit" },\
-{ "non_defini", "non_defini",   "non_defini" },\
-{ "non_defini", "non_defini",   "non_defini" },\
-{ "non_defini", "non_defini",   "non_defini" },\
-{ "non_defini", "non_defini",   "non_defini" },\
-{ "non_defini", "non_defini",   "non_defini" },\
-}; /* ascii 113 => touch 'q' */
 
-/* TAILLE TABLEAU 50 = CONFIG_CODE_NB_CODES */
+/*--------------------------------*/
+/* arret du programme */
+/*--------------------------------*/
+
+/* arret de la carte */
+{ "27",        "KEY_POWER",      "key_power"}, /* ascii 27 => touch ESC */
+{ "113",       "KEY_EXIT",   "key_exit" },
+
+/*--------------------------------*/
+/* touches obsoletes */
+/*--------------------------------*/
+
+{ "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = lettre '>' */
+{ "obsolete",  "KEY_PREVIOUS","previous"}, /* action a definir */
+{ "obsolete",  "KEY_SETUP",   "SETUP"},    /* non mis en place pour l instant (2022/04) */
+{ "obsolete",  "KEY_SOUND",   "TIME"  },   /* remplace par KEY_MUTE sur la telecommande */
+{ "obsolete",  "KEY_FORWARD", "forward"},  /* remplace par KEY_VOLUMEUP */
+{ "obsolete",  "KEY_REWIND",  "rewind" },  /* remplace par KEY_VOLUMEDOWN */
+{ "obsolete",  "KEY_RED",     "red"},      /* remplace par KEY_M (messier) */
+{ "obsolete",  "KEY_BLUE",    "blue"},     /* remplace par KEY_N (ngc) */
+{ "obsolete",  "KEY_YELLOW",  "yellow"},   /* remplace par KEY_E (etoiles) */
+{ "obsolete",  "KEY_GREEN",   "green"},    /* remplace par KEY_P (planetes) */
+
+/*--------------------------------*/
+/* touches restantes non definies */
+/*--------------------------------*/
+
+{ "non_defini", "non_defini",   "non_defini" },
+{ "non_defini", "non_defini",   "non_defini" },
+{ "non_defini", "non_defini",   "non_defini" },
+{ "non_defini", "non_defini",   "non_defini" },
+{ "non_defini", "non_defini",   "non_defini" } 
+}; 
+/*------------------------------------------  */
+/* TAILLE TABLEAU 50 = CONFIG_CODE_NB_CODES   */
+/* TODO : redefinir si besoin (doubler a 100) */
+/*------------------------------------------  */
 
 // ------------------------------------------------------------------------
 // definition des structures de devices du programme
@@ -846,17 +898,32 @@ typedef struct {
   t_en_Mode_Calcul mode ;
   int              numero ; 
 
-  char  c_hhmmss_agh[ 16] ;
-  char  c_hhmmss_asc[ 16] ;
-  char  c_hhmmss_azi[ 16] ;
-  char  c_hhmmss_alt[ 16] ;
-  char  c_hhmmss_dec[ 16] ;
+  /* formatage des informations de coordonnnes sur l astre */
 
-  char  c_ddmm_agh[ 16] ;
-  char  c_ddmm_asc[ 16] ;
-  char  c_ddmm_azi[ 16] ;
-  char  c_ddmm_alt[ 16] ;
-  char  c_ddmm_dec[ 16] ;
+  char  c_hhmmss_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmmss_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmmss_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmmss_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmmss_dec[ CONFIG_TAILLE_BUFFER_16] ;
+
+  char  c_hhmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_hhmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
+
+  char  c_ddmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_ddmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_ddmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_ddmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_ddmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
+
+  char  c_dd_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_dd_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_dd_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_dd_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char  c_dd_dec[ CONFIG_TAILLE_BUFFER_16] ;
+
 }
 ASTRE ;
 

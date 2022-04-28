@@ -507,11 +507,26 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   TRACE2("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, as->Va, azi_rot);
   TRACE2("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, as->Vh, alt_rot);
 
-  if ( devices->DEVICE_USE_CONTROLER )  freq_azi     = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI ;
-  else                              freq_azi     = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
+  /*------------------------*/
+  /* Calculs des frequences */
+  /*------------------------*/
 
-  if ( devices->DEVICE_USE_CONTROLER )  freq_alt     = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI ;
-  else                              freq_alt     = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
+  if ( devices->DEVICE_USE_CONTROLER ) {
+    freq_azi = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI ;
+  }
+  else {
+    freq_azi = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
+  }
+  if ( devices->DEVICE_USE_CONTROLER ) {
+    freq_alt = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI ;
+  }
+  else {
+    freq_alt = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
+  }
+
+  /*------------------------*/
+  /* Calculs des periodes   */
+  /*------------------------*/
 
   pthread_mutex_lock(& suivi->mutex_azi );
       

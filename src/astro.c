@@ -290,16 +290,34 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_azi_alt")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(gp_Lcd, 2, as ) ;
+    CONFIG_LCD_AFFICHER_AZI_ALT(gp_Lcd, 2, as ) ;
+    /* suivi->menu = MENU_MANUEL_BRUT ; */
+    strcpy(clavier->mot,"") ; 
+  }
+
+  /*  touche aff_agh_dec */
+
+  if ( ! strcmp( clavier->mot, "aff_agh_dec")) { 
+    CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
+    CONFIG_LCD_AFFICHER_AGH_DEC(gp_Lcd, 2, as ) ;
     /* suivi->menu = MENU_MANUEL_BRUT ; */
     strcpy(clavier->mot,"") ; 
   }
 
   /*  touche aff_azi_alt */
 
-  if ( ! strcmp( clavier->mot, "aff_agh_dec")) { 
+  if ( ! strcmp( clavier->mot, "aff_asc_dec")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_ANGLE_HORAIRE_DECLINAISON(gp_Lcd, 2, as ) ;
+    CONFIG_LCD_AFFICHER_ASC_DEC(gp_Lcd, 2, as ) ;
+    /* suivi->menu = MENU_MANUEL_BRUT ; */
+    strcpy(clavier->mot,"") ; 
+  }
+
+  /*  touche aff_mod_ste */
+
+  if ( ! strcmp( clavier->mot, "aff_mod_ste")) { 
+    CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
+    CONFIG_AFFICHER_LCD_MODE_STELLARIUM(gp_Lcd, 2, as ) ;
     /* suivi->menu = MENU_MANUEL_BRUT ; */
     strcpy(clavier->mot,"") ; 
   }
@@ -312,38 +330,54 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
     suivi->menu = MENU_MANUEL_BRUT ; 
     strcpy(clavier->mot,"") ; 
   }  
+  /*  touche aff_info */
+
   if ( ! strcmp( clavier->mot, "aff_info" )) { 
+    CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
     CONFIG_LCD_AFFICHER_INFORMATIONS(gp_Lcd, 2 ) ;
     suivi->menu = MENU_INFO ; 
     strcpy(clavier->mot,"") ; 
   }     // mode info
-  /*  mode equatorial */
+
+  /*  touche mode equatorial */
+  
   if ( ! strcmp( clavier->mot, "key_equ" ))      { 
     CONFIG_LCD_AFFICHER_STRINGS(gp_Lcd, 2, "Mode equatorial", (char*)c_Menus[ MENU_EQUATORIAL ] ) ;
     suivi->menu = MENU_EQUATORIAL ; 
     strcpy(clavier->mot,"") ; 
   }    
+
+  /*  touche mode azimutal */
+
   if ( ! strcmp( clavier->mot, "key_azi" ))      { 
     CONFIG_LCD_AFFICHER_STRINGS(gp_Lcd, 2, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
     suivi->menu = MENU_AZIMUTAL ; 
     strcpy(clavier->mot,"") ; 
   }       // mode azimutal
 
+  /* touche POWER : arret su systeme */
+
   if ( ! strcmp( clavier->mot, "key_power" ))     { 
     CONFIG_LCD_AFFICHER_STRINGS(gp_Lcd, 1, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
     suivi->menu = MENU_DOWN ; 
     strcpy(clavier->mot,"") ;  
-  } // arret complet
+  } 
+
+  /* touche EXIT : arret su programme */
+
   if ( ! strcmp( clavier->mot, "key_exit" ))      { 
     suivi->menu = MENU_PROGRAMME_DOWN ; 
     strcpy(clavier->mot,"") ; 
-  } // arret du programme
+  } 
+
+  /* touche reseau : arret du reseau */
+  /* TODO : non implemente : a definir et coder */
 
   if ( ! strcmp( clavier->mot, "key_reseau_up"))  { 
     
-    suivi->menu = MENU_RESEAU_UP ; strcpy(clavier->mot,"") ; 
-  }      // activation du reseau
-  
+    suivi->menu = MENU_RESEAU_UP ; 
+    strcpy(clavier->mot,"") ; 
+  }     
   
   //-----------------------------------------------------------------
   // Si un  mot est lu sur le clavier (appui sur menu->valider) necessaire)
@@ -476,11 +510,11 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 * @todo   : 
 *****************************************************************************************/
 /* FIXME :
- SUIVI_MANUEL_BRUT : le suivi etant effectue sur un as (calcul des vitesses et periodes par suivi_voute)
- l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
- avec une multiplication des vitesses N-S-E-O par un facteur ALT_ACC
-
- Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
+  SUIVI_MANUEL_BRUT : 
+    le suivi etant effectue sur un as (calcul des vitesses et periodes par suivi_voute)
+    l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
+    avec une multiplication des vitesses N-S-E-O par un facteur ALT_ACC
+    Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
 */
 
 void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
@@ -540,7 +574,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
     pthread_mutex_lock(& suivi->mutex_azi );
     pthread_mutex_lock(& suivi->mutex_alt );
 
-    // On utilise les memes touches que dans SUIVI_MANUEL_1
+    // On utilise les memes touches que dans SUIVI_MANUEL_ASSERVI
 
     if ( suivi->pas_nord )  suivi->pas_alt++ ; if ( suivi->pas_alt == 0 ) suivi->pas_alt = 1 ;
     if ( suivi->pas_sud )   suivi->pas_alt-- ; if ( suivi->pas_alt == 0 ) suivi->pas_alt = -1 ;
@@ -680,7 +714,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
 // MODE MANUEL : le suivi d'effectue directement en appuyant sur les touches 
 //==========================================================
 
-void SUIVI_MANUEL_1(SUIVI * suivi, CLAVIER *clavier) {
+void SUIVI_MANUEL_ASSERVI(SUIVI * suivi, CLAVIER *clavier) {
     
   double  tempo_raq_alt ;
   double  tempo_raq_azi ;
@@ -994,7 +1028,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
         // TODO : le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
         // TODO : les periodes / frequences en azimut et altitude
 
-        SUIVI_MANUEL_1(suivi, clavier) ; 
+        SUIVI_MANUEL_ASSERVI(suivi, clavier) ; 
         CALCUL_PERIODES_SUIVI_MANUEL(as,suivi,voute)  ;
 
         suivi->menu_old         = suivi->menu ;
@@ -1257,7 +1291,7 @@ void * SUIVI_LCD(SUIVI * suivi) {
   
   if ( devices->DEVICE_USE_LCD ) {
 
-    param.sched_priority = PTHREAD_POLICY_1  ;
+    param.sched_priority = PTHREAD_POLICY_0  ;
     
     if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_LCD, & param) != 0) { 
       perror("setschedparam SUIVI_LCD"); 
@@ -1270,6 +1304,8 @@ void * SUIVI_LCD(SUIVI * suivi) {
 
       /* CONFIG_LCD_AFFICHER_TEMPS_LIEU( gp_Lcd,0 , lieu, temps ) ; */
       usleep( suivi->temporisation_lcd );
+
+      CONFIG_LCD_DISPLAY( gp_Lcd ) ;
     }
   }
 

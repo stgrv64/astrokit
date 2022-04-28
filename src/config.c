@@ -33,6 +33,9 @@
 #                * fonctions CONFIG_LCD_xxxx
 #                * ajout mutex init sur mutex_datas_infrarouge
 #                * => protection zone de code avec datas_infrarouge
+#                * ajout fonction CONFIG_LCD_AFFICHER_AGH_DEC / CONFIG_LCD_AFFICHER_EQU_DEC
+#                * CONFIG_FORMATE_DONNEES_AFFICHAGE : ajout de 2 resolutions supplementaires
+#                * protection zones de code impliquant LCD* (mutex_lcd)
 # -------------------------------------------------------------- 
 */
 
@@ -338,6 +341,10 @@ void CONFIG_INIT_LOG(void) {
 *****************************************************************************************/
 
 void CONFIG_INIT_LCD(LCD *lcd) {
+
+  Trace("") ;
+
+  pthread_mutex_init( & lcd->mutex_lcd, NULL ) ;
 
   memset( lcd->c_line_0, 0 , sizeof( lcd->c_line_0 )) ;
   memset( lcd->c_line_1, 0 , sizeof( lcd->c_line_1 )) ;
@@ -1097,7 +1104,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
    /* Definition de valeurs par defauts pour les TEMPO */ 
 
   TEMPO_MENU     =  50000;
-  TEMPO_RAQ      =  51000; /* est utilisee uniquement dans SUIVI_MANUEL_1 */
+  TEMPO_RAQ      =  51000; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
   TEMPO_IR       =  52000;
   TEMPO_TERMIOS  =  53000;
   TEMPO_CLAVIER  =  25000;
@@ -1621,8 +1628,12 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier) {
 * @brief  : Cette fonction formate divers string en vue d un affichage pertinent
 * @param  : ASTRE *as
 * @date   : 2022-04-12 creation
-* @date   : 2022-04-21 remplacement ° par o (affichage ° impossible)
+* @date   : 2022-04-21 remplacement ° par o (affichage LCD ° impossible)
+* @date   : 2022-04-21 ajout de 2 resolutions plus simple (affichage contraint par LCD) :
+* @date   : 2022-04-21 - c_hhmm_*
+* @date   : 2022-04-21 - c_dd_*  
 *****************************************************************************************/
+
 void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
 
   char  c_hhmmss_agh[ 16] ;
@@ -1631,11 +1642,23 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   char  c_hhmmss_alt[ 16] ;
   char  c_hhmmss_dec[ 16] ;
 
+  char  c_hhmm_agh[ 16] ;
+  char  c_hhmm_asc[ 16] ;
+  char  c_hhmm_azi[ 16] ;
+  char  c_hhmm_alt[ 16] ;
+  char  c_hhmm_dec[ 16] ;
+
   char  c_ddmm_agh[ 16] ;
   char  c_ddmm_asc[ 16] ;
   char  c_ddmm_azi[ 16] ;
   char  c_ddmm_alt[ 16] ;
   char  c_ddmm_dec[ 16] ;
+
+  char  c_dd_agh[ 16] ;
+  char  c_dd_asc[ 16] ;
+  char  c_dd_azi[ 16] ;
+  char  c_dd_alt[ 16] ;
+  char  c_dd_dec[ 16] ;
 
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
@@ -1643,11 +1666,25 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   memset( c_hhmmss_alt, 0, sizeof(c_hhmmss_alt) ) ;
   memset( c_hhmmss_dec, 0, sizeof(c_hhmmss_dec) ) ;
 
+  memset( c_hhmm_agh, 0, sizeof(c_hhmm_agh) ) ;
+  memset( c_hhmm_asc, 0, sizeof(c_hhmm_asc) ) ;
+  memset( c_hhmm_azi, 0, sizeof(c_hhmm_azi) ) ;
+  memset( c_hhmm_alt, 0, sizeof(c_hhmm_alt) ) ;
+  memset( c_hhmm_dec, 0, sizeof(c_hhmm_dec) ) ;
+
   memset( c_ddmm_agh, 0, sizeof(c_ddmm_agh) ) ;
   memset( c_ddmm_asc, 0, sizeof(c_ddmm_asc) ) ;
   memset( c_ddmm_azi, 0, sizeof(c_ddmm_azi) ) ;
   memset( c_ddmm_alt, 0, sizeof(c_ddmm_alt) ) ;
   memset( c_ddmm_dec, 0, sizeof(c_ddmm_dec) ) ;
+
+  memset( c_dd_agh, 0, sizeof(c_dd_agh) ) ;
+  memset( c_dd_asc, 0, sizeof(c_dd_asc) ) ;
+  memset( c_dd_azi, 0, sizeof(c_dd_azi) ) ;
+  memset( c_dd_alt, 0, sizeof(c_dd_alt) ) ;
+  memset( c_dd_dec, 0, sizeof(c_dd_dec) ) ;
+
+  /* traitement des donnees en heures / minutes / secondes */
 
   sprintf( c_hhmmss_agh, "  %3dh%2dm%2ds",  as->AGHt.HH, as->AGHt.MM, as->AGHt.SS  ) ;
   sprintf( c_hhmmss_asc, "  %3dh%2dm%2ds",  as->ASCt.HH, as->ASCt.MM, as->ASCt.SS  ) ;
@@ -1655,11 +1692,26 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   sprintf( c_hhmmss_alt, "  %3dh%2dm%2ds",  as->ALTt.HH, as->ALTt.MM, as->ALTt.SS  ) ;
   sprintf( c_hhmmss_dec, "  %3dh%2dm%2ds",  as->DECt.HH, as->DECt.MM, as->DECt.SS  ) ;
 
+  sprintf( c_hhmm_agh, "  %3dh%2dm",  as->AGHt.HH, as->AGHt.MM ) ;
+  sprintf( c_hhmm_asc, "  %3dh%2dm",  as->ASCt.HH, as->ASCt.MM ) ;
+  sprintf( c_hhmm_azi, "  %3dh%2dm",  as->AZIt.HH, as->AZIt.MM ) ;
+  sprintf( c_hhmm_alt, "  %3dh%2dm",  as->ALTt.HH, as->ALTt.MM ) ;
+  sprintf( c_hhmm_dec, "  %3dh%2dm",  as->DECt.HH, as->DECt.MM ) ;
+
+  /* traitement des donnees en degres / minutes / secondes */
+  /* est inclus dans l affichage le signe */
+
   sprintf( c_ddmm_agh, "%c %-3d d %d'", as->AGHa.c_si, as->AGHa.DD, as->AGHa.MM ) ;
   sprintf( c_ddmm_asc, "%c %-3d d %d'", as->ASCa.c_si, as->ASCa.DD, as->ASCa.MM ) ;
   sprintf( c_ddmm_azi, "%c %-3d d %d'", as->AZIa.c_si, as->AZIa.DD, as->AZIa.MM ) ;
   sprintf( c_ddmm_alt, "%c %-3d d %d'", as->ALTa.c_si, as->ALTa.DD, as->ALTa.MM ) ;
   sprintf( c_ddmm_dec, "%c %-3d d %d'", as->DECa.c_si, as->DECa.DD, as->DECa.MM ) ;
+
+  sprintf( c_dd_agh, "%c %-3d d %d'", as->AGHa.c_si, as->AGHa.DD ) ;
+  sprintf( c_dd_asc, "%c %-3d d %d'", as->ASCa.c_si, as->ASCa.DD ) ;
+  sprintf( c_dd_azi, "%c %-3d d %d'", as->AZIa.c_si, as->AZIa.DD ) ;
+  sprintf( c_dd_alt, "%c %-3d d %d'", as->ALTa.c_si, as->ALTa.DD ) ;
+  sprintf( c_dd_dec, "%c %-3d d %d'", as->DECa.c_si, as->DECa.DD ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   
@@ -1669,12 +1721,23 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
   strcpy( as->c_hhmmss_alt, c_hhmmss_alt)  ;
   strcpy( as->c_hhmmss_dec, c_hhmmss_dec)  ;
 
+  strcpy( as->c_hhmm_agh, c_hhmm_agh)  ;
+  strcpy( as->c_hhmm_asc, c_hhmm_asc)  ;
+  strcpy( as->c_hhmm_azi, c_hhmm_azi)  ;
+  strcpy( as->c_hhmm_alt, c_hhmm_alt)  ;
+  strcpy( as->c_hhmm_dec, c_hhmm_dec)  ;
+
   strcpy( as->c_ddmm_agh, c_ddmm_agh)  ;
   strcpy( as->c_ddmm_asc, c_ddmm_asc)  ;
   strcpy( as->c_ddmm_azi, c_ddmm_azi)  ;
   strcpy( as->c_ddmm_alt, c_ddmm_alt)  ;
   strcpy( as->c_ddmm_dec, c_ddmm_dec)  ;
 
+  strcpy( as->c_dd_agh, c_dd_agh)  ;
+  strcpy( as->c_dd_asc, c_dd_asc)  ;
+  strcpy( as->c_dd_azi, c_dd_azi)  ;
+  strcpy( as->c_dd_alt, c_dd_alt)  ;
+  strcpy( as->c_dd_dec, c_dd_dec)  ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_MODE_STELLARIUM
@@ -1682,23 +1745,15 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *as) {
 * @brief  : Cette fonction affiche les informations a la sauce stellarium
 * @param  : 
 * @date   : 2022-03-18 creation
+* @date   : 2022-03-28 simplification
 *****************************************************************************************/
 
 void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *as) {
 
-  char c_vit_alt[16] ;
-  char c_vit_azi[16] ;
-
-  memset( c_vit_alt, 0, sizeof(c_vit_alt) ) ;
-  memset( c_vit_azi, 0, sizeof(c_vit_azi) ) ;
-
-  sprintf( c_vit_alt, "%3.2f", as->Vh) ;
-  sprintf( c_vit_azi, "%3.2f", as->Va) ;
-
-  Trace("Va / Vh    : %s / %s" , c_vit_azi        , c_vit_alt ) ;
-  Trace("AD / Dec   : %s / %s" , as->c_hhmmss_asc , as->c_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s" , as->c_hhmmss_agh , as->c_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s" , as->c_ddmm_azi , as->c_ddmm_alt ) ;
+  Trace("Va / Vh    : %3.2f / %3.2f" , as->Va           , as->Vh ) ;
+  Trace("AD / Dec   : %s / %s"       , as->c_hhmmss_asc , as->c_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s"       , as->c_hhmmss_agh , as->c_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s"       , as->c_ddmm_azi   , as->c_ddmm_alt ) ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_MODE_LONG
@@ -1869,6 +1924,8 @@ void CONFIG_LCD_EMPILER(LCD * lcd, char* c_line_0, char * c_line_1) {
 
   if ( devices->DEVICE_USE_LCD ) {
 
+    pthread_mutex_lock( & lcd->mutex_lcd ) ;
+
     memset( lcd->c_line_0_old, 0, sizeof( lcd->c_line_0_old )) ;
     memset( lcd->c_line_1_old, 0, sizeof( lcd->c_line_1_old )) ;
 
@@ -1880,6 +1937,8 @@ void CONFIG_LCD_EMPILER(LCD * lcd, char* c_line_0, char * c_line_1) {
 
     strcpy( lcd->c_line_0, c_line_0 ) ;
     strcpy( lcd->c_line_1, c_line_1 ) ;
+
+    pthread_mutex_unlock( & lcd->mutex_lcd ) ;
   }
   return ;
 }
@@ -1897,11 +1956,15 @@ void CONFIG_LCD_DEPILER(LCD * lcd) {
 
   if ( devices->DEVICE_USE_LCD ) {
 
+    pthread_mutex_lock( & lcd->mutex_lcd ) ;
+
     memset( lcd->c_line_0, 0, sizeof( lcd->c_line_0 )) ;
     memset( lcd->c_line_1, 0, sizeof( lcd->c_line_1 )) ;
 
     strcpy( lcd->c_line_0, lcd->c_line_0_old ) ;
     strcpy( lcd->c_line_1, lcd->c_line_1_old ) ;
+
+    pthread_mutex_unlock( & lcd->mutex_lcd ) ;
   }
   return ;
 }
@@ -1914,6 +1977,8 @@ void CONFIG_LCD_DEPILER(LCD * lcd) {
 * @param  : char* c_line_0
 * @param  : char* c_line_1
 * @date   : 2022-04-09 creation 
+* @date   : 2022-04-28 suppression fonction LCD1602Init (fait dans CONFIG_LCD_INIT)
+* @date   : 2022-04-28 protection par un mutex des donnees de lcd*
 * @todo   : verifier la valeur de usleep (parametrer ?)
 *****************************************************************************************/
 
@@ -1921,19 +1986,19 @@ void CONFIG_LCD_DISPLAY(LCD * lcd) {
 
   if ( devices->DEVICE_USE_LCD ) {
 
-    if ((lcd->i_fd = LCD1602Init(lcd->i_i2c_num)) == -1) {
-      SyslogErr("Failed to init LCD1602Init\n");
-      return ;
-    }
+    pthread_mutex_lock( & lcd->mutex_lcd ) ;
 
     if ( LCD1602Clear(lcd->i_fd) == -1) {
       SyslogErr("Failed to LCD1602Clear\n");
       return ;
     }
+    pthread_mutex_unlock( & lcd->mutex_lcd ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
     /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
     usleep( CONFIG_LCD_USLEEP_AFTER_CLEARING ) ;
-      
+    
+    pthread_mutex_lock( & lcd->mutex_lcd ) ;
+
     if ( LCD1602DispLines(\
         lcd->i_fd, \
         lcd->c_line_0, \
@@ -1946,6 +2011,7 @@ void CONFIG_LCD_DISPLAY(LCD * lcd) {
 
     LCD1602DeInit(lcd->i_fd);
 
+    pthread_mutex_unlock( & lcd->mutex_lcd ) ;
   }
   return ;
 }
@@ -2006,6 +2072,7 @@ void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *lcd, int i_duree, char* c_line
   char c_line_1[16] = {0} ;
   memset(c_line_1,0,sizeof(c_line_1));
   sprintf( c_line_1, "%d", i) ;
+
   CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
 }
 /*****************************************************************************************
@@ -2075,16 +2142,93 @@ void CONFIG_LCD_AFFICHER_ASTRE_VITESSES(LCD * lcd, int i_duree, ASTRE* as ) {
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE
+* @fn     : CONFIG_LCD_AFFICHER_AZI_ALT
 * @author : s.gravois
 * @brief  : Cette fonction affiche les coordonnees azimutales en cours
 * @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
+* @param  : int i_duree
+* @param  : ASTRE* as
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(LCD * lcd, int i_duree, ASTRE* as ) {
+void CONFIG_LCD_AFFICHER_AZI_ALT(LCD * lcd, int i_duree, ASTRE* as ) {
+
+  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_line_0, 0, sizeof(c_line_0)) ; 
+  memset( c_line_1, 0, sizeof(c_line_1)) ;
+
+  sprintf( c_line_0, "AZI %s", as->c_ddmm_azi ) ;
+  sprintf( c_line_1, "ALT %s", as->c_ddmm_alt );
+
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_AGH_DEC
+* @author : s.gravois
+* @brief  : Cette fonction affiche les coordonnees horaires en cours
+* @param  : LCD * lcd
+* @param  : int i_duree
+* @param  : ASTRE* as
+* @date   : 2022-04-28 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_AFFICHER_AGH_DEC(LCD * lcd, int i_duree, ASTRE* as ) {
+
+  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_line_0, 0, sizeof(c_line_0)) ; 
+  memset( c_line_1, 0, sizeof(c_line_1)) ;
+
+  sprintf( c_line_0, "AGH %s", as->c_hhmm_agh ) ;
+  sprintf( c_line_1, "DEC %s", as->c_ddmm_dec ) ;
+
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_LCD_AFFICHER_ASC_DEC
+* @author : s.gravois
+* @brief  : Cette fonction affiche les coordonnees horaires en cours
+* @param  : LCD * lcd
+* @param  : int i_duree
+* @param  : ASTRE* as
+* @date   : 2022-04-28 creation 
+*****************************************************************************************/
+
+void CONFIG_LCD_AFFICHER_ASC_DEC(LCD * lcd, int i_duree, ASTRE* as ) {
+
+  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_line_0, 0, sizeof(c_line_0)) ; 
+  memset( c_line_1, 0, sizeof(c_line_1)) ;
+
+  sprintf( c_line_0, "ASC %s", as->c_hhmm_asc ) ;
+  sprintf( c_line_1, "DEC %s", as->c_ddmm_dec ) ;
+
+  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_LCD_MODE_STELLARIUM
+* @author : s.gravois
+* @brief  : Cette fonction s inspire de CONFIG_AFFICHER_MODE_STELLARIUM pour le LCD
+* @param  : 
+* @date   : 2022-03-18 creation
+* @date   : 2022-03-28 simplification
+*****************************************************************************************/
+
+void CONFIG_AFFICHER_LCD_MODE_STELLARIUM(LCD * lcd, int i_duree, ASTRE *as) {
 
   char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
@@ -2095,9 +2239,12 @@ void CONFIG_LCD_AFFICHER_AZIMUT_ALTITUDE(LCD * lcd, int i_duree, ASTRE* as ) {
   sprintf( c_line_0, "(AZI) %s", as->c_ddmm_azi ) ;
   sprintf( c_line_1, "(ALT) %s", as->c_ddmm_alt );
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree, c_line_0, c_line_1) ;
-
-  return ;
+  /*
+  Trace("Va / Vh    : %3.2f / %3.2f" , as->Va           , as->Vh ) ;
+  Trace("AD / Dec   : %s / %s"       , as->c_hhmmss_asc , as->c_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s"       , as->c_hhmmss_agh , as->c_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s"       , as->c_ddmm_azi   , as->c_ddmm_alt ) ;
+  */
 }
 
 /*****************************************************************************************
