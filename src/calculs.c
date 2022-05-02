@@ -525,7 +525,7 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   }
 
   /*------------------------*/
-  /* Calculs des periodes   */
+  /* Calculs des periodes  */
   /*------------------------*/
 
   pthread_mutex_lock(& suivi->mutex_azi );

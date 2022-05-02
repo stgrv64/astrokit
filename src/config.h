@@ -11,6 +11,7 @@
 # 2022-04-28  | ajout de 2 resolutions plus simple (affichage contraint par LCD) :
 # 2022-04-28  | - c_hhmm_*
 # 2022-04-28  | - c_dd_*  
+# 2022-05-02  | ajout fonction CONFIG_PATH_FIND
 # -------------------------------------------------------------- 
 */
 
@@ -111,6 +112,8 @@ void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 void   CONFIG_FORMATE_DONNEES_AFFICHAGE ( ASTRE * ) ;
 void   CONFIG_AFFICHER_MODE_STELLARIUM  ( ASTRE * )  ;
 
+void   CONFIG_LCD_PT_DISPLAY                ( void ) ;
+
 void   CONFIG_LCD_DISPLAY                  ( LCD * ) ;
 void   CONFIG_LCD_AFFICHER                 ( LCD *, int , char* , char * ) ;
 void   CONFIG_LCD_AFFICHER_STRINGS         ( LCD *, int , char* , char * ) ;
@@ -120,13 +123,15 @@ void   CONFIG_LCD_AFFICHER_ASTRE_VITESSES  ( LCD *, int , ASTRE* )  ;
 
 void   CONFIG_LCD_AFFICHER_AZI_ALT         ( LCD *, int , ASTRE* ) ;
 void   CONFIG_LCD_AFFICHER_AGH_DEC         ( LCD *, int , ASTRE* ) ;
-void   CONFIG_LCD_AFFICHER_EQU_DEC         ( LCD *, int , ASTRE* ) ;
+void   CONFIG_LCD_AFFICHER_ASC_DEC         ( LCD *, int , ASTRE* ) ;
 void   CONFIG_AFFICHER_LCD_MODE_STELLARIUM ( LCD *, int , ASTRE *) ;
 void   CONFIG_LCD_AFFICHER_INFORMATIONS    ( LCD *, int ) ;
 
+void   CONFIG_LCD_EMPILER                  ( int , char* , char * ) ;
+void   CONFIG_LCD_DEPILER                  ( void) ;
+void   CONFIG_LCD_CONTINU                  ( char* , char * ) ;
 
-void   CONFIG_LCD_EMPILER                  ( LCD * , char* , char * ) ;
-void   CONFIG_LCD_DEPILER                  ( LCD * ) ;
+int    CONFIG_PATH_FIND                    ( char * , char *) ;
 
 #endif
 

@@ -33,6 +33,6 @@ int main(int argc, char ** argv)
         printf("Fail to Display String\n");
     }
     printf("displaying LCD1602\n");
-    LCD1602DeInit(devFD);
+    LCD1602Close(devFD);
     return 0;
 }

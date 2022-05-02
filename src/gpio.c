@@ -131,7 +131,7 @@ void GPIO_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BU
       gpio_mas[j]=atoi(token);
     }
    }
-   
+
 
    if(!strcmp("GPIO_FREQUENCE_PWM",g_Datas[l][0])) {
 

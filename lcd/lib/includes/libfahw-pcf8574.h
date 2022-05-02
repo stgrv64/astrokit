@@ -16,6 +16,6 @@ int  LCD1602Clear(int devFD);
 int  LCD1602DispChar(int devFD, unsigned char x, unsigned char y, unsigned char data);
 int  LCD1602DispStr(int devFD, unsigned char x, unsigned char y, char *str);
 int  LCD1602DispLines(int devFD, char* line1, char* line2);
-void LCD1602DeInit(int devFD);
+void LCD1602Close(int devFD);
 
 #endif

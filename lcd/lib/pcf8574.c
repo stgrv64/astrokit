@@ -207,7 +207,7 @@ EXPORT int LCD1602Clear(int devFD) {
     return 0;
 }
 
-EXPORT void LCD1602DeInit(int devFD)
+EXPORT void LCD1602Close(int devFD)
 {
     clearLastError();
     closeHW(devFD);    

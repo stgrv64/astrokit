@@ -54,10 +54,10 @@ int main(int argc, char ** argv)
   }
 
   if ( argc >= 4 && argv[3][0] == '1') {
-    LCD1602DeInit(devFD);
+    LCD1602Close(devFD);
   }
   else {
-    printf("no LCD1602DeInit\n");
+    printf("no LCD1602Close\n");
   }
   
   return 0;

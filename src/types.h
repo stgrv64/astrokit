@@ -39,6 +39,11 @@
 #               * ajout c_hhmmss_agh etc... a strcuture ASTRE
 #               * ajout mutex mutex_infrarouge pour proteger
 #                 lecture / exriture sur cette donnee
+#               * creation static char * c_Bin_Possible_Paths
+#               * remplacement PATH_CMD_STTY par var globale
+# mai 2022      * ajout var glob g_Path_Cmd_Stty
+#               * ajout type enum pour les chemins de bin (/bin,/sbin,etc..)
+#               * ajout enum pour le masque
 # -------------------------------------------------------------- 
 */
 
@@ -149,8 +154,9 @@
 // ------------------------------------------------------------------------
 // Constantes
 // ------------------------------------------------------------------------
-
+/*
 #define  PATH_CMD_STTY         "/usr/bin/stty"
+*/
 #define  CONFIG_FIC_CFG        "config.txt"
 
 #define TEMPORISATION_RAQUETTE 5000
@@ -224,6 +230,7 @@
 #define CONFIG_LCD_USLEEP_AFTER_CLEARING     10000
 #define CONFIG_LCD_I2C_DEFAULT_DEV_PORT      1
 
+#define CONFIG_C_BIN_POSSIBLE_PATHS_LENGTH   6
 //------------------------------------------------------------------------------
 /* LA valeur dans le nom de champs enum est arbitraite , seule compte une valeur < ou > */
 /* En effet , une policy N+1 aura toujours l'avantage */
@@ -270,7 +277,27 @@ typedef enum {
 t_en_Lcd_Display_Months ;
 
 static const char * c_Lcd_Display_Months[] = {
- "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
+ "Jan",
+ "Feb",
+ "Mar",
+ "Apr",
+ "May",
+ "Jun",
+ "Jul",
+ "Aug",
+ "Sep",
+ "Oct",
+ "Nov",
+ "Dec"
+} ;
+
+static const char * c_Bin_Possible_Paths[] = {
+  "/bin",
+  "/sbin",
+  "/usr/bin",
+  "/usr/sbin",
+  "/usr/local/bin",
+  "/usr/local/sbin"
 } ;
 
 typedef enum {
@@ -280,18 +307,27 @@ typedef enum {
 t_en_Lcd_Type_Affichage ; 
 
 typedef struct {
- int  i_type_affichage ; 
- int  i_fd ; 
- int  i_board ; 
- int  i_i2c_num ; 
 
- char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
- char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  int  i_type_affichage ; 
+  int  i_fd ; 
+  int  i_board ; 
+  int  i_i2c_num ; 
 
- char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
- char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
 
- pthread_mutex_t mutex_lcd ;
+  char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+
+  int  i_change ;
+  int  i_duree_us ; 
+
+  pthread_mutex_t mutex_lcd ;
+
+  void (*display)(void);
+  void (*continu)(char*,char*);
+  void (*empiler)(int,char*,char*);
+  void (*depiler)(void);
 } 
 LCD ;
 //------------------------------------------------------------------------------
@@ -383,10 +419,13 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /* F1 : 274  F2 : 275  F3 : 276  F4  : 277  F5  : 278  F6  : 348 */
 /* F7 : 349  F8 : 350  F9 : 342  F10 : 343  F11 : 345  F12 : 346 */
 
-{ "274",       "KEY_SCREEN", "aff_azi_alt" },  /* 274  ascii = lettre 'F1' */ /* info 0 */
-{ "275",       "KEY_TV",     "aff_agh_dec" },  /* 274  ascii = lettre 'F2' */ /* info 1 */
-{ "276",       "KEY_INFO",   "aff_time"},      /* 275  ascii = lettre 'F3' */ /* info 2 */
-{ "277",       "KEY_ZOOM",   "aff_time"},      /* 276  ascii = lettre 'F4' */ /* info 3 */
+{ "274",       "KEY_SCREEN",  "aff_azi_alt" },  /* 274 sum ascii = lettre 'F1' */ /* info 0 */
+{ "275",       "KEY_TV",      "aff_agh_dec" },  /* 274 sum ascii = lettre 'F2' */ /* info 1 */
+{ "276",       "KEY_INFO",    "aff_asc_dec" },  /* 275 sum ascii = lettre 'F3' */ /* info 2 */
+{ "277",       "KEY_ZOOM",    "aff_mod_ste" },  /* 277 sum ascii = lettre 'F4' */ /* info 3 */
+
+{ "278",       "non_defini",  "aff_tps_lie"},   /* 278 sum ascii = lettre 'F5' */ /* info 4 */
+{ "348",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F6' */ /* info 5 */
 
 /*--------------------------------*/
 /* touches de permutations        */
@@ -396,12 +435,12 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 { "122",          "KEY_MODE",   "key_equ" },   /* z=equatorial => lettre 'z' */ 
 
 /*--------------------------------*/
-/* arret du programme */
+/* arret du programme / de la carte */
 /*--------------------------------*/
 
 /* arret de la carte */
-{ "27",        "KEY_POWER",      "key_power"}, /* ascii 27 => touch ESC */
-{ "113",       "KEY_EXIT",   "key_exit" },
+{ "27",        "KEY_POWER",     "key_power"}, /* ascii 27 => touch ESC */
+{ "113",       "KEY_EXIT",      "key_exit" },
 
 /*--------------------------------*/
 /* touches obsoletes */
@@ -423,10 +462,7 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /*--------------------------------*/
 
 { "non_defini", "non_defini",   "non_defini" },
-{ "non_defini", "non_defini",   "non_defini" },
-{ "non_defini", "non_defini",   "non_defini" },
-{ "non_defini", "non_defini",   "non_defini" },
-{ "non_defini", "non_defini",   "non_defini" } 
+{ "non_defini", "non_defini",   "non_defini" }
 }; 
 /*------------------------------------------  */
 /* TAILLE TABLEAU 50 = CONFIG_CODE_NB_CODES   */
@@ -786,6 +822,8 @@ typedef struct {
   unsigned long temporisation_clavier   ; 
   unsigned long temporisation_lcd ;
   struct timeval tval ; 
+
+  LCD * lcd ;
 } 
 SUIVI ;
 
@@ -956,13 +994,13 @@ VOUTE      vou, *voute ;
 SUIVI	     sui, *suivi ;
 CLAVIER    cla, *clavier ;
 DEVICES    dev, *devices ;
-
-char       g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
-
 CODES      g_Codes, *gp_Codes ;
 LCD        g_Lcd,   *gp_Lcd ;
 
 FILE      * flog ; 
+
+char       g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
+char      g_Path_Cmd_Stty[ CONFIG_TAILLE_BUFFER_32 ] ;
 
 // ------------------------------------------------------------------------
 // definition des variables dependant du fichier de conf
