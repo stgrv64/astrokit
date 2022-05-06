@@ -6,13 +6,20 @@
 # date     | commentaires 
 # #--------------------------------------------------------------
 # 04/2021     | * ajout configuration des noms
-#   de repertoires et fichiers
+#                 de repertoires et fichiers
 #               * suppression des confs inutiles (mis a la fin)
+#
 # 17/01/2022  | * ajout parametre DEVICE_CLAVIER_USE
+#
 # 23/01/2022  | * changement type MENU_PAR_DEFAUT int -> char*
-#       pour plus de lisibilite
+#                 pour plus de lisibilite
 #               * modification nom CLAVIER en DONNEES puis 
-# DEVICES_xxx_USE              
+#                 DEVICES_xxx_USE      
+#
+# avril 2022  | * ajout reductions liees a une poulie en sortie de moteur
+#               * CORRECTION reduction moteur d origine des NEQ3 (5760)          
+#                 subdivise en 64*90
+#               * ajout des reductions R5 R6 et R7 (prevoyant deux poulies)
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -63,9 +70,15 @@ DEVICE_USE_BLUETOOTH        0  # flag qui indique utilisation du bluetooth comme
 
 # ----------------------- parametres geographiques
 
+# Latitude et longitude Escout (64)
 LATITUDE   43.3
 LONGITUDE  -0.36 
 ALTITUDE   100
+
+# Latitude et longitude Orgeres (35)
+# LATITUDE   43.3
+# LONGITUDE  -0.36 
+# ALTITUDE   100
 
 # ----------------------- parametres gpios
 
@@ -97,34 +110,43 @@ GPIO_MASQUE     0,1,2,3
 
 # ----------------------- parametres pwm
 
-GPIO_FREQUENCE_PWM  1500
+GPIO_FREQUENCE_PWM  1000
 
 # ----------------------- parametres reductions altitude
 # Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760 
 # mesure precisemebnt sur 5 tours en 28800 pas avec le binaire /usr/local/bin/gpio23 
 
-ALT_R1  144      # reduction liee a la monture ( = 65 dents / 1.5 = 43.333)
-ALT_R2  64       # reducteur du moteur =  5760 (64*90) (32*180)
-ALT_R3  90       # nombre de pas du moteur en altitude
+ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
+ALT_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
+ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
 ALT_R4  255      # mode micro pas utilise (1/x)
+ALT_R5  1        # reduction liee a la poulie
+ALT_R6  1        # reduction liee au cpu
+ALT_R7  1        # reduction non decrite plus haut ....
+   
 ALT_ROT 0        # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
 ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions azimut
 
-AZI_R1   144     # reduction lee a la monture ( = 130 dents)
-AZI_R2   64      # reducteur du moteur = 28.75
-AZI_R3   90      # nombre de pas du moteur en azimut
-AZI_R4   255     # mode micro pas utilise (1/x)
+AZI_R1  144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
+AZI_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
+AZI_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
+AZI_R4  255      # mode micro pas utilise (1/x)
+AZI_R5  1        # reduction liee a la poulie
+AZI_R6  1        # reduction liee au cpu
+AZI_R7  1        # reduction non decrite plus haut ....
+
 AZI_ROT  1       # Flag de reversibilite du sens de rotation 1 <=> gauche->droite
 AZI_ACC  2       # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions altaz
 
-ALTAZ_FORWARD        1.01   # acceleration globale        (azi + alt)
-ALTAZ_REWIND         1.01   # acceleration globale        (azi + alt)
-ALTAZ_FORWARD_FAST   1.5    # acceleration globale rapide (azi + alt)
-ALTAZ_REWIND_FAST    1.5    # acceleration globale rapide (azi + alt)
+ALTAZ_FORWARD        1.005   # affinage vitesses : acceleration globale tres lente (azi + alt)
+ALTAZ_REWIND         1.005   # affinage vitesses : acceleration globale tres lente (azi + alt)
+
+ALTAZ_FORWARD_FAST   1.5     # acceleration globale rapide (azi + alt)
+ALTAZ_REWIND_FAST    1.5     # acceleration globale rapide (azi + alt)
 
 #===============================================================
 # anciens parametres qui ne servent plus (notamment avec 
