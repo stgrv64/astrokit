@@ -1111,9 +1111,9 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
    /* Les coefficients de reduction sont egaux a 1 par defaut */ 
    /* car leur presence n est pas obligatoires dans le fichier config.txt */
 
-   ALT_R1 = 1.0 ;  // reduction liee a la monture
-   ALT_R2 = 1.0;   // reducteur du moteur
-   ALT_R3 = 1.0;   // nombre de pas du moteur en azimut
+   ALT_R1 = 1.0 ;  // reduction liee a la monture ()
+   ALT_R2 = 1.0;   // reducteur du moteur (nombre de pas)
+   ALT_R3 = 1.0;   // reducteur du moteur (gearbox)
    ALT_R4 = 1.0;   // mode micro pas utilisee (1/R4)
    ALT_R5 = 1.0;   // reduction liee a la poulie
    ALT_R6 = 1.0;   // reduction liee au cpu
