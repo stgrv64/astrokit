@@ -1,4 +1,13 @@
 #!/bin/bash
+# -------------------------------------------------------------------------------------------------
+# mai 2022
+# -------------------------------------------------------------------------------------------------
+# Ce script permet de rechercher les repertoires old
+# et de copier les fichiers trouves (dans les .../old) ainsi que le meme fichier
+# du repertoire en dessous (d ou provient la sauvegarde dans old) dans un repertoire dedie.
+# La recherche est sauvegarde dans un repertoire dedie (/media/stef/datas1 par defaut)
+# ou est preserve la structure arborescente
+# -------------------------------------------------------------------------------------------------
 
 nom=old
 dest=/media/stef/datas1
