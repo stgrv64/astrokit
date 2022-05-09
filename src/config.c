@@ -90,7 +90,7 @@ void CONFIG_MAJ_SUIVI_PAS( SUIVI *suivi) {
     /* Si suivi->datas_infrarouge a ete utilise, il peut etre remis a zero */
 
     if ( c_act == '1' ) {
-      Trace2("g remise a zero de suivi->datas_infrarouge") ;
+      Trace("raz de suivi->datas_infrarouge") ;
       memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
       strcpy( suivi->datas_infrarouge, "") ;
     }

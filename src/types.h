@@ -44,6 +44,7 @@
 # mai 2022      * ajout var glob g_Path_Cmd_Stty
 #               * ajout type enum pour les chemins de bin (/bin,/sbin,etc..)
 #               * ajout enum pour le masque
+#               * correction code tremios pour 'FIN'
 # -------------------------------------------------------------- 
 */
 
@@ -389,7 +390,7 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /* touches gauche droite haut bas ok */ 
 /*--------------------------------*/
 
-{ "188",       "KEY_OK",    "reset"}, /* ascii 188 = touche 'FIN' */
+{ "296",       "KEY_OK",    "reset"}, /* ascii 296 = touche 'FIN' */
 { "183",       "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
 { "184",       "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
 { "185",       "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 

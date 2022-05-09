@@ -130,7 +130,7 @@ void LIRC_READ(SUIVI *suivi) {
     free(code);
 
     pthread_mutex_lock(& suivi->mutex_infrarouge );
-    Trace2("h remise a zero de suivi->datas_infrarouge") ;
+    Trace("raz de suivi->datas_infrarouge") ;
     memset( suivi->datas_infrarouge, 0, strlen( suivi->datas_infrarouge ) ) ;
     strcpy( suivi->datas_infrarouge, "") ;
     pthread_mutex_unlock(& suivi->mutex_infrarouge );
