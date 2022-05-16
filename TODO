@@ -1,40 +1,12 @@
-20 Janvier 2020 - 
-
- * identifications des points a travailler / ameliorer / effectuer / analyser ..
-
--------------------------------------------------------------------------------
-
-20 mars 2022 - 
-
- * correction problemes de signe dans les MACROS de calcul (AGHx , AZIx, etc..)
- * correction et verification des calculs de toutes les planetes (equatorial -> azimutal)
- * correction de la fonction CALCUL_EQUATEUR
- * correction de l'azimut ( 180 degres au sud)
- * ajout fonction angle vers ddmmss
-
-22 mars 2022 : 
-
- * parametrer eclairage LED (important) suite appui touche
- * RPI3B+ probleme alim : remettre un regulateur de tension
-   => tester chez moi sur breadboards
- * nombre de pas moteurs NEQ teste precisement a 5760 (32*180) ou 64*90 ) 
-   => teste avec /usr/local/bin/gpio23 21,26,19,13 50 28800 1 1 (5 tours)
-   => modifier le fichier cxonfig.txt
-
-27 mars 2022 :
-
- * essayer PREFERRED_VERSION_lirc pour avoir lirc ancien
-
-05 avril 2022 : 
-
- * utilisation ecran LCD1602 avec succes grace a conf raspbian (paquets python*)
- 
-   => cf clone depot git clone https://github.com/the-raspberry-pi-guy/lcd
-   => dans drivers apres un setup.sh (sur raspbian) doit apparaitre les fichiers __init__.pyc et i2c_dev.pyc
-   => il faut essayer de reproduire cette conf apartir de yocto (installation python / python* et smbus
-   => ensuite lancement sudo ./demo_scrolling_text.py avec succes
-   => evolution prevue portage en C
+avril 2022 :
    
+ * mise en place code C pour ecran LCD
+ 
+  => resolu
+  => cf code dans repertoire lcd
+  => binaire externe astrokit-lcd1602.targ construit et copie dans /usr/locaL/BIN
+  (CREER LA RECETTE yocto)
+-------------------------------------------------------------------------------
 07 avril 2022 :
 
  * resolution probleme LIRC sur branche dunfell => passage a branche HARDKNOTT
@@ -44,17 +16,112 @@
    => un diff entre hardknott et dunfell montre que ce patch a ete mis en place recemment
    => cela permet a irrecord et les commandes lirc de fonctionner avec le pilote gpio-ir-recv
    => il faut egalement copier le contenu de code_1120.conf (?) dans /etc/lirc/lircd.conf (!!)
-   
-avril 2022 :
-   
- * mise en place code C pour ecran LCD
+-------------------------------------------------------------------------------
+05 avril 2022 : 
+
+ * utilisation ecran LCD1602 avec succes grace a conf raspbian (paquets python*)
  
-  => resolu
-  => cf code dans repertoire lcd
-  => binaire externe astrokit-lcd1602.targ construit et copie dans /usr/locaL/BIN
-  (CREER LA RECETTE yocto)
-  
-   
+   => cf clone depot git clone https://github.com/the-raspberry-pi-guy/lcd
+   => dans drivers apres un setup.sh (sur raspbian) doit apparaitre les fichiers __init__.pyc et i2c_dev.pyc
+   => il faut essayer de reproduire cette conf apartir de yocto (installation python / python* et smbus
+   => ensuite lancement sudo ./demo_scrolling_text.py avec succes
+   => evolution prevue portage en C
+-------------------------------------------------------------------------------
+27 mars 2022 :
+
+ * essayer PREFERRED_VERSION_lirc pour avoir lirc ancien
+-------------------------------------------------------------------------------
+22 mars 2022 : 
+
+ * parametrer eclairage LED (important) suite appui touche
+ * RPI3B+ probleme alim : remettre un regulateur de tension
+   => tester chez moi sur breadboards
+ * nombre de pas moteurs NEQ teste precisement a 5760 (32*180) ou 64*90 ) 
+   => teste avec /usr/local/bin/gpio23 21,26,19,13 50 28800 1 1 (5 tours)
+   => modifier le fichier cxonfig.txt 
+-------------------------------------------------------------------------------
+20 mars 2022 - 
+
+ * correction problemes de signe dans les MACROS de calcul (AGHx , AZIx, etc..)
+ * correction et verification des calculs de toutes les planetes (equatorial -> azimutal)
+ * correction de la fonction CALCUL_EQUATEUR
+ * correction de l'azimut ( 180 degres au sud)
+ * ajout fonction angle vers ddmmss
+-------------------------------------------------------------------------------     
+20 Janvier 2020 - 
+
+ * identifications des points a travailler / ameliorer / effectuer / analyser ..
+
+-------------------------------------------------------------------------------   
+NOTIFIE PRIORITAIRE AU 16 MAI 2022 :
+
+(x,y, etc ..) concerne les problemes electroniques
+(A, etc..)    concerne yocto et le systeme de build)
+(0, etc..)    concerne le code
+
+
+-----------------
+
+x => avec un rootfs provenant de yocto (conf mettant en jeu wifi, etc..)
+     un soucis de reboot se produit (pas de traces visibles)
+     
+ !!! ce probleme n'apparait pas quand la pi est alimente par le cordon
+     electrique 5v sur l'alimentation prevue a cet effet !!!
+     
+     -> cela laisse supposer un soucis de regulation de tension         
+
+y => tester les nouveaux double pont en H
+
+z => refaire des cartes modules en adaptant toutes les modifications necessaires :
+
+     * module alimentation regule pour 5v 
+     * module autonome pour l amplification des signaux moteurs (double pont en H)
+     * module IR simple (la LED doit pouvoir etre interfacee vers l'exterieur)
+     * module BARGRAPH (plutot que led etat) avec interrupteur
+     * module LCD I2C
+     * connectique multiple I2C (en RJ12 ou bien autre)
+     
+     ou bien tout integrer sur une seule carte avec la connectique qui s'impose
+
+-----------------
+ 
+A  => migrer integralite des modifications systemd hardknott sur RPI2
+    + verifier portage du code actuel sur RPI2 (arm-gnueabihf)
+     
+      (en cours)
+
+B  => finaliser services a lancer au demarrage 
+
+      (/etc/systemd/system/astrokit-xxxxx.sercvice 
+          pointant sur un script dans /usr/local/bin ou /usr/local/scr
+      )
+
+C => copier et verifier les scripts gpio<x> dans /usr/local/scr
+     faire une notice precise et identifier ceux qui manquent
+
+D => creer les recettes yocto 
+
+E => generer une trace visible au moment du boot (variable Yocto ?)
+
+-----------------
+ 
+0  => consolider affichage LCD (touche Fx clavier) 
+      generer de facon approprie les logs (usure SDCARD ? => etudier)  
+      
+1  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
+      pour dynamiquement modifier le comportement
+      
+2  => analyser impact d'un rafraichissement plus lent / rapide  de SUIVI_VOUTE 
+
+3  => dans les temporisations , etudier utilisation des semaphores et fcts associees
+     sem_wait / sem_post / sem_timedwait (regarder code )
+     etudier la performance des attentes par rapport aux usleep / gettimeofday (etc..)
+     --> interessant et a etudier
+
+4 => mettre en place une base sqlite pour configurer et afficher (config.txt, ..)
+
+5 => etudier possibilite mise en place paho-mqtt-c dans une optique Iot
+
 -------------------------------------------------------------------------------
 
   => ajouter les outils de perf CPU vcgencmd et sysbench  
@@ -71,15 +138,27 @@ OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales
      a partir de azimut, altitude, et donneees GPS (lat / lon / date / heure )
      (OK, traite )
 
-** => ajouter un facteur de reduction prenant en compte les engrenages / poulies 
+WA => ajouter un facteur de reduction prenant en compte les engrenages / poulies 
+     (OK, traite)
+      => cependant , decider si facteur de reduction reel (exemple 1.0625) 
+         ou bien le nombre de dents des 2 poulies (exemple 32 et 34 dents)
 
-** => mettre en place, suite a la correction du bug close gpio[ fd] impactant getch(),
+OK => mettre en place, suite a la correction du bug close gpio[ fd] impactant getch(),
      une implementation NCURSES et TERMIOS et regarder les differences de comportement
      => fait (ok) on conserve le code TERMIOS
      => prevoir interraction avec structure clavier et boucle comme c'est fait 
         avec les fonctions irread / iretc..
+     (OK, traite)
+     
+OK => verifier coeffcient de reduction des moteurs NEQ3.2
+     (OK, traite : il y avait une erreur : le bon facteur est 5760)
+     dans le fichier config.txt , 5760 a ete separre en deux : 64 et 90 (5760=64*90)
+     NOTE : les binaires /usr/local/bin/gpio<xx> ont ette utiles 
 
-** => verifier coeffcient de reduction des moteurs NEQ3.2
+OK  => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
+     => (OK, traite) : touche 'q'
+     
+-------------------------------------------------------------------------------
 
 * => refaire un thread de suivi du temps pour calcul precis 
      de la duree d un cycle de SUIVI_VOUTE (1 seconde en theorie)
@@ -91,13 +170,11 @@ OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales
    
   => passer en DOXYGEN integralite du code
   
-  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
-     pour dynamiquement modifier le comportement
-  
   => reprendre les fonctions de arguments.c / .h pour les consolider avec getopt
      si besoin, et permettre de tester rapidement sous x86 les differents calculs
      notamment CALCUL_VOUTE, voir comment optimiser cette fonction
-  
+     (en cours)
+     
   => verifier le code de SOLAR_SYSTEM pour obtenir les coordonnees des planetes 
      et leur precision en fonction des calculs flottant 32 ou 64 bits
   
@@ -107,8 +184,6 @@ OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales
        * le type de calculs pour aboutir aux vitesses
        * rafraichir tous les calculs necessaires
      (traite partiellement)
-  
-  => analyser impact d'un rafraichissement plus lent / rapide  de SUIVI_VOUTE 
 
   => corriger MANUEL_BRUT pour que le suivi brut telecommande permette
      une approximation bonne des vitesses (reprendre les calculs differentiels)
@@ -129,11 +204,7 @@ OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales
   => remplacer l'ensemble des TRACE longs par des fonctions dediees ou des macros
   
   => etudier passage en static des var glob puis utilisation avec extern
-  
-  => dans les temporisations , etudier utilisation des semaphores et fcts associees
-     sem_wait / sem_post / sem_timedwait (regarder code )
-     etudier la performance des attentes par rapport aux usleep / gettimeofday (etc..)
-     
+       
   => consolider la DEMANDE de SETUP ( strcmp( clavier->symbole, "SETUP" ) )
      regarder si elle est utile 
      
@@ -144,10 +215,7 @@ OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales
   => https://lwn.net/Articles/876471/ 
      * etudier la possibilite utlisation gpio-sim driver sur PC intel x86
        pour avoir un comportement le plus identiquement possible que sur RPI ARM
-  
-  => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
-     => OK , touche 'q'
-  
+    
   => prevoir lors de TRAP_MAIN un ssty sane avec system (pas besoin de sudo )
   
   => corriger / verifier les calculs flottants notamment lors de la conversion
