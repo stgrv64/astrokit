@@ -1,3 +1,26 @@
+16 mai 2022 :
+ * mise a jour de ce fichier suite a point general et tests yocto hardknott sur le ciel
+ * copie de ce fichier dans les repertoires de sauvegardes de cardes SD : 
+   /media/stef/ssd/astrokit-sdcard-save/2022-rpi2-model2v1.1-yocto-systemd-1.0
+   /media/stef/ssd/astrokit-sdcard-save/2022-rpi3aplus-yocto-systemd-1.0
+   
+ * ainsi les fichiers de sauvegardes rootfs.tar / bootfs.tar / sdcard.img savent ou ils en sont
+ * -> on ne peut pas faire un commit sur gitlab (probleme de securite / probleme de taille fichiers)
+ 
+ * portage et configuration yocto hardknott systemd RPI3 ---> RPI2 :
+   - portage fait par principe
+   - inexistance du wifi => la date et l'heure resteront a configurer manuellement
+   - test clavier TERMIOS                          ok
+   - test IR                                       ok
+   - test chargement module I2C                    ok
+   - test LCD                                      non fait
+   - test WIFI                                     sans objet
+   - test BLUETOOTH                                sans objet
+  
+  * sauvegarde de cette conf dans /media/stef/ssd + /media/stef/ssd256 
+    dans le repertoire            astrokit-sdcard-save
+-------------------------------------------------------------------------------
+
 avril 2022 :
    
  * mise en place code C pour ecran LCD
@@ -104,9 +127,12 @@ D => creer les recettes yocto
 E => generer une trace visible au moment du boot (variable Yocto ?)
 
 -----------------
- 
+
 0  => consolider affichage LCD (touche Fx clavier) 
       generer de facon approprie les logs (usure SDCARD ? => etudier)  
+
+0  => prioritaire
+      gerer les TEMPO* et le bug qui execute 2 fois les touches FAST et SLOW
       
 1  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
       pour dynamiquement modifier le comportement
