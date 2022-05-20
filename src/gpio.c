@@ -13,12 +13,45 @@
 # ainsi que termios (cf fichier keyboard.c / .h ) :
 # creation entete de la fonction au format doxygen du reliquat de close dans le code
 # 23/01/2022  | * ajout condition pour entree dans GPIO_RAQUETTE_READ
-#   =>  if ( devices->DEVICE_USE_RAQUETTE ) {        
+#   =>  if ( devices->DEVICE_USE_RAQUETTE ) {  
+# 20 mai 2022 | * reprise de la fonction main Gpio pour effectuer
+#                 des fonctions de deplacements utiles      
 # -------------------------------------------------------------- 
 */
 
 #include <gpio.h>
 
+/*****************************************************************************************
+* @fn     : TRAP_GPIO
+* @author : s.gravois
+* @brief  : fonction appelle quand un signal est trape dans main gpio
+* @param  : int     sig
+* @date   : 2022-05-20 creation 
+* @todo   : voir s il est preferable de trapper egalement depuis les threads (si c possible)
+*****************************************************************************************/
+
+void TRAP_GPIO(int sig) {
+
+  char c_cmd[ 64 ] ;
+  int i ;
+
+  /*----------------------------------*/
+  /* Rendre le terminal propre (sane) */
+  /*----------------------------------*/
+
+  memset( c_cmd, 0, sizeof(c_cmd)) ;
+  sprintf(c_cmd,"%s sane", g_Path_Cmd_Stty ) ;
+
+  if ( system( c_cmd ) < 0 ) {
+
+    SyslogErr("Probleme avec stty sane\n") ;
+    Trace("Probleme avec stty sane") ;
+    exit(2) ;
+  } 
+  Trace("appel exit(0)") ;
+  
+  exit(0) ;
+}
 /*****************************************************************************************
 * @fn     : GPIO_CLIGNOTE
 * @author : s.gravois
@@ -1331,7 +1364,18 @@ void * suivi_clavier() {
 //          ET choix de la fonction de rapport cyclique
 // ##########################################################################################################
 
-void mainGpio(int argc, char **argv)
+/*****************************************************************************************
+* @fn     : main(Gpio)xxx : main
+* @author : s.gravois
+* @brief  : point entree du programme GPIO (se concentre sur le test des moteurs)
+* @param  : int     argc
+* @param  : char ** argv
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @fixme  : les autres main ont ete sauvegardes dnas gpio.fonctions.utiles.c
+* @todo   : amelioration continue
+*****************************************************************************************/
+
+int main(int argc, char **argv)
 {
   int         i, pid, nbcpus, nbm , type_fonction;
   double      param0, param1 ;
@@ -1354,9 +1398,11 @@ void mainGpio(int argc, char **argv)
   GPIO_PWM_MOTEUR *pm0 , m0 ; 
   GPIO_PWM_MOTEUR *pm1 , m1 ;
 
-  nbm = 0 ;
+  signal(SIGINT,TRAP_GPIO) ;
+  signal(SIGALRM,TRAP_GPIO) ;
 
-   if( argc < 13 ) { 
+  nbm = 0 ;
+/*
     printf("Usage : %s\n\
                <gpios moteur1 (ex 26,19,13,6 )>\n\
                <gpios moteur2 (ex 5,11,9,10 )>\n\
@@ -1371,12 +1417,25 @@ void mainGpio(int argc, char **argv)
                <parametre de fonction (utile pour fonction mixte = 1)\n\
                <parametre de multiplication des focntions\n\
     \n",argv[0]) ;
+*/
+   if( argc < 10 ) { 
+    printf("Usage : %s\n\
+      gpios moteur1         ( exemple 26,19,13,6 )\n\
+      gpios moteur2         ( exemple 5,11,9,10 )\n\
+      masque                ( exemple 3,1,0,2 )\n\
+      fr MOTEUR1 = alt (Hz) ( exemple 10 )\n\
+      fr MOTEUR2 = azi (Hz) ( exemple 20 )\n\
+      micro pas>            ( exemple 64 )\n\
+      priority CPU (0-99)   ( exemple 1 )\n\
+      nb moteurs a utiliser ( 0=1 moteur, 1=les deux)\n\
+      Fpwm                  ( exemple 1000 )\n\
+    \n",argv[0]) ;
 
     printf("Commande DEUX moteurs en utilisant une modulation PWM\n") ;
     exit(1) ;
   }
 
-  TRACE("debut programme") ;  
+  Trace("debut programme") ;  
   
   nbm       = atof(argv[8]) ;
 
@@ -1413,53 +1472,86 @@ void mainGpio(int argc, char **argv)
   pid=getpid() ;
   nbcpus = sysconf(_SC_NPROCESSORS_ONLN) ;
   
-  TRACE("pid processus = %d", pid) ; 
-  TRACE("nb cppus      = %d", nbcpus ) ; 
+  Trace("pid processus = %d", pid) ; 
+  Trace("nb cppus      = %d", nbcpus ) ; 
 
   if ( priority > 0)  {
     mlockall(MCL_CURRENT | MCL_FUTURE);
-    TRACE("mise en place temps reel : echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
+    Trace("mise en place temps reel : echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ;
     param.sched_priority = priority ;
-    TRACE("mise en place temps reel : param.sched_priority = %d", priority) ;
+    Trace("mise en place temps reel : param.sched_priority = %d", priority) ;
     if ( sched_setscheduler( pid, SCHED_RR, & param) != 0) { perror("setschedparam"); exit(EXIT_FAILURE);  }
     else printf("modification du processus avec priorite = %d\n", priority) ;
   } 
   pm0 = &m0 ;
   if(nbm) pm1 = &m1 ;
  
-  GPIO_INIT_PWM_MOTEUR_2(pm0,gpiosM1,masque,upas,Fm1, Fpwm,0, type_fonction, param0, param1) ;
-  if(nbm)
-  GPIO_INIT_PWM_MOTEUR_2(pm1,gpiosM2,masque,upas,Fm2, Fpwm,1, type_fonction, param0, param1) ;
+  type_fonction=GPIO_CURRENT_FONCTION ;
+  param0=GPIO_CURRENT_FONCTION_PARAM0 ;
+  param1=GPIO_CURRENT_FONCTION_PARAM1 ;
+
+  GPIO_INIT_PWM_MOTEUR_2(\
+    pm0, \
+    gpiosM1, \
+    masque, \
+    upas, \
+    Fm1, \
+    Fpwm, \
+    0, \
+    type_fonction, \
+    param0, \
+    param1) ;
+
+  if(nbm) {
+    GPIO_INIT_PWM_MOTEUR_2(\
+    pm1, \
+    gpiosM2, \
+    masque, \
+    upas, \
+    Fm2, \
+    Fpwm, \
+    1, \
+    type_fonction, \
+    param0, \
+    param1) ;
+  }
   
   sleep(1) ;
   
-  // lancement des pthreads -------------------------------------------------------------
+  // lancement des pthreads moteurs ----------------------------------------------------
   
-  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
+  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     pthread_create( &p_thread_p0[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm0->phase[i] ) ;
-
+  }
   pthread_create( &p_thread_m0, NULL, (void*)suivi_main_M, pm0 ) ;
   
   if(nbm) {
-    for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
+    for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
       pthread_create( &p_thread_p1[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm1->phase[i] ) ;
-
+    }
     pthread_create( &p_thread_m1, NULL, (void*)suivi_main_M, pm1 ) ;
   }
+
+  // lancement des autres pthreads  ----------------------------------------------------
+
   pthread_create( &p_thread_getc, NULL, (void*)suivi_clavier, NULL ) ;
 
   // Join des threads -------------------------------------------------------------------
   
-  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
-  pthread_join( p_thread_p0[i], NULL) ; 
+  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+    pthread_join( p_thread_p0[i], NULL) ; 
+  }
   pthread_join( p_thread_m0, NULL) ;
 
   if(nbm) {  
-   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ )
+   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
      pthread_join( p_thread_p1[i], NULL) ; 
+   }
    pthread_join( p_thread_m1, NULL) ;
   }
   pthread_join( p_thread_getc, NULL) ;
+
+  return 0 ;
 }
 // ##########################################################################################################

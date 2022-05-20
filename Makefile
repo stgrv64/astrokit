@@ -66,8 +66,8 @@ EXEC	= ${FICH}.${VERS}
 # et renommer le main dans le fichier astro.c (entree prog astrokit)
 #--------------------------------------------------------------------------------------
 
-EXECIR		=	ir
-EXECGPIO	=	gpios
+EXECIR	= ir
+EXECGP	= gpio
 
 #--------------------------------------------------------------------------------------
 
@@ -128,8 +128,8 @@ $(EXEC): $(OBJ)
 $(EXECIR): $(OBJ)
 	$(CC) $(OBJ) $(LIBS) -o ${EXECIR}
 
-$(GPIO): $(OBJ)
-	$(CC) $(OBJ) $(LIBS) -o ${GPIO}
+$(EXECGP): $(OBJ)
+	$(CC) $(OBJ) $(LIBS) -o ${EXECGP}
 
 $(LEPH)	:
 	cd ${REPH} ; make CC=$(CC) $(EPHA)

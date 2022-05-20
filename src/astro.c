@@ -23,9 +23,10 @@
 #
 # 21/03/2022  | * ajout appel CONFIG_INIT_CODES dasn main 
 #                 en remaplacement de IR_INIT_CODES
-# avril 2002   | * debut codage fonctionnalites LCD1602
-#                * suppressione appel GPIO_RAQUETTE_READ
-#                * correction BUG ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
+# avril 2002  | * debut codage fonctionnalites LCD1602
+#               * suppressione appel GPIO_RAQUETTE_READ
+#               * correction BUG ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
+# mai 2022      * petites corrections mineures
 # -------------------------------------------------------------- 
 */
 
@@ -138,6 +139,8 @@ void TRAP_MAIN(int sig) {
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-04-27 ajout affichage LCD
 * @date   : 2022-04-27 ajout TRAP_MAIN a la fin des fonctions
+* @date   : 2022-05-20 correction pthread_cancel  suivi->p_suivi_lcd ) ;
+* @date   : 2022-05-20 suppression TRAP_SUIVI_TERMIOS
 * @todo   : (completer)
 *****************************************************************************************/
 
@@ -175,18 +178,11 @@ void TRAP_SUIVI_CLAVIER(int sig)  {
   pthread_cancel( suivi->p_suivi_clavier ) ;
   TRAP_MAIN(1) ;
 }
-void TRAP_SUIVI_TERMIOS(int sig)  {
-  
-  Trace("Signal trappe depuis thread suivi_termios= %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
-  pthread_cancel( suivi->p_suivi_clavier ) ;
-  TRAP_MAIN(1) ;
-}
 void TRAP_SUIVI_LCD(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_termios= %d\n",sig) ;
   CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
-  pthread_cancel( suivi->p_suivi_clavier ) ;
+  pthread_cancel( suivi->p_suivi_lcd ) ;
   TRAP_MAIN(1) ;
 }
 /*****************************************************************************************
@@ -1633,7 +1629,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   (deplacement fonctions main ailleurs que dans astro.c )
   int mainAstro(int argc, char ** argv) {
 */
-int main(int argc, char ** argv) {
+int mainAstrokit(int argc, char ** argv) {
   
   int i ;
   int devFD, board;
@@ -1779,7 +1775,6 @@ int main(int argc, char ** argv) {
   pm_azi->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   pm_alt->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   
-
   GPIO_INIT_PWM_MOTEUR_2(\
     pm_alt,\
     gpio_alt,\
