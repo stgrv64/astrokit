@@ -20,7 +20,7 @@ extern int    moon4 ( int ltflag );
 extern int    chewm ( short *p, int nlines, int nangles, int typflg, double ans[] );
 extern int    showcname ( char *in );
 extern int    relativity ( double p[], double q[], double e[] );
-extern double deltat ( double Y );
+extern double periode ( double Y );
 extern int    update ( void );
 extern int    diurab ( double last, double *ra, double *dec );
 extern int    diurpx ( double last, double *ra, double *dec, double dist );

@@ -1330,12 +1330,12 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_PHASE *gpios_pwm[]) {
     for( j=0;j < GPIO_MICROPAS_MAX; j++ )
       gpios_pwm[i]->rap[j] = 0 ;
   
-  TRACE("TM %f\t%f",gpios_pwm[0]->Tm ,gpios_pwm[0]->deltat) ;
+  TRACE("TM %f\t%f",gpios_pwm[0]->Tm ,gpios_pwm[0]->periode) ;
   
   j=0 ; 
-  for( t=0 ; t< gpios_pwm[0]->Tm ;  t += gpios_pwm[0]->deltat ) {
+  for( t=0 ; t< gpios_pwm[0]->Tm ;  t += gpios_pwm[0]->periode ) {
     
-    TRACE("t = %f\t%f",t,gpios_pwm[0]->Tm ,gpios_pwm[0]->deltat) ;
+    TRACE("t = %f\t%f",t,gpios_pwm[0]->Tm ,gpios_pwm[0]->periode) ;
     
     rapportcyclique = sin( 2*PI*gpios_pwm[0]->Fm* t ) ;
     
@@ -1390,7 +1390,7 @@ void * suivi_main6(GPIO_PWM_PHASES_MOTEUR *gpios_pwm) {
     pthread_mutex_lock( &mutex_phase_d ) ;
     
       gpios_pwm->pas++ ;
-      gpios_pwm->t += gpios_pwm->deltat ;
+      gpios_pwm->t += gpios_pwm->periode ;
 
       if ( gpios_pwm->pas >= gpios_pwm->upas ) { gpios_pwm->pas = 0 ; gpios_pwm->t = 0 ; }
       
@@ -1428,7 +1428,7 @@ void * suivi_main6(GPIO_PWM_PHASES_MOTEUR *gpios_pwm) {
     pthread_mutex_unlock( &mutex_phase_c ) ;
     pthread_mutex_unlock( &mutex_phase_d ) ;
     
-    usleep( (gpios_pwm->deltat) * GPIO_MICRO_SEC ) ;
+    usleep( (gpios_pwm->periode) * GPIO_MICRO_SEC ) ;
   }
 }
 // ##########################################################################################################
@@ -1436,11 +1436,11 @@ void * suivi_main_M1(GPIO_PWM_PHASE *gpios_pwm[]) {
    
    double t ;
    int pas , i ;
-   double deltat ;
+   double periode ;
    t=0 ;
    pas=0 ;
       
-   deltat = gpios_pwm[0]->deltat ;
+   periode = gpios_pwm[0]->periode ;
    
    for( i=0 ; i< GPIO_NB_PHASES_PAR_MOTEUR ; i++ ) {
      gpios_pwm[i]->pas = 0 ;
@@ -1455,7 +1455,7 @@ void * suivi_main_M1(GPIO_PWM_PHASE *gpios_pwm[]) {
       if ( i == 3 ) pthread_mutex_lock( &mutex_phase_d ) ;
     
         gpios_pwm[i]->pas++ ;
-        gpios_pwm[i]->t += gpios_pwm[i]->deltat ;
+        gpios_pwm[i]->t += gpios_pwm[i]->periode ;
         
 	if ( gpios_pwm[i]->pas >= gpios_pwm[i]->upas ) { 
 	  gpios_pwm[i]->pas = 0 ;
@@ -1467,7 +1467,7 @@ void * suivi_main_M1(GPIO_PWM_PHASE *gpios_pwm[]) {
       if ( i == 2 ) pthread_mutex_unlock( &mutex_phase_c ) ;
       if ( i == 3 ) pthread_mutex_unlock( &mutex_phase_d ) ;
     }
-    usleep( deltat * GPIO_MICRO_SEC ) ;
+    usleep( periode * GPIO_MICRO_SEC ) ;
   }
 }
 // ##########################################################################################################
@@ -1475,11 +1475,11 @@ void * suivi_main_M2(GPIO_PWM_PHASE *gpios_pwm[]) {
    
    double t ;
    int pas , i ;
-   double deltat ;
+   double periode ;
    t=0 ;
    pas=0 ;
       
-   deltat = gpios_pwm[0]->deltat ;
+   periode = gpios_pwm[0]->periode ;
    
    for( i=0 ; i< GPIO_NB_PHASES_PAR_MOTEUR ; i++ ) {
      gpios_pwm[i]->pas = 0 ;
@@ -1495,7 +1495,7 @@ void * suivi_main_M2(GPIO_PWM_PHASE *gpios_pwm[]) {
       if ( i == 3 ) pthread_mutex_lock( &mutex_phase_h ) ;
     
         gpios_pwm[i]->pas++ ;
-        gpios_pwm[i]->t += gpios_pwm[i]->deltat ;
+        gpios_pwm[i]->t += gpios_pwm[i]->periode ;
         
 	if ( gpios_pwm[i]->pas >= gpios_pwm[i]->upas ) { 
 	  gpios_pwm[i]->pas = 0 ;
@@ -1507,7 +1507,7 @@ void * suivi_main_M2(GPIO_PWM_PHASE *gpios_pwm[]) {
       if ( i == 2 ) pthread_mutex_unlock( &mutex_phase_g ) ;
       if ( i == 3 ) pthread_mutex_unlock( &mutex_phase_h ) ;
     }
-    usleep( deltat * GPIO_MICRO_SEC ) ;
+    usleep( periode * GPIO_MICRO_SEC ) ;
   }
 }
 // ##########################################################################################################
@@ -1517,7 +1517,7 @@ void main6(int argc, char **argv)
   double t ;
   double Fm, Fpwm ;
   double rapport ; 
-  double deltat ;
+  double periode ;
   double upas ;
   int gpioa1  ;
   int gpioa2 ;
@@ -1580,7 +1580,7 @@ void main6(int argc, char **argv)
   gpios_pwm->gpiob2 = gpiob2 ;
   gpios_pwm->upas = upas ;
   gpios_pwm->nbdeltat = (unsigned long)(gpios_pwm->Fm * gpios_pwm->upas) ;
-  gpios_pwm->deltat =  1 / ( gpios_pwm->Fm * gpios_pwm->upas ) ;
+  gpios_pwm->periode =  1 / ( gpios_pwm->Fm * gpios_pwm->upas ) ;
   
   TRACE1("gpioa1       = %d",gpios_pwm->gpioa1 ) ;
   TRACE1("gpioa2       = %d",gpios_pwm->gpioa2 ) ;
@@ -1593,7 +1593,7 @@ void main6(int argc, char **argv)
   TRACE("upas        = %f", gpios_pwm->upas ) ;
   TRACE("priority   = %d", priority) ;
   TRACE1("nbdeltat = %ld",gpios_pwm->nbdeltat) ;
-  TRACE1("deltat = %f",gpios_pwm->deltat) ;
+  TRACE1("periode = %f",gpios_pwm->periode) ;
   
   for( i=0;i<4;i++ )  gpios_pwm->rap[i] = (double *) malloc ( sizeof(double) * gpios_pwm->nbdeltat ) ;
   
@@ -1657,7 +1657,7 @@ void main(int argc, char **argv)
   double t ;
   double Fm, Fm2 , Fpwm ;
   double rapport ; 
-  double deltat ;
+  double periode ;
   double upas ;
   double x ;
 
@@ -1729,7 +1729,7 @@ void main(int argc, char **argv)
    gpwms[i]->Tpwm     = 1 / gpwms[i]->Fpwm ;
    gpwms[i]->upas     = upas ;
    gpwms[i]->nbdeltat = (unsigned long)(gpwms[i]->Fm * gpwms[i]->upas) ;
-   gpwms[i]->deltat   =  1 / ( gpwms[i]->Fm * gpwms[i]->upas ) ;
+   gpwms[i]->periode   =  1 / ( gpwms[i]->Fm * gpwms[i]->upas ) ;
    
    printf(" %d\n", GPIO_OPEN_BROCHE_PWM(gpwms[i]) ) ;
    //sleep(1) ;
@@ -1756,7 +1756,7 @@ void main(int argc, char **argv)
    gpwms2[i]->Tpwm     = 1 / gpwms2[i]->Fpwm ;
    gpwms2[i]->upas     = upas ;
    gpwms2[i]->nbdeltat = (unsigned long)(gpwms2[i]->Fm * gpwms2[i]->upas) ;
-   gpwms2[i]->deltat   =  1 / ( gpwms2[i]->Fm * gpwms2[i]->upas ) ;
+   gpwms2[i]->periode   =  1 / ( gpwms2[i]->Fm * gpwms2[i]->upas ) ;
    
    printf(" %d\n", GPIO_OPEN_BROCHE_PWM(gpwms2[i]) ) ;
    //sleep(1) ;

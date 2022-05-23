@@ -1629,7 +1629,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   (deplacement fonctions main ailleurs que dans astro.c )
   int mainAstro(int argc, char ** argv) {
 */
-int mainAstrokit(int argc, char ** argv) {
+int main(int argc, char ** argv) {
   
   int i ;
   int devFD, board;

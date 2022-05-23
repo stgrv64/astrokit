@@ -19,13 +19,13 @@
  *     Y = 2000.0 + (JD - 2451545.0)/365.25.
  * See AA page B4.
  *
- * Output double deltat(Y) is ET-UT in seconds.
+ * Output double periode(Y) is ET-UT in seconds.
  *
  *
  * References:
  *
  * Morrison, L. V., and F. R. Stephenson, Historical values of the Earth's
- * clock error deltat T and the calculation of eclipses. Journal for the
+ * clock error periode T and the calculation of eclipses. Journal for the
  * History of Astronomy 35, 327-336 (2004)
  *
  * Stephenson, F. R., and L. V. Morrison, "Long-term changes
@@ -134,7 +134,7 @@ short dt[TABSIZ] = {
 
 
 
-double deltat(Y)
+double periode(Y)
 double Y;
 {
 double ans, p, B;
@@ -346,14 +346,14 @@ switch( jdflag ) {
 	case 1:
 	  TRACE("case 1");
 		TDT = JD;
-    deltat_value = deltat(T);
+    deltat_value = periode(T);
 		UT = TDT - deltat_value/86400.0;
 		jtocal(UT); /* display the other date */
 		break;
 	case 2:
 	  TRACE("case 2");
 		UT = JD;
-    deltat_value = deltat(T);
+    deltat_value = periode(T);
 		TDT = UT + deltat_value/86400.0;
 		jtocal(TDT);
 		break;
@@ -378,7 +378,7 @@ loop:
 printf( "year ? " );
 gets(s);
 sscanf( s, "%lf", &y );
-ans = deltat(y);
+ans = periode(y);
 printf( "%.4lf\n", ans );
 goto loop;
 }

@@ -27,7 +27,7 @@
 #include <time.h>
 #include <types.h>
 #include <unistd.h>
-
+#include <semaphore.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -56,7 +56,7 @@
 
 #define GPIO_SUIVI_PWM_PHASE_PRIORITY  10
 #define GPIO_SUIVI_MAIN_PRIORITY       5
-#define GPIO_SUIVI_MAIN_ATTENTE_MAX    0.3     // attente maximum exprimee en seconde pour non blocage
+#define GPIO_SUIVI_MAIN_ATTENTE_MAX    2     // attente maximum exprimee en seconde pour non blocage
 
 #define GPIO_SUIVI_PWM_PHASE_SCHED   SCHED_RR
 #define GPIO_SUIVI_MAIN_SCHED        SCHED_RR
@@ -88,8 +88,10 @@ typedef struct {
 
   int     id ;  
   double  Tpwm ;  
-  int     pas ;
 
+  int     pas ;
+  int     micropas ;
+  
   double  rap[ GPIO_MICROPAS_MAX ] ;
   double  rc ;
 
@@ -97,7 +99,8 @@ typedef struct {
   int     gpio_open_statut ;
   int     gpio_fd ;
   
-  double  deltat_m ;
+  double  periode_mic ;
+  double  periode_mot ;
 
   struct timeval tval ;
 }
@@ -113,8 +116,12 @@ typedef struct {
   GPIO_PWM_PHASE * phase[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   
   int     id ;
-  int     pas ;
-  double  deltat ;
+
+  long long  pas ;
+  int        micropas ;
+  
+  double  periode_mic ;
+  double  periode_mot ;
   double  t ;
 
   double  Fm ;  
@@ -122,7 +129,7 @@ typedef struct {
   double  Fpwm ;  
   double  Tpwm ; 
 
-  double  upas ; 
+  double  nbmicropas ; 
   long    nbdeltat ;
   int     type_fonction ; 
 
@@ -130,7 +137,7 @@ typedef struct {
   double  param1 ;
 
   // FIXME : la difference entre temps et  temps_reel : voir fonction *suivi_main_M
-  //         *  temps      : on utilise deltat , qui sert pour le usleep 
+  //         *  temps      : on utilise periode , qui sert pour le usleep 
   //         *  temps_reel : on utilise gettimeofday , qui sert a calculer la duree de la boucle while(en entier)
 
   double  temps ;      // temps ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
@@ -200,7 +207,11 @@ GPIO_PWM_MOTEUR *pm_alt , m_alt ;
 GPIO_PWM_MOTEUR *pm_azi , m_azi ;
 
 int priority ;
-
+int i_trace ;
+int i_timeout ;
+sem_t gpio_sem  ;
+struct timespec gpio_tm_now;
+struct timespec gpio_tm_nxt;
 //==========================================================================
 // broches pour l'injection directe d'une frequence depuis 2 ports GPIO dans le cas 
 // ou la carte electronique de division par etage de la frequence de ref (32768 Hz)
@@ -210,7 +221,6 @@ int priority ;
 // - sens = sens de rotation du moteur, en cas d'erreur lors du montage, on utilise
 //          le flag ERR_SENS par defaut egal a 1
 //==========================================================================
-
 
 void   GPIO_CLIGNOTE         (int , int , int ) ;
 void   GPIO_READ         (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;

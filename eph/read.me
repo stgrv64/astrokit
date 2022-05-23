@@ -179,13 +179,13 @@ are used to estimate deltaT.  These formulas are based on
 analyses of eclipse records going back to ancient times
 (Stephenson and Houlden, 1986; Borkowski, 1988) but they do not
 predict future values very accurately.  For precise calculations,
-you should update the table in deltat.c from the current year's
+you should update the table in periode.c from the current year's
 Almanac. Note the civil time of day is UTC, which is adjusted by
 integral leap seconds to be within 0.9 second of UT.
 
    Updated deltaT values and predictions can be obtained from this
 network archive: http://maia.usno.navy.mil .
-See the file deltat.c for additional information.
+See the file periode.c for additional information.
 In addition, the IAU has adopted several other definitions of
 time, but this program does not distinguish among them.  The
 International Earth Rotation Service is in charge of UT. Precise
@@ -398,7 +398,7 @@ angles.c       Angles and sides of triangle in three dimensions
 annuab.c       Annual aberration
 constel.c      Expand constellation name abbreviations
 deflec.c       Deflection of light due to Sun's gravity
-deltat.c       Ephemeris Time minus Universal Time
+periode.c       Ephemeris Time minus Universal Time
 diurab.c       Diurnal aberration
 diurpx.c       Diurnal parallax
 dms.c          Time and date conversions and display

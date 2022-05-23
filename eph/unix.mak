@@ -1,6 +1,6 @@
 CC= gcc
 CFLAGS=  -O2 -Wall
-OBJS = altaz.o angles.o annuab.o constel.o deflec.o deltat.o diurab.o \
+OBJS = altaz.o angles.o annuab.o constel.o deflec.o periode.o diurab.o \
 diurpx.o dms.o epsiln.o fk4fk5.o kepler.o kfiles.o lightt.o lonlat.o \
 nutate.o precess.o refrac.o rplanet.o rstar.o sidrlt.o sun.o domoon.o \
 trnsit.o vearth.o zatan2.o \
@@ -36,7 +36,7 @@ constel.o: constel.c $(INCS)
 
 deflec.o: deflec.c $(INCS)
 
-deltat.o: deltat.c $(INCS)
+periode.o: periode.c $(INCS)
 
 diurab.o: diurab.c $(INCS)
 

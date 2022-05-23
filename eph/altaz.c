@@ -9,7 +9,7 @@
  * between Ephemeris Time (TDT) and Universal Time (UT),
  * has already been calculated.  The global variables
  * TDT and UT must already have been loaded with the
- * correct values of TDT and UT, respectively.  See deltat.c.
+ * correct values of TDT and UT, respectively.  See periode.c.
  *
  * Inputs are polar coordinates:
  * dist is the true geocentric distance in au.

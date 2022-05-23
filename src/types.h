@@ -80,7 +80,8 @@
 
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)             { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Debug(fmt, args...) if(i_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
@@ -768,16 +769,19 @@ typedef struct {
   
   double       Ta ;       // periode de la frequence a injecter directement
   double       Th ;       // periode de la frequence a injecter directement
+  double       Ta_mot ;   // periode de la frequence moteur (ne tient compte des micro pas)
+  double       Th_mot ;   // periode de la frequence moteur (ne tient compte des micro pas)
 
-  double       temps_a ;   // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
-  double       temps_h ;   // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
+  double       temps_a ;  // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
+  double       temps_h ;  // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
 
-  double       Fa ;  // frequence a injecter directement 
-  double       Fh ;  // frequence a injecter directement 
+  double       Fa ;       // frequence a injecter directement (tient compte des micro pas)
+  double       Fh ;       // frequence a injecter directement (tient compte des micro pas)
+  double       Fa_mot ;   // frequence du moteur deduite (ne tient compte des micro pas)
+  double       Fh_mot ;   // frequence du moteur deduite (ne tient compte des micro pas)
 
   double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
   double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
-
   double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
   double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
 
@@ -1075,6 +1079,20 @@ unsigned long ALT_F ;    // frequence de reference (utile si on utilise CALCUL_D
 unsigned int  ALT_N ;    // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
 double        ALT_R ;    // reduction totale
 
+/* rappel 
+typedef enum {
+
+  REDUCTION_INDETERMINE=0,
+  REDUCTION_MONTURE_NB_DENTS,
+  REDUCTION_POULIE_MONTURE_NB_DENTS,
+  REDUCTION_POULIE_MOTEUR_NB_DENTS,
+  REDUCTION_REDUCTEUR_PLANETAIRE,
+  REDUCTION_MOTEUR_NB_PAS,
+  REDUCTION_MOTEUR_NB_MICROPAS,
+  REDUCTION_CPU_CORRECTION
+}
+t_en_Reduction_Type ;
+*/
 double        ALT_R1 ;   // reduction liee a la monture
 double        ALT_R2 ;   // reducteur du moteur
 double        ALT_R3 ;   // nombre de pas du moteur en azimut

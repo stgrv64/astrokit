@@ -5,7 +5,7 @@ void main(int argc, char **argv)
   int         i, pid, nbcpus, priority ;
   double      t ;
   double      Fm1, Fm2 , Fpwm ;
-  double      deltat ;
+  double      periode ;
   double      upas ;
   int         gpiosM1[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   int         gpiosM2[ GPIO_NB_PHASES_PAR_MOTEUR ] ;

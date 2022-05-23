@@ -57,7 +57,7 @@ typedef struct {
   double *rap[4] ; 
   double rapp[5][4][128] ;
   
-  double deltat ;
+  double periode ;
  
   unsigned long nbdeltat ;
   

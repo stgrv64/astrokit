@@ -101,6 +101,31 @@ double CALCUL_REDUCTION_TOTALE() {
    return 0.0 ;
 }
 /*****************************************************************************************
+* @fn     : CALCUL_DUREE_SECONDES
+* @author : s.gravois
+* @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
+* @brief  : resultat en secondes
+* @param  : struct timeval *t00
+* @date   : 2022-03-20 creation entete
+*****************************************************************************************/
+
+double CALCUL_DUREE_SECONDES(struct timeval *t00) {
+  
+  struct timeval t01 ;
+  double  t_diff ;
+  
+  gettimeofday(&t01,NULL) ;
+
+  t_diff = GPIO_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
+  t_diff = t_diff / GPIO_MICRO_SEC ;
+
+  t00->tv_sec  = t01.tv_sec ; 
+  t00->tv_usec = t01.tv_usec ;
+
+  return t_diff  ;
+}
+
+/*****************************************************************************************
 * @fn     : CALCUL_DUREE_MICROSEC
 * @author : s.gravois
 * @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
@@ -483,11 +508,14 @@ void CALCUL_D(ASTRE *as, SUIVI *suivi) {
 // FIXME : CALCUL_PERIODE : 
 // FIXME : * calcule les "vrais" periodes et frequences des moteurs pas a pas
 //           en tant que paramtres de la sinusoide de reference
+// mai 2022 : ajout non prise enn compte des micro pas pour la frequence moteur
+//            double freq_alt_mot, freq_azi_mot ;
 //========================================================================================
 
 void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
 
   double freq_alt, freq_azi ;
+  double freq_alt_mot, freq_azi_mot ;
   double azi_rot,   alt_rot ;
   
   // Calcul de la periode necessaire si pas de terme D ni 2 puissance N
@@ -511,17 +539,19 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   /* Calculs des frequences */
   /*------------------------*/
 
+  freq_azi_mot = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI / 4  ;
+  freq_alt_mot = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI / 4  ;
+  freq_azi     = freq_azi_mot * AZI_R4 ;
+  freq_alt     = freq_alt_mot * ALT_R4 ;
+
+  /*-----------------------------------------------------*/
+  /* Le calcul est different si on utilise un controleur                    */
+  /* la frequence est la frequence moteur (sans tenir compte des micro pas) */
+  /*-----------------------------------------------------*/
+
   if ( devices->DEVICE_USE_CONTROLER ) {
-    freq_azi = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI ;
-  }
-  else {
-    freq_azi = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot * AZI_R4 / DIV / PIPI / 4  ;
-  }
-  if ( devices->DEVICE_USE_CONTROLER ) {
-    freq_alt = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI ;
-  }
-  else {
-    freq_alt = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot * ALT_R4 / DIV / PIPI / 4  ;
+    freq_azi   = freq_azi_mot ;
+    freq_alt   = freq_alt_mot ;
   }
 
   /*------------------------*/
@@ -533,8 +563,10 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
     suivi->Sa_old = suivi->Sa ; 
     suivi->Sa     = (int)SGN(freq_azi)  ;
     suivi->Fa     = fabs(freq_azi )  ;
+    suivi->Fa_mot = fabs(freq_alt_mot) ;
     suivi->Ta     = 1 / suivi->Fa ;
-  
+    suivi->Ta_mot = 1 / suivi->Fa_mot ;
+
   pthread_mutex_unlock(& suivi->mutex_azi );
   
   pthread_mutex_lock(& suivi->mutex_alt );
@@ -543,6 +575,7 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
     suivi->Sh     = (int)SGN(freq_alt) ;
     suivi->Fh     = fabs(freq_alt)  ;
     suivi->Th     = 1 / suivi->Fh ;
+    suivi->Th_mot = 1 / suivi->Fh_mot ;
 
   pthread_mutex_unlock(& suivi->mutex_alt );
 }
