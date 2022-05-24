@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 /* -------------------------------------------------------------
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
@@ -876,7 +878,8 @@ void CONFIG_INIT_DEVICES(DEVICES *devices) {
 * @param  : SUIVI *suivi
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 passage d une partie de code dans CONFIG_INIT_DEVICES
-* @todo   : 
+* @date   : 2022-05-24 ajout mutex_thread suivi pour proteger section crotique threads
+* @todo   : voir si les mutex peuvent etre dispatches / eclates dans les autres struct
 *****************************************************************************************/
 
 void CONFIG_INIT_SUIVI(SUIVI *suivi) {
@@ -986,6 +989,7 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   pthread_mutex_init( & suivi->mutex_azi, NULL ) ;
   pthread_mutex_init( & suivi->mutex_cal, NULL ) ;
   pthread_mutex_init( & suivi->mutex_infrarouge , NULL ) ;
+  pthread_mutex_init( & suivi->mutex_pthread , NULL ) ;
 
   suivi->temps_a = 0 ; 
   suivi->temps_h = 0 ; 
@@ -1329,6 +1333,29 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
   if ( AZI_R == 0 ) {
     AZI_R = AZI_R1 * AZI_R2 * AZI_R3 * AZI_R5 * AZI_R6 * AZI_R7 ;
   }
+}
+/*****************************************************************************************
+* @fn     : CONFIG_AFFICHER_ETAT_THREADS
+* @author : s.gravois
+* @brief  : Cette fonction affiche l etat des threads en cours 
+* @param  : void
+* @date   : 2022-05-24 creation
+* @todo   : a finir
+*****************************************************************************************/
+
+void   CONFIG_AFFICHER_ETAT_THREADS(SUIVI* suivi) {
+
+  char c_thread_name [ 16 ] ;
+  int i_num_thread=0 ;
+  long id_thread ;
+  for (i_num_thread=0; i_num_thread < MAX_THREADS; i_num_thread++) {
+    id_thread = suivi->p_threads_id[i_num_thread] ;
+    memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
+    if ( id_thread > 0) pthread_getname_np( id_thread , c_thread_name, 16 ) ;
+    else break ;
+    Trace1("Thread %d : id %ld nom %s ", i_num_thread, id_thread, c_thread_name )  ;
+  }
+  return ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_VARIABLES

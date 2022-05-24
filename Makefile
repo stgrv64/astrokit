@@ -97,7 +97,7 @@ else
 endif
 
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow -Wno-unused-variable -Wno-unused-but-set-variable
-CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC -static
+CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC -static -pthread
 
 SRC	= \
 src/arguments.c src/astro.c src/calculs.c src/cat.c \

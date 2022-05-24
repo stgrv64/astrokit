@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 /* -------------------------------------------------------------
 # astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
@@ -45,6 +47,7 @@
 #               * ajout type enum pour les chemins de bin (/bin,/sbin,etc..)
 #               * ajout enum pour le masque
 #               * correction code tremios pour 'FIN'
+#               * modif MAX_THREADS a 20
 # -------------------------------------------------------------- 
 */
 
@@ -81,7 +84,7 @@
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
 
 #define Trace(fmt, args...)             { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Debug(fmt, args...) if(i_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Debug(fmt, args...) if(g_i_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
@@ -215,7 +218,7 @@
 #define  ROT_RAD_SEC          0.000072921235170   // vitesse de rotation de la Terre (radians par seconde)
 #define  ROT_DEG_SEC          0.004178079012116   // vitesse de rotation de la Terre (degres par seconde)
 
-#define  MAX_THREADS          10
+#define  MAX_THREADS          20
 #define  ASTRE_TAILLE_BUFFER  256
 #define  ASTRE_NB_COLONNES    10000
 
@@ -704,10 +707,10 @@ typedef struct {
   char datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
 
   pthread_mutex_t  mutex_infrarouge  ;
-
   pthread_mutex_t  mutex_alt  ;
   pthread_mutex_t  mutex_azi  ;
   pthread_mutex_t  mutex_cal  ;
+  pthread_mutex_t  mutex_pthread ;
 
   // Pthreads utilises comme pointeurs dans la structure passee en argument des fonctions de thread
 
@@ -723,6 +726,7 @@ typedef struct {
   pthread_t    p_menu ;
   pthread_t    p_test ;
   
+  char         p_c_thread_name [ MAX_THREADS ][ 16 ] ;
   pthread_t    p_threads_id[ MAX_THREADS ]  ;
   
   long         t_diff ;
@@ -826,9 +830,9 @@ typedef struct {
   unsigned long temporisation_capteurs  ; 
   unsigned long temporisation_clavier   ; 
   unsigned long temporisation_lcd ;
-  struct timeval tval ; 
 
-  LCD * lcd ;
+  struct timeval tval ; 
+  LCD          * lcd ;
 } 
 SUIVI ;
 

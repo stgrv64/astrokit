@@ -76,8 +76,8 @@ void main(int argc, char **argv)
   pm0 = &m0 ;
   pm1 = &m1 ;
  
-  GPIO_INIT_PWM_MOTEUR_2(pm0,gpiosM1,masque,upas,Fm1, Fpwm,0) ;
-  GPIO_INIT_PWM_MOTEUR_2(pm1,gpiosM2,masque,upas,Fm2, Fpwm,1) ;
+  GPIO_INIT_PWM_MOTEUR(pm0,gpiosM1,masque,upas,Fm1, Fpwm,0) ;
+  GPIO_INIT_PWM_MOTEUR(pm1,gpiosM2,masque,upas,Fm2, Fpwm,1) ;
   
   sleep(1) ;
   

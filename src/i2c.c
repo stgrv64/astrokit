@@ -1,4 +1,5 @@
-//#define _GNU_SOURCE
+#define _GNU_SOURCE
+
 #include <i2c.h>
 
 I2C_DEVICE lsm303d, *lsm ;

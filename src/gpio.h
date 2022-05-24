@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 /* -------------------------------------------------------------
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
@@ -6,6 +8,8 @@
 # 01/05/2021  | ajout entete
 # 01/05/2021  | creation entete de la fonction au format doxygen #define GPIO_FREQUENCE_PWM 
 #   suite a ajout de la variable du meme nom dans types.h
+# mai 2022    | ajout / modifications sur les threads  
+#               ajout / renommage membres champs struct PMW phases et moteurs
 # -------------------------------------------------------------- 
 */
 
@@ -50,6 +54,16 @@
 
 // FIN INCLUDES =====================================
 
+
+#define GPIO_DEFAULT_ALT_MOTOR_GPIOS  "26,19,13,6"
+#define GPIO_DEFAULT_AZI_MOTOR_GPIOS  "5,7,11,10"
+#define GPIO_DEFAULT_MAS_MOTOR_ORDER  "3,0,2,1"
+
+/*
+#define GPIO_DEFAULT_ALT_MOTOR_GPIOS  "21,26,19,13"
+#define GPIO_DEFAULT_AZI_MOTOR_GPIOS  "6,5,7,11"
+#define GPIO_DEFAULT_MAS_MOTOR_ORDER  "3,0,2,1"
+*/
 #define GPIO_CURRENT_FONCTION          3       // 0 : triangle - 1 : sinus - 2 : mixte - 3  : sinus arrondi (best)
 #define GPIO_CURRENT_FONCTION_PARAM0   0.65    // ce parametre deforme la fonction 2 et 3
 #define GPIO_CURRENT_FONCTION_PARAM1   1.0     // ce parametre multiplie la fonction pour l'ajuster a 1 (5v)
@@ -81,7 +95,12 @@
 #define GPIO_TAILLE_BUFFER 16
 
 //==========================================================================
-
+/* mai 2022 : ajout / renommage champs  
+  - micropas
+  - periode_mic
+  - periode_mot
+  - SUIVI * suivi 
+*/
 typedef struct {
   
   pthread_mutex_t mutex ; 
@@ -103,6 +122,8 @@ typedef struct {
   double  periode_mot ;
 
   struct timeval tval ;
+
+  SUIVI  * suivi ;
 }
 GPIO_PWM_PHASE ;
 
@@ -188,6 +209,9 @@ static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
 
 //==========================================================================
 
+GPIO_PWM_MOTEUR *pm_alt , m_alt ; 
+GPIO_PWM_MOTEUR *pm_azi , m_azi ;
+
 int gpio_key_l[4] ;
 int gpio_key_c[4] ;  
 
@@ -203,15 +227,19 @@ int gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // masque de redefinition des 
 
 double gpio_frequence_pwm ;
 
-GPIO_PWM_MOTEUR *pm_alt , m_alt ; 
-GPIO_PWM_MOTEUR *pm_azi , m_azi ;
-
 int priority ;
-int i_trace ;
-int i_timeout ;
-sem_t gpio_sem  ;
+int g_i_trace ;
+int g_i_timeout ;
+int g_i_max_nb_pas ;
+int g_i_max_nb_micropas ;
+
+sem_t           gpio_sem  ;
 struct timespec gpio_tm_now;
 struct timespec gpio_tm_nxt;
+
+int        g_incrlog ;
+int        g_id_thread ;  
+
 //==========================================================================
 // broches pour l'injection directe d'une frequence depuis 2 ports GPIO dans le cas 
 // ou la carte electronique de division par etage de la frequence de ref (32768 Hz)
@@ -221,6 +249,8 @@ struct timespec gpio_tm_nxt;
 // - sens = sens de rotation du moteur, en cas d'erreur lors du montage, on utilise
 //          le flag ERR_SENS par defaut egal a 1
 //==========================================================================
+
+void   GPIO_GETOPT(int argc, char ** argv) ;
 
 void   GPIO_CLIGNOTE         (int , int , int ) ;
 void   GPIO_READ         (char [DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
@@ -247,10 +277,8 @@ long   GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,lon
 long   GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double delai,long nano_moins) ;
 
 // PWM
-void   GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpio, double upas, double fm, double fpwm, int id)  ;
-void   GPIO_INIT_PWM_MOTEUR_2(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
+void   GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
 void   GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) ;
-void   GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm0, int gpio, double upas, double fm, double fpwm,int id) ;
 
 // Fonction de threads
 

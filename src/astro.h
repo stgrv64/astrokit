@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #ifndef ASTRO_H
 #define ASTRO_H
 

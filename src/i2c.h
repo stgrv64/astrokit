@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #ifndef I2C_H
 #define I2C_H
 

@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #ifndef STAT_H
 #define STAT_H
 

@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 /* -------------------------------------------------------------
 # astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
@@ -12,6 +14,7 @@
 # 2022-04-28  | - c_hhmm_*
 # 2022-04-28  | - c_dd_*  
 # 2022-05-02  | ajout fonction CONFIG_PATH_FIND
+# 2022-05-24  | ajout fonction CONFIG_AFFICHER_ETAT_THREADS
 # -------------------------------------------------------------- 
 */
 
@@ -96,6 +99,7 @@ int    CONFIG_FIN_MOT(char c) ;
 int    CONFIG_FIN_FICHIER(char c) ;
 void   CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 void   CONFIG_AFFICHER_VARIABLES(void) ;
+void   CONFIG_AFFICHER_ETAT_THREADS(SUIVI* ) ;
 void   CONFIG_AFFICHER_DATAS(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_GETCWD(char * ) ;

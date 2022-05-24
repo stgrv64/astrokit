@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <stat.h>
 
 void STAT_MESURE_PULSATIONS_INJECTEES(SUIVI* suivi) {

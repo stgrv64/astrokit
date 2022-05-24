@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /* -------------------------------------------------------------
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
@@ -47,21 +48,22 @@
 #include <astro.h>
 #include <keyboard.h>
 
-int        g_incrlog ;
-int        g_id_thread ;  
-
 /*****************************************************************************************
 * @fn     : TRAP_MAIN
 * @author : s.gravois
 * @brief  : fonction appelle quand un signal est trape dans main
 * @param  : int     sig
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 remaniement fonction avec nom et id de thread 
 * @todo   : voir s il est preferable de faire un kill(getpid(),SIGKILL) 
 *           plutot qu un exit
 *****************************************************************************************/
 
 void TRAP_MAIN(int sig) {
 
+  int i_num_thread=0 ;
+  long id_thread =0;
+  char c_thread_name [ 16 ] ; 
   char c_cmd[ 64 ] ;
   int i ;
 
@@ -76,9 +78,14 @@ void TRAP_MAIN(int sig) {
   /* Si sig > positif on abandonne les threads et on quitte */
   /*--------------------------------------------------------*/
 
-  for(i=0;i<g_id_thread;i++)  {
-    Trace("Abandon thread numero %d de p_thread_t = %d",i,(int)suivi->p_threads_id[i]) ;
-    pthread_cancel(suivi->p_threads_id[i]);
+  for(i_num_thread=0;i_num_thread<g_id_thread;i_num_thread++)  {
+    id_thread = suivi->p_threads_id[i_num_thread] ;
+    if ( id_thread >0 ) {
+      memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
+      pthread_getname_np( id_thread , c_thread_name, 16 ) ;
+      Trace("Abandon thread : num %d id %ld nom %s" ,i_num_thread,id_thread,c_thread_name) ;
+      pthread_cancel( id_thread );
+    }
   }
   Trace("fin des abandons de threads") ;
   
@@ -729,8 +736,6 @@ void SUIVI_MANUEL_ASSERVI(SUIVI * suivi, CLAVIER *clavier) {
   
   gettimeofday(&t00,NULL) ;
   
-  Trace("start") ;
-  
   azi = 0 ;
   alt = 0 ;
   
@@ -857,6 +862,7 @@ void SUIVI_MANUEL_ASSERVI(SUIVI * suivi, CLAVIER *clavier) {
 * @brief  : Ce mode permet de gerer les menus .
 * @param  : SUIVI   *suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : 
 *****************************************************************************************/
 
@@ -866,7 +872,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
   
    // La temporisation dans les boucles du thread SUIVI_MENU depend de  suivi->temporisation_menu
    
-  Trace("start with tempo %ld", suivi->temporisation_menu) ;
+  Trace("start") ;
     
   param.sched_priority = PTHREAD_POLICY_1 ;
 
@@ -874,6 +880,10 @@ void * SUIVI_MENU(SUIVI * suivi) {
     perror("setschedparam SUIVI_MENU");
     exit(EXIT_FAILURE); 
   }
+  pthread_mutex_lock( & suivi->mutex_pthread) ;
+  pthread_setname_np( pthread_self(), "SUIVI_MENU" ) ;
+  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
   signal(SIGTERM,TRAP_SUIVI_MENU) ;
   
@@ -1121,6 +1131,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
 * @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
 * @param  : SUIVI   *suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : 
 *****************************************************************************************/
 
@@ -1145,7 +1156,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
   // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
   
-  Trace("start with tempo %ld", suivi->temporisation_voute) ;
+  Trace("start") ;
   
   param.sched_priority = PTHREAD_POLICY_1 ;
   
@@ -1153,7 +1164,11 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
      perror("setschedparam SUIVI_VOUTE"); 
      exit(EXIT_FAILURE);
   }
+  pthread_mutex_lock( & suivi->mutex_pthread) ;
+  pthread_setname_np( pthread_self(), "SUIVI_VOUTE" ) ;
   suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  pthread_mutex_unlock( & suivi->mutex_pthread) ;
+
   signal( SIGTERM, TRAP_SUIVI_VOUTE) ;
   
   suivi->d_temps = 0 ;
@@ -1234,6 +1249,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
 * @brief  : fonction de callback du thread suivi infrarouge
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : supprimer argument qi est variable globale
 *****************************************************************************************/
 
@@ -1241,7 +1257,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
    
   struct sched_param param;
   
-  Trace("start with tempo %ld", suivi->temporisation_ir) ;
+  Trace("start") ;
   
   // La temporisation dans la boucle du thread SUIVI_INFRAROUGE depend de suivi->temporisation_ir (en us)
   // present dans la fonction bloquante LIRC_READ 
@@ -1260,7 +1276,11 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
       perror("setschedparam SUIVI_INFRAROUGE"); 
       exit(EXIT_FAILURE);
     }
+    pthread_mutex_lock( & suivi->mutex_pthread) ;
+    pthread_setname_np( pthread_self(), "SUIVI_IR" ) ;
     suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    pthread_mutex_unlock( & suivi->mutex_pthread) ;
+    
     signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
   
     LIRC_OPEN( lircconfig ) ;
@@ -1282,6 +1302,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 * @param  : SUIVI * suivi
 * @date   : 2022-04-12 creation 
 * @date   : 2022-04-27 mise en commentaire de CONFIG_LCD_AFFICHER_TEMPS_LIEU
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : TODO : reflechir a ce qui doit etre rafraichi
 *****************************************************************************************/
 
@@ -1289,7 +1310,7 @@ void * SUIVI_LCD(SUIVI * suivi) {
   int i_duree_us ;
   struct sched_param param;
   
-  Trace("start with tempo %ld", suivi->temporisation_lcd) ;
+  Trace("start") ;
   
   if ( devices->DEVICE_USE_LCD ) {
 
@@ -1301,8 +1322,11 @@ void * SUIVI_LCD(SUIVI * suivi) {
       perror("setschedparam SUIVI_LCD"); 
       exit(EXIT_FAILURE);
     }
-    
+    pthread_mutex_lock( & suivi->mutex_pthread) ;
+    pthread_setname_np( pthread_self(), "SUIVI_LCD" ) ;
     suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    pthread_mutex_unlock( & suivi->mutex_pthread) ;
+
     signal( SIGTERM, TRAP_SUIVI_LCD) ;
 
     suivi->lcd->display() ;
@@ -1336,6 +1360,7 @@ void * SUIVI_LCD(SUIVI * suivi) {
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-04-12 correction code ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1349,7 +1374,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   struct sched_param param;
   struct timeval t00,t01  ;
   
-  Trace("start with tempo %ld", suivi->temporisation_termios) ;
+  Trace("start") ;
   
   sleep(1) ;
   
@@ -1359,7 +1384,11 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
     if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
       perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
     }
+    pthread_mutex_lock( & suivi->mutex_pthread) ;
+    pthread_setname_np( pthread_self(), "SUIVI_TERMIOS" ) ;
     suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    pthread_mutex_unlock( & suivi->mutex_pthread) ;
+    
     signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
     KEYBOARD_TERMIOS_INIT() ;
@@ -1430,6 +1459,7 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 *           qui utilise directement getchar (aucun effet)
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1437,6 +1467,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 
   int c_char = 0 ;
   struct sched_param param;
+
   Trace("start") ;
 
   sleep(1) ;
@@ -1447,7 +1478,11 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
     if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
       perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
     }
+    pthread_mutex_lock( & suivi->mutex_pthread) ;
+    pthread_setname_np( pthread_self(), "SUIVI_getchar" ) ;
     suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    pthread_mutex_unlock( & suivi->mutex_pthread) ;
+
     signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
 
     while( ( c_char = getchar () ) != 'q' ) {
@@ -1473,6 +1508,7 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 * @brief  : fonction de callback du thread suivi clavier en mode ncurses
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1480,6 +1516,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
   int ch = 0 ;
   unsigned long l_incr=0 ;
   struct sched_param param;
+
   Trace("start") ;
   
   sleep(1) ;
@@ -1490,7 +1527,11 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
     if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
       perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
     }
+    pthread_mutex_lock( & suivi->mutex_pthread) ;
+    pthread_setname_np( pthread_self(), "SUIVI_NCURSES" ) ;
     suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    pthread_mutex_unlock( & suivi->mutex_pthread) ;
+
     signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
     
     sleep(1) ;
@@ -1535,6 +1576,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
 * @brief  : fonction de callback du thread suivi capteurs (non utilisee)
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1566,9 +1608,13 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
     param.sched_priority = PTHREAD_POLICY_1  ;
     
     if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CAPTEUR, & param) != 0) {
-      perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);}
+      perror("setschedparam SUIVI_CAPTEURS"); exit(EXIT_FAILURE);
+    }
 
+    pthread_mutex_lock( & suivi->mutex_pthread) ;
+    pthread_setname_np( pthread_self(), "SUIVI_CAPTEURS" ) ;
     suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    pthread_mutex_unlock( & suivi->mutex_pthread) ;
     
     signal( SIGTERM, TRAP_SUIVI_CAPTEURS) ;
     
@@ -1629,7 +1675,7 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   (deplacement fonctions main ailleurs que dans astro.c )
   int mainAstro(int argc, char ** argv) {
 */
-int main(int argc, char ** argv) {
+int mainAstrokit(int argc, char ** argv) {
   
   int i ;
   int devFD, board;
@@ -1650,6 +1696,11 @@ int main(int argc, char ** argv) {
   /* ---------------------------------------------------------------
   * Gestion d un chemin externe (option -p <path>) si getcwd KO
   * ---------------------------------------------------------------*/
+
+  g_i_trace = 0 ;
+  g_i_timeout = 0 ;
+  g_i_max_nb_pas = 0 ;
+  g_i_max_nb_micropas = 0 ;
 
   ARGUMENTS_GERER_REP_HOME(argc, argv) ;
   
@@ -1775,7 +1826,7 @@ int main(int argc, char ** argv) {
   pm_azi->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   pm_alt->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   
-  GPIO_INIT_PWM_MOTEUR_2(\
+  GPIO_INIT_PWM_MOTEUR(\
     pm_alt,\
     gpio_alt,\
     gpio_mas,\
@@ -1787,7 +1838,7 @@ int main(int argc, char ** argv) {
     GPIO_CURRENT_FONCTION_PARAM0,\
     GPIO_CURRENT_FONCTION_PARAM1 ) ;
 
-  GPIO_INIT_PWM_MOTEUR_2(\
+  GPIO_INIT_PWM_MOTEUR(\
     pm_azi,\
     gpio_azi,\
     gpio_mas,\
