@@ -1451,7 +1451,7 @@ void * suivi_clavier() {
 * @todo   : amelioration continue
 *****************************************************************************************/
 
-int main(int argc, char **argv) {
+int mainGpio(int argc, char **argv) {
 
   char c='0', ch='0' ;
   int nread =0 ; 
@@ -1597,7 +1597,7 @@ int main(int argc, char **argv) {
           Trace("%d : Prise en compte argument %c %s",incr,c,optarg) ;
           g_i_max_nb_micropas = atoi(optarg) ; 
           break ;   
-0
+          
         case 'g':
           Trace("%d : Prise en compte argument %c %s",incr,c,optarg) ;
           strcpy( c_gpio_alt , optarg ) ;
