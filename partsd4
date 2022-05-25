@@ -28,6 +28,7 @@
 # -rw-r--r-- 1 stef stef     133 févr. 15  2020 README
 # ============================================================
 
+utiliser_tarball_locaux=0
 rep_git_astrokit=/home/stef/git/astrokit
 git_astrokit_branch=develop
 rep_tmp_deploy_image_machine=tmp/deploy/images/raspberrypi3
@@ -66,6 +67,9 @@ device_letter_supp=""
 # cp zImage.bin kernel.img
 
 # sur cible : homeroot=$(sudo cat /etc/passwd | grep root | cut -d':' -f6)
+
+rootfstar=rootfs.tar
+bootfstar=bootfs.tar
 homeroot=/root
 fsrootfs=/media/stef/rootfs
 fsbootfs=/media/stef/bootfs
@@ -88,6 +92,8 @@ nombin=$(basename $binaire)
 declare -a USE_DEVICES=("1" "2" "3")
 
 # USE_FILES doit avoir la meme taille que FichiersACopierTemplate
+
+declare -a FichiersTar=("$rootfstar" "$bootfstar")
 
 declare -a FichiersACopier=("" "" "" "" "" "" "" "" "" "" "")
 declare -a FichiersACopierMethode=("" "" "" "" "" "" "" "" "" "" "")
@@ -829,46 +835,68 @@ shift $((OPTIND-1))
 [ -z $d ]||[ -z $b ]||[ -z $r ]&& { ECHOARGS ; USAGE ;  }
 [ -z $x ]&& { x=$(pwd) ;  }
 
+[ -f ./$rootfstar ] && [ -f ./$bootfstar ] && {
+ echo "Fichier $rootfstar present , utiliser ?" ;
+ read reponse ;
+ [ "$reponse" == "y" ]&& { 
+   utiliser_tarball_locaux=1 ; 
+ } ;
+} ;
+
 USE_ARGS['l']=$l
 USE_ARGS['d']=$d
 USE_ARGS['b']=$b
 USE_ARGS['r']=$r
 USE_ARGS['x']=$x
 
-rep_build=$x
-VerifierSiYoctoOuBuildroot $rep_build
-is_yocto=$?
-echo "is_yocto=$is_yocto"
-
-if [ $is_yocto -eq 1 ]
-then
-  FichiersACopierTemplate=${FichiersACopierTemplate_Buildroot[@]}
-else
-  FichiersACopierTemplate=${FichiersACopierTemplate_Yocto[@]}
-fi
-
-VerifierContenuTableau ${FichiersACopierTemplate[@]}
-
 sizerootfs=$r
 sizebootfs=$b
-
 device=$d
 device_letter_supp=""
 [ "$l" != "" ]&& {  device_letter_supp=$l ; }
 echo  "device_letter_supp=$device_letter_supp"
+
+if [ $utiliser_tarball_locaux -eq 0 ]
+then
+  rep_build=$x
+  VerifierSiYoctoOuBuildroot $rep_build
+  is_yocto=$?
+  echo "is_yocto=$is_yocto"
+
+  if [ $is_yocto -eq 1 ]
+  then
+    FichiersACopierTemplate=${FichiersACopierTemplate_Buildroot[@]}
+  else
+    FichiersACopierTemplate=${FichiersACopierTemplate_Yocto[@]}
+  fi
+  
+  VerifierContenuTableau ${FichiersACopierTemplate[@]}
+fi
+
 
 CrerCheminsDevices
 VerifPresenceDevice       $device
 Partitionne_Vfat_Linux    $device $sizebootfs $sizerootfs
 Formate_Et_Monte          $device $fsbootfs   $fsrootfs
 
-Yocto_Traiter_Tmp_Deploy_Images_Machine $rep_build
-exit 1
-VerifierContenuRepertoire $rep_build
-exit 1
-CopierFichiers            $device $fsbootfs   $fsrootfs $destproj
-Afficher_Et_Demonter      $device $fsbootfs   $fsrootfs
+if [ $utiliser_tarball_locaux -eq 1 ]
+then
+  echo "sudo tar xf $rootfstar $fsrootfs"
+  sudo tar xf $rootfstar -C $fsrootfs
+  
+  echo "sudo tar xf $bootfstar $fsbootfs"
+  sudo tar xf $bootfstar -C $fsbootfs
+  
+else
 
+  Yocto_Traiter_Tmp_Deploy_Images_Machine $rep_build
+  exit 1
+  VerifierContenuRepertoire $rep_build
+  exit 1
+  CopierFichiers            $device $fsbootfs   $fsrootfs $destproj
+  Afficher_Et_Demonter      $device $fsbootfs   $fsrootfs
+
+fi
 
 exit 0
 
