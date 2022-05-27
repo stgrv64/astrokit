@@ -1898,18 +1898,19 @@ int main(int argc, char ** argv) {
 */
   // ============================== gestion des threads  ===================================
 
+  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
+  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
+
   pthread_create( &p_thread_pha_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[0] ) ;
   pthread_create( &p_thread_pha_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[1] ) ;
   pthread_create( &p_thread_pha_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[2] ) ;
   pthread_create( &p_thread_pha_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[3] ) ;
+
   pthread_create( &p_thread_pha_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[0] ) ;
   pthread_create( &p_thread_pha_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[1] ) ;
   pthread_create( &p_thread_pha_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[2] ) ;
   pthread_create( &p_thread_pha_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[3] ) ;
   
-  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
-  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
-
   pthread_create( &suivi->p_menu,            NULL, (void*)SUIVI_MENU,      suivi ) ;
   pthread_create( &suivi->p_suivi_voute,     NULL, (void*)SUIVI_VOUTE,     suivi ) ;
 

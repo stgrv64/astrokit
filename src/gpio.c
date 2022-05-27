@@ -1127,12 +1127,8 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
   char   buf0[BUFFER] ;
   char   buf1[BUFFER] ;
   double TUpwm, TUpwm_haut, TUpwm_bas, rap ;
-
+  double pmot =0 ;
   struct sched_param param;
-  
-  Trace("sleeping..") ;
-  sleep(2) ;
-  Trace("start") ;
 
   if ( priority > 0) {
     param.sched_priority = PTHREAD_POLICY_10 ;  
@@ -1140,6 +1136,10 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
       perror("GPIO_SUIVI_PWM_PHASE");
       exit(EXIT_FAILURE);}
   }
+
+  Trace("sleeping..") ;
+  sleep(1) ;
+  Trace("start") ;
 
   pthread_mutex_lock( & suivi->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "gpio_suivi_pwm" ) ;
@@ -1159,14 +1159,14 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
     
       rap   = ph->rap[ ph->micropas ] ;
       TUpwm = (double)GPIO_MICRO_SEC * ph->Tpwm ;
-    
-      Trace1("id phase = %d\tpas_en_cours=%d \trapport_cyclique=%f",ph->id,ph->micropas, ph->rap[ ph->micropas ] ) ;
-    
+      pmot  = ph->periode_mot ;
     pthread_mutex_unlock( & ph->mutex ) ;
     
     TUpwm_haut = TUpwm * rap  ; 
     TUpwm_bas  = TUpwm - TUpwm_haut ;
     
+    // Trace("Phid%-3d upas %-3d rapc %.3f Tpwmh %-3f Tpwmb %-3f ",ph->id, ph->micropas, rap, TUpwm_haut, TUpwm_bas) ;
+
     // =================================================================
     // ecriture sur GPIO
     // si la periode moteur est trop longue (> 1 seconde) 
@@ -1175,7 +1175,7 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
     // =================================================================
 
     if ( rap > 0 )
-      if ( ph->periode_mot < GPIO_SUIVI_MAIN_ATTENTE_MAX )
+      // if ( ph->periode_mot < GPIO_SUIVI_MAIN_ATTENTE_MAX )
         pwrite( ph->gpio_fd,buf1,strlen(buf1),0) ;
 
     usleep( TUpwm_haut ) ;  
@@ -1201,8 +1201,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
   struct sched_param param;
   int     micropas=0 ;
 
-  Trace("sleeping..") ;
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_MAIN) ;
   Trace("start") ;
 
   if ( priority > 0) {
@@ -1212,27 +1210,25 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       exit(EXIT_FAILURE);
     }
   }
-/*
+
   pthread_mutex_lock( & pm->suivi->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "suivi_main_m" ) ;
   pm->suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & pm->suivi->mutex_pthread) ;
-*/
+
   pm->micropas = 0 ;
   pm->pas = 0 ;
   pm->t = 0 ;
-  periode_mic = pm->periode_mic ;
-  periode_mot = pm->periode_mot ;
-/*
+  periode_mic = 0 ;
+  periode_mot = 0 ;
+
   pthread_mutex_lock( & pm->suivi->mutex_pthread) ;
   gettimeofday(&pm->tval,NULL) ; 
   pthread_mutex_unlock( & pm->suivi->mutex_pthread) ;
-*/
-  Trace("debut while") ;
 
   while (1) {
 
-    Trace("debut debut while") ;
+    pthread_mutex_lock( & pm->mutex ) ;
     /* En fonction de l'id moteur (ALT ou AZI) 
         on recopie les donnees de suivi* sur les structures moteurs */
 
@@ -1261,21 +1257,12 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         break ;
     }
 
-    //TRACE("periode_mic=%f",periode_mic) ;
-    // correction bug 26/08/2016 :
-    // incorrect : if ( sens > 0 ) { if ( pm->micropas == pm->nbmicropas ) { pm->micropas = 0 ; }         else { pm->micropas++ ; }}
-    /* reinitialisation du compteur de micro pas lorsque max atteint */
-
-    /* exemple avec upas = 64 , cela permet de boucler de 0 a 63 */
-
-    pthread_mutex_lock( & pm->mutex ) ;
-
     if ( sens > 0 ) { 
       if ( pm->micropas == pm->nbmicropas - 1 ) { 
         pm->micropas = 0 ; 
         /* Si pm->micropas = 0 , cela veut dire que tout le cycle de micro pas a ete ecoule */
         pm->pas ++ ;
-        /*
+        
         pm->temps_reel += CALCUL_DUREE_SECONDES( & pm->tval ) ;
         // Trace("%lld %d %d ", pm->pas, g_i_trace, (int)(llabs(pm->pas) % g_i_trace)) ;
 
@@ -1293,11 +1280,9 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
           ) ;
         }
         
-
         if ( g_i_max_nb_pas >0 && pm->pas > g_i_max_nb_pas ) {
           GPIO_TRAP_SIG(0);
         }
-        */
       }
       else { 
         pm->micropas++ ; 
@@ -1310,7 +1295,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         pm->pas -- ;
 
         // Trace("%lld %d %d ", pm->pas, g_i_trace, (int)(llabs(pm->pas) % g_i_trace)) ;
-        /*
+        
         pm->temps_reel += CALCUL_DUREE_SECONDES( & pm->tval ) ;
 
         if ( g_i_trace>0 && ( (int)fabs(pm->temps) % g_i_trace ) == 0 ) {
@@ -1326,7 +1311,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
             pm->temps_reel  \
           ) ;
         }
-        */
       } 
       else { 
         pm->micropas-- ; 
@@ -1334,8 +1318,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
     }
     micropas  =  pm->micropas ;
     Tpwm =  pm->Tpwm ;
-     
-    pthread_mutex_unlock( & pm->mutex ) ;
 
     //printf("%d\t",pm->micropas) ;
 
@@ -1355,11 +1337,12 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       pthread_mutex_unlock( & pm->phase[i]->mutex ) ;
       //printf("\t%f",pm->phase[i]->rc ) ;
     }
+    pthread_mutex_unlock(& pm->mutex ) ;
 
     // si periode_mic est trop grand (>GPIO_SUIVI_MAIN_ATTENTE_MAX) on ne peut pas attendre plus ..
     // on attend GPIO_SUIVI_MAIN_ATTENTE_MAX maximum (c est un seuil d attente maximum donc)
 
-    if (periode_mot > GPIO_SUIVI_MAIN_ATTENTE_MAX ) {
+    if (periode_mic < GPIO_SUIVI_MAIN_ATTENTE_MAX ) {
 
       usleep( periode_mic * GPIO_MICRO_SEC ) ;
       /* on met a jour le temps attendu pour le moteur */
@@ -1369,27 +1352,27 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       pthread_mutex_unlock(& pm->mutex ) ;
     }
     else {
-      /*
+      
       usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC * 0.1 ) ; 
+
       pthread_mutex_lock(  & pm->mutex ) ;
       pm->temps += GPIO_SUIVI_MAIN_ATTENTE_MAX * 0.1 ;
       pthread_mutex_unlock(& pm->mutex ) ;
-      */
+      
       Trace("depassement periode") ;
-
-      Trace("bou %-5ld mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
-        i_incr,    \
-        pm->id,    \
-        pm->pas,   \
-        pm->periode_mic,    \
-        pm->periode_mot,    \
-        pm->Fm, \
-        pm->Tm
-      ) ;
 
       usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC ) ;
     }
 
+    Trace1("bou %-5ld mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
+      i_incr,    \
+      pm->id,    \
+      pm->pas,   \
+      pm->periode_mic,    \
+      pm->periode_mot,    \
+      pm->Fm, \
+      pm->Tm
+    ) ;
     // FIXME : calcule la duree reelle d une iteration dans la boucle
 
     //tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
@@ -1419,7 +1402,7 @@ void GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOT
   pm->Tm            = 1 / pm->Fm ;
   pm->Tpwm          = 1 / pm->Fpwm ;
   pm->nbdeltat      = (long)(pm->Fm * pm->nbmicropas) ;
-  pm->periode_mot   =  1 / ( pm->Fm  ) ;
+  pm->periode_mot   =  1 / pm->Fm ;
   pm->periode_mic   =  1 / ( pm->Fm * pm->nbmicropas ) ;
 
   pm->temps            = 0 ; 
