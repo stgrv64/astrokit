@@ -135,15 +135,19 @@ E => generer une trace visible au moment du boot (variable Yocto ?)
       etc..
 
 0  => mettre en place mutex systematiquement dans toutes les structures
-
+      : commencé 
+      
 0  => en se basant sur ce qui a ete fait sur mesdep , consolider les etats
       cancell des threads pour pouvoir les arrêter sur demande
+      : important pour tester en temps reel les calculs stats 
       
 0  => consolider affichage LCD (touche Fx clavier) 
       generer de facon approprie les logs (usure SDCARD ? => etudier)  
+      : utiliser partition s3 pour les datas
 
 0  => prioritaire
       gerer les TEMPO* et le bug qui execute 2 fois les touches FAST et SLOW
+      (OK) traite
       
 1  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
       pour dynamiquement modifier le comportement
@@ -156,7 +160,9 @@ E => generer une trace visible au moment du boot (variable Yocto ?)
      --> interessant et a etudier
 
 4 => mettre en place une base sqlite pour configurer et afficher (config.txt, ..)
-
+     : reflechir a facon de parametrer la configuration
+     => lancer un script
+     
 5 => etudier possibilite mise en place paho-mqtt-c dans une optique Iot
 
 -------------------------------------------------------------------------------

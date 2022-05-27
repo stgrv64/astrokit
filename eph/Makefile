@@ -51,7 +51,7 @@ else
 	EXEC	= ${RLIB}/${EPHX}.targ
 endif
 
-SRC = altaz.c angles.c annuab.c constel.c deflec.c periode.c diurab.c \
+SRC = altaz.c angles.c annuab.c constel.c deflec.c deltat.c diurab.c \
 diurpx.c dms.c epsiln.c fk4fk5.c kepler.c kfiles.c lightt.c lonlat.c \
 nutate.c precess.c refrac.c rplanet.c rstar.c sidrlt.c sun.c domoon.c \
 trnsit.c vearth.c zatan2.c gplan.c mer404.c ven404.c ear404.c mar404.c jup404.c \

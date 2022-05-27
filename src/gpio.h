@@ -70,7 +70,7 @@
 
 #define GPIO_SUIVI_PWM_PHASE_PRIORITY  10
 #define GPIO_SUIVI_MAIN_PRIORITY       5
-#define GPIO_SUIVI_MAIN_ATTENTE_MAX    2     // attente maximum exprimee en seconde pour non blocage
+#define GPIO_SUIVI_MAIN_ATTENTE_MAX    10     // attente maximum exprimee en seconde pour non blocage
 
 #define GPIO_SUIVI_PWM_PHASE_SCHED   SCHED_RR
 #define GPIO_SUIVI_MAIN_SCHED        SCHED_RR
@@ -208,10 +208,10 @@ static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
   { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
 
 //==========================================================================
-
+/*
 GPIO_PWM_MOTEUR *pm_alt , m_alt ; 
 GPIO_PWM_MOTEUR *pm_azi , m_azi ;
-
+*/
 int gpio_key_l[4] ;
 int gpio_key_c[4] ;  
 

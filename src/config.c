@@ -339,6 +339,7 @@ void CONFIG_INIT_LOG(void) {
 * @brief  : Cette fonction initialise la structure lcd *l
 * @param  : LIEU *lieu
 * @date   : 2022-04-08 creation
+* @date   : 2022-04-08 ajout sauvegarde des lignes dans old
 * @date   : 2022-04-27 mise en commentaire de CALCUL_TEMPS_SIDERAL
 *****************************************************************************************/
 
@@ -399,6 +400,10 @@ void CONFIG_INIT_LCD(LCD *lcd) {
   sprintf(lcd->c_line_1, "%.2f %.2f", \
     lieu->lat * DEGRES, \
     lieu->lon * DEGRES ) ;
+
+  /* ajout 26 mai 2022 */
+  strcpy( lcd->c_line_0_old, lcd->c_line_0 ) ;
+  strcpy( lcd->c_line_1_old, lcd->c_line_1 ) ;
 
   if ( LCD1602Clear(lcd->i_fd) == -1) {
     SyslogErr("Fail to LCD1602Clear\n");
@@ -1349,7 +1354,7 @@ void   CONFIG_AFFICHER_ETAT_THREADS(SUIVI* suivi) {
   int i_num_thread=0 ;
   long id_thread ;
   for (i_num_thread=0; i_num_thread < MAX_THREADS; i_num_thread++) {
-    id_thread = suivi->p_threads_id[i_num_thread] ;
+    id_thread = suivi->p_thread_t_id[i_num_thread] ;
     memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
     if ( id_thread > 0) pthread_getname_np( id_thread , c_thread_name, 16 ) ;
     else break ;

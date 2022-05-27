@@ -1080,7 +1080,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
 
   for( t=0 ; t< pm->Tm ;  t += pm->periode_mic ) {
     
-    Trace1("t = %f\t%f\t%f",t,pm->Tm ,pm->periode_mic) ;
+    Trace2("t = %f\t%f\t%f",t,pm->Tm ,pm->periode_mic) ;
     
     rc = GPIO_FONCTION_RAPPORT_CYCLIQUE(0, t, pm )  ;
     if ( rc >  0)  { 
@@ -1111,7 +1111,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
 	  pm->phase[2]->rap[i]+ \
 	  pm->phase[3]->rap[i] ) != 0 )
 
-    Trace1("%d\t%f\t%f\t%f\t%f",i,pm->phase[0]->rap[i],pm->phase[1]->rap[i],pm->phase[2]->rap[i],pm->phase[3]->rap[i]) ;
+    Trace2("%d\t%f\t%f\t%f\t%f",i,pm->phase[0]->rap[i],pm->phase[1]->rap[i],pm->phase[2]->rap[i],pm->phase[3]->rap[i]) ;
   }
 }
 // ##########################################################################################################
@@ -1119,7 +1119,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
 // module les etats hauts et bas de la phase
 // avec les rapports cycliques calcules pour chaque micro pas
 // et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
-/* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ] */
+/* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ] */
 // ##########################################################################################################
 
 void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
@@ -1130,6 +1130,8 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
 
   struct sched_param param;
   
+  Trace("sleeping..") ;
+  sleep(2) ;
   Trace("start") ;
 
   if ( priority > 0) {
@@ -1141,7 +1143,7 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
 
   pthread_mutex_lock( & suivi->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "gpio_suivi_pwm" ) ;
-  ph->suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  ph->suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
   TUpwm = TUpwm_haut  = TUpwm_bas = rap = 0 ;
@@ -1149,6 +1151,8 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
   memset(buf0,0,BUFFER); snprintf(buf0,BUFFER,"%d\n",0) ;
   memset(buf1,0,BUFFER); snprintf(buf1,BUFFER,"%d\n",1) ;
  
+  Trace("debut while") ;
+
   while(1) {
     
     pthread_mutex_lock( & ph->mutex ) ;
@@ -1156,7 +1160,7 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
       rap   = ph->rap[ ph->micropas ] ;
       TUpwm = (double)GPIO_MICRO_SEC * ph->Tpwm ;
     
-      Trace2("id phase = %d\tpas_en_cours=%d \trapport_cyclique=%f",ph->id,ph->micropas, ph->rap[ ph->micropas ] ) ;
+      Trace1("id phase = %d\tpas_en_cours=%d \trapport_cyclique=%f",ph->id,ph->micropas, ph->rap[ ph->micropas ] ) ;
     
     pthread_mutex_unlock( & ph->mutex ) ;
     
@@ -1191,11 +1195,15 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
   double periode_mic=0 ;
   double periode_mot=0 ;
   double  Tpwm = 0; 
+  double rc=0 ;
   //double tdiff=0 ;
   long   i_incr=0 ; 
   struct sched_param param;
-  int     pas=0 ;
-  TRACE("start") ;
+  int     micropas=0 ;
+
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_MAIN) ;
+  Trace("start") ;
 
   if ( priority > 0) {
     param.sched_priority = PTHREAD_POLICY_5 ;  
@@ -1204,22 +1212,27 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       exit(EXIT_FAILURE);
     }
   }
-
+/*
   pthread_mutex_lock( & pm->suivi->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "suivi_main_m" ) ;
-  pm->suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  pm->suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & pm->suivi->mutex_pthread) ;
-
+*/
   pm->micropas = 0 ;
   pm->pas = 0 ;
   pm->t = 0 ;
   periode_mic = pm->periode_mic ;
   periode_mot = pm->periode_mot ;
-
+/*
+  pthread_mutex_lock( & pm->suivi->mutex_pthread) ;
   gettimeofday(&pm->tval,NULL) ; 
+  pthread_mutex_unlock( & pm->suivi->mutex_pthread) ;
+*/
+  Trace("debut while") ;
 
   while (1) {
 
+    Trace("debut debut while") ;
     /* En fonction de l'id moteur (ALT ou AZI) 
         on recopie les donnees de suivi* sur les structures moteurs */
 
@@ -1254,8 +1267,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
     /* reinitialisation du compteur de micro pas lorsque max atteint */
 
     /* exemple avec upas = 64 , cela permet de boucler de 0 a 63 */
-    
-    pthread_mutex_unlock( & pm->mutex ) ;
 
     pthread_mutex_lock( & pm->mutex ) ;
 
@@ -1264,6 +1275,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         pm->micropas = 0 ; 
         /* Si pm->micropas = 0 , cela veut dire que tout le cycle de micro pas a ete ecoule */
         pm->pas ++ ;
+        /*
         pm->temps_reel += CALCUL_DUREE_SECONDES( & pm->tval ) ;
         // Trace("%lld %d %d ", pm->pas, g_i_trace, (int)(llabs(pm->pas) % g_i_trace)) ;
 
@@ -1280,11 +1292,12 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
             pm->temps_reel  \
           ) ;
         }
-        /* Sortie du programme si max nb pas atteint */
+        
 
         if ( g_i_max_nb_pas >0 && pm->pas > g_i_max_nb_pas ) {
           GPIO_TRAP_SIG(0);
         }
+        */
       }
       else { 
         pm->micropas++ ; 
@@ -1297,6 +1310,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         pm->pas -- ;
 
         // Trace("%lld %d %d ", pm->pas, g_i_trace, (int)(llabs(pm->pas) % g_i_trace)) ;
+        /*
         pm->temps_reel += CALCUL_DUREE_SECONDES( & pm->tval ) ;
 
         if ( g_i_trace>0 && ( (int)fabs(pm->temps) % g_i_trace ) == 0 ) {
@@ -1312,14 +1326,15 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
             pm->temps_reel  \
           ) ;
         }
+        */
       } 
       else { 
         pm->micropas-- ; 
       }
     }
-    pas  =  pm->micropas ;
+    micropas  =  pm->micropas ;
     Tpwm =  pm->Tpwm ;
-
+     
     pthread_mutex_unlock( & pm->mutex ) ;
 
     //printf("%d\t",pm->micropas) ;
@@ -1331,9 +1346,9 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
       pthread_mutex_lock( & pm->phase[i]->mutex ) ;
 
-        pm->phase[i]->micropas    = pas ;
+        pm->phase[i]->micropas    = micropas ;
         pm->phase[i]->Tpwm        = Tpwm ;
-        pm->phase[i]->rc          = pm->phase[i]->rap[ pm->micropas ] ;
+        pm->phase[i]->rc          = pm->phase[i]->rap[ micropas ] ;
         pm->phase[i]->periode_mot = periode_mot ; 
         pm->phase[i]->periode_mic = periode_mic ; 
 
@@ -1344,7 +1359,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
     // si periode_mic est trop grand (>GPIO_SUIVI_MAIN_ATTENTE_MAX) on ne peut pas attendre plus ..
     // on attend GPIO_SUIVI_MAIN_ATTENTE_MAX maximum (c est un seuil d attente maximum donc)
 
-    if (periode_mot < GPIO_SUIVI_MAIN_ATTENTE_MAX ) {
+    if (periode_mot > GPIO_SUIVI_MAIN_ATTENTE_MAX ) {
 
       usleep( periode_mic * GPIO_MICRO_SEC ) ;
       /* on met a jour le temps attendu pour le moteur */
@@ -1361,6 +1376,18 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       pthread_mutex_unlock(& pm->mutex ) ;
       */
       Trace("depassement periode") ;
+
+      Trace("bou %-5ld mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
+        i_incr,    \
+        pm->id,    \
+        pm->pas,   \
+        pm->periode_mic,    \
+        pm->periode_mot,    \
+        pm->Fm, \
+        pm->Tm
+      ) ;
+
+      usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC ) ;
     }
 
     // FIXME : calcule la duree reelle d une iteration dans la boucle
@@ -1451,7 +1478,7 @@ void * suivi_clavier() {
 * @todo   : amelioration continue
 *****************************************************************************************/
 
-int mainGpio(int argc, char **argv) {
+int mainG(int argc, char **argv) {
 
   char c='0', ch='0' ;
   int nread =0 ; 
@@ -1469,10 +1496,10 @@ int mainGpio(int argc, char **argv) {
   int incr=0 ;
   //cpu_set_t          cpuset ;
   
-  pthread_t p_phases_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_t p_phases_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_t p_mot_alt ;
-  pthread_t p_mot_azi ;
+  pthread_t p_thread_pha_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  pthread_t p_thread_pha_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  pthread_t p_thread_mot_alt ;
+  pthread_t p_thread_mot_azi ;
   pthread_t p_thread_getc ;
   
   GPIO_PWM_MOTEUR *pm_alt , m0 ; 
@@ -1574,13 +1601,8 @@ int mainGpio(int argc, char **argv) {
       switch (c) {
 
         case 'L':
-          if ( optarg == NULL  ) {
-            Trace("optarg NULL") ; 
-          }
-          else {
-            Trace("%d : Prise en compte argument %c %s",incr,c,optarg) ;
-            g_i_trace = atoi(optarg) ; 
-          }
+          Trace("%d : Prise en compte argument %c %s",incr,c,optarg) ;
+          g_i_trace = atoi(optarg) ; 
           break ;  
 
         case 'T':
@@ -1777,15 +1799,15 @@ int mainGpio(int argc, char **argv) {
   // lancement des pthreads moteurs ----------------------------------------------------
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_create( &p_phases_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[i] ) ;
+    pthread_create( &p_thread_pha_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[i] ) ;
   }
-  pthread_create( &p_mot_alt, NULL, (void*)suivi_main_M, pm_alt ) ;
+  pthread_create( &p_thread_mot_alt, NULL, (void*)suivi_main_M, pm_alt ) ;
   
   if(nbm) {
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-      pthread_create( &p_phases_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[i] ) ;
+      pthread_create( &p_thread_pha_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[i] ) ;
     }
-    pthread_create( &p_mot_azi, NULL, (void*)suivi_main_M, pm_azi ) ;
+    pthread_create( &p_thread_mot_azi, NULL, (void*)suivi_main_M, pm_azi ) ;
   }
 
   // lancement des autres pthreads  ----------------------------------------------------
@@ -1797,15 +1819,15 @@ int mainGpio(int argc, char **argv) {
   // Join des threads -------------------------------------------------------------------
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_join( p_phases_alt[i], NULL) ; 
+    pthread_join( p_thread_pha_alt[i], NULL) ; 
   }
-  pthread_join( p_mot_alt, NULL) ;
+  pthread_join( p_thread_mot_alt, NULL) ;
 
   if(nbm) {  
    for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-     pthread_join( p_phases_azi[i], NULL) ; 
+     pthread_join( p_thread_pha_azi[i], NULL) ; 
    }
-   pthread_join( p_mot_azi, NULL) ;
+   pthread_join( p_thread_mot_azi, NULL) ;
   }
   pthread_join( p_thread_getc, NULL) ;
 

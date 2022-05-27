@@ -79,7 +79,7 @@ void TRAP_MAIN(int sig) {
   /*--------------------------------------------------------*/
 
   for(i_num_thread=0;i_num_thread<g_id_thread;i_num_thread++)  {
-    id_thread = suivi->p_threads_id[i_num_thread] ;
+    id_thread = suivi->p_thread_t_id[i_num_thread] ;
     if ( id_thread >0 ) {
       memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
       pthread_getname_np( id_thread , c_thread_name, 16 ) ;
@@ -862,7 +862,8 @@ void SUIVI_MANUEL_ASSERVI(SUIVI * suivi, CLAVIER *clavier) {
 * @brief  : Ce mode permet de gerer les menus .
 * @param  : SUIVI   *suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : 
 *****************************************************************************************/
 
@@ -872,6 +873,8 @@ void * SUIVI_MENU(SUIVI * suivi) {
   
    // La temporisation dans les boucles du thread SUIVI_MENU depend de  suivi->temporisation_menu
    
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU ) ;
   Trace("start") ;
     
   param.sched_priority = PTHREAD_POLICY_1 ;
@@ -882,7 +885,7 @@ void * SUIVI_MENU(SUIVI * suivi) {
   }
   pthread_mutex_lock( & suivi->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "SUIVI_MENU" ) ;
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
   signal(SIGTERM,TRAP_SUIVI_MENU) ;
@@ -895,6 +898,8 @@ void * SUIVI_MENU(SUIVI * suivi) {
   // FIXME : debut boucle infinie du thread SUIVI_MENU
   //-------------------------------------------------------------------------------
   
+  Trace("debut while") ;
+
   while(1) {
 
     usleep( suivi->temporisation_menu ) ;
@@ -1131,7 +1136,8 @@ void * SUIVI_MENU(SUIVI * suivi) {
 * @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
 * @param  : SUIVI   *suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : 
 *****************************************************************************************/
 
@@ -1156,6 +1162,8 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
   // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
   
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
   Trace("start") ;
   
   param.sched_priority = PTHREAD_POLICY_1 ;
@@ -1166,7 +1174,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   }
   pthread_mutex_lock( & suivi->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "SUIVI_VOUTE" ) ;
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
   signal( SIGTERM, TRAP_SUIVI_VOUTE) ;
@@ -1189,6 +1197,8 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
   //-------------------------------------------------------------------------------
   
   suivi->SUIVI_ALIGNEMENT=1 ;
+
+  Trace("debut while") ;
 
   while(1) {
     
@@ -1249,24 +1259,18 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
 * @brief  : fonction de callback du thread suivi infrarouge
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qi est variable globale
 *****************************************************************************************/
 
 void * SUIVI_INFRAROUGE(SUIVI * suivi) {
    
   struct sched_param param;
-  
+    
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA ) ;
   Trace("start") ;
-  
-  // La temporisation dans la boucle du thread SUIVI_INFRAROUGE depend de suivi->temporisation_ir (en us)
-  // present dans la fonction bloquante LIRC_READ 
-  
-  // on laisse le temps aux autres threads de demarrer
-  // notamment pour arriver dans la fonction SUIVI_TRAITEMENT_MENU
-  // qui initialise a 1 SUIVI_INFRAROUGE
-  
-  sleep(1) ;
   
   if ( devices->DEVICE_USE_INFRAROUGE ) {
 
@@ -1278,7 +1282,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
     }
     pthread_mutex_lock( & suivi->mutex_pthread) ;
     pthread_setname_np( pthread_self(), "SUIVI_IR" ) ;
-    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
     pthread_mutex_unlock( & suivi->mutex_pthread) ;
     
     signal( SIGTERM, TRAP_SUIVI_INFRAROUGE) ;
@@ -1302,7 +1306,8 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 * @param  : SUIVI * suivi
 * @date   : 2022-04-12 creation 
 * @date   : 2022-04-27 mise en commentaire de CONFIG_LCD_AFFICHER_TEMPS_LIEU
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : TODO : reflechir a ce qui doit etre rafraichi
 *****************************************************************************************/
 
@@ -1310,6 +1315,8 @@ void * SUIVI_LCD(SUIVI * suivi) {
   int i_duree_us ;
   struct sched_param param;
   
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
   Trace("start") ;
   
   if ( devices->DEVICE_USE_LCD ) {
@@ -1324,12 +1331,14 @@ void * SUIVI_LCD(SUIVI * suivi) {
     }
     pthread_mutex_lock( & suivi->mutex_pthread) ;
     pthread_setname_np( pthread_self(), "SUIVI_LCD" ) ;
-    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
     pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
     signal( SIGTERM, TRAP_SUIVI_LCD) ;
 
     suivi->lcd->display() ;
+
+    Trace("debut while") ;
 
     while(1) {
       usleep( suivi->temporisation_lcd );
@@ -1360,7 +1369,8 @@ void * SUIVI_LCD(SUIVI * suivi) {
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-04-12 correction code ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1374,10 +1384,10 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
   struct sched_param param;
   struct timeval t00,t01  ;
   
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
   Trace("start") ;
-  
-  sleep(1) ;
-  
+    
   if ( devices->DEVICE_USE_KEYBOARD ) {
 
     param.sched_priority = PTHREAD_POLICY_1  ;
@@ -1386,12 +1396,14 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
     }
     pthread_mutex_lock( & suivi->mutex_pthread) ;
     pthread_setname_np( pthread_self(), "SUIVI_TERMIOS" ) ;
-    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
     pthread_mutex_unlock( & suivi->mutex_pthread) ;
     
     signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
     KEYBOARD_TERMIOS_INIT() ;
+
+    Trace("debut while") ;
 
     while( c_char != 'q' ) {
       
@@ -1459,7 +1471,8 @@ void * SUIVI_CLAVIER_TERMIOS( SUIVI * suivi ) {
 *           qui utilise directement getchar (aucun effet)
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1468,9 +1481,9 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
   int c_char = 0 ;
   struct sched_param param;
 
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
   Trace("start") ;
-
-  sleep(1) ;
 
   if ( devices->DEVICE_USE_KEYBOARD ) {
 
@@ -1480,10 +1493,12 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
     }
     pthread_mutex_lock( & suivi->mutex_pthread) ;
     pthread_setname_np( pthread_self(), "SUIVI_getchar" ) ;
-    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
     pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
     signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
+
+    Trace("debut while") ;
 
     while( ( c_char = getchar () ) != 'q' ) {
       usleep(100000) ;
@@ -1508,7 +1523,8 @@ void * SUIVI_CLAVIER_getchar( SUIVI * suivi ) {
 * @brief  : fonction de callback du thread suivi clavier en mode ncurses
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1517,9 +1533,9 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
   unsigned long l_incr=0 ;
   struct sched_param param;
 
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
   Trace("start") ;
-  
-  sleep(1) ;
   
   if ( devices->DEVICE_USE_KEYBOARD ) {
 
@@ -1529,7 +1545,7 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
     }
     pthread_mutex_lock( & suivi->mutex_pthread) ;
     pthread_setname_np( pthread_self(), "SUIVI_NCURSES" ) ;
-    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
     pthread_mutex_unlock( & suivi->mutex_pthread) ;
 
     signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
@@ -1549,6 +1565,9 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
     printw("Fin initialisation\n");
     refresh();
     l_incr=0;
+
+    Trace("debut while") ;
+
     while ((ch = getch())) {
       l_incr++;
       //refresh();
@@ -1576,7 +1595,8 @@ void * SUIVI_CLAVIER_NCURSES(SUIVI* suivi ) {
 * @brief  : fonction de callback du thread suivi capteurs (non utilisee)
 * @param  : SUIVI * suivi
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex de suivi−>p_threads_id[ g_id_thread++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
@@ -1588,9 +1608,9 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
   I2C_DEVICE   exemple, *ex ;
   I2C_ACC_MAG  accmag,  *am ;
   
+  Trace("sleeping..") ;
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
   Trace("start") ;
-  
-  sleep(1) ;
 
   ex = & exemple ;
   am = & accmag ;
@@ -1613,13 +1633,15 @@ void * SUIVI_CAPTEURS(SUIVI * suivi) {
 
     pthread_mutex_lock( & suivi->mutex_pthread) ;
     pthread_setname_np( pthread_self(), "SUIVI_CAPTEURS" ) ;
-    suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+    suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
     pthread_mutex_unlock( & suivi->mutex_pthread) ;
     
     signal( SIGTERM, TRAP_SUIVI_CAPTEURS) ;
     
     // a modifier pour definir le choix de l'infrarouge ou pas (config.txt ? .h ? )
     
+    Trace("debut while") ;
+
     while(1) {
       
       if ( ! devices->init_capteurs ) {
@@ -1680,10 +1702,14 @@ int main(int argc, char ** argv) {
   int i ;
   int devFD, board;
   struct sched_param param;
-  pthread_t p_thread_p_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_t p_thread_p_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_t p_thread_m_alt ;
-  pthread_t p_thread_m_azi ;
+  pthread_t p_thread_pha_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  pthread_t p_thread_pha_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  pthread_t p_thread_mot_alt ;
+  pthread_t p_thread_mot_azi ;
+
+  GPIO_PWM_MOTEUR *pm_alt , m_alt ; 
+  GPIO_PWM_MOTEUR *pm_azi , m_azi ;
+
   int i2cDev = 1;
   // -----------------------------------------------------------------
   // recuperer le chemin courant avec getcwd
@@ -1711,16 +1737,20 @@ int main(int argc, char ** argv) {
   // Initialisations des structures de devices
   // -----------------------------------------------------------------
 
-  as      = &ast ;
-  lieu    = &lie;
-  voute   = &vou ;
-  suivi   = &sui ;
-  temps   = &tem ;
-  clavier = &cla ;
-  devices = &dev ;
-
+  as        = &ast ;
+  lieu      = &lie;
+  voute     = &vou ;
+  temps     = &tem ;
+  clavier   = &cla ;
+  devices   = &dev ;
   gp_Codes  = &g_Codes ;
   gp_Lcd    = &g_Lcd ;
+  pm_azi    = &m_azi ;
+  pm_alt    = &m_alt ;
+  suivi     = &sui ;
+
+  pm_azi->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
+  pm_alt->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
 
   CONFIG_PATH_FIND( g_Path_Cmd_Stty, "stty") ;
   Trace("Chemin retenu : %s", g_Path_Cmd_Stty) ;
@@ -1775,13 +1805,13 @@ int main(int argc, char ** argv) {
   signal(SIGINT,TRAP_MAIN) ;
   signal(SIGALRM,TRAP_MAIN) ;
 
-  memset( suivi->p_threads_id, 0 , MAX_THREADS*sizeof(pthread_t)) ;
+  memset( suivi->p_thread_t_id, 0 , MAX_THREADS*sizeof(pthread_t)) ;
 
-  TRACE("gpio_alt         : %d %d %d %d", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
-  TRACE("gpio_azi         : %d %d %d %d", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
-  TRACE("gpio_mas         : %d %d %d %d", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
-  TRACE("GPIO_LED_ETAT    : %d", GPIO_LED_ETAT );
-  TRACE("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
+  Trace("gpio_alt         : %d %d %d %d", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
+  Trace("gpio_azi         : %d %d %d %d", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
+  Trace("gpio_mas         : %d %d %d %d", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
+  Trace("GPIO_LED_ETAT    : %d", GPIO_LED_ETAT );
+  Trace("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
   
   // -----------------------------------------------------------------
   // reglages variables particulieres
@@ -1820,12 +1850,6 @@ int main(int argc, char ** argv) {
   
   // -----------------------------------------------------------------
   
-  pm_azi = &m_azi ;
-  pm_alt = &m_alt ;
-  
-  pm_azi->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
-  pm_alt->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
-  
   GPIO_INIT_PWM_MOTEUR(\
     pm_alt,\
     gpio_alt,\
@@ -1850,6 +1874,9 @@ int main(int argc, char ** argv) {
     GPIO_CURRENT_FONCTION_PARAM0,\
     GPIO_CURRENT_FONCTION_PARAM1 ) ;
   
+  Trace("pm_azi->Fm %f pm_azi->periode_mot = %f", pm_azi->Fm, pm_azi->periode_mot ) ;
+  Trace("pm_alt->Fm %f pm_alt->periode_mot = %f", pm_alt->Fm, pm_alt->periode_mot ) ;
+
   for( i=0 ; i< ALT_R4 ; i++ ) {
     TRACE1("%d\t%f\t%f\t%f\t%f",i,\
       pm_azi->phase[0]->rap[i],\
@@ -1857,24 +1884,35 @@ int main(int argc, char ** argv) {
       pm_azi->phase[2]->rap[i],\
       pm_azi->phase[3]->rap[i]) ;
   }
-
+  // ============================== lancement threads   ===================================
+  /*
+  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+    pthread_create( &p_thread_pha_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[i] ) ;
+  }
+  pthread_create( &p_thread_mot_alt, NULL, (void*)suivi_main_M, pm_alt ) ;
+  
+  for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
+    pthread_create( &p_thread_pha_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[i] ) ;
+  }
+  pthread_create( &p_thread_mot_azi, NULL, (void*)suivi_main_M, pm_azi ) ;
+*/
   // ============================== gestion des threads  ===================================
 
-  pthread_create( &p_thread_p_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[0] ) ;
-  pthread_create( &p_thread_p_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[1] ) ;
-  pthread_create( &p_thread_p_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[2] ) ;
-  pthread_create( &p_thread_p_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[3] ) ;
-
-  pthread_create( &p_thread_p_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[0] ) ;
-  pthread_create( &p_thread_p_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[1] ) ;
-  pthread_create( &p_thread_p_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[2] ) ;
-  pthread_create( &p_thread_p_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[3] ) ;
+  pthread_create( &p_thread_pha_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[0] ) ;
+  pthread_create( &p_thread_pha_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[1] ) ;
+  pthread_create( &p_thread_pha_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[2] ) ;
+  pthread_create( &p_thread_pha_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[3] ) ;
+  pthread_create( &p_thread_pha_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[0] ) ;
+  pthread_create( &p_thread_pha_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[1] ) ;
+  pthread_create( &p_thread_pha_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[2] ) ;
+  pthread_create( &p_thread_pha_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[3] ) ;
   
-  pthread_create( &p_thread_m_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
-  pthread_create( &p_thread_m_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
+  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
+  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
 
   pthread_create( &suivi->p_menu,            NULL, (void*)SUIVI_MENU,      suivi ) ;
   pthread_create( &suivi->p_suivi_voute,     NULL, (void*)SUIVI_VOUTE,     suivi ) ;
+
   pthread_create( &suivi->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, suivi ) ;
   pthread_create( &suivi->p_suivi_capteurs,  NULL, (void*)SUIVI_CAPTEURS,  suivi ) ;
   pthread_create( &suivi->p_suivi_clavier,   NULL, (void*)SUIVI_CLAVIER_TERMIOS,  suivi ) ;
@@ -1888,14 +1926,14 @@ int main(int argc, char ** argv) {
   if ( devices->DEVICE_USE_INFRAROUGE )  pthread_join( suivi->p_suivi_infrarouge, NULL) ;
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_join( p_thread_p_azi[i], NULL) ; 
+    pthread_join( p_thread_pha_azi[i], NULL) ; 
   }
-  pthread_join( p_thread_m_azi, NULL) ;
+  pthread_join( p_thread_mot_azi, NULL) ;
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_join( p_thread_p_alt[i], NULL) ; 
+    pthread_join( p_thread_pha_alt[i], NULL) ; 
   }
-  pthread_join( p_thread_m_alt, NULL) ;
+  pthread_join( p_thread_mot_alt, NULL) ;
   
   pthread_join( suivi->p_menu, NULL) ;
   pthread_join( suivi->p_suivi_voute, NULL) ;  
@@ -1920,7 +1958,7 @@ void * SUIVI_CLAVIER_1(SUIVI * suivi) {
   if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
   if ( devices->DEVICE_USE_KEYBOARD ) {
@@ -2058,7 +2096,7 @@ void * SUIVI_CLAVIER_0(SUIVI * suivi) {
   if (pthread_setschedparam( pthread_self(), SCHED_RR, & param) != 0) { 
     perror("setschedparam SUIVI_CLAVIER"); exit(EXIT_FAILURE);
   }
-  suivi->p_threads_id[ g_id_thread++ ] = pthread_self() ;
+  suivi->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   signal( SIGTERM, TRAP_SUIVI_CLAVIER) ;
   
   if ( devices->DEVICE_USE_KEYBOARD ) {

@@ -263,6 +263,19 @@ typedef enum {
 }
 t_en_Pthreads_Sched_Param ;
 
+typedef enum {
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_PHASES = 250000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_MAIN   = 500000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU       = 750000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE      = 1000000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA      = 1250000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD        = 1500000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER    = 1750000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR    = 2000000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_MAIN       = 2250000
+}
+t_en_Pthreads_Usleep_Before_Start ;
+
 //------------------------------------------------------------------------------
 
 typedef enum {
@@ -726,8 +739,9 @@ typedef struct {
   pthread_t    p_menu ;
   pthread_t    p_test ;
   
+  pthread_t    p_thread_t_id[ MAX_THREADS ]  ;
+  int          p_thread_sleep_before_start[ MAX_THREADS ] ;
   char         p_c_thread_name [ MAX_THREADS ][ 16 ] ;
-  pthread_t    p_threads_id[ MAX_THREADS ]  ;
   
   long         t_diff ;
   double       t_diff_sec ;
