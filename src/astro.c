@@ -28,6 +28,10 @@
 #               * suppressione appel GPIO_RAQUETTE_READ
 #               * correction BUG ( repetition if ( i_indice_code < CONFIG_CODE_NB_CODES ))
 # mai 2022      * petites corrections mineures
+#               * reprise intégralité code pour utilisation pointeur fct (gp_Lcd->display_xxx)
+#               -> display / display_default pour affichage par defaut
+#               -> display_xxx pour affichage autre que default
+#               => affichage par default parametrable
 # -------------------------------------------------------------- 
 */
 
@@ -109,7 +113,7 @@ void TRAP_MAIN(int sig) {
 
   if (sig==0) {
 
-    CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Halt with sig :", sig) ;
+    CONFIG_LCD_DISPLAY_STRING_INT(0,"Halt with sig :", sig) ;
 
     GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 100) ;
 
@@ -130,8 +134,8 @@ void TRAP_MAIN(int sig) {
 		kill(getpid(),SIGKILL) ;
 	} */
 
-  Trace("appel CONFIG_LCD_AFFICHER_STRING_INT") ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Exit with pid :", getpid()) ;
+  Trace("appel CONFIG_LCD_DISPLAY_STRING_INT") ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Exit with pid :", getpid()) ;
 
   Trace("appel exit(0)") ;
   
@@ -154,41 +158,41 @@ void TRAP_MAIN(int sig) {
 void TRAP_SUIVI_MENU(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_menu = %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Signal trappe", sig) ;
   pthread_cancel( suivi->p_menu ) ;
   TRAP_MAIN(1) ;
 }
 void TRAP_SUIVI_VOUTE(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_voute= %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Signal trappe", sig) ;
   pthread_cancel( suivi->p_suivi_voute ) ;
   TRAP_MAIN(1) ;
 }
 void TRAP_SUIVI_INFRAROUGE(int sig)  {
   Trace("Signal trappe depuis thread suivi_infrarouge= %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Signal trappe", sig) ;
   pthread_cancel( suivi->p_suivi_infrarouge ) ;
   TRAP_MAIN(1) ;
 }
 void TRAP_SUIVI_CAPTEURS(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_capteurs= %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Signal trappe", sig) ;
   pthread_cancel( suivi->p_suivi_capteurs ) ;
   TRAP_MAIN(1) ;
 }
 void TRAP_SUIVI_CLAVIER(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_clavier= %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Signal trappe", sig) ;
   pthread_cancel( suivi->p_suivi_clavier ) ;
   TRAP_MAIN(1) ;
 }
 void TRAP_SUIVI_LCD(int sig)  {
   
   Trace("Signal trappe depuis thread suivi_termios= %d\n",sig) ;
-  CONFIG_LCD_AFFICHER_STRING_INT(gp_Lcd,0,"Signal trappe", sig) ;
+  CONFIG_LCD_DISPLAY_STRING_INT(0,"Signal trappe", sig) ;
   pthread_cancel( suivi->p_suivi_lcd ) ;
   TRAP_MAIN(1) ;
 }
@@ -299,7 +303,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_azi_alt")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_AZI_ALT(gp_Lcd, 2000000, as ) ;
+    CONFIG_LCD_DISPLAY_AZI_ALT( 2000000, as ) ;
     /* suivi->menu = MENU_MANUEL_BRUT ; */
     strcpy(clavier->mot,"") ; 
   }
@@ -308,7 +312,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_agh_dec")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_AGH_DEC(gp_Lcd, 2000000, as ) ;
+    CONFIG_LCD_DISPLAY_AGH_DEC( 2000000, as ) ;
     /* suivi->menu = MENU_MANUEL_BRUT ; */
     strcpy(clavier->mot,"") ; 
   }
@@ -317,7 +321,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_asc_dec")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_ASC_DEC(gp_Lcd, 2000000, as ) ;
+    CONFIG_LCD_DISPLAY_ASC_DEC( 2000000, as ) ;
     /* suivi->menu = MENU_MANUEL_BRUT ; */
     strcpy(clavier->mot,"") ; 
   }
@@ -326,7 +330,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_mod_ste")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_AFFICHER_LCD_MODE_STELLARIUM(gp_Lcd, 2000000, as ) ;
+    CONFIG_LCD_DISPLAY_MODE_STELLARIUM( 2000000, as ) ;
     /* suivi->menu = MENU_MANUEL_BRUT ; */
     strcpy(clavier->mot,"") ; 
   }
@@ -335,7 +339,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_tps_lie")) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_TEMPS_LIEU(gp_Lcd, 2000000 , lieu, temps ) ; 
+    CONFIG_LCD_DISPLAY_TEMPS_LIEU( 2000000 , lieu, temps ) ; 
     suivi->menu = MENU_MANUEL_BRUT ; 
     strcpy(clavier->mot,"") ; 
   }  
@@ -343,7 +347,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
   if ( ! strcmp( clavier->mot, "aff_info" )) { 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
-    CONFIG_LCD_AFFICHER_INFORMATIONS(gp_Lcd, 2000000 ) ;
+    CONFIG_LCD_DISPLAY_INFORMATIONS( 2000000 ) ;
     suivi->menu = MENU_INFO ; 
     strcpy(clavier->mot,"") ; 
   }     // mode info
@@ -351,7 +355,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   /*  touche mode equatorial */
   
   if ( ! strcmp( clavier->mot, "key_equ" ))      { 
-    CONFIG_LCD_AFFICHER_STRINGS(gp_Lcd, 2000000, "Mode equatorial", (char*)c_Menus[ MENU_EQUATORIAL ] ) ;
+    CONFIG_LCD_DISPLAY_STRING_STRING( 2000000, "Mode equatorial", (char*)c_Menus[ MENU_EQUATORIAL ] ) ;
     suivi->menu = MENU_EQUATORIAL ; 
     strcpy(clavier->mot,"") ; 
   }    
@@ -359,7 +363,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   /*  touche mode azimutal */
 
   if ( ! strcmp( clavier->mot, "key_azi" ))      { 
-    CONFIG_LCD_AFFICHER_STRINGS(gp_Lcd, 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
+    CONFIG_LCD_DISPLAY_STRING_STRING( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
     suivi->menu = MENU_AZIMUTAL ; 
     strcpy(clavier->mot,"") ; 
   }       // mode azimutal
@@ -367,7 +371,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   /* touche POWER : arret su systeme */
 
   if ( ! strcmp( clavier->mot, "key_power" ))     { 
-    CONFIG_LCD_AFFICHER_STRINGS(gp_Lcd, 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
+    CONFIG_LCD_DISPLAY_STRING_STRING( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
     suivi->menu = MENU_DOWN ; 
     strcpy(clavier->mot,"") ;  
   } 
@@ -1208,15 +1212,15 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       
       CALCUL_TOUT() ;
       /* Exceptionnellement , utilisation variables globales */ 
-      /* CONFIG_LCD_AFFICHER_TEMPS_LIEU(gp_Lcd,0,lieu,temps) ;*/
+      /* CONFIG_LCD_DISPLAY_TEMPS_LIEU(0,lieu,temps) ;*/
 
       if ( suivi->SUIVI_ALIGNEMENT ) { 
 
         CONFIG_FORMATE_DONNEES_AFFICHAGE(as) ;
         CONFIG_AFFICHER_MODE_LONG(as) ; 
         CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
-        CONFIG_LCD_AFFICHER_ASTRE_VITESSES(gp_Lcd,1000000,as) ;
-        gp_Lcd->continu( gp_Lcd->c_line_0, gp_Lcd->c_line_0) ;
+        CONFIG_LCD_DISPLAY_ASTRE_VITESSES(1000000,as) ;
+        
         suivi->SUIVI_ALIGNEMENT = 0 ;
       }
 /*
@@ -1305,7 +1309,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 * @brief  : fonction de callback du thread suivi ecran LCD
 * @param  : SUIVI * suivi
 * @date   : 2022-04-12 creation 
-* @date   : 2022-04-27 mise en commentaire de CONFIG_LCD_AFFICHER_TEMPS_LIEU
+* @date   : 2022-04-27 mise en commentaire de CONFIG_LCD_DISPLAY_TEMPS_LIEU
 * @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : TODO : reflechir a ce qui doit etre rafraichi
@@ -1336,24 +1340,22 @@ void * SUIVI_LCD(SUIVI * suivi) {
 
     signal( SIGTERM, TRAP_SUIVI_LCD) ;
 
-    suivi->lcd->display() ;
+    gp_Lcd->display_default() ;
 
     Trace("debut while") ;
 
     while(1) {
+      
       usleep( suivi->temporisation_lcd );
-      pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
+      
       /* Si un changement de lignes a ete effectue dans une partie du programme */
-      if ( suivi->lcd->i_change == TRUE ) {
-        i_duree_us = suivi->lcd->i_duree_us ;
+      if ( gp_Lcd->i_change_current == TRUE ) {
+        i_duree_us = gp_Lcd->i_duree_us ;
         pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
         usleep( i_duree_us );
-        suivi->lcd->depiler() ;
-        suivi->lcd->display() ;
+        
+        gp_Lcd->display_default() ;
       }
-      else {
-        pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
-      }  
     }
   }
 
@@ -1734,7 +1736,7 @@ int main(int argc, char ** argv) {
   g_id_thread=0 ;
 
   // -----------------------------------------------------------------
-  // Initialisations des structures de devices
+  // Initialisations des structures et pointeurs sur structure
   // -----------------------------------------------------------------
 
   as        = &ast ;

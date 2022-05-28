@@ -35,9 +35,10 @@
 #                * fonctions CONFIG_LCD_xxxx
 #                * ajout mutex init sur mutex_datas_infrarouge
 #                * => protection zone de code avec datas_infrarouge
-#                * ajout fonction CONFIG_LCD_AFFICHER_AGH_DEC / CONFIG_LCD_AFFICHER_EQU_DEC
+#                * ajout fonction CONFIG_LCD_DISPLAY_AGH_DEC / CONFIG_LCD_DISPLAY_EQU_DEC
 #                * CONFIG_FORMATE_DONNEES_AFFICHAGE : ajout de 2 resolutions supplementaires
 #                * protection zones de code impliquant LCD* (mutex_lcd)
+# mai 2022    |  * reprise intégralité code pour utilisation pointeur fct (gp_Lcd->display_xxx)
 # -------------------------------------------------------------- 
 */
 
@@ -343,41 +344,43 @@ void CONFIG_INIT_LOG(void) {
 * @date   : 2022-04-27 mise en commentaire de CALCUL_TEMPS_SIDERAL
 *****************************************************************************************/
 
-void CONFIG_INIT_LCD(LCD *lcd) {
+void CONFIG_INIT_LCD(void) {
 
   Trace("") ;
 
   /* Initialisation mutex */
 
-  pthread_mutex_init( & lcd->mutex_lcd, NULL ) ;
+  pthread_mutex_init( & gp_Lcd->mutex_lcd, NULL ) ;
   
   /* Initialisation pointeurs de fonctions */
 
-  lcd->display = CONFIG_LCD_PT_DISPLAY ;
-  lcd->depiler = CONFIG_LCD_DEPILER ;
-  lcd->empiler = CONFIG_LCD_EMPILER ;
-  lcd->continu = CONFIG_LCD_CONTINU ;
+  gp_Lcd->display_default = CONFIG_LCD_DISPLAY_DEFAULT ;
+  gp_Lcd->display_current = CONFIG_LCD_DISPLAY_CURRENT ;
+
+  gp_Lcd->change_default = CONFIG_LCD_CHANGE_DEFAULT ;
+  gp_Lcd->change_current = CONFIG_LCD_CHANGE_CURRENT ;
+  
 
   /* Initialisation autres champs */
 
-  memset( lcd->c_line_0, 0 , sizeof( lcd->c_line_0 )) ;
-  memset( lcd->c_line_1, 0 , sizeof( lcd->c_line_1 )) ;
-  memset( lcd->c_line_0_old, 0 , sizeof( lcd->c_line_0_old )) ;
-  memset( lcd->c_line_1_old, 0 , sizeof( lcd->c_line_1_old )) ;
+  memset( gp_Lcd->c_l0cur, 0 , sizeof( gp_Lcd->c_l0cur )) ;
+  memset( gp_Lcd->c_l1cur, 0 , sizeof( gp_Lcd->c_l1cur )) ;
+  memset( gp_Lcd->c_l0def, 0 , sizeof( gp_Lcd->c_l0def )) ;
+  memset( gp_Lcd->c_l1def, 0 , sizeof( gp_Lcd->c_l1def )) ;
 
-  strcpy( lcd->c_line_0, "") ; 
-  strcpy( lcd->c_line_1, "") ; 
-  strcpy( lcd->c_line_0_old, "") ; 
-  strcpy( lcd->c_line_1_old, "") ; 
+  strcpy( gp_Lcd->c_l0cur, "") ; 
+  strcpy( gp_Lcd->c_l1cur, "") ; 
+  strcpy( gp_Lcd->c_l0def, "") ; 
+  strcpy( gp_Lcd->c_l1def, "") ; 
 
-  lcd->i_board = 0 ;
-  lcd->i_i2c_num = CONFIG_LCD_I2C_DEFAULT_DEV_PORT ; 
+  gp_Lcd->i_board = 0 ;
+  gp_Lcd->i_i2c_num = CONFIG_LCD_I2C_DEFAULT_DEV_PORT ; 
   
   /*--------------------------*/
   /* Initialisation ecran LCD */ 
   /*--------------------------*/
 
-  if ((lcd->i_fd = LCD1602Init(lcd->i_i2c_num)) == -1) {
+  if ((gp_Lcd->i_fd = LCD1602Init(gp_Lcd->i_i2c_num)) == -1) {
      SyslogErr("Fail to init LCD1602Init\n");
      Trace("Fail to init LCD1602Init") ;
      return ;
@@ -390,22 +393,22 @@ void CONFIG_INIT_LCD(LCD *lcd) {
   /* Affichage phrases init   */ 
   /*--------------------------*/
 
-  sprintf(lcd->c_line_0, "%d %s %d %d:%d", \
+  sprintf(gp_Lcd->c_l0cur, "%d %s %d %d:%d", \
     temps->yy , \
     c_Lcd_Display_Months[ temps->mm -1  ] , \
     temps->dd, \
     temps->HH, \
     temps->MM ) ;
   
-  sprintf(lcd->c_line_1, "%.2f %.2f", \
+  sprintf(gp_Lcd->c_l1cur, "%.2f %.2f", \
     lieu->lat * DEGRES, \
     lieu->lon * DEGRES ) ;
 
   /* ajout 26 mai 2022 */
-  strcpy( lcd->c_line_0_old, lcd->c_line_0 ) ;
-  strcpy( lcd->c_line_1_old, lcd->c_line_1 ) ;
+  strcpy( gp_Lcd->c_l0def, gp_Lcd->c_l0cur ) ;
+  strcpy( gp_Lcd->c_l1def, gp_Lcd->c_l1cur ) ;
 
-  if ( LCD1602Clear(lcd->i_fd) == -1) {
+  if ( LCD1602Clear(gp_Lcd->i_fd) == -1) {
     SyslogErr("Fail to LCD1602Clear\n");
     Trace("Fail to LCD1602Clear") ;
     return ;
@@ -416,7 +419,7 @@ void CONFIG_INIT_LCD(LCD *lcd) {
 
   usleep(CONFIG_LCD_USLEEP_AFTER_CLEARING) ;
 
-  if (LCD1602DispLines(lcd->i_fd, lcd->c_line_0, lcd->c_line_1 ) == -1) {
+  if (LCD1602DispLines(gp_Lcd->i_fd, gp_Lcd->c_l0cur, gp_Lcd->c_l1cur ) == -1) {
     SyslogErr("Fail to LCD1602DispLines\n");
     Trace("Fail to LCD1602DispLines");
   }
@@ -1000,8 +1003,6 @@ void CONFIG_INIT_SUIVI(SUIVI *suivi) {
   suivi->temps_h = 0 ; 
   
   gettimeofday(&suivi->tval,NULL) ;
-
-  suivi->lcd = gp_Lcd ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_FORMAT_ADMIS
@@ -1980,194 +1981,97 @@ void CONFIG_AFFICHER_DEVICES_USE (void) {
   return ;
 }
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_EMPILER
+* @fn     : CONFIG_LCD_CHANGE_CURRENT
 * @author : s.gravois
-* @brief  : Cette fonction decale les buffers d'affichage telle une PILE vers le bas
-* @brief  : les valeurs courantes a afficher sont lcd->c_line*
+* @brief  : Cette fonction change les valeurs 'courantes' d'affichage par les nouvelles
 * @param  : void
 * @date   : 2022-04-11 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_EMPILER(int i_duree_us,  char* c_line_0, char * c_line_1) {
+void CONFIG_LCD_CHANGE_CURRENT(int i_duree_us,  char* c_l0, char * c_l1) {
 
   if ( devices->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
-    memset( gp_Lcd->c_line_0_old, 0, sizeof( gp_Lcd->c_line_0_old )) ;
-    memset( gp_Lcd->c_line_1_old, 0, sizeof( gp_Lcd->c_line_1_old )) ;
+    memset( gp_Lcd->c_l0cur, 0, sizeof( gp_Lcd->c_l0cur )) ;
+    memset( gp_Lcd->c_l1cur, 0, sizeof( gp_Lcd->c_l1cur )) ;
 
-    strcpy( gp_Lcd->c_line_0_old, gp_Lcd->c_line_0 ) ;
-    strcpy( gp_Lcd->c_line_1_old, gp_Lcd->c_line_1 ) ;
+    strcpy( gp_Lcd->c_l0cur, c_l0 ) ;
+    strcpy( gp_Lcd->c_l1cur, c_l1 ) ;
 
-    memset( gp_Lcd->c_line_0, 0, sizeof( gp_Lcd->c_line_0 )) ;
-    memset( gp_Lcd->c_line_1, 0, sizeof( gp_Lcd->c_line_1 )) ;
-
-    strcpy( gp_Lcd->c_line_0, c_line_0 ) ;
-    strcpy( gp_Lcd->c_line_1, c_line_1 ) ;
-
-    gp_Lcd->i_change = TRUE ; 
+    gp_Lcd->i_change_current = TRUE ; 
     gp_Lcd->i_duree_us = i_duree_us ;
 
+    /* Si la duree est NULLE, on a comem regle de changer 'current' vers 'defaut' */
+
+    if ( i_duree_us == 0 ){
+
+      CONFIG_LCD_CHANGE_DEFAULT
+    }
+
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_DEPILER
+* @fn     : CONFIG_LCD_CHANGE_DEFAULT
 * @author : s.gravois
-* @brief  : Cette fonction decale les buffers d'affichage telle une PILE vers le haut
-* @brief  : les valeurs courantes a afficher sont lcd->c_line*
+* @brief  : Cette fonction change les valeurs d'affichage 'par default' 
 * @param  : void
-* @date   : 2022-04-11 creation 
-* @date   : 2022-05-02 modification en utilisation pour pointeur de fonction
+* @date   : 2022-05-28 creation en remplacement de 'depiler'
 *****************************************************************************************/
 
-void CONFIG_LCD_DEPILER(void) {
+void CONFIG_LCD_CHANGE_DEFAULT(char* c_l0, char * c_l1) {
 
   if ( devices->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
-    memset( gp_Lcd->c_line_0, 0, sizeof( gp_Lcd->c_line_0 )) ;
-    memset( gp_Lcd->c_line_1, 0, sizeof( gp_Lcd->c_line_1 )) ;
+    memset( gp_Lcd->c_l0def, 0, sizeof( gp_Lcd->c_l0def )) ;
+    memset( gp_Lcd->c_l1def, 0, sizeof( gp_Lcd->c_l1def )) ;
 
     /* OLD -> NEW ; au final OLD OLD */
-    strcpy( gp_Lcd->c_line_0, gp_Lcd->c_line_0_old ) ;
-    strcpy( gp_Lcd->c_line_1, gp_Lcd->c_line_1_old ) ;
+    strcpy( gp_Lcd->c_l0def, gp_Lcd->c_l0 ) ;
+    strcpy( gp_Lcd->c_l1def, gp_Lcd->c_l1 ) ;
 
-    gp_Lcd->i_change = FALSE ;
-
-    pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
-  }
-  return ;
-}
-/*****************************************************************************************
-* @fn     : CONFIG_LCD_EMPILER
-* @author : s.gravois
-* @brief  : Cette fonction definit l 'affichage en continu (reattribut les lignes old et new)
-* @brief  : les valeurs courantes a afficher sont lcd->c_line*
-* @param  : void
-* @date   : 2022-05-02 creation 
-*****************************************************************************************/
-
-void CONFIG_LCD_CONTINU(char* c_line_0, char * c_line_1) {
-
-  if ( devices->DEVICE_USE_LCD ) {
-
-    pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
-
-    memset( gp_Lcd->c_line_0_old, 0, sizeof( gp_Lcd->c_line_0_old )) ;
-    memset( gp_Lcd->c_line_1_old, 0, sizeof( gp_Lcd->c_line_1_old )) ;
-    memset( gp_Lcd->c_line_0, 0,     sizeof( gp_Lcd->c_line_0 )) ;
-    memset( gp_Lcd->c_line_1, 0,     sizeof( gp_Lcd->c_line_1 )) ;
-
-    strcpy( gp_Lcd->c_line_0_old, c_line_0 ) ;
-    strcpy( gp_Lcd->c_line_1_old, c_line_1 ) ;
-    strcpy( gp_Lcd->c_line_0,     c_line_0 ) ;
-    strcpy( gp_Lcd->c_line_1,     c_line_1 ) ;
-
-    gp_Lcd->i_change = TRUE ; 
-    gp_Lcd->i_duree_us = 1000000 ;
+    gp_Lcd->i_change_current = FALSE ;
 
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
   return ;
 }
+
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_DISPLAY
+* @fn     : CONFIG_LCD_DISPLAY_DEFAULT
 * @author : s.gravois
-* @brief  : Cette fonction affiche les deux chaines de la struct LCD* sur ecran LCD  
+* @brief  : Cette fonction affiche les deux chaines 'default' de la struct LCD*  
 * @brief  : fonction de BASE pour les autres fonctions
-* @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
+* @param  : LCD * gp_Lcd
 * @date   : 2022-04-09 creation 
 * @date   : 2022-04-28 suppression fonction LCD1602Init (fait dans CONFIG_LCD_INIT)
 * @date   : 2022-04-28 protection par un mutex des donnees de lcd*
+* @date   : 2022-05-28 reprise tout code lcd pour passage par pt fct
 * @todo   : verifier la valeur de usleep (parametrer ?)
 *****************************************************************************************/
 
-void CONFIG_LCD_DISPLAY(LCD * lcd) {
-
-  if ( devices->DEVICE_USE_LCD ) {
-
-    pthread_mutex_lock( & lcd->mutex_lcd ) ;
-
-    /*--------------------------------*/
-    /* Clearing the LCD               */ 
-    /*--------------------------------*/
-
-    if ( LCD1602Clear(lcd->i_fd) == -1) {
-      SyslogErr("Failed to LCD1602Clear\n");
-      Trace("Failed to LCD1602Clear");
-      pthread_mutex_unlock( & lcd->mutex_lcd ) ;
-      return ;
-    }
-    else {
-      Trace("LCD1602Clear(ok)");
-    }
-    pthread_mutex_unlock( & lcd->mutex_lcd ) ;
-    /* entre 2500 et 5000 semble une bonne valeur de usleep */
-    /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
-
-    usleep( CONFIG_LCD_USLEEP_AFTER_CLEARING ) ;
-    
-    pthread_mutex_lock( & lcd->mutex_lcd ) ;
-
-    /*--------------------------------*/
-    /* Displaying the lines on LCD    */ 
-    /*--------------------------------*/
-
-    if ( LCD1602DispLines(\
-        lcd->i_fd, \
-        lcd->c_line_0, \
-        lcd->c_line_1 ) \
-    == -1) { 
-
-      SyslogErr("Failed to Display String\n");
-      Trace("Failed to Display String");
-      pthread_mutex_unlock( & lcd->mutex_lcd ) ;
-      return ;
-    }
-    else {
-      Trace("LCD1602DispLines(ok)");
-    }
-
-    pthread_mutex_unlock( & lcd->mutex_lcd ) ;
-
-  }
-  return ;
-}
-
-/*****************************************************************************************
-* @fn     : CONFIG_LCD_PT_DISPLAY
-* @author : s.gravois
-* @brief  : Cette fonction affiche les deux chaines de la struct LCD* sur ecran LCD  
-* @brief  : fonction de BASE pour les autres fonctions
-* @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
-* @date   : 2022-04-09 creation 
-* @date   : 2022-04-28 suppression fonction LCD1602Init (fait dans CONFIG_LCD_INIT)
-* @date   : 2022-04-28 protection par un mutex des donnees de lcd*
-* @todo   : verifier la valeur de usleep (parametrer ?)
-*****************************************************************************************/
-
-void CONFIG_LCD_PT_DISPLAY(void) {
+void CONFIG_LCD_DISPLAY_DEFAULT(void) {
 
   if ( devices->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
     if ( LCD1602Clear(gp_Lcd->i_fd) == -1) {
-      SyslogErr("Failed to LCD1602Clear\n");
-      Trace("Failed to LCD1602Clear");
+      SyslogErr("LCD1602Clear : FAILED\n");
+      Trace("LCD1602Clear : FAILED");
 
       pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
 
       return ;
+    }
+    else {
+      Trace1("LCD1602Clear : OK")
     }
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
@@ -2178,227 +2082,259 @@ void CONFIG_LCD_PT_DISPLAY(void) {
 
     if ( LCD1602DispLines(\
         gp_Lcd->i_fd, \
-        gp_Lcd->c_line_0, \
-        gp_Lcd->c_line_1 ) \
-    == -1) { 
+        gp_Lcd->c_l0def, \
+        gp_Lcd->c_l1def ) \
+        == -1) { 
 
-      SyslogErr("Failed to Display String\n");
-      Trace("Failed to Display String");
+      SyslogErr("LCD1602DispLines : FAILED\n");
+      Trace("LCD1602DispLines : FAILED");
       
       pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
 
       return ;
     }
-
+    else {
+      Trace("LCD1602DispLines : OK");
+    }
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER
+* @fn     : CONFIG_LCD_DISPLAY_CURRENT
 * @author : s.gravois
-* @brief  : Cette fonction affiche deux chaines sur ecran LCD  
-* @param  : LCD * lcd
-* @param  : int i_duree_us  => si 0  affichage definitif
-*                        => si >0 affichage de la duree correspodante
-* @param  : char* c_line_0
-* @param  : char* c_line_1
-* @date   : 2022-04-09 creation 
+* @brief  : Cette fonction affiche les deux chaines 'current' de la struct LCD*  
+* @brief  : fonction de BASE pour les autres fonctions
+* @param  : LCD * gp_Lcd
+* @date   : 2022-05-28 creation (reprise code fct CONFIG_LCD_DISPLAY_DEFAULT)
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER(LCD * lcd, int i_duree_us, char * c_line_0, char * c_line_1) {
+void CONFIG_LCD_DISPLAY_CURRENT(void) {
 
-  lcd->empiler(i_duree_us,c_line_0,c_line_1);
-  lcd->display() ;
-/*
-  if ( i_duree_us > 0 ) {
-    usleep(i_duree_us  ) ;
-    CONFIG_LCD_DEPILER(lcd) ;
-    CONFIG_LCD_DISPLAY( lcd ) ;
+  if ( devices->DEVICE_USE_LCD ) {
+
+    pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
+
+    if ( LCD1602Clear(gp_Lcd->i_fd) == -1) {
+      SyslogErr("LCD1602Clear : FAILED\n");
+      Trace("LCD1602Clear : FAILED");
+
+      pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
+
+      return ;
+    }
+    else {
+      Trace1("LCD1602Clear : OK")
+    }
+    pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
+    /* entre 2500 et 5000 semble une bonne valeur de usleep */
+    /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
+    usleep( CONFIG_LCD_USLEEP_AFTER_CLEARING ) ;
+    
+    pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
+
+    if ( LCD1602DispLines(\
+        gp_Lcd->i_fd, \
+        gp_Lcd->c_l0cur, \
+        gp_Lcd->c_l1cur ) \
+        == -1) { 
+
+      SyslogErr("LCD1602DispLines : FAILED\n");
+      Trace("LCD1602DispLines : FAILED");
+      
+      pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
+
+      return ;
+    }
+    else {
+      Trace("LCD1602DispLines : OK");
+    }
+    pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
-*/
   return ;
 }
+
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_STRINGS
+* @fn     : CONFIG_LCD_DISPLAY_STRING_STRING
 * @author : s.gravois
 * @brief  : Cette fonction affiche deux chaines sur ecran LCD  
 * @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
+* @param  : char* c_l0
+* @param  : char* c_l1
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_STRINGS(LCD * lcd, int i_duree_us , char* c_line_0, char * c_line_1) {
+void CONFIG_LCD_DISPLAY_STRING_STRING( int i_duree_us , char* c_l0, char * c_l1) {
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_CHANGE_CURRENT()
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_STRINGS
+* @fn     : CONFIG_LCD_DISPLAY_STRING_STRING
 * @author : s.gravois
 * @brief  : Cette fonction affiche une chaine et un entier sur ecran LCD  
 * @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
+* @param  : char* c_l0
+* @param  : char* c_l1
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *lcd, int i_duree_us, char* c_line_0, int i) {
-  char c_line_1[16] = {0} ;
-  memset(c_line_1,0,sizeof(c_line_1));
-  sprintf( c_line_1, "%d", i) ;
+void   CONFIG_LCD_DISPLAY_STRING_INT      (  int i_duree_us, char* c_l0, int i) {
+  char c_l1[16] = {0} ;
+  memset(c_l1,0,sizeof(c_l1));
+  sprintf( c_l1, "%d", i) ;
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
 }
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_TEMPS_LIEU
+* @fn     : CONFIG_LCD_DISPLAY_TEMPS_LIEU
 * @author : s.gravois
 * @brief  : Cette fonction calcule le temps sideral en cours puis affiche sur LCD
 * @brief  : la date et l heure ainsi que la latitude et la longitude
 * @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
+* @param  : char* c_l0
+* @param  : char* c_l1
 * @date   : 2022-04-09 creation 
-* @date   : 2022-04-27 corrrection longueur de c_line_0
+* @date   : 2022-04-27 corrrection longueur de c_l0
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_TEMPS_LIEU( LCD *lcd, int i_duree_us, LIEU* lieu, TEMPS *temps) {
+void CONFIG_LCD_DISPLAY_TEMPS_LIEU(  int i_duree_us, LIEU* lieu, TEMPS *temps) {
 
-  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_line_0, 0, sizeof(c_line_0) ) ; 
-  memset( c_line_1, 0, sizeof(c_line_1) ) ; 
+  memset( c_l0, 0, sizeof(c_l0) ) ; 
+  memset( c_l1, 0, sizeof(c_l1) ) ; 
 
   CALCUL_TEMPS_SIDERAL(lieu, temps) ;
 
   /* Remplissage de line 0 et line 1 */
 
-  sprintf( c_line_0, "%d%s%d %d:%d", \
+  sprintf( c_l0, "%d%s%d %d:%d", \
     temps->yy ,\
     c_Lcd_Display_Months[ temps->mm -1  ] , \
     temps->dd, \
     temps->HH, \
     temps->MM ) ;
   
-  sprintf( c_line_1, "%.2f %.2f", \
+  sprintf( c_l1, "%.2f %.2f", \
     lieu->lat * DEGRES, \
     lieu->lon * DEGRES ) ;
 
-  CONFIG_LCD_AFFICHER( lcd, i_duree_us, c_line_0, c_line_1 ) ;
+  CONFIG_LCD_DISPLAY_CURRENT( lcd, i_duree_us, c_l0, c_l1 ) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_ASTRE_VITESSES
+* @fn     : CONFIG_LCD_DISPLAY_ASTRE_VITESSES
 * @author : s.gravois
 * @brief  : Cette fonction affiche le nom de l 'astre et les vitesses
 * @param  : LCD * lcd
-* @param  : char* c_line_0
-* @param  : char* c_line_1
+* @param  : char* c_l0
+* @param  : char* c_l1
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_ASTRE_VITESSES(LCD * lcd, int i_duree_us, ASTRE* as ) {
+void CONFIG_LCD_DISPLAY_ASTRE_VITESSES( int i_duree_us, ASTRE * as ) {
 
-  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_line_0, 0, sizeof(c_line_0)) ; 
-  memset( c_line_1, 0, sizeof(c_line_1)) ;
+  memset( c_l0, 0, sizeof(c_l0)) ; 
+  memset( c_l1, 0, sizeof(c_l1)) ;
 
-  strcpy(  c_line_0, as->nom ) ;
-  sprintf( c_line_1,"%.2f %.2f", as->Va, as->Vh);
+  strcpy(  c_l0, as->nom ) ;
+  sprintf( c_l1,"%.2f %.2f", as->Va, as->Vh);
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_AZI_ALT
+* @fn     : CONFIG_LCD_DISPLAY_AZI_ALT
 * @author : s.gravois
 * @brief  : Cette fonction affiche les coordonnees azimutales en cours
 * @param  : LCD * lcd
 * @param  : int i_duree_us
-* @param  : ASTRE* as
+* @param  : ASTRE * as
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_AZI_ALT(LCD * lcd, int i_duree_us, ASTRE* as ) {
+void CONFIG_LCD_DISPLAY_AZI_ALT( int i_duree_us, ASTRE * as ) {
 
-  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_line_0, 0, sizeof(c_line_0)) ; 
-  memset( c_line_1, 0, sizeof(c_line_1)) ;
+  memset( c_l0, 0, sizeof(c_l0)) ; 
+  memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_line_0, "AZI %s", as->c_ddmm_azi ) ;
-  sprintf( c_line_1, "ALT %s", as->c_ddmm_alt );
+  sprintf( c_l0, "AZI %s", as->c_ddmm_azi ) ;
+  sprintf( c_l1, "ALT %s", as->c_ddmm_alt );
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_AGH_DEC
+* @fn     : CONFIG_LCD_DISPLAY_AGH_DEC
 * @author : s.gravois
 * @brief  : Cette fonction affiche les coordonnees horaires en cours
 * @param  : LCD * lcd
 * @param  : int i_duree_us
-* @param  : ASTRE* as
+* @param  : ASTRE * as
 * @date   : 2022-04-28 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_AGH_DEC(LCD * lcd, int i_duree_us, ASTRE* as ) {
+void CONFIG_LCD_DISPLAY_AGH_DEC( int i_duree_us, ASTRE * as ) {
 
-  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_line_0, 0, sizeof(c_line_0)) ; 
-  memset( c_line_1, 0, sizeof(c_line_1)) ;
+  memset( c_l0, 0, sizeof(c_l0)) ; 
+  memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_line_0, "AGH %s", as->c_hhmm_agh ) ;
-  sprintf( c_line_1, "DEC %s", as->c_ddmm_dec ) ;
+  sprintf( c_l0, "AGH %s", as->c_hhmm_agh ) ;
+  sprintf( c_l1, "DEC %s", as->c_ddmm_dec ) ;
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_ASC_DEC
+* @fn     : CONFIG_LCD_DISPLAY_ASC_DEC
 * @author : s.gravois
 * @brief  : Cette fonction affiche les coordonnees horaires en cours
 * @param  : LCD * lcd
 * @param  : int i_duree_us
-* @param  : ASTRE* as
+* @param  : ASTRE * as
 * @date   : 2022-04-28 creation 
 *****************************************************************************************/
 
-void CONFIG_LCD_AFFICHER_ASC_DEC(LCD * lcd, int i_duree_us, ASTRE* as ) {
+void CONFIG_LCD_DISPLAY_ASC_DEC( int i_duree_us, ASTRE * as ) {
 
-  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_line_0, 0, sizeof(c_line_0)) ; 
-  memset( c_line_1, 0, sizeof(c_line_1)) ;
+  memset( c_l0, 0, sizeof(c_l0)) ; 
+  memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_line_0, "ASC %s", as->c_hhmm_asc ) ;
-  sprintf( c_line_1, "DEC %s", as->c_ddmm_dec ) ;
+  sprintf( c_l0, "ASC %s", as->c_hhmm_asc ) ;
+  sprintf( c_l1, "DEC %s", as->c_ddmm_dec ) ;
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_AFFICHER_LCD_MODE_STELLARIUM
+* @fn     : CONFIG_LCD_DISPLAY_MODE_STELLARIUM
 * @author : s.gravois
 * @brief  : Cette fonction s inspire de CONFIG_AFFICHER_MODE_STELLARIUM pour le LCD
 * @param  : 
@@ -2406,18 +2342,18 @@ void CONFIG_LCD_AFFICHER_ASC_DEC(LCD * lcd, int i_duree_us, ASTRE* as ) {
 * @date   : 2022-03-28 simplification
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_LCD_MODE_STELLARIUM(LCD * lcd, int i_duree_us, ASTRE *as) {
+void CONFIG_LCD_DISPLAY_MODE_STELLARIUM( int i_duree_us, ASTRE *as) {
 
-  char c_line_0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_line_1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_line_0, 0, sizeof(c_line_0)) ; 
-  memset( c_line_1, 0, sizeof(c_line_1)) ;
+  memset( c_l0, 0, sizeof(c_l0)) ; 
+  memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_line_0, "(AZI) %s", as->c_ddmm_azi ) ;
-  sprintf( c_line_1, "(ALT) %s", as->c_ddmm_alt );
+  sprintf( c_l0, "(AZI) %s", as->c_ddmm_azi ) ;
+  sprintf( c_l1, "(ALT) %s", as->c_ddmm_alt );
 
-  CONFIG_LCD_AFFICHER(lcd, i_duree_us, c_line_0, c_line_1) ;
+  CONFIG_LCD_DISPLAY_CURRENT( i_duree_us, c_l0, c_l1) ;
   /*
   Trace("Va / Vh    : %3.2f / %3.2f" , as->Va           , as->Vh ) ;
   Trace("AD / Dec   : %s / %s"       , as->c_hhmmss_asc , as->c_ddmm_dec ) ;
@@ -2427,7 +2363,7 @@ void CONFIG_AFFICHER_LCD_MODE_STELLARIUM(LCD * lcd, int i_duree_us, ASTRE *as) {
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_LCD_AFFICHER_INFORMATIONS
+* @fn     : CONFIG_LCD_DISPLAY_INFORMATIONS
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations qu on souhaite
 * @param  : LCD * lcd
@@ -2435,7 +2371,7 @@ void CONFIG_AFFICHER_LCD_MODE_STELLARIUM(LCD * lcd, int i_duree_us, ASTRE *as) {
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
-void   CONFIG_LCD_AFFICHER_INFORMATIONS    ( LCD * lcd, int i_duree_us) {
+void   CONFIG_LCD_DISPLAY_INFORMATIONS    (  int i_duree_us) {
 
   return ;
 }

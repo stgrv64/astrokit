@@ -116,23 +116,21 @@ void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 void   CONFIG_FORMATE_DONNEES_AFFICHAGE ( ASTRE * ) ;
 void   CONFIG_AFFICHER_MODE_STELLARIUM  ( ASTRE * )  ;
 
-void   CONFIG_LCD_PT_DISPLAY                ( void ) ;
+void   CONFIG_LCD_DISPLAY_DEFAULT                  ( void ) ;
 
-void   CONFIG_LCD_DISPLAY                  ( LCD * ) ;
-void   CONFIG_LCD_AFFICHER                 ( LCD *, int , char* , char * ) ;
-void   CONFIG_LCD_AFFICHER_STRINGS         ( LCD *, int , char* , char * ) ;
-void   CONFIG_LCD_AFFICHER_STRING_INT      ( LCD *, int , char* , int ) ;
-void   CONFIG_LCD_AFFICHER_TEMPS_LIEU      ( LCD *, int , LIEU* , TEMPS *) ;
-void   CONFIG_LCD_AFFICHER_ASTRE_VITESSES  ( LCD *, int , ASTRE* )  ;
+void   CONFIG_LCD_DISPLAY_CURRENT                 (  int , char* , char * ) ;
+void   CONFIG_LCD_DISPLAY_STRING_STRING         (  int , char* , char * ) ;
+void   CONFIG_LCD_DISPLAY_STRING_INT      (  int , char* , int ) ;
+void   CONFIG_LCD_DISPLAY_TEMPS_LIEU      (  int , LIEU* , TEMPS *) ;
+void   CONFIG_LCD_DISPLAY_ASTRE_VITESSES  (  int , ASTRE * )  ;
+void   CONFIG_LCD_DISPLAY_AZI_ALT         (  int , ASTRE * ) ;
+void   CONFIG_LCD_DISPLAY_AGH_DEC         (  int , ASTRE * ) ;
+void   CONFIG_LCD_DISPLAY_ASC_DEC         (  int , ASTRE * ) ;
+void   CONFIG_LCD_DISPLAY_MODE_STELLARIUM (  int , ASTRE *) ;
+void   CONFIG_LCD_DISPLAY_INFORMATIONS    (  int ) ;
 
-void   CONFIG_LCD_AFFICHER_AZI_ALT         ( LCD *, int , ASTRE* ) ;
-void   CONFIG_LCD_AFFICHER_AGH_DEC         ( LCD *, int , ASTRE* ) ;
-void   CONFIG_LCD_AFFICHER_ASC_DEC         ( LCD *, int , ASTRE* ) ;
-void   CONFIG_AFFICHER_LCD_MODE_STELLARIUM ( LCD *, int , ASTRE *) ;
-void   CONFIG_LCD_AFFICHER_INFORMATIONS    ( LCD *, int ) ;
-
-void   CONFIG_LCD_EMPILER                  ( int , char* , char * ) ;
-void   CONFIG_LCD_DEPILER                  ( void) ;
+void   CONFIG_LCD_CHANGE_CURRENT                  ( int , char* , char * ) ;
+void   CONFIG_LCD_CHANGE_DEFAULT                  ( void) ;
 void   CONFIG_LCD_CONTINU                  ( char* , char * ) ;
 
 int    CONFIG_PATH_FIND                    ( char * , char *) ;

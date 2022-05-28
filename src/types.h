@@ -331,21 +331,49 @@ typedef struct {
   int  i_board ; 
   int  i_i2c_num ; 
 
-  char c_line_0[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_line_1[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l0[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l1[     CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
 
-  char c_line_0_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_line_1_old[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l0def[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l1def[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
 
-  int  i_change ;
+  int  i_change_current ;
   int  i_duree_us ; 
 
   pthread_mutex_t mutex_lcd ;
 
   void (*display)(void);
-  void (*continu)(char*,char*);
-  void (*empiler)(int,char*,char*);
-  void (*depiler)(void);
+  void (*display)(int;
+  void (*display_default)(void);
+
+void   CONFIG_LCD_DISPLAY_CURRENT                 (  int , char* , char * ) ;
+void   CONFIG_LCD_DISPLAY_STRING_STRING   (  int , char* , char * ) ;
+void   CONFIG_LCD_DISPLAY_STRING_INT      (  int , char* , int ) ;
+void   CONFIG_LCD_DISPLAY_TEMPS_LIEU      (  int ) ;
+void   CONFIG_LCD_DISPLAY_ASTRE_VITESSES  (  int )  ;
+void   CONFIG_LCD_DISPLAY_AZI_ALT         (  int ) ;
+void   CONFIG_LCD_DISPLAY_AGH_DEC         (  int ) ;
+void   CONFIG_LCD_DISPLAY_ASC_DEC         (  int ) ;
+void   CONFIG_LCD_DISPLAY_MODE_STELLARIUM (  int ) ;
+void   CONFIG_LCD_DISPLAY_INFORMATIONS    (  int ) ; 
+
+  void (*display_str_str) ( int , char* , char *);
+  void (*display_str_int) ( int , char* , int);
+  void (*display_int_int) ( int , int , int);
+  void (*display_tps_lie) ( int) ;
+  void (*display_ast_vit) ( int) ;
+  void (*display_azi_alt) ( void );
+  void (*display_agh_dec) ( void) ;
+  void (*display_asc_dec) ( void) ;
+  void (*display_mod_ste) ( void) ;
+  void (*display_cfg_mas) (void ) ;
+  void (*display_cfg_red) (void ) ;
+  void (*display_cfg_def) (void ) ;
+  void (*display_cfg_def) (void ) ;
+
+  
+  void (*change_current)(int,char*,char*);
+  void (*change_default)(void);
 } 
 LCD ;
 //------------------------------------------------------------------------------
@@ -846,7 +874,6 @@ typedef struct {
   unsigned long temporisation_lcd ;
 
   struct timeval tval ; 
-  LCD          * lcd ;
 } 
 SUIVI ;
 

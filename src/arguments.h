@@ -62,7 +62,7 @@ int incrlog ;
 //extern void TRAP_MAIN(int sig) ;
 /* janvier 2022 : 
   remplacements des arguments de type var glob par void 
-  on considere que ASTRE* VOUTE* etc.. sont dorenavant var glob
+  on considere que ASTRE * VOUTE* etc.. sont dorenavant var glob
 */
 void  ARGUMENTS_HELP                   (int , char** ) ;
 void  ARGUMENTS_GERER_FACON_CLASSIQUE  (int , char** )  ;
