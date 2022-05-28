@@ -2033,10 +2033,10 @@ void CONFIG_LCD_CHANGE_DEFAULT(char* c_l0, char * c_l1) {
     memset( gp_Lcd->c_l1def, 0, sizeof( gp_Lcd->c_l1def )) ;
 
     /* OLD -> NEW ; au final OLD OLD */
-    strcpy( gp_Lcd->c_l0def, gp_Lcd->c_l0 ) ;
-    strcpy( gp_Lcd->c_l1def, gp_Lcd->c_l1 ) ;
+    strcpy( gp_Lcd->c_l0def, c_l0 ) ;
+    strcpy( gp_Lcd->c_l1def, c_l1 ) ;
 
-    gp_Lcd->i_change_current = FALSE ;
+    gp_Lcd->i_change_default = TRUE ;
 
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
