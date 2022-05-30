@@ -37,7 +37,7 @@
 #               * ajout c_si signe sous forme char
 # avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
 #               * ajout type enum pour les mois (affichage LCD)
-#               * ajout temporisation_voute et temporisation_lcd
+#               * ajout temporisation_voute et temporisation_lcd_loop
 #               * ajout c_hhmmss_agh etc... a strcuture ASTRE
 #               * ajout mutex mutex_infrarouge pour proteger
 #                 lecture / exriture sur cette donnee
@@ -48,6 +48,8 @@
 #               * ajout enum pour le masque
 #               * correction code tremios pour 'FIN'
 #               * modif MAX_THREADS a 20
+#               * ajout TEMPO_LCD_LOOP et TEMPO_LCD_DISP en remplacement
+#                 de TEMPO_LCD (remaniement affichage LCD)
 # -------------------------------------------------------------- 
 */
 
@@ -66,6 +68,12 @@
   #define TRACE1(fmt, args...)     while(0) { } 
   #define TRACE2(fmt, args...)     while(0) { } 
 #endif
+
+// ------------------------------------------------------------------------
+// Raccourci
+// ----------------------------------------------------------------
+
+#define If_Mot_Is(s)    if(!strcmp(clavier->mot,s))
 
 // ------------------------------------------------------------------------
 // Syslog
@@ -338,30 +346,35 @@ typedef struct {
 
   int  i_change_current ;
   int  i_change_default ;
-  
+
   int  i_duree_us ; 
 
   pthread_mutex_t mutex_lcd ;
 
   void (*display)(void);
-  void (*display_default)(void);
 
-  void (*display_str_str) ( int , char* , char *);
-  void (*display_str_int) ( int , char* , int);
-  void (*display_int_int) ( int , int , int);
-  void (*display_tps_lie) ( int) ;
-  void (*display_ast_vit) ( int) ;
-  void (*display_azi_alt) ( void );
-  void (*display_agh_dec) ( void) ;
-  void (*display_asc_dec) ( void) ;
-  void (*display_mod_ste) ( void) ;
+  void (*change_current)  (const int, const char*, const char*) ;
+  void (*change_default)  (const int, const char*, const char*) ;
 
-  void (*display_cfg_gpios_used) (void ) ;
-  void (*display_cfg_reduction) (void ) ;
-  void (*display_cfg_default_value) (void ) ;
+  void (*display_default) (void) ;
+  void (*display_current) (void) ;
 
-  void (*change_current)(int,char*,char*);
-  void (*change_default)(void);
+  void (*display_str_str) ( const int , const char* , const char * );
+  void (*display_str_int) ( const int , const char* , int );
+  void (*display_int_int) ( const int , const int   , const int );
+  void (*display_str_lng) ( const int , const char* , const long );
+
+  void (*display_tps_lie) ( const int ) ;
+  void (*display_ast_vit) ( const int ) ;
+  void (*display_azi_alt) ( const int ) ;
+  void (*display_agh_dec) ( const int ) ;
+  void (*display_asc_dec) ( const int ) ;
+  void (*display_mod_ste) ( const int ) ;
+
+  void (*display_cfg_gpios_alt_azi) ( const int ) ;
+  void (*display_cfg_gpios_mas_fre) ( const int ) ;
+  void (*display_cfg_gpios_leds)    ( const int ) ;
+  void (*display_cfg_reduction)     ( const int ) ;
 } 
 LCD ;
 //------------------------------------------------------------------------------
@@ -453,13 +466,18 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /* F1 : 274  F2 : 275  F3 : 276  F4  : 277  F5  : 278  F6  : 348 */
 /* F7 : 349  F8 : 350  F9 : 342  F10 : 343  F11 : 345  F12 : 346 */
 
-{ "274",       "KEY_SCREEN",  "aff_azi_alt" },  /* 274 sum ascii = lettre 'F1' */ /* info 0 */
-{ "275",       "KEY_TV",      "aff_agh_dec" },  /* 274 sum ascii = lettre 'F2' */ /* info 1 */
-{ "276",       "KEY_INFO",    "aff_asc_dec" },  /* 275 sum ascii = lettre 'F3' */ /* info 2 */
-{ "277",       "KEY_ZOOM",    "aff_mod_ste" },  /* 277 sum ascii = lettre 'F4' */ /* info 3 */
-
-{ "278",       "non_defini",  "aff_tps_lie"},   /* 278 sum ascii = lettre 'F5' */ /* info 4 */
-{ "348",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F6' */ /* info 5 */
+{ "274",       "KEY_SCREEN",  "aff_tps_lie" },  /* 274 sum ascii = lettre 'F1'  */ /* info 0 */
+{ "275",       "KEY_TV",      "aff_ast_vit" },  /* 274 sum ascii = lettre 'F2'  */ /* info 1 */
+{ "276",       "KEY_INFO",    "aff_asc_dec" },  /* 275 sum ascii = lettre 'F3'  */ /* info 2 */
+{ "277",       "KEY_ZOOM",    "aff_mod_ste" },  /* 277 sum ascii = lettre 'F4'  */ /* info 3 */
+{ "278",       "non_defini",  "aff_tps_lie"},   /* 278 sum ascii = lettre 'F5'  */ /* info 4 */
+{ "348",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F6'  */ /* info 5 */
+{ "349",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F7'  */ /* info 5 */
+{ "350",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F8'  */ /* info 5 */
+{ "342",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F9'  */ /* info 5 */
+{ "343",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F10' */ /* info 5 */
+{ "345",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F11' */ /* info 5 */
+{ "346",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F12'  */ /* info 5 */
 
 /*--------------------------------*/
 /* touches de permutations        */
@@ -859,7 +877,8 @@ typedef struct {
   unsigned long temporisation_termios   ; 
   unsigned long temporisation_capteurs  ; 
   unsigned long temporisation_clavier   ; 
-  unsigned long temporisation_lcd ;
+  unsigned long temporisation_lcd_loop ;
+  unsigned long temporisation_lcd_disp ;
 
   struct timeval tval ; 
 } 
@@ -1027,7 +1046,7 @@ VOUTE ;
 
 TEMPS      tem, *temps ;
 LIEU       lie, *lieu ;
-ASTRE      ast, *as ;
+ASTRE      ast , *as ;
 VOUTE      vou, *voute ;
 SUIVI	     sui, *suivi ;
 CLAVIER    cla, *clavier ;
@@ -1104,7 +1123,8 @@ unsigned long TEMPO_IR ;
 unsigned long TEMPO_TERMIOS ;
 unsigned long TEMPO_CLAVIER ;
 unsigned long TEMPO_CAPTEURS ;
-unsigned long TEMPO_LCD ;
+unsigned long TEMPO_LCD_LOOP ;
+unsigned long TEMPO_LCD_DISP ;
 
 // ------ PARAMETRES DE ALT ou AZI   ------------
 
