@@ -58,7 +58,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     2
+#define DEBUG     0
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -236,7 +236,7 @@
 #define  CONFIG_VALIDATIONS_SIZE 10
 
 #define CONFIG_CODE_BUFFER_SIZE  255 
-#define CONFIG_CODE_NB_CODES     50 
+#define CONFIG_CODE_NB_CODES     56 
 
 #define LCD_LINES_CHAR_NUMBERS        16
 #define LCD_LINES_CHAR_NUMBERS_secure 8
@@ -441,7 +441,7 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 
 { "10",        "KEY_PLAY",    "valider"},  /* 10  ascii = touche 'ENTER' */
 { "obsolete",  "KEY_STOP",    "stop"},     /* 188 ascii = touche 'FIN' */
-{ "109",       "KEY_MENU",    "MENU"},     /* 109  ascii = touche 'm' */
+{ "109",       "KEY_MENU",    "MENU"},     /* 109  ascii = lettre 'm' */
 { "32",        "KEY_PAUSE",   "pause"},    /* 32 ascii = espace = pause */
 
 /*--------------------------------*/
@@ -526,8 +526,8 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 /* touches restantes non definies */
 /*--------------------------------*/
 
-{ "114", "key_reseau_up",   "non_defini" },     /* 114 sum ascii = lettre 'r' = reseau */ 
-{ "non_defini", "non_defini",   "non_defini" }
+{ "114", "key_reseau_up",   "cfg_reseau_up" },     /* 114 sum ascii = lettre 'r' = reseau */ 
+{ "108", "key_log",         "cfg_log_tps_reel_up" }      /* 108 sum ascii = lettre 'l' = generer les traces temps reel */ 
 }; 
 /*------------------------------------------  */
 /* TAILLE TABLEAU 50 = CONFIG_CODE_NB_CODES   */

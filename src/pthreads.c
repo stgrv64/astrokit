@@ -82,5 +82,5 @@ void PTHREADS_INIT( void ) {
 
 void PTHREADS_CONFIG( void ) {
 
-
+  return ;
 }

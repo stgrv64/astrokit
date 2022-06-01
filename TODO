@@ -177,6 +177,13 @@ E => generer une trace visible au moment du boot (variable Yocto ?)
 
 juin 2022 : modification ordre priorites 
 
+0  => traiter message VALGRIND (conditional  dumpm or move)
+0  => traiter message VALGRIND ( CALCUL_TOUT (calculs.c:1123) )
+      *** memcpy_chk: buffer overflow detected ***: program terminated
+
+0 => inverser les signes dans les vitesses affichees
+     : plus logique d 'afficher une vitesse positive qd ça monte
+           
 0  => consolider affichage commencé des temps "moteurs" , temps "reel" 
       et mettre en place une API de choix de methode "sleep" et de mesure
       ... usleep         ... cleck-gettime 

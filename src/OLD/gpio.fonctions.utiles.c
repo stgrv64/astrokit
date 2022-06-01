@@ -1184,8 +1184,6 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *gpios_pwm ) {
   double TUpwm, TUpwm_haut, TUpwm_bas, rap ;
   int    pas, retour, i , j  ;
   
-  usleep(150000)  ;
-  
   TUpwm = TUpwm_haut  = 0 ;
   
   memset(buf0,0,BUFFER); snprintf(buf0,BUFFER,"%d\n",0) ;

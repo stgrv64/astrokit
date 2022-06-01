@@ -125,10 +125,10 @@ void CONFIG_MAJ_SUIVI_PAS( SUIVI * gp_Sui) {
 void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
 
   int  i = 0 ;
-  char val[255] ;
-  char s_buffer[CONFIG_TAILLE_BUFFER_32] ;
+  char val[255]={0} ;
+  char s_buffer[CONFIG_TAILLE_BUFFER_32]={0} ;
 
-  memset(val, 0, strlen(val)) ;     
+  memset(val, 0, sizeof(val)) ;     
 
   pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
   strcpy( val, gp_Sui->datas_infrarouge ) ;

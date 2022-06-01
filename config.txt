@@ -122,7 +122,7 @@ GPIO_FREQUENCE_PWM  1000
 ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
 ALT_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-ALT_R4  255      # mode micro pas utilise (1/x)
+ALT_R4  8      # mode micro pas utilise (1/x)
 ALT_R5  1        # reduction liee a la poulie
 ALT_R6  1        # reduction liee au cpu
 ALT_R7  1        # reduction non decrite plus haut ....
@@ -135,7 +135,7 @@ ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 AZI_R1  144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
 AZI_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 AZI_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-AZI_R4  255      # mode micro pas utilise (1/x)
+AZI_R4  8      # mode micro pas utilise (1/x)
 AZI_R5  1        # reduction liee a la poulie
 AZI_R6  1        # reduction liee au cpu
 AZI_R7  1        # reduction non decrite plus haut ....

@@ -241,8 +241,8 @@ void SUIVI_MENU_PREALABLE (SUIVI * gp_Sui) {
 
 void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
   int i=0;
-  char cmd[256] ;
-  char s_buffer4[ CONFIG_TAILLE_BUFFER_32 * 4 ] ;
+  char cmd[256]={0} ;
+  char s_buffer4[ CONFIG_TAILLE_BUFFER_32 * 4 ]={0} ;
 
   memset( cmd,       ZERO_CHAR, strlen( cmd )) ;
   memset( s_buffer4, ZERO_CHAR, strlen( s_buffer4 )) ;
@@ -284,6 +284,8 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
     If_Mot_Is("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
     If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
     If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
+
+    If_Mot_Is("cfg_log_tps_reel_up") { gp_Lcd->display_str_int( 2000000, "g_i_trace",60 ) ; i=1 ; g_i_trace=60 ; }
 
     If_Mot_Is("aff_info") { 
       CONFIG_AFFICHER_TOUT() ; 
@@ -1904,9 +1906,6 @@ int main(int argc, char ** argv) {
 
   // ============================== gestion des threads  ===================================
 
-  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
-  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
-
   pthread_create( &p_thread_pha_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[0] ) ;
   pthread_create( &p_thread_pha_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[1] ) ;
   pthread_create( &p_thread_pha_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[2] ) ;
@@ -1916,7 +1915,10 @@ int main(int argc, char ** argv) {
   pthread_create( &p_thread_pha_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[1] ) ;
   pthread_create( &p_thread_pha_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[2] ) ;
   pthread_create( &p_thread_pha_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[3] ) ;
-  
+
+  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, pm_azi ) ;
+  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, pm_alt ) ;
+
   pthread_create( &gp_Sui->p_Pth->p_menu,            NULL, (void*)SUIVI_MENU,      gp_Sui ) ;
   pthread_create( &gp_Sui->p_Pth->p_suivi_voute,     NULL, (void*)SUIVI_VOUTE,     gp_Sui ) ;
   pthread_create( &gp_Sui->p_Pth->p_suivi_infrarouge,NULL, (void*)SUIVI_INFRAROUGE, gp_Sui ) ;

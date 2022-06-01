@@ -51,6 +51,7 @@
 /* #include <pthreads.h> */
 #include <lcd.h>
 
-void PTHREADS_INIT  (void) ;
+void PTHREADS_INIT   ( void) ;
+void PTHREADS_CONFIG ( void ) ;
 
 #endif
