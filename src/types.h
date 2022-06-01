@@ -238,10 +238,10 @@
 #define CONFIG_CODE_BUFFER_SIZE  255 
 #define CONFIG_CODE_NB_CODES     50 
 
-#define CONFIG_LCD_LINES_CHAR_NUMBERS        16
-#define CONFIG_LCD_LINES_CHAR_NUMBERS_secure 8
-#define CONFIG_LCD_USLEEP_AFTER_CLEARING     10000
-#define CONFIG_LCD_I2C_DEFAULT_DEV_PORT      1
+#define LCD_LINES_CHAR_NUMBERS        16
+#define LCD_LINES_CHAR_NUMBERS_secure 8
+#define LCD_USLEEP_AFTER_CLEARING     10000
+#define LCD_I2C_DEFAULT_DEV_PORT      1
 
 #define CONFIG_C_BIN_POSSIBLE_PATHS_LENGTH   6
 //------------------------------------------------------------------------------
@@ -339,10 +339,10 @@ typedef struct {
   int  i_board ; 
   int  i_i2c_num ; 
 
-  char c_l0cur[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_l1cur[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_l0def[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_l1def[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l0cur[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l1cur[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l0def[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char c_l1def[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
 
   int  i_change_current ;
   int  i_change_default ;
@@ -371,10 +371,15 @@ typedef struct {
   void (*display_asc_dec) ( const int ) ;
   void (*display_mod_ste) ( const int ) ;
 
+  void (*display_ast_fre) ( const int ) ;
+  void (*display_ast_per) ( const int ) ;
+
   void (*display_cfg_gpios_alt_azi) ( const int ) ;
   void (*display_cfg_gpios_mas_fre) ( const int ) ;
   void (*display_cfg_gpios_leds)    ( const int ) ;
   void (*display_cfg_reduction)     ( const int ) ;
+
+  void (*display_informations) ( const int ) ;
 } 
 LCD ;
 //------------------------------------------------------------------------------
@@ -468,16 +473,17 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 
 { "274",       "KEY_SCREEN",  "aff_tps_lie" },  /* 274 sum ascii = lettre 'F1'  */ /* info 0 */
 { "275",       "KEY_TV",      "aff_ast_vit" },  /* 274 sum ascii = lettre 'F2'  */ /* info 1 */
-{ "276",       "KEY_INFO",    "aff_asc_dec" },  /* 275 sum ascii = lettre 'F3'  */ /* info 2 */
-{ "277",       "KEY_ZOOM",    "aff_mod_ste" },  /* 277 sum ascii = lettre 'F4'  */ /* info 3 */
-{ "278",       "non_defini",  "aff_tps_lie"},   /* 278 sum ascii = lettre 'F5'  */ /* info 4 */
-{ "348",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F6'  */ /* info 5 */
-{ "349",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F7'  */ /* info 5 */
-{ "350",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F8'  */ /* info 5 */
-{ "342",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F9'  */ /* info 5 */
-{ "343",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F10' */ /* info 5 */
-{ "345",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F11' */ /* info 5 */
-{ "346",       "non_defini",  "aff_tps_lie"},   /* 348 sum ascii = lettre 'F12'  */ /* info 5 */
+{ "276",       "KEY_INFO",    "aff_azi_alt" },  /* 275 sum ascii = lettre 'F3'  */ /* info 2 */
+{ "277",       "KEY_ZOOM",    "aff_agh_dec" },  /* 277 sum ascii = lettre 'F4'  */ /* info 3 */
+{ "278",       "non_defini",  "aff_asc_dec"},   /* 278 sum ascii = lettre 'F5'  */ /* info 4 */
+{ "348",       "non_defini",  "cfg_gpios_alt_azi"},   /* 348 sum ascii = lettre 'F6'  */ /* info 5 */
+{ "349",       "non_defini",  "cfg_gpios_mas_fre"},   /* 348 sum ascii = lettre 'F7'  */ /* info 5 */
+{ "350",       "non_defini",  "cfg_gpios_leds"},   /* 348 sum ascii = lettre 'F8'  */ /* info 5 */
+{ "342",       "non_defini",  "cfg_reduction"},   /* 348 sum ascii = lettre 'F9'  */ /* info 5 */
+{ "343",       "non_defini",  "aff_ast_fre"},   /* 348 sum ascii = lettre 'F10' */ /* info 5 */
+{ "345",       "non_defini",  "aff_ast_per"},   /* 348 sum ascii = lettre 'F11' */ /* info 5 */
+
+{ "105",       "non_defini",  "aff_info"},   /* 106 sum ascii = lettre 'i'  */ /* info 5 */
 
 /*--------------------------------*/
 /* touches de permutations        */
@@ -513,7 +519,7 @@ static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
 /* touches restantes non definies */
 /*--------------------------------*/
 
-{ "non_defini", "non_defini",   "non_defini" },
+{ "114", "key_reseau_up",   "non_defini" },     /* 114 sum ascii = lettre 'r' = reseau */ 
 { "non_defini", "non_defini",   "non_defini" }
 }; 
 /*------------------------------------------  */

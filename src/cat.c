@@ -123,7 +123,7 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
   
   int    L=0 ;
   int    i_ligne=0 ;
-  
+  int    i_trouve =FALSE ;
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
   // conversion en degres decimaux dans cat.dec
@@ -132,6 +132,7 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
   L=0 ;
   
   memset( as->infos, 0 , sizeof( as->infos) ) ;
+
   as->ASC=0;
   as->DEC=0 ;
   
@@ -150,49 +151,48 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
 
       as->ASC = atof( cat[L][2] ) / DEGRES ;
       as->DEC = atof( cat[L][3] ) / DEGRES ;
-
       strcpy( as->infos, cat[L][1] ) ;
-      i_ligne = L ;break  ;
+
+      i_ligne = L ;
+      i_trouve = TRUE ;
+      break  ;
     }
 
     if(!strcmp(cat[L][1],as->nom)) {
 
       as->ASC = atof( cat[L][2] ) / DEGRES ;
       as->DEC = atof( cat[L][3] ) / DEGRES ;
-      
       strcpy( as->infos, cat[L][1] ) ;
-      i_ligne = L ; break ;
+
+      i_ligne = L ; 
+      i_trouve = TRUE ;
+      break ;
     }
     L++;
   }
-  if ( L < CAT_NB_LIGNES ) {
-    TRACE(" %s : trouve dans catalogue",as->nom) ;
+  if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
 
-    CALCUL_CONVERSIONS_ANGLES( as ) ;
+    Trace(" %s : trouve dans catalogue",as->nom) ;
 
-    TRACE(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
-       as->nom , \
-       as->ASCt.HH, \
-       as->ASCt.MM, \
-       as->ASCt.SS, \
-       as->ASC * DEGRES, \
-       as->ASC \
-    ) ; 
-
-    TRACE(" %s : DEC = %.2f  (deg) %.2f (rad)", \
-       as->nom , \
-       as->DEC * DEGRES , \
-       as->DEC \
-    ) ; 
-
-    TRACE(" %s : INFOS : %s", \
-      as->nom , \
-      as->infos \
-    ) ; 
   }
   else {
+    
+    as->ASC = 0.0 ;
+    as->DEC = 0.0 ;
     TRACE(" %s : non trouve dans catalogue",as->nom) ;
+    strcpy( as->nom, "undefined" ) ;
+    strcpy( as->infos, "undefined" ) ;
   }
+
+  CALCUL_CONVERSIONS_ANGLES( as ) ;
+
+  TRACE(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
+    as->nom , \
+    as->ASCt.HH, \
+    as->ASCt.MM, \
+    as->ASCt.SS, \
+    as->DEC * DEGRES
+  ) ; 
 
   return ; 
 }

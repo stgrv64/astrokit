@@ -104,6 +104,8 @@ void TRAP_MAIN(int sig) {
 
     SyslogErr("Probleme avec stty sane\n") ;
     Trace("Probleme avec stty sane") ;
+
+    gp_Lcd->display_str_int(1000000,"exit with return", 2) ;
     exit(2) ;
   } 
 
@@ -120,6 +122,8 @@ void TRAP_MAIN(int sig) {
     if ( system("/sbin/halt") < 0 ) {
       SyslogErr("Probleme avec /sbin/halt\n") ;
       Trace("Probleme avec /sbin/halt") ;
+
+      gp_Lcd->display_str_int(1000000,"exit with return", 2) ;
       exit(2) ;
     } 
   }
@@ -134,11 +138,12 @@ void TRAP_MAIN(int sig) {
 		kill(getpid(),SIGKILL) ;
 	} */
 
-  Trace("appel CONFIG_LCD_DISPLAY_STRING_INT") ;
+  Trace("appel LCD_DISPLAY_STRING_INT") ;
   gp_Lcd->display_str_int(0,"Exit with pid :", getpid()) ;
 
   Trace("appel exit(0)") ;
   
+  gp_Lcd->display_str_int(1000000,"exit with return", 0) ;
   exit(0) ;
 }
 
@@ -235,7 +240,7 @@ void SUIVI_MENU_PREALABLE (SUIVI *suivi) {
 *****************************************************************************************/
 
 void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
-  
+  int i=0;
   char cmd[256] ;
   char s_buffer4[ CONFIG_TAILLE_BUFFER_32 * 4 ] ;
 
@@ -259,158 +264,79 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 
     CONFIG_FORMATE_DONNEES_AFFICHAGE(as);
 
-    If_Mot_Is("o")  { 
-      suivi->menu = MENU_MANUEL_BRUT ; 
-      
-    }
+    If_Mot_Is("o")     { suivi->menu = MENU_MANUEL_BRUT ;i=1; }
+    If_Mot_Is("e" )    { suivi->menu = MENU_MANUEL_BRUT ; i=1;}
+    If_Mot_Is("s")     { suivi->menu = MENU_MANUEL_BRUT ; i=1;}
+    If_Mot_Is("n")     { suivi->menu = MENU_MANUEL_BRUT ;i=1; }
+    If_Mot_Is("reset") { suivi->menu = MENU_MANUEL_BRUT ;i=1; }
+    If_Mot_Is("stop")  { suivi->SUIVI_VOUTE = 0 ; i=1;}
+    If_Mot_Is("play")  { suivi->SUIVI_VOUTE = 1 ; i=1;}
+    
+    If_Mot_Is("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
+    If_Mot_Is("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
+    If_Mot_Is("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
+    If_Mot_Is("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
+    If_Mot_Is("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
+    If_Mot_Is("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
+    If_Mot_Is("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
+    If_Mot_Is("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
+    If_Mot_Is("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
+    If_Mot_Is("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
+    If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
+    If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
 
-    /*  touche EST */
-
-    if ( ! strcmp( clavier->mot, "e" )) { 
-      suivi->menu = MENU_MANUEL_BRUT ; 
-      
-    }
-
-    /*  touche SUD */
-
-    if ( ! strcmp( clavier->mot, "s" )) { 
-      suivi->menu = MENU_MANUEL_BRUT ; 
-      
-    }
-
-    /*  touche NORD */
-
-    if ( ! strcmp( clavier->mot, "n" )) { 
-      suivi->menu = MENU_MANUEL_BRUT ; 
-      
-    }
-
-    /*  touche RESET */
-
-    if ( ! strcmp( clavier->mot, "reset" ))     { 
-      suivi->menu = MENU_MANUEL_BRUT ; 
-      
-    }
-
-    /*  touche STOP */
-
-    if ( ! strcmp( clavier->mot, "stop" ))      { 
-      suivi->SUIVI_VOUTE = 0 ; 
-      
-    }
-
-    /*  touche PLAY */
-
-    if ( ! strcmp( clavier->mot, "play" ))      { 
-      suivi->SUIVI_VOUTE = 1 ; 
-      
-    }
-
-    /*  touche aff_tps_lie */
-
-    if ( ! strcmp( clavier->mot, "aff_tps_lie")) { 
-      
-      gp_Lcd->display_tps_lie( 2000000 ) ; 
-      suivi->menu = MENU_MANUEL_BRUT ; 
-      
-    }  
-
-    /*  touche aff_azi_alt */
-
-    if ( ! strcmp( clavier->mot, "aff_azi_alt")) { 
-      
-      gp_Lcd->display_azi_alt( 2000000 ) ;
-      /* suivi->menu = MENU_MANUEL_BRUT ; */
-      
-    }
-
-    /*  touche aff_agh_dec */
-
-    if ( ! strcmp( clavier->mot, "aff_agh_dec")) { 
-      
-      gp_Lcd->display_agh_dec( 2000000 ) ;
-      /* suivi->menu = MENU_MANUEL_BRUT ; */
-      
-    }
-
-    /*  touche aff_azi_alt */
-
-    if ( ! strcmp( clavier->mot, "aff_asc_dec")) { 
-      
-      gp_Lcd->display_asc_dec( 2000000 ) ;
-      /* suivi->menu = MENU_MANUEL_BRUT ; */
-      
-    }
-
-    /*  touche aff_mod_ste */
-
-    if ( ! strcmp( clavier->mot, "aff_mod_ste")) { 
-      
-      gp_Lcd->display_mod_ste( 2000000 ) ;
-      /* suivi->menu = MENU_MANUEL_BRUT ; */
-      
-    }
-
-    /*  touche aff_cfg_gpios_azi_alt */
-
-    if ( ! strcmp( clavier->mot, "aff_cfg_gpios_azi_alt")) { 
-      
-      gp_Lcd->display_azi_alt( 2000000 ) ;
-      /* suivi->menu = MENU_MANUEL_BRUT ; */
-      
-    }
-
-    /*  touche aff_info */
-
-    if ( ! strcmp( clavier->mot, "aff_info" )) { 
-      
-      CONFIG_LCD_DISPLAY_INFORMATIONS( 2000000 ) ;
+    If_Mot_Is("aff_info") { 
+      CONFIG_AFFICHER_TOUT() ; 
+      gp_Lcd->display_informations ( 2000000 ) ;
       suivi->menu = MENU_INFO ; 
+      i=1;
       
     }     // mode info
 
     /*  touche mode equatorial */
     
-    if ( ! strcmp( clavier->mot, "key_equ" ))      { 
-      CONFIG_LCD_DISPLAY_STRING_STRING( 2000000, "Mode equatorial", (char*)c_Menus[ MENU_EQUATORIAL ] ) ;
+    If_Mot_Is("key_equ")      { 
+      gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)c_Menus[ MENU_EQUATORIAL ] ) ;
       suivi->menu = MENU_EQUATORIAL ; 
-      
+      i=1;
     }    
 
     /*  touche mode azimutal */
 
-    if ( ! strcmp( clavier->mot, "key_azi" ))      { 
-      CONFIG_LCD_DISPLAY_STRING_STRING( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
+    If_Mot_Is("key_azi")      { 
+      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
       suivi->menu = MENU_AZIMUTAL ; 
-      
+      i=1;
     }       // mode azimutal
 
     /* touche POWER : arret su systeme */
 
-    if ( ! strcmp( clavier->mot, "key_power" ))     { 
-      CONFIG_LCD_DISPLAY_STRING_STRING( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
+    If_Mot_Is("key_power")     { 
+      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
       suivi->menu = MENU_DOWN ; 
-       
+      i=1;
     } 
 
     /* touche EXIT : arret su programme */
 
-    if ( ! strcmp( clavier->mot, "key_exit" ))      { 
+    If_Mot_Is("key_exit")      { 
       suivi->menu = MENU_PROGRAMME_DOWN ; 
-      
+      i=1;
     } 
 
     /* touche reseau : arret du reseau */
     /* TODO : non implemente : a definir et coder */
 
-    if ( ! strcmp( clavier->mot, "key_reseau_up"))  { 
+    If_Mot_Is("key_reseau_up") { 
       
       suivi->menu = MENU_RESEAU_UP ; 
+      /* TODO : a terminer */
+      i=1;
       
     }     
     /* remise a jour du mot a vide */ 
 
-    strcpy(clavier->mot,"") ; 
+    if (i) strcpy(clavier->mot,"") ; 
   }
   
   //-----------------------------------------------------------------
@@ -419,8 +345,6 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
   // Si autre chose qu'un menu est lu sur le clavier , on peut aussi changer
   // de menu (pour plus de rapidite)
   //-----------------------------------------------------------------
-  
-  Trace1("clavier->phrase_lue = %d", clavier->phrase_lue) ;
 
   if ( clavier->phrase_lue ) {
     
@@ -464,8 +388,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
       suivi->SUIVI_ALIGNEMENT = 1 ;
       //suivi->menu = MENU_AZIMUTAL ;
 
-      GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
-      
+      GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ; 
     }
     //---------------------------------------------------------------------------------------------------------
     // Si une DEMANDE de MISE A JOUR relative au temps (sauf mois et jour)
@@ -541,6 +464,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI *suivi, CLAVIER *clavier ) {
 * @param  : SUIVI   *suivi
 * @param  : CLAVIER *clavier 
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-31 correction code dans flag_nord_sud_est_ouest : les accelrations sont les pas
 * @todo   : 
 *****************************************************************************************/
 /* FIXME :
@@ -556,7 +480,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
   int flag_nord_sud_est_ouest = 0 ;
   int flag_calcul = 0 ;
 
-  TRACE2("start") ;
+  Trace1("start") ;
 
   // GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, suivi) ;
 
@@ -616,12 +540,21 @@ void SUIVI_MANUEL_BRUT(SUIVI * suivi, CLAVIER *clavier) {
     if ( suivi->pas_est )   suivi->pas_azi-- ; if ( suivi->pas_azi == 0 ) suivi->pas_azi = -1 ;
 
     if ( suivi->pas_nord  || suivi->pas_sud ) {
+      /*
       if ( abs(suivi->pas_alt) <= 2) suivi->acc_alt = suivi->pas_alt  ;
       else                           suivi->acc_alt = suivi->pas_alt * ALT_ACC ;
+      */ /* correction mai 2022 */
+
+      suivi->acc_alt = suivi->pas_alt  ;
+
     }
     if ( suivi->pas_ouest || suivi->pas_est ) {
+      /*
       if ( abs(suivi->pas_azi) <= 2) suivi->acc_azi = suivi->pas_azi ;
       else                           suivi->acc_azi = suivi->pas_azi * AZI_ACC ;
+      */ /* correction mai 2022 */
+
+      suivi->acc_azi = suivi->pas_azi ;
     }
     suivi->pas_est     = 0 ;
     suivi->pas_ouest   = 0 ; 
@@ -929,37 +862,12 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
     usleep( suivi->temporisation_menu ) ;
 
-    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
-      Trace2("A suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-    }
-
     /* GPIO_RAQUETTE_READ( gpio_key_l, gpio_key_c, clavier) ; */
     CONFIG_INPUTS_GESTION_APPUIS( suivi, clavier) ;
-
-    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
-      Trace2("B suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-    }
-
     /* IR_ACTIONS_PARTICULIERES( suivi) ; */
     SUIVI_TRAITEMENT_MOT( suivi, clavier ) ;
-
-
-    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
-      Trace2("C suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-    }
-
     CONFIG_AFFICHER_CHANGEMENTS() ;
-
-
-    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
-      Trace2("D suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-    }
-
     CONFIG_AFFICHER_CLAVIER( clavier ) ;	
-
-    if( strcmp( suivi->datas_infrarouge, "") != 0 ) {
-      Trace2("E suivi->datas_infrarouge = %s", suivi->datas_infrarouge ) ;
-    }
 
     switch( suivi->menu ) {
 
@@ -1174,11 +1082,14 @@ void * SUIVI_MENU(SUIVI * suivi) {
 
 void * SUIVI_VOUTE(SUIVI * suivi) {
   
+  char c_l0[16] ;
+  char c_l1[16] ;
+
   unsigned long  incr ;
   struct timeval t00 ;
   struct sched_param param;
   /*
-  char   c_Vitesses[ CONFIG_LCD_LINES_CHAR_NUMBERS + CONFIG_LCD_LINES_CHAR_NUMBERS_secure] ;
+  char   c_Vitesses[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ;
   */
   // La temporisation dans la boucle du thread SUIVI_VOUTE depend de voute->DT (en us)
   // a completer / modifier :
@@ -1233,7 +1144,7 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
       
       CALCUL_TOUT() ;
       /* Exceptionnellement , utilisation variables globales */ 
-      /* CONFIG_LCD_DISPLAY_TEMPS_LIEU(0,lieu,temps) ;*/
+      /* LCD_DISPLAY_TEMPS_LIEU(0,lieu,temps) ;*/
 
       if ( suivi->SUIVI_ALIGNEMENT ) { 
 
@@ -1242,6 +1153,24 @@ void * SUIVI_VOUTE(SUIVI * suivi) {
         CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
         
         gp_Lcd->display_ast_vit(2000000) ;
+
+        sprintf( c_l0, "%d%s%d %d:%d", \
+          temps->yy , \
+          c_Lcd_Display_Months[ temps->mm -1  ] , \
+          temps->dd, \
+          temps->HH, \
+          temps->MM ) ;
+      
+        if (  strlen( as->nom ) < 7  ) {
+          sprintf( c_l1, "Tracking %s", as->nom ) ;
+        }
+        else if ( strlen(as->nom ) < 10 ) {
+          sprintf( c_l1, "Track %s", as->nom ) ;
+        }
+        else  {
+          sprintf( c_l1, "%s", as->nom ) ;
+        }
+        gp_Lcd->change_default( 2000000, c_l0 , c_l1 ) ;
         
         suivi->SUIVI_ALIGNEMENT = 0 ;
       }
@@ -1331,7 +1260,7 @@ void * SUIVI_INFRAROUGE(SUIVI * suivi) {
 * @brief  : fonction de callback du thread suivi ecran LCD
 * @param  : SUIVI * suivi
 * @date   : 2022-04-12 creation 
-* @date   : 2022-04-27 mise en commentaire de CONFIG_LCD_DISPLAY_TEMPS_LIEU
+* @date   : 2022-04-27 mise en commentaire de LCD_DISPLAY_TEMPS_LIEU
 * @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : TODO : reflechir a ce qui doit etre rafraichi
@@ -1807,7 +1736,7 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_TEMPS     ( temps ) ;
   CONFIG_INIT_DEVICES   ( devices ) ;
   CALCUL_TEMPS_SIDERAL  ( lieu, temps) ;
-  CONFIG_INIT_LCD       ( gp_Lcd ) ;
+  LCD_INIT              ( gp_Lcd ) ;
   CONFIG_AFFICHER_DEVICES_USE() ;
 
   CONFIG_INIT_SUIVI     ( suivi ) ;
@@ -1846,20 +1775,26 @@ int main(int argc, char ** argv) {
   // -----------------------------------------------------------------
   // reglages variables particulieres
   // ----------------------------------------------------------------- 
-
-  if ( strcmp(ASTRE_PAR_DEFAUT,"") != 0 ) {
-
-    memset( as->nom, 0, sizeof(as->nom)) ;
-    strcpy( as->nom, ASTRE_PAR_DEFAUT ) ;
-  }
-  // -----------------------------------------------------------------
   
   CAT_READ            ( CAT_NGC_TXT, cat) ;                     // CAT_AFFICHER ( cat ) ; 
   CAT_FORMAT_DECIMAL  ( "ngc.csv.dec" , cat, cat_dec) ;         // CAT_AFFICHER ( cat_dec ) ;
 
   CAT_READ            ( CAT_ETO_TXT, etoiles) ;                 // CAT_AFFICHER ( etoiles ) ;
   CAT_FORMAT_DECIMAL_2( "eto.csv.dec" , etoiles, etoiles_dec) ; // CAT_AFFICHER ( etoiles_dec ) ;
+  // -----------------------------------------------------------------
   
+  if ( strcmp(ASTRE_PAR_DEFAUT,"") != 0 ) {
+
+    memset( as->nom, 0, sizeof(as->nom)) ;
+    strcpy( as->nom, ASTRE_PAR_DEFAUT ) ;
+
+    if ( strstr( as->nom, CONFIG_MES ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_NGC ) != NULL ) CAT_FIND( as, cat_dec) ;
+    if ( strstr( as->nom, CONFIG_ETO ) != NULL ) CAT_FIND( as, etoiles_dec) ;
+
+    suivi->SUIVI_ALIGNEMENT = 1 ;
+  }
+
   // -----------------------------------------------------------------
 
   ARGUMENTS_HELP                  ( argc, argv ) ;

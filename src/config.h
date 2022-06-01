@@ -116,27 +116,6 @@ void   CONFIG_AFFICHER_DEVICES_USE (void) ;  /* FIXME ajout 20220312 */
 void   CONFIG_FORMATE_DONNEES_AFFICHAGE ( ASTRE * ) ;
 void   CONFIG_AFFICHER_MODE_STELLARIUM  ( ASTRE * )  ;
 
-void   CONFIG_LCD_DISPLAY_DEFAULT           ( void ) ;
-void   CONFIG_LCD_DISPLAY_CURRENT           ( void ) ;
-
-void   CONFIG_LCD_CHANGE_CURRENT            ( const int , const char* , const char * ) ;
-void   CONFIG_LCD_CHANGE_DEFAULT            ( const int , const char* , const char * ) ;
-void   CONFIG_LCD_DISPLAY_STRING_STRING     ( const int , const char* , const char * ) ;
-void   CONFIG_LCD_DISPLAY_STRING_INT        ( const int , const char* , const int ) ;
-void   CONFIG_LCD_DISPLAY_INT_INT           ( const int , const int, const int ) ;
-void   CONFIG_LCD_DISPLAY_TEMPS_LIEU        ( const int ) ;
-void   CONFIG_LCD_DISPLAY_ASTRE_VITESSES    ( const int ) ;
-void   CONFIG_LCD_DISPLAY_AZI_ALT           ( const int ) ;
-void   CONFIG_LCD_DISPLAY_AGH_DEC           ( const int ) ;
-void   CONFIG_LCD_DISPLAY_ASC_DEC           ( const int ) ;
-void   CONFIG_LCD_DISPLAY_MODE_STELLARIUM   ( const int ) ;
-
-void   CONFIG_LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int ) ;
-void   CONFIG_LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int ) ;
-void   CONFIG_LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int ) ;
-void   CONFIG_LCD_DISPLAY_CFG_REDUCTION     ( const int ) ;
-
-void   CONFIG_LCD_DISPLAY_INFORMATIONS      ( const int ) ;
 
 int    CONFIG_PATH_FIND                    ( char * , char *) ;
 

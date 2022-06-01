@@ -83,50 +83,99 @@ NOTIFIE PRIORITAIRE AU 16 MAI 2022 :
 (0, etc..)    concerne le code
 
 
------------------
+###################################################################################
+##############               problemes electroniques       ########################
+###################################################################################
 
 x => avec un rootfs provenant de yocto (conf mettant en jeu wifi, etc..)
      un soucis de reboot se produit (pas de traces visibles)
-     
+
+(KO)
+
  !!! ce probleme n'apparait pas quand la pi est alimente par le cordon
      electrique 5v sur l'alimentation prevue a cet effet !!!
      
-     -> cela laisse supposer un soucis de regulation de tension         
+     -> cela laisse supposer un soucis de regulation de tension
+     -> test avec regulateur effectué, sans succès
+     -> attente test regulateur a decoupage 
+     -> sinon achat cordon UART vers ALIM ou soudure sur la carte         
 
 y => tester les nouveaux double pont en H
 
+(KO)
+     -> les 3 nouveaux composants sont des simples ponts ou autre
+     -> etudier plus en profondeur ou utiliser unipolaire
+     
 z => refaire des cartes modules en adaptant toutes les modifications necessaires :
 
+     * cable en nappe pour connecter GPIOS a sorties en barettes secables
+       -> plusieurs  entrees I2C (4  secables necessaires)
+       -> deux       entrees IR  (3  secables necessaires)
+       -> maximum de sortie  MOT (16 secables necessaires) -> tester 4 moteurs ensemble
+       -> 
+       
      * module alimentation regule pour 5v 
+     
+       -> chercher adaptateur UART / barette secable
+       -> ou bien autre chose
+       
      * module autonome pour l amplification des signaux moteurs (double pont en H)
+       -> voir si achat possible cartes modules L293D toute prete
+       -> il faut alors dessouder les connecteurs fils et faire la liaison vers RJ45
+       -> I/O : input  : barette secable 4 broches
+       
      * module IR simple (la LED doit pouvoir etre interfacee vers l'exterieur)
-     * module BARGRAPH (plutot que led etat) avec interrupteur
+       -> I/O : input  : barette secable 3 broches
+       -> I/O : output : sans objet
+       
+     * module BARGRAPH (plutot que led etat) avec interrupteur 
+       -> I/O : input  : barette secable 4 broches
+       -> I/O : output : sans objet
+       
      * module LCD I2C
+       -> I/O : input  : barette secable 4 broches (I2C)
+       
      * connectique multiple I2C (en RJ12 ou bien autre)
      
      ou bien tout integrer sur une seule carte avec la connectique qui s'impose
 
------------------
- 
-A  => migrer integralite des modifications systemd hardknott sur RPI2
+###################################################################################
+##############            problemes yocto et embedded      ########################
+###################################################################################
+
+A  => obtenir mac adress de la carte pour algo securite et licence et hostname
+
+A  => systemctl list-units | grep -i fail
+      -> problem synchro date a permis de detecter via systemd que certains
+         services ne se lancent pas correctement
+      −> uiniquement sur une carte (rpi3-b+)
+
+A  => finaliser services a lancer au demarrage 
+
+      −> /etc/systemd/system/astrokit-xxxxx.service 
+          pointant sur un script dans /usr/local/bin ou /usr/local/scr
+      
+      -> etudier le plus tot pour afficher LCD (message boot /etc... )
+      
+B  => migrer integralite des modifications systemd hardknott sur RPI2
     + verifier portage du code actuel sur RPI2 (arm-gnueabihf)
      
-      (en cours)
-
-B  => finaliser services a lancer au demarrage 
-
-      (/etc/systemd/system/astrokit-xxxxx.sercvice 
-          pointant sur un script dans /usr/local/bin ou /usr/local/scr
-      )
+      (en cours) 
 
 C => copier et verifier les scripts gpio<x> dans /usr/local/scr
      faire une notice precise et identifier ceux qui manquent
-
+     
+     (en cours)
+     
 D => creer les recettes yocto 
 
 E => generer une trace visible au moment du boot (variable Yocto ?)
 
------------------
+###################################################################################
+##############               problemes coding              ########################
+###################################################################################
+
+juin 2022 : modification ordre priorites 
 
 0  => consolider affichage commencé des temps "moteurs" , temps "reel" 
       et mettre en place une API de choix de methode "sleep" et de mesure
@@ -140,19 +189,27 @@ E => generer une trace visible au moment du boot (variable Yocto ?)
 0  => en se basant sur ce qui a ete fait sur mesdep , consolider les etats
       cancell des threads pour pouvoir les arrêter sur demande
       : important pour tester en temps reel les calculs stats 
-      
-0  => consolider affichage LCD (touche Fx clavier) 
-      generer de facon approprie les logs (usure SDCARD ? => etudier)  
-      : utiliser partition s3 pour les datas
 
 0  => prioritaire
       gerer les TEMPO* et le bug qui execute 2 fois les touches FAST et SLOW
       (OK) traite
+
+0  => nouveau test sur calcul planetes (soleil le 01 juin a 09h30) 
+      avec 5 degres ecart entre position attendue et position reeelle 
+      -> regarder et corriger
       
+0 => prise en compte SIGKILL (sudo kill -9 pid n appelle pas la fct TRAP_MAIN)
+
+1  => recompiler et finir programme generique GPIO , le mettre dans /usr/local/bin
+
 1  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..
       pour dynamiquement modifier le comportement
-      
+
+1  => affichage 09h02 donne 9h2 => a corriger
+
 2  => analyser impact d'un rafraichissement plus lent / rapide  de SUIVI_VOUTE 
+
+2  => interraction clavier lors d'une connexion SSH via termios
 
 3  => dans les temporisations , etudier utilisation des semaphores et fcts associees
      sem_wait / sem_post / sem_timedwait (regarder code )
@@ -167,14 +224,15 @@ E => generer une trace visible au moment du boot (variable Yocto ?)
 
 -------------------------------------------------------------------------------
 
-  => ajouter les outils de perf CPU vcgencmd et sysbench  
-     retrouver les paquets dans lesquels ils se trouvent
+WA  => consolider affichage LCD (touche Fx clavier) 
+      generer de facon approprie les logs (usure SDCARD ? => etudier)  
+      : utiliser partition s3 pour les datas
 
 KO => modifier les droits du user stef et astrokit pour avec 
      sudo setcap 'cap_sys_nice=eip' <application>
      pour pouvoir executer les primitives pthread_setschedparam (param.sched_priority)
      => test KO (fin 2021)
-     => obligration de passer par sudo
+     => obligation de passer par sudo
      (probleme en suspens)
      
 OK => corriger le calcul CALCUL_EQUATEUR des coordonnees equatoriales 
@@ -210,7 +268,10 @@ OK  => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
      azimut et altitude : 
      => soit entrer directement les coordonnees via la telecommande
      => soit utiliser un capteur type accelerometre
-   
+
+  => ajouter les outils de perf CPU vcgencmd et sysbench  
+     retrouver les paquets dans lesquels ils se trouvent
+     
   => passer en DOXYGEN integralite du code
   
   => reprendre les fonctions de arguments.c / .h pour les consolider avec getopt
@@ -253,7 +314,7 @@ OK  => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
      
   => passer les double 64 bits en float 32 bits
      
-   => verifier a quel moment on doit faire un CAT_FIND 
+  => verifier a quel moment on doit faire un CAT_FIND 
   
   => https://lwn.net/Articles/876471/ 
      * etudier la possibilite utlisation gpio-sim driver sur PC intel x86

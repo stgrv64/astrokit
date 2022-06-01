@@ -20,6 +20,7 @@
 #               * CORRECTION reduction moteur d origine des NEQ3 (5760)          
 #                 subdivise en 64*90
 #               * ajout des reductions R5 R6 et R7 (prevoyant deux poulies)
+# juin 2022     * ajout TEMPO_LCD_LOOP et  TEMPO_LCD_DISP
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -48,15 +49,17 @@ CONFIG_FIC_HHMM      hhmm.txt
 CONFIG_SCR_KERNEL   script_kernel.sh
 
 # ----------------------- parametres temporisation
+# tempo_menu     doit etre legerement inferieur aux autres tempo
+# tempo_raq      doit etre etre deux fois inferieur aux autres tempos
 
-TEMPO_MENU      50000
-TEMPO_RAQ       51000
-TEMPO_IR        52000
-TEMPO_TERMIOS   53000
-TEMPO_CLAVIER   54000
-TEMPO_CAPTEURS  55000
-TEMPO_LCD       2000000
-
+TEMPO_MENU      20000
+TEMPO_RAQ       10000
+TEMPO_IR        27000
+TEMPO_TERMIOS   27500
+TEMPO_CLAVIER   27500
+TEMPO_CAPTEURS  27500
+TEMPO_LCD_LOOP  250000
+TEMPO_LCD_DISP  100000
 
 # ----------------------- parametres acquisitions
 
@@ -163,7 +166,6 @@ GPIO_SLP_ALT 16    # sleep du controleur du moteur
 GPIO_RST_ALT 12    # reset du controleur du moteur
 GPIO_MMM_ALT 7     # mode micro pas du controleur du moteur
 GPIO_ENA_ALT 8     # broche enable du controleur du moteur
-
 GPIO_DIR_AZI 25    # direction de l'azimut
 GPIO_CLK_AZI 24    # horloge de l'azimut
 GPIO_SLP_AZI 23    # sleep du controleur du moteur
@@ -191,7 +193,6 @@ GPIO_KEY_L1  10   # entree keyboard ligne 1
 GPIO_KEY_L2  9    # entree keyboard ligne 2
 GPIO_KEY_L3  11   # entree keyboard ligne 3
 GPIO_KEY_L4  5    # entree keyboard ligne 4
-
 GPIO_KEY_C1  6    # sortie keyboard colonnne 1
 GPIO_KEY_C2  13   # sortie keyboard colonnne 2
 GPIO_KEY_C3  19   # sortie keyboard colonnne 3

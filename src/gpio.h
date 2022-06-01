@@ -264,7 +264,7 @@ void   GPIO_STATUT(void) ;
 int    GPIO_GET(int ) ;
 int    GPIO_SET(int ,int ) ;
 int    GPIO_OPEN_BROCHE(int ,int ) ;
-void   GPIO_OPEN_BROCHE_PWM(GPIO_PWM_PHASE *) ;
+void   /* GPIO_OPEN_BROCHE */_PWM(GPIO_PWM_PHASE *) ;
 int    GPIO_OPEN(int gpio_in[GPIO_SIZE],int [GPIO_SIZE]) ;
 int    GPIO_CLOSE_BROCHE(int gpio) ;
 int    GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) ;
