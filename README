@@ -1,7 +1,7 @@
 # ===============================================================================================================
 Conclusion analyse Novembre 2021  : 
 
- * configuration YOCTO pour les elements suivants OK : 
+  * configuration YOCTO pour les elements suivants OK : 
 
    - wifi
    - linux-rt
