@@ -51,6 +51,8 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 
@@ -99,11 +101,15 @@
   - micropas
   - periode_mic
   - periode_mot
-  - SUIVI * suivi 
+  - SUIVI * gp_Sui 
 */
 typedef struct {
-  
+
+  SUIVI         * p_Sui ;
+  PTHREADS      * p_Pth ;
   pthread_mutex_t mutex ; 
+
+  struct timeval tval ;
 
   int     id ;  
   double  Tpwm ;  
@@ -119,22 +125,19 @@ typedef struct {
   int     gpio_fd ;
   
   double  periode_mic ;
-  double  periode_mot ;
-
-  struct timeval tval ;
-
-  SUIVI  * suivi ;
+  double  periode_mot ;  
 }
 GPIO_PWM_PHASE ;
 
 //==========================================================================
 
 typedef struct {
-  
-  pthread_mutex_t mutex ; 
-  
-  SUIVI          * suivi ;
+
+  SUIVI          * p_Sui ;
+  PTHREADS       * p_Pth ;
   GPIO_PWM_PHASE * phase[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+
+  pthread_mutex_t mutex ; 
   
   int     id ;
 

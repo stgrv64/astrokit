@@ -49,6 +49,8 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 // FIXME : 20210501 : creation entete de la fonction au format doxygen ligne suivante 
@@ -72,7 +74,7 @@ int       CAT_FIN_MOT(char c) ;
 void      CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 void      CAT_READ(char * catalogue_txt, char g_Datas[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 
-void      CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
+void      CAT_FIND(ASTRE *gp_Astr, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 void      CAT_FIND_OLD(char * catalogue_txt,ASTRE *objet,char *type) ;
 
 void      CAT_FORMAT_DECIMAL( char * catalogue_txt, char g_Datas[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
@@ -81,6 +83,6 @@ void      CAT_FORMAT_DECIMAL( char * catalogue_txt, char g_Datas[CAT_NB_LIGNES][
 void      CAT_FORMAT_DECIMAL_2( char * catalogue_txt, char g_Datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
                            char datas_dec[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
                            
-void      CAT_ZONE(ASTRE *as, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
+void      CAT_ZONE(ASTRE *gp_Astr, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 // ===========================================================================
 #endif

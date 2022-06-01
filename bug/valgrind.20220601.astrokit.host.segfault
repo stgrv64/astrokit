@@ -1,0 +1,30 @@
+CONFIG_AFFICHER_DEVICES_USE : gp_Devi->DEVICE_USE_KEYBOARD   = 1
+CONFIG_AFFICHER_DEVICES_USE : gp_Devi->DEVICE_USE_CONTROLER  = 0
+CONFIG_AFFICHER_DEVICES_USE : gp_Devi->DEVICE_USE_LCD        = 0==131362== Invalid write of size 8
+==131362==    at 0x4878784: pthread_mutex_init (pthread_mutex_init.c:89)
+==131362==    by 0x118530: CONFIG_INIT_SUIVI (config.c:904)
+==131362==    by 0x10E14B: main (astro.c:1743)
+==131362==  Address 0x48 is not stack'd, malloc'd or (recently) free'd
+==131362== 
+==131362== 
+==131362== Process terminating with default action of signal 11 (SIGSEGV)
+==131362==  Access not within mapped region at address 0x48
+==131362==    at 0x4878784: pthread_mutex_init (pthread_mutex_init.c:89)
+==131362==    by 0x118530: CONFIG_INIT_SUIVI (config.c:904)
+==131362==    by 0x10E14B: main (astro.c:1743)
+==131362==  If you believe this happened as a result of a stack
+==131362==  overflow in your program's main thread (unlikely but
+==131362==  possible), you can try to increase the size of the
+==131362==  main thread stack using the --main-stacksize= flag.
+==131362==  The main thread stack size used in this run was 8388608.
+==131362== 
+==131362== HEAP SUMMARY:
+==131362==     in use at exit: 0 bytes in 0 blocks
+==131362==   total heap usage: 23 allocs, 23 frees, 21,324 bytes allocated
+==131362== 
+==131362== All heap blocks were freed -- no leaks are possible
+==131362== 
+==131362== For lists of detected and suppressed errors, rerun with: -s
+==131362== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+Segmentation fault (core dumped)
+

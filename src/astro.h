@@ -39,6 +39,8 @@
 #include <stat.h>
 #include <types.h>
 #include <keyboard.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 
@@ -48,10 +50,12 @@ void   TRAP_SUIVI_VOUTE(int )  ;
 void   TRAP_SUIVI_INFRAROUGE(int )  ;
 void   TRAP_SUIVI_CAPTEURS(int )  ;
 void   TRAP_SUIVI_CLAVIER(int )  ;
+
 void   SUIVI_MENU_PREALABLE (SUIVI *) ;
 void   SUIVI_TRAITEMENT_MOT( SUIVI *, CLAVIER * ) ;
 void   SUIVI_MANUEL_BRUT(SUIVI * , CLAVIER *) ;
 void   SUIVI_MANUEL_ASSERVI(SUIVI * , CLAVIER *) ;
+
 void * SUIVI_MENU(SUIVI * ) ;
 void * SUIVI_VOUTE(SUIVI * ) ;
 void * SUIVI_INFRAROUGE(SUIVI * ) ;

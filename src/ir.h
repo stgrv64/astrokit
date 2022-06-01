@@ -49,6 +49,8 @@
 //#include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 
@@ -74,10 +76,10 @@ struct lirc_config *lircconfig;
 
 int   LIRC_OPEN(struct lirc_config *lircconfig) ;
 void  LIRC_CLOSE(struct lirc_config *lircconfig) ;
-void  LIRC_READ(SUIVI *suivi) ;
+void  LIRC_READ(SUIVI * gp_Sui) ;
 
-void  CONFIG_INIT_CODES(CODES *gp_Codes) ;
+void  CONFIG_INIT_CODES(CODES *gp_Cod) ;
 
-void  IR_ACTIONS_PARTICULIERES( SUIVI *suivi) ;
+void  IR_ACTIONS_PARTICULIERES( SUIVI * gp_Sui) ;
 
 #endif

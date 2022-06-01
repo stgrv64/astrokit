@@ -27,10 +27,10 @@ void main(int argc, char **argv)
   
   pm0 = &m0 ;
   pm1 = &m1 ;
-  suivi = &su ;
+  gp_Sui = &su ;
   
-  pm0->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
-  pm1->suivi = (SUIVI*)suivi ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
+  pm0->p_Sui = (SUIVI*)gp_Sui ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
+  pm1->p_Sui = (SUIVI*)gp_Sui ;   // pour permettre l'acces des membres de SUIVI dans GPIO_PWM_MOTEUR
   
   if( argc < 8 ) { 
     printf("Usage : %s <gpios moteur1 (ex 5,6,7,8)> <gpios moteur 2> <masque (ex 3,0,2,1)> <fr MOTEUR1 = alt (Hz)> <fr MOTEUR2 = azi (Hz)> <micro pas> <priority (0-99)>\n",argv[0]) ;
@@ -53,8 +53,8 @@ void main(int argc, char **argv)
   upas       = atof(argv[6]) ;
   priority   = atoi(argv[7]) ;    
   
-  pm0->suivi->Th = 1 / (Fm1*upas) ;
-  pm1->suivi->Ta = 1 / (Fm2*upas) ;
+  pm0->p_Sui->Th = 1 / (Fm1*upas) ;
+  pm1->p_Sui->Ta = 1 / (Fm2*upas) ;
   
   Fpwm       = GPIO_FREQUENCE_PWM ;
     

@@ -11,7 +11,7 @@
 #                 c'est a dire q'on effectue les calculs en fonction des coordonnees
 #                 sans l'information de nom (recherche catagues inutiles)
 # 21/01/2022  | * recuperation numero objet (PLA5 => 5, MES10 -> 10, ..)
-#               * passage dernier arg de SOLAR_SYSTEM abec as->numero
+#               * passage dernier arg de SOLAR_SYSTEM abec gp_Astr->numero
 # 12/03/2022  | * correction calcul DEC (declinaison) - => + dans formule
 # 
 # mars  2022  | * reprise des calculs et ajout de fonctions de conversions
@@ -187,19 +187,19 @@ double CALCUL_DUREE_NANOSEC(struct timeval *t00) {
 *           la priorite du thread egalement
 *****************************************************************************************/
 
-long CALCUL_TEMPORISATION_VOUTE(VOUTE *voute, struct timeval t00) {
+long CALCUL_TEMPORISATION_VOUTE(VOUTE *gp_Vout, struct timeval t00) {
   
   struct timeval t01 ;
   double  t_diff ;
   
-  usleep ( (long)(voute->DT * voute->pourcentage_tempo) ) ;
+  usleep ( (long)(gp_Vout->DT * gp_Vout->pourcentage_tempo) ) ;
   
   t_diff=0;
   
-  // FIXME : rappel : voute->calibration_voute = 0.99 normalement
+  // FIXME : rappel : gp_Vout->calibration_voute = 0.99 normalement
   // FIXME : pour eviter de faire appel a la boucle while 99% du temps
   
-  while( t_diff < ( voute->DT * voute->calibration_voute ) ) {
+  while( t_diff < ( gp_Vout->DT * gp_Vout->calibration_voute ) ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (double)(( t01.tv_sec - t00.tv_sec)  * GPIO_MICRO_SEC ) + t01.tv_usec - t00.tv_usec;
@@ -235,7 +235,7 @@ long CALCUL_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct 
 // TODO  : * supprimer ? SUIVI_ALTITUDE non utilise actuellement
 //========================================================================================
 
-void CALCUL_TEMPORISATION_ALTITUDE(SUIVI *suivi, struct timeval * pt00) {
+void CALCUL_TEMPORISATION_ALTITUDE(SUIVI * gp_Sui, struct timeval * pt00) {
   
   struct timeval t01 ;
   double  t_diff ;
@@ -243,10 +243,10 @@ void CALCUL_TEMPORISATION_ALTITUDE(SUIVI *suivi, struct timeval * pt00) {
   // temporisation pour ne pas consommer de CPU
   // on sommeille = pourcentage_tempo du usleep 
   
-  usleep ( (long)(suivi->DTh * suivi->pourcentage_tempo) ) ;
+  usleep ( (long)(gp_Sui->DTh * gp_Sui->pourcentage_tempo) ) ;
   
   t_diff=0;
-  while( t_diff < suivi->DTh ) {
+  while( t_diff < gp_Sui->DTh ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (( t01.tv_sec - pt00->tv_sec)  * GPIO_MICRO_SEC ) + t01.tv_usec - pt00->tv_usec;
@@ -259,7 +259,7 @@ void CALCUL_TEMPORISATION_ALTITUDE(SUIVI *suivi, struct timeval * pt00) {
 // TODO  : * supprimer ? SUIVI_AZIMUT non utilise actuellement
 //========================================================================================
 
-void CALCUL_TEMPORISATION_AZIMUT(SUIVI *suivi, struct timeval * pt00) {
+void CALCUL_TEMPORISATION_AZIMUT(SUIVI * gp_Sui, struct timeval * pt00) {
   
   struct timeval t01 ;
   double t_diff ;
@@ -267,10 +267,10 @@ void CALCUL_TEMPORISATION_AZIMUT(SUIVI *suivi, struct timeval * pt00) {
   // temporisation pour ne pas consommer de CPU
   // on sommeille = pourcentage_tempo du usleep 
   
-  usleep ( (long)(suivi->DTa * suivi->pourcentage_tempo) ) ;
+  usleep ( (long)(gp_Sui->DTa * gp_Sui->pourcentage_tempo) ) ;
   
   t_diff=0;
-  while( t_diff < suivi->DTa ) {
+  while( t_diff < gp_Sui->DTa ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (( t01.tv_sec - pt00->tv_sec)  * GPIO_MICRO_SEC ) + t01.tv_usec - pt00->tv_usec;
@@ -283,23 +283,23 @@ void CALCUL_TEMPORISATION_AZIMUT(SUIVI *suivi, struct timeval * pt00) {
 // FIXME : * en supposant que la voute est de diametre = 1
 //========================================================================================
 
-void CALCUL_GEODE(ASTRE *as) {
+void CALCUL_GEODE(ASTRE *gp_Astr) {
 
   // on deduit de l'azimut et de l'altitude
   // les coordonnees x y et z dans la geode d'observation
   
-  as->x = cos( as->h ) * cos( as->a )  ;
-  as->y = cos( as->h ) * sin( as->a ) ;
-  as->z = sin( as->h ) ;
+  gp_Astr->x = cos( gp_Astr->h ) * cos( gp_Astr->a )  ;
+  gp_Astr->y = cos( gp_Astr->h ) * sin( gp_Astr->a ) ;
+  gp_Astr->z = sin( gp_Astr->h ) ;
   
   // On projette la sphere de rayon=1 sur une autre sphere de rayon la valeur qu'on veut
   // ce systeme permet de voir en 3D une valeur en fonction de 3 autres
   // Ici on veut representer la vitesse (norme du vecteur) 
   // en fonction de x y et z (x y z directions du vecteur sur la sphere unite)
   
-  as->xx = as->x * as->V ;
-  as->yy = as->y * as->V ;
-  as->zz = as->z * as->V ;
+  gp_Astr->xx = gp_Astr->x * gp_Astr->V ;
+  gp_Astr->yy = gp_Astr->y * gp_Astr->V ;
+  gp_Astr->zz = gp_Astr->z * gp_Astr->V ;
   
 }
 //========================================================================================
@@ -307,69 +307,69 @@ void CALCUL_GEODE(ASTRE *as) {
 // FIXME : * transforme les coordonnees siderales en coordonnees azimutales
 //========================================================================================
 
-void CALCUL_AZIMUT(LIEU *lieu, ASTRE *as) {
+void CALCUL_AZIMUT(LIEU *gp_Lieu, ASTRE *gp_Astr) {
   
   // transforme les coordonnees "sid�rales" en coordonnees azimutales
   // permet de trouver l'azimut et l'altitude en fonction de l'angle horaire
   // par rapport au m�ridien (SUD) et la declinaison
   // ATTENTION !! angle horaire = ascension droite sid�rale corrig�e
   // avec le temps sid�ral : une conversion doit etre faite pour trouver
-  // as->AGH  = TS - (asc droite absolue)
+  // gp_Astr->AGH  = TS - (asc droite absolue)
   // Une fonction de calcul du temps sid�ral doit etre faite ult�rieurement 
   
   double lat,A,H,a0,h,a1,a2,af ;
   
-  lat= lieu->lat ;
-  A  = as->AGH ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
-  H  = as->DEC ; // FIXME : declinaison - seule valeur qui ne change pas 
+  lat= gp_Lieu->lat ;
+  A  = gp_Astr->AGH ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
+  H  = gp_Astr->DEC ; // FIXME : declinaison - seule valeur qui ne change pas 
   
-  TRACE1("agh = %2.3f\tH = %2.3f\t",(as->AGH)*DEGRES,(as->DEC)*DEGRES) ;
+  TRACE1("agh = %2.3f\tH = %2.3f\t",(gp_Astr->AGH)*DEGRES,(gp_Astr->DEC)*DEGRES) ;
 
   h  = ALT(lat,A,H) ;
-  as->h = h ;
+  gp_Astr->h = h ;
 
   a0 = AZI0(A,H,h) ;
   a1 = AZI1(lat,A,H,h) ;
   a2 = AZI2(lat,h,H) ;
 
-  as->a = SGN(a0)*a2 ;
+  gp_Astr->a = SGN(a0)*a2 ;
 
   /* Si azimut negatif on ajoute 360 degres */  
   
-  if ( as->a < 0 ) {
-    as->a += 2*PI ;
+  if ( gp_Astr->a < 0 ) {
+    gp_Astr->a += 2*PI ;
   }
 
    // resultats de calculs : pour tests (a modifier : supprimer)
   
-  as->AZI0 = a0 ;
-  as->AZI1 = a1 ;
-  as->AZI2 = a2 ;
+  gp_Astr->AZI0 = a0 ;
+  gp_Astr->AZI1 = a1 ;
+  gp_Astr->AZI2 = a2 ;
 
-  CALCUL_CONVERSIONS_ANGLES( as) ;
+  CALCUL_CONVERSIONS_ANGLES( gp_Astr) ;
 
   Trace1("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
-    as->AZI0t.HH, \
-    as->AZI0t.MM , \
-    as->AZI0t.SS, \
-    as->AZI0 * DEGRES );
+    gp_Astr->AZI0t.HH, \
+    gp_Astr->AZI0t.MM , \
+    gp_Astr->AZI0t.SS, \
+    gp_Astr->AZI0 * DEGRES );
 
   Trace1("AZI1 = %d.%d.%d (hms) %.2f (deg)", \
-    as->AZI1t.HH, \
-    as->AZI1t.MM , \
-    as->AZI1t.SS, \
-    as->AZI1 * DEGRES );
+    gp_Astr->AZI1t.HH, \
+    gp_Astr->AZI1t.MM , \
+    gp_Astr->AZI1t.SS, \
+    gp_Astr->AZI1 * DEGRES );
 
   Trace1("AZI2 = %d.%d.%d (hms) %.2f (deg)", \
-    as->AZI2t.HH, \
-    as->AZI2t.MM , \
-    as->AZI2t.SS, \
-    as->AZI2 * DEGRES );
+    gp_Astr->AZI2t.HH, \
+    gp_Astr->AZI2t.MM , \
+    gp_Astr->AZI2t.SS, \
+    gp_Astr->AZI2 * DEGRES );
 
   Trace1("azi = %d.%d.%d (hms) %.2f (deg)", \
-    as->AGHt.HH, as->AGHt.MM , as->AGHt.SS, as->AGH * DEGRES );
+    gp_Astr->AGHt.HH, gp_Astr->AGHt.MM , gp_Astr->AGHt.SS, gp_Astr->AGH * DEGRES );
 
-  Trace1("alt = %f (deg)" , (as->h)*DEGRES) ;
+  Trace1("alt = %f (deg)" , (gp_Astr->h)*DEGRES) ;
 
 }
 //========================================================================================
@@ -381,7 +381,7 @@ void CALCUL_AZIMUT(LIEU *lieu, ASTRE *as) {
 //          qui utilise les coordonnees equatoriales 
 //========================================================================================
 
-void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
+void CALCUL_EQUATEUR(LIEU *gp_Lieu, ASTRE *gp_Astr) {
 
   // transforme les coordonnees azimutales en coordonnees siderales (angle horaire)
   // permet de trouver les coordonn�es siderales en fonction de l'azimut et de l'altitude
@@ -394,19 +394,19 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
   double A0,A2,A1,a,h,lat,Af,agh,H ;
 
   TRACE1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
-    (as->a)   * DEGRES,\
-    (as->h)   * DEGRES,\
-    (as->AGH)* DEGRES,\
-    (as->DEC) * DEGRES) ;
+    (gp_Astr->a)   * DEGRES,\
+    (gp_Astr->h)   * DEGRES,\
+    (gp_Astr->AGH)* DEGRES,\
+    (gp_Astr->DEC) * DEGRES) ;
 
-  lat      = lieu->lat ;
-  a        = as->a ;
-  h        = as->h ;
+  lat      = gp_Lieu->lat ;
+  a        = gp_Astr->a ;
+  h        = gp_Astr->h ;
   
   // FIXME : obtention de declinaison et ascension droite (d'apres formules usuelles de Gauss)
   
   H  = DEC(lat,a,h) ;
-  as->DEC  = H ;
+  gp_Astr->DEC  = H ;
 
   A0 = AGH0(a,h,H) ;       /* correct , ajouter 2*PI si negatif */
   A1 = AGH1(lat,a,h,H)+PI; /* correct , ajouter PI */ 
@@ -415,46 +415,46 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
   if ( A0 < 0 ) {
     A0 += 2 * PI ;
   }
-  // as->AGH = SGN(A0)*A1  ;
+  // gp_Astr->AGH = SGN(A0)*A1  ;
 
-  as->AGH = A0 ;
+  gp_Astr->AGH = A0 ;
 
   // resultats de calculs : pour tests (a modifier : supprimer)
 
-  as->AGH0 = A0 ;
-  as->AGH1 = A1 ;
-  as->AGH2 = A2 ;
+  gp_Astr->AGH0 = A0 ;
+  gp_Astr->AGH1 = A1 ;
+  gp_Astr->AGH2 = A2 ;
   
-  CALCUL_CONVERSIONS_ANGLES( as) ;
+  CALCUL_CONVERSIONS_ANGLES( gp_Astr) ;
   
   Trace1(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
-       as->nom , \
-       as->ASCt.HH, \
-       as->ASCt.MM, \
-       as->ASCt.SS, \
-       as->ASC * DEGRES, \
-       as->ASC \
+       gp_Astr->nom , \
+       gp_Astr->ASCt.HH, \
+       gp_Astr->ASCt.MM, \
+       gp_Astr->ASCt.SS, \
+       gp_Astr->ASC * DEGRES, \
+       gp_Astr->ASC \
   ) ; 
 
   Trace1("AH0   (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    as->AGH0t.HH, as->AGH0t.MM , as->AGH0t.SS, as->AGH0 * DEGRES );
+    gp_Astr->AGH0t.HH, gp_Astr->AGH0t.MM , gp_Astr->AGH0t.SS, gp_Astr->AGH0 * DEGRES );
 
   Trace1("AH1   (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    as->AGH1t.HH, as->AGH1t.MM , as->AGH1t.SS, as->AGH1 * DEGRES );
+    gp_Astr->AGH1t.HH, gp_Astr->AGH1t.MM , gp_Astr->AGH1t.SS, gp_Astr->AGH1 * DEGRES );
 
   Trace1("AH2   (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    as->AGH2t.HH, as->AGH2t.MM , as->AGH2t.SS, as->AGH2 * DEGRES );
+    gp_Astr->AGH2t.HH, gp_Astr->AGH2t.MM , gp_Astr->AGH2t.SS, gp_Astr->AGH2 * DEGRES );
 
   Trace1("AH    (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    as->AGHt.HH, as->AGHt.MM , as->AGHt.SS, as->AGH * DEGRES );
+    gp_Astr->AGHt.HH, gp_Astr->AGHt.MM , gp_Astr->AGHt.SS, gp_Astr->AGH * DEGRES );
 
-  Trace1("DEC   (deg) = %f" , (as->DEC)*DEGRES) ;
+  Trace1("DEC   (deg) = %f" , (gp_Astr->DEC)*DEGRES) ;
 
   Trace1("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
-   (as->a)*DEGRES,\
-   (as->h)*DEGRES,\
-   (as->AGH)*DEGRES,\
-   (as->DEC)*DEGRES) ;
+   (gp_Astr->a)*DEGRES,\
+   (gp_Astr->h)*DEGRES,\
+   (gp_Astr->AGH)*DEGRES,\
+   (gp_Astr->DEC)*DEGRES) ;
 } 
 
 //========================================================================================
@@ -463,36 +463,36 @@ void CALCUL_EQUATEUR(LIEU *lieu, ASTRE *as) {
 //           comme vitesses equatoriales theoriques (15" / s ) 
 //========================================================================================
 
-void CALCUL_VITESSES_EQUATORIAL(ASTRE *as) {
+void CALCUL_VITESSES_EQUATORIAL(ASTRE *gp_Astr) {
 
-  as->Va = -15.0 ;
-  as->Vh = -15.0 ;
+  gp_Astr->Va = -15.0 ;
+  gp_Astr->Vh = -15.0 ;
 }
 //========================================================================================
 // FIXME : CALCUL_VITESSES : 
 // FIXME : * calcule les vitesses azimutales Va et Vh (vitesses sur les moteurs azimut et altitude) 
 //========================================================================================
 
-void CALCUL_VITESSES(LIEU *li,ASTRE *as, SUIVI *suivi) {
+void CALCUL_VITESSES(LIEU *li,ASTRE *gp_Astr, SUIVI * gp_Sui) {
 
   // le calcul des vitesses est fait avec
   // l'angle horaire et la declinaison (azimut et altitude inutiles)
  
   double G, Va, Vh, angle ;
   
-  if ( suivi->SUIVI_EQUATORIAL == 1 ) {
-    as->Va = -15.0 ;
-    as->Vh = -15.0 ;
+  if ( gp_Sui->SUIVI_EQUATORIAL == 1 ) {
+    gp_Astr->Va = -15.0 ;
+    gp_Astr->Vh = -15.0 ;
   }
   else {
     angle=ANGLE_S ;
-    G  = sqr(sin(as->AGH))*sqr(cos(as->DEC))+sqr(sin(li->lat)*cos(as->DEC)*cos(as->AGH)-cos(li->lat)*sin(as->DEC)) ;
-    Va = angle*(cos(as->DEC)*(cos(li->lat)*cos(as->AGH)*sin(as->DEC)-sin(li->lat)*cos(as->DEC)))/G ;
-    Vh = angle*sin(as->AGH)*cos(as->DEC)*cos(li->lat)/sqrt(G) ;
-    as->Va=Va ;
-    as->Vh=Vh ;
+    G  = sqr(sin(gp_Astr->AGH))*sqr(cos(gp_Astr->DEC))+sqr(sin(li->lat)*cos(gp_Astr->DEC)*cos(gp_Astr->AGH)-cos(li->lat)*sin(gp_Astr->DEC)) ;
+    Va = angle*(cos(gp_Astr->DEC)*(cos(li->lat)*cos(gp_Astr->AGH)*sin(gp_Astr->DEC)-sin(li->lat)*cos(gp_Astr->DEC)))/G ;
+    Vh = angle*sin(gp_Astr->AGH)*cos(gp_Astr->DEC)*cos(li->lat)/sqrt(G) ;
+    gp_Astr->Va=Va ;
+    gp_Astr->Vh=Vh ;
   }
-  TRACE1("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n",(li->lat)*DEGRES,(as->AGH)*DEGRES,(as->DEC)*DEGRES,Va,Vh) ;
+  TRACE1("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n",(li->lat)*DEGRES,(gp_Astr->AGH)*DEGRES,(gp_Astr->DEC)*DEGRES,Va,Vh) ;
 }
 //========================================================================================
 // FIXME : CALCUL_D : 
@@ -501,10 +501,10 @@ void CALCUL_VITESSES(LIEU *li,ASTRE *as, SUIVI *suivi) {
 // TODO :  * a supprimer ?
 //========================================================================================
 
-void CALCUL_D(ASTRE *as, SUIVI *suivi) {
+void CALCUL_D(ASTRE *gp_Astr, SUIVI * gp_Sui) {
   
-  suivi->Da = AZI_F * 2.0 * PI / ( AZI_R * pow(2.0, AZI_N) * ( as->Va / ( 60 * 60 * DEGRES ) )) ;
-  suivi->Dh = ALT_F * 2.0 * PI / ( ALT_R * pow(2.0, ALT_N) * ( as->Vh / ( 60 * 60 * DEGRES ) )) ;
+  gp_Sui->Da = AZI_F * 2.0 * PI / ( AZI_R * pow(2.0, AZI_N) * ( gp_Astr->Va / ( 60 * 60 * DEGRES ) )) ;
+  gp_Sui->Dh = ALT_F * 2.0 * PI / ( ALT_R * pow(2.0, ALT_N) * ( gp_Astr->Vh / ( 60 * 60 * DEGRES ) )) ;
 }
 //========================================================================================
 // FIXME : CALCUL_PERIODE : 
@@ -514,7 +514,7 @@ void CALCUL_D(ASTRE *as, SUIVI *suivi) {
 //            double freq_alt_mot, freq_azi_mot ;
 //========================================================================================
 
-void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
+void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
 
   double freq_alt, freq_azi ;
   double freq_alt_mot, freq_azi_mot ;
@@ -534,15 +534,15 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  TRACE2("%f %f %f %f %f",suivi->acc_azi, voute->acc, AZI_R, as->Va, azi_rot);
-  TRACE2("%f %f %f %f %f",suivi->acc_alt, voute->acc, AZI_R, as->Vh, alt_rot);
+  TRACE2("%f %f %f %f %f",gp_Sui->acc_azi, gp_Vout->acc, AZI_R, gp_Astr->Va, azi_rot);
+  TRACE2("%f %f %f %f %f",gp_Sui->acc_alt, gp_Vout->acc, AZI_R, gp_Astr->Vh, alt_rot);
 
   /*------------------------*/
   /* Calculs des frequences */
   /*------------------------*/
 
-  freq_azi_mot = suivi->acc_azi * voute->acc * AZI_R * as->Va * azi_rot / DIV / PIPI / 4  ;
-  freq_alt_mot = suivi->acc_alt * voute->acc * ALT_R * as->Vh * alt_rot / DIV / PIPI / 4  ;
+  freq_azi_mot = gp_Sui->acc_azi * gp_Vout->acc * AZI_R * gp_Astr->Va * azi_rot / DIV / PIPI / 4  ;
+  freq_alt_mot = gp_Sui->acc_alt * gp_Vout->acc * ALT_R * gp_Astr->Vh * alt_rot / DIV / PIPI / 4  ;
   freq_azi     = freq_azi_mot * AZI_R4 ;
   freq_alt     = freq_alt_mot * ALT_R4 ;
 
@@ -551,7 +551,7 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   /* la frequence est la frequence moteur (sans tenir compte des micro pas) */
   /*-----------------------------------------------------*/
 
-  if ( devices->DEVICE_USE_CONTROLER ) {
+  if ( gp_Devi->DEVICE_USE_CONTROLER ) {
     freq_azi   = freq_azi_mot ;
     freq_alt   = freq_alt_mot ;
   }
@@ -560,26 +560,26 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
   /* Calculs des periodes  */
   /*------------------------*/
 
-  pthread_mutex_lock(& suivi->mutex_azi );
+  pthread_mutex_lock(& gp_Pthr->mutex_azi );
       
-    suivi->Sa_old = suivi->Sa ; 
-    suivi->Sa     = (int)SGN(freq_azi)  ;
-    suivi->Fa     = fabs(freq_azi )  ;
-    suivi->Fa_mot = fabs(freq_alt_mot) ;
-    suivi->Ta     = 1 / suivi->Fa ;
-    suivi->Ta_mot = 1 / suivi->Fa_mot ;
+    gp_Sui->Sa_old = gp_Sui->Sa ; 
+    gp_Sui->Sa     = (int)SGN(freq_azi)  ;
+    gp_Sui->Fa     = fabs(freq_azi )  ;
+    gp_Sui->Fa_mot = fabs(freq_alt_mot) ;
+    gp_Sui->Ta     = 1 / gp_Sui->Fa ;
+    gp_Sui->Ta_mot = 1 / gp_Sui->Fa_mot ;
 
-  pthread_mutex_unlock(& suivi->mutex_azi );
+  pthread_mutex_unlock(& gp_Pthr->mutex_azi );
   
-  pthread_mutex_lock(& suivi->mutex_alt );
+  pthread_mutex_lock(& gp_Pthr->mutex_alt );
 
-    suivi->Sh_old = suivi->Sh ; 
-    suivi->Sh     = (int)SGN(freq_alt) ;
-    suivi->Fh     = fabs(freq_alt)  ;
-    suivi->Th     = 1 / suivi->Fh ;
-    suivi->Th_mot = 1 / suivi->Fh_mot ;
+    gp_Sui->Sh_old = gp_Sui->Sh ; 
+    gp_Sui->Sh     = (int)SGN(freq_alt) ;
+    gp_Sui->Fh     = fabs(freq_alt)  ;
+    gp_Sui->Th     = 1 / gp_Sui->Fh ;
+    gp_Sui->Th_mot = 1 / gp_Sui->Fh_mot ;
 
-  pthread_mutex_unlock(& suivi->mutex_alt );
+  pthread_mutex_unlock(& gp_Pthr->mutex_alt );
 }
 //========================================================================================
 // FIXME : CALCUL_PERIODES_SUIVI_MANUEL : 
@@ -591,7 +591,7 @@ void CALCUL_PERIODE(ASTRE *as,SUIVI* suivi, VOUTE *voute) {
 // TODO : les periodes / frequences en azimut et altitude
 //========================================================================================
 
-void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *as, SUIVI* suivi, VOUTE *voute) {
+void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout) {
 
   double frequence ;
   double azi_rot, alt_rot ;
@@ -600,46 +600,46 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *as, SUIVI* suivi, VOUTE *voute) {
   // renvoyer par les boutons de la raquette
   // on deduit la frequence du nombre de pas comptes et de la periode ecoulee
   
-  if ( suivi->pas_azi !=  suivi->pas_azi_old ) {
-    if ( suivi->pas_azi !=0 ) {
+  if ( gp_Sui->pas_azi !=  gp_Sui->pas_azi_old ) {
+    if ( gp_Sui->pas_azi !=0 ) {
       if ( AZI_ROT == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
     
-      //frequence = azi_rot * (double)suivi->pas_azi / suivi->d_appui_raq_azi ;
-      frequence = azi_rot * (double)suivi->pas_azi ;
+      //frequence = azi_rot * (double)gp_Sui->pas_azi / gp_Sui->d_appui_raq_azi ;
+      frequence = azi_rot * (double)gp_Sui->pas_azi ;
     
-      pthread_mutex_lock(& suivi->mutex_azi );
+      pthread_mutex_lock(& gp_Pthr->mutex_azi );
   
-        as->Va     = frequence * DIV * PIPI / ( voute->acc * AZI_R ) ;
-        suivi->Sa_old = suivi->Sa ; 
-        suivi->Sa     = (int)SGN(frequence)  ;
-        suivi->Fa     = fabs(frequence) ;
-        suivi->Ta     = 1 / suivi->Fa ;
+        gp_Astr->Va     = frequence * DIV * PIPI / ( gp_Vout->acc * AZI_R ) ;
+        gp_Sui->Sa_old = gp_Sui->Sa ; 
+        gp_Sui->Sa     = (int)SGN(frequence)  ;
+        gp_Sui->Fa     = fabs(frequence) ;
+        gp_Sui->Ta     = 1 / gp_Sui->Fa ;
     
-      pthread_mutex_unlock(& suivi->mutex_azi );
+      pthread_mutex_unlock(& gp_Pthr->mutex_azi );
     
-      TRACE1("Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f\n",suivi->Ta, suivi->Th, suivi->Fa, suivi->Fh) ;
+      TRACE1("Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f\n",gp_Sui->Ta, gp_Sui->Th, gp_Sui->Fa, gp_Sui->Fh) ;
     }
   }
-  if ( suivi->pas_alt !=  suivi->pas_alt_old ) {
-    if ( suivi->pas_alt !=0 ) {
+  if ( gp_Sui->pas_alt !=  gp_Sui->pas_alt_old ) {
+    if ( gp_Sui->pas_alt !=0 ) {
       if ( ALT_ROT == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
     
-      //frequence = alt_rot * (double)suivi->pas_alt / suivi->d_appui_raq_alt ;
-      frequence = alt_rot * (double)suivi->pas_alt ;
+      //frequence = alt_rot * (double)gp_Sui->pas_alt / gp_Sui->d_appui_raq_alt ;
+      frequence = alt_rot * (double)gp_Sui->pas_alt ;
     
       // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL demande le mutex\n");
-      pthread_mutex_lock( & suivi->mutex_alt );
+      pthread_mutex_lock( & gp_Pthr->mutex_alt );
     
-        as->Vh     = frequence * DIV * PIPI / ( voute->acc * ALT_R ) ;
-        suivi->Sh_old = suivi->Sh ; 
-        suivi->Sh     = (int)SGN(frequence)  ;
-        suivi->Fh     = fabs(frequence) ;
-        suivi->Th     = 1 / suivi->Fh ;
+        gp_Astr->Vh     = frequence * DIV * PIPI / ( gp_Vout->acc * ALT_R ) ;
+        gp_Sui->Sh_old = gp_Sui->Sh ; 
+        gp_Sui->Sh     = (int)SGN(frequence)  ;
+        gp_Sui->Fh     = fabs(frequence) ;
+        gp_Sui->Th     = 1 / gp_Sui->Fh ;
   
         // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL relache le mutex\n");
-      pthread_mutex_unlock( & suivi->mutex_alt );
+      pthread_mutex_unlock( & gp_Pthr->mutex_alt );
     
-      TRACE1("Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f\n",suivi->Ta, suivi->Th, suivi->Fa, suivi->Fh) ;
+      TRACE1("Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f\n",gp_Sui->Ta, gp_Sui->Th, gp_Sui->Fa, gp_Sui->Fh) ;
     }
   }
 }
@@ -648,9 +648,9 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *as, SUIVI* suivi, VOUTE *voute) {
 // FIXME : * afficher heure minute seconde et heure decimal
 //========================================================================================
 
-void CALCUL_AFFICHER_HEURE( char * mesg, TEMPS *temps ) {
+void CALCUL_AFFICHER_HEURE( char * mesg, TEMPS * gp_Time ) {
 
-  Trace2("%s : %dh%dmn%ds : %f", mesg, temps->HH, temps->MM, temps->SS, temps->hd ) ;
+  Trace2("%s : %dh%dmn%ds : %f", mesg, gp_Time->HH, gp_Time->MM, gp_Time->SS, gp_Time->hd ) ;
 }
 
 //========================================================================================
@@ -668,42 +668,42 @@ void CALCUL_AFFICHER_ANGLE( char * mesg, ANGLE *angle ) {
 // FIXME : * Convertit heure minutes secondes en heure decimale 
 //========================================================================================
 
-void CALCUL_HDEC(TEMPS *temps) {
+void CALCUL_HDEC(TEMPS * gp_Time) {
   
-  temps->hd = temps->HH + (temps->MM / 60.0) + (temps->SS / 3600.0)  ;
+  gp_Time->hd = gp_Time->HH + (gp_Time->MM / 60.0) + (gp_Time->SS / 3600.0)  ;
 }
 
 /*****************************************************************************************
 * @fn     : CALCUL_TEMPS_VERS_HMS
 * @author : s.gravois
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
-* @param  : TEMPS *temps
+* @param  : TEMPS * gp_Time
 * @date   : 2022-03-18 creation 
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCUL_TEMPS_VERS_HMS(TEMPS *temps) {
+void CALCUL_TEMPS_VERS_HMS(TEMPS * gp_Time) {
   
   Trace1(""); 
-  Trace1("TEMPS    decimal  = %.4f" , temps->hd) ;
+  Trace1("TEMPS    decimal  = %.4f" , gp_Time->hd) ;
 
-  if ( temps->hd >=0 ) { 
-    temps->si   =  1 ;
-    temps->c_si = '+' ;
+  if ( gp_Time->hd >=0 ) { 
+    gp_Time->si   =  1 ;
+    gp_Time->c_si = '+' ;
   }
   else {
-    temps->si   = -1 ;
-    temps->c_si = '-' ; 
+    gp_Time->si   = -1 ;
+    gp_Time->c_si = '-' ; 
   }
   
-  temps->HH = (int)fabs(  temps->hd ) ;
-  Trace1("heure    decimale = %d" , temps->HH) ;
+  gp_Time->HH = (int)fabs(  gp_Time->hd ) ;
+  Trace1("heure    decimale = %d" , gp_Time->HH) ;
   
-  temps->MM = (int)fabs( (fabs(temps->hd) - temps->HH ) * 60.0 ) ;
-  Trace1("minutes  decimale = %d" , temps->MM) ;
+  gp_Time->MM = (int)fabs( (fabs(gp_Time->hd) - gp_Time->HH ) * 60.0 ) ;
+  Trace1("minutes  decimale = %d" , gp_Time->MM) ;
 
-  temps->SS = (int)fabs(((fabs(temps->hd) - temps->HH ) * 60.0 - temps->MM ) * 60.0 ) ;
-  Trace1("secondes decimale = %d" , temps->SS) ;
+  gp_Time->SS = (int)fabs(((fabs(gp_Time->hd) - gp_Time->HH ) * 60.0 - gp_Time->MM ) * 60.0 ) ;
+  Trace1("secondes decimale = %d" , gp_Time->SS) ;
 }
 
 /*****************************************************************************************
@@ -750,112 +750,112 @@ void CALCUL_ANGLE_VERS_DMS(ANGLE *angle) {
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCUL_CONVERSIONS_ANGLES(ASTRE *as) {
+void CALCUL_CONVERSIONS_ANGLES(ASTRE *gp_Astr) {
   
   /* ----------------------------*/
   /* azimut et altitude          */
   /* ----------------------------*/
 
-  (as->at).hd = as->a * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->at) ;
+  (gp_Astr->at).hd = gp_Astr->a * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->at) ;
 
-  (as->AZIa).AD = as->a ;
-  (as->AZIa).ad = as->a * DEGRES ;
-  CALCUL_ANGLE_VERS_DMS(&as->AZIa) ;
+  (gp_Astr->AZIa).AD = gp_Astr->a ;
+  (gp_Astr->AZIa).ad = gp_Astr->a * DEGRES ;
+  CALCUL_ANGLE_VERS_DMS(&gp_Astr->AZIa) ;
   
-  (as->ht).hd = as->h * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->ht) ;
+  (gp_Astr->ht).hd = gp_Astr->h * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->ht) ;
   
-  (as->ALTa).AD = as->h ;
-  (as->ALTa).ad = as->h * DEGRES ;
-  CALCUL_ANGLE_VERS_DMS(&as->ALTa) ;
+  (gp_Astr->ALTa).AD = gp_Astr->h ;
+  (gp_Astr->ALTa).ad = gp_Astr->h * DEGRES ;
+  CALCUL_ANGLE_VERS_DMS(&gp_Astr->ALTa) ;
 
   /* -----------------------------*/
   /* angle horaire et declinaison */
   /* ascension droite             */
   /* -----------------------------*/
 
-  (as->AGHt).hd = as->AGH * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AGHt) ;
+  (gp_Astr->AGHt).hd = gp_Astr->AGH * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGHt) ;
   
-  (as->DECt).hd = as->DEC * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->DECt) ;
+  (gp_Astr->DECt).hd = gp_Astr->DEC * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->DECt) ;
 
-  (as->ASCt).hd  = as->ASC * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->ASCt) ;
+  (gp_Astr->ASCt).hd  = gp_Astr->ASC * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->ASCt) ;
 
   /* -------------------------------*/
 
-  (as->AGHa).AD = as->AGH ;
-  (as->AGHa).ad = as->AGH * DEGRES ;
-  CALCUL_ANGLE_VERS_DMS(&as->AGHa) ;
+  (gp_Astr->AGHa).AD = gp_Astr->AGH ;
+  (gp_Astr->AGHa).ad = gp_Astr->AGH * DEGRES ;
+  CALCUL_ANGLE_VERS_DMS(&gp_Astr->AGHa) ;
 
-  (as->ASCa).AD = as->ASC ;
-  (as->ASCa).ad = as->ASC * DEGRES ;
-  CALCUL_ANGLE_VERS_DMS(&as->ASCa) ;
+  (gp_Astr->ASCa).AD = gp_Astr->ASC ;
+  (gp_Astr->ASCa).ad = gp_Astr->ASC * DEGRES ;
+  CALCUL_ANGLE_VERS_DMS(&gp_Astr->ASCa) ;
 
-  (as->DECa).AD = as->DEC ;
-  (as->DECa).ad = as->DEC * DEGRES ;
-  CALCUL_ANGLE_VERS_DMS(&as->DECa) ;
+  (gp_Astr->DECa).AD = gp_Astr->DEC ;
+  (gp_Astr->DECa).ad = gp_Astr->DEC * DEGRES ;
+  CALCUL_ANGLE_VERS_DMS(&gp_Astr->DECa) ;
 
   /* -------------------------------*/
   /* les calculs intermediaires     */
   /* -------------------------------*/
 
-  (as->AGH0t).hd = as->AGH0 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AGH0t) ;
+  (gp_Astr->AGH0t).hd = gp_Astr->AGH0 * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGH0t) ;
 
-  (as->AGH1t).hd = as->AGH1 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AGH1t) ;
+  (gp_Astr->AGH1t).hd = gp_Astr->AGH1 * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGH1t) ;
 
-  (as->AGH2t).hd = as->AGH2 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AGH2t) ;
+  (gp_Astr->AGH2t).hd = gp_Astr->AGH2 * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGH2t) ;
 
-  (as->AZI0t).hd = as->AZI0 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AZI0t) ;
+  (gp_Astr->AZI0t).hd = gp_Astr->AZI0 * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AZI0t) ;
 
-  (as->AZI1t).hd = as->AZI1 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AZI1t) ;
+  (gp_Astr->AZI1t).hd = gp_Astr->AZI1 * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AZI1t) ;
 
-  (as->AZI2t).hd = as->AZI2 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&as->AZI2t) ;
+  (gp_Astr->AZI2t).hd = gp_Astr->AZI2 * 24.0 / PIPI ;
+  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AZI2t) ;
 }
 //========================================================================================
 // FIXME : CALCUL_DATE : 
 // FIXME : * calcule la date locale servant a tous les calculs ulterieurs
 //========================================================================================
 
-int CALCUL_DATE(TEMPS *temps) {
+int CALCUL_DATE(TEMPS * gp_Time) {
   
   time_t t ;
   
   struct tm *tm ;
   
-  temps->HH = 0 ;
-  temps->MM = 0 ;
-  temps->SS = 0 ;
+  gp_Time->HH = 0 ;
+  gp_Time->MM = 0 ;
+  gp_Time->SS = 0 ;
   
-  temps->yy = 0 ;
-  temps->dd = 0 ;
-  temps->mm = 0 ;
+  gp_Time->yy = 0 ;
+  gp_Time->dd = 0 ;
+  gp_Time->mm = 0 ;
   
   time(&t) ;
   // tzset() ;
   // tm=localtime(&t) ; // pour le temps local (UTC+1 en hiver et UTC+2 en ete)
   tm=gmtime(&t);   // pour UTC
   
-  temps->HH = tm->tm_hour ;
-  temps->MM = tm->tm_min ;
-  temps->SS = tm->tm_sec ;
+  gp_Time->HH = tm->tm_hour ;
+  gp_Time->MM = tm->tm_min ;
+  gp_Time->SS = tm->tm_sec ;
   
-  temps->yy = 1900 + tm->tm_year ;
-  temps->dd = tm->tm_mday ;
-  temps->mm = tm->tm_mon + 1 ;
+  gp_Time->yy = 1900 + tm->tm_year ;
+  gp_Time->dd = tm->tm_mday ;
+  gp_Time->mm = tm->tm_mon + 1 ;
   
-  CALCUL_HDEC (temps ) ;
+  CALCUL_HDEC (gp_Time ) ;
   
   //printf("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
-  Trace2("%d %d %d %d %d %d %f",temps->yy,temps->mm,temps->dd,temps->HH,temps->MM,temps->SS, temps->hd ) ;
+  Trace2("%d %d %d %d %d %d %f",gp_Time->yy,gp_Time->mm,gp_Time->dd,gp_Time->HH,gp_Time->MM,gp_Time->SS, gp_Time->hd ) ;
   
   return 0 ;
 }
@@ -865,37 +865,37 @@ int CALCUL_DATE(TEMPS *temps) {
 // TODO : * valider / comparer avec valeurs de logiciels astronomiques (stellarium etc..)
 //========================================================================================
 
-int CALCUL_JOUR_JULIEN(LIEU* lieu, TEMPS * temps) {
+int CALCUL_JOUR_JULIEN(LIEU* gp_Lieu, TEMPS * gp_Time) {
   
   int    yy,mm,A,B,C,Y,M,D ;
   double T ;          // fraction de jour a ajouter au jour Julien	
   double JJ ;         // jour julien
   
-  Y  = temps->yy ;
-  M  = temps->mm ;
-  D  = temps->dd ;
+  Y  = gp_Time->yy ;
+  M  = gp_Time->mm ;
+  D  = gp_Time->dd ;
   
-  yy = temps->yy ;
-  mm = temps->mm ;
+  yy = gp_Time->yy ;
+  mm = gp_Time->mm ;
   
-  lieu->JJ = 0 ;
+  gp_Lieu->JJ = 0 ;
   JJ=0 ;
   
-  if ( temps->mm < 3) {
-    yy = temps->yy  - 1 ;
-    mm = temps->mm + 12 ;
+  if ( gp_Time->mm < 3) {
+    yy = gp_Time->yy  - 1 ;
+    mm = gp_Time->mm + 12 ;
   }
   A  = yy ;
   C  = floor(yy / 100  ) ;  
   B  = 2-C+floor(C/4) ;
   
-  Trace2("%d %d %d %d %d %d",temps->yy,temps->mm,temps->dd,temps->HH,temps->MM,temps->SS ) ;
+  Trace2("%d %d %d %d %d %d",gp_Time->yy,gp_Time->mm,gp_Time->dd,gp_Time->HH,gp_Time->MM,gp_Time->SS ) ;
   
-  T  = (double)temps->HH / 24.0 + (double)temps->MM / 1440.0 + (double)temps->SS / 86400.0 ;
+  T  = (double)gp_Time->HH / 24.0 + (double)gp_Time->MM / 1440.0 + (double)gp_Time->SS / 86400.0 ;
   
   Trace2("A B C T = %d %d %d %8.8f",A,B,C,T) ;
   
-  JJ = floor(365.25*(A+4716.0))+floor(30.6001*(mm+1))+(temps->dd)+T+B-1524.5 ;
+  JJ = floor(365.25*(A+4716.0))+floor(30.6001*(mm+1))+(gp_Time->dd)+T+B-1524.5 ;
   
   Trace2("Date Julienne (Jour Julien corriger avec le temps local) = %7.9f\n",JJ) ;
   
@@ -903,7 +903,7 @@ int CALCUL_JOUR_JULIEN(LIEU* lieu, TEMPS * temps) {
   
   Trace2("Date Julienne = %7.9f",JJ) ;
   
-  lieu->JJ = JJ ;
+  gp_Lieu->JJ = JJ ;
   
   return 0 ;
 }
@@ -915,23 +915,23 @@ int CALCUL_JOUR_JULIEN(LIEU* lieu, TEMPS * temps) {
 // TODO  : avec valeurs de logiciels astronomiques (stellarium etc..)
 //========================================================================================
 
-int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
+int CALCUL_TEMPS_SIDERAL(LIEU* gp_Lieu, TEMPS * gp_Time ) {
   
   double d, T, TSMG, TSMG2, TSH, TSMGH, TSMGH2, TSMH, TSMH2, GMSTO, GMST, LMST ;
   const double P = 2451545.5 ; 
   
-  CALCUL_DATE( temps ) ;   
-  CALCUL_JOUR_JULIEN  ( lieu, temps ) ;
+  CALCUL_DATE( gp_Time ) ;   
+  CALCUL_JOUR_JULIEN  ( gp_Lieu, gp_Time ) ;
   
   TEMPS TSMG3 ;
   TEMPS TSMGH3 ;
   TEMPS TSMH3 ;
 
-  if ( lieu->JJ == 0 ) return 1 ;
+  if ( gp_Lieu->JJ == 0 ) return 1 ;
   
-  d = lieu->JJ - P ;
+  d = gp_Lieu->JJ - P ;
   T = d / 36525.0 ;
-  T = ( lieu->JJ - P) / 36525.0 ; 
+  T = ( gp_Lieu->JJ - P) / 36525.0 ; 
   
   Trace2("T = %f",T);
   
@@ -944,7 +944,7 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   
   CALCUL_TEMPS_VERS_HMS( & TSMG3 ) ;
   
-  TSH   = temps->hd * 1.00273790935 * 15 ;
+  TSH   = gp_Time->hd * 1.00273790935 * 15 ;
   
   TSMGH  = TSMG + TSH ;
   
@@ -953,7 +953,7 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
 
   CALCUL_TEMPS_VERS_HMS( & TSMGH3) ;
   
-  TSMH  = TSMGH - lieu->lon ;
+  TSMH  = TSMGH - gp_Lieu->lon ;
   
   TSMH2 = fmod(TSMH, 360.0) ;
   TSMH3.hd = TSMH2 * 24.0 / 360.0 ;
@@ -967,10 +967,10 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   // =======================  Deuxieme methode ==========================
   
   GMSTO = 100.460618375 + 0.985647366286 * d ;
-  GMST  = GMSTO + 1.00273790935 * 15 * temps->hd  ;
-  GMST  = GMSTO + 1.002737 * 15 * temps->hd  ;
+  GMST  = GMSTO + 1.00273790935 * 15 * gp_Time->hd  ;
+  GMST  = GMSTO + 1.002737 * 15 * gp_Time->hd  ;
   
-  LMST = GMST + lieu->lon ; // FIXME : attention !! ici la longitude du lien intervient !!
+  LMST = GMST + gp_Lieu->lon ; // FIXME : attention !! ici la longitude du lien intervient !!
   
   TSMG2  = fmod(GMSTO, 360.0) ;
   TSMGH2 = fmod(GMST,  360.0) ;
@@ -988,12 +988,12 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
   CALCUL_AFFICHER_HEURE("2eme methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
   CALCUL_AFFICHER_HEURE("2eme methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSMH3) ;
   
-  lieu->TS  = TSMH3.hd ;
-  lieu->TSR = (TSMH3.hd / 24) * PIPI ;
+  gp_Lieu->TS  = TSMH3.hd ;
+  gp_Lieu->TSR = (TSMH3.hd / 24) * PIPI ;
   
-  Trace2("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  Trace2("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
-  Trace2("Methode 1 : lieu->JJ = %f lieu->TSR = %f",lieu->JJ, lieu->TSR ) ;
+  Trace2("Methode 1 : gp_Lieu->JJ = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
+  Trace2("Methode 1 : gp_Lieu->JJ = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
+  Trace2("Methode 1 : gp_Lieu->JJ = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
 
   return 0 ;
 }
@@ -1001,39 +1001,39 @@ int CALCUL_TEMPS_SIDERAL(LIEU* lieu, TEMPS *temps ) {
 * @fn     : CALCUL_ANGLE_HORAIRE
 * @author : s.gravois
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
-* @param  : TEMPS *temps
+* @param  : TEMPS * gp_Time
 * @date   : 2022-03-19 correction valeur quand negatif 
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCUL_ANGLE_HORAIRE( LIEU *li, ASTRE *as ) {
+void CALCUL_ANGLE_HORAIRE( LIEU *li, ASTRE *gp_Astr ) {
   
   // en radians 
 
   /* correction ascension droite si negatif (on ajoute 360 degres) */
 
-  if ( as->ASC < 0 ) {
-    as->ASC += 2*PI ;
+  if ( gp_Astr->ASC < 0 ) {
+    gp_Astr->ASC += 2*PI ;
   }
 
   /* calcul */ 
 
-  as->AGH = li->TSR - as->ASC ;
+  gp_Astr->AGH = li->TSR - gp_Astr->ASC ;
   
   /* correction angle horaire si negatif (on ajoute 360 degres) */
 
-  if ( as->AGH < 0 ) {
-    as->AGH += 2*PI ;
+  if ( gp_Astr->AGH < 0 ) {
+    gp_Astr->AGH += 2*PI ;
   }
 
-  CALCUL_CONVERSIONS_ANGLES( as) ;
+  CALCUL_CONVERSIONS_ANGLES( gp_Astr) ;
   
-  Trace1("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", gp_Astr->ASC * DEGRES) ;
   Trace1("temps sideral (rad)      = %.2f", li->TSR ) ;
-  Trace1("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
+  Trace1("angle horaire (deg)      = %.2f", gp_Astr->AGH * DEGRES) ;
 
   /*
-    CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
+    CONFIG_AFFICHER_MODE_STELLARIUM(gp_Astr) ;
   */
 }
 
@@ -1041,40 +1041,40 @@ void CALCUL_ANGLE_HORAIRE( LIEU *li, ASTRE *as ) {
 * @fn     : CALCUL_ASCENSION_DROITE
 * @author : s.gravois
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
-* @param  : TEMPS *temps
+* @param  : TEMPS * gp_Time
 * @date   : 2022-03-19 correction valeur quand negatif 
 * @date   : 2022-03-20 verification que angle horaire est positif
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCUL_ASCENSION_DROITE( LIEU *li, ASTRE *as ) {
+void CALCUL_ASCENSION_DROITE( LIEU *li, ASTRE *gp_Astr ) {
   
   // en radians 
   
   /* correction angle horaire si negatif (on ajoute 360 degres) */
 
-  if ( as->AGH < 0 ) {
-    as->AGH += 2*PI ;
+  if ( gp_Astr->AGH < 0 ) {
+    gp_Astr->AGH += 2*PI ;
   }
 
   /* calcul */ 
 
-  as->ASC = li->TSR - as->AGH ;
+  gp_Astr->ASC = li->TSR - gp_Astr->AGH ;
   
   /* correction ascension droite si negatif (on ajoute 360 degres) */
 
-  if ( as->ASC < 0 ) {
-    as->ASC += 2*PI ;
+  if ( gp_Astr->ASC < 0 ) {
+    gp_Astr->ASC += 2*PI ;
   }
 
-  CALCUL_CONVERSIONS_ANGLES( as) ;
+  CALCUL_CONVERSIONS_ANGLES( gp_Astr) ;
   
-  Trace1("ascension droite (deg)   = %.2f", as->ASC * DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", gp_Astr->ASC * DEGRES) ;
   Trace1("temps sideral (rad)      = %.2f", li->TSR ) ;
-  Trace1("angle horaire (deg)      = %.2f", as->AGH * DEGRES) ;
+  Trace1("angle horaire (deg)      = %.2f", gp_Astr->AGH * DEGRES) ;
 
   /*
-    CONFIG_AFFICHER_MODE_STELLARIUM(as) ;
+    CONFIG_AFFICHER_MODE_STELLARIUM(gp_Astr) ;
   */
 }
 //========================================================================================
@@ -1098,33 +1098,33 @@ void CALCUL_TOUT(void) {
   * et le type de l'as (CIEL_PROFOND etc...)
   -------------------------------------------------------*/
 
-  if      ( strstr( as->nom, CONFIG_MES ) != NULL ) as->type = ASTRE_CIEL_PROFOND ;
-  else if ( strstr( as->nom, CONFIG_NGC ) != NULL ) as->type = ASTRE_CIEL_PROFOND ;
-  else if ( strstr( as->nom, CONFIG_ETO ) != NULL ) as->type = ASTRE_CIEL_PROFOND ;
-  else if ( strstr( as->nom, CONFIG_PLA ) != NULL ) as->type = ASTRE_PLANETE ;
-  else if ( strstr( as->nom, CONFIG_AZI ) != NULL ) as->type = ASTRE_INDETERMINE ;
-  else if ( strstr( as->nom, CONFIG_EQU ) != NULL ) as->type = ASTRE_INDETERMINE ;
-  else                                                 as->type = ASTRE_INDETERMINE ;
+  if      ( strstr( gp_Astr->nom, CONFIG_MES ) != NULL ) gp_Astr->type = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( gp_Astr->nom, CONFIG_NGC ) != NULL ) gp_Astr->type = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( gp_Astr->nom, CONFIG_ETO ) != NULL ) gp_Astr->type = ASTRE_CIEL_PROFOND ;
+  else if ( strstr( gp_Astr->nom, CONFIG_PLA ) != NULL ) gp_Astr->type = ASTRE_PLANETE ;
+  else if ( strstr( gp_Astr->nom, CONFIG_AZI ) != NULL ) gp_Astr->type = ASTRE_INDETERMINE ;
+  else if ( strstr( gp_Astr->nom, CONFIG_EQU ) != NULL ) gp_Astr->type = ASTRE_INDETERMINE ;
+  else                                                 gp_Astr->type = ASTRE_INDETERMINE ;
   /* TODO : completer avec les types manquants */ 
 
-  if      ( strstr( as->nom, CONFIG_MES ) != NULL ) as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  else if ( strstr( as->nom, CONFIG_NGC ) != NULL ) as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  else if ( strstr( as->nom, CONFIG_ETO ) != NULL ) as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  else if ( strstr( as->nom, CONFIG_PLA ) != NULL ) as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  else if ( strstr( as->nom, CONFIG_AZI ) != NULL ) as->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  else if ( strstr( as->nom, CONFIG_EQU ) != NULL ) as->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ;
-  else                                                 as->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
+  if      ( strstr( gp_Astr->nom, CONFIG_MES ) != NULL ) gp_Astr->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( gp_Astr->nom, CONFIG_NGC ) != NULL ) gp_Astr->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( gp_Astr->nom, CONFIG_ETO ) != NULL ) gp_Astr->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( gp_Astr->nom, CONFIG_PLA ) != NULL ) gp_Astr->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( gp_Astr->nom, CONFIG_AZI ) != NULL ) gp_Astr->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  else if ( strstr( gp_Astr->nom, CONFIG_EQU ) != NULL ) gp_Astr->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ;
+  else                                                 gp_Astr->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
   /* TODO : completer avec les types manquants */ 
 
   /* recuperation du numero apres les 3 premiers caracteres */
 
-	len=strlen(as->nom)-pos ;
+	len=strlen(gp_Astr->nom)-pos ;
   memset( c_sub, 0, sizeof(c_sub));
-  memcpy( c_sub, &as->nom[pos], len );
+  memcpy( c_sub, &gp_Astr->nom[pos], len );
   c_sub[len] = '\0';
-  as->numero = atoi(c_sub) ;
+  gp_Astr->numero = atoi(c_sub) ;
   
-  switch (as->type) {
+  switch (gp_Astr->type) {
 
     /* ----------------------------------------------------------------- */
       /* pour un as indetermine 
@@ -1134,25 +1134,25 @@ void CALCUL_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
-      pthread_mutex_lock( & suivi->mutex_cal );
+      pthread_mutex_lock( & gp_Pthr->mutex_cal );
       
-      CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
-      /* CALCUL_AZIMUT       ( lieu, as) ; */
+      CALCUL_TEMPS_SIDERAL( gp_Lieu, gp_Time ) ;
+      /* CALCUL_AZIMUT       ( gp_Lieu, gp_Astr) ; */
 
-      if ( as->mode == MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ) {
+      if ( gp_Astr->mode == MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ) {
         
-        CALCUL_EQUATEUR        ( lieu, as ) ;
-        CALCUL_ASCENSION_DROITE( lieu, as ) ;
+        CALCUL_EQUATEUR        ( gp_Lieu, gp_Astr ) ;
+        CALCUL_ASCENSION_DROITE( gp_Lieu, gp_Astr ) ;
       }
       else {
-        CALCUL_ANGLE_HORAIRE( lieu, as ) ;
-        CALCUL_AZIMUT       ( lieu, as) ;
+        CALCUL_ANGLE_HORAIRE( gp_Lieu, gp_Astr ) ;
+        CALCUL_AZIMUT       ( gp_Lieu, gp_Astr) ;
       }
 
-      CALCUL_VITESSES     ( lieu, as, suivi) ;
-      CALCUL_PERIODE      ( as, suivi, voute) ;
+      CALCUL_VITESSES     ( gp_Lieu, gp_Astr, gp_Sui) ;
+      CALCUL_PERIODE      ( gp_Astr, gp_Sui, gp_Vout) ;
       
-      pthread_mutex_unlock( & suivi->mutex_cal ) ;
+      pthread_mutex_unlock( & gp_Pthr->mutex_cal ) ;
       
       break ;
 
@@ -1160,17 +1160,17 @@ void CALCUL_TOUT(void) {
 
     case ASTRE_CIEL_PROFOND :
     
-      pthread_mutex_lock( & suivi->mutex_cal );
+      pthread_mutex_lock( & gp_Pthr->mutex_cal );
       
-      CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+      CALCUL_TEMPS_SIDERAL( gp_Lieu, gp_Time ) ;
 
-      CALCUL_ANGLE_HORAIRE( lieu, as ) ;
-      CALCUL_AZIMUT       ( lieu, as) ;
+      CALCUL_ANGLE_HORAIRE( gp_Lieu, gp_Astr ) ;
+      CALCUL_AZIMUT       ( gp_Lieu, gp_Astr) ;
       
-      CALCUL_VITESSES     ( lieu, as, suivi) ;
-      CALCUL_PERIODE      ( as, suivi, voute) ;
+      CALCUL_VITESSES     ( gp_Lieu, gp_Astr, gp_Sui) ;
+      CALCUL_PERIODE      ( gp_Astr, gp_Sui, gp_Vout) ;
       
-      pthread_mutex_unlock( & suivi->mutex_cal ) ;
+      pthread_mutex_unlock( & gp_Pthr->mutex_cal ) ;
       
       break ;
       
@@ -1178,26 +1178,26 @@ void CALCUL_TOUT(void) {
     
     case ASTRE_PLANETE :
       
-      pthread_mutex_lock( & suivi->mutex_cal );
+      pthread_mutex_lock( & gp_Pthr->mutex_cal );
             
-      CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+      CALCUL_TEMPS_SIDERAL( gp_Lieu, gp_Time ) ;
       
-      if ( as->numero > 9 ) {
-        Trace("numero de planete interdit = %d", as->numero ) ;
+      if ( gp_Astr->numero > 9 ) {
+        Trace("numero de planete interdit = %d", gp_Astr->numero ) ;
         Trace("=> forçage a zero (soleil)"
          ) ;
-        as->numero = 0 ; 
+        gp_Astr->numero = 0 ; 
       }
-      SOLAR_SYSTEM( as->nom,\
-                      & as->ASC,\
-                      & as->DEC,\
-                      & as->a,\
-                      & as->h ,\
-                        lieu->lat, lieu->lon, lieu->alt,\
-                        temps->yy, temps->mm, temps->dd,temps->HH, temps->MM, temps->SS,\
-                        as->numero) ;
+      SOLAR_SYSTEM( gp_Astr->nom,\
+                      & gp_Astr->ASC,\
+                      & gp_Astr->DEC,\
+                      & gp_Astr->a,\
+                      & gp_Astr->h ,\
+                        gp_Lieu->lat, gp_Lieu->lon, gp_Lieu->alt,\
+                        gp_Time->yy, gp_Time->mm, gp_Time->dd,gp_Time->HH, gp_Time->MM, gp_Time->SS,\
+                        gp_Astr->numero) ;
       
-      CALCUL_ANGLE_HORAIRE( lieu, as ) ;
+      CALCUL_ANGLE_HORAIRE( gp_Lieu, gp_Astr ) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 
       // FIXME : ainsi que coordonnees equatoriales / declinaison
@@ -1205,12 +1205,12 @@ void CALCUL_TOUT(void) {
       // TODO  : verifier que le CALCUL_AZIMUT en fonction des coordonnees siderales
       // TODO  : ne modifie pas azimut et altitude calcules par SOLAR_SYSTEM
       
-      // CALCUL_AZIMUT  ( lieu, as) ;
+      // CALCUL_AZIMUT  ( gp_Lieu, gp_Astr) ;
       
-      CALCUL_VITESSES ( lieu, as, suivi) ;
-      CALCUL_PERIODE  ( as, suivi, voute) ;
+      CALCUL_VITESSES ( gp_Lieu, gp_Astr, gp_Sui) ;
+      CALCUL_PERIODE  ( gp_Astr, gp_Sui, gp_Vout) ;
 
-      pthread_mutex_unlock( & suivi->mutex_cal ) ;
+      pthread_mutex_unlock( & gp_Pthr->mutex_cal ) ;
       
       break ;
 
@@ -1240,18 +1240,18 @@ void CALCUL_TOUT(void) {
       /* 
       case CAPTEURS :
 
-        CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+        CALCUL_TEMPS_SIDERAL( gp_Lieu, gp_Time ) ;
         
         // TODO : modifier / completer / corriger ..
         
-        if ( devices->DEVICE_USE_CAPTEURS ) { 
-          as->a = suivi->pitch ;         // FIXME : donne azimut
-          as->h = suivi->heading ;       // FIXME : donne altitude 
-          CALCUL_EQUATEUR ( lieu, as) ;  // FIXME : donnes ASC et DEC
+        if ( gp_Devi->DEVICE_USE_CAPTEURS ) { 
+          gp_Astr->a = gp_Sui->pitch ;         // FIXME : donne azimut
+          gp_Astr->h = gp_Sui->heading ;       // FIXME : donne altitude 
+          CALCUL_EQUATEUR ( gp_Lieu, gp_Astr) ;  // FIXME : donnes ASC et DEC
         }
             
-        CALCUL_ANGLE_HORAIRE( lieu, as ) ;
-        CALCUL_AZIMUT  ( lieu, as) ;
+        CALCUL_ANGLE_HORAIRE( gp_Lieu, gp_Astr ) ;
+        CALCUL_AZIMUT  ( gp_Lieu, gp_Astr) ;
         
         break ;
       */
@@ -1272,66 +1272,66 @@ void CALCUL_VOUTE(void ) {
   double a, h ;
 
 /*
-  CALCUL_TEMPS_SIDERAL    ( lieu, temps ) ;
-  CALCUL_EQUATEUR         ( lieu, as ) ;
-  CALCUL_ASCENSION_DROITE ( lieu, as ) ;
-  CALCUL_VITESSES         ( lieu, as, suivi) ;
-  CALCUL_PERIODE          ( as, suivi, voute) ;
+  CALCUL_TEMPS_SIDERAL    ( gp_Lieu, gp_Time ) ;
+  CALCUL_EQUATEUR         ( gp_Lieu, gp_Astr ) ;
+  CALCUL_ASCENSION_DROITE ( gp_Lieu, gp_Astr ) ;
+  CALCUL_VITESSES         ( gp_Lieu, gp_Astr, gp_Sui) ;
+  CALCUL_PERIODE          ( gp_Astr, gp_Sui, gp_Vout) ;
 */
   fout=fopen("voute.csv","w") ;
   
-  CALCUL_TEMPS_SIDERAL( lieu, temps ) ;
+  CALCUL_TEMPS_SIDERAL( gp_Lieu, gp_Time ) ;
 
   // On fait varier les coordonnees azimutales
   
-  for(h=-(PI/2)+(lieu->lat)+0.001;h<PI/2;h+=voute->pas)
+  for(h=-(PI/2)+(gp_Lieu->lat)+0.001;h<PI/2;h+=gp_Vout->pas)
     if (h>=0) 
-    for(a=-PI +0.001 ;a<PI;a+=voute->pas){
+    for(a=-PI +0.001 ;a<PI;a+=gp_Vout->pas){
      
-     as->a=a ;
-     as->h=h ;
+     gp_Astr->a=a ;
+     gp_Astr->h=h ;
      
-     CALCUL_EQUATEUR          ( lieu, as) ; 
-     CALCUL_ASCENSION_DROITE  ( lieu, as ) ;
-     CALCUL_VITESSES          ( lieu, as, suivi) ;
-     CALCUL_PERIODE           ( as, suivi, voute) ;
+     CALCUL_EQUATEUR          ( gp_Lieu, gp_Astr) ; 
+     CALCUL_ASCENSION_DROITE  ( gp_Lieu, gp_Astr ) ;
+     CALCUL_VITESSES          ( gp_Lieu, gp_Astr, gp_Sui) ;
+     CALCUL_PERIODE           ( gp_Astr, gp_Sui, gp_Vout) ;
 
-     as->V  = sqrt( sqr( as->Va ) + sqr( as->Vh )) ;
+     gp_Astr->V  = sqrt( sqr( gp_Astr->Va ) + sqr( gp_Astr->Vh )) ;
      
-     if ( as->Va != 0) 
-       as->An = atan( as->Vh / as->Va ) ;
+     if ( gp_Astr->Va != 0) 
+       gp_Astr->An = atan( gp_Astr->Vh / gp_Astr->Va ) ;
      else
-       as->An = PI/2 ;
+       gp_Astr->An = PI/2 ;
      
-     CALCUL_GEODE( as ) ;
+     CALCUL_GEODE( gp_Astr ) ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
-       as->a * DEGRES, \
-       as->h * DEGRES, \
-       as->AGH * DEGRES, \
-       as->DEC * DEGRES, \
-       as->x , \
-       as->y, \
-       as->z, \
-       as->Va, \
-       as->Vh, \
-       as->V, \
-       as->An ) ;
+       gp_Astr->a * DEGRES, \
+       gp_Astr->h * DEGRES, \
+       gp_Astr->AGH * DEGRES, \
+       gp_Astr->DEC * DEGRES, \
+       gp_Astr->x , \
+       gp_Astr->y, \
+       gp_Astr->z, \
+       gp_Astr->Va, \
+       gp_Astr->Vh, \
+       gp_Astr->V, \
+       gp_Astr->An ) ;
      
      /*  	
      printf("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
-       as->xx , \
-       as->yy , \
-       as->zz , \
-       as->V ) ;
+       gp_Astr->xx , \
+       gp_Astr->yy , \
+       gp_Astr->zz , \
+       gp_Astr->V ) ;
      
      printf("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
-       as->xx , \
-       as->yy , \
-       as->zz , \
-       as->Va, \
-       as->Vh, \
-       as->V ) ;
+       gp_Astr->xx , \
+       gp_Astr->yy , \
+       gp_Astr->zz , \
+       gp_Astr->Va, \
+       gp_Astr->Vh, \
+       gp_Astr->V ) ;
      */
    }
   
@@ -1344,31 +1344,31 @@ void CALCUL_VOUTE(void ) {
       // si un alignement vient d etre effectue on affiche les vitesses calculees
       // TODO : verifier / completer / modifier ..
       /*
-      if ( suivi->SUIVI_ALIGNEMENT  ) {
+      if ( gp_Sui->SUIVI_ALIGNEMENT  ) {
 
         Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta %.2f Th %.2f Fa=%.2f Fh %.2f",\
-          as->nom,\
-          (int)((as->a)*DEGRES),\
-          (int)((as->h)*DEGRES),\
-          (int)((as->AGH)*DEGRES),\
-          (int)((as->DEC)*DEGRES),\
-          as->Va,\
-          as->Vh,\
-          suivi->Ta,\
-          suivi->Th,\
-          suivi->Fa,\
-          suivi->Fh ) ;
+          gp_Astr->nom,\
+          (int)((gp_Astr->a)*DEGRES),\
+          (int)((gp_Astr->h)*DEGRES),\
+          (int)((gp_Astr->AGH)*DEGRES),\
+          (int)((gp_Astr->DEC)*DEGRES),\
+          gp_Astr->Va,\
+          gp_Astr->Vh,\
+          gp_Sui->Ta,\
+          gp_Sui->Th,\
+          gp_Sui->Fa,\
+          gp_Sui->Fh ) ;
 
         Trace1("Va=%2.4f Vh=%2.4f Ta=%2.4f Th=%2.4f Fa=%2.4f Fh=%2.4f Fam = %ld Fhm = %ld Tac = %f Thc = %f\n",\
-              as->Va,\
-              as->Vh,\
-              suivi->Ta,\
-              suivi->Th,\
-              suivi->Fa,\
-              suivi->Fh,\
-              (suivi->Ia - suivi->Ia_prec),(suivi->Ih - suivi->Ih_prec ),suivi->Tac, suivi->Thc) ;
+              gp_Astr->Va,\
+              gp_Astr->Vh,\
+              gp_Sui->Ta,\
+              gp_Sui->Th,\
+              gp_Sui->Fa,\
+              gp_Sui->Fh,\
+              (gp_Sui->Ia - gp_Sui->Ia_prec),(gp_Sui->Ih - gp_Sui->Ih_prec ),gp_Sui->Tac, gp_Sui->Thc) ;
         
-        suivi->SUIVI_ALIGNEMENT = 0 ;
+        gp_Sui->SUIVI_ALIGNEMENT = 0 ;
 
       }
       */

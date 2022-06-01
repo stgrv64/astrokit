@@ -38,6 +38,8 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 

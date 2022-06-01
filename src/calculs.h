@@ -52,6 +52,8 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 
@@ -86,37 +88,37 @@ double DEG  (int degres, int minutes )                  ;
 // en profitant d'un sleep parametrable (eviter une consommation CPU
 // avant de rentrer en boucle active d'attente
 
-long   CALCUL_TEMPORISATION_VOUTE     ( VOUTE *voute, struct timeval t00) ;
+long   CALCUL_TEMPORISATION_VOUTE     ( VOUTE *gp_Vout, struct timeval t00) ;
 long   CALCUL_TEMPORISATION_MICROSEC  ( double microsecondes, double percent, struct timeval t00) ;
-void   CALCUL_TEMPORISATION_ALTITUDE  ( SUIVI *suivi, struct timeval * pt00)  ;
-void   CALCUL_TEMPORISATION_AZIMUT    ( SUIVI *suivi, struct timeval * pt00) ;
+void   CALCUL_TEMPORISATION_ALTITUDE  ( SUIVI * gp_Sui, struct timeval * pt00)  ;
+void   CALCUL_TEMPORISATION_AZIMUT    ( SUIVI * gp_Sui, struct timeval * pt00) ;
 
-void   CALCUL_GEODE                   ( ASTRE *as) ;
-void   CALCUL_AZIMUT                  ( LIEU *lieu, ASTRE *as) ;
-void   CALCUL_EQUATEUR                ( LIEU *lieu, ASTRE *as) ;
+void   CALCUL_GEODE                   ( ASTRE *gp_Astr) ;
+void   CALCUL_AZIMUT                  ( LIEU *gp_Lieu, ASTRE *gp_Astr) ;
+void   CALCUL_EQUATEUR                ( LIEU *gp_Lieu, ASTRE *gp_Astr) ;
 
-void   CALCUL_VITESSES_EQUATORIAL     (ASTRE *as) ;
-void   CALCUL_VITESSES                ( LIEU *lieu, ASTRE *as, SUIVI *suivi) ;
+void   CALCUL_VITESSES_EQUATORIAL     (ASTRE *gp_Astr) ;
+void   CALCUL_VITESSES                ( LIEU *gp_Lieu, ASTRE *gp_Astr, SUIVI * gp_Sui) ;
 
-void   CALCUL_ANGLE_HORAIRE           ( LIEU *lieu, ASTRE *as) ;
-void   CALCUL_ASCENSION_DROITE        ( LIEU *lieu, ASTRE *as) ; 
-void   CALCUL_D                       ( ASTRE *as, SUIVI *suivi) ;   
-void   CALCUL_PERIODE                 ( ASTRE *as, SUIVI* suivi,VOUTE *voute)  ;
-void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *as, SUIVI* suivi, VOUTE *voute) ;
+void   CALCUL_ANGLE_HORAIRE           ( LIEU *gp_Lieu, ASTRE *gp_Astr) ;
+void   CALCUL_ASCENSION_DROITE        ( LIEU *gp_Lieu, ASTRE *gp_Astr) ; 
+void   CALCUL_D                       ( ASTRE *gp_Astr, SUIVI * gp_Sui) ;   
+void   CALCUL_PERIODE                 ( ASTRE *gp_Astr, SUIVI * gp_Sui,VOUTE *gp_Vout)  ;
+void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout) ;
 
-int    CALCUL_TEMPS_SIDERAL           ( LIEU* lieu, TEMPS *temps ) ;
-int    CALCUL_JOUR_JULIEN             ( LIEU* lieu, TEMPS *temps) ;
-int    CALCUL_DATE                    ( TEMPS *temps ) ;
-void   CALCUL_HDEC                    ( TEMPS *temps ) ;
-void   CALCUL_TEMPS_VERS_HMS                     ( TEMPS *temps ) ;
+int    CALCUL_TEMPS_SIDERAL           ( LIEU* gp_Lieu, TEMPS * gp_Time ) ;
+int    CALCUL_JOUR_JULIEN             ( LIEU* gp_Lieu, TEMPS * gp_Time) ;
+int    CALCUL_DATE                    ( TEMPS * gp_Time ) ;
+void   CALCUL_HDEC                    ( TEMPS * gp_Time ) ;
+void   CALCUL_TEMPS_VERS_HMS                     ( TEMPS * gp_Time ) ;
 
-void   CALCUL_CONVERSIONS_ANGLES ( ASTRE *as) ;
-void   CALCUL_AFFICHER_HEURE            ( char * mesg, TEMPS *temps ) ;
+void   CALCUL_CONVERSIONS_ANGLES ( ASTRE *gp_Astr) ;
+void   CALCUL_AFFICHER_HEURE            ( char * mesg, TEMPS * gp_Time ) ;
 void   CALCUL_AFFICHER_ANGLE            ( char * mesg, ANGLE *angle ) ;
 
-void   SET_ASTRE( ASTRE *as,char *parametre, double valeur) ;
-void   SET_LIEU(  LIEU *lieu,char *parametre, double valeur) ;
-void   SET_VOUTE( VOUTE *voute,char *parametre, double valeur) ;
+void   SET_ASTRE( ASTRE *gp_Astr,char *parametre, double valeur) ;
+void   SET_LIEU(  LIEU *gp_Lieu,char *parametre, double valeur) ;
+void   SET_VOUTE( VOUTE *gp_Vout,char *parametre, double valeur) ;
 
 double CALCUL_DUREE_SECONDES           (struct timeval *) ;
 double CALCUL_DUREE_MICROSEC           (struct timeval *) ;

@@ -82,7 +82,7 @@ void CAT_READ(char * catalogue_txt, char g_Datas[CAT_NB_LIGNES][CAT_NB_COLONNES]
 // retourne tous les objets dans une zone de deg degres autour de ASTRE
 //============================================================================
 
-void CAT_ZONE(ASTRE *as, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+void CAT_ZONE(ASTRE *gp_Astr, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
   
   int    L,C ;
   double asc, asc_b  ;
@@ -90,13 +90,13 @@ void CAT_ZONE(ASTRE *as, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CA
   double d_angulaire ;
   double d_min ;
   
-  asc = as->AGH0 ;
-  dec = as->DEC ;
+  asc = gp_Astr->AGH0 ;
+  dec = gp_Astr->DEC ;
   L=0 ;
   d_min=deg ;
-  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", as->nom, as->AGH0, as->DEC) ;
+  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", gp_Astr->nom, gp_Astr->AGH0, gp_Astr->DEC) ;
   
-  while(strcmp(cat[L][3],"_") && strcmp(as->nom,cat[L][0]) && strcmp(as->nom,cat[L][1])) {
+  while(strcmp(cat[L][3],"_") && strcmp(gp_Astr->nom,cat[L][0]) && strcmp(gp_Astr->nom,cat[L][1])) {
    
     asc_b = atof( cat[L][2] ) ;
     dec_b = atof( cat[L][3] ) ;
@@ -108,18 +108,18 @@ void CAT_ZONE(ASTRE *as, double deg, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CA
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
-          memset( as->plus_proche[C], ZERO_CHAR, CAT_TAILLE_BUFFER);
-          strcpy( as->plus_proche[C], cat[L][C]) ;
+          memset( gp_Astr->plus_proche[C], ZERO_CHAR, CAT_TAILLE_BUFFER);
+          strcpy( gp_Astr->plus_proche[C], cat[L][C]) ;
         }
       }
     }
     L++;
   }
   TRACE("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f",\
-  as->plus_proche[0], as->plus_proche[1], as->plus_proche[2], as->plus_proche[3], d_min) ;
+  gp_Astr->plus_proche[0], gp_Astr->plus_proche[1], gp_Astr->plus_proche[2], gp_Astr->plus_proche[3], d_min) ;
 }
 //============================================================================
-void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+void  CAT_FIND(ASTRE *gp_Astr, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
   
   int    L=0 ;
   int    i_ligne=0 ;
@@ -131,10 +131,10 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
   
   L=0 ;
   
-  memset( as->infos, 0 , sizeof( as->infos) ) ;
+  memset( gp_Astr->infos, 0 , sizeof( gp_Astr->infos) ) ;
 
-  as->ASC=0;
-  as->DEC=0 ;
+  gp_Astr->ASC=0;
+  gp_Astr->DEC=0 ;
   
   i_ligne = L ;
 
@@ -142,27 +142,27 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
     //usleep(10000) ;
     TRACE1("L=%d %s %s %s %s" , L , cat[L][0], cat[L][1] , cat[L][2] , cat[L][3] );
 
-    if(!strcmp(cat[L][0],as->nom)) {
+    if(!strcmp(cat[L][0],gp_Astr->nom)) {
 
       /* -----------------------------------------------
        * Sauvegarde des coordonnees equatoriales du catalogue 
        * dans la structure ASTRE 
        **************************************************/
 
-      as->ASC = atof( cat[L][2] ) / DEGRES ;
-      as->DEC = atof( cat[L][3] ) / DEGRES ;
-      strcpy( as->infos, cat[L][1] ) ;
+      gp_Astr->ASC = atof( cat[L][2] ) / DEGRES ;
+      gp_Astr->DEC = atof( cat[L][3] ) / DEGRES ;
+      strcpy( gp_Astr->infos, cat[L][1] ) ;
 
       i_ligne = L ;
       i_trouve = TRUE ;
       break  ;
     }
 
-    if(!strcmp(cat[L][1],as->nom)) {
+    if(!strcmp(cat[L][1],gp_Astr->nom)) {
 
-      as->ASC = atof( cat[L][2] ) / DEGRES ;
-      as->DEC = atof( cat[L][3] ) / DEGRES ;
-      strcpy( as->infos, cat[L][1] ) ;
+      gp_Astr->ASC = atof( cat[L][2] ) / DEGRES ;
+      gp_Astr->DEC = atof( cat[L][3] ) / DEGRES ;
+      strcpy( gp_Astr->infos, cat[L][1] ) ;
 
       i_ligne = L ; 
       i_trouve = TRUE ;
@@ -172,26 +172,26 @@ void  CAT_FIND(ASTRE *as, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BU
   }
   if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
 
-    Trace(" %s : trouve dans catalogue",as->nom) ;
+    Trace(" %s : trouve dans catalogue",gp_Astr->nom) ;
 
   }
   else {
     
-    as->ASC = 0.0 ;
-    as->DEC = 0.0 ;
-    TRACE(" %s : non trouve dans catalogue",as->nom) ;
-    strcpy( as->nom, "undefined" ) ;
-    strcpy( as->infos, "undefined" ) ;
+    gp_Astr->ASC = 0.0 ;
+    gp_Astr->DEC = 0.0 ;
+    TRACE(" %s : non trouve dans catalogue",gp_Astr->nom) ;
+    strcpy( gp_Astr->nom, "undefined" ) ;
+    strcpy( gp_Astr->infos, "undefined" ) ;
   }
 
-  CALCUL_CONVERSIONS_ANGLES( as ) ;
+  CALCUL_CONVERSIONS_ANGLES( gp_Astr ) ;
 
   TRACE(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
-    as->nom , \
-    as->ASCt.HH, \
-    as->ASCt.MM, \
-    as->ASCt.SS, \
-    as->DEC * DEGRES
+    gp_Astr->nom , \
+    gp_Astr->ASCt.HH, \
+    gp_Astr->ASCt.MM, \
+    gp_Astr->ASCt.SS, \
+    gp_Astr->DEC * DEGRES
   ) ; 
 
   return ; 

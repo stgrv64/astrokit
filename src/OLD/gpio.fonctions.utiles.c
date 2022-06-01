@@ -88,12 +88,12 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
   // qui est dans astro.c
   // =======================================================================
   
-  clavier->appui_en_cours = 0 ;
+  gp_Clav->appui_en_cours = 0 ;
     
   for(i=0;i<4;i++) {
     GPIO_SET( GPIO_KEY_C[i], 1) ;
     
-    usleep( clavier->temporisation_clavier ) ;
+    usleep( gp_Clav->temporisation_clavier ) ;
     
     for(j=0;j<4;j++)  {
       if( GPIO_GET(GPIO_KEY_L[j])) {
@@ -102,9 +102,9 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
           strcpy( val, KEYBOARD[I][J] ) ;
 	  if ( strcmp( val, "") ) {
 	    //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, KEYBOARD[i][j] ) ;
-	    strcpy( clavier->mot, val ) ; 
-            clavier->appui_en_cours = 1 ;
-	    clavier->mot_en_cours = 1 ;
+	    strcpy( gp_Clav->mot, val ) ; 
+            gp_Clav->appui_en_cours = 1 ;
+	    gp_Clav->mot_en_cours = 1 ;
 	  }
       }
     }
@@ -117,33 +117,33 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
   // dans ceet aprtie de code
   // =======================================================================
   
-  if ( clavier->mot_en_cours && ! clavier->appui_en_cours ) {
+  if ( gp_Clav->mot_en_cours && ! gp_Clav->appui_en_cours ) {
   
-    // printf("mot trouver = %s\n", clavier->mot ) ;
+    // printf("mot trouver = %s\n", gp_Clav->mot ) ;
     
     //------------------------------------------------------------
     // On incremente la phrase avec le mot et
     // On incremente le nombre avec le mot si premier n'est pas vide
     //------------------------------------------------------------
     
-    if ( strcmp( clavier->mot, clavier->valider) != 0 ) { 
+    if ( strcmp( gp_Clav->mot, gp_Clav->valider) != 0 ) { 
       
-      if ( strlen(clavier->phrase) + strlen(clavier->mot) < DATAS_TAILLE_BUFFER_2)
-        sprintf(clavier->phrase,"%s%s",clavier->phrase, clavier->mot);
+      if ( strlen(gp_Clav->phrase) + strlen(gp_Clav->mot) < DATAS_TAILLE_BUFFER_2)
+        sprintf(gp_Clav->phrase,"%s%s",gp_Clav->phrase, gp_Clav->mot);
       
-      if ( strcmp( clavier->premier, "")) {
-        if ( strlen(clavier->nombre) + strlen(clavier->mot) < DATAS_TAILLE_BUFFER_2)
+      if ( strcmp( gp_Clav->premier, "")) {
+        if ( strlen(gp_Clav->nombre) + strlen(gp_Clav->mot) < DATAS_TAILLE_BUFFER_2)
         //printf("Si pas d'appui sur valider et premier non vide => on met le mot dans la phrase !!\n" ) ; 
-          sprintf(clavier->nombre,"%s%s",clavier->nombre,clavier->mot);
+          sprintf(gp_Clav->nombre,"%s%s",gp_Clav->nombre,gp_Clav->mot);
       }
     }    
     //------------------------------------------------------------
     // On met le mot dans premier si il est vide 
     //------------------------------------------------------------
     
-    if (   strcmp( clavier->premier, "") ==0 ){ 
+    if (   strcmp( gp_Clav->premier, "") ==0 ){ 
       // printf("Si premier est vide on met le mot en cours dedans\n" ) ; 
-      strcpy( clavier->premier, clavier->mot);
+      strcpy( gp_Clav->premier, gp_Clav->mot);
     }
     
     //------------------------------------------------------------
@@ -155,19 +155,19 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
     // et on met le mot dans PREMIER (premier mot de la phrase)
     //------------------------------------------------------------
     
-    for( i=0 ; i < clavier->validations_size ; i++ )
-    if ( ! strcmp( clavier->phrase, clavier->validations[i]) \
-      || ! strcmp( clavier->mot,    clavier->valider )  ) {
+    for( i=0 ; i < gp_Clav->validations_size ; i++ )
+    if ( ! strcmp( gp_Clav->phrase, gp_Clav->validations[i]) \
+      || ! strcmp( gp_Clav->mot,    gp_Clav->valider )  ) {
       //printf("APPUI sur VALIDER => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
       
-      strcpy(clavier->symbole, clavier->premier)  ;
+      strcpy(gp_Clav->symbole, gp_Clav->premier)  ;
       
-      strcpy(clavier->premier,"") ;
-      strcpy(clavier->phrase,"")  ;
-      strcpy(clavier->mot,"") ;
+      strcpy(gp_Clav->premier,"") ;
+      strcpy(gp_Clav->phrase,"")  ;
+      strcpy(gp_Clav->mot,"") ;
       
-      //printf("TROIS = symbole = %s nombre = %s\n", clavier->symbole, clavier->nombre ) ;
-      clavier->phrase_lue=1 ;
+      //printf("TROIS = symbole = %s nombre = %s\n", gp_Clav->symbole, gp_Clav->nombre ) ;
+      gp_Clav->phrase_lue=1 ;
     }
     
     //------------------------------------------------------------
@@ -175,21 +175,21 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
     // et on met le mot dans PREMIER (premier mot de la phrase)
     //------------------------------------------------------------
     
-    for( i=0 ; i < clavier->actions_size ; i++ )
-    if ( ! strcmp( clavier->mot, clavier->actions[i] )) {
+    for( i=0 ; i < gp_Clav->actions_size ; i++ )
+    if ( ! strcmp( gp_Clav->mot, gp_Clav->actions[i] )) {
         printf("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier") ;
-	strcpy(clavier->premier,clavier->mot) ;
-        strcpy(clavier->nombre,"")  ;
-	strcpy(clavier->phrase,"")  ;
-	strcpy(clavier->mot,"") ;
+	strcpy(gp_Clav->premier,gp_Clav->mot) ;
+        strcpy(gp_Clav->nombre,"")  ;
+	strcpy(gp_Clav->phrase,"")  ;
+	strcpy(gp_Clav->mot,"") ;
     }
     
-    clavier->mot_en_cours = 0 ;
-    clavier->appui_en_cours = 0 ;
+    gp_Clav->mot_en_cours = 0 ;
+    gp_Clav->appui_en_cours = 0 ;
   }
 }
 //==========================================================
-void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], char raquette[4][4][GPIO_TAILLE_BUFFER], SUIVI *suivi) {
+void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], char raquette[4][4][GPIO_TAILLE_BUFFER], SUIVI * gp_Sui) {
   int  i,j, I, J , appui ;
   char val[255] ;
   
@@ -202,23 +202,23 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], c
   for(i=0;i<4;i++) { GPIO_SET( GPIO_KEY_C[i], 1) ; 
   for(j=0;j<4;j++)  { if( GPIO_GET(GPIO_KEY_L[j])) {
    
-    if ( ! strcmp( raquette[i][j], "plus" ) ) {  suivi->pas_acc_plus =1 ; }
-    if ( ! strcmp( raquette[i][j], "moins" ) ) { suivi->pas_acc_moins=1 ; }
+    if ( ! strcmp( raquette[i][j], "plus" ) ) {  gp_Sui->pas_acc_plus =1 ; }
+    if ( ! strcmp( raquette[i][j], "moins" ) ) { gp_Sui->pas_acc_moins=1 ; }
 
-    if ( ! strcmp( raquette[i][j], "ne" ) ) { suivi->pas_nord=1 ; suivi->pas_est=1   ; }
-    if ( ! strcmp( raquette[i][j], "no" ) ) { suivi->pas_nord=1 ; suivi->pas_ouest=1 ; }
-    if ( ! strcmp( raquette[i][j], "se" ) ) { suivi->pas_sud=1  ; suivi->pas_est=1   ; }
-    if ( ! strcmp( raquette[i][j], "so" ) ) { suivi->pas_sud=1  ; suivi->pas_ouest=1 ; }
+    if ( ! strcmp( raquette[i][j], "ne" ) ) { gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
+    if ( ! strcmp( raquette[i][j], "no" ) ) { gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
+    if ( ! strcmp( raquette[i][j], "se" ) ) { gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
+    if ( ! strcmp( raquette[i][j], "so" ) ) { gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
     
-    if ( ! strcmp( raquette[i][j], "n" ) ) { suivi->pas_nord  = 1 ; }
-    if ( ! strcmp( raquette[i][j], "o" ) ) { suivi->pas_ouest = 1 ; }
-    if ( ! strcmp( raquette[i][j], "e" ) ) { suivi->pas_est   = 1 ; }
-    if ( ! strcmp( raquette[i][j], "s" ) ) { suivi->pas_sud   = 1 ; }
+    if ( ! strcmp( raquette[i][j], "n" ) ) { gp_Sui->pas_nord  = 1 ; }
+    if ( ! strcmp( raquette[i][j], "o" ) ) { gp_Sui->pas_ouest = 1 ; }
+    if ( ! strcmp( raquette[i][j], "e" ) ) { gp_Sui->pas_est   = 1 ; }
+    if ( ! strcmp( raquette[i][j], "s" ) ) { gp_Sui->pas_sud   = 1 ; }
     
-    if ( ! strcmp( raquette[i][j], "reset" ) ) { suivi->reset   = 1 ; }
+    if ( ! strcmp( raquette[i][j], "reset" ) ) { gp_Sui->reset   = 1 ; }
     
   }} GPIO_SET( GPIO_KEY_C[i], 0) ;  }
-  //printf("%ld %ld %ld %ld\n", suivi->pas_ouest, suivi->pas_est, suivi->pas_nord, suivi->pas_sud);
+  //printf("%ld %ld %ld %ld\n", gp_Sui->pas_ouest, gp_Sui->pas_est, gp_Sui->pas_nord, gp_Sui->pas_sud);
 }
 //==========================================================
 void GPIO_TRAP(int sig) {

@@ -22,7 +22,7 @@
 # 19/01/2022  | * ajout ASTRE_INDETERMINE pour pouvoir calculer
 #                 meme sans nom d as => cela permettra a terme
 #                 d'entrer l azimut et l altitude directement
-#                 pour effectuer le suivi
+#                 pour effectuer le gp_Sui
 # 20/01/2022  | * ajout de tous les types d 'as a t_en_Astre_Type
 #               * ajout d'un enum t_en_Mode_Calcul
 #               * ajout structure DEVICES et var don, *devices ;
@@ -58,7 +58,7 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     0
+#define DEBUG     2
 #define DEBUG_LOG 0
 
 // quelques macros de debugging
@@ -73,7 +73,7 @@
 // Raccourci
 // ----------------------------------------------------------------
 
-#define If_Mot_Is(s)    if(!strcmp(clavier->mot,s))
+#define If_Mot_Is(s)    if(!strcmp(gp_Clav->mot,s))
 
 // ------------------------------------------------------------------------
 // Syslog
@@ -230,7 +230,7 @@
 #define  ASTRE_TAILLE_BUFFER  256
 #define  ASTRE_NB_COLONNES    10000
 
-#define  CONFIG_CODES_NB_IN_OUT  3
+#define  CONFIG_COD_NB_IN_OUT  3
 #define  CONFIG_ASS              3 
 #define  CONFIG_ACTIONS_SIZE     7
 #define  CONFIG_VALIDATIONS_SIZE 10
@@ -244,6 +244,13 @@
 #define LCD_I2C_DEFAULT_DEV_PORT      1
 
 #define CONFIG_C_BIN_POSSIBLE_PATHS_LENGTH   6
+
+typedef enum {
+  USERID_ROOT=0,
+  USERID_STEF=1000
+} 
+t_en_User_Ids ;
+
 //------------------------------------------------------------------------------
 /* LA valeur dans le nom de champs enum est arbitraite , seule compte une valeur < ou > */
 /* En effet , une policy N+1 aura toujours l'avantage */
@@ -402,7 +409,7 @@ CODES ;
 /* DEFINITION DES CODES d INTERRACTION en INPUT */ 
 /*----------------------------------------------*/
 
-static const char *g_char_Codes[][ CONFIG_CODES_NB_IN_OUT ] = {
+static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 
 /*--------------------------------*/
 /* clavier numerique              */ 
@@ -746,18 +753,7 @@ typedef struct {
 }
 DEVICES ;
 
-//=====================================================
 typedef struct {
-
-  int          SUIVI_MANUEL ;
-  int          SUIVI_ALIGNEMENT ;
-  int          SUIVI_GOTO ;
-  int          SUIVI_VOUTE ;
-  int          SUIVI_EQUATORIAL ;
-
-  char datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
-  char datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
-  char datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
 
   pthread_mutex_t  mutex_infrarouge  ;
   pthread_mutex_t  mutex_alt  ;
@@ -782,7 +778,24 @@ typedef struct {
   pthread_t    p_thread_t_id[ MAX_THREADS ]  ;
   int          p_thread_sleep_before_start[ MAX_THREADS ] ;
   char         p_c_thread_name [ MAX_THREADS ][ 16 ] ;
-  
+}
+PTHREADS ;
+
+//=====================================================
+typedef struct {
+
+  PTHREADS *   p_Pth ;
+
+  int          SUIVI_MANUEL ;
+  int          SUIVI_ALIGNEMENT ;
+  int          SUIVI_GOTO ;
+  int          SUIVI_VOUTE ;
+  int          SUIVI_EQUATORIAL ;
+
+  char datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
+  char datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
+  char datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
+
   long         t_diff ;
   double       t_diff_sec ;
   
@@ -797,7 +810,6 @@ typedef struct {
   long         l_NANO_MOINS ;     // a retirer sur les temporisations pour les tests
   
   unsigned int i_statut_suivi ;
-  unsigned int i_threads[MAX_THREADS] ;
   
   // Variables utilisees en mode MANUEL SIMPLE
   // elles servent dans le calcul des periodes (par defaut sont egales à 1)
@@ -958,7 +970,7 @@ typedef struct {
  double a0 ;   // valeur precedente de l'azimut
  double h0 ;   // valeur precedente de l'altitude
  
- double AGH ;    // angle horaire  ( = lieu->temps sideral - ASC)
+ double AGH ;    // angle horaire  ( = gp_Lieu->temps sideral - ASC)
  double H    ;    // declinaison
  
  double DEC  ;  // un resultat de calcul de declinaison
@@ -1050,21 +1062,22 @@ VOUTE ;
 * Definition des variables globales a partir des structures
   ------------------------------------------------------------*/
 
-TEMPS      tem, *temps ;
-LIEU       lie, *lieu ;
-ASTRE      ast , *as ;
-VOUTE      vou, *voute ;
-SUIVI	     sui, *suivi ;
-CLAVIER    cla, *clavier ;
-DEVICES    dev, *devices ;
-CODES      g_Codes, *gp_Codes ;
-LCD        g_Lcd,   *gp_Lcd ;
+ASTRE      ast,   *gp_Astr ;
+CLAVIER    cla,   *gp_Clav ;
+CODES      g_Cod, *gp_Cod ;
+TEMPS      tem,   *gp_Time ;
+LIEU       lie,   *gp_Lieu ;
+VOUTE      vou,   *gp_Vout ;
+SUIVI	     sui,   *gp_Sui ;
+DEVICES    dev,   *gp_Devi ;
+LCD        g_Lcd, *gp_Lcd ;
+PTHREADS   g_Pth, *gp_Pthr ;
 
 FILE      * flog ; 
 
-char       g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
+char      g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
 char      g_Path_Cmd_Stty[ CONFIG_TAILLE_BUFFER_32 ] ;
-
+int       gc_user_id ;
 // ------------------------------------------------------------------------
 // definition des variables dependant du fichier de conf
 // ------------------------------------------------------------------------

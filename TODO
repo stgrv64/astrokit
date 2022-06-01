@@ -200,6 +200,10 @@ juin 2022 : modification ordre priorites
       
 0 => prise en compte SIGKILL (sudo kill -9 pid n appelle pas la fct TRAP_MAIN)
 
+1 => voute.csv code en dur : corrriger
+
+1  => remplacer CONFIG_INIT etc.. par CONFIG_PROBE / RELEASE (a la sauce driver)
+
 1  => recompiler et finir programme generique GPIO , le mettre dans /usr/local/bin
 
 1  => mettre le parametre d inversion (flag de reversibilité) code IR /CLAVIER /etc..

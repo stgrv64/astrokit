@@ -56,6 +56,8 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 // FIN INCLUDES =====================================
 
@@ -67,19 +69,18 @@
 
 void   CONFIG_INIT_LOG(void)  ;
 
-void   CONFIG_INIT_CLAVIER ( CLAVIER * clavier)  ;
-void   CONFIG_INIT_LIEU    ( LIEU    * lieu) ;
-void   CONFIG_INIT_ASTRE   ( ASTRE   * as ) ;
-void   CONFIG_INIT_VOUTE   ( VOUTE   * voute) ;
-void   CONFIG_INIT_SUIVI   ( SUIVI   * suivi) ;
-void   CONFIG_INIT_TEMPS   ( TEMPS   * temps) ;
-void   CONFIG_INIT_DEVICES ( DEVICES * devices) ;
-void   CONFIG_INIT_LCD     ( LCD     * lcd) ;
+void   CONFIG_INIT_CLAVIER ( CLAVIER * )  ;
+void   CONFIG_INIT_LIEU    ( LIEU    * ) ;
+void   CONFIG_INIT_ASTRE   ( ASTRE   *  ) ;
+void   CONFIG_INIT_VOUTE   ( VOUTE   * ) ;
+void   CONFIG_INIT_SUIVI   ( SUIVI   * ) ;
+void   CONFIG_INIT_TEMPS   ( TEMPS   * ) ;
+void   CONFIG_INIT_DEVICES ( DEVICES * ) ;
 
 /* ajout mars 2022 */
 /* fonctions anciennement dans ir.c /.h */
 
-void  CONFIG_INIT_CODE     ( CODES *, int, const char * [][CONFIG_CODES_NB_IN_OUT] ) ;
+void  CONFIG_INIT_CODE     ( CODES *, int, const char * [][CONFIG_COD_NB_IN_OUT] ) ;
 void  CONFIG_INIT_CODES    ( CODES *) ;
 void  CONFIG_MAJ_SUIVI_PAS ( SUIVI *) ;
 void  CONFIG_INPUTS_GESTION_APPUIS(SUIVI *, CLAVIER *) ;
@@ -90,7 +91,7 @@ void   CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) ; // FIXME ajout 20190822
 void   CONFIG_SET_MONTH_AND_DAY(char * s_data) ;
 void   CONFIG_SET_HOUR_AND_MINUTES(char * s_data) ;
 
-void   CONFIG_VOUTE( VOUTE *voute, double dt, double acc, double percent ) ;
+void   CONFIG_VOUTE( VOUTE *gp_Vout, double dt, double acc, double percent ) ;
 
 int    CONFIG_FORMAT_ADMIS(char c) ;
 int    CONFIG_FIN_LIGNE(char c) ;
@@ -104,9 +105,9 @@ void   CONFIG_AFFICHER_DATAS(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CO
 int    CONFIG_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_GETCWD(char * ) ;
 
-void   CONFIG_AFFICHER_TEMPS(TEMPS *temps) ; /* FIXME ajout 20191228 */
-void   CONFIG_AFFICHER_MODE_LONG(ASTRE *as) ;
-void   CONFIG_AFFICHER_LIEU(LIEU *lieu) ;
+void   CONFIG_AFFICHER_TEMPS(TEMPS * gp_Time) ; /* FIXME ajout 20191228 */
+void   CONFIG_AFFICHER_MODE_LONG(ASTRE *gp_Astr) ;
+void   CONFIG_AFFICHER_LIEU(LIEU *gp_Lieu) ;
 void   CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier)  ;
 
 void   CONFIG_AFFICHER_TOUT(void) ;          /* FIXME ajout 20191228 */

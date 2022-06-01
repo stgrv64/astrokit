@@ -40,7 +40,7 @@
 
 #include <linux/i2c-dev.h>
 #include <lirc_client.h>
-/*
+
 #include <arguments.h>
 #include <astro.h>
 #include <calculs.h>
@@ -51,10 +51,9 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
-*/
 /* #include <keyboard.h> */
-
-#include <types.h>
+#include <pthreads.h>
+#include <lcd.h>
 
 /* definition du character d echappement */ 
 #define TERMIOS_ESCAPE_CHAR            27

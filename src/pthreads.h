@@ -10,8 +10,8 @@
 # -------------------------------------------------------------- 
 */
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef PTHREADS_H
+#define PTHREADS_H
 
 // INCLUDES =====================================
 #include <errno.h>
@@ -48,6 +48,9 @@
 #include <ir.h>
 #include <stat.h>
 #include <types.h>
+/* #include <pthreads.h> */
 #include <lcd.h>
+
+void PTHREADS_INIT  (void) ;
 
 #endif

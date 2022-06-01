@@ -10,8 +10,8 @@
 # -------------------------------------------------------------- 
 */
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef LCD_H
+#define LCD_H
 
 // INCLUDES =====================================
 #include <errno.h>
@@ -49,6 +49,9 @@
 #include <stat.h>
 #include <types.h>
 #include <pthreads.h>
+/* #include <lcd.h> */
+
+void   LCD_INIT                      (LCD *) ;
 
 void   LCD_DISPLAY_DEFAULT           ( void ) ;
 void   LCD_DISPLAY_CURRENT           ( void ) ;
