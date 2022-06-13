@@ -1077,11 +1077,16 @@ void CALCUL_ASCENSION_DROITE( LIEU *li, ASTRE *gp_Astr ) {
     CONFIG_AFFICHER_MODE_STELLARIUM(gp_Astr) ;
   */
 }
-//========================================================================================
-// FIXME : CALCUL_TOUT
-// FIXME :  * rafraichit l integralite des calculs 
-// FIXME :  * a besoin de tous les calculs , ainsi que du mode 
-//========================================================================================
+/*****************************************************************************************
+* @fn     : CALCUL_ASCENSION_DROITE
+* @author : s.gravois
+* @brief  : Rafraichit l integralite des calculs
+* @param  : ASTRE * gp_Astr
+* @param  : LIEU  * gp_Lieu
+* @param  : SUIVI * gp_Suivi
+* @date   : 2022-06-13 correction argument 1 de SOLAR_SYSTEM astre->nom => astre->infos
+* @todo   : ras
+*****************************************************************************************/
 
 void CALCUL_TOUT(void) {
   
@@ -1089,7 +1094,7 @@ void CALCUL_TOUT(void) {
   int len=0 ;
   char c_sub[32];
 
-  Trace2("") ;
+  Trace2("%s",gp_Astr->nom) ;
 
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la as peut avoir plusieurs
@@ -1188,7 +1193,8 @@ void CALCUL_TOUT(void) {
          ) ;
         gp_Astr->numero = 0 ; 
       }
-      SOLAR_SYSTEM( gp_Astr->nom,\
+
+      SOLAR_SYSTEM(     gp_Astr->infos,\
                       & gp_Astr->ASC,\
                       & gp_Astr->DEC,\
                       & gp_Astr->a,\

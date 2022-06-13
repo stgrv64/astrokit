@@ -167,23 +167,23 @@ int KINIT_ASTROKIT(double tlongg, double glatt, double heightt,double attempp, d
     trho = 0.998327073 + 0.001676438 * cos(2.0*u) - 0.000003519 * cos(4.0*u) + 0.000000008 * cos(6.0*u);
     trho += height/6378160.;
    */
-    TRACE( "Terrestrial east longitude %.4f deg", tlong );
-    TRACE( "geocentric latitude %.4f deg", tlat );
-    TRACE( "Earth radius %.5f", trho );
+    TRACE1( "Terrestrial east longitude %.4f deg", tlong );
+    TRACE1( "geocentric latitude %.4f deg", tlat );
+    TRACE1( "Earth radius %.5f", trho );
      
     attemp = attempp ;
     atpress = atpresss ;
     jdflag = jdflagg ;
 
     switch( jdflag ) {
-      case 0:  TRACE("TDT and UT assumed equal."); break;
-      case 1:  TRACE("Input time is TDT." );       break;
-      case 2:  TRACE("Input time is UT." );        break;
-      default: TRACE("Illegal jdflag" ); exit(0);
+      case 0:  TRACE1("TDT and UT assumed equal."); break;
+      case 1:  TRACE1("Input time is TDT." );       break;
+      case 2:  TRACE1("Input time is UT." );        break;
+      default: TRACE1("Illegal jdflag" ); exit(0);
     }
     dtgiven = dtgivenn ; 
     
-    if( dtgiven != 0.0 ) TRACE( "Using deltaT = %.2fs.", dtgiven );
+    if( dtgiven != 0.0 ) TRACE1( "Using deltaT = %.2fs.", dtgiven );
 
   
   

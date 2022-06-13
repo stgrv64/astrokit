@@ -335,7 +335,7 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
   
   memset( infos->nom, 0, sizeof( infos->nom) ) ;
 
-  Trace("objnum=%d",objnum) ;
+  TRACE1("objnum=%d",objnum) ;
   
   switch(objnum) {
     case -1: exit(0);
@@ -358,15 +358,15 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
     default: return ;
   }
 
-  Trace("infos->nom=%s",infos->nom) ;
+  TRACE1("infos->nom=%s",infos->nom) ;
 
   if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
-  else if( elobject )                      TRACE( "\n\t%s", &elobject->obname[0] ); 
+  else if( elobject )                      TRACE1( "\n\t%s", &elobject->obname[0] ); 
 
   for( i=0; i<ntab; i++ ) {
     /* print Julian date */
   
-    TRACE( "\nJD %.2f,  ", JD );
+    TRACE1( "\nJD %.2f,  ", JD );
     update(); // fonction
 
     /* Always calculate heliocentric position of the earth */
@@ -405,11 +405,11 @@ void SOLAR_SYSTEM( char * nom, \
   double tlongg, glatt, heightt;
   int    yearr, monthh, dayy, hourr, minn, secc ;
   
-  Trace("numero planete = %d", num) ;
+  TRACE1("numero planete = %d", num) ;
   
   if ( num > 9 ) return ;
 
-  TRACE("RTD = %f", RTD) ;
+  TRACE1("RTD = %f", RTD) ;
   infos = &inf ;
 
   tlongg  = lon * RTD ;
@@ -438,7 +438,7 @@ void SOLAR_SYSTEM( char * nom, \
   
   memset( infos->nom, 0, sizeof( infos->nom) ) ;
   
-  TRACE("%f %f %f %d %d %d %d %d %d : %d : %f", glatt, tlongg, heightt, yearr, monthh, dayy, hourr, minn, secc, objnum,  JD ) ;
+  TRACE1("%f %f %f %d %d %d %d %d %d : %d : %f", glatt, tlongg, heightt, yearr, monthh, dayy, hourr, minn, secc, objnum,  JD ) ;
   
   switch(objnum) {
     case -1: exit(0);
@@ -462,11 +462,11 @@ void SOLAR_SYSTEM( char * nom, \
   }
 
   if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
-  else if( elobject )                      TRACE( "\n\t%s", &elobject->obname[0] ); 
+  else if( elobject )                      TRACE1( "\n\t%s", &elobject->obname[0] ); 
 
   for( i=0; i<ntab; i++ ) {
   
-    TRACE( "\nJD %.2f,", JD );
+    TRACE1( "\nJD %.2f,", JD );
     update(); 
 
     kepler( TDT, &earth, rearth, eapolar );
@@ -477,11 +477,11 @@ void SOLAR_SYSTEM( char * nom, \
       case 88:  dostar(    infos);  /* iter_trnsit( dostar );*/    break;
       default:  doplanet(  infos);  /* iter_trnsit( doplanet );*/  break;
     }
-    printf( "\ninfos->nom = %s\n" , infos->nom );
-    printf( "infos->asc = %f deg\n" , infos->asc * RTD );
-    printf( "infos->dec = %f deg\n" , infos->dec * RTD );
-    printf( "infos->alt = %f deg\n" , infos->alt * RTD);
-    printf( "infos->azi = %f deg\n" , infos->azi * RTD);
+    TRACE1( "\ninfos->nom = %s\n" , infos->nom );
+    TRACE1( "infos->asc = %f deg\n" , infos->asc * RTD );
+    TRACE1( "infos->dec = %f deg\n" , infos->dec * RTD );
+    TRACE1( "infos->alt = %f deg\n" , infos->alt * RTD);
+    TRACE1( "infos->azi = %f deg\n" , infos->azi * RTD);
     
     JD += djd;
   }
@@ -563,7 +563,7 @@ int mainSS(int argc , char ** argv) {
 
     update();        
 */   
-    TRACE("%f %f %f %d %d %d %d %d %d : %d : %f",tlongg, glatt,heightt, yearr, monthh, dayy, hourr, minn, secc, objnum,  JD ) ;
+    TRACE1("%f %f %f %d %d %d %d %d %d : %d : %f",tlongg, glatt,heightt, yearr, monthh, dayy, hourr, minn, secc, objnum,  JD ) ;
     
     SOLAR_SYSTEM( nom, asc, h, azi, alt, glatt / RTD, tlongg / RTD, heightt, yearr, monthh, dayy, hourr, minn, secc, objnum ) ;
 
@@ -581,7 +581,7 @@ int mainSS(int argc , char ** argv) {
     
     update();        /* find UT and ET */ // appel fonction
   
-    TRACE( "Julian day %.7f, delta T = %.2f s", JD, deltat_value );
+    TRACE1( "Julian day %.7f, delta T = %.2f s", JD, deltat_value );
 
     getnum( "Enter interval between tabulations in days", &djd, dblfmt ); // fonction
     getnum( "Number of tabulations to display", &ntab, intfmt ); // fonction
@@ -589,10 +589,10 @@ int mainSS(int argc , char ** argv) {
   
     switch(objnum) {
      case -1: exit(0);
-     case 0:  elobject = 0; TRACE( "\nThe Sun" ); break;
+     case 0:  elobject = 0; TRACE1( "\nThe Sun" ); break;
      case 1:  elobject = &mercury; break;
      case 2:  elobject = &venus; break;
-     case 3:  elobject = 0; TRACE( "\nThe Moon" ); break;
+     case 3:  elobject = 0; TRACE1( "\nThe Moon" ); break;
      case 4:  elobject = &mars; break;
      case 5:  elobject = &jupiter; break;
      case 6:  elobject = &saturn; break;
@@ -609,12 +609,12 @@ int mainSS(int argc , char ** argv) {
     }
 
     if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
-    else if( elobject )                      TRACE( "\n\t%s", &elobject->obname[0] ); 
+    else if( elobject )                      TRACE1( "\n\t%s", &elobject->obname[0] ); 
 
     for( i=0; i<ntab; i++ ) {
       /* print Julian date */
   
-      TRACE( "\nJD %.2f,", JD );
+      TRACE1( "\nJD %.2f,", JD );
       update(); // fonction
 
       /* Always calculate heliocentric position of the earth */

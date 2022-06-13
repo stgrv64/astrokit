@@ -140,12 +140,12 @@ if( prtflg )
   infos->asc = ra ;
   infos->dec = dec ;
 
-	printf( "AD  (hms) =\t" );
+	TRACE1( "AD  (hms) =\t" );
 	hms( ra );
-	printf( "DEC (hms) =\t" );
+	TRACE1( "DEC (hms) =\t" );
 	dms( dec );
 
-	TRACE( "=========" );
+	TRACE1( "=========" );
 	}
 return(0);
 }
