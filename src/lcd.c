@@ -695,7 +695,7 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
   memset( c_l1, 0, sizeof(c_l1)) ;
 
   sprintf( c_l0, "(F alt) %.2f", gp_Sui->Fh ) ;
-  sprintf( c_l0, "(F azi) %.2f", gp_Sui->Fa ) ;
+  sprintf( c_l1, "(F azi) %.2f", gp_Sui->Fa ) ;
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;
@@ -721,7 +721,7 @@ void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
   memset( c_l1, 0, sizeof(c_l1)) ;
 
   sprintf( c_l0, "(T alt) %.2f", gp_Sui->Th ) ;
-  sprintf( c_l0, "(T azi) %.2f", gp_Sui->Ta ) ;
+  sprintf( c_l1, "(T azi) %.2f", gp_Sui->Ta ) ;
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;

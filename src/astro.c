@@ -1176,15 +1176,8 @@ void * SUIVI_VOUTE(SUIVI * gp_Sui) {
           gp_Time->HH, \
           gp_Time->MM ) ;
       
-        if (  strlen( gp_Astr->nom ) < 7  ) {
-          sprintf( c_l1, "Tracking %s", gp_Astr->nom ) ;
-        }
-        else if ( strlen(gp_Astr->nom ) < 10 ) {
-          sprintf( c_l1, "Track %s", gp_Astr->nom ) ;
-        }
-        else  {
-          sprintf( c_l1, "%s", gp_Astr->nom ) ;
-        }
+        sprintf( c_l1, "%s", gp_Astr->nom ) ;
+        
         gp_Lcd->change_default( 2000000, c_l0 , c_l1 ) ;
         
         gp_Sui->SUIVI_ALIGNEMENT = 0 ;
