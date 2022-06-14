@@ -151,7 +151,7 @@ void  CAT_FIND(ASTRE *gp_Astr, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAIL
 
       gp_Astr->ASC = atof( cat[L][2] ) / DEGRES ;
       gp_Astr->DEC = atof( cat[L][3] ) / DEGRES ;
-      strcpy( gp_Astr->infos, cat[L][1] ) ;
+      strcpy( gp_Astr->infos, cat[L][0] ) ;
 
       i_ligne = L ;
       i_trouve = TRUE ;
@@ -171,9 +171,7 @@ void  CAT_FIND(ASTRE *gp_Astr, char cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAIL
     L++;
   }
   if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
-
-    Trace(" %s : trouve dans catalogue",gp_Astr->nom) ;
-
+    Trace("(trouve) : (nom) %s (infos) %s: ",gp_Astr->nom , gp_Astr->infos ) ;
   }
   else {
     

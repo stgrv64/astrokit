@@ -21,6 +21,7 @@
 #                 subdivise en 64*90
 #               * ajout des reductions R5 R6 et R7 (prevoyant deux poulies)
 # juin 2022     * ajout TEMPO_LCD_LOOP et  TEMPO_LCD_DISP
+#               * ajout CONFIG_FIC_LED
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -42,6 +43,7 @@ CONFIG_REP_LOG       log
 CONFIG_REP_IN        inp
 CONFIG_REP_OUT       out
 CONFIG_REP_SCR       scr
+CONFIG_FIC_LED       /tmp/astrokit-boo-recup-led-ir.txt
 CONFIG_FIC_LOG       astrokit.log.new
 CONFIG_FIC_DATE      date.txt
 CONFIG_FIC_HHMM      hhmm.txt

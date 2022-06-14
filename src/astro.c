@@ -287,7 +287,9 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
 
     If_Mot_Is("cfg_log_tps_reel_up") { gp_Lcd->display_str_int( 2000000, "g_i_trace",60 ) ; i=1 ; g_i_trace=60 ; }
 
-    If_Mot_Is("aff_info") { 
+    If_Mot_Is("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
+
+    If_Mot_Is("aff_infos") { 
       CONFIG_AFFICHER_TOUT() ; 
       gp_Lcd->display_informations ( 2000000 ) ;
       gp_Sui->menu = MENU_INFO ; 
@@ -387,6 +389,8 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
       if ( strstr( gp_Astr->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Astr, cat_dec) ;
       if ( strstr( gp_Astr->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Astr, etoiles_dec) ;
       
+      /* Pour les planetes, le calcul est fait dans SOLAR_SYSTEM dans CALCUL_TOUT */
+
       gp_Sui->SUIVI_ALIGNEMENT = 1 ;
       //gp_Sui->menu = MENU_AZIMUTAL ;
 

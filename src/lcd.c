@@ -70,6 +70,7 @@ void LCD_INIT(LCD * p_lcd) {
   p_lcd->display_cfg_reduction      = LCD_DISPLAY_CFG_REDUCTION ;
 
   p_lcd->display_informations       = LCD_DISPLAY_INFORMATIONS ;
+  p_lcd->display_acc_alt_azi        = LCD_DISPLAY_ACC_ALT_AZI ;
 
   /* Initialisation autres champs */
 
@@ -271,6 +272,8 @@ void LCD_DISPLAY_DEFAULT(void) {
 
 void LCD_DISPLAY_CURRENT(void) {
 
+  Trace("") ;
+  
   if ( gp_Devi->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
@@ -591,8 +594,8 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
   memset( c_l0, 0, sizeof(c_l0)) ; 
   memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_l0, "(alt) %s", GPIO_ALT ) ;
-  sprintf( c_l1, "(azi) %s", GPIO_AZI );
+  sprintf( c_l0, "(h) %s", GPIO_ALT ) ;
+  sprintf( c_l1, "(a) %s", GPIO_AZI );
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;
@@ -600,9 +603,9 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
   return ;
 }
 /*****************************************************************************************
-* @fn     : LCD_DISPLAY_INFORMATIONS
+* @fn     : LCD_DISPLAY_CFG_GPIOS_MAS_FRE
 * @author : s.gravois
-* @brief  : Cette fonction affiche les informations qu on souhaite
+* @brief  : Cette fonction affiche le masque et frequence GPIOS
 * @param  : LCD * gp_Lcd
 * @param  : int i_duree_us
 * @date   : 2022-05-30 creation 
@@ -616,8 +619,8 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
   memset( c_l0, 0, sizeof(c_l0)) ; 
   memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_l0, "(MASQ gpio) %s", GPIO_MAS ) ;
-  sprintf( c_l1, "(FPWM gpio) %s", GPIO_FREQUENCE_PWM );
+  sprintf( c_l0, "(Masq) %s", GPIO_MAS ) ;
+  sprintf( c_l1, "(Fpwm) %s", GPIO_FREQUENCE_PWM );
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;
@@ -631,18 +634,36 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
 * @param  : LCD * gp_Lcd
 * @param  : int i_duree_us
 * @date   : 2022-05-30 creation 
+* @todo   : recuperer led ir
 *****************************************************************************************/
 
 void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
 
+  FILE * f_led_ir ;
+  char c_gets[ CONFIG_TAILLE_BUFFER_16 + 1 ] ;
+  char*  pc_gets ;
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
   memset( c_l0, 0, sizeof(c_l0)) ; 
   memset( c_l1, 0, sizeof(c_l1)) ;
 
+  if ( ( f_led_ir = fopen( CONFIG_FIC_LED, "r" ) ) == NULL ) {
+    Trace("le fichier %s n a semble t til pas ete cree", CONFIG_FIC_LED) ;
+    pc_gets = fgets( c_gets, CONFIG_TAILLE_BUFFER_16, f_led_ir ) ;
+
+    if ( pc_gets != NULL ) {
+      sprintf( c_l1, "(LED IR) %s", c_gets );
+    }
+    else {
+      sprintf( c_l1, "(LED IR) fic non lu" );
+    }
+  }
+  else {
+    sprintf( c_l1, "(LED IR) fic non trouve" );
+  }
   sprintf( c_l0, "(LED ETAT) %d", GPIO_LED_ETAT ) ;
-  sprintf( c_l1, " " );
+  
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;
@@ -704,7 +725,7 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
 }
 
 /*****************************************************************************************
-* @fn     : LCD_DISPLAY_CFG_REDUCTION
+* @fn     : LCD_DISPLAY_AST_PERIODES
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations concernant les periodes moteurs
 * @param  : LCD * gp_Lcd
@@ -727,8 +748,32 @@ void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
   gp_Lcd->display_current() ;
 
   return ;
+}
 
+/*****************************************************************************************
+* @fn     : LCD_DISPLAY_ACC_ALT_AZI
+* @author : s.gravois
+* @brief  : Cette fonction affiche les valeurs d acceleration
+* @param  : LCD * gp_Lcd
+* @param  : int i_duree_us
+* @date   : 2022-06-13 creation 
+*****************************************************************************************/
 
+void   LCD_DISPLAY_ACC_ALT_AZI     ( const int i_duree_us) {
+
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+
+  memset( c_l0, 0, sizeof(c_l0)) ; 
+  memset( c_l1, 0, sizeof(c_l1)) ;
+
+  sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui->acc_alt ) ;
+  sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui->acc_azi ) ;
+
+  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+  gp_Lcd->display_current() ;
+
+  return ;
 }
 
 /* ----------------------------------------------------------------------

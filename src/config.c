@@ -40,6 +40,9 @@
 #                * protection zones de code impliquant LCD* (mutex_lcd)
 # mai  2022      * reprise intégralité code pour utilisation pointeur fct (gp_Lcd->display_xxx)
 # juin 2022      * deport du code concernant LCD dans lcd.c
+#                * ajout prise en charge fichier CONFIG_FIC_LED (param config.txt)
+#                  pour lecture numero led gpio IR , ce paramatre est defini 
+#                  dans /boot/config.txt
 # -------------------------------------------------------------- 
 */
 
@@ -1071,7 +1074,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
   memset( CONFIG_REP_LOG, ZERO_CHAR, sizeof( CONFIG_REP_LOG ) ) ;
   memset( CONFIG_REP_IN, ZERO_CHAR, sizeof( CONFIG_REP_IN ) ) ;
   memset( CONFIG_REP_SCR, ZERO_CHAR, sizeof( CONFIG_REP_SCR ) ) ;
-
+  memset( CONFIG_FIC_LED, ZERO_CHAR, sizeof( CONFIG_FIC_LED ) ) ;
   memset( CONFIG_FIC_LOG, ZERO_CHAR, sizeof( CONFIG_FIC_LOG ) ) ;
   memset( CONFIG_FIC_DATE, ZERO_CHAR, sizeof( CONFIG_FIC_DATE ) ) ;
   memset( CONFIG_FIC_HHMM, ZERO_CHAR, sizeof( CONFIG_FIC_HHMM ) ) ;
@@ -1222,6 +1225,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
     if(!strcmp("CONFIG_REP_LOG",g_Datas[l][0]))  strcpy( CONFIG_REP_LOG, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_REP_IN",g_Datas[l][0]))   strcpy( CONFIG_REP_IN, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_LOG",g_Datas[l][0]))  strcpy( CONFIG_FIC_LOG, g_Datas[l][1]) ;
+    if(!strcmp("CONFIG_FIC_LED",g_Datas[l][0]))  strcpy( CONFIG_FIC_LED, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_DATE",g_Datas[l][0])) strcpy( CONFIG_FIC_DATE, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_HHMM",g_Datas[l][0])) strcpy( CONFIG_FIC_HHMM, g_Datas[l][1]) ;  
 
@@ -1323,6 +1327,7 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   Trace1("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
   Trace1("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
   Trace1("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
+  Trace1("CONFIG_FIC_LED = %s", CONFIG_FIC_LED)  ; 
   Trace1("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
   Trace1("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
 

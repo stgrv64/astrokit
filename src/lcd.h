@@ -81,5 +81,6 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int ) ;
 void   LCD_DISPLAY_AST_PERIODES      ( const int ) ;
 
 void   LCD_DISPLAY_INFORMATIONS      ( const int ) ;
+void   LCD_DISPLAY_ACC_ALT_AZI       ( const int ) ;
 
 #endif

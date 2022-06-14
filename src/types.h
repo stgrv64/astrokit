@@ -236,7 +236,7 @@
 #define  CONFIG_VALIDATIONS_SIZE 10
 
 #define CONFIG_CODE_BUFFER_SIZE  255 
-#define CONFIG_CODE_NB_CODES     56 
+#define CONFIG_CODE_NB_CODES     57 
 
 #define LCD_LINES_CHAR_NUMBERS        16
 #define LCD_LINES_CHAR_NUMBERS_secure 8
@@ -387,6 +387,8 @@ typedef struct {
   void (*display_cfg_reduction)     ( const int ) ;
 
   void (*display_informations) ( const int ) ;
+  
+  void (*display_acc_alt_azi) ( const int ) ;
 } 
 LCD ;
 //------------------------------------------------------------------------------
@@ -482,15 +484,16 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 { "275",       "KEY_TV",      "aff_ast_vit" },  /* 274 sum ascii = lettre 'F2'  */ /* info 1 */
 { "276",       "KEY_INFO",    "aff_azi_alt" },  /* 275 sum ascii = lettre 'F3'  */ /* info 2 */
 { "277",       "KEY_ZOOM",    "aff_agh_dec" },  /* 277 sum ascii = lettre 'F4'  */ /* info 3 */
-{ "278",       "non_defini",  "aff_asc_dec"},   /* 278 sum ascii = lettre 'F5'  */ /* info 4 */
-{ "348",       "non_defini",  "cfg_gpios_alt_azi"},   /* 348 sum ascii = lettre 'F6'  */ /* info 5 */
-{ "349",       "non_defini",  "cfg_gpios_mas_fre"},   /* 348 sum ascii = lettre 'F7'  */ /* info 5 */
-{ "350",       "non_defini",  "cfg_gpios_leds"},   /* 348 sum ascii = lettre 'F8'  */ /* info 5 */
-{ "342",       "non_defini",  "cfg_reduction"},   /* 348 sum ascii = lettre 'F9'  */ /* info 5 */
-{ "343",       "non_defini",  "aff_ast_fre"},   /* 348 sum ascii = lettre 'F10' */ /* info 5 */
-{ "345",       "non_defini",  "aff_ast_per"},   /* 348 sum ascii = lettre 'F11' */ /* info 5 */
 
-{ "105",       "non_defini",  "aff_info"},   /* 106 sum ascii = lettre 'i'  */ /* info 5 */
+{ "278",       "non_defini",  "aff_asc_dec"       },   /* 278 sum ascii = lettre 'F5'  */ /* info 4 */
+{ "348",       "non_defini",  "cfg_gpios_alt_azi" },   /* 348 sum ascii = lettre 'F6'  */ /* info 5 */
+{ "349",       "non_defini",  "cfg_gpios_mas_fre" },   /* 348 sum ascii = lettre 'F7'  */ /* info 5 */
+{ "350",       "non_defini",  "cfg_gpios_leds"    },   /* 348 sum ascii = lettre 'F8'  */ /* info 5 */
+{ "342",       "non_defini",  "cfg_reduction"     },   /* 348 sum ascii = lettre 'F9'  */ /* info 5 */
+{ "343",       "non_defini",  "aff_ast_fre"       },   /* 348 sum ascii = lettre 'F10' */ /* info 5 */
+{ "345",       "non_defini",  "aff_ast_per"       },   /* 348 sum ascii = lettre 'F11' */ /* info 5 */
+{ "346",       "non_defini",  "aff_acc_alt_azi"   },   /* 346 sum ascii = lettre 'F12'  */ /* info 5 */
+{ "105",       "non_defini",  "aff_infos"         },   /* 346 sum ascii = lettre 'F12'  */ /* info 5 */
 
 /*--------------------------------*/
 /* touches de permutations        */
@@ -530,7 +533,7 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 { "108", "key_log",         "cfg_log_tps_reel_up" }      /* 108 sum ascii = lettre 'l' = generer les traces temps reel */ 
 }; 
 /*------------------------------------------  */
-/* TAILLE TABLEAU 50 = CONFIG_CODE_NB_CODES   */
+/* TAILLE TABLEAU 57 = CONFIG_CODE_NB_CODES   */
 /* TODO : redefinir si besoin (doubler a 100) */
 /*------------------------------------------  */
 
@@ -1258,6 +1261,7 @@ char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;
 char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;        
 
+char CONFIG_FIC_LED  [ CONFIG_TAILLE_BUFFER_64 ] ; 
 // ajout variable globale de chemin rep home lue (2021)
 // avec la commande getcwd 
 char CONFIG_REP_HOME [ CONFIG_TAILLE_BUFFER_64 ] ;

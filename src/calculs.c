@@ -506,13 +506,16 @@ void CALCUL_D(ASTRE *gp_Astr, SUIVI * gp_Sui) {
   gp_Sui->Da = AZI_F * 2.0 * PI / ( AZI_R * pow(2.0, AZI_N) * ( gp_Astr->Va / ( 60 * 60 * DEGRES ) )) ;
   gp_Sui->Dh = ALT_F * 2.0 * PI / ( ALT_R * pow(2.0, ALT_N) * ( gp_Astr->Vh / ( 60 * 60 * DEGRES ) )) ;
 }
-//========================================================================================
-// FIXME : CALCUL_PERIODE : 
-// FIXME : * calcule les "vrais" periodes et frequences des moteurs pas a pas
-//           en tant que paramtres de la sinusoide de reference
-// mai 2022 : ajout non prise enn compte des micro pas pour la frequence moteur
-//            double freq_alt_mot, freq_azi_mot ;
-//========================================================================================
+
+/*****************************************************************************************
+* @fn     : CALCUL_PERIODE
+* @author : s.gravois
+* @brief  : calcule les "vraies" periodes et frequences des moteurs pas a pas
+* @brief  : en tant que parametres de la sinusoide de reference 
+* @param  : struct timeval *t00
+* @date   : 2022-05 ajout non prise en compte des micro-pas pour la frequence moteur
+* @date   : 2022-06 correction petite erreur sur Fa_mot / Fh_mot
+*****************************************************************************************/
 
 void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
 
@@ -543,6 +546,9 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
 
   freq_azi_mot = gp_Sui->acc_azi * gp_Vout->acc * AZI_R * gp_Astr->Va * azi_rot / DIV / PIPI / 4  ;
   freq_alt_mot = gp_Sui->acc_alt * gp_Vout->acc * ALT_R * gp_Astr->Vh * alt_rot / DIV / PIPI / 4  ;
+
+  /* La frequence retenue est la frequence moteur multipliee par le nb de micro pas */
+
   freq_azi     = freq_azi_mot * AZI_R4 ;
   freq_alt     = freq_alt_mot * ALT_R4 ;
 
@@ -564,8 +570,10 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
       
     gp_Sui->Sa_old = gp_Sui->Sa ; 
     gp_Sui->Sa     = (int)SGN(freq_azi)  ;
+
     gp_Sui->Fa     = fabs(freq_azi )  ;
-    gp_Sui->Fa_mot = fabs(freq_alt_mot) ;
+    gp_Sui->Fa_mot = fabs(freq_azi_mot) ;
+
     gp_Sui->Ta     = 1 / gp_Sui->Fa ;
     gp_Sui->Ta_mot = 1 / gp_Sui->Fa_mot ;
 
@@ -575,7 +583,10 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
 
     gp_Sui->Sh_old = gp_Sui->Sh ; 
     gp_Sui->Sh     = (int)SGN(freq_alt) ;
+
     gp_Sui->Fh     = fabs(freq_alt)  ;
+    gp_Sui->Fh_mot = fabs(freq_alt_mot) ;
+    
     gp_Sui->Th     = 1 / gp_Sui->Fh ;
     gp_Sui->Th_mot = 1 / gp_Sui->Fh_mot ;
 
