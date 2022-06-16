@@ -50,6 +50,9 @@
 #               * modif MAX_THREADS a 20
 #               * ajout TEMPO_LCD_LOOP et TEMPO_LCD_DISP en remplacement
 #                 de TEMPO_LCD (remaniement affichage LCD)
+# juin 2022     * ajout paramatres pid_azi et pid_alt 
+#                 et autres params pour tenter un asservissement des frequences
+#                 (voir code gpio.c et calcul.c sur les frequences et periodes)
 # -------------------------------------------------------------- 
 */
 
@@ -814,11 +817,15 @@ typedef struct {
   
   unsigned int i_statut_suivi ;
   
-  // Variables utilisees en mode MANUEL SIMPLE
-  // elles servent dans le calcul des periodes (par defaut sont egales à 1)
+  /* les variables suivantes compensent le calcul des */
+  /* frequences et periodes (par defaut sont egales à 1) */
 
-  double       acc_azi ;      // acceleration en azimut   utile en mode manuel simple
-  double       acc_alt ;      // acceleration en altitude utile en mode manuel simple
+  double       acc_azi_pid ;  // acceleration deduite en azimut   pour asservissement
+  double       acc_alt_pid ;  // acceleration deduite en altitude pour asservissement
+
+  double       acc_azi ;      // acceleration volontaire en azimut   
+  double       acc_alt ;      // acceleration volontaire en altitude 
+
   int          sgn_azi ;      // signe de la frequence en azimut  a modifier au besoin
   int          sgn_alt ;      // signe de la frequence en altitude a modifier au besoin
 
@@ -840,21 +847,23 @@ typedef struct {
   long         pas_nord ;      // flag d'appui sur le touche NORD
   long         pas_sud ;       // flag d'appui sur le touche SUD
   
-  double       Ta ;       // periode de la frequence a injecter directement
-  double       Th ;       // periode de la frequence a injecter directement
+  double       Ta_mic ;       // periode de la frequence a injecter directement
+  double       Th_mic ;       // periode de la frequence a injecter directement
+  double       Ta_bru ;   // periode brute avant corrections (accelerations et micro pas)
+  double       Th_bru ;   // periode brute avant corrections (accelerations et micro pas)
   double       Ta_mot ;   // periode de la frequence moteur (ne tient compte des micro pas)
   double       Th_mot ;   // periode de la frequence moteur (ne tient compte des micro pas)
 
-  double       temps_a ;  // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
-  double       temps_h ;  // temps ecoule sur azimut , deduit des calculs gpio : suivi_main_M
-
-  double       Fa ;       // frequence a injecter directement (tient compte des micro pas)
-  double       Fh ;       // frequence a injecter directement (tient compte des micro pas)
-  double       Fa_mot ;   // frequence du moteur deduite (ne tient compte des micro pas)
-  double       Fh_mot ;   // frequence du moteur deduite (ne tient compte des micro pas)
+  double       Fa_bru ;   // frequence brute avant corrections (accelerations et micro pas)
+  double       Fh_bru ;   // frequence brute avant corrections (accelerations et micro pas)
+  double       Fa_mot ;   // frequence du moteur deduite      (ne tient compte des micro pas)
+  double       Fh_mot ;   // frequence du moteur deduite      (ne tient compte des micro pas)
+  double       Fa_mic ;       // frequence a injecter directement (tient compte des micro pas)
+  double       Fh_mic ;       // frequence a injecter directement (tient compte des micro pas)
 
   double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
   double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
+
   double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
   double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
 
@@ -973,7 +982,7 @@ typedef struct {
  double a0 ;   // valeur precedente de l'azimut
  double h0 ;   // valeur precedente de l'altitude
  
- double AGH ;    // angle horaire  ( = gp_Lieu->temps sideral - ASC)
+ double AGH ;    // angle horaire  ( = gp_Lieu->tps_mic sideral - ASC)
  double H    ;    // declinaison
  
  double DEC  ;  // un resultat de calcul de declinaison

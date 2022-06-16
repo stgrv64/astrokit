@@ -832,8 +832,12 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->pas_forward_fast  = 0 ;
   gp_Sui->pas_rewind_fast   = 0 ;
 
-  gp_Sui->acc_azi   = 1.0 ;     // cette variable est utilisee dans le calcul des periodes
-  gp_Sui->acc_alt   = 1.0 ;     // cette variable est utilisee dans le calcul des periodes
+  gp_Sui->acc_azi   = 1.0 ;     // acceleration volontaire des vitesses brutes
+  gp_Sui->acc_alt   = 1.0 ;     // acceleration volontaire des vitesses brutes
+
+  gp_Sui->acc_azi_pid   = 1.0 ; // acceleration deduite par retour boucle des vitesses brutes
+  gp_Sui->acc_alt_pid   = 1.0 ; // acceleration deduite par retour boucle des vitesses brutes
+
   gp_Sui->sgn_azi   = 1 ;
   gp_Sui->sgn_alt   = 1 ;
 
@@ -843,11 +847,11 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->d_appui_raq_azi  = 0 ;
   gp_Sui->d_appui_raq_alt  = 0 ;
   
-  gp_Sui->Fa        = 30 ;
-  gp_Sui->Fh        = 30 ;
+  gp_Sui->Fa_mic        = 30 ;
+  gp_Sui->Fh_mic        = 30 ;
 
-  gp_Sui->Ta        = 1 / gp_Sui->Fa ;
-  gp_Sui->Th        = 1 / gp_Sui->Fh ;
+  gp_Sui->Ta_mic        = 1 / gp_Sui->Fa_mic ;
+  gp_Sui->Th_mic        = 1 / gp_Sui->Fh_mic ;
   
   gp_Sui->Tac        = 1.0 ;
   gp_Sui->Thc        = 1.0 ;
@@ -901,12 +905,9 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
 
   gp_Sui->temporisation_voute    = gp_Vout->DT ;
 
-  gp_Sui->DTh = gp_Sui->Th * CONFIG_MICRO_SEC ;
-  gp_Sui->DTa = gp_Sui->Ta * CONFIG_MICRO_SEC ;
+  gp_Sui->DTh = gp_Sui->Th_mic * CONFIG_MICRO_SEC ;
+  gp_Sui->DTa = gp_Sui->Ta_mic * CONFIG_MICRO_SEC ;
 
-  gp_Sui->temps_a = 0 ; 
-  gp_Sui->temps_h = 0 ; 
-  
   gettimeofday(&gp_Sui->tval,NULL) ;
 }
 /*****************************************************************************************

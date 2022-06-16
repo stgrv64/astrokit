@@ -1193,7 +1193,7 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
 * @brief  : et gestion du temps reel par algorithme PID
 * @param  : GPIO_PWM_MOTEUR *pm
 * @date   : 2022-05    ajout non prise en compte des micro-pas pour la frequence moteur
-* @date   : 2022-05-24 correction pm->tps_mic += pm->periode ;  + m->tps_mic += pm->periode_mot
+* @date   : 2022-05-24 correction pm->temps += pm->periode ;  + m->temps += pm->periode_mot
 * @date   : 2022-06-14 correction petite erreur sur Ta_mot / Th_mot
 *****************************************************************************************/
 
@@ -1202,11 +1202,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
   int i_pas_change=0;
   int i=0 , sens=0 ;
 
-  double d_ecart =0;       /* ecart entre Periodes attendues et reelles */
-  double d_pid = 0 ;         /* parametre PID a appliquer */
-  double periode_bru=0 ; /* periode brute calculee dans CALCUL_PERIODE */
   double periode_eff=0 ; /* periode effective pour la temporisation */
-  double periode_ree=0 ; /* periode effective reelle consommee pour la temporisation */
   double periode_mic=0 ; /* periode de referefence (micro pas) pour la temporisation */
   double periode_mot=0 ; /* periode de referrence (sans micro pas ) du moteur */
   double  Tpwm = 0; 
@@ -1238,7 +1234,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
   pm->t = 0 ;
   periode_mic = 0 ;
   periode_mot = 0 ;
-  periode_bru = 0 ;
 
   pthread_mutex_unlock( & pm->mutex ) ;
 
@@ -1261,9 +1256,8 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       case 0 : 
         pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
 
-          periode_mic         = pm->p_Sui->Th_mic ;
-          periode_mot         = pm->p_Sui->Th_mot / ALT_R4;
-          periode_bru         = pm->p_Sui->Th_bru / ALT_R4 ;
+          periode_mic         = pm->p_Sui->Th_mic   ;
+          periode_mot         = pm->p_Sui->Th_mot ;
           sens                = pm->p_Sui->Sh ;
 
         pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
@@ -1272,9 +1266,8 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       case 1 :
           pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
 
-          periode_mic         = pm->p_Sui->Ta_mic ; 
-          periode_mot         = pm->p_Sui->Ta_mot / AZI_R4 ;
-          periode_bru         = pm->p_Sui->Ta_bru / AZI_R4 ;
+          periode_mic         = pm->p_Sui->Ta_mic   ; 
+          periode_mot         = pm->p_Sui->Ta_mot ;
           sens                = pm->p_Sui->Sa ;
 
         pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
@@ -1340,85 +1333,102 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         moteurs : on change de rapport cycliques tous les micropas
         ----------------------------------------------------------*/
 
-    periode_eff = periode_mic  ;
+    if (periode_mic < GPIO_SUIVI_MAIN_ATTENTE_MAX ) {
 
-    if (periode_mic >= GPIO_SUIVI_MAIN_ATTENTE_MAX ) {      
-      periode_eff = GPIO_SUIVI_MAIN_ATTENTE_MAX  ;
+      usleep( periode_mic * GPIO_MICRO_SEC ) ;
+      /* on met a jour le temps attendu pour le moteur */
+
+      pthread_mutex_lock(  & pm->mutex ) ;
+      pm->temps += periode_mic ;
+      pthread_mutex_unlock(& pm->mutex ) ;
+    }
+    else {
+      
+      usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC * 0.1 ) ; 
+
+      pthread_mutex_lock(  & pm->mutex ) ;
+      pm->temps += GPIO_SUIVI_MAIN_ATTENTE_MAX * 0.1 ;
+      pthread_mutex_unlock(& pm->mutex ) ;
+      
       Trace("depassement periode") ;
+
+      usleep( GPIO_SUIVI_MAIN_ATTENTE_MAX * GPIO_MICRO_SEC ) ;
     }
 
-    usleep( periode_eff * GPIO_MICRO_SEC ) ;
-    
-    pthread_mutex_lock(  & pm->mutex ) ;
+    pthread_mutex_lock(& pm->mutex ) ;
 
-    periode_ree = CALCUL_DUREE_SECONDES( & pm->tval ) ;
-
-    /* les temps sont mis a jour en considerant que le passage
-       dans la boucle while se fait au regard des temps micro pas */
-
-    pm->tps_mot += ( periode_mot ) ;
-    pm->tps_bru += ( periode_bru ) ;
-    pm->tps_mic += ( periode_eff ) ;
-    pm->tps_ree += ( periode_ree ) ;
-    
-    pthread_mutex_unlock(& pm->mutex ) ;
+    pm->tps_ree += CALCUL_DUREE_SECONDES( & pm->tval ) ;
+    // Trace("%lld %d %d ", pm->pas, g_i_trace, (int)(llabs(pm->pas) % g_i_trace)) ;
 
     if ( g_i_trace>0 && i_pas_change && ( pm->pas % g_i_trace ) == 0 ) {
 
-      /* Le temps usleep est toujours inferieur au temps "reel" consomme */ 
-      /* on compense par PID en utilisant l ecart sur les periodes brutes calculees avec le temps reel */
-      /* cela ajuste la frequence deduite et la periode deduite pour etre en phase avec teps reel */
+    /* au bout de N pas, on attend 
 
-      if ( periode_bru != 0 ) {
-        d_ecart = periode_ree / periode_bru ; 
-        d_pid   = ( (d_ecart-1.0) / 2.0 )+ 1.0 ;
-      }
-      else {
-        Trace("division par zero") ;
-      }
-      Trace1("%lld %d %d", pm->pas, g_i_trace, i_pas_change) ;
-
+      Trace("bou %-5lld mot %-5d pas %-5lld micropas %-5d : per_mic %f pm->per_mic %f per_mot %f tps_mic %.1f tps_reel %.1f",\
+        i_incr,    \
+        pm->id,    \
+        pm->pas,   \
+        pm->micropas,   \
+        periode_mic,    \
+        pm->periode_mic,    \
+        periode_mot,    \
+        pm->temps , \
+        pm->tps_ree  \
+      ) ; */
+/*
+      Trace("bou %-5lld mot %-5d pas %-5lld micropas %-5d : per_mic %f pm->per_mic %f per_mot %f tps_mic %.1f tps_reel %.1f",\
+        i_incr,    \
+        pm->id,    \
+        pm->pas,   \
+        pm->micropas,   \
+        periode_mic,    \
+        pm->periode_mic,    \
+        periode_mot,    \
+        pm->temps , \
+        pm->tps_ree  \
+      ) ;
+*/
       /* Correction du calcul asservissement juin 2022 */
 
       switch ( pm->id ) {
 
         case 0 : 
-          pthread_mutex_lock(  & pm->mutex ) ;
-          pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
-          // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pm->p_Sui->acc_alt *= d_pid ;
-          // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
-          pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
-          pthread_mutex_unlock(  & pm->mutex ) ;
+          pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
+          Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_Sui->acc_azi, pm->tps_ree, pm->temps, pm->pas ) ;
+          /* pm->p_Sui->acc_azi *= ( pm->tps_ree / pm->temps  )  ;*/
+          // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_Sui->acc_azi, pm->tps_ree, pm->temps ) ;
+          pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
           break ;
 
         case 1 : 
-          pthread_mutex_lock(  & pm->mutex ) ;
-          pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
-          // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pm->p_Sui->acc_azi *= d_pid ;
-          // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
-          pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
-          pthread_mutex_unlock(  & pm->mutex ) ;
+          pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
+          Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_Sui->acc_alt, pm->tps_ree, pm->temps, pm->pas ) ;
+          /* pm->p_Sui->acc_alt *= ( pm->tps_ree / pm->temps  ) / 2.0 ;*/
+          // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_Sui->acc_alt, pm->tps_ree, pm->temps ) ;
+          pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
           break ;
-
       }
-      Trace("mot %-3d => pas %-5lld : tps_bru %f tps_mot %f tps_mic %f tps_ree %f : per_bru %f per_mot %f per_mic %f per_ree %f ecart %f",\
-        pm->id,       \
-        pm->pas,      \
-        pm->tps_bru,  \
-        pm->tps_mot,  \
-        pm->tps_mic,  \
-        pm->tps_ree,  \
-        periode_bru,  \
-        periode_mot,  \
-        periode_eff,  \
-        periode_ree,  \
-        d_ecart         \
+      Trace("mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
+        pm->id,    \
+        pm->pas,   \
+        pm->periode_mic,    \
+        pm->periode_mot,    \
+        pm->Fm, \
+        pm->Tm
       ) ;
-
+      /* la periode * 
+      Trace("mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
+        pm->id,    \
+        pm->pas,   \
+        pm->periode_mic,    \
+        pm->periode_mot,    \
+        pm->Fm, \
+        pm->Tm
+      ) ;
       /* Fin Correction du calcul asservissement juin 2022 */
     }
+
+    pthread_mutex_unlock(& pm->mutex ) ;
 
     Trace1("bou %-5lld mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
       i_incr,    \
@@ -1429,7 +1439,6 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       pm->Fm, \
       pm->Tm
     ) ;
-
     // FIXME : calcule la duree reelle d une iteration dans la boucle
 
     //tdiff = CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
@@ -1438,7 +1447,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 }
 // ##########################################################################################################
 /* mai 2022 : ajout pm->phase[i]->p_Sui            = pm->p_Sui ; */
-/* juin 2022 :  prise en compte tps_bru */
+/* mai 2022 :  */
 
 void GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) {
 
@@ -1462,11 +1471,8 @@ void GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOT
   pm->periode_mot   =  1 / pm->Fm ;
   pm->periode_mic   =  1 / ( pm->Fm * pm->nbmicropas ) ;
 
-  pm->tps_mic       = 0 ; 
+  pm->temps            = 0 ; 
   pm->tps_ree       = 0 ; 
-  pm->tps_bru       = 0 ; 
-  pm->tps_mot       = 0 ;
-
   pm->temps_moyen      = 0 ; 
   pm->temps_reel_moyen = 0 ; 
 
@@ -1787,19 +1793,13 @@ int mainG(int argc, char **argv) {
   pm_alt->p_Sui->Fa_mot = (double)fr_azi ;
   pm_azi->p_Sui->Fh_mot = (double)fr_alt ;
 
-  pm_alt->p_Sui->Fa_bru = (double)fr_azi ;
-  pm_azi->p_Sui->Fh_bru = (double)fr_alt ;
-
-  pm_alt->p_Sui->Fa_mic     = pm_alt->p_Sui->Fa_mot * (double)upas  ;
+  pm_alt->p_Sui->Fa     = pm_alt->p_Sui->Fa_mot * (double)upas  ;
   pm_azi->p_Sui->Fh_mic     = pm_azi->p_Sui->Fh_mot * (double)upas ;
 
   pm_alt->p_Sui->Ta_mot = 1 / pm_alt->p_Sui->Fa_mot ;
   pm_azi->p_Sui->Th_mot = 1 / pm_azi->p_Sui->Fh_mot ;
 
-  pm_alt->p_Sui->Ta_bru = 1 / pm_alt->p_Sui->Fa_mot ;
-  pm_azi->p_Sui->Th_bru = 1 / pm_azi->p_Sui->Fh_mot ;
-
-  pm_alt->p_Sui->Ta_mic = 1 / pm_alt->p_Sui->Fa_mic ;
+  pm_alt->p_Sui->Ta_mic = 1 / pm_alt->p_Sui->Fa ;
   pm_azi->p_Sui->Th_mic = 1 / pm_alt->p_Sui->Fh_mic ;
 
   pid=getpid() ;
@@ -1808,7 +1808,7 @@ int mainG(int argc, char **argv) {
   Trace("ALTITUDE : periode mot = %.2f f = %.f ", pm_alt->p_Sui->Ta_mot, pm_alt->p_Sui->Fa_mot ) ; 
   Trace("AZIMUT   : periode mot = %.2f f = %.f ", pm_azi->p_Sui->Th_mot, pm_azi->p_Sui->Fh_mot ) ; 
 
-  Trace("ALTITUDE : periode mic = %.2f f = %.f ", pm_alt->p_Sui->Ta_mic, pm_alt->p_Sui->Fa_mic ) ; 
+  Trace("ALTITUDE : periode mic = %.2f f = %.f ", pm_alt->p_Sui->Ta_mic, pm_alt->p_Sui->Fa ) ; 
   Trace("AZIMUT   : periode mic = %.2f f = %.f ", pm_azi->p_Sui->Th_mic, pm_azi->p_Sui->Fh_mic ) ; 
 /*
   Trace("correct(y/n)?") ;

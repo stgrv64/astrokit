@@ -160,21 +160,28 @@ typedef struct {
   double  param0 ;
   double  param1 ;
 
-  // FIXME : la difference entre temps et  temps_reel : voir fonction *suivi_main_M
+  // FIXME : la difference entre temps et  tps_ree : voir fonction *suivi_main_M
   //         *  temps      : on utilise periode , qui sert pour le usleep 
-  //         *  temps_reel : on utilise gettimeofday , qui sert a calculer la duree de la boucle while(en entier)
+  //         *  tps_ree : on utilise gettimeofday , qui sert a calculer la duree de la boucle while(en entier)
 
-  double  temps ;      // temps ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
-                       // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+  /* Les 3 champs suivants permettent d avoir une indication sur le temps rell consomm et le temps reel moteur
+     du au calcul des periodes et frequences brutes, l ecart correspond aux latences entre chaque usleep ou a la 
+    somme de la l incertitude sur les usleep (dans la fonction SUIVI_MAIN)
+    On a les inegalites suivantes : 
 
-  double  temps_reel ; // temps REEL ecoule sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
-                       // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+    tps_ree > tps_mic
+    
+    En asservissant , on souhaite avoir : 
+    
+    tps_ree = tps_bru
+  */
+  double  tps_mic ; /* somme des usleep dans la fonction de thread void * SUIVI_MAIN */
+  double  tps_ree ; /* somme des temps reels consomme entre les usleep (en utilisant gettimeofday )*/
+  double  tps_bru ; /* somme des periodes T<x>_bru brutes calculees dans CALCUL_PERIODE */
+  double  tps_mot ; /* somme des periodes T<x>_mot (T<x>_bru * accelerations) */ 
+  double  temps_moyen ;       
 
-  double  temps_moyen ;       // temps ecoule moyen sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
-                              // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
-
-  double  temps_reel_moyen ;  // temps REEL ecoule moyen sur azimut ou altitude, deduit des calculs gpio : suivi_main_M, 
-                              // recopie dans SUIVI* temps_a ou temps_h suivant que GPIO_PWM_MOTEUR est moteur azimut ou altitude
+  double  temps_reel_moyen ;  
 
   struct timeval tval ;
 

@@ -584,7 +584,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( ALT_R2 * ALT_R3 * ALT_R4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
      
-     gp_Sui->Th = periode ;
+     gp_Sui->Th_mic = periode ;
     
      printf("reduction totale azimut    = %f\n", AZI_R) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
@@ -592,7 +592,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( AZI_R2 * AZI_R3 * AZI_R4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
      
-     gp_Sui->Ta = periode ;
+     gp_Sui->Ta_mic = periode ;
   }    
   /* (obsolete)
   if ( ( argc == 2 ) &&  ! strcmp("ir",argv[1]) ) {

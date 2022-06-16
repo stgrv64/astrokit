@@ -512,15 +512,19 @@ void CALCUL_D(ASTRE *gp_Astr, SUIVI * gp_Sui) {
 * @author : s.gravois
 * @brief  : calcule les "vraies" periodes et frequences des moteurs pas a pas
 * @brief  : en tant que parametres de la sinusoide de reference 
-* @param  : struct timeval *t00
+* @param  : ASTRE * gp_Astr
+* @param  : SUIVI * gp_Sui
+* @param  : VOUTE * gp_Vout
 * @date   : 2022-05 ajout non prise en compte des micro-pas pour la frequence moteur
 * @date   : 2022-06 correction petite erreur sur Fa_mot / Fh_mot
+* @date   : 2022-06 ajout champs xxx_bru freq /periode avant multiplication par acceleration
 *****************************************************************************************/
 
 void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
 
-  double freq_alt, freq_azi ;
+  double freq_alt_mic, freq_azi_mic ;
   double freq_alt_mot, freq_azi_mot ;
+  double freq_alt_bru, freq_azi_bru ;
   double azi_rot,   alt_rot ;
   
   // Calcul de la periode necessaire si pas de terme D ni 2 puissance N
@@ -544,13 +548,23 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
   /* Calculs des frequences */
   /*------------------------*/
 
-  freq_azi_mot = gp_Sui->acc_azi * gp_Vout->acc * AZI_R * gp_Astr->Va * azi_rot / DIV / PIPI / 4  ;
-  freq_alt_mot = gp_Sui->acc_alt * gp_Vout->acc * ALT_R * gp_Astr->Vh * alt_rot / DIV / PIPI / 4  ;
+  /* calcul des frequences brutes non corrigees = brutes */
+  /* ces frequences ne sont pas corrigees par les accelerations diverses */
 
+  freq_azi_bru = AZI_R * gp_Astr->Va * azi_rot / DIV / PIPI / 4  ;
+  freq_alt_bru = ALT_R * gp_Astr->Vh * alt_rot / DIV / PIPI / 4  ;
+
+  /* calcul des frequences corrigees avant prise en compte micro pas */
+  /* ces frequences sont corrigees par les accelerations diverses */
+
+  freq_azi_mot = gp_Sui->acc_azi * gp_Vout->acc * freq_azi_bru  ;
+  freq_alt_mot = gp_Sui->acc_alt * gp_Vout->acc * freq_alt_bru  ;
+
+  /* calcul des frequences finales UTILES */
   /* La frequence retenue est la frequence moteur multipliee par le nb de micro pas */
 
-  freq_azi     = freq_azi_mot * AZI_R4 ;
-  freq_alt     = freq_alt_mot * ALT_R4 ;
+  freq_azi_mic     = freq_azi_mot * AZI_R4 ;
+  freq_alt_mic     = freq_alt_mot * ALT_R4 ;
 
   /*-----------------------------------------------------*/
   /* Le calcul est different si on utilise un controleur                    */
@@ -558,8 +572,8 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
   /*-----------------------------------------------------*/
 
   if ( gp_Devi->DEVICE_USE_CONTROLER ) {
-    freq_azi   = freq_azi_mot ;
-    freq_alt   = freq_alt_mot ;
+    freq_azi_mic   = freq_azi_mot ;
+    freq_alt_mic   = freq_alt_mot ;
   }
 
   /*------------------------*/
@@ -569,12 +583,14 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
   pthread_mutex_lock(& gp_Pthr->mutex_azi );
       
     gp_Sui->Sa_old = gp_Sui->Sa ; 
-    gp_Sui->Sa     = (int)SGN(freq_azi)  ;
+    gp_Sui->Sa     = (int)SGN(freq_azi_mic)  ;
 
-    gp_Sui->Fa     = fabs(freq_azi )  ;
+    gp_Sui->Fa_mic = fabs(freq_azi_mic )  ;
+    gp_Sui->Fa_bru = fabs(freq_azi_bru )  ;    
     gp_Sui->Fa_mot = fabs(freq_azi_mot) ;
 
-    gp_Sui->Ta     = 1 / gp_Sui->Fa ;
+    gp_Sui->Ta_mic = 1 / gp_Sui->Fa_mic ;
+    gp_Sui->Ta_bru = 1 / gp_Sui->Fa_bru ;
     gp_Sui->Ta_mot = 1 / gp_Sui->Fa_mot ;
 
   pthread_mutex_unlock(& gp_Pthr->mutex_azi );
@@ -582,12 +598,14 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
   pthread_mutex_lock(& gp_Pthr->mutex_alt );
 
     gp_Sui->Sh_old = gp_Sui->Sh ; 
-    gp_Sui->Sh     = (int)SGN(freq_alt) ;
+    gp_Sui->Sh     = (int)SGN(freq_alt_mic) ;
 
-    gp_Sui->Fh     = fabs(freq_alt)  ;
+    gp_Sui->Fh_mic = fabs(freq_alt_mic)  ;
+    gp_Sui->Fh_bru = fabs(freq_alt_bru) ;
     gp_Sui->Fh_mot = fabs(freq_alt_mot) ;
     
-    gp_Sui->Th     = 1 / gp_Sui->Fh ;
+    gp_Sui->Th_mic     = 1 / gp_Sui->Fh_mic ;
+    gp_Sui->Th_bru = 1 / gp_Sui->Fh_bru ;
     gp_Sui->Th_mot = 1 / gp_Sui->Fh_mot ;
 
   pthread_mutex_unlock(& gp_Pthr->mutex_alt );
@@ -623,12 +641,12 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout
         gp_Astr->Va     = frequence * DIV * PIPI / ( gp_Vout->acc * AZI_R ) ;
         gp_Sui->Sa_old = gp_Sui->Sa ; 
         gp_Sui->Sa     = (int)SGN(frequence)  ;
-        gp_Sui->Fa     = fabs(frequence) ;
-        gp_Sui->Ta     = 1 / gp_Sui->Fa ;
+        gp_Sui->Fa_mic     = fabs(frequence) ;
+        gp_Sui->Ta_mic     = 1 / gp_Sui->Fa_mic ;
     
       pthread_mutex_unlock(& gp_Pthr->mutex_azi );
     
-      TRACE1("Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f\n",gp_Sui->Ta, gp_Sui->Th, gp_Sui->Fa, gp_Sui->Fh) ;
+      TRACE1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
     }
   }
   if ( gp_Sui->pas_alt !=  gp_Sui->pas_alt_old ) {
@@ -644,13 +662,13 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout
         gp_Astr->Vh     = frequence * DIV * PIPI / ( gp_Vout->acc * ALT_R ) ;
         gp_Sui->Sh_old = gp_Sui->Sh ; 
         gp_Sui->Sh     = (int)SGN(frequence)  ;
-        gp_Sui->Fh     = fabs(frequence) ;
-        gp_Sui->Th     = 1 / gp_Sui->Fh ;
+        gp_Sui->Fh_mic     = fabs(frequence) ;
+        gp_Sui->Th_mic     = 1 / gp_Sui->Fh_mic ;
   
         // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL relache le mutex\n");
       pthread_mutex_unlock( & gp_Pthr->mutex_alt );
     
-      TRACE1("Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f\n",gp_Sui->Ta, gp_Sui->Th, gp_Sui->Fa, gp_Sui->Fh) ;
+      TRACE1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
     }
   }
 }
@@ -1363,7 +1381,7 @@ void CALCUL_VOUTE(void ) {
       /*
       if ( gp_Sui->SUIVI_ALIGNEMENT  ) {
 
-        Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta %.2f Th %.2f Fa=%.2f Fh %.2f",\
+        Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta_mic %.2f Th_mic %.2f Fa_mic=%.2f Fh_mic %.2f",\
           gp_Astr->nom,\
           (int)((gp_Astr->a)*DEGRES),\
           (int)((gp_Astr->h)*DEGRES),\
@@ -1371,18 +1389,18 @@ void CALCUL_VOUTE(void ) {
           (int)((gp_Astr->DEC)*DEGRES),\
           gp_Astr->Va,\
           gp_Astr->Vh,\
-          gp_Sui->Ta,\
-          gp_Sui->Th,\
-          gp_Sui->Fa,\
-          gp_Sui->Fh ) ;
+          gp_Sui->Ta_mic,\
+          gp_Sui->Th_mic,\
+          gp_Sui->Fa_mic,\
+          gp_Sui->Fh_mic ) ;
 
-        Trace1("Va=%2.4f Vh=%2.4f Ta=%2.4f Th=%2.4f Fa=%2.4f Fh=%2.4f Fam = %ld Fhm = %ld Tac = %f Thc = %f\n",\
+        Trace1("Va=%2.4f Vh=%2.4f Ta_mic=%2.4f Th_mic=%2.4f Fa_mic=%2.4f Fh_mic=%2.4f Fam = %ld Fhm = %ld Tac = %f Thc = %f\n",\
               gp_Astr->Va,\
               gp_Astr->Vh,\
-              gp_Sui->Ta,\
-              gp_Sui->Th,\
-              gp_Sui->Fa,\
-              gp_Sui->Fh,\
+              gp_Sui->Ta_mic,\
+              gp_Sui->Th_mic,\
+              gp_Sui->Fa_mic,\
+              gp_Sui->Fh_mic,\
               (gp_Sui->Ia - gp_Sui->Ia_prec),(gp_Sui->Ih - gp_Sui->Ih_prec ),gp_Sui->Tac, gp_Sui->Thc) ;
         
         gp_Sui->SUIVI_ALIGNEMENT = 0 ;

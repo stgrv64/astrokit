@@ -285,7 +285,7 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
     If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
     If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
 
-    If_Mot_Is("cfg_log_tps_reel_up") { gp_Lcd->display_str_int( 2000000, "g_i_trace",60 ) ; i=1 ; g_i_trace=60 ; }
+    If_Mot_Is("cfg_log_tps_reel_up") { gp_Lcd->display_str_int( 2000000, "g_i_trace",15 ) ; i=1 ; g_i_trace=15 ; }
 
     If_Mot_Is("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
 
@@ -724,10 +724,10 @@ void SUIVI_MANUEL_ASSERVI(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
     gp_Sui->d_appui_raq_azi = 0 ;
     gp_Sui->d_appui_raq_alt = 0 ; 
 
-    gp_Sui->Ta = MAIN_TA_RESET ;
-    gp_Sui->Th = MAIN_TH_RESET ;
-    gp_Sui->Fa = MAIN_FA_RESET ;
-    gp_Sui->Fh = MAIN_FH_RESET ;
+    gp_Sui->Ta_mic = MAIN_TA_RESET ;
+    gp_Sui->Th_mic = MAIN_TH_RESET ;
+    gp_Sui->Fa_mic = MAIN_FA_RESET ;
+    gp_Sui->Fh_mic = MAIN_FH_RESET ;
     gp_Sui->reset = 0 ;
   }
   // -----------------------------------------------------------
@@ -738,11 +738,11 @@ void SUIVI_MANUEL_ASSERVI(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
   { 
     // On remet une periode inferieure a la seconde pour eviter aux deux autres threads d'attendre
     
-    if ( gp_Sui->Ta == MAIN_TA_RESET && gp_Sui->Th == MAIN_TH_RESET ) {
-      gp_Sui->Ta = MAIN_TA_TRANSITOIRE ;
-      gp_Sui->Th = MAIN_TH_TRANSITOIRE ;
-      gp_Sui->Fa = MAIN_FA_TRANSITOIRE ;
-      gp_Sui->Fh = MAIN_FH_TRANSITOIRE ;
+    if ( gp_Sui->Ta_mic == MAIN_TA_RESET && gp_Sui->Th_mic == MAIN_TH_RESET ) {
+      gp_Sui->Ta_mic = MAIN_TA_TRANSITOIRE ;
+      gp_Sui->Th_mic = MAIN_TH_TRANSITOIRE ;
+      gp_Sui->Fa_mic = MAIN_FA_TRANSITOIRE ;
+      gp_Sui->Fh_mic = MAIN_FH_TRANSITOIRE ;
     }
     
     // ----------------------------------------------------------------------------
@@ -814,8 +814,8 @@ void SUIVI_MANUEL_ASSERVI(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
 	 
   if ( gp_Sui->pas_azi_old != gp_Sui->pas_azi || gp_Sui->pas_alt_old != gp_Sui->pas_alt ) {
 
-   TRACE(" : Va = %2.4f Vh = %2.4f Ta = %2.4f Th = %2.4f Fa = %2.4f Fh = %2.4f Fam = %ld Fhm = %ld",\
-        gp_Astr->Va,gp_Astr->Vh,gp_Sui->Ta,gp_Sui->Th,gp_Sui->Fa,gp_Sui->Fh, \
+   TRACE(" : Va = %2.4f Vh = %2.4f Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f Fam = %ld Fhm = %ld",\
+        gp_Astr->Va,gp_Astr->Vh,gp_Sui->Ta_mic,gp_Sui->Th_mic,gp_Sui->Fa_mic,gp_Sui->Fh_mic, \
 	(gp_Sui->Ia - gp_Sui->Ia_prec),(gp_Sui->Ih - gp_Sui->Ih_prec )) ;  
   }
 

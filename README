@@ -575,7 +575,7 @@ diff -ybEr --suppress-common-lines armv7/src/gpio.c rpi3a+/src/gpio.c
        i_incr++ ;					      <
    } // FIXME : fin boucle while 			      <
   pm->temps            = 0 ; 				      <
-  pm->temps_reel       = 0 ; 				      <
+  pm->tps_ree       = 0 ; 				      <
   pm->temps_moyen      = 0 ; 				      <
   pm->temps_reel_moyen = 0 ; 				      <
 							      <
@@ -603,14 +603,14 @@ diff -ybEr --suppress-common-lines armv7/src/gpio.h rpi3a+/src/gpio.h
 							      <
 							      <
 							      <
-  // FIXME : la difference entre temps et  temps_reel : voir  <
+  // FIXME : la difference entre temps et  tps_ree : voir  <
   //         *  temps      : on utilise deltat , qui sert pou <
-  //         *  temps_reel : on utilise gettimeofday , qui se <
+  //         *  tps_ree : on utilise gettimeofday , qui se <
 							      <
   double  temps ;      // temps ecoule sur azimut ou altitude <
                        // recopie dans SUIVI* temps_a ou temp <
 							      <
-  double  temps_reel ; // temps REEL ecoule sur azimut ou alt <
+  double  tps_ree ; // temps REEL ecoule sur azimut ou alt <
                        // recopie dans SUIVI* temps_a ou temp <
 							      <
   double  temps_moyen ;       // temps ecoule moyen sur azimu <

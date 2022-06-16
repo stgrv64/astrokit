@@ -53,8 +53,8 @@ void main(int argc, char **argv)
   upas       = atof(argv[6]) ;
   priority   = atoi(argv[7]) ;    
   
-  pm0->p_Sui->Th = 1 / (Fm1*upas) ;
-  pm1->p_Sui->Ta = 1 / (Fm2*upas) ;
+  pm0->p_Sui->Th_mic = 1 / (Fm1*upas) ;
+  pm1->p_Sui->Ta_mic = 1 / (Fm2*upas) ;
   
   Fpwm       = GPIO_FREQUENCE_PWM ;
     

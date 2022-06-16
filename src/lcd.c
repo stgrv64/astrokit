@@ -125,7 +125,7 @@ void LCD_INIT(LCD * p_lcd) {
     return ;
   }
   else {
-    Trace("LCD1602Clear(ok)") ;
+    Trace1("LCD1602Clear : (OK)") ;
   }
 
   usleep(LCD_USLEEP_AFTER_CLEARING) ;
@@ -135,7 +135,7 @@ void LCD_INIT(LCD * p_lcd) {
     Trace("Fail to LCD1602DispLines");
   }
   else {
-    Trace("LCD1602DispLines(ok)") ;
+    Trace1("LCD1602DispLines : (ok)") ;
   }
 
   return ;
@@ -254,7 +254,7 @@ void LCD_DISPLAY_DEFAULT(void) {
       return ;
     }
     else {
-      Trace("LCD1602DispLines : OK");
+      Trace1("LCD1602DispLines : OK");
     }
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
@@ -273,7 +273,7 @@ void LCD_DISPLAY_DEFAULT(void) {
 void LCD_DISPLAY_CURRENT(void) {
 
   Trace("") ;
-  
+
   if ( gp_Devi->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
@@ -310,7 +310,7 @@ void LCD_DISPLAY_CURRENT(void) {
       return ;
     }
     else {
-      Trace("LCD1602DispLines : OK");
+      Trace1("LCD1602DispLines : OK");
     }
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
@@ -648,20 +648,28 @@ void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
   memset( c_l0, 0, sizeof(c_l0)) ; 
   memset( c_l1, 0, sizeof(c_l1)) ;
 
-  if ( ( f_led_ir = fopen( CONFIG_FIC_LED, "r" ) ) == NULL ) {
-    Trace("le fichier %s n a semble t til pas ete cree", CONFIG_FIC_LED) ;
-    pc_gets = fgets( c_gets, CONFIG_TAILLE_BUFFER_16, f_led_ir ) ;
+  Trace("CONFIG_FIC_LED = %s", CONFIG_FIC_LED) ;
 
+  /* Lecture LED IR */
+  /* Le service systemd astrokit-boot / script_astrokit_boot.sh cree 
+     normalement ce fichier */
+
+  if ( ( f_led_ir = fopen( CONFIG_FIC_LED, "r" ) ) != NULL ) {
+    pc_gets = fgets( c_gets, CONFIG_TAILLE_BUFFER_16, f_led_ir ) ;
     if ( pc_gets != NULL ) {
       sprintf( c_l1, "(LED IR) %s", c_gets );
     }
     else {
-      sprintf( c_l1, "(LED IR) fic non lu" );
+      sprintf( c_l1, "(LED IR) cf logs" );
+      Trace("fichier %s non lu", CONFIG_FIC_LED) ;
     }
   }
   else {
-    sprintf( c_l1, "(LED IR) fic non trouve" );
+    sprintf( c_l1, "(LED IR) cf logs" );
+    Trace("erreur ouverture %s", CONFIG_FIC_LED) ;
   }
+  /* Lecture LED ETAT */
+
   sprintf( c_l0, "(LED ETAT) %d", GPIO_LED_ETAT ) ;
   
 
@@ -715,8 +723,8 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
   memset( c_l0, 0, sizeof(c_l0)) ; 
   memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_l0, "(F alt) %.2f", gp_Sui->Fh ) ;
-  sprintf( c_l1, "(F azi) %.2f", gp_Sui->Fa ) ;
+  sprintf( c_l0, "(F alt) %.2f", gp_Sui->Fh_mic ) ;
+  sprintf( c_l1, "(F azi) %.2f", gp_Sui->Fa_mic ) ;
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;
@@ -741,8 +749,8 @@ void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
   memset( c_l0, 0, sizeof(c_l0)) ; 
   memset( c_l1, 0, sizeof(c_l1)) ;
 
-  sprintf( c_l0, "(T alt) %.2f", gp_Sui->Th ) ;
-  sprintf( c_l1, "(T azi) %.2f", gp_Sui->Ta ) ;
+  sprintf( c_l0, "(T alt) %.2f", gp_Sui->Th_mic ) ;
+  sprintf( c_l1, "(T azi) %.2f", gp_Sui->Ta_mic ) ;
 
   gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->display_current() ;

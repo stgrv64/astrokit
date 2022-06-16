@@ -143,12 +143,12 @@ void LIRC_READ(SUIVI * gp_Sui) {
 void IR_ACTIONS_PARTICULIERES( SUIVI * gp_Sui) {
     
   if ( ! strcmp( gp_Sui->datas_infrarouge, "plus" ) )  {
-    gp_Sui->Ta *=  gp_Sui->plus  ; gp_Sui->Fa = 1 / gp_Sui->Ta ;
-    gp_Sui->Th *=  gp_Sui->plus  ; gp_Sui->Fh = 1 / gp_Sui->Th ;
+    gp_Sui->Ta_mic *=  gp_Sui->plus  ; gp_Sui->Fa_mic = 1 / gp_Sui->Ta_mic ;
+    gp_Sui->Th_mic *=  gp_Sui->plus  ; gp_Sui->Fh_mic = 1 / gp_Sui->Th_mic ;
   }
   if ( ! strcmp( gp_Sui->datas_infrarouge, "moins" ) ) {
-    gp_Sui->Ta *=  gp_Sui->moins  ; gp_Sui->Fa = 1 / gp_Sui->Ta ;
-    gp_Sui->Th *=  gp_Sui->moins  ; gp_Sui->Fh = 1 / gp_Sui->Th ;
+    gp_Sui->Ta_mic *=  gp_Sui->moins  ; gp_Sui->Fa_mic = 1 / gp_Sui->Ta_mic ;
+    gp_Sui->Th_mic *=  gp_Sui->moins  ; gp_Sui->Fh_mic = 1 / gp_Sui->Th_mic ;
   }
 }
 //====================================================================================
