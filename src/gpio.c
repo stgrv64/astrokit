@@ -1283,7 +1283,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
     i_pas_change=0;
 
-    if ( sens > 0 ) { 
+    if ( sens > 0 ) {
       if ( pm->micropas == pm->nbmicropas - 1 ) { 
         pm->micropas = 0 ; 
         /* Si pm->micropas = 0 , cela veut dire que tout le cycle de micro pas a ete ecoule */
@@ -1297,7 +1297,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
         pm->micropas++ ; 
       }
     }
-    else { 
+    else {
       if ( pm->micropas == 0 ) { 
         pm->micropas = pm->nbmicropas-1 ;
         /* Si pm->micropas = pm->nbmicropas-1 , cela veut dire que tout le cycle de micro pas a ete ecoule */
@@ -1363,20 +1363,19 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
     
     pthread_mutex_unlock(& pm->mutex ) ;
 
+    if ( periode_bru != 0 ) {
+      d_ecart = periode_ree / periode_bru ; 
+      d_pid   = ( (d_ecart-1.0) / 2.0 )+ 1.0 ;
+    }
+    else {
+      Trace("division par zero") ;
+    }
+
     if ( g_i_trace>0 && i_pas_change && ( pm->pas % g_i_trace ) == 0 ) {
 
       /* Le temps usleep est toujours inferieur au temps "reel" consomme */ 
       /* on compense par PID en utilisant l ecart sur les periodes brutes calculees avec le temps reel */
       /* cela ajuste la frequence deduite et la periode deduite pour etre en phase avec teps reel */
-
-      if ( periode_bru != 0 ) {
-        d_ecart = periode_ree / periode_bru ; 
-        d_pid   = ( (d_ecart-1.0) / 2.0 )+ 1.0 ;
-      }
-      else {
-        Trace("division par zero") ;
-      }
-      Trace1("%lld %d %d", pm->pas, g_i_trace, i_pas_change) ;
 
       /* Correction du calcul asservissement juin 2022 */
 
@@ -1386,49 +1385,63 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
           pthread_mutex_lock(  & pm->mutex ) ;
           pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
           // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pm->p_Sui->acc_alt *= d_pid ;
+          pm->p_Sui->acc_alt_pid *= d_pid ;
           // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
           pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
+
           break ;
 
         case 1 : 
           pthread_mutex_lock(  & pm->mutex ) ;
           pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
           // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pm->p_Sui->acc_azi *= d_pid ;
+          pm->p_Sui->acc_azi_pid *= d_pid ;
           // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
           pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
+
+
           break ;
 
       }
-      Trace("mot %-3d => pas %-5lld : tps_bru %f tps_mot %f tps_mic %f tps_ree %f : per_bru %f per_mot %f per_mic %f per_ree %f ecart %f",\
-        pm->id,       \
-        pm->pas,      \
-        pm->tps_bru,  \
-        pm->tps_mot,  \
-        pm->tps_mic,  \
-        pm->tps_ree,  \
-        periode_bru,  \
-        periode_mot,  \
-        periode_eff,  \
-        periode_ree,  \
-        d_ecart         \
-      ) ;
 
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
-    Trace1("bou %-5lld mot %-5d pas %-5lld : per_mic %.3f per_mot %.3f pm->Fm %.3f pm->Tm %.3f",\
-      i_incr,    \
-      pm->id,    \
-      pm->pas,   \
-      pm->periode_mic,    \
-      pm->periode_mot,    \
-      pm->Fm, \
-      pm->Tm
-    ) ;
+    if ( i_pas_change && ( pm->pas % gp_Sui->temporisation_pid_loop ) == 0 ) {
+
+      switch ( pm->id ) {
+
+        case 0 : 
+          if ( g_i_trace_alt ) {
+            Trace("mot %-3d => pas %-5lld : tps_bru %f tps_ree %f : per_bru %f per_ree %f ecart %f",\
+              pm->id,       \
+              pm->pas,      \
+              pm->tps_bru,  \
+              pm->tps_ree,  \
+              periode_bru,  \
+              periode_ree,  \
+              d_ecart         \
+            ) ;
+          }
+          break ;
+
+        case 1 : 
+          if ( g_i_trace_azi ) {
+            Trace("mot %-3d => pas %-5lld : tps_bru %f tps_ree %f : per_bru %f per_ree %f ecart %f",\
+              pm->id,       \
+              pm->pas,      \
+              pm->tps_bru,  \
+              pm->tps_ree,  \
+              periode_bru,  \
+              periode_ree,  \
+              d_ecart         \
+            ) ;
+          }
+          break ;
+      }
+    }
 
     // FIXME : calcule la duree reelle d une iteration dans la boucle
 

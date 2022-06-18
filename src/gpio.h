@@ -238,7 +238,11 @@ int gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // masque de redefinition des 
 double gpio_frequence_pwm ;
 
 int priority ;
+
 int g_i_trace ;
+int g_i_trace_alt ;
+int g_i_trace_azi ;
+
 int g_i_timeout ;
 int g_i_max_nb_pas ;
 int g_i_max_nb_micropas ;

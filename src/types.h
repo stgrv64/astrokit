@@ -53,6 +53,7 @@
 # juin 2022     * ajout paramatres pid_azi et pid_alt 
 #                 et autres params pour tenter un asservissement des frequences
 #                 (voir code gpio.c et calcul.c sur les frequences et periodes)
+#               * ajout TEMPO_PID_LOOP
 # -------------------------------------------------------------- 
 */
 
@@ -239,7 +240,7 @@
 #define  CONFIG_VALIDATIONS_SIZE 10
 
 #define CONFIG_CODE_BUFFER_SIZE  255 
-#define CONFIG_CODE_NB_CODES     57 
+#define CONFIG_CODE_NB_CODES     60 
 
 #define LCD_LINES_CHAR_NUMBERS        16
 #define LCD_LINES_CHAR_NUMBERS_secure 8
@@ -533,7 +534,10 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 /*--------------------------------*/
 
 { "114", "key_reseau_up",   "cfg_reseau_up" },     /* 114 sum ascii = lettre 'r' = reseau */ 
-{ "108", "key_log",         "cfg_log_tps_reel_up" }      /* 108 sum ascii = lettre 'l' = generer les traces temps reel */ 
+{ "108", "key_log",     "cfg_log_tps_reel_up" },         /* 108 sum ascii = lettre 'l' = activer les traces temps reel */ 
+{ "107", "key_log_alt", "cfg_log_tps_reel_trace_azi" },  /* 108 sum ascii = lettre 'k' = generer les traces azi */ 
+{ "106", "key_log_azi", "cfg_log_tps_reel_trace_alt" },  /* 108 sum ascii = lettre 'j' = generer les traces alt */ 
+{ "undefined", "undefined", "undefined"}
 }; 
 /*------------------------------------------  */
 /* TAILLE TABLEAU 57 = CONFIG_CODE_NB_CODES   */
@@ -900,15 +904,16 @@ typedef struct {
   double       DTh ;
   double       DTa ;
   
-  unsigned long temporisation_menu  ;
-  unsigned long temporisation_voute   ;
-  unsigned long temporisation_raq  ;
-  unsigned long temporisation_ir   ; 
+  unsigned long temporisation_menu      ;
+  unsigned long temporisation_voute     ;
+  unsigned long temporisation_raq       ;
+  unsigned long temporisation_ir        ; 
   unsigned long temporisation_termios   ; 
   unsigned long temporisation_capteurs  ; 
   unsigned long temporisation_clavier   ; 
-  unsigned long temporisation_lcd_loop ;
-  unsigned long temporisation_lcd_disp ;
+  unsigned long temporisation_lcd_loop  ;
+  unsigned long temporisation_lcd_disp  ;
+  unsigned long temporisation_pid_loop  ;
 
   struct timeval tval ; 
 } 
@@ -1156,6 +1161,7 @@ unsigned long TEMPO_CLAVIER ;
 unsigned long TEMPO_CAPTEURS ;
 unsigned long TEMPO_LCD_LOOP ;
 unsigned long TEMPO_LCD_DISP ;
+unsigned long TEMPO_PID_LOOP ;
 
 // ------ PARAMETRES DE ALT ou AZI   ------------
 

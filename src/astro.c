@@ -243,6 +243,11 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
   int i=0;
   char cmd[256]={0} ;
   char s_buffer4[ CONFIG_TAILLE_BUFFER_32 * 4 ]={0} ;
+  char c_l0[16] ;
+  char c_l1[16] ;
+
+  memset( c_l0, ZERO_CHAR, strlen( c_l0 )) ;
+  memset( c_l1, ZERO_CHAR, strlen( c_l1 )) ;
 
   memset( cmd,       ZERO_CHAR, strlen( cmd )) ;
   memset( s_buffer4, ZERO_CHAR, strlen( s_buffer4 )) ;
@@ -285,7 +290,65 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
     If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
     If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
 
-    If_Mot_Is("cfg_log_tps_reel_up") { gp_Lcd->display_str_int( 2000000, "g_i_trace",15 ) ; i=1 ; g_i_trace=15 ; }
+    /* Activation algorithme PID de regulation des periodes / frequences moteurs */
+
+    If_Mot_Is("cfg_log_tps_reel_up") { 
+      i=1 ; 
+      if ( g_i_trace == 0 ){
+        g_i_trace = gp_Sui->temporisation_pid_loop ; 
+        sprintf(c_l0,"PID:activation") ;
+        sprintf(c_l1,"echant. = %d pas", g_i_trace) ;
+        gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
+        Trace("%s : %s", c_l0, c_l1) ;
+      } 
+      else {
+        g_i_trace = 0 ; 
+        sprintf(c_l0,"PID:") ;
+        sprintf(c_l1,"desactivation") ;
+        gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
+        Trace("%s : %s", c_l0, c_l1) ;        
+      }
+    }
+
+    /* Activation traces PID pour le moteur ALT */
+
+    If_Mot_Is("cfg_log_tps_reel_trace_alt") { 
+      i=1 ; 
+      if ( g_i_trace_alt == 0 ) {
+        g_i_trace_alt=1;      
+        sprintf(c_l0,"PID:log alt") ;
+        sprintf(c_l1,"echant. = %d pas", g_i_trace) ;
+        gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
+        Trace("%s : %s", c_l0, c_l1) ;
+      }
+      else {
+        g_i_trace_alt=0;      
+        sprintf(c_l0,"PID:log alt") ;
+        sprintf(c_l1,"desactivation") ;
+        gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
+        Trace("%s : %s", c_l0, c_l1) ;        
+      }
+    }
+
+    /* Activation traces PID pour le moteur AZI */
+
+    If_Mot_Is("cfg_log_tps_reel_trace_azi") { 
+      i=1 ;
+      if ( g_i_trace_azi == 0 ) {
+        g_i_trace_azi=1 ; 
+        sprintf(c_l0,"PID:log azi") ;
+        sprintf(c_l1,"echant. = %d pas", g_i_trace) ;
+        gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
+        Trace("%s : %s", c_l0, c_l1) ;
+      }
+      else {
+        g_i_trace_azi=0 ; 
+        sprintf(c_l0,"PID:log azi") ;
+        sprintf(c_l1,"desactivation") ;
+        gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
+        Trace("%s : %s", c_l0, c_l1) ;        
+      }
+    }
 
     If_Mot_Is("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
 
@@ -510,7 +573,7 @@ void SUIVI_MANUEL_BRUT(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
     gp_Sui->acc_azi = 1 ;
 
     if ( gp_Sui->SUIVI_EQUATORIAL )  gp_Sui->acc_alt = 0.0 ;
-    else                            gp_Sui->acc_alt = 1.0 ;
+    else                             gp_Sui->acc_alt = 1.0 ;
 
     gp_Sui->reset = 0 ;
 
@@ -1738,6 +1801,9 @@ int main(int argc, char ** argv) {
   * ---------------------------------------------------------------*/
 
   g_i_trace = 0 ;
+  g_i_trace_alt = 0 ;
+  g_i_trace_azi = 0 ;
+
   g_i_timeout = 0 ;
   g_i_max_nb_pas = 0 ;
   g_i_max_nb_micropas = 0 ;

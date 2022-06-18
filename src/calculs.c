@@ -557,8 +557,8 @@ void CALCUL_PERIODE(ASTRE *gp_Astr,SUIVI * gp_Sui, VOUTE *gp_Vout) {
   /* calcul des frequences corrigees avant prise en compte micro pas */
   /* ces frequences sont corrigees par les accelerations diverses */
 
-  freq_azi_mot = gp_Sui->acc_azi * gp_Vout->acc * freq_azi_bru  ;
-  freq_alt_mot = gp_Sui->acc_alt * gp_Vout->acc * freq_alt_bru  ;
+  freq_azi_mot = gp_Sui->acc_azi_pid * gp_Sui->acc_azi * gp_Vout->acc * freq_azi_bru  ;
+  freq_alt_mot = gp_Sui->acc_alt_pid * gp_Sui->acc_alt * gp_Vout->acc * freq_alt_bru  ;
 
   /* calcul des frequences finales UTILES */
   /* La frequence retenue est la frequence moteur multipliee par le nb de micro pas */
@@ -638,11 +638,11 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout
     
       pthread_mutex_lock(& gp_Pthr->mutex_azi );
   
-        gp_Astr->Va     = frequence * DIV * PIPI / ( gp_Vout->acc * AZI_R ) ;
+        gp_Astr->Va    = frequence * DIV * PIPI / ( gp_Vout->acc * AZI_R ) ;
         gp_Sui->Sa_old = gp_Sui->Sa ; 
         gp_Sui->Sa     = (int)SGN(frequence)  ;
-        gp_Sui->Fa_mic     = fabs(frequence) ;
-        gp_Sui->Ta_mic     = 1 / gp_Sui->Fa_mic ;
+        gp_Sui->Fa_mic = fabs(frequence) ;
+        gp_Sui->Ta_mic = 1 / gp_Sui->Fa_mic ;
     
       pthread_mutex_unlock(& gp_Pthr->mutex_azi );
     

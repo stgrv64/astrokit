@@ -43,6 +43,7 @@
 #                * ajout prise en charge fichier CONFIG_FIC_LED (param config.txt)
 #                  pour lecture numero led gpio IR , ce paramatre est defini 
 #                  dans /boot/config.txt
+#                * ajout TEMPO_PID_LOOP
 # -------------------------------------------------------------- 
 */
 
@@ -797,6 +798,7 @@ void CONFIG_INIT_DEVICES(DEVICES *gp_Devi) {
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 passage d une partie de code dans CONFIG_INIT_DEVICES
 * @date   : 2022-05-24 ajout mutex_thread suivi pour proteger section crotique threads
+* @date   : 2022-06-17 ajout TEMPO_PID_LOOP 
 * @todo   : voir si les mutex peuvent etre dispatches / eclates dans les autres struct
 *****************************************************************************************/
 
@@ -832,11 +834,12 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->pas_forward_fast  = 0 ;
   gp_Sui->pas_rewind_fast   = 0 ;
 
-  gp_Sui->acc_azi   = 1.0 ;     // acceleration volontaire des vitesses brutes
-  gp_Sui->acc_alt   = 1.0 ;     // acceleration volontaire des vitesses brutes
+  /* Initialisation des accelerations */
 
-  gp_Sui->acc_azi_pid   = 1.0 ; // acceleration deduite par retour boucle des vitesses brutes
-  gp_Sui->acc_alt_pid   = 1.0 ; // acceleration deduite par retour boucle des vitesses brutes
+  gp_Sui->acc_azi       = 1.0 ; // acceleration volontaire des vitesses brutes
+  gp_Sui->acc_alt       = 1.0 ; // acceleration volontaire des vitesses brutes
+  gp_Sui->acc_azi_pid   = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+  gp_Sui->acc_alt_pid   = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
 
   gp_Sui->sgn_azi   = 1 ;
   gp_Sui->sgn_alt   = 1 ;
@@ -902,7 +905,7 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->temporisation_capteurs = TEMPO_CAPTEURS ;
   gp_Sui->temporisation_lcd_loop = TEMPO_LCD_LOOP ;
   gp_Sui->temporisation_lcd_disp = TEMPO_LCD_DISP ;
-
+  gp_Sui->temporisation_pid_loop = TEMPO_PID_LOOP ;
   gp_Sui->temporisation_voute    = gp_Vout->DT ;
 
   gp_Sui->DTh = gp_Sui->Th_mic * CONFIG_MICRO_SEC ;
@@ -1063,6 +1066,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
   TEMPO_CAPTEURS = 50000;
   TEMPO_LCD_LOOP = 250000 ; 
   TEMPO_LCD_DISP = 100000 ; 
+  TEMPO_PID_LOOP = 5 ;
 
    //----------------------------------------------------------------------
    // Lecture des variables dans la config lue dans le fichier de config
@@ -1109,6 +1113,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
      if(!strcmp("TEMPO_CAPTEURS",g_Datas[l][0])) TEMPO_CAPTEURS=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_LCD_LOOP",g_Datas[l][0])) TEMPO_LCD_LOOP=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_LCD_DISP",g_Datas[l][0])) TEMPO_LCD_DISP=atol(g_Datas[l][1]);
+     if(!strcmp("TEMPO_PID_LOOP",g_Datas[l][0])) TEMPO_PID_LOOP=atol(g_Datas[l][1]);
      if(!strcmp("GPIO_LED_ETAT",g_Datas[l][0]))  GPIO_LED_ETAT=atoi(g_Datas[l][1]);
 
      if(!strcmp("DEVICE_USE_CONTROLER",g_Datas[l][0]))  DEVICE_USE_CONTROLER=atoi(g_Datas[l][1]);
@@ -1278,6 +1283,7 @@ void   CONFIG_AFFICHER_ETAT_THREADS(SUIVI * gp_Sui) {
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-05-30 ajout TEMPO_LCD_xxx 
+* @date   : 2022-06-17 ajout TEMPO_PID_LOOP
 * @todo   : 
 *****************************************************************************************/
 
@@ -1291,6 +1297,7 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   Trace("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
   Trace("TEMPO_LCD_LOOP = %ld",  TEMPO_LCD_LOOP);
   Trace("TEMPO_LCD_DISP = %ld",  TEMPO_LCD_DISP);
+  Trace("TEMPO_PID_LOOP = %ld",  TEMPO_PID_LOOP);
 
   Trace1("DEVICE_USE_CONTROLER = %d",  DEVICE_USE_CONTROLER);
   Trace1("DEVICE_USE_CAPTEURS = %d",  DEVICE_USE_CAPTEURS);

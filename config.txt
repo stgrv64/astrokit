@@ -22,6 +22,7 @@
 #               * ajout des reductions R5 R6 et R7 (prevoyant deux poulies)
 # juin 2022     * ajout TEMPO_LCD_LOOP et  TEMPO_LCD_DISP
 #               * ajout CONFIG_FIC_LED
+#               * ajout TEMPO_PID_LOOP
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -62,6 +63,7 @@ TEMPO_CLAVIER   27500
 TEMPO_CAPTEURS  27500
 TEMPO_LCD_LOOP  250000
 TEMPO_LCD_DISP  100000
+TEMPO_PID_LOOP  5       
 
 # ----------------------- parametres acquisitions
 
