@@ -54,6 +54,7 @@
 #                 et autres params pour tenter un asservissement des frequences
 #                 (voir code gpio.c et calcul.c sur les frequences et periodes)
 #               * ajout TEMPO_PID_LOOP
+#               * ajout structure PID 
 # -------------------------------------------------------------- 
 */
 
@@ -345,6 +346,8 @@ t_en_Lcd_Type_Affichage ;
 
 typedef struct {
 
+  pthread_mutex_t mutex_lcd ;
+
   int  i_type_affichage ; 
   int  i_fd ; 
   int  i_board ; 
@@ -359,8 +362,6 @@ typedef struct {
   int  i_change_default ;
 
   int  i_duree_us ; 
-
-  pthread_mutex_t mutex_lcd ;
 
   void (*display)(void);
 
@@ -396,7 +397,25 @@ typedef struct {
 } 
 LCD ;
 //------------------------------------------------------------------------------
+typedef struct {
 
+  pthread_mutex_t mutex_pid ;
+  
+  /* Entree / sortie de l algorithme : input = consigne */ 
+
+  double inp ;  /* consigne */ 
+  double out ;  /* sortie */ 
+  double err ; /* erreur  = out - inp */ 
+  
+  /* Parametres de regalges du PID proportionnel integral derive*/
+
+  double Kp ;
+  double Ki ;
+  double Kd ;
+}
+PID ;
+
+//------------------------------------------------------------------------------
 typedef enum {
   CODES_POS_IN_TERM=0,
   CODES_POS_IN_LIRC,
@@ -1088,6 +1107,7 @@ VOUTE      vou,   *gp_Vout ;
 SUIVI	     sui,   *gp_Sui ;
 DEVICES    dev,   *gp_Devi ;
 LCD        g_Lcd, *gp_Lcd ;
+PID        g_Pid, *gp_Pid ;
 PTHREADS   g_Pth, *gp_Pthr ;
 
 FILE      * flog ; 

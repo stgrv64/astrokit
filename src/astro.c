@@ -1826,6 +1826,7 @@ int main(int argc, char ** argv) {
   gp_Devi    = & dev ;
   gp_Cod     = & g_Cod ;
   gp_Lcd     = & g_Lcd ;
+  gp_Pid     = & g_Pid ;
   pm_azi     = & m_azi ;
   pm_alt     = & m_alt ;
   gp_Sui     = & sui ;
