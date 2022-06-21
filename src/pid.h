@@ -49,10 +49,16 @@
 #include <stat.h>
 #include <types.h>
 #include <pthreads.h>
-/* #include <lcd.h> */
+/* #include <lcd.h>
+#include <pid.h> */
 
-void   PID_INIT     (PID *) ;
+#define PID_ERR_PRE_INIT 56.245856
+
+void   PID_INIT             (PID *, double, double, double, double) ;
+void   PID_RESET         ( void)  ;
+void   PID_TEST         ( void)  ;
 void   PID_ACTIVATE         ( void) ;
 int    PID_IS_IN_CONDITION  ( void) ;
+void   PID_CALCULATE        ( double, double ) ;
 
 #endif

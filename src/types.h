@@ -53,7 +53,7 @@
 # juin 2022     * ajout paramatres pid_azi et pid_alt 
 #                 et autres params pour tenter un asservissement des frequences
 #                 (voir code gpio.c et calcul.c sur les frequences et periodes)
-#               * ajout TEMPO_PID_LOOP
+#               * ajout PID_ECH
 #               * ajout structure PID 
 # -------------------------------------------------------------- 
 */
@@ -241,7 +241,7 @@
 #define  CONFIG_VALIDATIONS_SIZE 10
 
 #define CONFIG_CODE_BUFFER_SIZE  255 
-#define CONFIG_CODE_NB_CODES     60 
+#define CONFIG_CODE_NB_CODES     70 
 
 #define LCD_LINES_CHAR_NUMBERS        16
 #define LCD_LINES_CHAR_NUMBERS_secure 8
@@ -399,19 +399,40 @@ LCD ;
 //------------------------------------------------------------------------------
 typedef struct {
 
+  FILE          * f_out ; 
   pthread_mutex_t mutex_pid ;
   
   /* Entree / sortie de l algorithme : input = consigne */ 
 
-  double inp ;  /* consigne */ 
-  double out ;  /* sortie */ 
-  double err ; /* erreur  = out - inp */ 
-  
+  unsigned long incr ; /* numero d increment du calcul */ 
+
+  double inp ;     /* consigne */ 
+  double out ;     /* sortie */ 
+  double ech ;     /* echantillonage */
+  double err ;     /* erreur  = out - inp */
+
+  double err_sum ; /* calcul de la somme des erreurs */ 
+
+  double err_pro_Kp ; /* calcul de la partie proportionnelle */  
+  double err_int_Ki ; /* calcul de la partie integrale */  
+  double err_der_Kd ; /* calcul de la partie derivee */
+
+  /* resultat du calcul complet =
+      Kp * (terme proportionnel ) + Ki * (terme integral) + Kd * (terme derivee) 
+  */
+  double pid ; /* resultat du calcul complet */
+  double err_pre ; /* sauvegarde de erreur precedente */ 
   /* Parametres de regalges du PID proportionnel integral derive*/
 
   double Kp ;
   double Ki ;
   double Kd ;
+
+  void (* pid_init)(void) ; 
+  void (* pid_reset)(void) ; 
+  void (* pid_run)(double,double) ; 
+  /* void (* pid_calcul)(void) ;  */
+  void (* pid_test)(void) ;
 }
 PID ;
 
@@ -556,7 +577,17 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 { "108", "key_log",     "cfg_log_tps_reel_up" },         /* 108 sum ascii = lettre 'l' = activer les traces temps reel */ 
 { "107", "key_log_alt", "cfg_log_tps_reel_trace_azi" },  /* 108 sum ascii = lettre 'k' = generer les traces azi */ 
 { "106", "key_log_azi", "cfg_log_tps_reel_trace_alt" },  /* 108 sum ascii = lettre 'j' = generer les traces alt */ 
-{ "undefined", "undefined", "undefined"}
+{ "undefined", "undefined", "undefined"}, 
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
+{ "undefined", "undefined", "undefined"},
 }; 
 /*------------------------------------------  */
 /* TAILLE TABLEAU 57 = CONFIG_CODE_NB_CODES   */
@@ -1181,7 +1212,13 @@ unsigned long TEMPO_CLAVIER ;
 unsigned long TEMPO_CAPTEURS ;
 unsigned long TEMPO_LCD_LOOP ;
 unsigned long TEMPO_LCD_DISP ;
-unsigned long TEMPO_PID_LOOP ;
+
+/* Parametres du regulateur PID en frequences */
+
+double PID_ECH ;
+double PID_KP ;
+double PID_KI ;
+double PID_KD ;
 
 // ------ PARAMETRES DE ALT ou AZI   ------------
 
@@ -1292,6 +1329,7 @@ char CONFIG_REP_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;
 char CONFIG_REP_IN   [ CONFIG_TAILLE_BUFFER_64 ] ;    
 char CONFIG_REP_SCR  [ CONFIG_TAILLE_BUFFER_64 ] ; 
 
+char CONFIG_FIC_PID  [ CONFIG_TAILLE_BUFFER_64 ] ;
 char CONFIG_FIC_LOG  [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_DATE [ CONFIG_TAILLE_BUFFER_64 ] ;            
 char CONFIG_FIC_HHMM [ CONFIG_TAILLE_BUFFER_64 ] ;        

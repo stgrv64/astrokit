@@ -1363,13 +1363,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
     
     pthread_mutex_unlock(& pm->mutex ) ;
 
-    if ( periode_bru != 0 ) {
-      d_ecart = periode_ree / periode_bru ; 
-      d_pid   = ( (d_ecart-1.0) / 2.0 )+ 1.0 ;
-    }
-    else {
-      Trace("division par zero") ;
-    }
+    gp_Pid->pid_run( periode_bru, periode_ree ) ;
 
     if ( g_i_trace>0 && i_pas_change && ( pm->pas % g_i_trace ) == 0 ) {
 
@@ -1385,7 +1379,9 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
           pthread_mutex_lock(  & pm->mutex ) ;
           pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
           // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pm->p_Sui->acc_alt_pid *= d_pid ;
+          
+          pm->p_Sui->acc_alt_pid *= gp_Pid->pid ;
+          
           // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
           pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
@@ -1396,7 +1392,9 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
           pthread_mutex_lock(  & pm->mutex ) ;
           pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
           // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pm->p_Sui->acc_azi_pid *= d_pid ;
+          
+          pm->p_Sui->acc_azi_pid *= gp_Pid->pid ;
+          
           // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
           pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;

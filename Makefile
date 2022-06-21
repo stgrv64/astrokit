@@ -22,6 +22,7 @@
 # jan 2022    * prise en compte CCHOST et CCTARG
 # avril 2022  * ajout compilation pour lcd1602 (git matrix adapter)
 # juin 2022   * ajout lcd.c dans SRC
+# 21 juin 2022   * ajout pid.c / .hdans SRC
 #--------------------------------------------------------------------------------------
 # CC	= gcc
 # CC	= armv6-gcc
@@ -100,7 +101,7 @@ CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC -static -pthread
 SRC	= \
 src/arguments.c src/astro.c src/calculs.c src/cat.c \
 src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c \
-src/keyboard.c src/lcd.c src/pthreads.c
+src/keyboard.c src/lcd.c src/pthreads.c src/pid.c
 
 OBJ	= $(SRC:.c=.o)
 

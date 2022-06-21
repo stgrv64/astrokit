@@ -58,6 +58,7 @@
 #include <types.h>
 #include <pthreads.h>
 #include <lcd.h>
+#include <pid.h>
 
 // FIN INCLUDES =====================================
 

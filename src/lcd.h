@@ -49,7 +49,8 @@
 #include <stat.h>
 #include <types.h>
 #include <pthreads.h>
-/* #include <lcd.h> */
+/* #include <lcd.h>
+#include <pid.h> */
 
 void   LCD_INIT                      (LCD *) ;
 

@@ -44,7 +44,7 @@ void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFF
 //============================================================================
 void CAT_READ(char * catalogue_txt, char g_Datas[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
 
-  FILE *fin ;
+  FILE * fin ;
   char buf[CAT_TAILLE_BUFFER * CAT_NB_COLONNES] ;
   int  C,L ;
   char *str1, *token, *sptr ;

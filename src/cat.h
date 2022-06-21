@@ -51,6 +51,7 @@
 #include <types.h>
 #include <pthreads.h>
 #include <lcd.h>
+#include <pid.h>
 
 // FIN INCLUDES =====================================
 // FIXME : 20210501 : creation entete de la fonction au format doxygen ligne suivante 

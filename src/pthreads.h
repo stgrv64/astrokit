@@ -50,6 +50,7 @@
 #include <types.h>
 /* #include <pthreads.h> */
 #include <lcd.h>
+#include <pid.h>
 
 void PTHREADS_INIT   ( void) ;
 void PTHREADS_CONFIG ( void ) ;

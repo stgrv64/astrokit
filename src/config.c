@@ -43,7 +43,7 @@
 #                * ajout prise en charge fichier CONFIG_FIC_LED (param config.txt)
 #                  pour lecture numero led gpio IR , ce paramatre est defini 
 #                  dans /boot/config.txt
-#                * ajout TEMPO_PID_LOOP
+#                * ajout PID_ECH PID_KP PID_KI PID_KD
 # -------------------------------------------------------------- 
 */
 
@@ -798,7 +798,7 @@ void CONFIG_INIT_DEVICES(DEVICES *gp_Devi) {
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 passage d une partie de code dans CONFIG_INIT_DEVICES
 * @date   : 2022-05-24 ajout mutex_thread suivi pour proteger section crotique threads
-* @date   : 2022-06-17 ajout TEMPO_PID_LOOP 
+* @date   : 2022-06-17 ajout PID_ECH PID_KP PID_KI PID_KD 
 * @todo   : voir si les mutex peuvent etre dispatches / eclates dans les autres struct
 *****************************************************************************************/
 
@@ -905,7 +905,7 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->temporisation_capteurs = TEMPO_CAPTEURS ;
   gp_Sui->temporisation_lcd_loop = TEMPO_LCD_LOOP ;
   gp_Sui->temporisation_lcd_disp = TEMPO_LCD_DISP ;
-  gp_Sui->temporisation_pid_loop = TEMPO_PID_LOOP ;
+  gp_Sui->temporisation_pid_loop = PID_ECH ;
   gp_Sui->temporisation_voute    = gp_Vout->DT ;
 
   gp_Sui->DTh = gp_Sui->Th_mic * CONFIG_MICRO_SEC ;
@@ -1013,6 +1013,7 @@ int CONFIG_FIN_FICHIER(char c) {
             par CONFIG_READ / GPIO_READ
 * @param  : g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : juin 2022 : ajout parametres PID
 * @todo   : 
 *****************************************************************************************/
 
@@ -1066,7 +1067,8 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
   TEMPO_CAPTEURS = 50000;
   TEMPO_LCD_LOOP = 250000 ; 
   TEMPO_LCD_DISP = 100000 ; 
-  TEMPO_PID_LOOP = 5 ;
+
+  PID_ECH        = 3 ;
 
    //----------------------------------------------------------------------
    // Lecture des variables dans la config lue dans le fichier de config
@@ -1081,6 +1083,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
   memset( CONFIG_REP_SCR, ZERO_CHAR, sizeof( CONFIG_REP_SCR ) ) ;
   memset( CONFIG_FIC_LED, ZERO_CHAR, sizeof( CONFIG_FIC_LED ) ) ;
   memset( CONFIG_FIC_LOG, ZERO_CHAR, sizeof( CONFIG_FIC_LOG ) ) ;
+  memset( CONFIG_FIC_PID, ZERO_CHAR, sizeof( CONFIG_FIC_PID ) ) ;
   memset( CONFIG_FIC_DATE, ZERO_CHAR, sizeof( CONFIG_FIC_DATE ) ) ;
   memset( CONFIG_FIC_HHMM, ZERO_CHAR, sizeof( CONFIG_FIC_HHMM ) ) ;
   memset( CONFIG_SCR_KERNEL, ZERO_CHAR, sizeof( CONFIG_SCR_KERNEL ) ) ;
@@ -1113,7 +1116,12 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
      if(!strcmp("TEMPO_CAPTEURS",g_Datas[l][0])) TEMPO_CAPTEURS=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_LCD_LOOP",g_Datas[l][0])) TEMPO_LCD_LOOP=atol(g_Datas[l][1]);
      if(!strcmp("TEMPO_LCD_DISP",g_Datas[l][0])) TEMPO_LCD_DISP=atol(g_Datas[l][1]);
-     if(!strcmp("TEMPO_PID_LOOP",g_Datas[l][0])) TEMPO_PID_LOOP=atol(g_Datas[l][1]);
+
+     if(!strcmp("PID_ECH",g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
+     if(!strcmp("PID_KP", g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
+     if(!strcmp("PID_KI", g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
+     if(!strcmp("PID_KD", g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
+
      if(!strcmp("GPIO_LED_ETAT",g_Datas[l][0]))  GPIO_LED_ETAT=atoi(g_Datas[l][1]);
 
      if(!strcmp("DEVICE_USE_CONTROLER",g_Datas[l][0]))  DEVICE_USE_CONTROLER=atoi(g_Datas[l][1]);
@@ -1231,6 +1239,7 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
     if(!strcmp("CONFIG_REP_LOG",g_Datas[l][0]))  strcpy( CONFIG_REP_LOG, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_REP_IN",g_Datas[l][0]))   strcpy( CONFIG_REP_IN, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_LOG",g_Datas[l][0]))  strcpy( CONFIG_FIC_LOG, g_Datas[l][1]) ;
+    if(!strcmp("CONFIG_FIC_PID",g_Datas[l][0]))  strcpy( CONFIG_FIC_PID, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_LED",g_Datas[l][0]))  strcpy( CONFIG_FIC_LED, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_DATE",g_Datas[l][0])) strcpy( CONFIG_FIC_DATE, g_Datas[l][1]) ;
     if(!strcmp("CONFIG_FIC_HHMM",g_Datas[l][0])) strcpy( CONFIG_FIC_HHMM, g_Datas[l][1]) ;  
@@ -1283,7 +1292,7 @@ void   CONFIG_AFFICHER_ETAT_THREADS(SUIVI * gp_Sui) {
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-05-30 ajout TEMPO_LCD_xxx 
-* @date   : 2022-06-17 ajout TEMPO_PID_LOOP
+* @date   : 2022-06-17 ajout PID_ECH
 * @todo   : 
 *****************************************************************************************/
 
@@ -1297,7 +1306,11 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   Trace("TEMPO_CAPTEURS = %ld",  TEMPO_CAPTEURS);
   Trace("TEMPO_LCD_LOOP = %ld",  TEMPO_LCD_LOOP);
   Trace("TEMPO_LCD_DISP = %ld",  TEMPO_LCD_DISP);
-  Trace("TEMPO_PID_LOOP = %ld",  TEMPO_PID_LOOP);
+
+  Trace("PID_ECH = %f",  PID_ECH);
+  Trace("PID_KI = %f",  PID_KI);
+  Trace("PID_KP = %f",  PID_KP);
+  Trace("PID_KD = %f",  PID_KD);
 
   Trace1("DEVICE_USE_CONTROLER = %d",  DEVICE_USE_CONTROLER);
   Trace1("DEVICE_USE_CAPTEURS = %d",  DEVICE_USE_CAPTEURS);
@@ -1335,6 +1348,7 @@ void   CONFIG_AFFICHER_VARIABLES(void) {
   Trace1("CONFIG_REP_LOG = %s", CONFIG_REP_LOG)  ; 
   Trace1("CONFIG_REP_IN = %s", CONFIG_REP_IN)  ; 
   Trace1("CONFIG_FIC_LOG = %s", CONFIG_FIC_LOG)  ; 
+  Trace1("CONFIG_FIC_PID = %s", CONFIG_FIC_PID)  ; 
   Trace1("CONFIG_FIC_LED = %s", CONFIG_FIC_LED)  ; 
   Trace1("CONFIG_FIC_DATE = %s", CONFIG_FIC_DATE)  ; 
   Trace1("CONFIG_FIC_HHMM = %s", CONFIG_FIC_HHMM)  ;  
@@ -1426,7 +1440,7 @@ int CONFIG_GETCWD(char * c_getcwd) {
 
 int CONFIG_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) {
 
-  FILE *fin ;
+  FILE * fin ;
   char buf   [CONFIG_TAILLE_BUFFER] ;
   char buffer[CONFIG_TAILLE_BUFFER] ;
   char c ;

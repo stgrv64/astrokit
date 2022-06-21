@@ -1871,8 +1871,12 @@ int main(int argc, char ** argv) {
   CONFIG_INIT_LIEU      ( gp_Lieu  ) ;
   CONFIG_INIT_TEMPS     ( gp_Time ) ;
   CONFIG_INIT_DEVICES   ( gp_Devi ) ;
+
   CALCUL_TEMPS_SIDERAL  ( gp_Lieu, gp_Time) ;
+
   LCD_INIT              ( gp_Lcd ) ;
+  PID_INIT              ( gp_Pid, PID_ECH, PID_KP, PID_KI, PID_KD ) ;
+
   PTHREADS_INIT         () ;
 
   CONFIG_AFFICHER_DEVICES_USE() ;
