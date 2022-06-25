@@ -129,6 +129,11 @@ else {
 
   gp_Pid->pid = gp_Pid->err_pro_Kp + gp_Pid->err_int_Ki + gp_Pid->err_der_Kd ;
 
+  /* mise en conformite pour COmmande Sortie */
+  /* TODO : voir si une addition avec 1 suffit */
+  
+  gp_Pid->pid   = ( (gp_Pid->pid-1.0) / 2.0 )+ 1.0 ;
+
   /* sauvegarde de erreur dans erreur precedente pour calcul suivant */
 
   gp_Pid->err_pre = gp_Pid->err ;

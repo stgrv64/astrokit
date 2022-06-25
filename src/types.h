@@ -568,22 +568,17 @@ static const char *g_char_Codes[][ CONFIG_COD_NB_IN_OUT ] = {
 { "obsolete",  "KEY_BLUE",    "blue"},     /* remplace par KEY_N (ngc) */
 { "obsolete",  "KEY_YELLOW",  "yellow"},   /* remplace par KEY_E (etoiles) */
 { "obsolete",  "KEY_GREEN",   "green"},    /* remplace par KEY_P (planetes) */
-
-/*--------------------------------*/
-/* touches restantes non definies */
-/*--------------------------------*/
-
-{ "114", "key_reseau_up",   "cfg_reseau_up" },     /* 114 sum ascii = lettre 'r' = reseau */ 
+{ "114", "key_reseau_up",   "cfg_reseau_up" },           /* 114 sum ascii = lettre 'r' = reseau */ 
 { "108", "key_log",     "cfg_log_tps_reel_up" },         /* 108 sum ascii = lettre 'l' = activer les traces temps reel */ 
 { "107", "key_log_alt", "cfg_log_tps_reel_trace_azi" },  /* 108 sum ascii = lettre 'k' = generer les traces azi */ 
 { "106", "key_log_azi", "cfg_log_tps_reel_trace_alt" },  /* 108 sum ascii = lettre 'j' = generer les traces alt */ 
-{ "undefined", "undefined", "undefined"}, 
-{ "undefined", "undefined", "undefined"},
-{ "undefined", "undefined", "undefined"},
-{ "undefined", "undefined", "undefined"},
-{ "undefined", "undefined", "undefined"},
-{ "undefined", "undefined", "undefined"},
-{ "undefined", "undefined", "undefined"},
+{ "115", "undefined", "undefined"},  /* 115 sum ascii = lettre 's' = reseau */ 
+{ "117", "undefined", "undefined"},     /* 117 sum ascii = lettre 'u' = reseau */ 
+{ "118", "undefined", "aff_variables"},     /* 118 sum ascii = lettre 'v' = reseau */ 
+{ "119", "undefined", "undefined"},     /* 119 sum ascii = lettre 'w' = reseau */
+{ "undefined", "undefined", "undefined"}, /* 120 sum ascii = lettre 'w' = reseau */
+{ "undefined", "undefined", "undefined"}, /* 121 sum ascii = lettre 'w' = reseau */
+{ "undefined", "undefined", "undefined"}, /* 122 sum ascii = lettre 'w' = reseau */
 { "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},

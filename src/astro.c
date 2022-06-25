@@ -277,6 +277,12 @@ void SUIVI_TRAITEMENT_MOT( SUIVI * gp_Sui, CLAVIER *gp_Clav ) {
     If_Mot_Is("stop")  { gp_Sui->SUIVI_VOUTE = 0 ; i=1;}
     If_Mot_Is("play")  { gp_Sui->SUIVI_VOUTE = 1 ; i=1;}
     
+    /* Quelques actions d 'affichage a l'ecran  */
+
+    If_Mot_Is("aff_variables")       { CONFIG_AFFICHER_VARIABLES() ; i=1 ; } ;
+
+    /* Quelques actions d 'affichage a l'ecran LCD */
+
     If_Mot_Is("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
     If_Mot_Is("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
     If_Mot_Is("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
@@ -1803,7 +1809,6 @@ int main(int argc, char ** argv) {
   g_i_trace = 0 ;
   g_i_trace_alt = 0 ;
   g_i_trace_azi = 0 ;
-
   g_i_timeout = 0 ;
   g_i_max_nb_pas = 0 ;
   g_i_max_nb_micropas = 0 ;

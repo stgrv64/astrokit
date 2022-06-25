@@ -23,6 +23,8 @@
 # juin 2022     * ajout TEMPO_LCD_LOOP et  TEMPO_LCD_DISP
 #               * ajout CONFIG_FIC_LED
 #               * ajout TEMPO_PID_LOOP
+#               * ajout PID_ECH PID_KP PID_KI PID_KD
+#               * correction longitude et latitude orgeres
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -74,7 +76,7 @@ PID_KD  = 0.05
 
 DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
 DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
-DEVICE_USE_LCD              0  # flag qui indique utilisation de ecran LCD1602 / PCA8574
+DEVICE_USE_LCD              1  # flag qui indique utilisation de ecran LCD1602 / PCA8574
 DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
 DEVICE_USE_CAPTEURS         0  # flag qui indique utilisation de capteurs comme source input
 DEVICE_USE_RAQUETTE         0  # flag qui indique utilisation d une raquette (gpio) comme source input
@@ -88,18 +90,9 @@ LONGITUDE  -0.36
 ALTITUDE   100
 
 # Latitude et longitude Orgeres (35)
-# LATITUDE   43.3
-# LONGITUDE  -0.36 
+# LATITUDE   48.0
+# LONGITUDE  -1.67 
 # ALTITUDE   100
-
-# ----------------------- parametres gpios
-
-# la led est parametree grace a :
-# insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
-# GPIO_LED_IR     27  
-# inutiles (2021) :
-# GPIO_INPUT      7,8 
-# GPIO_OUTPUT     14,15 
 
 #--------------------------------------------------------------------------
 # Conf corecte pour carte essai carre (celle qui s enfiche sur rpi3aplus)
@@ -109,7 +102,7 @@ ALTITUDE   100
 GPIO_LED_ETAT   4
 GPIO_ALT        21,26,19,13
 GPIO_AZI        6,5,7,11
-GPIO_MASQUE     0,1,2,3
+# GPIO_MASQUE     0,1,2,3
 
 #--------------------------------------------------------------------------
 # Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus)
@@ -118,7 +111,7 @@ GPIO_MASQUE     0,1,2,3
 # GPIO_LED_ETAT   4
 # GPIO_ALT        21,26,19,13
 # GPIO_AZI        6,5,7,11
-# GPIO_MASQUE     3,1,0,2
+GPIO_MASQUE     3,1,0,2
 
 # ----------------------- parametres pwm
 
@@ -131,12 +124,11 @@ GPIO_FREQUENCE_PWM  1000
 ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
 ALT_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-ALT_R4  8      # mode micro pas utilise (1/x)
+ALT_R4  64       # mode micro pas utilise (1/x)
 ALT_R5  1        # reduction liee a la poulie
 ALT_R6  1        # reduction liee au cpu
 ALT_R7  1        # reduction non decrite plus haut ....
-   
-ALT_ROT 0        # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
+ALT_ROT 0        # Flag de reversibilite du sens de rotation
 ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions azimut
@@ -144,13 +136,12 @@ ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 AZI_R1  144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
 AZI_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 AZI_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-AZI_R4  8      # mode micro pas utilise (1/x)
+AZI_R4  64       # mode micro pas utilise (1/x)
 AZI_R5  1        # reduction liee a la poulie
 AZI_R6  1        # reduction liee au cpu
 AZI_R7  1        # reduction non decrite plus haut ....
-
-AZI_ROT  1       # Flag de reversibilite du sens de rotation 1 <=> gauche->droite
-AZI_ACC  2       # Facteur de multiplication en mode MANUEL
+AZI_ROT 1        # Flag de reversibilite du sens de rotation
+AZI_ACC 2        # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions altaz
 
@@ -206,6 +197,15 @@ GPIO_KEY_C1  6    # sortie keyboard colonnne 1
 GPIO_KEY_C2  13   # sortie keyboard colonnne 2
 GPIO_KEY_C3  19   # sortie keyboard colonnne 3
 GPIO_KEY_C4  26   # sortie keyboard colonnne 4
+
+# ----------------------- parametres gpios
+
+# la led est parametree grace a :
+# insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
+# GPIO_LED_IR     27  
+# inutiles (2021) :
+# GPIO_INPUT      7,8 
+# GPIO_OUTPUT     14,15 
 
 #===============================================================
 # fin fichier - fin fichier - fin fichier - fin fichier - fin fi
