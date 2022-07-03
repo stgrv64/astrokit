@@ -905,6 +905,7 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->temporisation_capteurs = TEMPO_CAPTEURS ;
   gp_Sui->temporisation_lcd_loop = TEMPO_LCD_LOOP ;
   gp_Sui->temporisation_lcd_disp = TEMPO_LCD_DISP ;
+
   gp_Sui->temporisation_pid_loop = PID_ECH ;
   gp_Sui->temporisation_voute    = gp_Vout->DT ;
 
@@ -1118,9 +1119,9 @@ void CONFIG_INIT_VAR(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAI
      if(!strcmp("TEMPO_LCD_DISP",g_Datas[l][0])) TEMPO_LCD_DISP=atol(g_Datas[l][1]);
 
      if(!strcmp("PID_ECH",g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
-     if(!strcmp("PID_KP", g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
-     if(!strcmp("PID_KI", g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
-     if(!strcmp("PID_KD", g_Datas[l][0])) PID_ECH=atof(g_Datas[l][1]);
+     if(!strcmp("PID_KP", g_Datas[l][0])) PID_KP =atof(g_Datas[l][1]);
+     if(!strcmp("PID_KI", g_Datas[l][0])) PID_KP =atof(g_Datas[l][1]);
+     if(!strcmp("PID_KD", g_Datas[l][0])) PID_KD =atof(g_Datas[l][1]);
 
      if(!strcmp("GPIO_LED_ETAT",g_Datas[l][0]))  GPIO_LED_ETAT=atoi(g_Datas[l][1]);
 

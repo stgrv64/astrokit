@@ -1210,7 +1210,7 @@ unsigned long TEMPO_LCD_DISP ;
 
 /* Parametres du regulateur PID en frequences */
 
-double PID_ECH ;
+double PID_ECH ; /* echantillonage en nombre de pas moteurs */
 double PID_KP ;
 double PID_KI ;
 double PID_KD ;

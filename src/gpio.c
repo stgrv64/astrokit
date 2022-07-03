@@ -1407,6 +1407,13 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
+    Trace("i_pas_change %d pm->pas %lld gp_Sui->tempo_pid_loop %ld PID_ECH %f" , \
+      i_pas_change, \
+      pm->pas, \
+      gp_Sui->temporisation_pid_loop, \
+      PID_ECH \
+    ) ;
+
     if ( i_pas_change && ( pm->pas % gp_Sui->temporisation_pid_loop ) == 0 ) {
 
       switch ( pm->id ) {
