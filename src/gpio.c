@@ -1204,6 +1204,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
   double d_ecart =0;       /* ecart entre Periodes attendues et reelles */
   double d_pid = 0 ;         /* parametre PID a appliquer */
+
   double periode_bru=0 ; /* periode brute calculee dans CALCUL_PERIODE */
   double periode_eff=0 ; /* periode effective pour la temporisation */
   double periode_ree=0 ; /* periode effective reelle consommee pour la temporisation */
@@ -1365,6 +1366,12 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
     gp_Pid->pid_run( periode_bru, periode_ree ) ;
 
+    pthread_mutex_lock( & gp_Pid->mutex_pid ) ;
+
+    d_ecart = gp_Pid->err ;
+    
+    pthread_mutex_unlock( & gp_Pid->mutex_pid ) ;
+
     if ( g_i_trace>0 && i_pas_change && ( pm->pas % g_i_trace ) == 0 ) {
 
       /* Le temps usleep est toujours inferieur au temps "reel" consomme */ 
@@ -1379,9 +1386,11 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
           pthread_mutex_lock(  & pm->mutex ) ;
           pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
           // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          
+          pthread_mutex_lock( & gp_Pid->mutex_pid ) ;
+
           pm->p_Sui->acc_alt_pid *= gp_Pid->pid ;
-          
+
+          pthread_mutex_unlock( & gp_Pid->mutex_pid ) ;
           // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
           pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
@@ -1392,22 +1401,22 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
           pthread_mutex_lock(  & pm->mutex ) ;
           pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
           // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          
+          pthread_mutex_lock( & gp_Pid->mutex_pid ) ;
+
           pm->p_Sui->acc_azi_pid *= gp_Pid->pid ;
           
+          pthread_mutex_unlock( & gp_Pid->mutex_pid ) ;
           // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
           pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
 
-
           break ;
-
       }
 
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
-    Trace("i_pas_change %d pm->pas %lld gp_Sui->tempo_pid_loop %ld PID_ECH %f" , \
+    Trace1("i_pas_change %d pm->pas %lld gp_Sui->tempo_pid_loop %ld PID_ECH %f" , \
       i_pas_change, \
       pm->pas, \
       gp_Sui->temporisation_pid_loop, \

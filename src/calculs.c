@@ -930,7 +930,7 @@ int CALCUL_JOUR_JULIEN(LIEU* gp_Lieu, TEMPS * gp_Time) {
   
   JJ = 367*Y - 7*(Y + ( M + 9) / 12 ) / 4 + 275 * M / 9 + D + 1721014 - 0.5 + T ;
   
-  Trace2("Date Julienne = %7.9f",JJ) ;
+  Trace1("Date Julienne = %7.9f",JJ) ;
   
   gp_Lieu->JJ = JJ ;
   
@@ -1020,9 +1020,7 @@ int CALCUL_TEMPS_SIDERAL(LIEU* gp_Lieu, TEMPS * gp_Time ) {
   gp_Lieu->TS  = TSMH3.hd ;
   gp_Lieu->TSR = (TSMH3.hd / 24) * PIPI ;
   
-  Trace2("Methode 1 : gp_Lieu->JJ = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
-  Trace2("Methode 1 : gp_Lieu->JJ = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
-  Trace2("Methode 1 : gp_Lieu->JJ = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
+  Trace1("temps sideral : gp_Lieu->TS = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
 
   return 0 ;
 }

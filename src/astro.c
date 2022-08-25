@@ -1408,6 +1408,25 @@ void * SUIVI_LCD(SUIVI * gp_Sui) {
         gp_Lcd->i_change_current = FALSE ;
       }
       
+      /* Si un changement de date a lieu et que cela fait partie du changement par défaut
+         alors on effectue un changement de affichage par defaut */
+      /* TODO : coder */
+      
+      if ( FALSE ) { 
+
+        sprintf( c_l0, "%d%s%d %-2d:%-2d", \
+          gp_Time->yy , \
+          c_Lcd_Display_Months[ gp_Time->mm -1  ] , \
+          gp_Time->dd, \
+          gp_Time->HH, \
+          gp_Time->MM ) ;
+      
+        sprintf( c_l1, "%s", gp_Astr->nom ) ;
+        
+        gp_Lcd->change_default( 2000000, c_l0 , c_l1 ) ;
+        
+        gp_Sui->SUIVI_ALIGNEMENT = 0 ;
+      }
     }
   }
 
@@ -1898,6 +1917,8 @@ int main(int argc, char ** argv) {
   Trace("gpio_mas         : %d %d %d %d", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
   Trace("GPIO_LED_ETAT    : %d", GPIO_LED_ETAT );
   Trace("ASTRE_PAR_DEFAUT : %s", ASTRE_PAR_DEFAUT) ;
+  
+  Trace("PID_ECH = %f",  PID_ECH);
   
   // -----------------------------------------------------------------
   // reglages variables particulieres

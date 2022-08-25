@@ -22,9 +22,8 @@
 #               * ajout des reductions R5 R6 et R7 (prevoyant deux poulies)
 # juin 2022     * ajout TEMPO_LCD_LOOP et  TEMPO_LCD_DISP
 #               * ajout CONFIG_FIC_LED
-#               * ajout TEMPO_PID_LOOP
-#               * ajout PID_ECH PID_KP PID_KI PID_KD
-#               * correction longitude et latitude orgeres
+#               * ajout PID_KP etc;.
+#               * correction lat et lon de orgeres
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -36,7 +35,7 @@
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
-ASTRE_PAR_DEFAUT PLA0 
+ASTRE_PAR_DEFAUT ETO5
 
 # ----------------------- parametres repertoires et fichiers
 
@@ -48,6 +47,7 @@ CONFIG_REP_OUT       out
 CONFIG_REP_SCR       scr
 CONFIG_FIC_LED       /tmp/astrokit-boo-recup-led-ir.txt
 CONFIG_FIC_LOG       astrokit.log.new
+CONFIG_FIC_PID       astrokit.pid.infos.log
 CONFIG_FIC_DATE      date.txt
 CONFIG_FIC_HHMM      hhmm.txt
 
@@ -63,14 +63,9 @@ TEMPO_IR        27000
 TEMPO_TERMIOS   27500
 TEMPO_CLAVIER   27500
 TEMPO_CAPTEURS  27500
-TEMPO_LCD_LOOP  250000
-TEMPO_LCD_DISP  100000
-TEMPO_PID_LOOP  5       
-
-PID_ECH 1.0
-PID_KP  1.0
-PID_KI  0.05 
-PID_KD  0.05
+TEMPO_LCD_LOOP  1000000
+TEMPO_LCD_DISP  2000000
+TEMPO_PID_LOOP  3 
 
 # ----------------------- parametres acquisitions
 
@@ -85,32 +80,41 @@ DEVICE_USE_BLUETOOTH        0  # flag qui indique utilisation du bluetooth comme
 # ----------------------- parametres geographiques
 
 # Latitude et longitude Escout (64)
-LATITUDE   43.3
-LONGITUDE  -0.36 
-ALTITUDE   100
+#LATITUDE   43.3
+#LONGITUDE  -0.36 
+#ALTITUDE   100
 
 # Latitude et longitude Orgeres (35)
-# LATITUDE   48.0
-# LONGITUDE  -1.67 
-# ALTITUDE   100
+LATITUDE   48.0
+LONGITUDE  -1.67
+ALTITUDE   100
+
+# ----------------------- parametres gpios
+
+# la led est parametree grace a :
+# insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
+# GPIO_LED_IR     27  
+# inutiles (2021) :
+# GPIO_INPUT      7,8 
+# GPIO_OUTPUT     14,15 
 
 #--------------------------------------------------------------------------
 # Conf corecte pour carte essai carre (celle qui s enfiche sur rpi3aplus)
 # et moteurs en metal NEMA 11 (pas ceux qui sont sur la monture vixen gp)
 #--------------------------------------------------------------------------
 
-GPIO_LED_ETAT   4
-GPIO_ALT        21,26,19,13
-GPIO_AZI        6,5,7,11
-# GPIO_MASQUE     0,1,2,3
+#GPIO_LED_ETAT   4
+#GPIO_ALT        21,26,19,13
+#GPIO_AZI        6,5,7,11
+#GPIO_MASQUE     0,1,2,3
 
 #--------------------------------------------------------------------------
 # Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus)
 #--------------------------------------------------------------------------
 
-# GPIO_LED_ETAT   4
-# GPIO_ALT        21,26,19,13
-# GPIO_AZI        6,5,7,11
+GPIO_LED_ETAT   4
+GPIO_ALT        21,26,19,13
+GPIO_AZI        6,5,7,11
 GPIO_MASQUE     3,1,0,2
 
 # ----------------------- parametres pwm
@@ -124,11 +128,11 @@ GPIO_FREQUENCE_PWM  1000
 ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
 ALT_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-ALT_R4  64       # mode micro pas utilise (1/x)
+ALT_R4  64      # mode micro pas utilise (1/x)
 ALT_R5  1        # reduction liee a la poulie
 ALT_R6  1        # reduction liee au cpu
 ALT_R7  1        # reduction non decrite plus haut ....
-ALT_ROT 0        # Flag de reversibilite du sens de rotation
+ALT_ROT 0        # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
 ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions azimut
@@ -136,12 +140,12 @@ ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 AZI_R1  144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
 AZI_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 AZI_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-AZI_R4  64       # mode micro pas utilise (1/x)
+AZI_R4  64      # mode micro pas utilise (1/x)
 AZI_R5  1        # reduction liee a la poulie
 AZI_R6  1        # reduction liee au cpu
 AZI_R7  1        # reduction non decrite plus haut ....
-AZI_ROT 1        # Flag de reversibilite du sens de rotation
-AZI_ACC 2        # Facteur de multiplication en mode MANUEL
+AZI_ROT 1       # Flag de reversibilite du sens de rotation 1 <=> gauche->droite
+AZI_ACC 2       # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions altaz
 
@@ -197,15 +201,6 @@ GPIO_KEY_C1  6    # sortie keyboard colonnne 1
 GPIO_KEY_C2  13   # sortie keyboard colonnne 2
 GPIO_KEY_C3  19   # sortie keyboard colonnne 3
 GPIO_KEY_C4  26   # sortie keyboard colonnne 4
-
-# ----------------------- parametres gpios
-
-# la led est parametree grace a :
-# insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
-# GPIO_LED_IR     27  
-# inutiles (2021) :
-# GPIO_INPUT      7,8 
-# GPIO_OUTPUT     14,15 
 
 #===============================================================
 # fin fichier - fin fichier - fin fichier - fin fichier - fin fi
