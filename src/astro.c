@@ -1180,6 +1180,9 @@ void * SUIVI_VOUTE(SUIVI * gp_Sui) {
   // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
   // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
   
+  memset( c_l0, ZERO_CHAR, strlen( c_l0 )) ;
+  memset( c_l1, ZERO_CHAR, strlen( c_l1 )) ;
+
   Trace2("sleeping..") ;
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
   Trace("start") ;
@@ -1356,7 +1359,12 @@ void * SUIVI_INFRAROUGE(SUIVI * gp_Sui) {
 void * SUIVI_LCD(SUIVI * gp_Sui) {
   int i_duree_us ;
   struct sched_param param;
-  
+  char c_l0[16] ;
+  char c_l1[16] ;
+
+  memset( c_l0, ZERO_CHAR, strlen( c_l0 )) ;
+  memset( c_l1, ZERO_CHAR, strlen( c_l1 )) ;
+    
   Trace2("sleeping..") ;
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
   Trace("start") ;

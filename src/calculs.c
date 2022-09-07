@@ -679,7 +679,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout
 
 void CALCUL_AFFICHER_HEURE( char * mesg, TEMPS * gp_Time ) {
 
-  Trace2("%s : %dh%dmn%ds : %f", mesg, gp_Time->HH, gp_Time->MM, gp_Time->SS, gp_Time->hd ) ;
+  Trace1("%s : %dh%dmn%ds : %f", mesg, gp_Time->HH, gp_Time->MM, gp_Time->SS, gp_Time->hd ) ;
 }
 
 //========================================================================================
@@ -1020,7 +1020,7 @@ int CALCUL_TEMPS_SIDERAL(LIEU* gp_Lieu, TEMPS * gp_Time ) {
   gp_Lieu->TS  = TSMH3.hd ;
   gp_Lieu->TSR = (TSMH3.hd / 24) * PIPI ;
   
-  Trace1("temps sideral : gp_Lieu->TS = %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
+  Trace("JJ %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
 
   return 0 ;
 }

@@ -76,7 +76,7 @@ PID_KD  0.05
 
 DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
 DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
-DEVICE_USE_LCD              1  # flag qui indique utilisation de ecran LCD1602 / PCA8574
+DEVICE_USE_LCD              0  # flag qui indique utilisation de ecran LCD1602 / PCA8574
 DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
 DEVICE_USE_CAPTEURS         0  # flag qui indique utilisation de capteurs comme source input
 DEVICE_USE_RAQUETTE         0  # flag qui indique utilisation d une raquette (gpio) comme source input
