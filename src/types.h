@@ -778,6 +778,10 @@ typedef struct {
   int HH ;      // hour
   int MM ;      // minutes
   int SS ;      // secondes
+
+  /* ajout 2022 septembre */
+
+  double tgo ;
 }
 TEMPS ;
 

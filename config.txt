@@ -36,7 +36,7 @@
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
-ASTRE_PAR_DEFAUT PLA0 
+ASTRE_PAR_DEFAUT NGC5061
 
 # ----------------------- parametres repertoires et fichiers
 
@@ -85,13 +85,19 @@ DEVICE_USE_BLUETOOTH        0  # flag qui indique utilisation du bluetooth comme
 # ----------------------- parametres geographiques
 
 # Latitude et longitude Escout (64)
-LATITUDE   43.3
-LONGITUDE  -0.36 
+
+LATITUDE   43.28
+LONGITUDE  -0.37
 ALTITUDE   100
 
 # Latitude et longitude Orgeres (35)
 # LATITUDE   48.0
 # LONGITUDE  -1.67 
+# ALTITUDE   100
+
+# Latitude et longitude de test  
+# LATITUDE   61.0
+# LONGITUDE  -149.9
 # ALTITUDE   100
 
 #--------------------------------------------------------------------------

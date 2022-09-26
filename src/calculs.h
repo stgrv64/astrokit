@@ -110,12 +110,13 @@ void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *g
 int    CALCUL_TEMPS_SIDERAL           ( LIEU* gp_Lieu, TEMPS * gp_Time ) ;
 int    CALCUL_JOUR_JULIEN             ( LIEU* gp_Lieu, TEMPS * gp_Time) ;
 int    CALCUL_DATE                    ( TEMPS * gp_Time ) ;
-void   CALCUL_HDEC                    ( TEMPS * gp_Time ) ;
-void   CALCUL_TEMPS_VERS_HMS                     ( TEMPS * gp_Time ) ;
+void   CALCUL_TEMPS_HMS_VERS_DEC      ( TEMPS * gp_Time ) ;
+void   CALCUL_TEMPS_DEC_VERS_HMS      ( TEMPS * gp_Time ) ;
+void   CALCUL_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
 
-void   CALCUL_CONVERSIONS_ANGLES ( ASTRE *gp_Astr) ;
-void   CALCUL_AFFICHER_HEURE            ( char * mesg, TEMPS * gp_Time ) ;
-void   CALCUL_AFFICHER_ANGLE            ( char * mesg, ANGLE *angle ) ;
+void   CALCUL_CONVERSIONS_ANGLES      ( ASTRE *gp_Astr) ;
+void   CALCUL_AFFICHER_HEURE          ( char * mesg, TEMPS * gp_Time ) ;
+void   CALCUL_AFFICHER_ANGLE          ( char * mesg, ANGLE *angle ) ;
 
 void   SET_ASTRE( ASTRE *gp_Astr,char *parametre, double valeur) ;
 void   SET_LIEU(  LIEU *gp_Lieu,char *parametre, double valeur) ;

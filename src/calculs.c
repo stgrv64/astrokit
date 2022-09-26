@@ -693,17 +693,29 @@ void CALCUL_AFFICHER_ANGLE( char * mesg, ANGLE *angle ) {
 }
 
 //========================================================================================
-// FIXME : CALCUL_HDEC : 
+// FIXME : CALCUL_TEMPS_HMS_VERS_DEC : 
 // FIXME : * Convertit heure minutes secondes en heure decimale 
+/* 2022-09-26 : remplacement du nom HDEC -> TEMPS_VERS_HDEC */
 //========================================================================================
 
-void CALCUL_HDEC(TEMPS * gp_Time) {
+void CALCUL_TEMPS_HMS_VERS_DEC(TEMPS * gp_Time) {
   
   gp_Time->hd = gp_Time->HH + (gp_Time->MM / 60.0) + (gp_Time->SS / 3600.0)  ;
 }
 
+//========================================================================================
+// FIXME : CALCUL_TEMPS_HMS_VERS_DEC : 
+// FIXME : * Convertit heure minutes secondes en heure decimale 
+/* 2022-09-26 : remplacement du nom HDEC -> TEMPS_VERS_HDEC */
+//========================================================================================
+
+void CALCUL_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double min, double sec) {
+  
+  *hdec = hou + ( min / 60.0) + ( sec / 3600.0)  ;
+}
+
 /*****************************************************************************************
-* @fn     : CALCUL_TEMPS_VERS_HMS
+* @fn     : CALCUL_TEMPS_DEC_VERS_HMS
 * @author : s.gravois
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
 * @param  : TEMPS * gp_Time
@@ -711,7 +723,7 @@ void CALCUL_HDEC(TEMPS * gp_Time) {
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCUL_TEMPS_VERS_HMS(TEMPS * gp_Time) {
+void CALCUL_TEMPS_DEC_VERS_HMS(TEMPS * gp_Time) {
   
   Trace1(""); 
   Trace1("TEMPS    decimal  = %.4f" , gp_Time->hd) ;
@@ -786,14 +798,14 @@ void CALCUL_CONVERSIONS_ANGLES(ASTRE *gp_Astr) {
   /* ----------------------------*/
 
   (gp_Astr->at).hd = gp_Astr->a * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->at) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->at) ;
 
   (gp_Astr->AZIa).AD = gp_Astr->a ;
   (gp_Astr->AZIa).ad = gp_Astr->a * DEGRES ;
   CALCUL_ANGLE_VERS_DMS(&gp_Astr->AZIa) ;
   
   (gp_Astr->ht).hd = gp_Astr->h * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->ht) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->ht) ;
   
   (gp_Astr->ALTa).AD = gp_Astr->h ;
   (gp_Astr->ALTa).ad = gp_Astr->h * DEGRES ;
@@ -805,13 +817,13 @@ void CALCUL_CONVERSIONS_ANGLES(ASTRE *gp_Astr) {
   /* -----------------------------*/
 
   (gp_Astr->AGHt).hd = gp_Astr->AGH * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGHt) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AGHt) ;
   
   (gp_Astr->DECt).hd = gp_Astr->DEC * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->DECt) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->DECt) ;
 
   (gp_Astr->ASCt).hd  = gp_Astr->ASC * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->ASCt) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->ASCt) ;
 
   /* -------------------------------*/
 
@@ -832,22 +844,22 @@ void CALCUL_CONVERSIONS_ANGLES(ASTRE *gp_Astr) {
   /* -------------------------------*/
 
   (gp_Astr->AGH0t).hd = gp_Astr->AGH0 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGH0t) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AGH0t) ;
 
   (gp_Astr->AGH1t).hd = gp_Astr->AGH1 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGH1t) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AGH1t) ;
 
   (gp_Astr->AGH2t).hd = gp_Astr->AGH2 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AGH2t) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AGH2t) ;
 
   (gp_Astr->AZI0t).hd = gp_Astr->AZI0 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AZI0t) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AZI0t) ;
 
   (gp_Astr->AZI1t).hd = gp_Astr->AZI1 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AZI1t) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AZI1t) ;
 
   (gp_Astr->AZI2t).hd = gp_Astr->AZI2 * 24.0 / PIPI ;
-  CALCUL_TEMPS_VERS_HMS(&gp_Astr->AZI2t) ;
+  CALCUL_TEMPS_DEC_VERS_HMS(&gp_Astr->AZI2t) ;
 }
 //========================================================================================
 // FIXME : CALCUL_DATE : 
@@ -881,7 +893,7 @@ int CALCUL_DATE(TEMPS * gp_Time) {
   gp_Time->dd = tm->tm_mday ;
   gp_Time->mm = tm->tm_mon + 1 ;
   
-  CALCUL_HDEC (gp_Time ) ;
+  CALCUL_TEMPS_HMS_VERS_DEC (gp_Time ) ;
   
   //printf("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
   Trace2("%d %d %d %d %d %d %f",gp_Time->yy,gp_Time->mm,gp_Time->dd,gp_Time->HH,gp_Time->MM,gp_Time->SS, gp_Time->hd ) ;
@@ -942,85 +954,132 @@ int CALCUL_JOUR_JULIEN(LIEU* gp_Lieu, TEMPS * gp_Time) {
 // FIXME :  * a besoin de CALCUL_DATE  et de CALCUL_JOUR_JULIEN et du LIEU
 // TODO  : valider 1ere methode / 2eme methode et tester sur le ciel ou comparer
 // TODO  : avec valeurs de logiciels astronomiques (stellarium etc..)
+
+/* septembre 2022 : correction de deux BUGS passes inapercus car la longitude
+   utilisee etait proche de ce celle de GREENWICH ( -0.36 pour escout) => 
+   La correction local / greenwich n 'etait pas correct
+   bug 1 : 
+     dans methode 1 et 2 , le terme gp_Lieu->lon est a multiplier par DEGRES
+     bug constate quand on passait a un endroit de la Terre eloigne de Greenwich
+     (verification sur stellarium)
+   bug 2 :
+     remplacement de 24h -> 23h56m04s dans les calculs de conversion angles vers H dec
+    on doit utiliser le temps sideral et non pas le temps solaire
+*/
 //========================================================================================
 
 int CALCUL_TEMPS_SIDERAL(LIEU* gp_Lieu, TEMPS * gp_Time ) {
   
-  double d, T, TSMG, TSMG2, TSH, TSMGH, TSMGH2, TSMH, TSMH2, GMSTO, GMST, LMST ;
-  const double P = 2451545.5 ; 
+  double d, T, TSMG, TSMG2, TSH, TSMGH, TSMGH2, TSMH ;
+  double TSMGS, TSMH2,TSMH3, GMSTO, GMST, LMST ;
+  double jour_sideral_decimal ;
+  const double P_2000 = 2451545.5 ; 
+  const double P_1900 = 2415020.0 ;
+
+  CALCUL_TEMPS_HMS_VERS_DEC_DIRECT(&jour_sideral_decimal , 23 , 56 , 4.09054) ;
+
+  Trace1("jour sideral : %f", jour_sideral_decimal) ;
   
   CALCUL_DATE( gp_Time ) ;   
   CALCUL_JOUR_JULIEN  ( gp_Lieu, gp_Time ) ;
   
+  TEMPS Temps0 ;
   TEMPS TSMG3 ;
   TEMPS TSMGH3 ;
-  TEMPS TSMH3 ;
+
+  TEMPS TSR2 ;
+  TEMPS TSR3 ;
 
   if ( gp_Lieu->JJ == 0 ) return 1 ;
   
-  d = gp_Lieu->JJ - P ;
+  d = gp_Lieu->JJ - P_2000 ;
   T = d / 36525.0 ;
-  T = ( gp_Lieu->JJ - P) / 36525.0 ; 
+  T = ( gp_Lieu->JJ - P_2000) / 36525.0 ; 
   
   Trace2("T = %f",T);
   
   // =======================  Premiere methode ==========================
-  
-  TSMG  = 100.46061837 + 36000.770053608 * T + 0.000387933*T*T - ( T*T*T ) / 38710000.0 ;   
+  /* cette methode ne tient pas compte du terme 36525 */
+  /* en degres */
+  /* calcul du temps sideral moyen de greenwich a 0h TU */
+  TSMG  = 100.46061837 + 36000.770053608 * T + ( 0.000387933*T*T) - (( T*T*T ) / 38710000.0) ;   
   //TSMG  = 100.46061837 + 36000.770053608 * T ;
+  /* rappel : fmod donne le reste de l operation modulo */
+  /* These functions compute the floating-point remainder of dividing x by y */ 
+
   TSMG2 = fmod(TSMG,360.0) ;
-  TSMG3.hd = TSMG2 * 24 / 360 ;
+  TSMG3.hd = TSMG2 * jour_sideral_decimal / 360 ; /* pour ramener en heures */
   
-  CALCUL_TEMPS_VERS_HMS( & TSMG3 ) ;
-  
-  TSH   = gp_Time->hd * 1.00273790935 * 15 ;
-  
-  TSMGH  = TSMG + TSH ;
-  
-  TSMGH2 = fmod(TSMGH, 360.0) ;
-  TSMGH3.hd = TSMGH2 * 24 / 360 ;
+  CALCUL_TEMPS_DEC_VERS_HMS( & TSMG3 ) ;
+  /* *15 = pour ramener en degres */
+  TSH       = gp_Time->hd * 1.00273790935 * 15 ;
+  TSMGH     = TSMG + TSH ;
+  TSMGH2    = fmod(TSMGH, 360.0) ;
+  TSMGH3.hd = TSMGH2 * jour_sideral_decimal / 360 ;
 
-  CALCUL_TEMPS_VERS_HMS( & TSMGH3) ;
-  
-  TSMH  = TSMGH - gp_Lieu->lon ;
-  
+  CALCUL_TEMPS_DEC_VERS_HMS( & TSMGH3) ;
+
+  TSMH  = TSMGH + ( gp_Lieu->lon * DEGRES )  ;
+  /*
+  Trace("TSMGH  TSMGH2  TSMGH3.hd    : %0.5f   %0.5f   %0.5f", TSMGH, TSMGH2, TSMGH3.hd) ;
+  Trace("TSMH = TSMGH - gp_Lieu->lon : %0.5f = %0.5f - %0.5f ", TSMH, TSMGH, gp_Lieu->lon) ; 
+  */
   TSMH2 = fmod(TSMH, 360.0) ;
-  TSMH3.hd = TSMH2 * 24.0 / 360.0 ;
-
-  CALCUL_TEMPS_VERS_HMS( & TSMH3 ) ;
+  TSR2.hd = TSMH2 * jour_sideral_decimal / 360 ;
+ 
+  CALCUL_TEMPS_DEC_VERS_HMS( & TSR3 ) ;
   
   CALCUL_AFFICHER_HEURE("1ere methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
   CALCUL_AFFICHER_HEURE("1ere methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
-  CALCUL_AFFICHER_HEURE("1ere methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSMH3) ;
+  CALCUL_AFFICHER_HEURE("1ere methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR2) ;
   
   // =======================  Deuxieme methode ==========================
-  
+  /* cette methode ne tient pas compte du terme 36525 */
+  /* en degres */
+  /* calcul du temps sideral moyen de greenwich a 0h TU */
   GMSTO = 100.460618375 + 0.985647366286 * d ;
   GMST  = GMSTO + 1.00273790935 * 15 * gp_Time->hd  ;
-  GMST  = GMSTO + 1.002737 * 15 * gp_Time->hd  ;
   
-  LMST = GMST + gp_Lieu->lon ; // FIXME : attention !! ici la longitude du lien intervient !!
-  
+  LMST = GMST - ( gp_Lieu->lon * DEGRES )  ; // FIXME : attention !! ici la longitude du lien intervient !!
+  /*
+  Trace("GMST  GMSTO  gp_Time->hd    : %0.5f   %0.5f   %0.5f", GMST, GMSTO, gp_Time->hd) ;
+  Trace("LMST = GMST  - gp_Lieu->lon : %0.5f = %0.5f - %0.5f ", LMST, GMST, gp_Lieu->lon) ; 
+  */
   TSMG2  = fmod(GMSTO, 360.0) ;
   TSMGH2 = fmod(GMST,  360.0) ;
   TSMH2  = fmod(LMST,  360.0) ;
   
-  TSMG3.hd  = TSMG2  * 24.0 / 360.0 ;
-  TSMGH3.hd = TSMGH2 * 24.0 / 360.0 ;
-  TSMH3.hd  = TSMH2  * 24.0 / 360.0 ;
+  TSMG3.hd  = TSMG2  * jour_sideral_decimal / 360.0 ;
+  TSMGH3.hd = TSMGH2 * jour_sideral_decimal / 360.0 ;
+  TSR3.hd  = TSMH2  * jour_sideral_decimal / 360.0 ;
   
-  CALCUL_TEMPS_VERS_HMS( & TSMG3) ;
-  CALCUL_TEMPS_VERS_HMS( & TSMGH3 ) ;
-  CALCUL_TEMPS_VERS_HMS( & TSMH3) ;
+  CALCUL_TEMPS_DEC_VERS_HMS( & TSMG3) ;
+  CALCUL_TEMPS_DEC_VERS_HMS( & TSMGH3 ) ;
+  CALCUL_TEMPS_DEC_VERS_HMS( & TSR3) ;
   
   CALCUL_AFFICHER_HEURE("2eme methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
   CALCUL_AFFICHER_HEURE("2eme methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
-  CALCUL_AFFICHER_HEURE("2eme methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSMH3) ;
+  CALCUL_AFFICHER_HEURE("2eme methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR3) ;
   
-  gp_Lieu->TS  = TSMH3.hd ;
-  gp_Lieu->TSR = (TSMH3.hd / 24) * PIPI ;
-  
-  Trace("JJ %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
+  // =======================  Troisieme methode ==========================
+  /* unite = la seconde */ 
+  /* reference : astronomie pratique et informatique */
+  /* TG0 = 6(h)41(m)50.54841(s) + \
+           8640184.812866(s) * T + \
+           0.093103(s)       * T*T - \
+           0.000000621(s)    * T*T*T 
+  */     
+         
+  TSMGS = (6*60*60) + (41*60) + 50.54841 + 8640184.812866 * T + 0.093103 * T*T - 0.000000621 * T*T*T ;
+
+  // =======================   ==========================
+
+  gp_Lieu->TS  = TSR2.hd ;
+
+  // gp_Lieu->TSR = (TSR3.hd / jour_sideral_decimal) * PIPI ;
+  gp_Lieu->TSR = (TSR2.hd / jour_sideral_decimal) * PIPI ;
+
+  Trace1("JJ %f gp_Lieu->TSR = %f",gp_Lieu->JJ, gp_Lieu->TSR ) ;
 
   return 0 ;
 }

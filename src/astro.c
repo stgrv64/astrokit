@@ -1240,7 +1240,7 @@ void * SUIVI_VOUTE(SUIVI * gp_Sui) {
       if ( gp_Sui->SUIVI_ALIGNEMENT ) { 
 
         CONFIG_FORMATE_DONNEES_AFFICHAGE(gp_Astr) ;
-        CONFIG_AFFICHER_MODE_LONG(gp_Astr) ; 
+        CONFIG_AFFICHER_MODE_LONG() ; 
         CONFIG_AFFICHER_MODE_STELLARIUM(gp_Astr) ;
         
         gp_Lcd->display_ast_vit(2000000) ;

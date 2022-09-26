@@ -1765,7 +1765,7 @@ void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *gp_Astr) {
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_MODE_LONG(ASTRE *gp_Astr) {
+void CONFIG_AFFICHER_MODE_LONG(void) {
   
   const char * c_nom  = gp_Astr->nom ;
   const char * c_type = c_Astre_Type [ gp_Astr->type ] ;
@@ -1802,6 +1802,8 @@ void CONFIG_AFFICHER_MODE_LONG(ASTRE *gp_Astr) {
   Trace(" %s : infos         : %s", c_nom , gp_Astr->infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;
   Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
+  Trace(" %s : latitude      : %.2f (deg) ", c_nom, gp_Lieu->lat    * DEGRES ) ;
+  Trace(" %s : longitude     : %.2f (deg) ", c_nom, gp_Lieu->lon    * DEGRES ) ;
   Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Astr->Va,  gp_Astr->Vh ) ; 
   Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Astr->a    * DEGRES ) ;
   Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Astr->h    * DEGRES ) ;
@@ -1849,7 +1851,7 @@ void CONFIG_AFFICHER_TOUT(void) {
 
   CONFIG_AFFICHER_TEMPS(   gp_Time ) ;
   CONFIG_AFFICHER_LIEU(    gp_Lieu );
-  CONFIG_AFFICHER_MODE_LONG(   gp_Astr ) ;
+  CONFIG_AFFICHER_MODE_LONG(  ) ;
   CONFIG_AFFICHER_VOUTE(   gp_Vout ) ;
 
   Trace("\n") ;
