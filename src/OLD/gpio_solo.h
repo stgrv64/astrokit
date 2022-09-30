@@ -97,7 +97,7 @@ int gpio_azi [ GPIO_CONTROLEUR_SIZE ] ;  // phases du moteur (utilse si CONTROLE
 //          le flag ERR_SENS par defaut egal a 1
 //==========================================================================
 
-void   GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4][GPIO_TAILLE_BUFFER], CLAVIER* gp_Clav)  ;
+void   GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4][GPIO_TAILLE_BUFFER], CLAVIER* gp_Cla)  ;
 void   GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) ;
 void   GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], char raquette[4][4][GPIO_TAILLE_BUFFER], SUIVI * gp_Sui) ;
 

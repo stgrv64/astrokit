@@ -49,7 +49,7 @@ void LIRC_CLOSE(struct lirc_config *lircconfig) {
 * @brief  :  car on utilise la fonction bloquante suivante : lirc_nextcode()
 * @param  : SUIVI * gp_Sui
 * @date   : 2022-04-12 creation entete de la fonction au format doxygen
-* @date   : 2022-04-12 mutex_lock sur gp_Sui->datas_infrarouge
+* @date   : 2022-04-12 mutex_lock sur gp_Sui->sui_dat.dat_inf
 * @todo   : 
 *****************************************************************************************/
 
@@ -92,16 +92,16 @@ void LIRC_READ(SUIVI * gp_Sui) {
     }  
     Trace1("i_indice_code j k = %d %d %d", i_indice_code,j,k); 
 
-    pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
-    memset( gp_Sui->datas_infrarouge, '\0', strlen( gp_Sui->datas_infrarouge ) ) ;
-    pthread_mutex_unlock(& gp_Pthr->mutex_infrarouge );
+    pthread_mutex_lock(& gp_Pth->pth_mut.mut_dat );
+    memset( gp_Sui->sui_dat.dat_inf, '\0', strlen( gp_Sui->sui_dat.dat_inf ) ) ;
+    pthread_mutex_unlock(& gp_Pth->pth_mut.mut_dat );
 
     if ( k == 0 && i_indice_code < CONFIG_CODE_NB_CODES ) {
       
-      pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
-      Trace2("AA maj gp_Sui->datas_infrarouge") ;
-      strcpy( gp_Sui->datas_infrarouge, gp_Cod->out_act[i_indice_code] ) ;
-      pthread_mutex_unlock(& gp_Pthr->mutex_infrarouge );
+      pthread_mutex_lock(& gp_Pth->pth_mut.mut_dat );
+      Trace2("AA maj gp_Sui->sui_dat.dat_inf") ;
+      strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
+      pthread_mutex_unlock(& gp_Pth->pth_mut.mut_dat );
 
       GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
     }
@@ -111,42 +111,42 @@ void LIRC_READ(SUIVI * gp_Sui) {
          i_indice_code <= IR_CODE_REPETE_AUTORISE_MAX && \
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
-      pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
-      Trace2("BB maj gp_Sui->datas_infrarouge") ;
-      strcpy( gp_Sui->datas_infrarouge, gp_Cod->out_act[i_indice_code] ) ;
-      pthread_mutex_unlock(& gp_Pthr->mutex_infrarouge );
+      pthread_mutex_lock(& gp_Pth->pth_mut.mut_dat );
+      Trace2("BB maj gp_Sui->sui_dat.dat_inf") ;
+      strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
+      pthread_mutex_unlock(& gp_Pth->pth_mut.mut_dat );
 
       GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 10) ;
     }
     
     // tres important !!
     // le usleep suivant permet de garder l information !!!!!!
-    // gp_Sui->datas_infrarouge fonctionne comme un TAMPON
+    // gp_Sui->sui_dat.dat_inf fonctionne comme un TAMPON
     // il va etre lu par les threads du programme principal
     
-    Trace("gp_Sui->datas_infrarouge = %s", gp_Sui->datas_infrarouge ) ;
+    Trace("gp_Sui->sui_dat.dat_inf = %s", gp_Sui->sui_dat.dat_inf ) ;
     Trace("gp_Sui->temporisation_ir = %ld", gp_Sui->temporisation_ir ) ;
     
     usleep( gp_Sui->temporisation_ir ) ;
     
     free(code);
 
-    pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
-    Trace("raz de gp_Sui->datas_infrarouge") ;
-    memset( gp_Sui->datas_infrarouge, 0, strlen( gp_Sui->datas_infrarouge ) ) ;
-    strcpy( gp_Sui->datas_infrarouge, "") ;
-    pthread_mutex_unlock(& gp_Pthr->mutex_infrarouge );
+    pthread_mutex_lock(& gp_Pth->pth_mut.mut_dat );
+    Trace("raz de gp_Sui->sui_dat.dat_inf") ;
+    memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
+    strcpy( gp_Sui->sui_dat.dat_inf, "") ;
+    pthread_mutex_unlock(& gp_Pth->pth_mut.mut_dat );
   }
 }
 
 //==========================================================
 void IR_ACTIONS_PARTICULIERES( SUIVI * gp_Sui) {
     
-  if ( ! strcmp( gp_Sui->datas_infrarouge, "plus" ) )  {
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "plus" ) )  {
     gp_Sui->Ta_mic *=  gp_Sui->plus  ; gp_Sui->Fa_mic = 1 / gp_Sui->Ta_mic ;
     gp_Sui->Th_mic *=  gp_Sui->plus  ; gp_Sui->Fh_mic = 1 / gp_Sui->Th_mic ;
   }
-  if ( ! strcmp( gp_Sui->datas_infrarouge, "moins" ) ) {
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "moins" ) ) {
     gp_Sui->Ta_mic *=  gp_Sui->moins  ; gp_Sui->Fa_mic = 1 / gp_Sui->Ta_mic ;
     gp_Sui->Th_mic *=  gp_Sui->moins  ; gp_Sui->Fh_mic = 1 / gp_Sui->Th_mic ;
   }

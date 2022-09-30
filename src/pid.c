@@ -33,6 +33,9 @@ void PID_INIT(PID * p_pid, double d_ech, double d_kp, double d_ki, double d_kd )
   if ( ( p_pid->f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
     Trace("ouverture %s (KO)",c_path_file_out );
   }
+  else {
+    Trace("ouverture %s (OK)",c_path_file_out );
+  }
   /* Initialisation mutex */
 
   pthread_mutex_init( & p_pid->mutex_pid, NULL ) ;

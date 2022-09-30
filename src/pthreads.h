@@ -52,7 +52,7 @@
 #include <lcd.h>
 #include <pid.h>
 
-void PTHREADS_INIT   ( void) ;
-void PTHREADS_CONFIG ( void ) ;
+void PTHREADS_INIT   ( pthread_t ) ;
+void PTHREADS_CONFIG ( PTHREADS * , pthread_t, t_en_Pthreads_Sched_Param  ) ;
 
 #endif

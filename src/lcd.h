@@ -54,33 +54,30 @@
 
 void   LCD_INIT                      (LCD *) ;
 
+void   LCD_DEFINE_DEFAULT            ( char * ,  char * ) ;
+void   LCD_REFRESH_DEFAULT           (void) ;
+
 void   LCD_DISPLAY_DEFAULT           ( void ) ;
 void   LCD_DISPLAY_CURRENT           ( void ) ;
 
-void   LCD_CHANGE_CURRENT            ( const int , const char* , const char * ) ;
-void   LCD_CHANGE_DEFAULT            ( const int , const char* , const char * ) ;
+void   LCD_CHANGE_CURRENT            ( const int, const char* , const char * ) ;
+void   LCD_CHANGE_DEFAULT            ( const int, const char* , const char * ) ;
 
 void   LCD_DISPLAY_STRING_STRING     ( const int , const char* , const char * ) ;
 void   LCD_DISPLAY_STRING_INT        ( const int , const char* , const int ) ;
 void   LCD_DISPLAY_INT_INT           ( const int , const int, const int ) ;
-
 void   LCD_DISPLAY_TEMPS_LIEU        ( const int ) ;
 void   LCD_DISPLAY_ASTRE_VITESSES    ( const int ) ;
-
 void   LCD_DISPLAY_AZI_ALT           ( const int ) ;
 void   LCD_DISPLAY_AGH_DEC           ( const int ) ;
 void   LCD_DISPLAY_ASC_DEC           ( const int ) ;
-
 void   LCD_DISPLAY_MODE_STELLARIUM   ( const int ) ;
-
 void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int ) ;
 void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int ) ;
 void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int ) ;
 void   LCD_DISPLAY_CFG_REDUCTION     ( const int ) ;
-
 void   LCD_DISPLAY_AST_FREQUENCES    ( const int ) ;
 void   LCD_DISPLAY_AST_PERIODES      ( const int ) ;
-
 void   LCD_DISPLAY_INFORMATIONS      ( const int ) ;
 void   LCD_DISPLAY_ACC_ALT_AZI       ( const int ) ;
 

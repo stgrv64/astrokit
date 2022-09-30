@@ -10,7 +10,7 @@
 # avril 2002  |  * debut codage fonctionnalites LCD1602 :
 #                * fonctions LCD_xxxx
 #                * ajout mutex init sur mutex_datas_infrarouge
-#                * => protection zone de code avec datas_infrarouge
+#                * => protection zone de code avec dat_inf
 #                * ajout fonction LCD_DISPLAY_AGH_DEC / LCD_DISPLAY_EQU_DEC
 #                * CONFIG_FORMATE_DONNEES_AFFICHAGE : ajout de 2 resolutions supplementaires
 #                * protection zones de code impliquant LCD* (mutex_lcd)
@@ -28,7 +28,7 @@
 * @fn     : LCD_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure lcd *l
-* @param  : LIEU *gp_Lieu
+* @param  : LIEU *gp_Lie
 * @date   : 2022-04-08 creation
 * @date   : 2022-04-08 ajout sauvegarde des lignes dans old
 * @date   : 2022-04-27 mise en commentaire de CALCUL_TEMPS_SIDERAL
@@ -44,12 +44,15 @@ void LCD_INIT(LCD * p_lcd) {
   
   /* Initialisation pointeurs de fonctions */
 
+  p_lcd->define_default  = LCD_DEFINE_DEFAULT ;
+  p_lcd->refresh_default = LCD_REFRESH_DEFAULT ;
+
   p_lcd->display_default = LCD_DISPLAY_DEFAULT ;
   p_lcd->display_current = LCD_DISPLAY_CURRENT ;
 
   p_lcd->change_default = LCD_CHANGE_DEFAULT ;
   p_lcd->change_current = LCD_CHANGE_CURRENT ;
-  
+
   p_lcd->display_str_str = LCD_DISPLAY_STRING_STRING ;
   p_lcd->display_str_int = LCD_DISPLAY_STRING_INT ;
   p_lcd->display_int_int = LCD_DISPLAY_INT_INT ;
@@ -92,53 +95,57 @@ void LCD_INIT(LCD * p_lcd) {
   /* Initialisation ecran LCD */ 
   /*--------------------------*/
 
-  if ((p_lcd->i_fd = LCD1602Init(p_lcd->i_i2c_num)) == -1) {
-     SyslogErr("Fail to init LCD1602Init\n");
-     Trace("Fail to init LCD1602Init") ;
-     return ;
-  }
-  else {
-    Trace("LCD1602Init(ok)") ;
-  }
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
+    if ((p_lcd->i_fd = LCD1602Init(p_lcd->i_i2c_num)) == -1) {
+      SyslogErr("Fail to init LCD1602Init\n");
+      Trace("Fail to init LCD1602Init") ;
+      return ;
+    }
+    else {
+      Trace("LCD1602Init(ok)") ;
+    }
+  }
   /*--------------------------*/
   /* Affichage phrases init   */ 
   /*--------------------------*/
 
   sprintf(p_lcd->c_l0cur, "%d%s%d %-2d:%-2d", \
-    gp_Time->yy , \
-    c_Lcd_Display_Months[ gp_Time->mm -1  ] , \
-    gp_Time->dd, \
-    gp_Time->HH, \
-    gp_Time->MM ) ;
+    gp_Tim->yy , \
+    c_Lcd_Display_Months[ gp_Tim->mm -1  ] , \
+    gp_Tim->dd, \
+    gp_Tim->HH, \
+    gp_Tim->MM ) ;
   
   sprintf(p_lcd->c_l1cur, "%.2f %.2f", \
-    gp_Lieu->lat * DEGRES, \
-    gp_Lieu->lon * DEGRES ) ;
+    gp_Lie->lat * DEGRES, \
+    gp_Lie->lon * DEGRES ) ;
 
   /* ajout 26 mai 2022 */
   strcpy( p_lcd->c_l0def, p_lcd->c_l0cur ) ;
   strcpy( p_lcd->c_l1def, p_lcd->c_l1cur ) ;
 
-  if ( LCD1602Clear(p_lcd->i_fd) == -1) {
-    SyslogErr("Fail to LCD1602Clear\n");
-    Trace("Fail to LCD1602Clear") ;
-    return ;
-  }
-  else {
-    Trace1("LCD1602Clear : (OK)") ;
-  }
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  usleep(LCD_USLEEP_AFTER_CLEARING) ;
-
-  if (LCD1602DispLines(p_lcd->i_fd, p_lcd->c_l0cur, p_lcd->c_l1cur ) == -1) {
-    SyslogErr("Fail to LCD1602DispLines\n");
-    Trace("Fail to LCD1602DispLines");
+    if ( LCD1602Clear(p_lcd->i_fd) == -1) {
+      SyslogErr("Fail to LCD1602Clear\n");
+      Trace("Fail to LCD1602Clear") ;
+      return ;
+    }
+    else {
+      Trace1("LCD1602Clear : (OK)") ;
+    }
+  
+    usleep(LCD_USLEEP_AFTER_CLEARING) ;
+  
+    if (LCD1602DispLines(p_lcd->i_fd, p_lcd->c_l0cur, p_lcd->c_l1cur ) == -1) {
+      SyslogErr("Fail to LCD1602DispLines\n");
+      Trace("Fail to LCD1602DispLines");
+    }
+    else {
+      Trace1("LCD1602DispLines : (ok)") ;
+    }
   }
-  else {
-    Trace1("LCD1602DispLines : (ok)") ;
-  }
-
   return ;
 }
 
@@ -152,7 +159,9 @@ void LCD_INIT(LCD * p_lcd) {
 
 void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l1) {
 
-  if ( gp_Devi->DEVICE_USE_LCD ) {
+  Trace("") ;
+
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
@@ -162,15 +171,8 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
     strcpy( gp_Lcd->c_l0cur, c_l0 ) ;
     strcpy( gp_Lcd->c_l1cur, c_l1 ) ;
 
-    gp_Lcd->i_change_current = TRUE ; 
     gp_Lcd->i_duree_us = i_duree_us ;
-
-    /* Si la duree est NULLE, on a comem regle de changer 'current' vers 'defaut' */
-
-    if ( i_duree_us == 0 ){
-
-      LCD_CHANGE_DEFAULT( i_duree_us, c_l0, c_l1 ) ;
-    }
+    gp_Lcd->i_change_current = TRUE ; 
 
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
@@ -186,7 +188,9 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
 
 void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l1) {
 
-  if ( gp_Devi->DEVICE_USE_LCD ) {
+  Trace("") ;
+
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
@@ -197,7 +201,81 @@ void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l
     strcpy( gp_Lcd->c_l0def, c_l0 ) ;
     strcpy( gp_Lcd->c_l1def, c_l1 ) ;
 
+    gp_Lcd->i_duree_us = i_duree_us ;
     gp_Lcd->i_change_default = TRUE ;
+
+    pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
+  }
+  return ;
+}
+/*****************************************************************************************
+* @fn     : LCD_DEFINE_DEFAULT
+* @author : s.gravois
+* @brief  : Cette fonction definit les valeurs d'affichage 'par default' c_l0 et c_l1
+* @param  : void
+* @date   : 2022-09-27 creation 
+*****************************************************************************************/
+
+void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
+
+  Trace("") ;
+
+  if ( gp_Dev->DEVICE_USE_LCD ) {
+
+    pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
+
+    /*---------------------------------------------------------------------------------*/
+    /* les valeurs par defaut de la ffichage sont la date l heure et l objet en cours */
+    /*---------------------------------------------------------------------------------*/
+
+    CALCUL_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+
+    sprintf( c_l0, "%d%s%d %-2d:%-2d", \
+      gp_Tim->yy , \
+      c_Lcd_Display_Months[ gp_Tim->mm -1  ] , \
+      gp_Tim->dd, \
+      gp_Tim->HH, \
+      gp_Tim->MM ) ;
+
+    sprintf( c_l1, "%s", gp_Ast->nom ) ;
+
+    pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
+  }
+  return ;
+}
+/*****************************************************************************************
+* @fn     : LCD_REFRESH_DEFAULT
+* @author : s.gravois
+* @brief  : Cette fonction rafraichit affichage des valeurs d'affichage 'par default' 
+* @brief  : si celles ci ont changé
+* @param  : void
+* @date   : 2022-09-27 creation
+*****************************************************************************************/
+
+void LCD_REFRESH_DEFAULT(void) {
+
+  char c_l0[16] ={0};
+  char c_l1[16] ={0};
+
+  Trace("") ;
+  
+  memset( c_l0, 0, sizeof( c_l0) ) ;
+  memset( c_l1, 0, sizeof( c_l1) ) ;
+
+  if ( gp_Dev->DEVICE_USE_LCD ) {
+
+    pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
+    
+    gp_Lcd->define_default( c_l0, c_l1 ) ;
+
+    /* Si les valeurs definis par default ont change */ 
+
+    if ( ( strcmp ( gp_Lcd->c_l0def, c_l0 ) != 0 ) ||
+         ( strcmp ( gp_Lcd->c_l1def, c_l1 ) != 0 ) ) {
+
+      gp_Lcd->change_default( 2000000, c_l0 , c_l1 ) ;
+      gp_Lcd->display_default() ;
+    }
 
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
   }
@@ -219,7 +297,9 @@ void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l
 
 void LCD_DISPLAY_DEFAULT(void) {
 
-  if ( gp_Devi->DEVICE_USE_LCD ) {
+  Trace("%d",gp_Dev->DEVICE_USE_LCD) ;
+
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
@@ -273,9 +353,9 @@ void LCD_DISPLAY_DEFAULT(void) {
 
 void LCD_DISPLAY_CURRENT(void) {
 
-  Trace("") ;
+  Trace("%d",gp_Dev->DEVICE_USE_LCD) ;
 
-  if ( gp_Devi->DEVICE_USE_LCD ) {
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
     pthread_mutex_lock( & gp_Lcd->mutex_lcd ) ;
 
@@ -290,6 +370,7 @@ void LCD_DISPLAY_CURRENT(void) {
     else {
       Trace1("LCD1602Clear : OK")
     }
+    /* TODO  : mettre le usleep a interieur de mutex */
     pthread_mutex_unlock( & gp_Lcd->mutex_lcd ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
     /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
@@ -367,10 +448,13 @@ void   LCD_DISPLAY_STRING_INT      ( const int i_duree_us, const char* c_l0, con
 void   LCD_DISPLAY_INT_INT      ( const int i_duree_us, const int i_l0, const int i_l1) {
   char c_l0[16] = {0} ;
   char c_l1[16] = {0} ;
-  sprintf( c_l0, "%d", i_l0) ;
-  sprintf( c_l1, "%d", i_l1) ;
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+
+  if ( gp_Dev->DEVICE_USE_LCD ) {
+    sprintf( c_l0, "%d", i_l0) ;
+    sprintf( c_l1, "%d", i_l1) ;
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
 }
 
 /*****************************************************************************************
@@ -387,30 +471,32 @@ void   LCD_DISPLAY_INT_INT      ( const int i_duree_us, const int i_l0, const in
 
 void LCD_DISPLAY_TEMPS_LIEU( const int i_duree_us ) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0) ) ; 
-  memset( c_l1, 0, sizeof(c_l1) ) ; 
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  CALCUL_TEMPS_SIDERAL(gp_Lieu, gp_Time) ;
+    memset( c_l0, 0, sizeof(c_l0) ) ; 
+    memset( c_l1, 0, sizeof(c_l1) ) ; 
 
-  /* Remplissage de line 0 et line 1 */
+    CALCUL_TEMPS_SIDERAL(gp_Lie, gp_Tim) ;
 
-  sprintf( c_l0, "%d%s%d %d:%d", \
-    gp_Time->yy ,\
-    c_Lcd_Display_Months[ gp_Time->mm -1  ] , \
-    gp_Time->dd, \
-    gp_Time->HH, \
-    gp_Time->MM ) ;
-  
-  sprintf( c_l1, "%.2f %.2f", \
-    gp_Lieu->lat * DEGRES, \
-    gp_Lieu->lon * DEGRES ) ;
+    /* Remplissage de line 0 et line 1 */
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "%d%s%d %d:%d", \
+      gp_Tim->yy ,\
+      c_Lcd_Display_Months[ gp_Tim->mm -1  ] , \
+      gp_Tim->dd, \
+      gp_Tim->HH, \
+      gp_Tim->MM ) ;
+    
+    sprintf( c_l1, "%.2f %.2f", \
+      gp_Lie->lat * DEGRES, \
+      gp_Lie->lon * DEGRES ) ;
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -429,15 +515,17 @@ void LCD_DISPLAY_ASTRE_VITESSES( const int i_duree_us ) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  strcpy(  c_l0, gp_Astr->nom ) ;
-  sprintf( c_l1,"%.2f %.2f", gp_Astr->Va, gp_Astr->Vh);
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    strcpy(  c_l0, gp_Ast->nom ) ;
+    sprintf( c_l1,"%.2f %.2f", gp_Ast->Va, gp_Ast->Vh);
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -447,24 +535,26 @@ void LCD_DISPLAY_ASTRE_VITESSES( const int i_duree_us ) {
 * @brief  : Cette fonction affiche les coordonnees azimutales en cours
 * @param  : LCD * lcd
 * @param  : int i_duree_us
-* @param  : ASTRE * gp_Astr
+* @param  : ASTRE * gp_Ast
 * @date   : 2022-04-09 creation 
 *****************************************************************************************/
 
 void LCD_DISPLAY_AZI_ALT( const int i_duree_us ) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "AZI %s", gp_Astr->c_ddmm_azi ) ;
-  sprintf( c_l1, "ALT %s", gp_Astr->c_ddmm_alt );
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "AZI %s", gp_Ast->c_ddmm_azi ) ;
+    sprintf( c_l1, "ALT %s", gp_Ast->c_ddmm_alt );
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -474,7 +564,7 @@ void LCD_DISPLAY_AZI_ALT( const int i_duree_us ) {
 * @brief  : Cette fonction affiche les coordonnees horaires en cours
 * @param  : LCD * lcd
 * @param  : int i_duree_us
-* @param  : ASTRE * gp_Astr
+* @param  : ASTRE * gp_Ast
 * @date   : 2022-04-28 creation 
 *****************************************************************************************/
 
@@ -483,15 +573,17 @@ void LCD_DISPLAY_AGH_DEC( const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "AGH %s", gp_Astr->c_hhmm_agh ) ;
-  sprintf( c_l1, "DEC %s", gp_Astr->c_ddmm_dec ) ;
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "AGH %s", gp_Ast->c_hhmm_agh ) ;
+    sprintf( c_l1, "DEC %s", gp_Ast->c_ddmm_dec ) ;
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -501,24 +593,26 @@ void LCD_DISPLAY_AGH_DEC( const int i_duree_us) {
 * @brief  : Cette fonction affiche les coordonnees horaires en cours
 * @param  : LCD * lcd
 * @param  : int i_duree_us
-* @param  : ASTRE * gp_Astr
+* @param  : ASTRE * gp_Ast
 * @date   : 2022-04-28 creation 
 *****************************************************************************************/
 
 void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "ASC %s", gp_Astr->c_hhmm_asc ) ;
-  sprintf( c_l1, "DEC %s", gp_Astr->c_ddmm_dec ) ;
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "ASC %s", gp_Ast->c_hhmm_asc ) ;
+    sprintf( c_l1, "DEC %s", gp_Ast->c_ddmm_dec ) ;
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -533,23 +627,27 @@ void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
 
 void LCD_DISPLAY_MODE_STELLARIUM( const int i_duree_us ) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(AZI) %s", gp_Astr->c_ddmm_azi ) ;
-  sprintf( c_l1, "(ALT) %s", gp_Astr->c_ddmm_alt );
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
-  /*
-  Trace("Va / Vh    : %3.2f / %3.2f" , gp_Astr->Va           , gp_Astr->Vh ) ;
-  Trace("AD / Dec   : %s / %s"       , gp_Astr->c_hhmmss_asc , gp_Astr->c_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s"       , gp_Astr->c_hhmmss_agh , gp_Astr->c_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s"       , gp_Astr->c_ddmm_azi   , gp_Astr->c_ddmm_alt ) ;
-  */
+    sprintf( c_l0, "(AZI) %s", gp_Ast->c_ddmm_azi ) ;
+    sprintf( c_l1, "(ALT) %s", gp_Ast->c_ddmm_alt );
+
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+    /*
+    Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->Va           , gp_Ast->Vh ) ;
+    Trace("AD / Dec   : %s / %s"       , gp_Ast->c_hhmmss_asc , gp_Ast->c_ddmm_dec ) ;
+    Trace("AH / Dec   : %s / %s"       , gp_Ast->c_hhmmss_agh , gp_Ast->c_ddmm_dec ) ;
+    Trace("AZ./ Haut. : %s / %s"       , gp_Ast->c_ddmm_azi   , gp_Ast->c_ddmm_alt ) ;
+    */
+  }
+  return ;
 }
 
 /*****************************************************************************************
@@ -566,15 +664,17 @@ void   LCD_DISPLAY_INFORMATIONS (  const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(INFO) ..." ) ;
-  sprintf( c_l1, "(INFO) ..." );
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "(INFO) ..." ) ;
+    sprintf( c_l1, "(INFO) ..." );
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -589,18 +689,20 @@ void   LCD_DISPLAY_INFORMATIONS (  const int i_duree_us) {
 
 void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(h) %s", GPIO_ALT ) ;
-  sprintf( c_l1, "(a) %s", GPIO_AZI );
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "(h) %s", GPIO_ALT ) ;
+    sprintf( c_l1, "(a) %s", GPIO_AZI );
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 /*****************************************************************************************
@@ -614,18 +716,21 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
 
 void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]={0}  ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(Masq) %s", GPIO_MAS ) ;
-  sprintf( c_l1, "(Fpwm) %s", GPIO_FREQUENCE_PWM );
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "(Masq) %s", GPIO_MAS ) ;
+    sprintf( c_l1, "(Fpwm) %s", GPIO_FREQUENCE_PWM );
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+
+  }
   return ;
 }
 /*****************************************************************************************
@@ -643,40 +748,43 @@ void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
   FILE * f_led_ir ;
   char c_gets[ CONFIG_TAILLE_BUFFER_16 + 1 ] ;
   char*  pc_gets ;
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  Trace("CONFIG_FIC_LED = %s", CONFIG_FIC_LED) ;
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  /* Lecture LED IR */
-  /* Le service systemd astrokit-boot / script_astrokit_boot.sh cree 
-     normalement ce fichier */
+    Trace("CONFIG_FIC_LED = %s", CONFIG_FIC_LED) ;
 
-  if ( ( f_led_ir = fopen( CONFIG_FIC_LED, "r" ) ) != NULL ) {
-    pc_gets = fgets( c_gets, CONFIG_TAILLE_BUFFER_16, f_led_ir ) ;
-    if ( pc_gets != NULL ) {
-      sprintf( c_l1, "(LED IR) %s", c_gets );
+    /* Lecture LED IR */
+    /* Le service systemd astrokit-boot / script_astrokit_boot.sh cree 
+      normalement ce fichier */
+
+    if ( ( f_led_ir = fopen( CONFIG_FIC_LED, "r" ) ) != NULL ) {
+      pc_gets = fgets( c_gets, CONFIG_TAILLE_BUFFER_16, f_led_ir ) ;
+      if ( pc_gets != NULL ) {
+        sprintf( c_l1, "(LED IR) %s", c_gets );
+      }
+      else {
+        sprintf( c_l1, "(LED IR) cf logs" );
+        Trace("fichier %s non lu", CONFIG_FIC_LED) ;
+      }
     }
     else {
       sprintf( c_l1, "(LED IR) cf logs" );
-      Trace("fichier %s non lu", CONFIG_FIC_LED) ;
+      Trace("erreur ouverture %s", CONFIG_FIC_LED) ;
     }
+    /* Lecture LED ETAT */
+
+    sprintf( c_l0, "(LED ETAT) %d", GPIO_LED_ETAT ) ;
+    
+
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+
   }
-  else {
-    sprintf( c_l1, "(LED IR) cf logs" );
-    Trace("erreur ouverture %s", CONFIG_FIC_LED) ;
-  }
-  /* Lecture LED ETAT */
-
-  sprintf( c_l0, "(LED ETAT) %d", GPIO_LED_ETAT ) ;
-  
-
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
-
   return ;
 }
 /*****************************************************************************************
@@ -693,18 +801,20 @@ void   LCD_DISPLAY_CFG_REDUCTION    ( const int i_duree_us ) {
   int h1=ALT_R1, h2= ALT_R2, h3= ALT_R3, h4= ALT_R4, h5= ALT_R5, h6= ALT_R6 ;
   int a1=AZI_R1, a2= AZI_R2, a3= AZI_R3, a4= AZI_R4, a5= AZI_R5, a6= AZI_R6 ;
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ={0};
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "%d %d %d %d %d %d", h1,h2,h3,h4,h5,h6 ) ;
-  sprintf( c_l1, "%d %d %d %d %d %d", a1,a2,a3,a4,a5,a6 );
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "%d %d %d %d %d %d", h1,h2,h3,h4,h5,h6 ) ;
+    sprintf( c_l1, "%d %d %d %d %d %d", a1,a2,a3,a4,a5,a6 );
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 /*****************************************************************************************
@@ -718,18 +828,20 @@ void   LCD_DISPLAY_CFG_REDUCTION    ( const int i_duree_us ) {
 
 void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(F alt) %.2f", gp_Sui->Fh_mic ) ;
-  sprintf( c_l1, "(F azi) %.2f", gp_Sui->Fa_mic ) ;
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "(F alt) %.2f", gp_Sui->Fh_mic ) ;
+    sprintf( c_l1, "(F azi) %.2f", gp_Sui->Fa_mic ) ;
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -744,18 +856,20 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
 
 void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(T alt) %.2f", gp_Sui->Th_mic ) ;
-  sprintf( c_l1, "(T azi) %.2f", gp_Sui->Ta_mic ) ;
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "(T alt) %.2f", gp_Sui->Th_mic ) ;
+    sprintf( c_l1, "(T azi) %.2f", gp_Sui->Ta_mic ) ;
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 
@@ -770,18 +884,20 @@ void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
 
 void   LCD_DISPLAY_ACC_ALT_AZI     ( const int i_duree_us) {
 
-  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
-  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
+  char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0}  ;
+  char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
-  memset( c_l0, 0, sizeof(c_l0)) ; 
-  memset( c_l1, 0, sizeof(c_l1)) ;
+  if ( gp_Dev->DEVICE_USE_LCD ) {
 
-  sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui->acc_alt ) ;
-  sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui->acc_azi ) ;
+    memset( c_l0, 0, sizeof(c_l0)) ; 
+    memset( c_l1, 0, sizeof(c_l1)) ;
 
-  gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
-  gp_Lcd->display_current() ;
+    sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui->acc_alt ) ;
+    sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui->acc_azi ) ;
 
+    gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
+    gp_Lcd->display_current() ;
+  }
   return ;
 }
 

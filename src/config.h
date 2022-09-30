@@ -92,7 +92,7 @@ void   CONFIG_SET_YEAR_MONTH_AND_DAY(char * s_data) ; // FIXME ajout 20190822
 void   CONFIG_SET_MONTH_AND_DAY(char * s_data) ;
 void   CONFIG_SET_HOUR_AND_MINUTES(char * s_data) ;
 
-void   CONFIG_VOUTE( VOUTE *gp_Vout, double dt, double acc, double percent ) ;
+void   CONFIG_VOUTE( VOUTE *gp_Vou, double dt, double acc, double percent ) ;
 
 int    CONFIG_FORMAT_ADMIS(char c) ;
 int    CONFIG_FIN_LIGNE(char c) ;
@@ -106,9 +106,9 @@ void   CONFIG_AFFICHER_DATAS(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CO
 int    CONFIG_READ(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER]) ;
 int    CONFIG_GETCWD(char * ) ;
 
-void   CONFIG_AFFICHER_TEMPS(TEMPS * gp_Time) ; /* FIXME ajout 20191228 */
+void   CONFIG_AFFICHER_TEMPS(TEMPS * gp_Tim) ; /* FIXME ajout 20191228 */
 void   CONFIG_AFFICHER_MODE_LONG(void) ;
-void   CONFIG_AFFICHER_LIEU(LIEU *gp_Lieu) ;
+void   CONFIG_AFFICHER_LIEU(LIEU *gp_Lie) ;
 void   CONFIG_AFFICHER_CLAVIER(CLAVIER *clavier)  ;
 
 void   CONFIG_AFFICHER_TOUT(void) ;          /* FIXME ajout 20191228 */

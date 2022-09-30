@@ -106,8 +106,8 @@
 */
 typedef struct {
 
-  SUIVI         * p_Sui ;
-  PTHREADS      * p_Pth ;
+  SUIVI         * p_sui ;
+  PTHREADS      * p_pth ;
   pthread_mutex_t mutex ; 
 
   struct timeval tval ;
@@ -134,9 +134,9 @@ GPIO_PWM_PHASE ;
 
 typedef struct {
 
-  SUIVI          * p_Sui ;
-  PTHREADS       * p_Pth ;
-  GPIO_PWM_PHASE * phase[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  SUIVI          * p_sui ;
+  PTHREADS       * p_pth ;
+  GPIO_PWM_PHASE * p_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
 
   pthread_mutex_t mutex ; 
   
@@ -253,7 +253,7 @@ struct timespec gpio_tm_now;
 struct timespec gpio_tm_nxt;
 
 int        g_incrlog ;
-int        g_id_thread ;  
+int        g_nb_threads ;  
 
 //==========================================================================
 // broches pour l'injection directe d'une frequence depuis 2 ports GPIO dans le cas 

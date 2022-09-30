@@ -88,12 +88,12 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
   // qui est dans astro.c
   // =======================================================================
   
-  gp_Clav->appui_en_cours = 0 ;
+  gp_Cla->appui_en_cours = 0 ;
     
   for(i=0;i<4;i++) {
     GPIO_SET( GPIO_KEY_C[i], 1) ;
     
-    usleep( gp_Clav->temporisation_clavier ) ;
+    usleep( gp_Cla->temporisation_clavier ) ;
     
     for(j=0;j<4;j++)  {
       if( GPIO_GET(GPIO_KEY_L[j])) {
@@ -102,9 +102,9 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
           strcpy( val, KEYBOARD[I][J] ) ;
 	  if ( strcmp( val, "") ) {
 	    //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, KEYBOARD[i][j] ) ;
-	    strcpy( gp_Clav->mot, val ) ; 
-            gp_Clav->appui_en_cours = 1 ;
-	    gp_Clav->mot_en_cours = 1 ;
+	    strcpy( gp_Cla->mot, val ) ; 
+            gp_Cla->appui_en_cours = 1 ;
+	    gp_Cla->mot_en_cours = 1 ;
 	  }
       }
     }
@@ -117,33 +117,33 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
   // dans ceet aprtie de code
   // =======================================================================
   
-  if ( gp_Clav->mot_en_cours && ! gp_Clav->appui_en_cours ) {
+  if ( gp_Cla->mot_en_cours && ! gp_Cla->appui_en_cours ) {
   
-    // printf("mot trouver = %s\n", gp_Clav->mot ) ;
+    // printf("mot trouver = %s\n", gp_Cla->mot ) ;
     
     //------------------------------------------------------------
     // On incremente la phrase avec le mot et
     // On incremente le nombre avec le mot si premier n'est pas vide
     //------------------------------------------------------------
     
-    if ( strcmp( gp_Clav->mot, gp_Clav->valider) != 0 ) { 
+    if ( strcmp( gp_Cla->mot, gp_Cla->valider) != 0 ) { 
       
-      if ( strlen(gp_Clav->phrase) + strlen(gp_Clav->mot) < DATAS_TAILLE_BUFFER_2)
-        sprintf(gp_Clav->phrase,"%s%s",gp_Clav->phrase, gp_Clav->mot);
+      if ( strlen(gp_Cla->phrase) + strlen(gp_Cla->mot) < DATAS_TAILLE_BUFFER_2)
+        sprintf(gp_Cla->phrase,"%s%s",gp_Cla->phrase, gp_Cla->mot);
       
-      if ( strcmp( gp_Clav->premier, "")) {
-        if ( strlen(gp_Clav->nombre) + strlen(gp_Clav->mot) < DATAS_TAILLE_BUFFER_2)
+      if ( strcmp( gp_Cla->premier, "")) {
+        if ( strlen(gp_Cla->nombre) + strlen(gp_Cla->mot) < DATAS_TAILLE_BUFFER_2)
         //printf("Si pas d'appui sur valider et premier non vide => on met le mot dans la phrase !!\n" ) ; 
-          sprintf(gp_Clav->nombre,"%s%s",gp_Clav->nombre,gp_Clav->mot);
+          sprintf(gp_Cla->nombre,"%s%s",gp_Cla->nombre,gp_Cla->mot);
       }
     }    
     //------------------------------------------------------------
     // On met le mot dans premier si il est vide 
     //------------------------------------------------------------
     
-    if (   strcmp( gp_Clav->premier, "") ==0 ){ 
+    if (   strcmp( gp_Cla->premier, "") ==0 ){ 
       // printf("Si premier est vide on met le mot en cours dedans\n" ) ; 
-      strcpy( gp_Clav->premier, gp_Clav->mot);
+      strcpy( gp_Cla->premier, gp_Cla->mot);
     }
     
     //------------------------------------------------------------
@@ -155,19 +155,19 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
     // et on met le mot dans PREMIER (premier mot de la phrase)
     //------------------------------------------------------------
     
-    for( i=0 ; i < gp_Clav->validations_size ; i++ )
-    if ( ! strcmp( gp_Clav->phrase, gp_Clav->validations[i]) \
-      || ! strcmp( gp_Clav->mot,    gp_Clav->valider )  ) {
+    for( i=0 ; i < gp_Cla->validations_size ; i++ )
+    if ( ! strcmp( gp_Cla->phrase, gp_Cla->validations[i]) \
+      || ! strcmp( gp_Cla->mot,    gp_Cla->valider )  ) {
       //printf("APPUI sur VALIDER => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
       
-      strcpy(gp_Clav->symbole, gp_Clav->premier)  ;
+      strcpy(gp_Cla->symbole, gp_Cla->premier)  ;
       
-      strcpy(gp_Clav->premier,"") ;
-      strcpy(gp_Clav->phrase,"")  ;
-      strcpy(gp_Clav->mot,"") ;
+      strcpy(gp_Cla->premier,"") ;
+      strcpy(gp_Cla->phrase,"")  ;
+      strcpy(gp_Cla->mot,"") ;
       
-      //printf("TROIS = symbole = %s nombre = %s\n", gp_Clav->symbole, gp_Clav->nombre ) ;
-      gp_Clav->phrase_lue=1 ;
+      //printf("TROIS = symbole = %s nombre = %s\n", gp_Cla->symbole, gp_Cla->nombre ) ;
+      gp_Cla->phrase_lue=1 ;
     }
     
     //------------------------------------------------------------
@@ -175,17 +175,17 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], char KEYBOARD[4][4
     // et on met le mot dans PREMIER (premier mot de la phrase)
     //------------------------------------------------------------
     
-    for( i=0 ; i < gp_Clav->actions_size ; i++ )
-    if ( ! strcmp( gp_Clav->mot, gp_Clav->actions[i] )) {
+    for( i=0 ; i < gp_Cla->actions_size ; i++ )
+    if ( ! strcmp( gp_Cla->mot, gp_Cla->actions[i] )) {
         printf("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier") ;
-	strcpy(gp_Clav->premier,gp_Clav->mot) ;
-        strcpy(gp_Clav->nombre,"")  ;
-	strcpy(gp_Clav->phrase,"")  ;
-	strcpy(gp_Clav->mot,"") ;
+	strcpy(gp_Cla->premier,gp_Cla->mot) ;
+        strcpy(gp_Cla->nombre,"")  ;
+	strcpy(gp_Cla->phrase,"")  ;
+	strcpy(gp_Cla->mot,"") ;
     }
     
-    gp_Clav->mot_en_cours = 0 ;
-    gp_Clav->appui_en_cours = 0 ;
+    gp_Cla->mot_en_cours = 0 ;
+    gp_Cla->appui_en_cours = 0 ;
   }
 }
 //==========================================================

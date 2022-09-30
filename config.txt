@@ -57,14 +57,14 @@ CONFIG_SCR_KERNEL   script_kernel.sh
 # tempo_menu     doit etre legerement inferieur aux autres tempo
 # tempo_raq      doit etre etre deux fois inferieur aux autres tempos
 
-TEMPO_MENU      20000
-TEMPO_RAQ       10000
-TEMPO_IR        27000
-TEMPO_TERMIOS   27500
-TEMPO_CLAVIER   27500
-TEMPO_CAPTEURS  27500
-TEMPO_LCD_LOOP  250000
-TEMPO_LCD_DISP  100000
+TEMPO_MENU      200000
+TEMPO_RAQ       100000
+TEMPO_IR        270000
+TEMPO_TERMIOS   275000
+TEMPO_CLAVIER   275000
+TEMPO_CAPTEURS  275000
+TEMPO_LCD_LOOP  2500000
+TEMPO_LCD_DISP  1000000
 TEMPO_PID_LOOP  5       
 
 PID_ECH 1.0
@@ -74,7 +74,7 @@ PID_KD  0.05
 
 # ----------------------- parametres acquisitions
 
-DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
+DEVICE_USE_INFRAROUGE       0  # flag qui indique utilisation de infrarouge comme source input
 DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
 DEVICE_USE_LCD              0  # flag qui indique utilisation de ecran LCD1602 / PCA8574
 DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
@@ -121,7 +121,7 @@ GPIO_MASQUE     3,1,0,2
 
 # ----------------------- parametres pwm
 
-GPIO_FREQUENCE_PWM  1000
+GPIO_FREQUENCE_PWM  250 
 
 # ----------------------- parametres reductions altitude
 # Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760 

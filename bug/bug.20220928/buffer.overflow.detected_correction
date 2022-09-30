@@ -1,0 +1,68 @@
+=> creation fonction CALCUL_ASTRE_RECUP_TYPE_ET_NOM
+
+void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
+
+  int pos=3;
+  int len=0 ;
+  char c_sub[32];
+
+  /*---------------- evolution 19/01/2022 ----------------
+  * prise en compte du fait que la as peut avoir plusieurs
+  * prefixe dans son nom (PLA/NGC/MES/ETO mais aussi EQU/AZI)
+  * Cela permet de determine le mode de calculs de l'as
+  * et le type de l'as (CIEL_PROFOND etc...)
+  -------------------------------------------------------*/
+
+  gp_Ast->type = ASTRE_INDETERMINE ;
+  gp_Ast->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ;   
+
+  len = strlen(gp_Ast->nom)-pos ;
+
+  if ( len > pos ) {
+
+    if      ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) gp_Ast->type = ASTRE_CIEL_PROFOND ;
+    else if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) gp_Ast->type = ASTRE_CIEL_PROFOND ;
+    else if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) gp_Ast->type = ASTRE_CIEL_PROFOND ;
+    else if ( strstr( gp_Ast->nom, CONFIG_PLA ) != NULL ) gp_Ast->type = ASTRE_PLANETE ;
+    else if ( strstr( gp_Ast->nom, CONFIG_AZI ) != NULL ) gp_Ast->type = ASTRE_INDETERMINE ;
+    else if ( strstr( gp_Ast->nom, CONFIG_EQU ) != NULL ) gp_Ast->type = ASTRE_INDETERMINE ;
+    else                                                   gp_Ast->type = ASTRE_INDETERMINE ;
+    /* TODO : completer avec les types manquants */ 
+
+    if      ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) gp_Ast->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) gp_Ast->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) gp_Ast->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->nom, CONFIG_PLA ) != NULL ) gp_Ast->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->nom, CONFIG_AZI ) != NULL ) gp_Ast->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->nom, CONFIG_EQU ) != NULL ) gp_Ast->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ;
+    else                                                   gp_Ast->mode = MODE_CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
+    /* TODO : completer avec les types manquants */ 
+  }
+  else {
+    gp_Ast->type = ASTRE_INDETERMINE ;
+  }
+  /* recuperation du numero apres les 3 premiers caracteres */
+
+  memset( c_sub, 0, sizeof(c_sub));
+  
+  if ( gp_Ast->type != ASTRE_INDETERMINE ) {
+
+    if( len > pos ) {
+      
+      if ( len > sizeof(c_sub) ) { Trace("erreur : %d >  %ld", len,sizeof(c_sub) ) ;}
+      if ( len <= 0 )            { Trace("erreur : %d <= 0",   len) ;}
+
+      memcpy( c_sub, &gp_Ast->nom[pos], len );
+
+      c_sub[len] = '\0';
+      gp_Ast->numero = atoi(c_sub) ;
+    }
+    else {
+      gp_Ast->numero=0 ;
+    }
+  }
+  else {
+    gp_Ast->numero=0 ;
+  }
+  return ;
+}

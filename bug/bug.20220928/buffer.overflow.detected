@@ -1,0 +1,198 @@
+root@stef-20qqs01l00:/home/stef/git/astrokit# valgrind ./astrokit.septembre.2022.host
+==13282== Memcheck, a memory error detector
+==13282== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==13282== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==13282== Command: ./astrokit.septembre.2022.host
+==13282== 
+
+ARGUMENTS_GERER_REP_HOME        :CONFIG_REP_HOME = /home/stef/git/astrokit
+CONFIG_PATH_FIND        :Test chemin /bin/stty
+main    :Chemin retenu : /bin/stty
+CONFIG_READ     :open /home/stef/git/astrokit/config.txt ok
+GPIO_READ       :Lecture dans fichier de config
+CONFIG_AFFICHER_VARIABLES       :TEMPO_RAQ = 10000
+CONFIG_AFFICHER_VARIABLES       :TEMPO_MENU = 20000
+CONFIG_AFFICHER_VARIABLES       :TEMPO_IR = 27000
+CONFIG_AFFICHER_VARIABLES       :TEMPO_TERMIOS = 27500
+CONFIG_AFFICHER_VARIABLES       :TEMPO_CLAVIER = 27500
+CONFIG_AFFICHER_VARIABLES       :TEMPO_CAPTEURS = 27500
+CONFIG_AFFICHER_VARIABLES       :TEMPO_LCD_LOOP = 250000
+CONFIG_AFFICHER_VARIABLES       :TEMPO_LCD_DISP = 100000
+CONFIG_AFFICHER_VARIABLES       :PID_ECH = 3.000000
+CONFIG_AFFICHER_VARIABLES       :PID_KI = 0.000000
+CONFIG_AFFICHER_VARIABLES       :PID_KP = 0.050000
+CONFIG_AFFICHER_VARIABLES       :PID_KD = 0.050000
+CONFIG_INIT_LOG :start
+GPIO_RAQUETTE_CONFIG    :
+CONFIG_INIT_CLAVIER     :==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x1144CB: CALCUL_TEMPS_DEC_VERS_HMS (calculs.c:731)
+==13282==    by 0x114D85: CALCUL_TEMPS_SIDERAL (calculs.c:1036)
+==13282==    by 0x10E159: main (astro.c:1885)
+==13282== 
+
+LCD_INIT        :FAHW-Lib: Fail to I2CWriteByte
+
+LCD_INIT        :Fail to init LCD1602Init
+PID_INIT        :ouverture log/ (KO)
+PTHREADS_INIT   :user is :  (getuid) 0 
+PTHREADS_INIT   :Mise en place temps reel et parallelisme 
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_INFRAROUGE = 1
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_CAPTEURS   = 0
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_RAQUETTE   = 0
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_BLUETOOTH  = 0
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_KEYBOARD   = 1
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_CONTROLER  = 0
+CONFIG_AFFICHER_DEVICES_USE     :gp_Dev->DEVICE_USE_LCD        = 0
+main    :gpio_alt         : 21 26 19 13
+main    :gpio_azi         : 6 5 7 11
+main    :gpio_mas         : 3 1 0 2
+main    :GPIO_LED_ETAT    : 4
+main    :ASTRE_PAR_DEFAUT : NGC5061
+main    :PID_ECH = 3.000000
+CAT_FIND        :(trouve) : (nom) NGC5061 (infos) NGC5061: 
+CAT_FIND        : NGC5061 : asc 13.18.0 (hms) dec -26.83 (deg)
+ARGUMENTS_GERER_FACON_CLASSIQUE :as (null) pris en comptefin ARGUMENTS_GERER
+
+GPIO_CLOSE_BROCHE       :fermeture GPIO 0
+GPIO_OPEN_BROCHE        :gpio ouverture en OUTPUT : dir= /sys/class/gpio/gpio4/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio4/value
+GPIO_OPEN_BROCHE_PWM    :open gpio 13 : dir= /sys/class/gpio/gpio13/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio13/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 13 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 26 : dir= /sys/class/gpio/gpio26/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio26/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 26 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 21 : dir= /sys/class/gpio/gpio21/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio21/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 21 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 19 : dir= /sys/class/gpio/gpio19/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio19/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 19 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 11 : dir= /sys/class/gpio/gpio11/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio11/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 11 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 5 : dir= /sys/class/gpio/gpio5/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio5/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 5 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 6 : dir= /sys/class/gpio/gpio6/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio6/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 6 en erreur -6
+GPIO_OPEN_BROCHE_PWM    :open gpio 7 : dir= /sys/class/gpio/gpio7/direction exp=/sys/class/gpio/export val=/sys/class/gpio/gpio7/value sta=-6
+GPIO_OPEN_BROCHE_PWM    :ouverture du gpio 7 en erreur -6
+main    :pm_azi->Fm 12.500000 pm_azi->periode_mot = 0.080000
+main    :pm_alt->Fm 12.500000 pm_alt->periode_mot = 0.080000
+suivi_main_M    :start
+suivi_main_M    :start==13282== Thread 17:
+==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x1111AA: SUIVI_LCD (astro.c:1358)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x1111CF: SUIVI_LCD (astro.c:1359)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+
+GPIO_SUIVI_PWM_PHASE    :start
+GPIO_SUIVI_PWM_PHASE    :start
+SUIVI_MENU      :start
+GPIO_SUIVI_PWM_PHASE    :start==13282== Thread 12 SUIVI_MENU:
+==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x11142A: SUIVI_TRAITEMENT_MOT (astro.c:249)
+==13282==    by 0x112C83: SUIVI_MENU (astro.c:950)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x111448: SUIVI_TRAITEMENT_MOT (astro.c:250)
+==13282==    by 0x112C83: SUIVI_MENU (astro.c:950)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+
+SUIVI_MENU      :appel : 0 : MENU_AZIMUTAL==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x1144CB: CALCUL_TEMPS_DEC_VERS_HMS (calculs.c:731)
+==13282==    by 0x114D85: CALCUL_TEMPS_SIDERAL (calculs.c:1036)
+==13282==    by 0x1151F0: CALCUL_TOUT (calculs.c:1262)
+==13282==    by 0x112D79: SUIVI_MENU (astro.c:1000)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+
+GPIO_SUIVI_PWM_PHASE    :start
+SUIVI_MANUEL_BRUT       :reset..    : Sh 1 Sa -1 pas_azi = -1 pas_alt = 1 acc_azi = 1.000000 acc_alt = 1.000000
+GPIO_SUIVI_PWM_PHASE    :start
+GPIO_SUIVI_PWM_PHASE    :start
+GPIO_SUIVI_PWM_PHASE    :start
+GPIO_SUIVI_PWM_PHASE    :start
+SUIVI_INFRAROUGE        :startdo_connect: could not connect to socket
+connect: No such file or directory
+
+LIRC_READ       :start==13282== Warning: invalid file descriptor -2 in syscall read()
+==13282== Warning: invalid file descriptor -2 in syscall close()
+
+SUIVI_INFRAROUGE        :Stop
+SUIVI_LCD       :start
+SUIVI_LCD       :Stop
+SUIVI_CLAVIER_TERMIOS   :start==13282== Thread 13:
+==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x11028F: SUIVI_VOUTE (astro.c:1185)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x1102B4: SUIVI_VOUTE (astro.c:1186)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+
+SUIVI_CAPTEURS  :start
+SUIVI_CAPTEURS  :Stop
+SUIVI_VOUTE     :start==13282== Conditional jump or move depends on uninitialised value(s)
+==13282==    at 0x1144CB: CALCUL_TEMPS_DEC_VERS_HMS (calculs.c:731)
+==13282==    by 0x114D85: CALCUL_TEMPS_SIDERAL (calculs.c:1036)
+==13282==    by 0x1151F0: CALCUL_TOUT (calculs.c:1262)
+==13282==    by 0x11040A: SUIVI_VOUTE (astro.c:1238)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : infos         : NGC5061
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : type          : ASTRE_CIEL_PROFOND
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : mode calcul   : MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : latitude      : 43.28 (deg) 
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : longitude     : -0.37 (deg) 
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : vitesses      : -9.04 (Va) -10.41 (Vh)
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : azimut        : 108.01 (deg) 
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : altitude      : -20.55 (deg) 
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : declinaison   : -26.83 (deg) 
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : ascension dro : 199.50 (deg) 13h18m0s (HH.MM.SS)
+CONFIG_AFFICHER_MODE_LONG       : NGC5061 : angle horaire : 266.34 (deg) 17h45m20s (HH.MM.SS)
+CONFIG_AFFICHER_MODE_LONG       :----------------------------
+CONFIG_AFFICHER_MODE_STELLARIUM :Va / Vh    : -9.04 / -10.41
+CONFIG_AFFICHER_MODE_STELLARIUM :AD / Dec   :   13h18m 0s / - 26  d 49'
+CONFIG_AFFICHER_MODE_STELLARIUM :AH / Dec   :   17h45m20s / - 26  d 49'
+CONFIG_AFFICHER_MODE_STELLARIUM :AZ./ Haut. : + 108 d 0' / - 20  d 32'
+LCD_DISPLAY_CURRENT     :
+KEYBOARD_TERMIOS_KBHIT_NEW      :nread 1   i_sum_ascii 10    ch_chaine 
+         
+SUIVI_CLAVIER_TERMIOS   :gp_Sui->sui_dat.dat_inf = valider
+SUIVI_TRAITEMENT_MOT    :symbole =  nombre = 
+**13282** *** memcpy_chk: buffer overflow detected ***: program terminated
+==13282==    at 0x483E9CC: ??? (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==13282==    by 0x4843C0A: __memcpy_chk (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==13282==    by 0x11513E: memcpy (string_fortified.h:34)
+==13282==    by 0x11513E: CALCUL_TOUT (calculs.c:1220)
+==13282==    by 0x11040A: SUIVI_VOUTE (astro.c:1238)
+==13282==    by 0x4874608: start_thread (pthread_create.c:477)
+==13282==    by 0x4B72132: clone (clone.S:95)
+==13282== 
+==13282== HEAP SUMMARY:
+==13282==     in use at exit: 37,440 bytes in 24 blocks
+==13282==   total heap usage: 164 allocs, 140 frees, 252,058 bytes allocated
+==13282== 
+==13282== LEAK SUMMARY:
+==13282==    definitely lost: 0 bytes in 0 blocks
+==13282==    indirectly lost: 0 bytes in 0 blocks
+==13282==      possibly lost: 4,352 bytes in 16 blocks
+==13282==    still reachable: 33,088 bytes in 8 blocks
+==13282==         suppressed: 0 bytes in 0 blocks
+==13282== Rerun with --leak-check=full to see details of leaked memory
+==13282== 
+==13282== Use --track-origins=yes to see where uninitialised values come from
+==13282== For lists of detected and suppressed errors, rerun with: -s
+==13282== ERROR SUMMARY: 998 errors from 9 contexts (suppressed: 0 from 0)
+

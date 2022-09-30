@@ -34,7 +34,7 @@
 # avril 2002  |  * debut codage fonctionnalites LCD1602 :
 #                * fonctions LCD_xxxx
 #                * ajout mutex init sur mutex_datas_infrarouge
-#                * => protection zone de code avec datas_infrarouge
+#                * => protection zone de code avec dat_inf
 #                * ajout fonction LCD_DISPLAY_AGH_DEC / LCD_DISPLAY_EQU_DEC
 #                * CONFIG_FORMATE_DONNEES_AFFICHAGE : ajout de 2 resolutions supplementaires
 #                * protection zones de code impliquant LCD* (mutex_lcd)
@@ -65,7 +65,7 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 * @fn     : CONFIG_MAJ_SUIVI_PAS
 * @author : s.gravois
 * @brief  : Cette fonction met a jour les valeurs de gp_Sui->pas* en fonction
-* @brief  : du contenu de gp_Sui->datas_infrarouge
+* @brief  : du contenu de gp_Sui->sui_dat.dat_inf
 * @param  : SUIVI * gp_Sui
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
@@ -75,34 +75,36 @@ void CONFIG_MAJ_SUIVI_PAS( SUIVI * gp_Sui) {
 
   char c_act = '0' ;
 
-  if ( gp_Devi->DEVICE_USE_INFRAROUGE ) {
+  // Arbo("0") ;
+
+  if ( gp_Dev->DEVICE_USE_INFRAROUGE ) {
     
-    pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
+    pthread_mutex_lock(& gp_Pth->pth_mut.mut_dat );
 
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "plus" ) )         { c_act='1'; gp_Sui->pas_acc_plus  = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "moins" ) )        { c_act='1'; gp_Sui->pas_acc_moins = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "forward" ) )      { c_act='1'; gp_Sui->pas_forward  = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "rewind" ) )       { c_act='1'; gp_Sui->pas_rewind = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "forwardfast" ) )  { c_act='1'; gp_Sui->pas_forward_fast  = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "rewindfast" ) )   { c_act='1'; gp_Sui->pas_rewind_fast = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "ne" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "no" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "se" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "so" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "n" ) )            { c_act='1'; gp_Sui->pas_nord  = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "o" ) )            { c_act='1'; gp_Sui->pas_ouest = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "e" ) )            { c_act='1'; gp_Sui->pas_est   = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "s" ) )            { c_act='1'; gp_Sui->pas_sud   = 1 ; }
-    if ( ! strcmp( gp_Sui->datas_infrarouge, "reset" ) )        { c_act='1'; gp_Sui->reset   = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "plus" ) )         { c_act='1'; gp_Sui->pas_acc_plus  = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "moins" ) )        { c_act='1'; gp_Sui->pas_acc_moins = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forward" ) )      { c_act='1'; gp_Sui->pas_forward  = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewind" ) )       { c_act='1'; gp_Sui->pas_rewind = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forwardfast" ) )  { c_act='1'; gp_Sui->pas_forward_fast  = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewindfast" ) )   { c_act='1'; gp_Sui->pas_rewind_fast = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "ne" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "no" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "se" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "so" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "n" ) )            { c_act='1'; gp_Sui->pas_nord  = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "o" ) )            { c_act='1'; gp_Sui->pas_ouest = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "e" ) )            { c_act='1'; gp_Sui->pas_est   = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "s" ) )            { c_act='1'; gp_Sui->pas_sud   = 1 ; }
+    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "reset" ) )        { c_act='1'; gp_Sui->reset   = 1 ; }
 
-    /* Si gp_Sui->datas_infrarouge a ete utilise, il peut etre remis a zero */
+    /* Si gp_Sui->sui_dat.dat_inf a ete utilise, il peut etre remis a zero */
 
     if ( c_act == '1' ) {
-      Trace("raz de gp_Sui->datas_infrarouge") ;
-      memset( gp_Sui->datas_infrarouge, 0, strlen( gp_Sui->datas_infrarouge ) ) ;
-      strcpy( gp_Sui->datas_infrarouge, "") ;
+      Trace("raz de gp_Sui->sui_dat.dat_inf") ;
+      memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
+      strcpy( gp_Sui->sui_dat.dat_inf, "") ;
     }
-    pthread_mutex_unlock(& gp_Pthr->mutex_infrarouge );
+    pthread_mutex_unlock(& gp_Pth->pth_mut.mut_dat );
 
     TRACE2("%ld %ld %ld %ld %d %d\n", \
       gp_Sui->pas_ouest, \
@@ -120,13 +122,13 @@ void CONFIG_MAJ_SUIVI_PAS( SUIVI * gp_Sui) {
 * @brief  : Cette fonction gere les appuis sur les "touches" (clavier, ir, ..)
 * @brief  : et en deduit le contenu de la structure clavier (mot, action, etc..)
 * @param  : SUIVI * gp_Sui
-* @param  : CLAVIER *gp_Clav
+* @param  : CLAVIER *gp_Cla
 * @date   : 2022-03-22 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
-* @date   : 2022-04-12 protection zone de code datas_infrarouge
+* @date   : 2022-04-12 protection zone de code dat_inf
 *****************************************************************************************/
 
-void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
+void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Cla) {
 
   int  i = 0 ;
   char val[255]={0} ;
@@ -134,20 +136,20 @@ void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
 
   memset(val, 0, sizeof(val)) ;     
 
-  pthread_mutex_lock(& gp_Pthr->mutex_infrarouge );
-  strcpy( val, gp_Sui->datas_infrarouge ) ;
-  pthread_mutex_unlock(& gp_Pthr->mutex_infrarouge );
+  pthread_mutex_lock(& gp_Pth->pth_mut.mut_dat );
+  strcpy( val, gp_Sui->sui_dat.dat_inf ) ;
+  pthread_mutex_unlock(& gp_Pth->pth_mut.mut_dat );
 
-  Trace1("val = %s\n", val ) ;
+  Trace("val = %s\n", val ) ;
   
   if ( strcmp( val, "") ) {
     
     //printf("val = %s\n", val ) ;
-    strcpy( gp_Clav->mot, val ) ; 
-    gp_Clav->appui_en_cours = 1 ;
-    gp_Clav->mot_en_cours = 1 ;    
+    strcpy( gp_Cla->mot, val ) ; 
+    gp_Cla->appui_en_cours = 1 ;
+    gp_Cla->mot_en_cours = 1 ;    
   }
-  else gp_Clav->appui_en_cours = 0 ; 
+  else gp_Cla->appui_en_cours = 0 ; 
   
   // =======================================================================
   // Quand la touche est relacheee, on traite
@@ -155,9 +157,9 @@ void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
   // dans cette partie de code
   // =======================================================================
   
-  if ( gp_Clav->mot_en_cours && gp_Clav->appui_en_cours == 0 ) {
+  if ( gp_Cla->mot_en_cours && gp_Cla->appui_en_cours == 0 ) {
   
-    Trace1("mot trouver = %s", gp_Clav->mot ) ;
+    Trace1("mot trouver = %s", gp_Cla->mot ) ;
 		
 		GPIO_CLIGNOTE(GPIO_LED_ETAT, 1, 5) ;
 
@@ -166,63 +168,63 @@ void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
     // On incremente le nombre avec le mot si premier n'est pas vide
     //------------------------------------------------------------
     
-    if ( strcmp( gp_Clav->mot, gp_Clav->valider) != 0 ) { 
+    if ( strcmp( gp_Cla->mot, gp_Cla->valider) != 0 ) { 
       
       Trace1("Si mot != valider : on incremente la phrase avec le mot !!\n" ) ;
 
-      if ( strlen(gp_Clav->phrase) + strlen(gp_Clav->mot) < CONFIG_TAILLE_BUFFER_32) {
+      if ( strlen(gp_Cla->phrase) + strlen(gp_Cla->mot) < CONFIG_TAILLE_BUFFER_32) {
 
-        Trace1("on incremente la phrase %s avec le mot %s\n",gp_Clav->phrase,  gp_Clav->mot ) ;
+        Trace1("on incremente la phrase %s avec le mot %s\n",gp_Cla->phrase,  gp_Cla->mot ) ;
         // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
-        memset( s_buffer, IR_ZERO_CHAR, strlen( s_buffer )) ;
-        strcpy( s_buffer, gp_Clav->phrase ) ;
+        memset( s_buffer, IR_ZERO_CHAR, sizeof( s_buffer )) ;
+        strcpy( s_buffer, gp_Cla->phrase ) ;
 
-        sprintf(gp_Clav->phrase,"%s%s",s_buffer, gp_Clav->mot);
+        sprintf(gp_Cla->phrase,"%s%s",s_buffer, gp_Cla->mot);
       }
-      Trace1("resultat => phrase = %s \n",gp_Clav->phrase ) ;
+      Trace1("resultat => phrase = %s \n",gp_Cla->phrase ) ;
       
       Trace1("Si mot != valider et premier non vide => on met nombre + mot dans le nombre !!\n" ) ;
 
-      if ( strcmp( gp_Clav->premier, "")) {
+      if ( strcmp( gp_Cla->premier, "")) {
         
-	      if ( strlen(gp_Clav->nombre) + strlen(gp_Clav->mot) < CONFIG_TAILLE_BUFFER_32) {
+	      if ( strlen(gp_Cla->nombre) + strlen(gp_Cla->mot) < CONFIG_TAILLE_BUFFER_32) {
 
-          Trace1("on incremente le nombre %s avec le mot %s\n",gp_Clav->nombre,  gp_Clav->mot ) ;
+          Trace1("on incremente le nombre %s avec le mot %s\n",gp_Cla->nombre,  gp_Cla->mot ) ;
           // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
-          memset( s_buffer, IR_ZERO_CHAR, strlen( s_buffer )) ;
-          strcpy( s_buffer, gp_Clav->nombre ) ;
+          memset( s_buffer, IR_ZERO_CHAR, sizeof( s_buffer )) ;
+          strcpy( s_buffer, gp_Cla->nombre ) ;
 
-          sprintf(gp_Clav->nombre,"%s%s", s_buffer, gp_Clav->mot);
+          sprintf(gp_Cla->nombre,"%s%s", s_buffer, gp_Cla->mot);
         }
       }
-      Trace1("resultat => nombre = %s \n",gp_Clav->nombre ) ;
+      Trace1("resultat => nombre = %s \n",gp_Cla->nombre ) ;
     }    
     //------------------------------------------------------------
     // On met le mot dans premier si il est vide 
     //------------------------------------------------------------
     
-    if ( ! strcmp( gp_Clav->premier, "")){ 
-      if ( strlen(gp_Clav->mot) < CONFIG_TAILLE_BUFFER_32)
-      strcpy( gp_Clav->premier, gp_Clav->mot);
+    if ( ! strcmp( gp_Cla->premier, "")){ 
+      if ( strlen(gp_Cla->mot) < CONFIG_TAILLE_BUFFER_32)
+      strcpy( gp_Cla->premier, gp_Cla->mot);
     }
     //------------------------------------------------------------
     // Si le mot en cours est une VALIDATION 
     // Exemple : valider
     // Alors on VALIDE la phrase en cours
-    //  - en mettant gp_Clav->phrase_lu à 1
+    //  - en mettant gp_Cla->phrase_lu à 1
     // on efface tout sauf SYMBOLE et NOMBRE qui sont determiner plus tot
     //------------------------------------------------------------
 
     for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )
-    if ( ! strcmp( gp_Clav->mot,    gp_Clav->valider )  ) {
+    if ( ! strcmp( gp_Cla->mot,    gp_Cla->valider )  ) {
       Trace1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
 
-      strcpy(gp_Clav->premier,"") ;
-      strcpy(gp_Clav->phrase,"")  ;
-      strcpy(gp_Clav->mot,"") ;
-      gp_Clav->phrase_lue=1 ;
+      strcpy(gp_Cla->premier,"") ;
+      strcpy(gp_Cla->phrase,"")  ;
+      strcpy(gp_Cla->mot,"") ;
+      gp_Cla->phrase_lue=1 ;
     }
     //------------------------------------------------------------
     // Si le mot est une ACTION, on efface la phrase en cours    
@@ -231,19 +233,19 @@ void CONFIG_INPUTS_GESTION_APPUIS(SUIVI * gp_Sui, CLAVIER *gp_Clav) {
     //------------------------------------------------------------
     
     for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )
-    if ( ! strcmp( gp_Clav->mot, gp_Clav->actions[i] )) {
+    if ( ! strcmp( gp_Cla->mot, gp_Cla->actions[i] )) {
         Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
-        strcpy(gp_Clav->premier,gp_Clav->mot) ;
-        strcpy(gp_Clav->symbole,gp_Clav->mot)  ;
+        strcpy(gp_Cla->premier,gp_Cla->mot) ;
+        strcpy(gp_Cla->symbole,gp_Cla->mot)  ;
 
-        strcpy(gp_Clav->nombre,"")  ;
-        strcpy(gp_Clav->phrase,"")  ;
-        strcpy(gp_Clav->mot,"") ;
-        gp_Clav->phrase_lue=0 ;
+        strcpy(gp_Cla->nombre,"")  ;
+        strcpy(gp_Cla->phrase,"")  ;
+        strcpy(gp_Cla->mot,"") ;
+        gp_Cla->phrase_lue=0 ;
     }
     
-    gp_Clav->mot_en_cours = 0 ;
-    gp_Clav->appui_en_cours = 0 ;
+    gp_Cla->mot_en_cours = 0 ;
+    gp_Cla->appui_en_cours = 0 ;
   }
 }
 /*****************************************************************************************
@@ -322,7 +324,7 @@ void CONFIG_INIT_LOG(void) {
 
   char buf[255] ;
   
-  Trace("start") ;
+  Trace("") ;
   
   if ( DEBUG_LOG ) {
     
@@ -343,56 +345,56 @@ void CONFIG_INIT_LOG(void) {
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_ASTRE
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure ASTRE * gp_Astr
+* @brief  : Cette fonction initialise la structure ASTRE * gp_Ast
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 ajout membres de la structure dans la fonction
-* @todo   : supprimer ASTRE *gp_Astr (var blog) et remplacer par void
+* @todo   : supprimer ASTRE *gp_Ast (var blog) et remplacer par void
 *           passer par des pointeurs de fonctions dans un structure
 *****************************************************************************************/
 
-void CONFIG_INIT_ASTRE(ASTRE *gp_Astr) {
+void CONFIG_INIT_ASTRE(ASTRE *gp_Ast) {
 
   int C ;
   
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
-    memset( gp_Astr->plus_proche[C], ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-    strcpy( gp_Astr->plus_proche[C], "") ;
+    memset( gp_Ast->plus_proche[C], ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+    strcpy( gp_Ast->plus_proche[C], "") ;
   }
-  memset( gp_Astr->nom,   ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( gp_Astr->infos, ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( gp_Astr->plus_proche, ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( gp_Ast->nom,   ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( gp_Ast->infos, ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( gp_Ast->plus_proche, ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   
-  gp_Astr->a   = 0  ;
-  gp_Astr->h   = 0  ;
-  gp_Astr->a0  = 0 ;
-  gp_Astr->h0  = 0 ;
-  gp_Astr->AGH   = 0  ; 
-  gp_Astr->ASC   = 0  ;
-  gp_Astr->DEC   = 0   ;
-  gp_Astr->A0  = 0 ;
-  gp_Astr->H0  = 0 ;
-  gp_Astr->da  = 0 ;
-  gp_Astr->dh  = 0 ;
-  gp_Astr->dA  = 0 ;
-  gp_Astr->dH  = 0 ;
-  gp_Astr->Va  = 0 ;
-  gp_Astr->Vh  = 0 ;
-  gp_Astr->dVa = 0 ;
-  gp_Astr->dVh = 0 ;
-  gp_Astr->dVam= 0 ;
-  gp_Astr->dVhm= 0 ;
+  gp_Ast->a   = 0  ;
+  gp_Ast->h   = 0  ;
+  gp_Ast->a0  = 0 ;
+  gp_Ast->h0  = 0 ;
+  gp_Ast->AGH   = 0  ; 
+  gp_Ast->ASC   = 0  ;
+  gp_Ast->DEC   = 0   ;
+  gp_Ast->A0  = 0 ;
+  gp_Ast->H0  = 0 ;
+  gp_Ast->da  = 0 ;
+  gp_Ast->dh  = 0 ;
+  gp_Ast->dA  = 0 ;
+  gp_Ast->dH  = 0 ;
+  gp_Ast->Va  = 0 ;
+  gp_Ast->Vh  = 0 ;
+  gp_Ast->dVa = 0 ;
+  gp_Ast->dVh = 0 ;
+  gp_Ast->dVam= 0 ;
+  gp_Ast->dVhm= 0 ;
 
-  gp_Astr->x = 0 ;
-  gp_Astr->xx = 0 ;
-  gp_Astr->y  = 0 ;
-  gp_Astr->yy =0;
-  gp_Astr->z =0;
-  gp_Astr->zz =0;
+  gp_Ast->x = 0 ;
+  gp_Ast->xx = 0 ;
+  gp_Ast->y  = 0 ;
+  gp_Ast->yy =0;
+  gp_Ast->z =0;
+  gp_Ast->zz =0;
   
-  gp_Astr->type = ASTRE_INDETERMINE ;
-  gp_Astr->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  gp_Astr->numero = 0 ;
+  gp_Ast->type = ASTRE_INDETERMINE ;
+  gp_Ast->mode = MODE_CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
+  gp_Ast->numero = 0 ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CLAVIER
@@ -401,73 +403,73 @@ void CONFIG_INIT_ASTRE(ASTRE *gp_Astr) {
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 ajout membres de la structure dans la fonction
-* @todo   : supprimer ASTRE *gp_Astr (var blog) et remplacer par void
+* @todo   : supprimer ASTRE *gp_Ast (var blog) et remplacer par void
 *           passer par des pointeurs de fonctions dans un structure
 *****************************************************************************************/
 
-void CONFIG_INIT_CLAVIER(CLAVIER * gp_Clav) {
+void CONFIG_INIT_CLAVIER(CLAVIER * gp_Cla) {
 
- int i ;
+  int i ;
   
-  Trace("") ;
+  Trace1("") ;
 
-  memset( gp_Clav->phrase,  ZERO_CHAR, strlen( gp_Clav->phrase ) );
-  memset( gp_Clav->valider, ZERO_CHAR, strlen( gp_Clav->valider ) );
-  memset( gp_Clav->symbole, ZERO_CHAR, strlen( gp_Clav->symbole ) );
-  memset( gp_Clav->menu,    ZERO_CHAR, strlen( gp_Clav->menu ) );
-  memset( gp_Clav->premier, ZERO_CHAR, strlen( gp_Clav->premier ) );
-  memset( gp_Clav->nombre,  ZERO_CHAR, strlen( gp_Clav->nombre ) );
-  memset( gp_Clav->mot,     ZERO_CHAR, strlen( gp_Clav->mot ) );
+  memset( gp_Cla->phrase,  ZERO_CHAR, sizeof( gp_Cla->phrase ) );
+  memset( gp_Cla->valider, ZERO_CHAR, sizeof( gp_Cla->valider ) );
+  memset( gp_Cla->symbole, ZERO_CHAR, sizeof( gp_Cla->symbole ) );
+  memset( gp_Cla->menu,    ZERO_CHAR, sizeof( gp_Cla->menu ) );
+  memset( gp_Cla->premier, ZERO_CHAR, sizeof( gp_Cla->premier ) );
+  memset( gp_Cla->nombre,  ZERO_CHAR, sizeof( gp_Cla->nombre ) );
+  memset( gp_Cla->mot,     ZERO_CHAR, sizeof( gp_Cla->mot ) );
   
-  strcpy( gp_Clav->valider, "valider" ) ;
-  strcpy( gp_Clav->menu,    "MENU" ) ;
+  strcpy( gp_Cla->valider, "valider" ) ;
+  strcpy( gp_Cla->menu,    "MENU" ) ;
   
-  strcpy( gp_Clav->symbole,  "" ) ;
-  strcpy( gp_Clav->phrase,   "" ) ;
-  strcpy( gp_Clav->premier,  "" ) ;
-  strcpy( gp_Clav->nombre,   "" ) ;
-  strcpy( gp_Clav->mot,      "" ) ;
+  strcpy( gp_Cla->symbole,  "" ) ;
+  strcpy( gp_Cla->phrase,   "" ) ;
+  strcpy( gp_Cla->premier,  "" ) ;
+  strcpy( gp_Cla->nombre,   "" ) ;
+  strcpy( gp_Cla->mot,      "" ) ;
 
-  gp_Clav->mot_en_cours   = 0 ;
-  gp_Clav->phrase_lue     = 0 ;
-  gp_Clav->appui_en_cours = 0 ;
-  gp_Clav->temporisation_clavier = TEMPO_CLAVIER ;
+  gp_Cla->mot_en_cours   = 0 ;
+  gp_Cla->phrase_lue     = 0 ;
+  gp_Cla->appui_en_cours = 0 ;
+  gp_Cla->temporisation_clavier = TEMPO_CLAVIER ;
  
   // FIXME : definitions des actions : 
   // Les actions servent a 
   
   for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ ) {
-    memset( gp_Clav->actions[i], ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+    memset( gp_Cla->actions[i], ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
   }
-  // for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )  memset( gp_Clav->validations[i], ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+  // for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )  memset( gp_Cla->validations[i], ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
 
-  strcpy( gp_Clav->actions[0], "MENU" ) ;
-  strcpy( gp_Clav->actions[1], "SETUP" ) ;
-  strcpy( gp_Clav->actions[2], "MES" ) ;
-  strcpy( gp_Clav->actions[3], "NGC" ) ;
-  strcpy( gp_Clav->actions[4], "ETO" ) ;
-  strcpy( gp_Clav->actions[5], "PLA" ) ;
-  strcpy( gp_Clav->actions[6], "TIME" ) ;
+  strcpy( gp_Cla->actions[0], "MENU" ) ;
+  strcpy( gp_Cla->actions[1], "SETUP" ) ;
+  strcpy( gp_Cla->actions[2], "MES" ) ;
+  strcpy( gp_Cla->actions[3], "NGC" ) ;
+  strcpy( gp_Cla->actions[4], "ETO" ) ;
+  strcpy( gp_Cla->actions[5], "PLA" ) ;
+  strcpy( gp_Cla->actions[6], "TIME" ) ;
    
 } 
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_LIEU
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure LIEU *gp_Lieu
-* @param  : LIEU *gp_Lieu
+* @brief  : Cette fonction initialise la structure LIEU *gp_Lie
+* @param  : LIEU *gp_Lie
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : cf si JJ etc.. sont utiles dans la structure (parametres de temps)
 *****************************************************************************************/
 
-void CONFIG_INIT_LIEU(LIEU *gp_Lieu) {
+void CONFIG_INIT_LIEU(LIEU *gp_Lie) {
  
-  gp_Lieu->JJ  = 0 ; // jour julien
-  gp_Lieu->TS  = 0 ;  // temps sideral
-  gp_Lieu->TSR = 0 ;  // temps sideral en radians
-  gp_Lieu->JD  = 0 ;  // jour decimal
-  gp_Lieu->lat = LATITUDE / DEGRES ;
-  gp_Lieu->lon = LONGITUDE / DEGRES ;
-  gp_Lieu->alt = ALTITUDE ;
+  gp_Lie->JJ  = 0 ; // jour julien
+  gp_Lie->TS  = 0 ;  // temps sideral
+  gp_Lie->TSR = 0 ;  // temps sideral en radians
+  gp_Lie->JD  = 0 ;  // jour decimal
+  gp_Lie->lat = LATITUDE / DEGRES ;
+  gp_Lie->lon = LONGITUDE / DEGRES ;
+  gp_Lie->alt = ALTITUDE ;
 }
 //---------------------------------------------------------------------------------------
 // man date sur noyau compile 
@@ -583,53 +585,54 @@ void CONFIG_SET_HOUR_AND_MINUTES(char * s_data) {
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_TEMPS
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure TEMPS * gp_Time
-* @param  : TEMPS * gp_Time
+* @brief  : Cette fonction initialise la structure TEMPS * gp_Tim
+* @param  : TEMPS * gp_Tim
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : configurer directement heure locale (?)
 *****************************************************************************************/
 
-void CONFIG_INIT_TEMPS( TEMPS * gp_Time) {
+void CONFIG_INIT_TEMPS( TEMPS * gp_Tim) {
   
-  gp_Time->mm = 0 ;  // month
-  gp_Time->yy = 0 ;  // year
-  gp_Time->dd = 0 ;  // day
-  gp_Time->HH = 0 ;  // hour
-  gp_Time->MM = 0 ;  // minutes
-  gp_Time->SS = 0 ;  // secondes
-  gp_Time->hd = 0.0 ;  // heure decimale (double)
+  gp_Tim->c_si = '+' ; // signe 
+  gp_Tim->mm = 0 ;  // month
+  gp_Tim->yy = 0 ;  // year
+  gp_Tim->dd = 0 ;  // day
+  gp_Tim->HH = 0 ;  // hour
+  gp_Tim->MM = 0 ;  // minutes
+  gp_Tim->SS = 0 ;  // secondes
+  gp_Tim->hd = 0.0 ;  // heure decimale (double)
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_VOUTE
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure VOUTE *gp_Vout
-* @param  : VOUTE *gp_Vout
+* @brief  : Cette fonction initialise la structure VOUTE *gp_Vou
+* @param  : VOUTE *gp_Vou
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : passer par une lecture de parametre dans config.txt pour \
 *           pourcentage_tempo et calibration_voute
 *****************************************************************************************/
 
-void CONFIG_INIT_VOUTE(VOUTE *gp_Vout) {
+void CONFIG_INIT_VOUTE(VOUTE *gp_Vou) {
   
-  gp_Vout->dt                = 0  ;
-  gp_Vout->pourcentage_tempo = 0.96 ;   
-  gp_Vout->calibration_voute = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
-	gp_Vout->num               = 0 ;
-  gp_Vout->deb               = 0 ;
-  gp_Vout->fin               = 0 ;
-  gp_Vout->acc_old           = 1 ;
-  gp_Vout->acc               = 1 ;
-  gp_Vout->pas               = gp_Vout->dt * ROT_RAD_SEC ;
+  gp_Vou->dt                = 0  ;
+  gp_Vou->pourcentage_tempo = 0.96 ;   
+  gp_Vou->calibration_voute = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
+	gp_Vou->num               = 0 ;
+  gp_Vou->deb               = 0 ;
+  gp_Vou->fin               = 0 ;
+  gp_Vou->acc_old           = 1 ;
+  gp_Vou->acc               = 1 ;
+  gp_Vou->pas               = gp_Vou->dt * ROT_RAD_SEC ;
   /* dt en micro-sec */
 
-  gp_Vout->DT = (unsigned long)( gp_Vout->dt * CONFIG_MICRO_SEC / gp_Vout->acc ) ;   
+  gp_Vou->DT = (unsigned long)( gp_Vou->dt * CONFIG_MICRO_SEC / gp_Vou->acc ) ;   
 }
 
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_CODE
 * @author : s.gravois
 * @brief  : Cette fonction initialise un code (appelle par CONFIG_INIT_CODES)
-* @param  : VOUTE *gp_Vout
+* @param  : VOUTE *gp_Vou
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : passer par une lecture de parametre dans config.txt pour \
 *           pourcentage_tempo et calibration_voute
@@ -668,13 +671,13 @@ void CONFIG_INIT_CODES(CODES *gp_Cod) {
 
   int i_pos ;
   
-  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) memset( gp_Cod->out_act[i_pos], IR_ZERO_CHAR, strlen(gp_Cod->out_act[i_pos]) ) ;
-  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) memset( gp_Cod->in_lirc[i_pos],  IR_ZERO_CHAR, strlen(gp_Cod->in_lirc[i_pos]) ) ;
+  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) memset( gp_Cod->out_act[i_pos], IR_ZERO_CHAR, sizeof(gp_Cod->out_act[i_pos]) ) ;
+  for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) memset( gp_Cod->in_lirc[i_pos],  IR_ZERO_CHAR, sizeof(gp_Cod->in_lirc[i_pos]) ) ;
 
   for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) {
-    memset( gp_Cod->in_term[i_pos],  IR_ZERO_CHAR, strlen(gp_Cod->in_term[i_pos]) ) ;
-    memset( gp_Cod->in_lirc[i_pos],  IR_ZERO_CHAR, strlen(gp_Cod->in_lirc[i_pos]) ) ;
-    memset( gp_Cod->out_act[i_pos],  IR_ZERO_CHAR, strlen(gp_Cod->out_act[i_pos]) ) ;
+    memset( gp_Cod->in_term[i_pos],  IR_ZERO_CHAR, sizeof(gp_Cod->in_term[i_pos]) ) ;
+    memset( gp_Cod->in_lirc[i_pos],  IR_ZERO_CHAR, sizeof(gp_Cod->in_lirc[i_pos]) ) ;
+    memset( gp_Cod->out_act[i_pos],  IR_ZERO_CHAR, sizeof(gp_Cod->out_act[i_pos]) ) ;
   }
   for( i_pos=0 ; i_pos<CONFIG_CODE_NB_CODES ; i_pos++ ) {
 
@@ -748,47 +751,47 @@ void CONFIG_INIT_CODES(CODES *gp_Cod) {
 /*****************************************************************************************
 * @fn     : CONFIG_VOUTE
 * @author : s.gravois
-* @brief  : Cette fonction configure la structure VOUTE *gp_Vout
-* @param  : VOUTE *gp_Vout
+* @brief  : Cette fonction configure la structure VOUTE *gp_Vou
+* @param  : VOUTE *gp_Vou
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : passer par une lecture de parametre dans config.txt pour \
 *           pourcentage_tempo et calibration_voute
 *****************************************************************************************/
 
-void CONFIG_VOUTE( VOUTE *gp_Vout, double dt, double acc, double percent ) {
+void CONFIG_VOUTE( VOUTE *gp_Vou, double dt, double acc, double percent ) {
   
-  gp_Vout->dt                 = dt  ;
-  gp_Vout->pourcentage_tempo  = percent ; 
-  gp_Vout->calibration_voute  = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
-  gp_Vout->deb                = 0 ;
-  gp_Vout->num                = 0 ;
-  gp_Vout->fin                = PIPI ;
-  gp_Vout->acc_old            = gp_Vout->acc ;
-  gp_Vout->acc                = acc ;
-  gp_Vout->pas                = gp_Vout->dt * ROT_RAD_SEC ;
+  gp_Vou->dt                 = dt  ;
+  gp_Vou->pourcentage_tempo  = percent ; 
+  gp_Vou->calibration_voute  = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
+  gp_Vou->deb                = 0 ;
+  gp_Vou->num                = 0 ;
+  gp_Vou->fin                = PIPI ;
+  gp_Vou->acc_old            = gp_Vou->acc ;
+  gp_Vou->acc                = acc ;
+  gp_Vou->pas                = gp_Vou->dt * ROT_RAD_SEC ;
   /* dt en micro-sec */
-  gp_Vout->DT = (unsigned long)( gp_Vout->dt * CONFIG_MICRO_SEC / gp_Vout->acc ) ;
+  gp_Vou->DT = (unsigned long)( gp_Vou->dt * CONFIG_MICRO_SEC / gp_Vou->acc ) ;
 }
 
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_DEVICES
 * @author : s.gravois
-* @brief  : Cette fonction configure la structure DEVICES *gp_Devi
-* @param  : DEVICES *gp_Devi
+* @brief  : Cette fonction configure la structure DEVICES *gp_Dev
+* @param  : DEVICES *gp_Dev
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : (obsolete) les devices sont lues depuis le fichier de configuration
 *****************************************************************************************/
 
-void CONFIG_INIT_DEVICES(DEVICES *gp_Devi) {
+void CONFIG_INIT_DEVICES(DEVICES *gp_Dev) {
 
-  gp_Devi->DEVICE_USE_CAPTEURS    = DEVICE_USE_CAPTEURS ;
-  gp_Devi->DEVICE_USE_RAQUETTE    = DEVICE_USE_RAQUETTE ;
-  gp_Devi->DEVICE_USE_BLUETOOTH   = DEVICE_USE_BLUETOOTH ;
-  gp_Devi->DEVICE_USE_INFRAROUGE  = DEVICE_USE_INFRAROUGE ;
-  gp_Devi->DEVICE_USE_CONTROLER   = DEVICE_USE_CONTROLER ;
-  gp_Devi->DEVICE_USE_KEYBOARD    = DEVICE_USE_KEYBOARD ;
-  gp_Devi->DEVICE_USE_LCD         = DEVICE_USE_LCD ; 
-  gp_Devi->init_capteurs = 0 ; 
+  gp_Dev->DEVICE_USE_CAPTEURS    = DEVICE_USE_CAPTEURS ;
+  gp_Dev->DEVICE_USE_RAQUETTE    = DEVICE_USE_RAQUETTE ;
+  gp_Dev->DEVICE_USE_BLUETOOTH   = DEVICE_USE_BLUETOOTH ;
+  gp_Dev->DEVICE_USE_INFRAROUGE  = DEVICE_USE_INFRAROUGE ;
+  gp_Dev->DEVICE_USE_CONTROLER   = DEVICE_USE_CONTROLER ;
+  gp_Dev->DEVICE_USE_KEYBOARD    = DEVICE_USE_KEYBOARD ;
+  gp_Dev->DEVICE_USE_LCD         = DEVICE_USE_LCD ; 
+  gp_Dev->init_capteurs = 0 ; 
 }
 /*****************************************************************************************
 * @fn     : CONFIG_INIT_SUIVI
@@ -907,7 +910,7 @@ void CONFIG_INIT_SUIVI(SUIVI * gp_Sui) {
   gp_Sui->temporisation_lcd_disp = TEMPO_LCD_DISP ;
 
   gp_Sui->temporisation_pid_loop = PID_ECH ;
-  gp_Sui->temporisation_voute    = gp_Vout->DT ;
+  gp_Sui->temporisation_voute    = gp_Vou->DT ;
 
   gp_Sui->DTh = gp_Sui->Th_mic * CONFIG_MICRO_SEC ;
   gp_Sui->DTa = gp_Sui->Ta_mic * CONFIG_MICRO_SEC ;
@@ -1277,11 +1280,16 @@ void   CONFIG_AFFICHER_ETAT_THREADS(SUIVI * gp_Sui) {
   char c_thread_name [ 16 ] ;
   int i_num_thread=0 ;
   long id_thread ;
+
   for (i_num_thread=0; i_num_thread < MAX_THREADS; i_num_thread++) {
-    id_thread = gp_Pthr->p_thread_t_id[i_num_thread] ;
+
+    id_thread = gp_Sui->p_pth->pth_att[i_num_thread].att_pid ;
+    
     memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
+    
     if ( id_thread > 0) pthread_getname_np( id_thread , c_thread_name, 16 ) ;
     else break ;
+    
     Trace1("Thread %d : id %ld nom %s ", i_num_thread, id_thread, c_thread_name )  ;
   }
   return ;
@@ -1551,25 +1559,25 @@ void CONFIG_AFFICHER_DATAS(char g_Datas[DATAS_NB_LIGNES][DATAS_NB_COLONNES][CONF
 * @fn     : CONFIG_AFFICHER_LIEU
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations du lieu d observation
-* @param  : LIEU *gp_Lieu
+* @param  : LIEU *gp_Lie
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_LIEU(LIEU *gp_Lieu) {
+void CONFIG_AFFICHER_LIEU(LIEU *gp_Lie) {
 
-  Trace1(" latitude   :  %.2f", gp_Lieu->lat * DEGRES ) ; 
-  Trace1(" longitude  :  %.2f", gp_Lieu->lon * DEGRES ) ;
-  Trace1("gp_Lieu->JD    : %f",gp_Lieu->JD) ;
-  Trace1("gp_Lieu->JJ    : %f",gp_Lieu->JJ) ;
-  Trace1("gp_Lieu->TS    : %f",gp_Lieu->TS) ;
-  Trace1("gp_Lieu->TSR   : %f",gp_Lieu->TSR) ;
+  Trace1(" latitude   :  %.2f", gp_Lie->lat * DEGRES ) ; 
+  Trace1(" longitude  :  %.2f", gp_Lie->lon * DEGRES ) ;
+  Trace1("gp_Lie->JD    : %f",gp_Lie->JD) ;
+  Trace1("gp_Lie->JJ    : %f",gp_Lie->JJ) ;
+  Trace1("gp_Lie->TS    : %f",gp_Lie->TS) ;
+  Trace1("gp_Lie->TSR   : %f",gp_Lie->TSR) ;
 
-  Trace1("gp_Lieu->alt = %f",gp_Lieu->alt ) ;
+  Trace1("gp_Lie->alt = %f",gp_Lie->alt ) ;
 
 
-  Trace1("gp_Lieu->lat (deg) = %f",gp_Lieu->lat * DEGRES ) ;
-  Trace1("gp_Lieu->lon (deg) = %f",gp_Lieu->lon * DEGRES ) ;
+  Trace1("gp_Lie->lat (deg) = %f",gp_Lie->lat * DEGRES ) ;
+  Trace1("gp_Lie->lon (deg) = %f",gp_Lie->lon * DEGRES ) ;
 
   Trace1("----------------------------") ;
 }
@@ -1577,22 +1585,22 @@ void CONFIG_AFFICHER_LIEU(LIEU *gp_Lieu) {
 * @fn     : CONFIG_AFFICHER_TEMPS
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations de temps
-* @param  : LIEU *gp_Lieu
+* @param  : LIEU *gp_Lie
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_TEMPS(TEMPS * gp_Time) {
+void CONFIG_AFFICHER_TEMPS(TEMPS * gp_Tim) {
   
-  Trace(" DATE / HOUR : %d-%d-%d %-2d:%-2d:%d : %f", gp_Time->yy, gp_Time->mm, gp_Time->dd, gp_Time->HH, gp_Time->MM, gp_Time->SS, gp_Time->hd ) ;
+  Trace(" DATE / HOUR : %d-%d-%d %-2d:%-2d:%d : %f", gp_Tim->yy, gp_Tim->mm, gp_Tim->dd, gp_Tim->HH, gp_Tim->MM, gp_Tim->SS, gp_Tim->hd ) ;
 
-  Trace1("gp_Time->yy = %d", gp_Time->yy ) ;
-  Trace1("gp_Time->mm = %d", gp_Time->mm ) ;
-  Trace1("gp_Time->dd = %d", gp_Time->dd ) ;
-  Trace1("gp_Time->HH = %d", gp_Time->HH ) ;
-  Trace1("gp_Time->MM = %d", gp_Time->MM ) ;
-  Trace1("gp_Time->SS = %d", gp_Time->SS ) ;
-  Trace1("gp_Time->hd = %f", gp_Time->hd ) ;
+  Trace1("gp_Tim->yy = %d", gp_Tim->yy ) ;
+  Trace1("gp_Tim->mm = %d", gp_Tim->mm ) ;
+  Trace1("gp_Tim->dd = %d", gp_Tim->dd ) ;
+  Trace1("gp_Tim->HH = %d", gp_Tim->HH ) ;
+  Trace1("gp_Tim->MM = %d", gp_Tim->MM ) ;
+  Trace1("gp_Tim->SS = %d", gp_Tim->SS ) ;
+  Trace1("gp_Tim->hd = %f", gp_Tim->hd ) ;
 
   Trace("----------------------------") ;
 
@@ -1600,35 +1608,35 @@ void CONFIG_AFFICHER_TEMPS(TEMPS * gp_Time) {
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_CLAVIER
 * @author : s.gravois
-* @brief  : Cette fonction affiche les informations d entrees input ("gp_Clav")
-* @param  : CLAVIER *gp_Clav
+* @brief  : Cette fonction affiche les informations d entrees input ("gp_Cla")
+* @param  : CLAVIER *gp_Cla
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_CLAVIER(CLAVIER *gp_Clav) {
+void CONFIG_AFFICHER_CLAVIER(CLAVIER *gp_Cla) {
   
   Trace1("phr %s mot %s sym %s nom %s pre %s val %s menu %s",\
-    gp_Clav->phrase,\
-    gp_Clav->mot,\
-    gp_Clav->symbole,\
-    gp_Clav->nombre,\
-    gp_Clav->premier,\
-    gp_Clav->valider,\
-    gp_Clav->menu) ;
+    gp_Cla->phrase,\
+    gp_Cla->mot,\
+    gp_Cla->symbole,\
+    gp_Cla->nombre,\
+    gp_Cla->premier,\
+    gp_Cla->valider,\
+    gp_Cla->menu) ;
 
-  Trace1("gp_Clav->mot         = %s",gp_Clav->mot) ;
-  Trace1("gp_Clav->premier     = %s",gp_Clav->premier) ;
-  Trace1("gp_Clav->phrase      = %s",gp_Clav->phrase) ;
-  Trace1("gp_Clav->nombre      = %s",gp_Clav->nombre) ;
-  Trace1("gp_Clav->symbole     = %s",gp_Clav->symbole) ;
-  Trace1("gp_Clav->phrase_lue  = %d",gp_Clav->phrase_lue) ;
+  Trace1("gp_Cla->mot         = %s",gp_Cla->mot) ;
+  Trace1("gp_Cla->premier     = %s",gp_Cla->premier) ;
+  Trace1("gp_Cla->phrase      = %s",gp_Cla->phrase) ;
+  Trace1("gp_Cla->nombre      = %s",gp_Cla->nombre) ;
+  Trace1("gp_Cla->symbole     = %s",gp_Cla->symbole) ;
+  Trace1("gp_Cla->phrase_lue  = %d",gp_Cla->phrase_lue) ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_FORMATE_DONNEES_AFFICHAGE
 * @author : s.gravois
 * @brief  : Cette fonction formate divers string en vue d un affichage pertinent
-* @param  : ASTRE *gp_Astr
+* @param  : ASTRE *gp_Ast
 * @date   : 2022-04-12 creation
 * @date   : 2022-04-21 remplacement ° par o (affichage LCD ° impossible)
 * @date   : 2022-04-21 ajout de 2 resolutions plus simple (affichage contraint par LCD) :
@@ -1636,7 +1644,7 @@ void CONFIG_AFFICHER_CLAVIER(CLAVIER *gp_Clav) {
 * @date   : 2022-04-21 - c_dd_*  
 *****************************************************************************************/
 
-void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *gp_Astr) {
+void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *gp_Ast) {
 
   char  c_hhmmss_agh[ 16] ;
   char  c_hhmmss_asc[ 16] ;
@@ -1688,58 +1696,58 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *gp_Astr) {
 
   /* traitement des donnees en heures / minutes / secondes */
 
-  sprintf( c_hhmmss_agh, " %3dh%2dm%2ds",  gp_Astr->AGHt.HH, gp_Astr->AGHt.MM, gp_Astr->AGHt.SS  ) ;
-  sprintf( c_hhmmss_asc, " %3dh%2dm%2ds",  gp_Astr->ASCt.HH, gp_Astr->ASCt.MM, gp_Astr->ASCt.SS  ) ;
-  sprintf( c_hhmmss_azi, " %3dh%2dm%2ds",  gp_Astr->AZIt.HH, gp_Astr->AZIt.MM, gp_Astr->AZIt.SS  ) ;
-  sprintf( c_hhmmss_alt, " %3dh%2dm%2ds",  gp_Astr->ALTt.HH, gp_Astr->ALTt.MM, gp_Astr->ALTt.SS  ) ;
-  sprintf( c_hhmmss_dec, " %3dh%2dm%2ds",  gp_Astr->DECt.HH, gp_Astr->DECt.MM, gp_Astr->DECt.SS  ) ;
+  sprintf( c_hhmmss_agh, " %3dh%2dm%2ds",  gp_Ast->AGHt.HH, gp_Ast->AGHt.MM, gp_Ast->AGHt.SS  ) ;
+  sprintf( c_hhmmss_asc, " %3dh%2dm%2ds",  gp_Ast->ASCt.HH, gp_Ast->ASCt.MM, gp_Ast->ASCt.SS  ) ;
+  sprintf( c_hhmmss_azi, " %3dh%2dm%2ds",  gp_Ast->AZIt.HH, gp_Ast->AZIt.MM, gp_Ast->AZIt.SS  ) ;
+  sprintf( c_hhmmss_alt, " %3dh%2dm%2ds",  gp_Ast->ALTt.HH, gp_Ast->ALTt.MM, gp_Ast->ALTt.SS  ) ;
+  sprintf( c_hhmmss_dec, " %3dh%2dm%2ds",  gp_Ast->DECt.HH, gp_Ast->DECt.MM, gp_Ast->DECt.SS  ) ;
 
-  sprintf( c_hhmm_agh, " %3d h %2d m",  gp_Astr->AGHt.HH, gp_Astr->AGHt.MM ) ;
-  sprintf( c_hhmm_asc, " %3d h %2d m",  gp_Astr->ASCt.HH, gp_Astr->ASCt.MM ) ;
-  sprintf( c_hhmm_azi, " %3d h %2d m",  gp_Astr->AZIt.HH, gp_Astr->AZIt.MM ) ;
-  sprintf( c_hhmm_alt, " %3d h %2d m",  gp_Astr->ALTt.HH, gp_Astr->ALTt.MM ) ;
-  sprintf( c_hhmm_dec, " %3d h %2d m",  gp_Astr->DECt.HH, gp_Astr->DECt.MM ) ;
+  sprintf( c_hhmm_agh, " %3d h %2d m",  gp_Ast->AGHt.HH, gp_Ast->AGHt.MM ) ;
+  sprintf( c_hhmm_asc, " %3d h %2d m",  gp_Ast->ASCt.HH, gp_Ast->ASCt.MM ) ;
+  sprintf( c_hhmm_azi, " %3d h %2d m",  gp_Ast->AZIt.HH, gp_Ast->AZIt.MM ) ;
+  sprintf( c_hhmm_alt, " %3d h %2d m",  gp_Ast->ALTt.HH, gp_Ast->ALTt.MM ) ;
+  sprintf( c_hhmm_dec, " %3d h %2d m",  gp_Ast->DECt.HH, gp_Ast->DECt.MM ) ;
 
   /* traitement des donnees en degres / minutes / secondes */
   /* est inclus dans l affichage le signe */
 
-  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Astr->AGHa.c_si, gp_Astr->AGHa.DD, gp_Astr->AGHa.MM ) ;
-  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Astr->ASCa.c_si, gp_Astr->ASCa.DD, gp_Astr->ASCa.MM ) ;
-  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Astr->AZIa.c_si, gp_Astr->AZIa.DD, gp_Astr->AZIa.MM ) ;
-  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Astr->ALTa.c_si, gp_Astr->ALTa.DD, gp_Astr->ALTa.MM ) ;
-  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Astr->DECa.c_si, gp_Astr->DECa.DD, gp_Astr->DECa.MM ) ;
+  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Ast->AGHa.c_si, gp_Ast->AGHa.DD, gp_Ast->AGHa.MM ) ;
+  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Ast->ASCa.c_si, gp_Ast->ASCa.DD, gp_Ast->ASCa.MM ) ;
+  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Ast->AZIa.c_si, gp_Ast->AZIa.DD, gp_Ast->AZIa.MM ) ;
+  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Ast->ALTa.c_si, gp_Ast->ALTa.DD, gp_Ast->ALTa.MM ) ;
+  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Ast->DECa.c_si, gp_Ast->DECa.DD, gp_Ast->DECa.MM ) ;
 
-  sprintf( c_dd_agh, "%c %-3d deg", gp_Astr->AGHa.c_si, gp_Astr->AGHa.DD ) ;
-  sprintf( c_dd_asc, "%c %-3d deg", gp_Astr->ASCa.c_si, gp_Astr->ASCa.DD ) ;
-  sprintf( c_dd_azi, "%c %-3d deg", gp_Astr->AZIa.c_si, gp_Astr->AZIa.DD ) ;
-  sprintf( c_dd_alt, "%c %-3d deg", gp_Astr->ALTa.c_si, gp_Astr->ALTa.DD ) ;
-  sprintf( c_dd_dec, "%c %-3d deg", gp_Astr->DECa.c_si, gp_Astr->DECa.DD ) ;
+  sprintf( c_dd_agh, "%c %-3d deg", gp_Ast->AGHa.c_si, gp_Ast->AGHa.DD ) ;
+  sprintf( c_dd_asc, "%c %-3d deg", gp_Ast->ASCa.c_si, gp_Ast->ASCa.DD ) ;
+  sprintf( c_dd_azi, "%c %-3d deg", gp_Ast->AZIa.c_si, gp_Ast->AZIa.DD ) ;
+  sprintf( c_dd_alt, "%c %-3d deg", gp_Ast->ALTa.c_si, gp_Ast->ALTa.DD ) ;
+  sprintf( c_dd_dec, "%c %-3d deg", gp_Ast->DECa.c_si, gp_Ast->DECa.DD ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   
-  strcpy( gp_Astr->c_hhmmss_agh, c_hhmmss_agh)  ;
-  strcpy( gp_Astr->c_hhmmss_asc, c_hhmmss_asc)  ;
-  strcpy( gp_Astr->c_hhmmss_azi, c_hhmmss_azi)  ;
-  strcpy( gp_Astr->c_hhmmss_alt, c_hhmmss_alt)  ;
-  strcpy( gp_Astr->c_hhmmss_dec, c_hhmmss_dec)  ;
+  strcpy( gp_Ast->c_hhmmss_agh, c_hhmmss_agh)  ;
+  strcpy( gp_Ast->c_hhmmss_asc, c_hhmmss_asc)  ;
+  strcpy( gp_Ast->c_hhmmss_azi, c_hhmmss_azi)  ;
+  strcpy( gp_Ast->c_hhmmss_alt, c_hhmmss_alt)  ;
+  strcpy( gp_Ast->c_hhmmss_dec, c_hhmmss_dec)  ;
 
-  strcpy( gp_Astr->c_hhmm_agh, c_hhmm_agh)  ;
-  strcpy( gp_Astr->c_hhmm_asc, c_hhmm_asc)  ;
-  strcpy( gp_Astr->c_hhmm_azi, c_hhmm_azi)  ;
-  strcpy( gp_Astr->c_hhmm_alt, c_hhmm_alt)  ;
-  strcpy( gp_Astr->c_hhmm_dec, c_hhmm_dec)  ;
+  strcpy( gp_Ast->c_hhmm_agh, c_hhmm_agh)  ;
+  strcpy( gp_Ast->c_hhmm_asc, c_hhmm_asc)  ;
+  strcpy( gp_Ast->c_hhmm_azi, c_hhmm_azi)  ;
+  strcpy( gp_Ast->c_hhmm_alt, c_hhmm_alt)  ;
+  strcpy( gp_Ast->c_hhmm_dec, c_hhmm_dec)  ;
 
-  strcpy( gp_Astr->c_ddmm_agh, c_ddmm_agh)  ;
-  strcpy( gp_Astr->c_ddmm_asc, c_ddmm_asc)  ;
-  strcpy( gp_Astr->c_ddmm_azi, c_ddmm_azi)  ;
-  strcpy( gp_Astr->c_ddmm_alt, c_ddmm_alt)  ;
-  strcpy( gp_Astr->c_ddmm_dec, c_ddmm_dec)  ;
+  strcpy( gp_Ast->c_ddmm_agh, c_ddmm_agh)  ;
+  strcpy( gp_Ast->c_ddmm_asc, c_ddmm_asc)  ;
+  strcpy( gp_Ast->c_ddmm_azi, c_ddmm_azi)  ;
+  strcpy( gp_Ast->c_ddmm_alt, c_ddmm_alt)  ;
+  strcpy( gp_Ast->c_ddmm_dec, c_ddmm_dec)  ;
 
-  strcpy( gp_Astr->c_dd_agh, c_dd_agh)  ;
-  strcpy( gp_Astr->c_dd_asc, c_dd_asc)  ;
-  strcpy( gp_Astr->c_dd_azi, c_dd_azi)  ;
-  strcpy( gp_Astr->c_dd_alt, c_dd_alt)  ;
-  strcpy( gp_Astr->c_dd_dec, c_dd_dec)  ;
+  strcpy( gp_Ast->c_dd_agh, c_dd_agh)  ;
+  strcpy( gp_Ast->c_dd_asc, c_dd_asc)  ;
+  strcpy( gp_Ast->c_dd_azi, c_dd_azi)  ;
+  strcpy( gp_Ast->c_dd_alt, c_dd_alt)  ;
+  strcpy( gp_Ast->c_dd_dec, c_dd_dec)  ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_MODE_STELLARIUM
@@ -1750,26 +1758,26 @@ void CONFIG_FORMATE_DONNEES_AFFICHAGE(ASTRE *gp_Astr) {
 * @date   : 2022-03-28 simplification
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *gp_Astr) {
+void CONFIG_AFFICHER_MODE_STELLARIUM(ASTRE *gp_Ast) {
 
-  Trace("Va / Vh    : %3.2f / %3.2f" , gp_Astr->Va           , gp_Astr->Vh ) ;
-  Trace("AD / Dec   : %s / %s"       , gp_Astr->c_hhmmss_asc , gp_Astr->c_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s"       , gp_Astr->c_hhmmss_agh , gp_Astr->c_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s"       , gp_Astr->c_ddmm_azi   , gp_Astr->c_ddmm_alt ) ;
+  Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->Va           , gp_Ast->Vh ) ;
+  Trace("AD / Dec   : %s / %s"       , gp_Ast->c_hhmmss_asc , gp_Ast->c_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s"       , gp_Ast->c_hhmmss_agh , gp_Ast->c_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s"       , gp_Ast->c_ddmm_azi   , gp_Ast->c_ddmm_alt ) ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_AFFICHER_MODE_LONG
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations relatives a l as observee
-* @param  : ASTRE *gp_Astr
+* @param  : ASTRE *gp_Ast
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 *****************************************************************************************/
 
 void CONFIG_AFFICHER_MODE_LONG(void) {
   
-  const char * c_nom  = gp_Astr->nom ;
-  const char * c_type = c_Astre_Type [ gp_Astr->type ] ;
-  const char * c_mode = c_Mode_Calcul[ gp_Astr->mode ] ;
+  const char * c_nom  = gp_Ast->nom ;
+  const char * c_type = c_Astre_Type [ gp_Ast->type ] ;
+  const char * c_mode = c_Mode_Calcul[ gp_Ast->mode ] ;
 
   char  c_hhmmss_agh0[ 16] ;
   char  c_hhmmss_agh1[ 16] ;
@@ -1788,36 +1796,36 @@ void CONFIG_AFFICHER_MODE_LONG(void) {
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
 
-  sprintf( c_hhmmss_agh, "%dh%dm%ds",   gp_Astr->AGHt.HH,  gp_Astr->AGHt.MM,  gp_Astr->AGHt.SS  ) ;
-  sprintf( c_hhmmss_asc,  "%dh%dm%ds",  gp_Astr->ASCt.HH,   gp_Astr->ASCt.MM,   gp_Astr->ASCt.SS  ) ;
+  sprintf( c_hhmmss_agh, "%dh%dm%ds",   gp_Ast->AGHt.HH,  gp_Ast->AGHt.MM,  gp_Ast->AGHt.SS  ) ;
+  sprintf( c_hhmmss_asc,  "%dh%dm%ds",  gp_Ast->ASCt.HH,   gp_Ast->ASCt.MM,   gp_Ast->ASCt.SS  ) ;
 
-  sprintf( c_hhmmss_agh0, "%dh%dm%ds", gp_Astr->AGH0t.HH, gp_Astr->AGH0t.MM, gp_Astr->AGH0t.SS  ) ;
-  sprintf( c_hhmmss_agh1, "%dh%dm%ds", gp_Astr->AGH1t.HH, gp_Astr->AGH1t.MM, gp_Astr->AGH1t.SS  ) ;
-  sprintf( c_hhmmss_agh2, "%dh%dm%ds", gp_Astr->AGH2t.HH, gp_Astr->AGH2t.MM, gp_Astr->AGH2t.SS  ) ;
+  sprintf( c_hhmmss_agh0, "%dh%dm%ds", gp_Ast->AGH0t.HH, gp_Ast->AGH0t.MM, gp_Ast->AGH0t.SS  ) ;
+  sprintf( c_hhmmss_agh1, "%dh%dm%ds", gp_Ast->AGH1t.HH, gp_Ast->AGH1t.MM, gp_Ast->AGH1t.SS  ) ;
+  sprintf( c_hhmmss_agh2, "%dh%dm%ds", gp_Ast->AGH2t.HH, gp_Ast->AGH2t.MM, gp_Ast->AGH2t.SS  ) ;
 
-  sprintf( c_hhmmss_azi0, "%dh%dm%ds", gp_Astr->AZI0t.HH, gp_Astr->AZI0t.MM, gp_Astr->AZI0t.SS  ) ;
-  sprintf( c_hhmmss_azi1, "%dh%dm%ds", gp_Astr->AZI1t.HH, gp_Astr->AZI1t.MM, gp_Astr->AZI1t.SS  ) ;
-  sprintf( c_hhmmss_azi2, "%dh%dm%ds", gp_Astr->AZI2t.HH, gp_Astr->AZI2t.MM, gp_Astr->AZI2t.SS  ) ;
+  sprintf( c_hhmmss_azi0, "%dh%dm%ds", gp_Ast->AZI0t.HH, gp_Ast->AZI0t.MM, gp_Ast->AZI0t.SS  ) ;
+  sprintf( c_hhmmss_azi1, "%dh%dm%ds", gp_Ast->AZI1t.HH, gp_Ast->AZI1t.MM, gp_Ast->AZI1t.SS  ) ;
+  sprintf( c_hhmmss_azi2, "%dh%dm%ds", gp_Ast->AZI2t.HH, gp_Ast->AZI2t.MM, gp_Ast->AZI2t.SS  ) ;
 
-  Trace(" %s : infos         : %s", c_nom , gp_Astr->infos ) ;
+  Trace(" %s : infos         : %s", c_nom , gp_Ast->infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;
   Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
-  Trace(" %s : latitude      : %.2f (deg) ", c_nom, gp_Lieu->lat    * DEGRES ) ;
-  Trace(" %s : longitude     : %.2f (deg) ", c_nom, gp_Lieu->lon    * DEGRES ) ;
-  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Astr->Va,  gp_Astr->Vh ) ; 
-  Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Astr->a    * DEGRES ) ;
-  Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Astr->h    * DEGRES ) ;
-  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Astr->DEC  * DEGRES  ) ;
-  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->ASC    * DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AGH   * DEGRES, c_hhmmss_agh ) ;
+  Trace(" %s : latitude      : %.2f (deg) ", c_nom, gp_Lie->lat    * DEGRES ) ;
+  Trace(" %s : longitude     : %.2f (deg) ", c_nom, gp_Lie->lon    * DEGRES ) ;
+  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Ast->Va,  gp_Ast->Vh ) ; 
+  Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Ast->a    * DEGRES ) ;
+  Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Ast->h    * DEGRES ) ;
+  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Ast->DEC  * DEGRES  ) ;
+  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ASC    * DEGRES, c_hhmmss_asc ) ;
+  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH   * DEGRES, c_hhmmss_agh ) ;
 
-  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AGH0  * DEGRES, c_hhmmss_agh0 ) ;
-  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AGH1  * DEGRES, c_hhmmss_agh1 ) ;
-  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AGH2  * DEGRES, c_hhmmss_agh2 ) ;
+  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH0  * DEGRES, c_hhmmss_agh0 ) ;
+  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH1  * DEGRES, c_hhmmss_agh1 ) ;
+  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH2  * DEGRES, c_hhmmss_agh2 ) ;
 
-  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AZI0  * DEGRES, c_hhmmss_azi0 ) ;
-  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AZI1  * DEGRES, c_hhmmss_azi1 ) ;
-  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Astr->AZI2  * DEGRES, c_hhmmss_azi2 ) ;
+  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI0  * DEGRES, c_hhmmss_azi0 ) ;
+  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI1  * DEGRES, c_hhmmss_azi1 ) ;
+  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI2  * DEGRES, c_hhmmss_azi2 ) ;
 
   Trace("----------------------------") ;
 }
@@ -1830,10 +1838,10 @@ void CONFIG_AFFICHER_MODE_LONG(void) {
 * @todo   : a completer eventuellement
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_VOUTE( VOUTE * gp_Vout) {
+void CONFIG_AFFICHER_VOUTE( VOUTE * gp_Vou) {
 	
-	Trace1("gp_Vout->num %lld", gp_Vout->num) ;
-  Trace1("gp_Vout->pas %lld", gp_Vout->num) ;
+	Trace1("gp_Vou->num %lld", gp_Vou->num) ;
+  Trace1("gp_Vou->pas %lld", gp_Vou->num) ;
 
   Trace1("----------------------------") ;
 
@@ -1849,10 +1857,10 @@ void CONFIG_AFFICHER_VOUTE( VOUTE * gp_Vout) {
 
 void CONFIG_AFFICHER_TOUT(void) {
 
-  CONFIG_AFFICHER_TEMPS(   gp_Time ) ;
-  CONFIG_AFFICHER_LIEU(    gp_Lieu );
+  CONFIG_AFFICHER_TEMPS(   gp_Tim ) ;
+  CONFIG_AFFICHER_LIEU(    gp_Lie );
   CONFIG_AFFICHER_MODE_LONG(  ) ;
-  CONFIG_AFFICHER_VOUTE(   gp_Vout ) ;
+  CONFIG_AFFICHER_VOUTE(   gp_Vou ) ;
 
   Trace("\n") ;
 }
@@ -1904,13 +1912,13 @@ void CONFIG_AFFICHER_CHANGEMENTS (void)  {
 
 void CONFIG_AFFICHER_DEVICES_USE (void) {
 
-  Trace("gp_Devi->DEVICE_USE_INFRAROUGE = %d",gp_Devi->DEVICE_USE_INFRAROUGE) ;
-  Trace("gp_Devi->DEVICE_USE_CAPTEURS   = %d",gp_Devi->DEVICE_USE_CAPTEURS) ;
-  Trace("gp_Devi->DEVICE_USE_RAQUETTE   = %d",gp_Devi->DEVICE_USE_RAQUETTE) ;
-  Trace("gp_Devi->DEVICE_USE_BLUETOOTH  = %d",gp_Devi->DEVICE_USE_BLUETOOTH) ;
-  Trace("gp_Devi->DEVICE_USE_KEYBOARD   = %d",gp_Devi->DEVICE_USE_KEYBOARD) ;
-  Trace("gp_Devi->DEVICE_USE_CONTROLER  = %d",gp_Devi->DEVICE_USE_CONTROLER) ;
-  Trace("gp_Devi->DEVICE_USE_LCD        = %d",gp_Devi->DEVICE_USE_LCD) ;
+  Trace("gp_Dev->DEVICE_USE_INFRAROUGE = %d",gp_Dev->DEVICE_USE_INFRAROUGE) ;
+  Trace("gp_Dev->DEVICE_USE_CAPTEURS   = %d",gp_Dev->DEVICE_USE_CAPTEURS) ;
+  Trace("gp_Dev->DEVICE_USE_RAQUETTE   = %d",gp_Dev->DEVICE_USE_RAQUETTE) ;
+  Trace("gp_Dev->DEVICE_USE_BLUETOOTH  = %d",gp_Dev->DEVICE_USE_BLUETOOTH) ;
+  Trace("gp_Dev->DEVICE_USE_KEYBOARD   = %d",gp_Dev->DEVICE_USE_KEYBOARD) ;
+  Trace("gp_Dev->DEVICE_USE_CONTROLER  = %d",gp_Dev->DEVICE_USE_CONTROLER) ;
+  Trace("gp_Dev->DEVICE_USE_LCD        = %d",gp_Dev->DEVICE_USE_LCD) ;
 
   return ;
 }
@@ -1938,6 +1946,8 @@ int   CONFIG_PATH_FIND (char * g_paths, char *cmd) {
       strcpy( g_paths, c_path ) ;
     }
   }
+  Trace1("Chemin retenu : %s", g_paths) ;
+
   return i_retour ; 
 }
 //========================================================================================

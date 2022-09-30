@@ -11,6 +11,9 @@
 #               * ajouts fonctions utilisant getopt
 # 21/01/2022  | * ajout CALCUL_ASCENSION_DROITE
 #                 pour inverser les calculs quand on a azi et alt
+# 29/09/2022  | * correction buffer overfow => 
+#     deplacement et correction code de recuperation type et nom de astre
+#     dans CALCUL_ASTRE_RECUP_TYPE_ET_NOM
 # -------------------------------------------------------------- 
 */
 
@@ -89,44 +92,45 @@ double DEG  (int degres, int minutes )                  ;
 // en profitant d'un sleep parametrable (eviter une consommation CPU
 // avant de rentrer en boucle active d'attente
 
-long   CALCUL_TEMPORISATION_VOUTE     ( VOUTE *gp_Vout, struct timeval t00) ;
+long   CALCUL_TEMPORISATION_VOUTE     ( VOUTE *gp_Vou, struct timeval t00) ;
 long   CALCUL_TEMPORISATION_MICROSEC  ( double microsecondes, double percent, struct timeval t00) ;
 void   CALCUL_TEMPORISATION_ALTITUDE  ( SUIVI * gp_Sui, struct timeval * pt00)  ;
 void   CALCUL_TEMPORISATION_AZIMUT    ( SUIVI * gp_Sui, struct timeval * pt00) ;
 
-void   CALCUL_GEODE                   ( ASTRE *gp_Astr) ;
-void   CALCUL_AZIMUT                  ( LIEU *gp_Lieu, ASTRE *gp_Astr) ;
-void   CALCUL_EQUATEUR                ( LIEU *gp_Lieu, ASTRE *gp_Astr) ;
+void   CALCUL_GEODE                   ( ASTRE *gp_Ast) ;
+void   CALCUL_AZIMUT                  ( LIEU *gp_Lie, ASTRE *gp_Ast) ;
+void   CALCUL_EQUATEUR                ( LIEU *gp_Lie, ASTRE *gp_Ast) ;
 
-void   CALCUL_VITESSES_EQUATORIAL     (ASTRE *gp_Astr) ;
-void   CALCUL_VITESSES                ( LIEU *gp_Lieu, ASTRE *gp_Astr, SUIVI * gp_Sui) ;
+void   CALCUL_VITESSES_EQUATORIAL     (ASTRE *gp_Ast) ;
+void   CALCUL_VITESSES                ( LIEU *gp_Lie, ASTRE *gp_Ast, SUIVI * gp_Sui) ;
 
-void   CALCUL_ANGLE_HORAIRE           ( LIEU *gp_Lieu, ASTRE *gp_Astr) ;
-void   CALCUL_ASCENSION_DROITE        ( LIEU *gp_Lieu, ASTRE *gp_Astr) ; 
-void   CALCUL_D                       ( ASTRE *gp_Astr, SUIVI * gp_Sui) ;   
-void   CALCUL_PERIODE                 ( ASTRE *gp_Astr, SUIVI * gp_Sui,VOUTE *gp_Vout)  ;
-void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *gp_Astr, SUIVI * gp_Sui, VOUTE *gp_Vout) ;
+void   CALCUL_ANGLE_HORAIRE           ( LIEU *gp_Lie, ASTRE *gp_Ast) ;
+void   CALCUL_ASCENSION_DROITE        ( LIEU *gp_Lie, ASTRE *gp_Ast) ; 
+void   CALCUL_D                       ( ASTRE *gp_Ast, SUIVI * gp_Sui) ;   
+void   CALCUL_PERIODE                 ( ASTRE *gp_Ast, SUIVI * gp_Sui,VOUTE *gp_Vou)  ;
+void   CALCUL_PERIODES_SUIVI_MANUEL   ( ASTRE *gp_Ast, SUIVI * gp_Sui, VOUTE *gp_Vou) ;
 
-int    CALCUL_TEMPS_SIDERAL           ( LIEU* gp_Lieu, TEMPS * gp_Time ) ;
-int    CALCUL_JOUR_JULIEN             ( LIEU* gp_Lieu, TEMPS * gp_Time) ;
-int    CALCUL_DATE                    ( TEMPS * gp_Time ) ;
-void   CALCUL_TEMPS_HMS_VERS_DEC      ( TEMPS * gp_Time ) ;
-void   CALCUL_TEMPS_DEC_VERS_HMS      ( TEMPS * gp_Time ) ;
+int    CALCUL_TEMPS_SIDERAL           ( LIEU* gp_Lie, TEMPS * gp_Tim ) ;
+int    CALCUL_JOUR_JULIEN             ( LIEU* gp_Lie, TEMPS * gp_Tim) ;
+int    CALCUL_DATE                    ( TEMPS * gp_Tim ) ;
+void   CALCUL_TEMPS_HMS_VERS_DEC      ( TEMPS * gp_Tim ) ;
+void   CALCUL_TEMPS_DEC_VERS_HMS      ( TEMPS * gp_Tim ) ;
 void   CALCUL_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
 
-void   CALCUL_CONVERSIONS_ANGLES      ( ASTRE *gp_Astr) ;
-void   CALCUL_AFFICHER_HEURE          ( char * mesg, TEMPS * gp_Time ) ;
+void   CALCUL_CONVERSIONS_ANGLES      ( ASTRE *gp_Ast) ;
+void   CALCUL_AFFICHER_HEURE          ( char * mesg, TEMPS * gp_Tim ) ;
 void   CALCUL_AFFICHER_ANGLE          ( char * mesg, ANGLE *angle ) ;
 
-void   SET_ASTRE( ASTRE *gp_Astr,char *parametre, double valeur) ;
-void   SET_LIEU(  LIEU *gp_Lieu,char *parametre, double valeur) ;
-void   SET_VOUTE( VOUTE *gp_Vout,char *parametre, double valeur) ;
+void   SET_ASTRE( ASTRE *gp_Ast,char *parametre, double valeur) ;
+void   SET_LIEU(  LIEU *gp_Lie,char *parametre, double valeur) ;
+void   SET_VOUTE( VOUTE *gp_Vou,char *parametre, double valeur) ;
 
 double CALCUL_DUREE_SECONDES           (struct timeval *) ;
 double CALCUL_DUREE_MICROSEC           (struct timeval *) ;
 double CALCUL_DUREE_NANOSEC            (struct timeval *) ;
 
 void   CALCUL_TOUT                    (void) ;
+void   CALCUL_ASTRE_RECUP_TYPE_ET_NOM (void) ;
 
 #endif
 

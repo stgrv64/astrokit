@@ -39,7 +39,7 @@
 #               * ajout type enum pour les mois (affichage LCD)
 #               * ajout temporisation_voute et temporisation_lcd_loop
 #               * ajout c_hhmmss_agh etc... a strcuture ASTRE
-#               * ajout mutex mutex_infrarouge pour proteger
+#               * ajout mutex pth_mut->mut_dat pour proteger
 #                 lecture / exriture sur cette donnee
 #               * creation static char * c_Bin_Possible_Paths
 #               * remplacement PATH_CMD_STTY par var globale
@@ -55,6 +55,9 @@
 #                 (voir code gpio.c et calcul.c sur les frequences et periodes)
 #               * ajout PID_ECH
 #               * ajout structure PID 
+# 29/09/2022    * ajout type enum et tableaux associes pour les 
+#                 attributs de threads
+# 30/09/2022    * ajout systeme de trace par arbo (DEBUG_ARBO)
 # -------------------------------------------------------------- 
 */
 
@@ -63,8 +66,9 @@
 
 // inclusion des librairies persos
 
-#define DEBUG     0
-#define DEBUG_LOG 0
+#define DEBUG       0
+#define DEBUG_ARBO  0
+#define DEBUG_LOG   0
 
 // quelques macros de debugging
 
@@ -78,7 +82,7 @@
 // Raccourci
 // ----------------------------------------------------------------
 
-#define If_Mot_Is(s)    if(!strcmp(gp_Clav->mot,s))
+#define If_Mot_Is(s)    if(!strcmp(gp_Cla->mot,s))
 
 // ------------------------------------------------------------------------
 // Syslog
@@ -93,6 +97,14 @@
 // ------------------------------------------------------------------------
 // Niveau 0 
 // ------------------------------------------------------------------------
+
+#if defined(DEBUG_ARBO) && DEBUG_ARBO == 0 
+#define Arbo(fmt, args...) { \
+  if ( atoi(argv[0]) == 0 ) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } \
+  if ( atoi(argv[0]) == 1 ) {} \
+  if ( atoi(argv[0]) == 2 ) {} \
+}
+#endif
 
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
 
@@ -121,6 +133,14 @@
 // Niveau 1
 // ------------------------------------------------------------------------
 
+#if defined(DEBUG_ARBO) && DEBUG_ARBO == 1 
+#define Arbo(fmt, args...) { \
+  if ( atoi(argv[0]) == 0 ) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } \
+  if ( atoi(argv[0]) == 1 ) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } \
+  if ( atoi(argv[0]) == 2 ) {} \
+}
+#endif
+
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG < 1
 
 #define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
@@ -146,6 +166,14 @@
 // ------------------------------------------------------------------------
 // Niveau 2 
 // ------------------------------------------------------------------------
+
+#if defined(DEBUG_ARBO) && DEBUG_ARBO == 2 
+#define Arbo(fmt, args...) { \
+  if ( atoi(argv[0]) == 0 ) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } \
+  if ( atoi(argv[0]) == 1 ) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } \
+  if ( atoi(argv[0]) == 2 ) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } \
+}
+#endif
 
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG < 1
 
@@ -212,7 +240,7 @@
 
 #define  CONFIG_TAILLE_BUFFER    255
 
-#define  ZERO_CHAR           '\0'
+#define  ZERO_CHAR           0
 
 #define  CONFIG_MILLI_SEC    1000                // frequence d'une microseconde (pour les usleep et calculs)
 #define  CONFIG_MICRO_SEC    1000000             // frequence d'une microseconde (pour les usleep et calculs)
@@ -259,6 +287,7 @@ t_en_User_Ids ;
 //------------------------------------------------------------------------------
 /* LA valeur dans le nom de champs enum est arbitraite , seule compte une valeur < ou > */
 /* En effet , une policy N+1 aura toujours l'avantage */
+
 typedef enum {
   PTHREAD_POLICY_0=0,
   PTHREAD_POLICY_1,
@@ -268,20 +297,57 @@ typedef enum {
   PTHREAD_POLICY_50,
   PTHREAD_POLICY_99
 }
-t_en_Pthreads_Policy ;
+t_en_Pthreads_Sched_Priority ;
 
 typedef enum {
-  PTHREAD_SCHED_PARAM_SUIVI_PWM_PHASES = SCHED_RR,
-  PTHREAD_SCHED_PARAM_SUIVI_PWM_MAIN   = SCHED_RR,
-  PTHREAD_SCHED_PARAM_SUIVI_MENU       = SCHED_FIFO,
-  PTHREAD_SCHED_PARAM_SUIVI_VOUTE      = SCHED_FIFO,
-  PTHREAD_SCHED_PARAM_SUIVI_INFRA      = SCHED_FIFO,
-  PTHREAD_SCHED_PARAM_SUIVI_LCD        = SCHED_FIFO,
-  PTHREAD_SCHED_PARAM_SUIVI_CLAVIER    = SCHED_FIFO,
-  PTHREAD_SCHED_PARAM_SUIVI_CAPTEUR    = SCHED_FIFO,
-  PTHREAD_SCHED_PARAM_SUIVI_MAIN       = SCHED_FIFO
-}
+  PTHREAD_SUIVI_PWM_PHASES = 0,
+  PTHREAD_SUIVI_PWM_MAIN   ,
+  PTHREAD_SUIVI_MENU       ,
+  PTHREAD_SUIVI_VOUTE      ,
+  PTHREAD_SUIVI_INFRA      ,
+  PTHREAD_SUIVI_LCD        ,
+  PTHREAD_SUIVI_CLAVIER    ,
+  PTHREAD_SUIVI_CAPTEUR    ,
+  PTHREAD_SUIVI_MAIN
+} 
 t_en_Pthreads_Sched_Param ;
+
+static const int gi_Pth_Sched_Priority[] = {
+  PTHREAD_POLICY_10,
+  PTHREAD_POLICY_5,
+  PTHREAD_POLICY_1,
+  PTHREAD_POLICY_1,
+  PTHREAD_POLICY_1,
+  PTHREAD_POLICY_2,
+  PTHREAD_POLICY_1,
+  PTHREAD_POLICY_1,
+  PTHREAD_POLICY_1
+} ;
+
+static const int gi_Pth_Sched_Param[] = {
+  SCHED_RR,
+  SCHED_RR,
+  SCHED_FIFO,
+  SCHED_FIFO,
+  SCHED_FIFO,
+  SCHED_FIFO,
+  SCHED_FIFO,
+  SCHED_FIFO,
+  SCHED_FIFO
+} ;
+
+static const char *  gi_Pth_Name[] = {
+  "SUIVI_PWM_PHASES" ,
+  "SUIVI_PWM_MAIN"   ,
+  "SUIVI_MENU"       ,
+  "SUIVI_VOUTE"      ,
+  "SUIVI_INFRA"      ,
+  "SUIVI_LCD"        ,
+  "SUIVI_CLAVIER"    ,
+  "SUIVI_CAPTEUR"    ,
+  "SUIVI_MAIN"
+} ;
+
 
 typedef enum {
   PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_PHASES = 250000,
@@ -365,8 +431,13 @@ typedef struct {
 
   void (*display)(void);
 
+  void (*define_default)  (char * ,char * )  ;
+
   void (*change_current)  (const int, const char*, const char*) ;
   void (*change_default)  (const int, const char*, const char*) ;
+
+  /* void (*refresh_current)  (void) ; */
+  void (*refresh_default)  (void) ;
 
   void (*display_default) (void) ;
   void (*display_current) (void) ;
@@ -779,9 +850,6 @@ typedef struct {
   int MM ;      // minutes
   int SS ;      // secondes
 
-  /* ajout 2022 septembre */
-
-  double tgo ;
 }
 TEMPS ;
 
@@ -812,48 +880,65 @@ typedef struct {
 }
 DEVICES ;
 
-typedef struct {
 
-  pthread_mutex_t  mutex_infrarouge  ;
-  pthread_mutex_t  mutex_alt  ;
-  pthread_mutex_t  mutex_azi  ;
-  pthread_mutex_t  mutex_cal  ;
-  pthread_mutex_t  mutex_pthread ;
+/* All concerning PTHREADS */ 
+
+typedef struct {
+  pthread_mutex_t  mut_dat  ;
+  pthread_mutex_t  mut_alt  ;
+  pthread_mutex_t  mut_azi  ;
+  pthread_mutex_t  mut_cal  ;
+  pthread_mutex_t  mut_pth ;
+}
+PTHREADS_MUTEXS ;
+
+typedef struct {
+  
+  pthread_t          att_pid  ;
+  int                att_ord ;
+  struct sched_param att_pri ; 
+  int                att_bef ;
+  char               att_nam[ CONFIG_TAILLE_BUFFER_32 ] ;
+}
+PTHREADS_ATTRIBUTS ;
+
+typedef struct {
 
   // Pthreads utilises comme pointeurs dans la structure passee en argument des fonctions de thread
 
-  pthread_t    p_suivi_infrarouge ;
-  pthread_t    p_suivi_capteurs ;
-  pthread_t    p_suivi_voute ;
-  pthread_t    p_suivi_clavier ;
-  pthread_t    p_suivi_termios ;
-  pthread_t    p_suivi_lcd ;
-
-  pthread_t    p_suivi_alt ;
-  pthread_t    p_suivi_azi ;
-  pthread_t    p_menu ;
-  pthread_t    p_test ;
+  pthread_t     pth_inf ;
+  pthread_t     pth_cap ;
+  pthread_t     pth_vou ;
+  pthread_t     pth_cla ;
+  pthread_t     pth_ter ;
+  pthread_t     pth_lcd ;
+  pthread_t     pth_alt ;
+  pthread_t     pth_azi ;
+  pthread_t     pth_men ;
+  pthread_t     pth_tst ;
   
-  pthread_t    p_thread_t_id[ MAX_THREADS ]  ;
-  int          p_thread_sleep_before_start[ MAX_THREADS ] ;
-  char         p_c_thread_name [ MAX_THREADS ][ 16 ] ;
+  PTHREADS_MUTEXS    pth_mut ;
+  PTHREADS_ATTRIBUTS pth_att[ MAX_THREADS ]  ; 
 }
 PTHREADS ;
 
+typedef struct {
+  char dat_inf [ CONFIG_TAILLE_BUFFER ] ;
+  char dat_acc [ CONFIG_TAILLE_BUFFER ] ;
+  char dat_bou [ CONFIG_TAILLE_BUFFER ] ;
+}
+DATAS ;
 //=====================================================
 typedef struct {
 
-  PTHREADS *   p_Pth ;
+  PTHREADS     * p_pth ;
+  DATAS        sui_dat ;
 
   int          SUIVI_MANUEL ;
   int          SUIVI_ALIGNEMENT ;
   int          SUIVI_GOTO ;
   int          SUIVI_VOUTE ;
   int          SUIVI_EQUATORIAL ;
-
-  char datas_infrarouge [ CONFIG_TAILLE_BUFFER ] ;
-  char datas_accelerometre [ CONFIG_TAILLE_BUFFER ] ;
-  char datas_boussole [ CONFIG_TAILLE_BUFFER ] ;
 
   long         t_diff ;
   double       t_diff_sec ;
@@ -1036,7 +1121,7 @@ typedef struct {
  double a0 ;   // valeur precedente de l'azimut
  double h0 ;   // valeur precedente de l'altitude
  
- double AGH ;    // angle horaire  ( = gp_Lieu->tps_mic sideral - ASC)
+ double AGH ;    // angle horaire  ( = gp_Lie->tps_mic sideral - ASC)
  double H    ;    // declinaison
  
  double DEC  ;  // un resultat de calcul de declinaison
@@ -1128,23 +1213,23 @@ VOUTE ;
 * Definition des variables globales a partir des structures
   ------------------------------------------------------------*/
 
-ASTRE      ast,   *gp_Astr ;
-CLAVIER    cla,   *gp_Clav ;
+ASTRE      ast,   *gp_Ast ;
+CLAVIER    cla,   *gp_Cla ;
 CODES      g_Cod, *gp_Cod ;
-TEMPS      tem,   *gp_Time ;
-LIEU       lie,   *gp_Lieu ;
-VOUTE      vou,   *gp_Vout ;
+TEMPS      tem,   *gp_Tim ;
+LIEU       lie,   *gp_Lie ;
+VOUTE      vou,   *gp_Vou ;
 SUIVI	     sui,   *gp_Sui ;
-DEVICES    dev,   *gp_Devi ;
+DEVICES    dev,   *gp_Dev ;
 LCD        g_Lcd, *gp_Lcd ;
 PID        g_Pid, *gp_Pid ;
-PTHREADS   g_Pth, *gp_Pthr ;
+PTHREADS   g_Pth, *gp_Pth ;
 
 FILE      * flog ; 
 
 char      g_Datas  [DATAS_NB_LIGNES] [DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER] ;
 char      g_Path_Cmd_Stty[ CONFIG_TAILLE_BUFFER_32 ] ;
-int       gc_user_id ;
+int       guit_user_getuid ;
 // ------------------------------------------------------------------------
 // definition des variables dependant du fichier de conf
 // ------------------------------------------------------------------------

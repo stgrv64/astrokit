@@ -16,7 +16,7 @@ __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
 (gdb) 
 
 
-IRC_READ : suivi->datas_infrarouge = forwardfast
+IRC_READ : suivi->dat_inf = forwardfast
 LIRC_READ : suivi->temporisation_ir = 52000*** buffer overflow detected ***: terminated
 
 Thread 12 "astrokit.janvie" received signal SIGABRT, Aborted.

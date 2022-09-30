@@ -15,7 +15,7 @@
 # ainsi que termios (cf fichier keyboard.c / .h ) :
 # creation entete de la fonction au format doxygen du reliquat de close dans le code
 # 23/01/2022  | * ajout condition pour entree dans GPIO_RAQUETTE_READ
-#   =>  if ( gp_Devi->DEVICE_USE_RAQUETTE ) {  
+#   =>  if ( gp_Dev->DEVICE_USE_RAQUETTE ) {  
 # 20 mai 2022 | * reprise de la fonction main Gpio pour effectuer
 #                 des fonctions de deplacements utiles      
 # 24 mai 2022 | * reprise des fonctions PWM
@@ -248,9 +248,9 @@ void GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
   
   int  i,j ;
 
-  Trace("") ;
+  Trace1("") ;
 
-  if ( gp_Devi->DEVICE_USE_RAQUETTE ) {
+  if ( gp_Dev->DEVICE_USE_RAQUETTE ) {
     
     GPIO_KEY_L[0] = GPIO_KEY_L1 ; 
     GPIO_KEY_L[1] = GPIO_KEY_L2 ; 
@@ -284,13 +284,13 @@ void GPIO_RAQUETTE_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
 * @param  : int       GPIO_KEY_L[4]
 * @param  : int       GPIO_KEY_C[4]
-* @param  : CLAVIER * gp_Clav
+* @param  : CLAVIER * gp_Cla
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
 * @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
 *****************************************************************************************/
 
-void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) {
+void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Cla) {
 
   int  i=0,j=0;
   int I=0, J=0  ;
@@ -298,7 +298,7 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
   
   char buffer_recopie [ CONFIG_TAILLE_BUFFER_32 ] ;
 
-  if ( gp_Devi->DEVICE_USE_RAQUETTE ) {
+  if ( gp_Dev->DEVICE_USE_RAQUETTE ) {
 
     I=-1; ; J=-1 ;
     
@@ -314,12 +314,12 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
     * qui est dans astro.c
     ======================================================================= */
     
-    gp_Clav->appui_en_cours = 0 ;
+    gp_Cla->appui_en_cours = 0 ;
       
     for(i=0;i<4;i++) {
       GPIO_SET( GPIO_KEY_C[i], 1) ;
       
-      usleep( gp_Clav->temporisation_clavier ) ;
+      usleep( gp_Cla->temporisation_clavier ) ;
       
       for(j=0;j<4;j++)  {
         if( GPIO_GET(GPIO_KEY_L[j])) {
@@ -328,9 +328,9 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
             strcpy( val, keyboard[I][J] ) ;
       if ( strcmp( val, "") ) {
         //printf("val = %s, keyboard[ %d ][ %d ] = %s\n", val, i,j, keyboard[i][j] ) ;
-        strcpy( gp_Clav->mot, val ) ; 
-              gp_Clav->appui_en_cours = 1 ;
-        gp_Clav->mot_en_cours = 1 ;
+        strcpy( gp_Cla->mot, val ) ; 
+              gp_Cla->appui_en_cours = 1 ;
+        gp_Cla->mot_en_cours = 1 ;
       }
         }
       }
@@ -343,42 +343,42 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
     // dans cette partie de code
     // =======================================================================
     
-    if ( gp_Clav->mot_en_cours && ! gp_Clav->appui_en_cours ) {
+    if ( gp_Cla->mot_en_cours && ! gp_Cla->appui_en_cours ) {
     
-      // printf("mot trouver = %s\n", gp_Clav->mot ) ;
+      // printf("mot trouver = %s\n", gp_Cla->mot ) ;
       
       //------------------------------------------------------------
       // On incremente la phrase avec le mot et
       // On incremente le nombre avec le mot si premier n'est pas vide
       //------------------------------------------------------------
       
-      if ( strcmp( gp_Clav->mot, gp_Clav->valider) != 0 ) { 
+      if ( strcmp( gp_Cla->mot, gp_Cla->valider) != 0 ) { 
         
-        if ( strlen(gp_Clav->phrase) + strlen(gp_Clav->mot) < CONFIG_TAILLE_BUFFER_32)
+        if ( strlen(gp_Cla->phrase) + strlen(gp_Cla->mot) < CONFIG_TAILLE_BUFFER_32)
 
           /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
           memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
-          strcpy( buffer_recopie, gp_Clav->phrase ) ;
-          /* sprintf( gp_Clav->phrase,"%s%s", gp_Clav->phrase, gp_Clav->mot); */
-          sprintf( gp_Clav->phrase,"%s%s", buffer_recopie, gp_Clav->mot);
+          strcpy( buffer_recopie, gp_Cla->phrase ) ;
+          /* sprintf( gp_Cla->phrase,"%s%s", gp_Cla->phrase, gp_Cla->mot); */
+          sprintf( gp_Cla->phrase,"%s%s", buffer_recopie, gp_Cla->mot);
         
-        if ( strcmp( gp_Clav->premier, "")) {
-          if ( strlen(gp_Clav->nombre) + strlen(gp_Clav->mot) < CONFIG_TAILLE_BUFFER_32)
+        if ( strcmp( gp_Cla->premier, "")) {
+          if ( strlen(gp_Cla->nombre) + strlen(gp_Cla->mot) < CONFIG_TAILLE_BUFFER_32)
           //printf("Si pas d'appui sur valider et premier non vide => on met le mot dans la phrase !!\n" ) ; 
             /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
             memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
-            strcpy( buffer_recopie, gp_Clav->nombre ) ;
-            /* sprintf(gp_Clav->nombre,"%s%s", gp_Clav->nombre, gp_Clav->mot); */
-            sprintf(gp_Clav->nombre,"%s%s", buffer_recopie, gp_Clav->mot); 
+            strcpy( buffer_recopie, gp_Cla->nombre ) ;
+            /* sprintf(gp_Cla->nombre,"%s%s", gp_Cla->nombre, gp_Cla->mot); */
+            sprintf(gp_Cla->nombre,"%s%s", buffer_recopie, gp_Cla->mot); 
         }
       }    
       //------------------------------------------------------------
       // On met le mot dans premier si il est vide 
       //------------------------------------------------------------
       
-      if (   strcmp( gp_Clav->premier, "") ==0 ){ 
+      if (   strcmp( gp_Cla->premier, "") ==0 ){ 
         // printf("Si premier est vide on met le mot en cours dedans\n" ) ; 
-        strcpy( gp_Clav->premier, gp_Clav->mot);
+        strcpy( gp_Cla->premier, gp_Cla->mot);
       }
       
       //------------------------------------------------------------
@@ -391,20 +391,20 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
       //------------------------------------------------------------
       
       for( i=0 ; i < CONFIG_VALIDATIONS_SIZE ; i++ )
-      if ( ! strcmp( gp_Clav->phrase, gp_Clav->validations[i]) \
-        || ! strcmp( gp_Clav->mot,    gp_Clav->valider )  ) {
+      if ( ! strcmp( gp_Cla->phrase, gp_Cla->validations[i]) \
+        || ! strcmp( gp_Cla->mot,    gp_Cla->valider )  ) {
 
         TRACE1("APPUI sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
         
-        strcpy(gp_Clav->symbole, gp_Clav->premier)  ;
+        strcpy(gp_Cla->symbole, gp_Cla->premier)  ;
         
-        strcpy(gp_Clav->premier,"") ;
-        strcpy(gp_Clav->phrase,"")  ;
-        strcpy(gp_Clav->mot,"") ;
+        strcpy(gp_Cla->premier,"") ;
+        strcpy(gp_Cla->phrase,"")  ;
+        strcpy(gp_Cla->mot,"") ;
         
-        TRACE1("TROIS = symbole = %s nombre = %s\n", gp_Clav->symbole, gp_Clav->nombre ) ;
+        TRACE1("TROIS = symbole = %s nombre = %s\n", gp_Cla->symbole, gp_Cla->nombre ) ;
 
-        gp_Clav->phrase_lue=1 ;
+        gp_Cla->phrase_lue=1 ;
       }
       
       //------------------------------------------------------------
@@ -413,16 +413,16 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
       //------------------------------------------------------------
       
       for( i=0 ; i < CONFIG_ACTIONS_SIZE ; i++ )
-      if ( ! strcmp( gp_Clav->mot, gp_Clav->actions[i] )) {
+      if ( ! strcmp( gp_Cla->mot, gp_Cla->actions[i] )) {
           printf("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier") ;
-          strcpy(gp_Clav->premier,gp_Clav->mot) ;
-          strcpy(gp_Clav->nombre,"")  ;
-          strcpy(gp_Clav->phrase,"")  ;
-          strcpy(gp_Clav->mot,"") ;
+          strcpy(gp_Cla->premier,gp_Cla->mot) ;
+          strcpy(gp_Cla->nombre,"")  ;
+          strcpy(gp_Cla->phrase,"")  ;
+          strcpy(gp_Cla->mot,"") ;
       }
       
-      gp_Clav->mot_en_cours = 0 ;
-      gp_Clav->appui_en_cours = 0 ;
+      gp_Cla->mot_en_cours = 0 ;
+      gp_Cla->appui_en_cours = 0 ;
     }
   }
 }
@@ -432,7 +432,7 @@ void GPIO_RAQUETTE_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], CLAVIER* gp_Clav) 
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
 * @param  : int       GPIO_KEY_L[4]
 * @param  : int       GPIO_KEY_C[4]
-* @param  : CLAVIER * gp_Clav
+* @param  : CLAVIER * gp_Cla
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
 * @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
@@ -443,7 +443,7 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], S
   int  i,j;
   char val[255] ;
   
-  if ( gp_Devi->DEVICE_USE_RAQUETTE ) {
+  if ( gp_Dev->DEVICE_USE_RAQUETTE ) {
     
     Trace("");
     
@@ -1072,7 +1072,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
   
   for( i=0 ; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++ ) 
     for( j=0;j < GPIO_MICROPAS_MAX; j++ )
-      pm->phase[i]->rap[j] = 0 ;
+      pm->p_pha[i]->rap[j] = 0 ;
     
   j=0 ; 
 
@@ -1084,34 +1084,34 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
     
     rc = GPIO_FONCTION_RAPPORT_CYCLIQUE(0, t, pm )  ;
     if ( rc >  0)  { 
-      pm->phase[1]->rap[j] = rc ;        
-      pm->phase[0]->rap[j] = 0.0 ; 
+      pm->p_pha[1]->rap[j] = rc ;        
+      pm->p_pha[0]->rap[j] = 0.0 ; 
     }
     else  { 
-      pm->phase[0]->rap[j] = rc * -1.0 ; 
-      pm->phase[1]->rap[j] = 0.0 ; 
+      pm->p_pha[0]->rap[j] = rc * -1.0 ; 
+      pm->p_pha[1]->rap[j] = 0.0 ; 
     }
 
     rc = GPIO_FONCTION_RAPPORT_CYCLIQUE(1, t, pm )  ;    
 
     if ( rc >  0)  { 
-      pm->phase[3]->rap[j] = rc ;        
-      pm->phase[2]->rap[j] = 0.0 ; 
+      pm->p_pha[3]->rap[j] = rc ;        
+      pm->p_pha[2]->rap[j] = 0.0 ; 
     }
     else { 
-      pm->phase[2]->rap[j] = rc * -1.0 ; 
-      pm->phase[3]->rap[j] = 0.0 ; 
+      pm->p_pha[2]->rap[j] = rc * -1.0 ; 
+      pm->p_pha[3]->rap[j] = 0.0 ; 
     }
  
     j++ ;
   }
   for( i=0 ; i< j ; i++ ) {
-    if( ( pm->phase[0]->rap[i]+ \
-          pm->phase[1]->rap[i]+ \
-	  pm->phase[2]->rap[i]+ \
-	  pm->phase[3]->rap[i] ) != 0 )
+    if( ( pm->p_pha[0]->rap[i]+ \
+          pm->p_pha[1]->rap[i]+ \
+	  pm->p_pha[2]->rap[i]+ \
+	  pm->p_pha[3]->rap[i] ) != 0 )
 
-    Trace2("%d\t%f\t%f\t%f\t%f",i,pm->phase[0]->rap[i],pm->phase[1]->rap[i],pm->phase[2]->rap[i],pm->phase[3]->rap[i]) ;
+    Trace2("%d\t%f\t%f\t%f\t%f",i,pm->p_pha[0]->rap[i],pm->p_pha[1]->rap[i],pm->p_pha[2]->rap[i],pm->p_pha[3]->rap[i]) ;
   }
 }
 // ##########################################################################################################
@@ -1119,7 +1119,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(GPIO_PWM_MOTEUR *pm) {
 // module les etats hauts et bas de la phase
 // avec les rapports cycliques calcules pour chaque micro pas
 // et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
-/* @date   : 2022-05-24 ajout protection par mutex des threads[ g_id_thread++ ] */
+/* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ] */
 // ##########################################################################################################
 
 void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
@@ -1130,21 +1130,11 @@ void * GPIO_SUIVI_PWM_PHASE(GPIO_PWM_PHASE *ph ) {
   double pmot =0 ;
   struct sched_param param;
 
-  if ( priority > 0) {
-    param.sched_priority = PTHREAD_POLICY_10 ;  
-    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_PHASES, & param) != 0) {
-      perror("GPIO_SUIVI_PWM_PHASE");
-      exit(EXIT_FAILURE);}
-  }
-
   Trace2("sleeping..") ;
   sleep(1) ;
-  Trace("start") ;
+  Trace1("start") ;
 
-  pthread_mutex_lock( & ph->p_Pth->mutex_pthread) ;
-  pthread_setname_np( pthread_self(), "gpio_suivi_pwm" ) ;
-  ph->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-  pthread_mutex_unlock( & ph->p_Pth->mutex_pthread) ;
+  PTHREADS_CONFIG( ph->p_pth, pthread_self(), PTHREAD_SUIVI_PWM_PHASES ) ;
 
   TUpwm = TUpwm_haut  = TUpwm_bas = rap = 0 ;
 
@@ -1217,20 +1207,9 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
   struct sched_param param;
   int     micropas=0 ;
 
-  Trace("start") ;
+  Trace1("start") ;
 
-  if ( priority > 0) {
-    param.sched_priority = PTHREAD_POLICY_5 ;  
-    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_MAIN, & param) != 0) {
-      perror("suivi_main_M");
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  pthread_mutex_lock( & pm->p_Pth->mutex_pthread) ;
-  pthread_setname_np( pthread_self(), "suivi_main_m" ) ;
-  pm->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-  pthread_mutex_unlock( & pm->p_Pth->mutex_pthread) ;
+  PTHREADS_CONFIG( pm->p_pth, pthread_self(), PTHREAD_SUIVI_PWM_MAIN  ) ;
 
   pthread_mutex_lock( & pm->mutex ) ;
 
@@ -1243,9 +1222,9 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
   pthread_mutex_unlock( & pm->mutex ) ;
 
-  pthread_mutex_lock( & pm->p_Pth->mutex_pthread) ;
+  pthread_mutex_lock( & pm->p_pth->pth_mut.mut_pth) ;
   gettimeofday(&pm->tval,NULL) ; 
-  pthread_mutex_unlock( & pm->p_Pth->mutex_pthread) ;
+  pthread_mutex_unlock( & pm->p_pth->pth_mut.mut_pth) ;
 
   while (1) {
 
@@ -1260,25 +1239,25 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
     switch ( pm->id ) {
 
       case 0 : 
-        pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
+        pthread_mutex_lock( & pm->p_pth->pth_mut.mut_alt ) ;
 
-          periode_mic         = pm->p_Sui->Th_mic ;
-          periode_mot         = pm->p_Sui->Th_mot / ALT_R4;
-          periode_bru         = pm->p_Sui->Th_bru / ALT_R4 ;
-          sens                = pm->p_Sui->Sh ;
+          periode_mic         = pm->p_sui->Th_mic ;
+          periode_mot         = pm->p_sui->Th_mot / ALT_R4;
+          periode_bru         = pm->p_sui->Th_bru / ALT_R4 ;
+          sens                = pm->p_sui->Sh ;
 
-        pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
+        pthread_mutex_unlock( & pm->p_pth->pth_mut.mut_alt ) ;
         break ;
 
       case 1 :
-          pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
+          pthread_mutex_lock( & pm->p_pth->pth_mut.mut_azi ) ;
 
-          periode_mic         = pm->p_Sui->Ta_mic ; 
-          periode_mot         = pm->p_Sui->Ta_mot / AZI_R4 ;
-          periode_bru         = pm->p_Sui->Ta_bru / AZI_R4 ;
-          sens                = pm->p_Sui->Sa ;
+          periode_mic         = pm->p_sui->Ta_mic ; 
+          periode_mot         = pm->p_sui->Ta_mot / AZI_R4 ;
+          periode_bru         = pm->p_sui->Ta_bru / AZI_R4 ;
+          sens                = pm->p_sui->Sa ;
 
-        pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
+        pthread_mutex_unlock( & pm->p_pth->pth_mut.mut_azi ) ;
         break ;
     }
 
@@ -1323,16 +1302,16 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
 
-      pthread_mutex_lock( & pm->phase[i]->mutex ) ;
+      pthread_mutex_lock( & pm->p_pha[i]->mutex ) ;
 
-        pm->phase[i]->micropas    = micropas ;
-        pm->phase[i]->Tpwm        = Tpwm ;
-        pm->phase[i]->rc          = pm->phase[i]->rap[ micropas ] ;
-        pm->phase[i]->periode_mot = periode_mot ; 
-        pm->phase[i]->periode_mic = periode_mic ; 
+        pm->p_pha[i]->micropas    = micropas ;
+        pm->p_pha[i]->Tpwm        = Tpwm ;
+        pm->p_pha[i]->rc          = pm->p_pha[i]->rap[ micropas ] ;
+        pm->p_pha[i]->periode_mot = periode_mot ; 
+        pm->p_pha[i]->periode_mic = periode_mic ; 
 
-      pthread_mutex_unlock( & pm->phase[i]->mutex ) ;
-      //printf("\t%f",pm->phase[i]->rc ) ;
+      pthread_mutex_unlock( & pm->p_pha[i]->mutex ) ;
+      //printf("\t%f",pm->p_pha[i]->rc ) ;
     }
     pthread_mutex_unlock(& pm->mutex ) ;
 
@@ -1384,30 +1363,30 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
 
         case 0 : 
           pthread_mutex_lock(  & pm->mutex ) ;
-          pthread_mutex_lock( & pm->p_Pth->mutex_alt ) ;
-          // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
+          pthread_mutex_lock( & pm->p_pth->pth_mut.mut_alt ) ;
+          // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
           pthread_mutex_lock( & gp_Pid->mutex_pid ) ;
 
-          pm->p_Sui->acc_alt_pid *= gp_Pid->pid ;
+          pm->p_sui->acc_alt_pid *= gp_Pid->pid ;
 
           pthread_mutex_unlock( & gp_Pid->mutex_pid ) ;
-          // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_Sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
-          pthread_mutex_unlock( & pm->p_Pth->mutex_alt ) ;
+          // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
+          pthread_mutex_unlock( & pm->p_pth->pth_mut.mut_alt ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
 
           break ;
 
         case 1 : 
           pthread_mutex_lock(  & pm->mutex ) ;
-          pthread_mutex_lock( & pm->p_Pth->mutex_azi ) ;
-          // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
+          pthread_mutex_lock( & pm->p_pth->pth_mut.mut_azi ) ;
+          // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
           pthread_mutex_lock( & gp_Pid->mutex_pid ) ;
 
-          pm->p_Sui->acc_azi_pid *= gp_Pid->pid ;
+          pm->p_sui->acc_azi_pid *= gp_Pid->pid ;
           
           pthread_mutex_unlock( & gp_Pid->mutex_pid ) ;
-          // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_Sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
-          pthread_mutex_unlock( & pm->p_Pth->mutex_azi ) ;
+          // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
+          pthread_mutex_unlock( & pm->p_pth->pth_mut.mut_azi ) ;
           pthread_mutex_unlock(  & pm->mutex ) ;
 
           break ;
@@ -1464,7 +1443,7 @@ void * suivi_main_M(GPIO_PWM_MOTEUR *pm) {
   } // FIXME : fin boucle while 
 }
 // ##########################################################################################################
-/* mai 2022 : ajout pm->phase[i]->p_Sui            = pm->p_Sui ; */
+/* mai 2022 : ajout pm->p_pha[i]->p_sui            = pm->p_sui ; */
 /* juin 2022 :  prise en compte tps_bru */
 
 void GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) {
@@ -1501,23 +1480,23 @@ void GPIO_INIT_PWM_MOTEUR(GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOT
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     
-    pm->phase[i]=(GPIO_PWM_PHASE *)malloc(sizeof(GPIO_PWM_PHASE)) ;
+    pm->p_pha[i]=(GPIO_PWM_PHASE *)malloc(sizeof(GPIO_PWM_PHASE)) ;
     
-    pthread_mutex_init( & pm->phase[i]->mutex, NULL ) ;
+    pthread_mutex_init( & pm->p_pha[i]->mutex, NULL ) ;
     
-    pm->phase[i]->p_Pth            = pm->p_Pth; 
-    pm->phase[i]->p_Sui            = pm->p_Sui ;
-    pm->phase[i]->gpio             = gpios[ masque[i] ]  ;
-    pm->phase[i]->id               = i ;
-    pm->phase[i]->Tpwm             = 0 ;
-    pm->phase[i]->micropas         = 0 ;
-    pm->phase[i]->gpio_open_statut = 0 ;
-    pm->phase[i]->gpio_fd          = 0 ;
+    pm->p_pha[i]->p_pth            = pm->p_pth; 
+    pm->p_pha[i]->p_sui            = pm->p_sui ;
+    pm->p_pha[i]->gpio             = gpios[ masque[i] ]  ;
+    pm->p_pha[i]->id               = i ;
+    pm->p_pha[i]->Tpwm             = 0 ;
+    pm->p_pha[i]->micropas         = 0 ;
+    pm->p_pha[i]->gpio_open_statut = 0 ;
+    pm->p_pha[i]->gpio_fd          = 0 ;
     
-    GPIO_OPEN_BROCHE_PWM( pm->phase[i] ) ;
+    GPIO_OPEN_BROCHE_PWM( pm->p_pha[i] ) ;
     /*
-    if ( pm->phase[i]->gpio_open_statut < 0 )  {
-      sprintf(cmd,"printf \"GPIO_OPEN_BROCHE_PWM : ouverture gpio %d = %d\" > /tmp/astrokit.log", i, pm->phase[i]->gpio_open_statut ) ;
+    if ( pm->p_pha[i]->gpio_open_statut < 0 )  {
+      sprintf(cmd,"printf \"GPIO_OPEN_BROCHE_PWM : ouverture gpio %d = %d\" > /tmp/astrokit.log", i, pm->p_pha[i]->gpio_open_statut ) ;
       perror(cmd) ;
       system(cmd) ;
     }*/
@@ -1583,21 +1562,21 @@ int mainG(int argc, char **argv) {
   pm_alt  = &m0 ;
   pm_azi  = &m1 ;
   gp_Sui  =  &sui ;
-  gp_Pthr = & g_Pth ;
+  gp_Pth = & g_Pth ;
 
   /* Pour permettre acces a PTHREADS* via struct SUIVI* */
 
-  gp_Sui->p_Pth = (PTHREADS*) gp_Pthr ; 
+  gp_Sui->p_pth = (PTHREADS*) gp_Pth ; 
 
   /* Pour permettre acces a SUIVI* via struct GPIO_PWM_MOTEUR* */
 
-  pm_azi->p_Sui = (SUIVI*)gp_Sui ;   
-  pm_alt->p_Sui = (SUIVI*)gp_Sui ;   
+  pm_azi->p_sui = (SUIVI*)gp_Sui ;   
+  pm_alt->p_sui = (SUIVI*)gp_Sui ;   
   
   /* Pour permettre acces a SUIVI* via struct GPIO_PWM_MOTEUR* */
 
-  pm_alt->p_Pth = (PTHREADS*)gp_Pthr ;
-  pm_azi->p_Pth = (PTHREADS*)gp_Pthr ; 
+  pm_alt->p_pth = (PTHREADS*)gp_Pth ;
+  pm_azi->p_pth = (PTHREADS*)gp_Pth ; 
 
   signal(SIGINT,GPIO_TRAP_SIG) ;
   signal(SIGALRM,GPIO_TRAP_SIG) ;
@@ -1615,7 +1594,7 @@ int mainG(int argc, char **argv) {
   g_i_timeout = 0 ;
   g_i_max_nb_pas = 0 ;
   g_i_max_nb_micropas = 0 ;
-  g_id_thread = 0 ;
+  g_nb_threads = 0 ;
 
   strcpy( c_gpio_alt , GPIO_DEFAULT_ALT_MOTOR_GPIOS ) ;
   strcpy( c_gpio_azi , GPIO_DEFAULT_AZI_MOTOR_GPIOS ) ;
@@ -1811,32 +1790,32 @@ int mainG(int argc, char **argv) {
   for(i=0;i<4;i++) Trace1("gpio %d : %d",i,gpiosM2[i]) ;
   for(i=0;i<4;i++) Trace1("masq %d : %d",i,masque[i]) ;
 
-  pm_alt->p_Sui->Fa_mot = (double)fr_azi ;
-  pm_azi->p_Sui->Fh_mot = (double)fr_alt ;
+  pm_alt->p_sui->Fa_mot = (double)fr_azi ;
+  pm_azi->p_sui->Fh_mot = (double)fr_alt ;
 
-  pm_alt->p_Sui->Fa_bru = (double)fr_azi ;
-  pm_azi->p_Sui->Fh_bru = (double)fr_alt ;
+  pm_alt->p_sui->Fa_bru = (double)fr_azi ;
+  pm_azi->p_sui->Fh_bru = (double)fr_alt ;
 
-  pm_alt->p_Sui->Fa_mic     = pm_alt->p_Sui->Fa_mot * (double)upas  ;
-  pm_azi->p_Sui->Fh_mic     = pm_azi->p_Sui->Fh_mot * (double)upas ;
+  pm_alt->p_sui->Fa_mic     = pm_alt->p_sui->Fa_mot * (double)upas  ;
+  pm_azi->p_sui->Fh_mic     = pm_azi->p_sui->Fh_mot * (double)upas ;
 
-  pm_alt->p_Sui->Ta_mot = 1 / pm_alt->p_Sui->Fa_mot ;
-  pm_azi->p_Sui->Th_mot = 1 / pm_azi->p_Sui->Fh_mot ;
+  pm_alt->p_sui->Ta_mot = 1 / pm_alt->p_sui->Fa_mot ;
+  pm_azi->p_sui->Th_mot = 1 / pm_azi->p_sui->Fh_mot ;
 
-  pm_alt->p_Sui->Ta_bru = 1 / pm_alt->p_Sui->Fa_mot ;
-  pm_azi->p_Sui->Th_bru = 1 / pm_azi->p_Sui->Fh_mot ;
+  pm_alt->p_sui->Ta_bru = 1 / pm_alt->p_sui->Fa_mot ;
+  pm_azi->p_sui->Th_bru = 1 / pm_azi->p_sui->Fh_mot ;
 
-  pm_alt->p_Sui->Ta_mic = 1 / pm_alt->p_Sui->Fa_mic ;
-  pm_azi->p_Sui->Th_mic = 1 / pm_alt->p_Sui->Fh_mic ;
+  pm_alt->p_sui->Ta_mic = 1 / pm_alt->p_sui->Fa_mic ;
+  pm_azi->p_sui->Th_mic = 1 / pm_alt->p_sui->Fh_mic ;
 
   pid=getpid() ;
   nbcpus = sysconf(_SC_NPROCESSORS_ONLN) ;
   
-  Trace("ALTITUDE : periode mot = %.2f f = %.f ", pm_alt->p_Sui->Ta_mot, pm_alt->p_Sui->Fa_mot ) ; 
-  Trace("AZIMUT   : periode mot = %.2f f = %.f ", pm_azi->p_Sui->Th_mot, pm_azi->p_Sui->Fh_mot ) ; 
+  Trace("ALTITUDE : periode mot = %.2f f = %.f ", pm_alt->p_sui->Ta_mot, pm_alt->p_sui->Fa_mot ) ; 
+  Trace("AZIMUT   : periode mot = %.2f f = %.f ", pm_azi->p_sui->Th_mot, pm_azi->p_sui->Fh_mot ) ; 
 
-  Trace("ALTITUDE : periode mic = %.2f f = %.f ", pm_alt->p_Sui->Ta_mic, pm_alt->p_Sui->Fa_mic ) ; 
-  Trace("AZIMUT   : periode mic = %.2f f = %.f ", pm_azi->p_Sui->Th_mic, pm_azi->p_Sui->Fh_mic ) ; 
+  Trace("ALTITUDE : periode mic = %.2f f = %.f ", pm_alt->p_sui->Ta_mic, pm_alt->p_sui->Fa_mic ) ; 
+  Trace("AZIMUT   : periode mic = %.2f f = %.f ", pm_azi->p_sui->Th_mic, pm_azi->p_sui->Fh_mic ) ; 
 /*
   Trace("correct(y/n)?") ;
   nread = read( 0, &ch, 1)  ;
@@ -1888,13 +1867,13 @@ int mainG(int argc, char **argv) {
   // lancement des pthreads moteurs ----------------------------------------------------
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_create( &p_thread_pha_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_alt->phase[i] ) ;
+    pthread_create( &p_thread_pha_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_alt->p_pha[i] ) ;
   }
   pthread_create( &p_thread_mot_alt, NULL, (void*)suivi_main_M, pm_alt ) ;
   
   if(nbm) {
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-      pthread_create( &p_thread_pha_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_azi->phase[i] ) ;
+      pthread_create( &p_thread_pha_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, pm_azi->p_pha[i] ) ;
     }
     pthread_create( &p_thread_mot_azi, NULL, (void*)suivi_main_M, pm_azi ) ;
   }
