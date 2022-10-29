@@ -36,7 +36,7 @@
 #--------------------------------------------------------------
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
-ASTRE_PAR_DEFAUT NGC5061
+ASTRE_PAR_DEFAUT NGC6755
 
 # ----------------------- parametres repertoires et fichiers
 
@@ -57,13 +57,13 @@ CONFIG_SCR_KERNEL   script_kernel.sh
 # tempo_menu     doit etre legerement inferieur aux autres tempo
 # tempo_raq      doit etre etre deux fois inferieur aux autres tempos
 
-TEMPO_MENU      200000
-TEMPO_RAQ       100000
-TEMPO_IR        270000
-TEMPO_TERMIOS   275000
-TEMPO_CLAVIER   275000
-TEMPO_CAPTEURS  275000
-TEMPO_LCD_LOOP  2500000
+TEMPO_MENU      1000000
+TEMPO_RAQ       500000
+TEMPO_IR        1000010
+TEMPO_TERMIOS   1000020
+TEMPO_CLAVIER   50000
+TEMPO_CAPTEURS  50000
+TEMPO_LCD_LOOP  1000000
 TEMPO_LCD_DISP  1000000
 TEMPO_PID_LOOP  5       
 
@@ -74,7 +74,7 @@ PID_KD  0.05
 
 # ----------------------- parametres acquisitions
 
-DEVICE_USE_INFRAROUGE       0  # flag qui indique utilisation de infrarouge comme source input
+DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
 DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
 DEVICE_USE_LCD              0  # flag qui indique utilisation de ecran LCD1602 / PCA8574
 DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
@@ -128,9 +128,9 @@ GPIO_FREQUENCE_PWM  250
 # mesure precisemebnt sur 5 tours en 28800 pas avec le binaire /usr/local/bin/gpio23 
 
 ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
-ALT_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
+ALT_R2  100       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-ALT_R4  64       # mode micro pas utilise (1/x)
+ALT_R4  8       # mode micro pas utilise (1/x)
 ALT_R5  1        # reduction liee a la poulie
 ALT_R6  1        # reduction liee au cpu
 ALT_R7  1        # reduction non decrite plus haut ....
@@ -140,9 +140,9 @@ ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 # ----------------------- parametres reductions azimut
 
 AZI_R1  144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
-AZI_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
+AZI_R2  100       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 AZI_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-AZI_R4  64       # mode micro pas utilise (1/x)
+AZI_R4  8       # mode micro pas utilise (1/x)
 AZI_R5  1        # reduction liee a la poulie
 AZI_R6  1        # reduction liee au cpu
 AZI_R7  1        # reduction non decrite plus haut ....

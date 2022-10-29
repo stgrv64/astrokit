@@ -1,0 +1,12 @@
+/lib/arm-linux-gnueabihf/libc.so.6
+/lib/arm-linux-gnueabihf/libdl.so.2
+/lib/arm-linux-gnueabihf/libformw.so.6
+/lib/arm-linux-gnueabihf/libmenuw.so.6
+/lib/arm-linux-gnueabihf/libm.so.6
+/lib/arm-linux-gnueabihf/libncursesw.so.6
+/lib/arm-linux-gnueabihf/libpanelw.so.6
+/lib/arm-linux-gnueabihf/libtinfo.so.6
+/lib/arm-linux-gnueabihf/libutil.so.1
+/lib/ld-linux-armhf.so.3
+linux-vdso.so.1
+/usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so

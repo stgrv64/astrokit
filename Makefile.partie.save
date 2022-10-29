@@ -1,0 +1,24 @@
+SRC	= \
+src/astro_arguments.c \
+src/astro_astre.c \
+src/astro_calculs.c \
+src/astro_cat.c \
+src/astro_codes.c \
+src/astro_config.c \
+src/astro_datas.c \
+src/astro_devices.c \
+src/astro_gpio.c \
+src/astro_i2c.c \
+src/astro_infrared.c \
+src/astro_keyboard.c \
+src/astro_keys.c \
+src/astro_lcd.c \
+src/astro_lieu.c \
+src/astro_log.c \
+src/astro_main.c \
+src/astro_pid.c \
+src/astro_pthreads.c \
+src/astro_stats.c \
+src/astro_suivi.c \
+src/astro_time.c \
+src/astro_voute.c \

@@ -98,10 +98,30 @@ endif
 DEBUG	= -g -Wall -O2 -Wno-unused-result -Wno-misleading-indentation -Wno-format-overflow -Wno-unused-variable -Wno-unused-but-set-variable
 CFLAGS 	= $(DEBUG) $(INCS) -Winline -pipe -Os -fPIC -static -pthread
 
-SRC	= \
-src/arguments.c src/astro.c src/calculs.c src/cat.c \
-src/config.c src/gpio.c src/i2c.c src/ir.c src/stat.c \
-src/keyboard.c src/lcd.c src/pthreads.c src/pid.c
+#include <astro_arguments.h>
+#include <astro_astre.h>
+#include <astro_astro.h>
+#include <astro_calculs.h>
+#include <astro_cat.h>
+#include <astro_codes.h>
+#include <astro_config.h>
+#include <astro_devices.h>
+#include <astro_gpios.h>
+#include <astro_i2c.h>
+#include <astro_infrared.h>
+#include <astro_keyboard.h>
+#include <astro_keys.h>
+#include <astro_lcd.h>
+#include <astro_lieu.h>
+#include <astro_log.h>
+#include <astro_pid.h>
+#include <astro_pthreads.h>
+#include <astro_stats.h>
+#include <astro_suivi.h>
+#include <astro_time.h>
+#include <astro_types.h>
+
+SRC	= src/astro_cat.c 
 
 OBJ	= $(SRC:.c=.o)
 
@@ -118,7 +138,7 @@ OBJS	= $(SRCS:.c=.o)
 OBJSUP	= $(LEPH)
 
 .c.o:
-	@echo $(CC) [CC] $<
+	@echo @$(CC) -c $(CFLAGS) $< -o $@
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(EXEC): $(OBJ)
