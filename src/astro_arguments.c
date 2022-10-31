@@ -16,7 +16,7 @@
 #include "astro_arguments.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
-MACRO_ASTRO_GLOBAL_EXTERN_OTHER ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 // extern ASTRO_TRAP_MAIN();
 
@@ -471,8 +471,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 6 ) &&  ! strcmp("cal0",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;
+    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
     if ( ! strcmp("alt", argv[5]) ) {
 
@@ -498,14 +498,14 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
+    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
   if ( ( argc == 6 ) &&  ! strcmp("calib2",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;
+    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
     if ( ! strcmp("alt", argv[5]) ) {
      printf("reduction totale altitude  = %f\n", gp_Cal_Par->par_alt_red_tot) ;
@@ -529,14 +529,14 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
+    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
   if ( ( argc == 5 ) &&  ! strcmp("calibt",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;
+    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
      printf("reduction totale altitude  = %f\n", gp_Cal_Par->par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
@@ -557,8 +557,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   /* (obsolete)
   if ( ( argc == 2 ) &&  ! strcmp("ir",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;
+    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
     //gettimeofday(&t00,NULL) ;
     ir_old=1 ;

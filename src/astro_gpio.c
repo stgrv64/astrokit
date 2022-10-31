@@ -30,15 +30,20 @@ int gpio_key_c[4] ;
 */
 int GPIO_OPEN_STATUT ;
 
-int             gpio_fd     [ GPIO_SIZE ] ;
-int             gpio_in   	[ GPIO_SIZE]  ;
-int             gpio_out    [ GPIO_SIZE] ; 
-int             gpio_alt    [ GPIO_NB_PHASES_PAR_MOTEUR ]  ;  // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
-int             gpio_azi    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
-int             gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // masque de redefinition des gpios des phases : evite soucis de branchement
+/* Variables concernant les broches */ 
 
-double          gpio_frequence_pwm ;
-int             priority ;
+int             gi_gpio_fd     [ GPIO_SIZE ] ;
+int             gi_gpio_in   	[ GPIO_SIZE]  ;
+int             gi_gpio_out    [ GPIO_SIZE] ; 
+
+/* Numeros de broches specifiques pour les sorties PWM */ 
+
+int             gi_gpio_alt    [ GPIO_NB_PHASES_PAR_MOTEUR ]  ;  // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
+int             gi_gpio_azi    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
+int             gi_gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // masque de redefinition des gpios des phases : evite soucis de branchement
+
+double          gd_gpio_frequence_pwm ;
+
 int             g_i_trace ;
 int             g_i_trace_alt ;
 int             g_i_trace_azi ;
@@ -82,7 +87,7 @@ void  GPIO_TEST_MOTEURS(void ) {
   } ;  
   // signal(SIGTERM,TRAP_SUIVI_TEST) ; 
   ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;
+  printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
   GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
   GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
@@ -119,7 +124,7 @@ void  GPIO_TEST_MOTEURS(void ) {
   GPIO_SET_ALT( 0,0,0,0,1,1 ) ;
   GPIO_SET_AZI( 0,0,0,0,1,1 ) ;
   
-  printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
+  printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
   
   GPIO_STATUT() ;
 }
@@ -205,7 +210,7 @@ void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
 * @author : s.gravois
 * @brief  : Cette fonction lit les parametres GPIO dans le fichier de configuration
 *           (gp_Gpi_Par->par_alt / gp_Gpi_Par->par_azi / GPIO_MASQUE )
-*           Initilise la frequence PWM a 1000 si aucune entree gpio_frequence_pwm
+*           Initilise la frequence PWM a 1000 si aucune entree gd_gpio_frequence_pwm
 * @param  : g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
@@ -227,12 +232,12 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
 
     Trace1("gp_Gpi_Par->par_alt trouve ligne %d = (%s)", l,gp_Gpi_Par->par_alt) ;
 
-    for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gpio_in[j]=-1 ;
+    for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gi_gpio_in[j]=-1 ;
 
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_alt[j]=atoi(token);
+      gi_gpio_alt[j]=atoi(token);
     }
    }
    
@@ -244,12 +249,12 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
 
     Trace1("gp_Gpi_Par->par_azi trouve ligne %d = (%s)", l,gp_Gpi_Par->par_azi) ;
 
-    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_out[i]=-1 ;
+    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_out[i]=-1 ;
 
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_azi[j]=atoi(token);
+      gi_gpio_azi[j]=atoi(token);
     }
    }
    
@@ -262,12 +267,12 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
 
     Trace1("GPIO_MASQUE trouve ligne %d = (%s)", l,gp_Gpi_Par->par_mas) ;
 
-    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gpio_mas[i]=-1 ;
+    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_mas[i]=-1 ;
 
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_mas[j]=atoi(token);
+      gi_gpio_mas[j]=atoi(token);
     }
    }
 
@@ -278,22 +283,22 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
     memset( gp_Gpi_Par->par_fre_pwm,0,sizeof(gp_Gpi_Par->par_fre_pwm)) ;
     strcpy( gp_Gpi_Par->par_fre_pwm, g_Char_Params[l][1] ) ;
 
-    gpio_frequence_pwm = 1000 ;
+    gd_gpio_frequence_pwm = 1000 ;
 
     Trace1("gp_Gpi_Par->par_fre_pwm trouve ligne %d = (%s)", l,gp_Gpi_Par->par_fre_pwm) ;
 
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_frequence_pwm=(double)atoi(token);
+      gd_gpio_frequence_pwm=(double)atoi(token);
     }
    }
   }
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gpio_azi[%d]=%d",i,gpio_azi[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gpio_alt[%d]=%d",i,gpio_alt[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gpio_mas[%d]=%d",i,gpio_mas[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_azi[%d]=%d",i,gi_gpio_azi[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_alt[%d]=%d",i,gi_gpio_alt[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_mas[%d]=%d",i,gi_gpio_mas[i]);
    
-  TRACE1("gp_Gpi_Par->par_fre_pwm=%f", gpio_frequence_pwm ) ;
+  TRACE1("gp_Gpi_Par->par_fre_pwm=%f", gd_gpio_frequence_pwm ) ;
 }
 /*****************************************************************************************
 * @fn     : GPIO_READ
@@ -311,24 +316,24 @@ void GPIO_READ2(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COL
   
   for(l=0;l<CONFIG_DATAS_NB_COLONNES;l++) {
    if(!strcmp("GPIO_INPUT",g_Char_Params[l][0])) {
-    for(j=0;j<GPIO_SIZE;j++) gpio_in[j]=-1 ;
+    for(j=0;j<GPIO_SIZE;j++) gi_gpio_in[j]=-1 ;
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_in[j]=atoi(token);
+      gi_gpio_in[j]=atoi(token);
     }
    }
    if(!strcmp("GPIO_OUTPUT",g_Char_Params[l][0])) {
-    for(i=0;i<GPIO_SIZE;i++) gpio_out[i]=-1 ;
+    for(i=0;i<GPIO_SIZE;i++) gi_gpio_out[i]=-1 ;
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
       if (token == NULL) break ;
-      gpio_out[j]=atoi(token);
+      gi_gpio_out[j]=atoi(token);
     }
    }
   }
-   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_in[%d] =%d\n",i,gpio_in[i]);
-   for(i=0;i<GPIO_SIZE;i++) TRACE1("gpio_out[%d]=%d\n",i,gpio_out[i]);
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gi_gpio_in[%d] =%d\n",i,gi_gpio_in[i]);
+   for(i=0;i<GPIO_SIZE;i++) TRACE1("gi_gpio_out[%d]=%d\n",i,gi_gpio_out[i]);
 }
 
 //==========================================================
@@ -336,13 +341,13 @@ void GPIO_STATUT(void) {
 
   int i ;
   
-  printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gpio_in,gpio_out)) ;
+  printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
       
-  for(i=0;gpio_in[i]>0 ;i++) 
-    printf("statut de la broche gpio_in[%3d]=%3d ==> %3d\n", i,\
-      gpio_in[i], GPIO_GET( gpio_in[i] ) ) ;
+  for(i=0;gi_gpio_in[i]>0 ;i++) 
+    printf("statut de la broche gi_gpio_in[%3d]=%3d ==> %3d\n", i,\
+      gi_gpio_in[i], GPIO_GET( gi_gpio_in[i] ) ) ;
   
-  printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
+  printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
 }
 //====================================================================================================
 int GPIO_GET(int gpio) {
@@ -352,7 +357,7 @@ int GPIO_GET(int gpio) {
   memset(buf,0,GPIO_BUFFER_SIZE_256);
   
   if ( GPIO_OPEN_STATUT == 0 ) {
-    if(pread(gpio_fd[gpio],buf,GPIO_BUFFER_SIZE_256,0)>0)
+    if(pread(gi_gpio_fd[gpio],buf,GPIO_BUFFER_SIZE_256,0)>0)
       if(sscanf(buf,"%d",&val)==1)
         return val ;
   }
@@ -370,13 +375,13 @@ int GPIO_SET(int gpio,int val) {
   memset(buf,0,GPIO_BUFFER_SIZE_256);
   snprintf(buf,GPIO_BUFFER_SIZE_256,"%d\n",val) ;
 
- /* PWM :   pwrite( ph->gpio_fd,buf0,strlen(buf0),0) ; */
+ /* PWM :   pwrite( ph->gi_gpio_fd,buf0,strlen(buf0),0) ; */
 
   if ( GPIO_OPEN_STATUT == 0 ) {
-     retour=pwrite(gpio_fd[gpio],buf,strlen(buf),0) ;
+     retour=pwrite(gi_gpio_fd[gpio],buf,strlen(buf),0) ;
   }
   else {
-    Trace2("GPIO non dispo : simulation : gpio %d set %d\n",gpio_fd[gpio], val) ;
+    Trace2("GPIO non dispo : simulation : gpio %d set %d\n",gi_gpio_fd[gpio], val) ;
   }
   return retour ;
 }
@@ -395,7 +400,7 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
   memset(dir,0,GPIO_BUFFER_SIZE_256);
   memset(val,0,GPIO_BUFFER_SIZE_256);
   
-  memset(gpio_fd,0,GPIO_SIZE*sizeof(int));
+  memset(gi_gpio_fd,0,GPIO_SIZE*sizeof(int));
     
   sprintf(exp,"%s/export",GPIO_PATH) ;
   sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gpio) ;
@@ -415,7 +420,7 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
     else if ((f=fopen(dir,"w")) == NULL)                  { GPIO_OPEN_STATUT = -4  ; }
     else if ((fprintf(f,"out\n")<=0))                     { GPIO_OPEN_STATUT = -5  ; }
     else if ((fclose(f)!=0))                              { GPIO_OPEN_STATUT = -6  ; }
-    else if ((gpio_fd[ gpio ]=open(val, O_WRONLY))<0)     { GPIO_OPEN_STATUT = -7  ; }
+    else if ((gi_gpio_fd[ gpio ]=open(val, O_WRONLY))<0)     { GPIO_OPEN_STATUT = -7  ; }
   }
   else {
 
@@ -427,7 +432,7 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
     else if ((f=fopen(dir,"w")) == NULL)                  { GPIO_OPEN_STATUT = -11  ; }
     else if ((fprintf(f,"in\n")<=0))                      { GPIO_OPEN_STATUT = -12  ; }
     else if ((fclose(f)!=0))                              { GPIO_OPEN_STATUT = -13  ; }
-    else if ((gpio_fd[ gpio ]=open(val, O_RDONLY))<0)     { GPIO_OPEN_STATUT = -14  ; }
+    else if ((gi_gpio_fd[ gpio ]=open(val, O_RDONLY))<0)     { GPIO_OPEN_STATUT = -14  ; }
   }
   
   return GPIO_OPEN_STATUT ;
@@ -450,7 +455,7 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   memset(val,0,GPIO_BUFFER_SIZE_256);
   
   sprintf(unexport,"%s/unexport",GPIO_PATH) ;
-  //close( gpwm->gpio_fd ) ;
+  //close( gpwm->gi_gpio_fd ) ;
   
   gpwm->gpio_open_statut = 0 ;
   
@@ -460,7 +465,7 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   
   gpwm->gpio_open_statut = 0 ;
   
-  gpwm->gpio_fd=0;
+  gpwm->gi_gpio_fd=0;
     
   sprintf(exp,"%s/export",          GPIO_PATH ) ;
   sprintf(dir,"%s/gpio%d/direction",GPIO_PATH, gpwm->gpio) ;
@@ -476,7 +481,7 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   else if ((f=fopen(dir,"w")) == NULL)                  { gpwm->gpio_open_statut = -7  ; }
   else if ((fprintf(f,"out\n")<=0))                     { gpwm->gpio_open_statut = -8  ; }
   else if ((fclose(f)!=0))                              { gpwm->gpio_open_statut = -9  ; }
-  else if ((gpwm->gpio_fd =open(val, O_WRONLY))<0)      { gpwm->gpio_open_statut = -10  ; }
+  else if ((gpwm->gi_gpio_fd =open(val, O_WRONLY))<0)      { gpwm->gpio_open_statut = -10  ; }
   
   // FIXME : synthese traces sur une ligne (2021)
   Trace("open gpio %d : dir= %s exp=%s val=%s sta=%d",\
@@ -492,7 +497,7 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   }
 }
 //====================================================================================================
-int GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
+int GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
   FILE *f ;
   char exp[GPIO_BUFFER_SIZE_256] ;
   char dir[GPIO_BUFFER_SIZE_256] ;
@@ -504,7 +509,7 @@ int GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
   
   GPIO_OPEN_STATUT=0 ;
   
-  while(gpio_out[++i]>0) {
+  while(gi_gpio_out[++i]>0) {
   
     memset(err,0,GPIO_BUFFER_SIZE_256) ;
     memset(exp,0,GPIO_BUFFER_SIZE_256);
@@ -512,8 +517,8 @@ int GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
     memset(val,0,GPIO_BUFFER_SIZE_256);
     
     sprintf(exp,"%s/export",GPIO_PATH) ;
-    sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gpio_out[i]) ;
-    sprintf(val,"%s/gpio%d/value",GPIO_PATH,gpio_out[i]) ;
+    sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gi_gpio_out[i]) ;
+    sprintf(val,"%s/gpio%d/value",GPIO_PATH,gi_gpio_out[i]) ;
     /*
     printf("exp=%s\n",exp);
     printf("dir=%s\n",dir);
@@ -521,36 +526,36 @@ int GPIO_OPEN(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
     */
     //sleep(1);
     if ((f=fopen(exp,"w")) == NULL )                      { GPIO_OPEN_STATUT = -1 ; break ; }
-    else if ((fprintf(f,"%d\n",gpio_out[i]))<=0)          { GPIO_OPEN_STATUT = -2 ; break ; }
+    else if ((fprintf(f,"%d\n",gi_gpio_out[i]))<=0)          { GPIO_OPEN_STATUT = -2 ; break ; }
     else if ((fclose(f)) != 0 )                           { GPIO_OPEN_STATUT = -3 ; break ; }
     else if ((f=fopen(dir,"w")) == NULL)                  { GPIO_OPEN_STATUT = -4 ; break ; }
     else if ((fprintf(f,"out\n")<=0))                     { GPIO_OPEN_STATUT = -5 ; break ; }
     else if ((fclose(f)!=0))                              { GPIO_OPEN_STATUT = -6 ; break ; }
-    else if ((gpio_fd[gpio_out[i]]=open(val,O_WRONLY))<0) { GPIO_OPEN_STATUT = -7 ; break ; }
+    else if ((gi_gpio_fd[gi_gpio_out[i]]=open(val,O_WRONLY))<0) { GPIO_OPEN_STATUT = -7 ; break ; }
   }
   
   i=-1;
   
   if ( GPIO_OPEN_STATUT == 0 )
-   while(gpio_in[++i]>0) {
+   while(gi_gpio_in[++i]>0) {
     
     memset(dir,0,GPIO_BUFFER_SIZE_256);
     memset(exp,0,GPIO_BUFFER_SIZE_256);
     memset(val,0,GPIO_BUFFER_SIZE_256);
     
     sprintf(exp,"%s/export",GPIO_PATH) ;
-    sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gpio_in[i]) ;
-    sprintf(val,"%s/gpio%d/value",GPIO_PATH,gpio_in[i]) ;
+    sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gi_gpio_in[i]) ;
+    sprintf(val,"%s/gpio%d/value",GPIO_PATH,gi_gpio_in[i]) ;
     
     printf("gpio ouverture en INPUT : exp=%s val=%s\n",exp,val);
     
     if ((f=fopen(exp,"w")) == NULL )                      { GPIO_OPEN_STATUT = -8 ; break ; }
-    else if ((fprintf(f,"%d\n",gpio_in[i]))<=0)           { GPIO_OPEN_STATUT = -9 ; break ; }
+    else if ((fprintf(f,"%d\n",gi_gpio_in[i]))<=0)           { GPIO_OPEN_STATUT = -9 ; break ; }
     else if ((fclose(f)) != 0 )                           { GPIO_OPEN_STATUT = -10 ; break ; }
     else if ((f=fopen(dir,"w")) == NULL)                  { GPIO_OPEN_STATUT = -11 ; break ; }
     else if ((fprintf(f,"in\n")<=0))                      { GPIO_OPEN_STATUT = -12 ; break ; }
     else if ((fclose(f)!=0))                              { GPIO_OPEN_STATUT = -13 ; break ; }
-    else if ((gpio_fd[gpio_in[i]]=open(val,O_RDONLY))<0)  { GPIO_OPEN_STATUT = -14 ; break ; }
+    else if ((gi_gpio_fd[gi_gpio_in[i]]=open(val,O_RDONLY))<0)  { GPIO_OPEN_STATUT = -14 ; break ; }
    }
   
   return GPIO_OPEN_STATUT ;
@@ -564,7 +569,7 @@ int GPIO_CLOSE_BROCHE(int gpio) {
   memset(une,0,GPIO_BUFFER_SIZE_256);
   sprintf(une,"%s/unexport",GPIO_PATH) ;
 
-  Trace("fermeture GPIO %d", gpio_fd [ gpio ] ) ;
+  Trace("fermeture GPIO %d", gi_gpio_fd [ gpio ] ) ;
 
   if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
   if ((fprintf(f,"%d\n",gpio))<=0) { return -2 ;}
@@ -573,27 +578,27 @@ int GPIO_CLOSE_BROCHE(int gpio) {
   return 0 ;
 }
 //====================================================================================================
-int GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) {
+int GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
   FILE *f ;
   char une[GPIO_BUFFER_SIZE_256] ;
   int i ;
   
   i=-1;
-  while(gpio_out[++i]>0) {
+  while(gi_gpio_out[++i]>0) {
     memset(une,0,GPIO_BUFFER_SIZE_256);
     sprintf(une,"%s/unexport",GPIO_PATH) ;
-    close( gpio_fd [ gpio_out [ i ] ] ) ;
+    close( gi_gpio_fd [ gi_gpio_out [ i ] ] ) ;
     if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
-    if ((fprintf(f,"%d\n",gpio_out[i]))<=0) { return -2 ;}
+    if ((fprintf(f,"%d\n",gi_gpio_out[i]))<=0) { return -2 ;}
     if ((fclose(f)) != 0 ) { return -3 ;}
   }
   i=-1;
-  while(gpio_in[++i]>0) {
+  while(gi_gpio_in[++i]>0) {
     memset(une,0,GPIO_BUFFER_SIZE_256);
     sprintf(une,"%s/unexport",GPIO_PATH) ;
-    close( gpio_fd [ gpio_in [ i ] ] ) ;
+    close( gi_gpio_fd [ gi_gpio_in [ i ] ] ) ;
     if ((f=fopen(une,"w")) == NULL )   { return -4 ;}
-    if ((fprintf(f,"%d\n",gpio_in[i]))<=0) { return -5 ;}
+    if ((fprintf(f,"%d\n",gi_gpio_in[i]))<=0) { return -5 ;}
     if ((fclose(f)) != 0 ) { return -6 ;}
   }
   return 0 ;
@@ -1027,11 +1032,11 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
 
     if ( rap > 0 )
       // if ( ph->periode_mot < GPIO_SUIVI_MAIN_ATTENTE_MAX )
-        pwrite( ph->gpio_fd,buf1,strlen(buf1),0) ;
+        pwrite( ph->gi_gpio_fd,buf1,strlen(buf1),0) ;
 
     usleep( TUpwm_haut ) ;  
 
-    pwrite( ph->gpio_fd,buf0,strlen(buf0),0) ;
+    pwrite( ph->gi_gpio_fd,buf0,strlen(buf0),0) ;
     
     usleep( TUpwm_bas ) ;
   }
@@ -1368,7 +1373,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
     pm->p_pha[i]->Tpwm             = 0 ;
     pm->p_pha[i]->micropas         = 0 ;
     pm->p_pha[i]->gpio_open_statut = 0 ;
-    pm->p_pha[i]->gpio_fd          = 0 ;
+    pm->p_pha[i]->gi_gpio_fd          = 0 ;
     
     GPIO_OPEN_BROCHE_PWM( pm->p_pha[i] ) ;
     /*

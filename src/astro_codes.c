@@ -13,7 +13,7 @@ octobre 2022 :
 #include "astro_codes.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
-MACRO_ASTRO_GLOBAL_EXTERN_OTHER ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 

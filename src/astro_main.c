@@ -68,7 +68,7 @@ void ASTRO_TRAP_MAIN(int sig) {
   
   GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 100) ;
 
-  //Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gpio_in,gpio_out)) ;
+  //Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
 
   /*--------------------------------------------------------*/
   /* Si sig > positif on abandonne les threads et on quitte */
@@ -1221,9 +1221,9 @@ int main(int argc, char ** argv) {
   signal(SIGINT,ASTRO_TRAP_MAIN) ;
   signal(SIGALRM,ASTRO_TRAP_MAIN) ;
 
-  Trace("gpio_alt         : %d %d %d %d", gpio_alt[0], gpio_alt[1], gpio_alt[2], gpio_alt[3] ) ;
-  Trace("gpio_azi         : %d %d %d %d", gpio_azi[0], gpio_azi[1], gpio_azi[2], gpio_azi[3] ) ;
-  Trace("gpio_mas         : %d %d %d %d", gpio_mas[0], gpio_mas[1], gpio_mas[2], gpio_mas[3] ) ;
+  Trace("gi_gpio_alt         : %d %d %d %d", gi_gpio_alt[0], gi_gpio_alt[1], gi_gpio_alt[2], gi_gpio_alt[3] ) ;
+  Trace("gi_gpio_azi         : %d %d %d %d", gi_gpio_azi[0], gi_gpio_azi[1], gi_gpio_azi[2], gi_gpio_azi[3] ) ;
+  Trace("gi_gpio_mas         : %d %d %d %d", gi_gpio_mas[0], gi_gpio_mas[1], gi_gpio_mas[2], gi_gpio_mas[3] ) ;
   Trace("gp_Gpi_Par->par_led_etat    : %d", gp_Gpi_Par->par_led_etat );
   Trace("gp_Ast_Par->par_default_object : %s", gp_Ast_Par->par_default_object) ;
   
@@ -1276,11 +1276,11 @@ int main(int argc, char ** argv) {
   
   GPIO_INIT_PWM_MOTEUR(\
     gp_Mot_Alt,\
-    gpio_alt,\
-    gpio_mas,\
+    gi_gpio_alt,\
+    gi_gpio_mas,\
     gp_Cal_Par->par_alt_red_4 ,\
     100,\
-    gpio_frequence_pwm, \
+    gd_gpio_frequence_pwm, \
     0, \
     GPIO_CURRENT_FONCTION,\
     GPIO_CURRENT_FONCTION_PARAM0,\
@@ -1288,11 +1288,11 @@ int main(int argc, char ** argv) {
 
   GPIO_INIT_PWM_MOTEUR(\
     gp_Mot_Azi,\
-    gpio_azi,\
-    gpio_mas,\
+    gi_gpio_azi,\
+    gi_gpio_mas,\
     gp_Cal_Par->par_azi_red4 ,\
     100,\
-    gpio_frequence_pwm, \
+    gd_gpio_frequence_pwm, \
     1, \
     GPIO_CURRENT_FONCTION,\
     GPIO_CURRENT_FONCTION_PARAM0,\

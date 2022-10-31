@@ -11,7 +11,7 @@
 #include "astro_astre.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
-MACRO_ASTRO_GLOBAL_EXTERN_OTHER ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 static const char * c_Astre_Type[] = {
   "ASTRE_INDETERMINE",

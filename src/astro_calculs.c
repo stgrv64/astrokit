@@ -22,7 +22,7 @@
 #include "astro_calculs.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
-MACRO_ASTRO_GLOBAL_EXTERN_OTHER ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 static const char * c_Reduction_Type[] = {
   "REDUCTION_INDETERMINE",

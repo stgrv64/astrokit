@@ -160,39 +160,42 @@
 #define GPIO_PATH                  "/sys/class/gpio" 
 #define GPIO_TAILLE_BUFFER         16
 
-typedef enum t_en_Reduction_Type     ENUM_CALCULS_REDUCTION_TYPE ;
-typedef enum t_en_Calculs_Mode       ENUM_CALCULS_MODE ;
+typedef enum t_en_Reduction_Type            ENUM_CALCULS_REDUCTION_TYPE ;
+typedef enum t_en_Calculs_Mode              ENUM_CALCULS_MODE ;
+       
+typedef struct  STR_TIME                    STRUCT_TIME ;
+typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
+typedef struct  STR_ASTRE                   STRUCT_ASTRE ;
+typedef struct  STR_CAT                     STRUCT_CAT ;
+typedef struct  STR_CODES                   STRUCT_CODES ;
+typedef struct  STR_CONFIG                  STRUCT_CONFIG ;
+typedef struct  STR_DATAS                   STRUCT_DATAS ;
+typedef struct  STR_DEVICES                 STRUCT_DEVICES ;
+typedef struct  STR_I2C_DEVICE              STRUCT_I2C_DEVICE ;
+typedef struct  STR_I2C_ACC_MAG             STRUCT_STR_I2C_ACC_MAG ;
+typedef struct  STR_KEYS                    STRUCT_KEYS ;
+typedef struct  STR_LCD                     STRUCT_LCD ;
+typedef struct  STR_LIEU                    STRUCT_LIEU ;
+typedef struct  STR_PID                     STRUCT_PID ;
+typedef struct  STR_MUTEXS                  STRUCT_MUTEXS ;
+typedef struct  STR_PTHREADS                STRUCT_PTHREADS ;
+typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
+typedef struct  STR_VOUTE                   STRUCT_VOUTE ;
+       
+typedef struct  STR_GPIO_BROCHES            STRUCT_GPIO_BROCHES ;
+typedef struct  STR_GPIO_PWM_PHASE          STRUCT_GPIO_PWM_PHASE ;
+typedef struct  STR_GPIO_PWM_MOTEUR         STRUCT_GPIO_PWM_MOTEUR ;
+       
+typedef struct  STR_ASTRE_PARAMS            STRUCT_ASTRE_PARAMS ;
+typedef struct  STR_CALCULS_PARAMS          STRUCT_CALCULS_PARAMS ;
+typedef struct  STR_CONFIG_PARAMS           STRUCT_CONFIG_PARAMS ;
+typedef struct  STR_DEVICES_PARAMS          STRUCT_DEVICES_PARAMS ;
+typedef struct  STR_GPIO_PARAMS_PWM             STRUCT_GPIO_PARAMS ;
+typedef struct  STR_PID_PARAMS              STRUCT_PID_PARAMS ;
+       
+typedef struct  STR_GPIO_PARAMS_MATRICIEL   STRUCT_GPIO_PAR_MAT ;
+typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PAR_RAQ ;
 
-typedef struct  STR_TIME             STRUCT_TIME ;
-typedef struct  STR_ANGLE            STRUCT_ANGLE ;
-typedef struct  STR_ASTRE            STRUCT_ASTRE ;
-typedef struct  STR_CAT              STRUCT_CAT ;
-typedef struct  STR_CODES            STRUCT_CODES ;
-typedef struct  STR_CONFIG           STRUCT_CONFIG ;
-typedef struct  STR_DATAS            STRUCT_DATAS ;
-typedef struct  STR_DEVICES          STRUCT_DEVICES ;
-typedef struct  STR_I2C_DEVICE       STRUCT_I2C_DEVICE ;
-typedef struct  STR_I2C_ACC_MAG      STRUCT_STR_I2C_ACC_MAG ;
-typedef struct  STR_KEYS             STRUCT_KEYS ;
-typedef struct  STR_LCD              STRUCT_LCD ;
-typedef struct  STR_LIEU             STRUCT_LIEU ;
-typedef struct  STR_PID              STRUCT_PID ;
-typedef struct  STR_MUTEXS           STRUCT_MUTEXS ;
-typedef struct  STR_PTHREADS         STRUCT_PTHREADS ;
-typedef struct  STR_SUIVI            STRUCT_SUIVI ;
-typedef struct  STR_VOUTE            STRUCT_VOUTE ;
-
-typedef struct  STR_GPIO_BROCHES     STRUCT_GPIO_BROCHES ;
-typedef struct  STR_GPIO_PWM_PHASE   STRUCT_GPIO_PWM_PHASE ;
-typedef struct  STR_GPIO_PWM_MOTEUR  STRUCT_GPIO_PWM_MOTEUR ;
-
-typedef struct  STR_ASTRE_PARAMS     STRUCT_ASTRE_PARAMS ;
-typedef struct  STR_CALCULS_PARAMS   STRUCT_CALCULS_PARAMS ;
-typedef struct  STR_CONFIG_PARAMS    STRUCT_CONFIG_PARAMS ;
-typedef struct  STR_DEVICES_PARAMS   STRUCT_DEVICES_PARAMS ;
-typedef struct  STR_GPIO_PARAMS_OLD  STRUCT_GPIO_PAR_OLD ;
-typedef struct  STR_GPIO_PARAMS      STRUCT_GPIO_PARAMS ;
-typedef struct  STR_PID_PARAMS       STRUCT_PID_PARAMS ;
 
 #include "astro_types.h"
 #include "astro_config.h"
@@ -249,9 +252,17 @@ typedef struct  STR_PID_PARAMS       STRUCT_PID_PARAMS ;
   extern STRUCT_TIME_PARAMS *gp_Tim_Par ; \
   extern STRUCT_PID_PARAMS *gp_Pid_Par ; \
 
-#define MACRO_ASTRO_GLOBAL_EXTERN_OTHER \
-  extern int gpio_in[ GPIO_SIZE] ; \
-  extern int gpio_out[ GPIO_SIZE] ; \
+#define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS \
+  extern double gd_gpio_frequence_pwm ; \
+  extern int    gi_gpio_fd     [ GPIO_SIZE ] ; \
+  extern int    gi_gpio_in   	 [ GPIO_SIZE]  ; \
+  extern int    gi_gpio_out    [ GPIO_SIZE] ; \
+  extern int    gi_gpio_alt    [ GPIO_NB_PHASES_PAR_MOTEUR ]  ; \
+  extern int    gi_gpio_azi    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
+  extern int    gi_gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
+
+#define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS_OLD \
+
 /*
 #ifndef CONFIG_DATAS_NB_LIGNES
 #define CONFIG_DATAS_NB_LIGNES 200

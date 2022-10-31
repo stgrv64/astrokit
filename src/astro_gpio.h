@@ -22,12 +22,12 @@
 /* Parametres de fichier config (modif octobre 2022) */ 
 /*---------------------------------------------------*/
 
-struct STR_GPIO_PARAMS_OLD {
+/* 
+  les params suivants servent pour utilisation d un controleur externe
+  pour les pas et micro pas et l'amplification des signaux (OBSOLETE)
+*/
 
-  /* 
-    les params suivants servent pour utilisation d un controleur externe
-    pour les pas et micro pas et l'amplification des signaux (OBSOLETE)
-  */
+struct STR_GPIO_PARAMS_CONTROLER {
 
   unsigned char GPIO_DIR_ALT ;  // numero de port GPIO pour le sens de rotation de l'altitude
   unsigned char GPIO_CLK_ALT ;  // numero de port GPIO pour l'horloge de l'altitude
@@ -38,6 +38,7 @@ struct STR_GPIO_PARAMS_OLD {
   unsigned char GPIO_M2_ALT  ;  // numero de port GPIO pour le choix du micro pas
   unsigned char GPIO_M1_ALT  ;  // numero de port GPIO pour le choix du micro pas
   unsigned char GPIO_M0_ALT  ;  // numero de port GPIO pour le choix du micro pas
+
   unsigned char GPIO_DIR_AZI ;  // numero de port GPIO pour le sens de rotation de l'azimut
   unsigned char GPIO_CLK_AZI ;  // numero de port GPIO pour l'horloge de l'azimut
   unsigned char GPIO_SLP_AZI ;  // numero de port GPIO pour le sleep du controleur du moteur
@@ -47,16 +48,23 @@ struct STR_GPIO_PARAMS_OLD {
   unsigned char GPIO_M2_AZI  ;  // numero de port GPIO pour le choix du micro pas
   unsigned char GPIO_M1_AZI  ;  // numero de port GPIO pour le choix du micro pas
   unsigned char GPIO_M0_AZI  ;  // numero de port GPIO pour le cho
-  /* 
-    les params suivants servent pour utilisation d'une raquette O/N/E/S
-    reliee directement aux gpios (OBSOLETE)
-  */
+} ;
+
+/* 
+  les params suivants servent pour utilisation d'une raquette O/N/E/S
+  reliee directement aux gpios (OBSOLETE)
+*/
+
+struct STR_GPIO_PARAMS_RAQUETTE {
+
   int           GPIO_RAQ_O  ; 
   int           GPIO_RAQ_E  ;
   int           GPIO_RAQ_S  ;
   int           GPIO_RAQ_N  ;
   int           GPIO_RAQ_V  ;
+} ;
 
+struct STR_GPIO_PARAMS_MATRICIEL {
   /* 
     les params suivants servent pour utilisation d'un clavier matriciel 4*4
     reliee directement aux 8 gpios par multiplexage (OBSOLETE)
@@ -73,7 +81,7 @@ struct STR_GPIO_PARAMS_OLD {
 
 } ;
 
-struct STR_GPIO_PARAMS {
+struct STR_GPIO_PARAMS_PWM {
   int           par_led_etat ;
   char          par_fre_pwm [ CONFIG_TAILLE_BUFFER_64 ] ;
   char          par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
@@ -117,7 +125,7 @@ struct STR_GPIO_PWM_PHASE {
 
   int     gpio ;
   int     gpio_open_statut ;
-  int     gpio_fd ;
+  int     gi_gpio_fd ;
   
   double  periode_mic ;
   double  periode_mot ;  
@@ -236,9 +244,9 @@ int    GPIO_GET(int ) ;
 int    GPIO_SET(int ,int ) ;
 int    GPIO_OPEN_BROCHE(int ,int ) ;
 void   /* GPIO_OPEN_BROCHE */_PWM(STRUCT_GPIO_PWM_PHASE *) ;
-int    GPIO_OPEN(int gpio_in[GPIO_SIZE],int [GPIO_SIZE]) ;
+int    GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int [GPIO_SIZE]) ;
 int    GPIO_CLOSE_BROCHE(int gpio) ;
-int    GPIO_CLOSE(int gpio_in[GPIO_SIZE],int gpio_out[GPIO_SIZE]) ;
+int    GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) ;
 void   GPIO_SET_ALT(int dir, int slp, int clk, int rst, int mmm, int ena) ;
 void   GPIO_SET_AZI(int dir, int slp, int clk, int rst, int mmm, int ena) ;
 void   GPIO_MOVE_1(int sens, double periode,double nb_pulse, int gpio_dir, int gpio_clk) ;

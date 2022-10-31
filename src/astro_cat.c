@@ -13,7 +13,7 @@
 #include "astro_cat.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
-MACRO_ASTRO_GLOBAL_EXTERN_OTHER ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
 * @fn     : CAT_FIN_MOT

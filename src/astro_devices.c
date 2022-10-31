@@ -23,7 +23,7 @@
 #include "astro_devices.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
-MACRO_ASTRO_GLOBAL_EXTERN_OTHER ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 // les variables suivantes servent si un expandeur de port est utilise. Exemple = MCP23017 ou MCP23008
 
