@@ -55,7 +55,9 @@
 // avec la commande getcwd 
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+MACRO_ASTRO_GLOBAL_EXTERN_CONST ;
 
 static const char * c_Bin_Possible_Paths[] = {
   "/bin",
@@ -236,7 +238,7 @@ void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DA
    gp_Dev_Par->par_use_Keyboard = 0 ;
    gp_Dev_Par->par_use_Lcd = 0 ;
 
-   gp_Gpi_Par->par_led_etat=0;
+   gp_Gpi_Par_Pwm->par_led_etat=0;
 
    /* Definition de valeurs par defauts pour les TEMPO */ 
 
@@ -303,7 +305,7 @@ void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DA
      if(!strcmp("gp_Pid_Par->par_pid_ki", lc_Params[l][0])) gp_Pid_Par->par_pid_kp =atof(lc_Params[l][1]);
      if(!strcmp("gp_Pid_Par->par_pid_kd", lc_Params[l][0])) gp_Pid_Par->par_pid_kd =atof(lc_Params[l][1]);
 
-     if(!strcmp("gp_Gpi_Par->par_led_etat",lc_Params[l][0]))  gp_Gpi_Par->par_led_etat=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Pwm->par_led_etat",lc_Params[l][0]))  gp_Gpi_Par_Pwm->par_led_etat=atoi(lc_Params[l][1]);
 
      if(!strcmp("gp_Dev_Par->par_use_Controler",lc_Params[l][0]))  gp_Dev_Par->par_use_Controler=atoi(lc_Params[l][1]);
      if(!strcmp("gp_Dev_Par->par_use_Capteurs",lc_Params[l][0]))   gp_Dev_Par->par_use_Capteurs=atoi(lc_Params[l][1]);
@@ -325,25 +327,25 @@ void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DA
      if(!strcmp("gp_Cal_Par->par_alt_red_tot",lc_Params[l][0]))        gp_Cal_Par->par_alt_red_tot=atof(lc_Params[l][1]);
      if(!strcmp("gp_Cal_Par->par_azi_red_tot",lc_Params[l][0]))        gp_Cal_Par->par_azi_red_tot=atof(lc_Params[l][1]);
      
-     if(!strcmp("GPIO_RAQ_O",lc_Params[l][0]))   GPIO_RAQ_O=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_RAQ_E",lc_Params[l][0]))   GPIO_RAQ_E=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_RAQ_S",lc_Params[l][0]))   GPIO_RAQ_S=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_RAQ_N",lc_Params[l][0]))   GPIO_RAQ_N=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_RAQ_V",lc_Params[l][0]))   GPIO_RAQ_V=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_ouest",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_ouest=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_est",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_est=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_sud",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_sud=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_nord",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_nord=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_v",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_v=atoi(lc_Params[l][1]);
      
-     if(!strcmp("GPIO_KEY_L1",lc_Params[l][0]))   GPIO_KEY_L1=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_KEY_L2",lc_Params[l][0]))   GPIO_KEY_L2=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_KEY_L3",lc_Params[l][0]))   GPIO_KEY_L3=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_KEY_L4",lc_Params[l][0]))   GPIO_KEY_L4=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l1",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l1=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l2",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l2=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l3",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l3=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l4",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l4=atoi(lc_Params[l][1]);
      
-     if(!strcmp("GPIO_KEY_C1",lc_Params[l][0]))   GPIO_KEY_C1=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_KEY_C2",lc_Params[l][0]))   GPIO_KEY_C2=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_KEY_C3",lc_Params[l][0]))   GPIO_KEY_C3=atoi(lc_Params[l][1]);
-     if(!strcmp("GPIO_KEY_C4",lc_Params[l][0]))   GPIO_KEY_C4=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c1",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c1=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c2",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c2=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c3",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c3=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c4",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c4=atoi(lc_Params[l][1]);
 
-     if(!strcmp("LIEU_LONGITUDE",lc_Params[l][0]))     LIEU_LONGITUDE=atof(lc_Params[l][1]);
-     if(!strcmp("LIEU_LATITUDE",lc_Params[l][0]))      LIEU_LATITUDE=atof(lc_Params[l][1]);
-     if(!strcmp("LIEU_ALTITUDE",lc_Params[l][0]))      LIEU_ALTITUDE=atof(lc_Params[l][1]);
+     if(!strcmp("gp_Lie_Par->par_longitude",lc_Params[l][0]))     gp_Lie_Par->par_longitude=atof(lc_Params[l][1]);
+     if(!strcmp("gp_Lie_Par->par_latitude",lc_Params[l][0]))      gp_Lie_Par->par_latitude=atof(lc_Params[l][1]);
+     if(!strcmp("gp_Lie_Par->par_altitude",lc_Params[l][0]))      gp_Lie_Par->par_altitude=atof(lc_Params[l][1]);
 
      // devices de altitude
 
@@ -357,23 +359,23 @@ void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DA
 
      if(!strcmp("gp_Cal_Par->par_alt_acc",lc_Params[l][0]))      gp_Cal_Par->par_alt_acc= atof(lc_Params[l][1])      ;
 
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_DIR_ALT",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_DIR_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_CLK_ALT",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_CLK_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_SLP_ALT",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_SLP_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_RST_ALT",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_RST_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_MMM_ALT",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_MMM_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_ENA_ALT",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_ENA_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_M2_ALT",lc_Params[l][0]))  gp_Gpi_Par_Old->GPIO_M2_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_M1_ALT",lc_Params[l][0]))  gp_Gpi_Par_Old->GPIO_M1_ALT=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_M0_ALT",lc_Params[l][0]))  gp_Gpi_Par_Old->GPIO_M0_ALT=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_dir",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_dir=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_clk",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_clk=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_slp",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_slp=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_rst",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_rst=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_mmm",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_mmm=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_ena",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_ena=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_m2",lc_Params[l][0]))  gp_Gpi_Par_Con->par_alt_m2=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_m1",lc_Params[l][0]))  gp_Gpi_Par_Con->par_alt_m1=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_m0",lc_Params[l][0]))  gp_Gpi_Par_Con->par_alt_m0=atoi(lc_Params[l][1]);  
 
-     if(!strcmp("MCP_DIR_ALT",lc_Params[l][0]))  MCP_DIR_ALT=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("MCP_CLK_ALT",lc_Params[l][0]))  MCP_CLK_ALT=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("MCP_SLP_ALT",lc_Params[l][0]))  MCP_SLP_ALT=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("MCP_RST_ALT",lc_Params[l][0]))  MCP_RST_ALT=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("MCP_M2_ALT",lc_Params[l][0]))   MCP_M2_ALT=atoi(lc_Params[l][1])   ;  
-     if(!strcmp("MCP_M1_ALT",lc_Params[l][0]))   MCP_M1_ALT=atoi(lc_Params[l][1])   ;  
-     if(!strcmp("MCP_M0_ALT",lc_Params[l][0]))   MCP_M0_ALT=atoi(lc_Params[l][1])   ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_dir",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_dir=atoi(lc_Params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_clk",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_clk=atoi(lc_Params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_slp",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_slp=atoi(lc_Params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_rst",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_rst=atoi(lc_Params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_m2",lc_Params[l][0]))   gp_I2c_Mcp->mcp_alt_m2=atoi(lc_Params[l][1])   ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_m1",lc_Params[l][0]))   gp_I2c_Mcp->mcp_alt_m1=atoi(lc_Params[l][1])   ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_m0",lc_Params[l][0]))   gp_I2c_Mcp->mcp_alt_m0=atoi(lc_Params[l][1])   ;  
      
      // devices de azimut
 
@@ -387,23 +389,23 @@ void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DA
 
      if(!strcmp("gp_Cal_Par->par_azi_acc",lc_Params[l][0]))      gp_Cal_Par->par_azi_acc= atof(lc_Params[l][1])      ;
 
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_DIR_AZI",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_DIR_AZI=atoi(lc_Params[l][1]) ; 
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_CLK_AZI",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_CLK_AZI=atoi(lc_Params[l][1]) ; 
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_SLP_AZI",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_SLP_AZI=atoi(lc_Params[l][1]) ;
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_RST_AZI",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_RST_AZI=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_MMM_AZI",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_MMM_AZI=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_ENA_AZI",lc_Params[l][0])) gp_Gpi_Par_Old->GPIO_ENA_AZI=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_M2_AZI",lc_Params[l][0]))  gp_Gpi_Par_Old->GPIO_M2_AZI=atoi(lc_Params[l][1])  ;
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_M1_AZI",lc_Params[l][0]))  gp_Gpi_Par_Old->GPIO_M1_AZI=atoi(lc_Params[l][1])  ; 
-     if(!strcmp("gp_Gpi_Par_Old->GPIO_M0_AZI",lc_Params[l][0]))  gp_Gpi_Par_Old->GPIO_M0_AZI=atoi(lc_Params[l][1])  ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_dir",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_dir=atoi(lc_Params[l][1]) ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_clk",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_clk=atoi(lc_Params[l][1]) ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_slp",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_slp=atoi(lc_Params[l][1]) ;
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_rst",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_rst=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_mmm",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_mmm=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_ena",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_ena=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_m2",lc_Params[l][0]))  gp_Gpi_Par_Con->par_azi_m2=atoi(lc_Params[l][1])  ;
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_m1",lc_Params[l][0]))  gp_Gpi_Par_Con->par_azi_m1=atoi(lc_Params[l][1])  ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_m0",lc_Params[l][0]))  gp_Gpi_Par_Con->par_azi_m0=atoi(lc_Params[l][1])  ; 
 
-     if(!strcmp("MCP_DIR_AZI",lc_Params[l][0]))  MCP_DIR_AZI=atoi(lc_Params[l][1])   ;
-     if(!strcmp("MCP_CLK_AZI",lc_Params[l][0]))  MCP_CLK_AZI=atoi(lc_Params[l][1])   ;
-     if(!strcmp("MCP_SLP_AZI",lc_Params[l][0]))  MCP_SLP_AZI=atoi(lc_Params[l][1])   ;
-     if(!strcmp("MCP_RST_AZI",lc_Params[l][0]))  MCP_RST_AZI=atoi(lc_Params[l][1])   ; 
-     if(!strcmp("MCP_M2_AZI",lc_Params[l][0]))   MCP_M2_AZI=atoi(lc_Params[l][1])    ;
-     if(!strcmp("MCP_M1_AZI",lc_Params[l][0]))   MCP_M1_AZI=atoi(lc_Params[l][1])    ;
-     if(!strcmp("MCP_M0_AZI",lc_Params[l][0]))   MCP_M0_AZI=atoi(lc_Params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_dir",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_dir=atoi(lc_Params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_clk",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_clk=atoi(lc_Params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_slp",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_slp=atoi(lc_Params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_rst",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_rst=atoi(lc_Params[l][1])   ; 
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_m2",lc_Params[l][0]))   gp_I2c_Mcp->mcp_azi_m2=atoi(lc_Params[l][1])    ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_m1",lc_Params[l][0]))   gp_I2c_Mcp->mcp_azi_m1=atoi(lc_Params[l][1])    ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_m0",lc_Params[l][0]))   gp_I2c_Mcp->mcp_azi_m0=atoi(lc_Params[l][1])   ;
 
      // devices de azimut et altitude (qui concernent les 2 en mm temps)
      
@@ -482,13 +484,13 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
   Trace1("gp_Dev_Par->par_use_Lcd = %d",  gp_Dev_Par->par_use_Lcd);
 
   Trace1("gp_Ast_Par->par_default_object = %s",  gp_Ast_Par->par_default_object );
-  Trace1("gp_Con_Par->par_default_menu = %s",  c_Menus[gp_Con_Par->par_default_menu]);
+  Trace1("gp_Con_Par->par_default_menu = %s",  gc_const_menus[gp_Con_Par->par_default_menu]);
 
-  Trace1("LIEU_LATITUDE  = %f",          LIEU_LATITUDE );
-  Trace1("LIEU_LONGITUDE = %f",          LIEU_LONGITUDE );
-  Trace1("LIEU_ALTITUDE  = %f",          LIEU_ALTITUDE );
+  Trace1("gp_Lie_Par->par_latitude  = %f",          gp_Lie_Par->par_latitude );
+  Trace1("gp_Lie_Par->par_longitude = %f",          gp_Lie_Par->par_longitude );
+  Trace1("gp_Lie_Par->par_altitude  = %f",          gp_Lie_Par->par_altitude );
 
-  Trace1("gp_Gpi_Par->par_led_etat = %d", gp_Gpi_Par->par_led_etat );
+  Trace1("gp_Gpi_Par_Pwm->par_led_etat = %d", gp_Gpi_Par_Pwm->par_led_etat );
 
   Trace1("gp_Cal_Par->par_alt_red_1 = %f",       gp_Cal_Par->par_alt_red_1);         
   Trace1("gp_Cal_Par->par_alt_red_2 = %f",       gp_Cal_Par->par_alt_red_2);
@@ -517,58 +519,58 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
   Trace1("gp_Con_Par->par_rep_scr = %s", gp_Con_Par->par_rep_scr)  ; 
   Trace1("gp_Con_Par->par_src_ker = %s", gp_Con_Par->par_src_ker)  ; 
 
-  Trace1("gp_Gpi_Par->par_alt = %s", gp_Gpi_Par->par_alt)  ;  
-  Trace1("gp_Gpi_Par->par_azi = %s", gp_Gpi_Par->par_azi)  ;  
-  Trace1("gp_Gpi_Par->par_mas = %s", gp_Gpi_Par->par_mas)  ;  
-  Trace1("gp_Gpi_Par->par_fre_pwm = %s", gp_Gpi_Par->par_fre_pwm)  ;  
+  Trace1("gp_Gpi_Par_Pwm->par_alt = %s", gp_Gpi_Par_Pwm->par_alt)  ;  
+  Trace1("gp_Gpi_Par_Pwm->par_azi = %s", gp_Gpi_Par_Pwm->par_azi)  ;  
+  Trace1("gp_Gpi_Par_Pwm->par_mas = %s", gp_Gpi_Par_Pwm->par_mas)  ;  
+  Trace1("gp_Gpi_Par_Pwm->par_fre_pwm = %s", gp_Gpi_Par_Pwm->par_fre_pwm)  ;  
 
   Trace2("anciennes variables\n");
-  Trace2("GPIO_RAQ_O   = %d",  GPIO_RAQ_O);
-  Trace2("GPIO_RAQ_E   = %d",  GPIO_RAQ_E);
-  Trace2("GPIO_RAQ_S   = %d",  GPIO_RAQ_S);
-  Trace2("GPIO_RAQ_N   = %d",  GPIO_RAQ_N);
-  Trace2("GPIO_RAQ_V   = %d",  GPIO_RAQ_V);
-  Trace2("GPIO_KEY_L1  = %d",  GPIO_KEY_L1);
-  Trace2("GPIO_KEY_L2  = %d",  GPIO_KEY_L2);
-  Trace2("GPIO_KEY_L3  = %d",  GPIO_KEY_L3);
-  Trace2("GPIO_KEY_L4  = %d",  GPIO_KEY_L4);
-  Trace2("GPIO_KEY_C1  = %d",  GPIO_KEY_C1);
-  Trace2("GPIO_KEY_C2  = %d",  GPIO_KEY_C2);
-  Trace2("GPIO_KEY_C3  = %d",  GPIO_KEY_C3);
-  Trace2("GPIO_KEY_C4  = %d",  GPIO_KEY_C4);
-  Trace2("gp_Gpi_Par_Old->GPIO_DIR_ALT = %d", gp_Gpi_Par_Old->GPIO_DIR_ALT);  
-  Trace2("gp_Gpi_Par_Old->GPIO_CLK_ALT = %d", gp_Gpi_Par_Old->GPIO_CLK_ALT);  
-  Trace2("gp_Gpi_Par_Old->GPIO_SLP_ALT = %d", gp_Gpi_Par_Old->GPIO_SLP_ALT);  
-  Trace2("gp_Gpi_Par_Old->GPIO_RST_ALT = %d", gp_Gpi_Par_Old->GPIO_RST_ALT);  
-  Trace2("gp_Gpi_Par_Old->GPIO_MMM_ALT = %d", gp_Gpi_Par_Old->GPIO_MMM_ALT);  
-  Trace2("gp_Gpi_Par_Old->GPIO_ENA_ALT = %d", gp_Gpi_Par_Old->GPIO_ENA_ALT);  
-  Trace2("gp_Gpi_Par_Old->GPIO_M2_ALT = %d",  gp_Gpi_Par_Old->GPIO_M2_ALT)  ;  
-  Trace2("gp_Gpi_Par_Old->GPIO_M1_ALT = %d",  gp_Gpi_Par_Old->GPIO_M1_ALT)  ;  
-  Trace2("gp_Gpi_Par_Old->GPIO_M0_ALT = %d",  gp_Gpi_Par_Old->GPIO_M0_ALT)  ;  
-  Trace2("gp_Gpi_Par_Old->GPIO_DIR_AZI = %d", gp_Gpi_Par_Old->GPIO_DIR_AZI) ; 
-  Trace2("gp_Gpi_Par_Old->GPIO_CLK_AZI = %d", gp_Gpi_Par_Old->GPIO_CLK_AZI) ; 
-  Trace2("gp_Gpi_Par_Old->GPIO_SLP_AZI = %d", gp_Gpi_Par_Old->GPIO_SLP_AZI) ;
-  Trace2("gp_Gpi_Par_Old->GPIO_RST_AZI = %d", gp_Gpi_Par_Old->GPIO_RST_AZI);  
-  Trace2("gp_Gpi_Par_Old->GPIO_MMM_AZI = %d", gp_Gpi_Par_Old->GPIO_MMM_AZI);  
-  Trace2("gp_Gpi_Par_Old->GPIO_ENA_AZI = %d", gp_Gpi_Par_Old->GPIO_ENA_AZI);  
-  Trace2("gp_Gpi_Par_Old->GPIO_M2_AZI = %d",  gp_Gpi_Par_Old->GPIO_M2_AZI)  ;
-  Trace2("gp_Gpi_Par_Old->GPIO_M1_AZI = %d",  gp_Gpi_Par_Old->GPIO_M1_AZI)  ; 
-  Trace2("gp_Gpi_Par_Old->GPIO_M0_AZI = %d",  gp_Gpi_Par_Old->GPIO_M0_AZI)  ; 
+  Trace2("gp_Gpi_Par_Raq->par_raq_ouest   = %d",  gp_Gpi_Par_Raq->par_raq_ouest);
+  Trace2("gp_Gpi_Par_Raq->par_raq_est   = %d",  gp_Gpi_Par_Raq->par_raq_est);
+  Trace2("gp_Gpi_Par_Raq->par_raq_sud   = %d",  gp_Gpi_Par_Raq->par_raq_sud);
+  Trace2("gp_Gpi_Par_Raq->par_raq_nord   = %d",  gp_Gpi_Par_Raq->par_raq_nord);
+  Trace2("gp_Gpi_Par_Raq->par_raq_v   = %d",  gp_Gpi_Par_Raq->par_raq_v);
+  Trace2("gp_Gpi_Par_Mat->par_l1  = %d",  gp_Gpi_Par_Mat->par_l1);
+  Trace2("gp_Gpi_Par_Mat->par_l2  = %d",  gp_Gpi_Par_Mat->par_l2);
+  Trace2("gp_Gpi_Par_Mat->par_l3  = %d",  gp_Gpi_Par_Mat->par_l3);
+  Trace2("gp_Gpi_Par_Mat->par_l4  = %d",  gp_Gpi_Par_Mat->par_l4);
+  Trace2("gp_Gpi_Par_Mat->par_c1  = %d",  gp_Gpi_Par_Mat->par_c1);
+  Trace2("gp_Gpi_Par_Mat->par_c2  = %d",  gp_Gpi_Par_Mat->par_c2);
+  Trace2("gp_Gpi_Par_Mat->par_c3  = %d",  gp_Gpi_Par_Mat->par_c3);
+  Trace2("gp_Gpi_Par_Mat->par_c4  = %d",  gp_Gpi_Par_Mat->par_c4);
+  Trace2("gp_Gpi_Par_Con->par_alt_dir = %d", gp_Gpi_Par_Con->par_alt_dir);  
+  Trace2("gp_Gpi_Par_Con->par_alt_clk = %d", gp_Gpi_Par_Con->par_alt_clk);  
+  Trace2("gp_Gpi_Par_Con->par_alt_slp = %d", gp_Gpi_Par_Con->par_alt_slp);  
+  Trace2("gp_Gpi_Par_Con->par_alt_rst = %d", gp_Gpi_Par_Con->par_alt_rst);  
+  Trace2("gp_Gpi_Par_Con->par_alt_mmm = %d", gp_Gpi_Par_Con->par_alt_mmm);  
+  Trace2("gp_Gpi_Par_Con->par_alt_ena = %d", gp_Gpi_Par_Con->par_alt_ena);  
+  Trace2("gp_Gpi_Par_Con->par_alt_m2 = %d",  gp_Gpi_Par_Con->par_alt_m2)  ;  
+  Trace2("gp_Gpi_Par_Con->par_alt_m1 = %d",  gp_Gpi_Par_Con->par_alt_m1)  ;  
+  Trace2("gp_Gpi_Par_Con->par_alt_m0 = %d",  gp_Gpi_Par_Con->par_alt_m0)  ;  
+  Trace2("gp_Gpi_Par_Con->par_azi_dir = %d", gp_Gpi_Par_Con->par_azi_dir) ; 
+  Trace2("gp_Gpi_Par_Con->par_azi_clk = %d", gp_Gpi_Par_Con->par_azi_clk) ; 
+  Trace2("gp_Gpi_Par_Con->par_azi_slp = %d", gp_Gpi_Par_Con->par_azi_slp) ;
+  Trace2("gp_Gpi_Par_Con->par_azi_rst = %d", gp_Gpi_Par_Con->par_azi_rst);  
+  Trace2("gp_Gpi_Par_Con->par_azi_mmm = %d", gp_Gpi_Par_Con->par_azi_mmm);  
+  Trace2("gp_Gpi_Par_Con->par_azi_ena = %d", gp_Gpi_Par_Con->par_azi_ena);  
+  Trace2("gp_Gpi_Par_Con->par_azi_m2 = %d",  gp_Gpi_Par_Con->par_azi_m2)  ;
+  Trace2("gp_Gpi_Par_Con->par_azi_m1 = %d",  gp_Gpi_Par_Con->par_azi_m1)  ; 
+  Trace2("gp_Gpi_Par_Con->par_azi_m0 = %d",  gp_Gpi_Par_Con->par_azi_m0)  ; 
   Trace2("=====================================================\n");
-  Trace2("MCP_DIR_AZI = %d",  MCP_DIR_AZI)   ;
-  Trace2("MCP_CLK_AZI = %d",  MCP_CLK_AZI)   ;
-  Trace2("MCP_SLP_AZI = %d",  MCP_SLP_AZI)   ;
-  Trace2("MCP_RST_AZI = %d",  MCP_RST_AZI)   ; 
-  Trace2("MCP_M2_AZI = %d",   MCP_M2_AZI)    ;
-  Trace2("MCP_M1_AZI = %d",   MCP_M1_AZI)    ;
-  Trace2("MCP_M0_AZI = %d",   MCP_M0_AZI)   ;
-  Trace2("MCP_DIR_ALT = %d",  MCP_DIR_ALT)  ;  
-  Trace2("MCP_CLK_ALT = %d",  MCP_CLK_ALT)  ;  
-  Trace2("MCP_SLP_ALT = %d",  MCP_SLP_ALT)  ;  
-  Trace2("MCP_RST_ALT = %d",  MCP_RST_ALT)  ;  
-  Trace2("MCP_M2_ALT = %d",   MCP_M2_ALT)   ;  
-  Trace2("MCP_M1_ALT = %d",   MCP_M1_ALT)   ;  
-  Trace2("MCP_M0_ALT = %d",   MCP_M0_ALT)   ;  
+  Trace2("gp_I2c_Mcp->mcp_azi_dir = %d",  gp_I2c_Mcp->mcp_azi_dir)   ;
+  Trace2("gp_I2c_Mcp->mcp_azi_clk = %d",  gp_I2c_Mcp->mcp_azi_clk)   ;
+  Trace2("gp_I2c_Mcp->mcp_azi_slp = %d",  gp_I2c_Mcp->mcp_azi_slp)   ;
+  Trace2("gp_I2c_Mcp->mcp_azi_rst = %d",  gp_I2c_Mcp->mcp_azi_rst)   ; 
+  Trace2("gp_I2c_Mcp->mcp_azi_m2 = %d",   gp_I2c_Mcp->mcp_azi_m2)    ;
+  Trace2("gp_I2c_Mcp->mcp_azi_m1 = %d",   gp_I2c_Mcp->mcp_azi_m1)    ;
+  Trace2("gp_I2c_Mcp->mcp_azi_m0 = %d",   gp_I2c_Mcp->mcp_azi_m0)   ;
+  Trace2("gp_I2c_Mcp->mcp_alt_dir = %d",  gp_I2c_Mcp->mcp_alt_dir)  ;  
+  Trace2("gp_I2c_Mcp->mcp_alt_clk = %d",  gp_I2c_Mcp->mcp_alt_clk)  ;  
+  Trace2("gp_I2c_Mcp->mcp_alt_slp = %d",  gp_I2c_Mcp->mcp_alt_slp)  ;  
+  Trace2("gp_I2c_Mcp->mcp_alt_rst = %d",  gp_I2c_Mcp->mcp_alt_rst)  ;  
+  Trace2("gp_I2c_Mcp->mcp_alt_m2 = %d",   gp_I2c_Mcp->mcp_alt_m2)   ;  
+  Trace2("gp_I2c_Mcp->mcp_alt_m1 = %d",   gp_I2c_Mcp->mcp_alt_m1)   ;  
+  Trace2("gp_I2c_Mcp->mcp_alt_m0 = %d",   gp_I2c_Mcp->mcp_alt_m0)   ;  
 }
 /*****************************************************************************************
 * @fn     : CONFIG_GETCWD
@@ -838,7 +840,7 @@ void CONFIG_AFFICHER_CHANGEMENTS (void)  {
   if ( gp_Sui->menu_old != gp_Sui->menu ) {
 
     Trace("appel : %d : %s" , gp_Sui->menu, s_menu) ;
-    GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 100) ;
+    GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 100) ;
   }
   Trace("end") ;
 

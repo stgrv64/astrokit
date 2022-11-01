@@ -11,7 +11,9 @@
 
 #include "astro_keys.h"
 
-STRUCT_KEYS g_Key, *lp_Key ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
 * @fn     : KEYS_INPUTS_GESTION_APPUIS
@@ -61,7 +63,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   
     Trace1("mot trouver = %s", lp_Key->mot ) ;
 		
-		GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 5) ;
+		GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 5) ;
 
     //------------------------------------------------------------
     // On incremente la phrase avec le mot et

@@ -22,24 +22,8 @@
 #include "astro_calculs.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
-
-static const char * c_Reduction_Type[] = {
-  "REDUCTION_INDETERMINE",
-  "REDUCTION_MONTURE_NB_DENTS",
-  "REDUCTION_POULIE_MONTURE_NB_DENTS",
-  "REDUCTION_POULIE_MOTEUR_NB_DENTS",
-  "REDUCTION_REDUCTEUR_PLANETAIRE",
-  "REDUCTION_MOTEUR_NB_PAS",
-  "REDUCTION_MOTEUR_NB_MICROPAS",
-  "REDUCTION_CPU_CORRECTION"
-} ;
-
-static const char * c_Calculs_Mode[] = {
-  "CALCUL_INDETERMINE",  
-  "CALCUL_AZIMUTAL_VERS_EQUATORIAL",
-  "CALCUL_EQUATORIAL_VERS_AZIMUTAL"
-} ;
 
 double sqr(double x)                                    { return x*x ; }
 double max(double x1,double x2)                         { if(fabs(x1)>fabs(x2)) return x1; else return x2 ; }

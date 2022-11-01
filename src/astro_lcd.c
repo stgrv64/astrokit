@@ -23,6 +23,10 @@
 
 #include "astro_lcd.h"
 
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
 static const char * c_Lcd_Display_Months[] = {
  "Jan",
  "Feb",
@@ -738,8 +742,8 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(h) %s", gp_Gpi_Par->par_alt ) ;
-    sprintf( c_l1, "(a) %s", gp_Gpi_Par->par_azi );
+    sprintf( c_l0, "(h) %s", gp_Gpi_Par_Pwm->par_alt ) ;
+    sprintf( c_l1, "(a) %s", gp_Gpi_Par_Pwm->par_azi );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -765,8 +769,8 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(Masq) %s", gp_Gpi_Par->par_mas ) ;
-    sprintf( c_l1, "(Fpwm) %s", gp_Gpi_Par->par_fre_pwm );
+    sprintf( c_l0, "(Masq) %s", gp_Gpi_Par_Pwm->par_mas ) ;
+    sprintf( c_l1, "(Fpwm) %s", gp_Gpi_Par_Pwm->par_fre_pwm );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -819,7 +823,7 @@ void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
     }
     /* Lecture LED ETAT */
 
-    sprintf( c_l0, "(LED ETAT) %d", gp_Gpi_Par->par_led_etat ) ;
+    sprintf( c_l0, "(LED ETAT) %d", gp_Gpi_Par_Pwm->par_led_etat ) ;
     
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;

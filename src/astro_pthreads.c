@@ -11,6 +11,12 @@
 
 #include "astro_pthreads.h"
 
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
+int g_nb_threads ;  
+
 static const char *  gi_Pth_Name[] = {
   "pth_phases" ,
   "pth_moteurs"   ,

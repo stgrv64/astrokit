@@ -11,7 +11,11 @@ date        | commentaires
 
 #include "astro_suivi.h"
 
-static const char * c_Menus[] = {
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
+const char * gc_const_menus[] = {
   "MENU_AZIMUTAL",
   "MENU_EQUATORIAL",
   "MENU_MANUEL_BRUT",
@@ -24,8 +28,6 @@ static const char * c_Menus[] = {
   "MENU_PROGRAMME_DOWN",
   "MENU_DOWN"
 } ;
-
-STRUCT_SUIVI g_Suivi, *gp_Sui ;
 
 /*****************************************************************************************
 * @fn     : SUIVI_TEMPORISATION_AZIMUT
@@ -351,7 +353,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     /*  touche mode equatorial */
     
     If_Mot_Is("key_equ")      { 
-      gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)c_Menus[ MENU_EQUATORIAL ] ) ;
+      gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_const_menus[ MENU_EQUATORIAL ] ) ;
       gp_Sui->menu = MENU_EQUATORIAL ; 
       i=1;
     }    
@@ -359,7 +361,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     /*  touche mode azimutal */
 
     If_Mot_Is("key_azi")      { 
-      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
+      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_const_menus[ MENU_AZIMUTAL ] ) ;
       gp_Sui->menu = MENU_AZIMUTAL ; 
       i=1;
     }       // mode azimutal
@@ -367,7 +369,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     /* touche POWER : arret su systeme */
 
     If_Mot_Is("key_power")     { 
-      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)c_Menus[ MENU_AZIMUTAL ] ) ;
+      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_const_menus[ MENU_AZIMUTAL ] ) ;
       gp_Sui->menu = MENU_DOWN ; 
       i=1;
     } 
@@ -447,7 +449,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
       gp_Sui->SUIVI_ALIGNEMENT = 1 ;
       //gp_Sui->menu = MENU_AZIMUTAL ;
 
-      GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 10) ; 
+      GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ; 
     }
     //---------------------------------------------------------------------------------------------------------
     // Si une DEMANDE de MISE A JOUR relative au temps (sauf mois et jour)
@@ -455,7 +457,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     
     if(  ! strcmp( gp_Key->symbole, "TIME" ) )  {
 
-      GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, strlen( gp_Key->nombre ), 10) ;
+      GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, strlen( gp_Key->nombre ), 10) ;
 
       switch ( strlen( gp_Key->nombre ) ) {
 

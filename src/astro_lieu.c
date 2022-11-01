@@ -11,19 +11,9 @@ date        | commentaires
 
 #include "astro_lieu.h"
 
-/*---------------------------------------------------*/
-/* Parametres de fichier config (modif octobre 2022) */ 
-/*---------------------------------------------------*/
-
-double LIEU_LONGITUDE ;
-double LIEU_LATITUDE ;
-double LIEU_ALTITUDE ;
-
-/*---------------------------------------------------*/
-/* FIN Parametres de fichier config                  */ 
-/*---------------------------------------------------*/
-
-STRUCT_LIEU g_Lieu, *gp_Lie ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
 * @fn     : LIEU_INIT
@@ -43,9 +33,9 @@ void LIEU_INIT(STRUCT_LIEU *gp_Lie) {
   gp_Lie->TS  = 0 ;  // temps sideral
   gp_Lie->TSR = 0 ;  // temps sideral en radians
   gp_Lie->JD  = 0 ;  // jour decimal
-  gp_Lie->lat = LIEU_LATITUDE / CALCUL_UN_RADIAN_EN_DEGRES ;
-  gp_Lie->lon = LIEU_LONGITUDE / CALCUL_UN_RADIAN_EN_DEGRES ;
-  gp_Lie->alt = LIEU_ALTITUDE ;
+  gp_Lie->lat = gp_Lie_Par->par_latitude / CALCUL_UN_RADIAN_EN_DEGRES ;
+  gp_Lie->lon = gp_Lie_Par->par_longitude / CALCUL_UN_RADIAN_EN_DEGRES ;
+  gp_Lie->alt = gp_Lie_Par->par_altitude ;
 }
 
 /*****************************************************************************************

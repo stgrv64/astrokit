@@ -6,7 +6,7 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 01/05/2021  | ajout entete
-# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Gpi_Par->par_fre_pwm 
+# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Gpi_Par_Pwm->par_fre_pwm 
 #   suite a ajout de la variable du meme nom dans types.h
 # mai 2022    | ajout / modifications sur les threads  
 #               ajout / renommage membres champs struct PMW phases et moteurs
@@ -22,32 +22,32 @@
 /* Parametres de fichier config (modif octobre 2022) */ 
 /*---------------------------------------------------*/
 
-/* 
+/* ---------------------------------------------------------------
   les params suivants servent pour utilisation d un controleur externe
   pour les pas et micro pas et l'amplification des signaux (OBSOLETE)
-*/
+  -------------------------------------------------------------------- */
 
 struct STR_GPIO_PARAMS_CONTROLER {
 
-  unsigned char GPIO_DIR_ALT ;  // numero de port GPIO pour le sens de rotation de l'altitude
-  unsigned char GPIO_CLK_ALT ;  // numero de port GPIO pour l'horloge de l'altitude
-  unsigned char GPIO_SLP_ALT ;  // numero de port GPIO pour le sleep du controleur du moteur
-  unsigned char GPIO_RST_ALT ;  // numero de port GPIO pour le reset du controleur du moteur
-  unsigned char GPIO_MMM_ALT ;  // numero de port GPIO pour le mmm du controleur du moteur
-  unsigned char GPIO_ENA_ALT ;  // numero de port GPIO pour le enale du controleur du moteur
-  unsigned char GPIO_M2_ALT  ;  // numero de port GPIO pour le choix du micro pas
-  unsigned char GPIO_M1_ALT  ;  // numero de port GPIO pour le choix du micro pas
-  unsigned char GPIO_M0_ALT  ;  // numero de port GPIO pour le choix du micro pas
+  unsigned char par_alt_dir ;  // numero de port GPIO pour le sens de rotation en altitude
+  unsigned char par_alt_clk ;  // numero de port GPIO pour l'horloge de l'altitude
+  unsigned char par_alt_slp ;  // numero de port GPIO pour le sleep en altitude
+  unsigned char par_alt_rst ;  // numero de port GPIO pour le reset en altitude
+  unsigned char par_alt_mmm ;  // numero de port GPIO pour le mmm en altitude
+  unsigned char par_alt_ena ;  // numero de port GPIO pour le enable en altitude
+  unsigned char par_alt_m2  ;  // numero de port GPIO pour le choix du micro pas en altitude
+  unsigned char par_alt_m1  ;  // numero de port GPIO pour le choix du micro pas en altitude
+  unsigned char par_alt_m0  ;  // numero de port GPIO pour le choix du micro pas en altitude
 
-  unsigned char GPIO_DIR_AZI ;  // numero de port GPIO pour le sens de rotation de l'azimut
-  unsigned char GPIO_CLK_AZI ;  // numero de port GPIO pour l'horloge de l'azimut
-  unsigned char GPIO_SLP_AZI ;  // numero de port GPIO pour le sleep du controleur du moteur
-  unsigned char GPIO_RST_AZI ;  // numero de port GPIO pour le sleep du controleur du moteur
-  unsigned char GPIO_MMM_AZI ;  // numero de port GPIO pour le sleep du controleur du moteur
-  unsigned char GPIO_ENA_AZI ;  // numero de port GPIO pour le sleep du controleur du moteur
-  unsigned char GPIO_M2_AZI  ;  // numero de port GPIO pour le choix du micro pas
-  unsigned char GPIO_M1_AZI  ;  // numero de port GPIO pour le choix du micro pas
-  unsigned char GPIO_M0_AZI  ;  // numero de port GPIO pour le cho
+  unsigned char par_azi_dir ;  // numero de port GPIO pour le sens de rotation en azimut
+  unsigned char par_azi_clk ;  // numero de port GPIO pour l'horloge de l'azimut
+  unsigned char par_azi_slp ;  // numero de port GPIO pour le sleep en azimut
+  unsigned char par_azi_rst ;  // numero de port GPIO pour le reset en azimut
+  unsigned char par_azi_mmm ;  // numero de port GPIO pour le mmm en azimut
+  unsigned char par_azi_ena ;  // numero de port GPIO pour le enable en azimut
+  unsigned char par_azi_m2  ;  // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char par_azi_m1  ;  // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char par_azi_m0  ;  // numero de port GPIO pour le choix du micro pas en azimut
 } ;
 
 /* 
@@ -57,36 +57,43 @@ struct STR_GPIO_PARAMS_CONTROLER {
 
 struct STR_GPIO_PARAMS_RAQUETTE {
 
-  int           GPIO_RAQ_O  ; 
-  int           GPIO_RAQ_E  ;
-  int           GPIO_RAQ_S  ;
-  int           GPIO_RAQ_N  ;
-  int           GPIO_RAQ_V  ;
+  int par_raq_ouest  ; 
+  int par_raq_est  ;
+  int par_raq_sud  ;
+  int par_raq_nord  ;
+  int par_raq_v  ;
 } ;
+
+/* 
+  les params suivants servent pour utilisation d'un clavier matriciel 4*4
+  reliee directement aux 8 gpios par multiplexage (OBSOLETE)
+*/
 
 struct STR_GPIO_PARAMS_MATRICIEL {
-  /* 
-    les params suivants servent pour utilisation d'un clavier matriciel 4*4
-    reliee directement aux 8 gpios par multiplexage (OBSOLETE)
-  */
 
-  int           GPIO_KEY_L1  ;
-  int           GPIO_KEY_L2  ;
-  int           GPIO_KEY_L3  ;
-  int           GPIO_KEY_L4  ;
-  int           GPIO_KEY_C1  ;
-  int           GPIO_KEY_C2  ;
-  int           GPIO_KEY_C3  ;
-  int           GPIO_KEY_C4  ;
+  int par_l1  ;
+  int par_l2  ;
+  int par_l3  ;
+  int par_l4  ;
+  int par_c1  ;
+  int par_c2  ;
+  int par_c3  ;
+  int par_c4  ;
 
 } ;
 
+/* 
+  les params suivants servent pour utilisation d'une modulation PWM
+  sur les sorties representees par altitude (4 broches) et azimut
+  un masque d 'attaque est utilise
+*/
+
 struct STR_GPIO_PARAMS_PWM {
-  int           par_led_etat ;
-  char          par_fre_pwm [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char          par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char          par_azi     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char          par_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  int  par_led_etat ;
+  char par_fre_pwm [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char par_azi     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char par_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/

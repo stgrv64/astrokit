@@ -11,7 +11,9 @@
 
 #include "astro_pid.h"
 
-STRUCT_PID g_Pid, *gp_Pid ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
 * @fn     : PID_INIT

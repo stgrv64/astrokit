@@ -10,12 +10,9 @@
 
 #include "astro_time.h"
 
-/* Variables globales ----------------------------------------------------------- */
-
-extern 
-
-/* Fin Variables globales ------------------------------------------------------- */
-
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;*/
 
 //========================================================================================
 // FIXME : TEMPS_CALCUL_DATE : 

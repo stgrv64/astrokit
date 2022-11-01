@@ -24,10 +24,11 @@
 */
 
 #include "astro_gpio.h"
-/*
-int gpio_key_l[4] ;
-int gpio_key_c[4] ;  
-*/
+
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
 int GPIO_OPEN_STATUT ;
 
 /* Variables concernant les broches */ 
@@ -56,7 +57,6 @@ struct timespec gpio_tm_now;
 struct timespec gpio_tm_nxt;
 
 int             g_incrlog ;
-int             g_nb_threads ;  
 
 STRUCT_GPIO_PWM_MOTEUR *gp_Mot_Alt , g_mot_alt ; 
 STRUCT_GPIO_PWM_MOTEUR *gp_Mot_Azi , g_mot_azi ;
@@ -108,7 +108,7 @@ void  GPIO_TEST_MOTEURS(void ) {
     f_fin = FREQ[i][1] ;
     delai = FREQ[i][2] ;
   
-    nb_puls = GPIO_ACCELERATION_2( gp_Gpi_Par_Old->GPIO_CLK_ALT, gp_Gpi_Par_Old->GPIO_CLK_AZI, f_deb, f_fin, delai, gp_Sui->l_NANO_MOINS) ;
+    nb_puls = GPIO_ACCELERATION_2( gp_Gpi_Par_Con->par_alt_clk, gp_Gpi_Par_Con->par_azi_clk, f_deb, f_fin, delai, gp_Sui->l_NANO_MOINS) ;
     
     gettimeofday(&t01,NULL) ;
 
@@ -179,8 +179,8 @@ void GPIO_CLIGNOTE(int gpio, int nombre_clignotement, int duree_clignotement) {
  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
  while(++i<nombre_clignotement) {
-  GPIO_SET( gp_Gpi_Par->par_led_etat, 1 ) ; usleep(duree_clignotement*10000);
-  GPIO_SET( gp_Gpi_Par->par_led_etat, 0 ) ; usleep(duree_clignotement*10000);
+  GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 1 ) ; usleep(duree_clignotement*10000);
+  GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 0 ) ; usleep(duree_clignotement*10000);
  }
 }
 /*****************************************************************************************
@@ -209,7 +209,7 @@ void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
 * @fn     : GPIO_READ
 * @author : s.gravois
 * @brief  : Cette fonction lit les parametres GPIO dans le fichier de configuration
-*           (gp_Gpi_Par->par_alt / gp_Gpi_Par->par_azi / GPIO_MASQUE )
+*           (gp_Gpi_Par_Pwm->par_alt / gp_Gpi_Par_Pwm->par_azi / GPIO_MASQUE )
 *           Initilise la frequence PWM a 1000 si aucune entree gd_gpio_frequence_pwm
 * @param  : g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
@@ -224,13 +224,13 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
 
   for(l=0;l<CONFIG_DATAS_NB_COLONNES;l++) {
 
-   if(!strcmp("gp_Gpi_Par->par_alt",g_Char_Params[l][0])) {
+   if(!strcmp("gp_Gpi_Par_Pwm->par_alt",g_Char_Params[l][0])) {
 
     // FIXME ajout stephane 2021
-    memset( gp_Gpi_Par->par_alt,0,sizeof(gp_Gpi_Par->par_alt)) ;
-    strcpy( gp_Gpi_Par->par_alt, g_Char_Params[l][1] ) ;
+    memset( gp_Gpi_Par_Pwm->par_alt,0,sizeof(gp_Gpi_Par_Pwm->par_alt)) ;
+    strcpy( gp_Gpi_Par_Pwm->par_alt, g_Char_Params[l][1] ) ;
 
-    Trace1("gp_Gpi_Par->par_alt trouve ligne %d = (%s)", l,gp_Gpi_Par->par_alt) ;
+    Trace1("gp_Gpi_Par_Pwm->par_alt trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_alt) ;
 
     for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gi_gpio_in[j]=-1 ;
 
@@ -241,13 +241,13 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
     }
    }
    
-   if(!strcmp("gp_Gpi_Par->par_azi",g_Char_Params[l][0])) {
+   if(!strcmp("gp_Gpi_Par_Pwm->par_azi",g_Char_Params[l][0])) {
 
     // FIXME ajout stephane 2021
-    memset( gp_Gpi_Par->par_azi,0,sizeof(gp_Gpi_Par->par_azi)) ;
-    strcpy( gp_Gpi_Par->par_azi, g_Char_Params[l][1] ) ;
+    memset( gp_Gpi_Par_Pwm->par_azi,0,sizeof(gp_Gpi_Par_Pwm->par_azi)) ;
+    strcpy( gp_Gpi_Par_Pwm->par_azi, g_Char_Params[l][1] ) ;
 
-    Trace1("gp_Gpi_Par->par_azi trouve ligne %d = (%s)", l,gp_Gpi_Par->par_azi) ;
+    Trace1("gp_Gpi_Par_Pwm->par_azi trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_azi) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_out[i]=-1 ;
 
@@ -262,10 +262,10 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
    if(!strcmp("GPIO_MASQUE",g_Char_Params[l][0])) {
 
     // FIXME ajout stephane 2021
-    memset( gp_Gpi_Par->par_mas,0,sizeof(gp_Gpi_Par->par_mas)) ;
-    strcpy( gp_Gpi_Par->par_mas, g_Char_Params[l][1] ) ;
+    memset( gp_Gpi_Par_Pwm->par_mas,0,sizeof(gp_Gpi_Par_Pwm->par_mas)) ;
+    strcpy( gp_Gpi_Par_Pwm->par_mas, g_Char_Params[l][1] ) ;
 
-    Trace1("GPIO_MASQUE trouve ligne %d = (%s)", l,gp_Gpi_Par->par_mas) ;
+    Trace1("GPIO_MASQUE trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_mas) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_mas[i]=-1 ;
 
@@ -277,15 +277,15 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
    }
 
 
-   if(!strcmp("gp_Gpi_Par->par_fre_pwm",g_Char_Params[l][0])) {
+   if(!strcmp("gp_Gpi_Par_Pwm->par_fre_pwm",g_Char_Params[l][0])) {
 
     // FIXME ajout stephane 2021
-    memset( gp_Gpi_Par->par_fre_pwm,0,sizeof(gp_Gpi_Par->par_fre_pwm)) ;
-    strcpy( gp_Gpi_Par->par_fre_pwm, g_Char_Params[l][1] ) ;
+    memset( gp_Gpi_Par_Pwm->par_fre_pwm,0,sizeof(gp_Gpi_Par_Pwm->par_fre_pwm)) ;
+    strcpy( gp_Gpi_Par_Pwm->par_fre_pwm, g_Char_Params[l][1] ) ;
 
     gd_gpio_frequence_pwm = 1000 ;
 
-    Trace1("gp_Gpi_Par->par_fre_pwm trouve ligne %d = (%s)", l,gp_Gpi_Par->par_fre_pwm) ;
+    Trace1("gp_Gpi_Par_Pwm->par_fre_pwm trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_fre_pwm) ;
 
     for (j = 0, str1 = g_Char_Params[l][1]; ; j++, str1 = NULL) {
       token = strtok_r(str1, ",", &sptr);
@@ -298,7 +298,7 @@ void GPIO_READ(char g_Char_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLO
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_alt[%d]=%d",i,gi_gpio_alt[i]);
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_mas[%d]=%d",i,gi_gpio_mas[i]);
    
-  TRACE1("gp_Gpi_Par->par_fre_pwm=%f", gd_gpio_frequence_pwm ) ;
+  TRACE1("gp_Gpi_Par_Pwm->par_fre_pwm=%f", gd_gpio_frequence_pwm ) ;
 }
 /*****************************************************************************************
 * @fn     : GPIO_READ
@@ -606,22 +606,22 @@ int GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
 //==========================================================
 void GPIO_SET_ALT(int dir, int slp, int clk, int rst, int mmm, int ena) {
 
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_DIR_ALT,dir);   
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_CLK_ALT,slp);      
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_SLP_ALT,clk);     
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_RST_ALT,rst);     
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_MMM_ALT,mmm);      
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_ENA_ALT,ena);  
+  GPIO_SET( gp_Gpi_Par_Con->par_alt_dir,dir);   
+  GPIO_SET( gp_Gpi_Par_Con->par_alt_clk,slp);      
+  GPIO_SET( gp_Gpi_Par_Con->par_alt_slp,clk);     
+  GPIO_SET( gp_Gpi_Par_Con->par_alt_rst,rst);     
+  GPIO_SET( gp_Gpi_Par_Con->par_alt_mmm,mmm);      
+  GPIO_SET( gp_Gpi_Par_Con->par_alt_ena,ena);  
 }
 //==========================================================
 void GPIO_SET_AZI(int dir, int slp, int clk, int rst, int mmm, int ena) {
 
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_DIR_AZI,dir);   
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_CLK_AZI,slp);      
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_SLP_AZI,clk);     
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_RST_AZI,rst);     
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_MMM_AZI,mmm);      
-  GPIO_SET( gp_Gpi_Par_Old->GPIO_ENA_AZI,ena);  
+  GPIO_SET( gp_Gpi_Par_Con->par_azi_dir,dir);   
+  GPIO_SET( gp_Gpi_Par_Con->par_azi_clk,slp);      
+  GPIO_SET( gp_Gpi_Par_Con->par_azi_slp,clk);     
+  GPIO_SET( gp_Gpi_Par_Con->par_azi_rst,rst);     
+  GPIO_SET( gp_Gpi_Par_Con->par_azi_mmm,mmm);      
+  GPIO_SET( gp_Gpi_Par_Con->par_azi_ena,ena);  
 }
 //==========================================================
 void GPIO_MOVE_1(int sens, double periode,double nb_pulse, int gpio_dir, int gpio_clk) {
@@ -661,12 +661,12 @@ void GPIO_MOVE_2(int sens, double periode,unsigned  long nb_pulse) {
   incr=0 ;
   
   if (sens <=0) {
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_DIR_ALT, 0 );
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_DIR_AZI, 0 );
+    GPIO_SET( gp_Gpi_Par_Con->par_alt_dir, 0 );
+    GPIO_SET( gp_Gpi_Par_Con->par_azi_dir, 0 );
   }
   else {
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_DIR_ALT, 1 );
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_DIR_AZI, 1 );
+    GPIO_SET( gp_Gpi_Par_Con->par_alt_dir, 1 );
+    GPIO_SET( gp_Gpi_Par_Con->par_azi_dir, 1 );
   } 
   periode_micro = ( periode * TEMPS_MICRO_SEC ) ;
   
@@ -674,13 +674,13 @@ void GPIO_MOVE_2(int sens, double periode,unsigned  long nb_pulse) {
   
     usleep( (long) (periode_micro / 2.0) ) ;
     
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_CLK_ALT, 0 );
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_CLK_AZI, 0 );
+    GPIO_SET( gp_Gpi_Par_Con->par_alt_clk, 0 );
+    GPIO_SET( gp_Gpi_Par_Con->par_azi_clk, 0 );
     
     usleep( (long) (periode_micro / 2.0) ) ;
     
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_CLK_ALT, 1 );
-    GPIO_SET( gp_Gpi_Par_Old->GPIO_CLK_AZI, 1 );
+    GPIO_SET( gp_Gpi_Par_Con->par_alt_clk, 1 );
+    GPIO_SET( gp_Gpi_Par_Con->par_azi_clk, 1 );
   }
 }
 //==========================================================
@@ -1694,10 +1694,10 @@ int mainG(int argc, char **argv) {
   pid=getpid() ;
   nbcpus = sysconf(_SC_NPROCESSORS_ONLN) ;
   
-  Trace("LIEU_ALTITUDE : periode mot = %.2f f = %.f ", gp_Mot_Alt->p_sui->Ta_mot, gp_Mot_Alt->p_sui->Fa_mot ) ; 
+  Trace("gp_Lie_Par->par_altitude : periode mot = %.2f f = %.f ", gp_Mot_Alt->p_sui->Ta_mot, gp_Mot_Alt->p_sui->Fa_mot ) ; 
   Trace("AZIMUT   : periode mot = %.2f f = %.f ", gp_Mot_Azi->p_sui->Th_mot, gp_Mot_Azi->p_sui->Fh_mot ) ; 
 
-  Trace("LIEU_ALTITUDE : periode mic = %.2f f = %.f ", gp_Mot_Alt->p_sui->Ta_mic, gp_Mot_Alt->p_sui->Fa_mic ) ; 
+  Trace("gp_Lie_Par->par_altitude : periode mic = %.2f f = %.f ", gp_Mot_Alt->p_sui->Ta_mic, gp_Mot_Alt->p_sui->Fa_mic ) ; 
   Trace("AZIMUT   : periode mic = %.2f f = %.f ", gp_Mot_Azi->p_sui->Th_mic, gp_Mot_Azi->p_sui->Fh_mic ) ; 
 /*
   Trace("correct(y/n)?") ;
@@ -1798,8 +1798,8 @@ Anciennes fonctions obsoletes
 * @fn     : GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS
 * @author : s.gravois
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
-* @param  : int       GPIO_KEY_L[4]
-* @param  : int       GPIO_KEY_C[4]
+* @param  : int       gp_Gpi_Par_Mat->par_l[4]
+* @param  : int       gp_Gpi_Par_Mat->par_c[4]
 * @param  : STRUCT_KEYS * gp_Key
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
@@ -1807,7 +1807,7 @@ Anciennes fonctions obsoletes
 *****************************************************************************************/
 
 /*
-void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], STRUCT_SUIVI * gp_Sui) {
+void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Mat->par_c[4], STRUCT_SUIVI * gp_Sui) {
   
   int  i,j;
   char val[255] ;
@@ -1817,18 +1817,18 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], S
     Trace("");
     
     for(i=0;i<4;i++) {
-      GPIO_SET( GPIO_KEY_C[i], 0) ;
+      GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ;
     }
   
     strcpy(val,"") ;       
     
     for(i=0;i<4;i++) { 
       
-      GPIO_SET( GPIO_KEY_C[i], 1) ; 
+      GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 1) ; 
       
       for(j=0;j<4;j++)  { 
 
-        if( GPIO_GET(GPIO_KEY_L[j])) {
+        if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
    
           if ( ! strcmp( raquette[i][j], "plus" ) )  {  gp_Sui->pas_acc_plus =1 ; }
           if ( ! strcmp( raquette[i][j], "moins" ) ) { gp_Sui->pas_acc_moins=1 ; }
@@ -1845,7 +1845,7 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], S
         }
       } 
     
-      GPIO_SET( GPIO_KEY_C[i], 0) ;  
+      GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ;  
     }
     // Trace("%ld %ld %ld %ld\n", gp_Sui->pas_ouest, gp_Sui->pas_est,  gp_Sui->pas_nord,gp_Sui->pas_sud);
   }
@@ -1858,8 +1858,8 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], S
 * @fn     : GPIO_CLAVIER_MATRICIEL_CONFIG
 * @author : s.gravois
 * @brief  : Cette fonction configure un clavier matriciel X lignes sur Y colonnes
-* @param  : int GPIO_KEY_L[4]
-* @param  : int GPIO_KEY_C[4]
+* @param  : int gp_Gpi_Par_Mat->par_l[4]
+* @param  : int gp_Gpi_Par_Mat->par_c[4]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : (obsolete) fonction ancienne, remplace par un clavier reel en USB
 *****************************************************************************************/
@@ -1867,11 +1867,11 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], S
 /* ---------------------------------------------------------------------------------------
 * Configuration du clavier (clavier matriciel en 4*4) en fonction des entrees de config :
 * lecture ou ecriture premieres sur les gpios
-* GPIO_KEY_L* et GPIO_KEY_C* sont definies dans le fichier de config
+* gp_Gpi_Par_Mat->par_l* et gp_Gpi_Par_Mat->par_c* sont definies dans le fichier de config
  ---------------------------------------------------------------------------------------*/
 
 /*
-void GPIO_CLAVIER_MATRICIEL_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
+void GPIO_CLAVIER_MATRICIEL_CONFIG (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Mat->par_c[4]) {
   
   int  i,j ;
 
@@ -1879,29 +1879,29 @@ void GPIO_CLAVIER_MATRICIEL_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 
   if ( gp_Dev->use_raquette ) {
     
-    GPIO_KEY_L[0] = GPIO_KEY_L1 ; 
-    GPIO_KEY_L[1] = GPIO_KEY_L2 ; 
-    GPIO_KEY_L[2] = GPIO_KEY_L3 ; 
-    GPIO_KEY_L[3] = GPIO_KEY_L4 ;
+    gp_Gpi_Par_Mat->par_l[0] = gp_Gpi_Par_Mat->par_l1 ; 
+    gp_Gpi_Par_Mat->par_l[1] = gp_Gpi_Par_Mat->par_l2 ; 
+    gp_Gpi_Par_Mat->par_l[2] = gp_Gpi_Par_Mat->par_l3 ; 
+    gp_Gpi_Par_Mat->par_l[3] = gp_Gpi_Par_Mat->par_l4 ;
 
-    GPIO_KEY_C[0] = GPIO_KEY_C1 ; 
-    GPIO_KEY_C[1] = GPIO_KEY_C2 ; 
-    GPIO_KEY_C[2] = GPIO_KEY_C3 ; 
-    GPIO_KEY_C[3] = GPIO_KEY_C4 ;
+    gp_Gpi_Par_Mat->par_c[0] = gp_Gpi_Par_Mat->par_c1 ; 
+    gp_Gpi_Par_Mat->par_c[1] = gp_Gpi_Par_Mat->par_c2 ; 
+    gp_Gpi_Par_Mat->par_c[2] = gp_Gpi_Par_Mat->par_c3 ; 
+    gp_Gpi_Par_Mat->par_c[3] = gp_Gpi_Par_Mat->par_c4 ;
 
     for(i=0;i<4;i++) {
 
-      GPIO_SET( GPIO_KEY_C[i], 0) ;
+      GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ;
 
       for(j=0;j<4;j++)
 
-        if( GPIO_GET(GPIO_KEY_L[j])) {
+        if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
 
           TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d allumer\n",\
-            i,j,GPIO_KEY_C[i],GPIO_KEY_L[j]); }
+            i,j,gp_Gpi_Par_Mat->par_c[i],gp_Gpi_Par_Mat->par_l[j]); }
         else {
           TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d eteint\n",\
-          i,j,GPIO_KEY_C[i],GPIO_KEY_L[j]); }
+          i,j,gp_Gpi_Par_Mat->par_c[i],gp_Gpi_Par_Mat->par_l[j]); }
     }
   }
 }
@@ -1911,8 +1911,8 @@ void GPIO_CLAVIER_MATRICIEL_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 * @fn     : GPIO_CLAVIER_MATRICIEL_READ
 * @author : s.gravois
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
-* @param  : int       GPIO_KEY_L[4]
-* @param  : int       GPIO_KEY_C[4]
+* @param  : int       gp_Gpi_Par_Mat->par_l[4]
+* @param  : int       gp_Gpi_Par_Mat->par_c[4]
 * @param  : STRUCT_KEYS * gp_Key
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-18 avoid -Wrestrict passing pointers via buffer_recopie
@@ -1920,7 +1920,7 @@ void GPIO_CLAVIER_MATRICIEL_CONFIG (int GPIO_KEY_L[4],int GPIO_KEY_C[4]) {
 *****************************************************************************************/
 
 /*
-void GPIO_CLAVIER_MATRICIEL_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], STRUCT_KEYS* gp_Key) {
+void GPIO_CLAVIER_MATRICIEL_READ (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Mat->par_c[4], STRUCT_KEYS* gp_Key) {
 
   int  i=0,j=0;
   int I=0, J=0  ;
@@ -1932,8 +1932,8 @@ void GPIO_CLAVIER_MATRICIEL_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], STRUCT_KE
 
     I=-1; ; J=-1 ;
     
-    for(i=0;i<4;i++) GPIO_SET( GPIO_KEY_C[i], 0) ;
-    //for(j=0;j<4;j++) GPIO_SET( GPIO_KEY_L[i], 0) ;
+    for(i=0;i<4;i++) GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ;
+    //for(j=0;j<4;j++) GPIO_SET( gp_Gpi_Par_Mat->par_l[i], 0) ;
     
     strcpy(val,"") ;     
     
@@ -1947,12 +1947,12 @@ void GPIO_CLAVIER_MATRICIEL_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], STRUCT_KE
     gp_Key->appui_en_cours = 0 ;
       
     for(i=0;i<4;i++) {
-      GPIO_SET( GPIO_KEY_C[i], 1) ;
+      GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 1) ;
       
       usleep( gp_Key->temporisation_clavier ) ;
       
       for(j=0;j<4;j++)  {
-        if( GPIO_GET(GPIO_KEY_L[j])) {
+        if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
           I=i; J=j ;
       memset( val, CONFIG_ZERO_CHAR, 255 );
             strcpy( val, keyboard[I][J] ) ;
@@ -1964,7 +1964,7 @@ void GPIO_CLAVIER_MATRICIEL_READ (int GPIO_KEY_L[4],int GPIO_KEY_C[4], STRUCT_KE
       }
         }
       }
-      GPIO_SET( GPIO_KEY_C[i], 0) ; 
+      GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ; 
     }
     
     // =======================================================================

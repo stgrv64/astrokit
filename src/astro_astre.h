@@ -176,6 +176,15 @@ struct STR_ASTRE {
 } ;
 typedef struct STR_ASTRE STRUCT_ASTRE ;
 
+static const char * c_Astre_Type[] = {
+  "ASTRE_INDETERMINE",
+  "ASTRE_CIEL_PROFOND",
+  "ASTRE_PLANETE",
+  "ASTRE_COMETE",
+  "ASTRE_ASTEROIDE",
+  "ASTRE_SATELLITE"
+} ;
+
 void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
 void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE * ) ;
 void ASTRE_AFFICHER_MODE_STELLARIUM  ( STRUCT_ASTRE * ) ;

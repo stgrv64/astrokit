@@ -23,17 +23,8 @@
 #include "astro_devices.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
-
-// les variables suivantes servent si un expandeur de port est utilise. Exemple = MCP23017 ou MCP23008
-
-unsigned char MCP_DIR_AZI   ; // numero de port GPIO pour l'horloge de l'azimut
-unsigned char MCP_CLK_AZI   ; // numero de port GPIO pour l'horloge de l'azimut
-unsigned char MCP_SLP_AZI   ; // numero de port GPIO pour le sleep du controleur du moteur
-unsigned char MCP_RST_AZI   ; // numero de port GPIO pour le sleep du controleur du moteur
-unsigned char MCP_M2_AZI    ; // numero de port GPIO pour le choix du micro pas
-unsigned char MCP_M1_AZI    ; // numero de port GPIO pour le choix du micro pas 
-unsigned char MCP_M0_AZI   ;  // numero de port GPIO pour le choix du micro pas
 
 /*****************************************************************************************
 * @fn     : DEVICES_INIT

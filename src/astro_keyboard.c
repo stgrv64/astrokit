@@ -11,6 +11,10 @@
 
 #include "astro_keyboard.h"
 
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
 static struct termios config_initiale; 
 static struct termios config_finale ; 
 

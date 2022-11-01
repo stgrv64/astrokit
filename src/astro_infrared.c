@@ -22,13 +22,11 @@
 
 #include "astro_infrared.h"
 
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
 struct lirc_config *gp_LircConfig;
-
-extern STRUCT_SUIVI  *gp_Sui, g_Suivi ;
-extern STRUCT_CODES  *gp_Cod , g_Codes ;
-extern STRUCT_MUTEXS *gp_Mut , g_Mutexs ;
-
-extern STRUCT_GPIO_PARAMS *gp_Gpi_Par ;
 
 /*****************************************************************************************
 * @fn     : INFRARED_OPEN
@@ -85,7 +83,7 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
   while(lirc_nextcode(&code)==0) {
     
     Trace1("on a lu quelquechose ..") ;
-    //GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 2, 2) ;
+    //GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 2, 2) ;
 
     if ( code == NULL ) { 
       Trace1("code NULL lu ..") ;
@@ -120,7 +118,7 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
       strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
       Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-      GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 10) ;
+      GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
     }
 
     if ( k > 0 && \
@@ -133,7 +131,7 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
       strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
       Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-      GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 10) ;
+      GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
     }
     
     // tres important !!

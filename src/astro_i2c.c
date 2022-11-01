@@ -11,16 +11,19 @@ octobre 2022 :
 
 #include "astro_i2c.h"
 
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
+unsigned short sym[16] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15} ;
+
 STRUCT_I2C_DEVICE  lsm303d,   *lsm ;
 STRUCT_I2C_DEVICE  mcp23008,  *mcp ;
 STRUCT_I2C_DEVICE  rtcds1307, *rtc ;
 STRUCT_I2C_DEVICE  exemple,   *ex ;
+STRUCT_I2C_ACC_MAG accmag,  * am ;
 
-STRUCT_STR_I2C_ACC_MAG accmag,  * am ;
-
-unsigned short sym[16] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15} ;
-
-void I2C_CALCULS_ACCMAG(STRUCT_STR_I2C_ACC_MAG *am) {
+void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *am) {
   
   float norme_acc, norme_mag  ;
   // float phi, psi , the ;
@@ -215,7 +218,7 @@ void I2C_GET_6( STRUCT_I2C_DEVICE * p_i2c_dev, char * registre) {
 }
 //===========================================================
 
-void I2C_GET_ACC( STRUCT_I2C_DEVICE *ex, STRUCT_STR_I2C_ACC_MAG *am ) {
+void I2C_GET_ACC( STRUCT_I2C_DEVICE *ex, STRUCT_I2C_ACC_MAG *am ) {
 
       am->axl = I2C_GET( ex, REG_OUT_ACC_X_L ) ;
       am->axh = I2C_GET( ex, REG_OUT_ACC_X_H ) ; 

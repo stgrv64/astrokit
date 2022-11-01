@@ -38,7 +38,11 @@
 # -------------------------------------------------------------- 
 */
 
-// #include "astro_main.h>
+#include "astro_main.h"
+
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
 * @fn     : ASTRO_TRAP_MAIN
@@ -66,7 +70,7 @@ void ASTRO_TRAP_MAIN(int sig) {
   TRACE("Signal trappe de valeur (sig) %d",sig) ;
   TRACE("Envoi d'un signal %d (SIGTERM) aux threads",SIGTERM) ;
   
-  GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 100) ;
+  GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 100) ;
 
   //Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
 
@@ -121,7 +125,7 @@ void ASTRO_TRAP_MAIN(int sig) {
 
     gp_Lcd->display_str_int(0,"Halt with sig :", sig) ;
 
-    GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 100) ;
+    GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 100) ;
 
     if ( system("/sbin/halt") < 0 ) {
       SyslogErr("Probleme avec /sbin/halt\n") ;
@@ -131,7 +135,7 @@ void ASTRO_TRAP_MAIN(int sig) {
       exit(2) ;
     } 
   }
-  GPIO_SET( gp_Gpi_Par->par_led_etat, 0 ) ;
+  GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 0 ) ;
 
   closelog();
 /*
@@ -882,7 +886,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
           strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
           Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-          GPIO_CLIGNOTE(gp_Gpi_Par->par_led_etat, 1, 10) ;
+          GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
         }
         // tres important !!
         // le usleep suivant permet de garder l information !!!!!!
@@ -1052,7 +1056,7 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   int ret ;
   
   STRUCT_I2C_DEVICE   exemple, *ex ;
-  STRUCT_STR_I2C_ACC_MAG  accmag,  *am ;
+  STRUCT_I2C_ACC_MAG  accmag,  *am ;
 
   ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   usleep( PTHREADS_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
@@ -1162,7 +1166,7 @@ int main(int argc, char ** argv) {
   /* car TRACE utilise ce fichier */
   /* Alternative : Trace */ 
 
-  GLOBAL_INIT() ;
+  ASTRO_GLOBAL_INIT() ;
 
 
   ARGUMENTS_GERER_REP_HOME(argc, argv) ;
@@ -1224,7 +1228,7 @@ int main(int argc, char ** argv) {
   Trace("gi_gpio_alt         : %d %d %d %d", gi_gpio_alt[0], gi_gpio_alt[1], gi_gpio_alt[2], gi_gpio_alt[3] ) ;
   Trace("gi_gpio_azi         : %d %d %d %d", gi_gpio_azi[0], gi_gpio_azi[1], gi_gpio_azi[2], gi_gpio_azi[3] ) ;
   Trace("gi_gpio_mas         : %d %d %d %d", gi_gpio_mas[0], gi_gpio_mas[1], gi_gpio_mas[2], gi_gpio_mas[3] ) ;
-  Trace("gp_Gpi_Par->par_led_etat    : %d", gp_Gpi_Par->par_led_etat );
+  Trace("gp_Gpi_Par_Pwm->par_led_etat    : %d", gp_Gpi_Par_Pwm->par_led_etat );
   Trace("gp_Ast_Par->par_default_object : %s", gp_Ast_Par->par_default_object) ;
   
   Trace("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
@@ -1265,11 +1269,11 @@ int main(int argc, char ** argv) {
 
   // ouverture led etat ----------------------------------------------
 
-  if ( gp_Gpi_Par->par_led_etat != 0 ) {
+  if ( gp_Gpi_Par_Pwm->par_led_etat != 0 ) {
 
-    GPIO_CLOSE_BROCHE( gp_Gpi_Par->par_led_etat) ;
-    GPIO_OPEN_BROCHE( gp_Gpi_Par->par_led_etat, 1) ;
-    GPIO_SET( gp_Gpi_Par->par_led_etat, 0 ) ;
+    GPIO_CLOSE_BROCHE( gp_Gpi_Par_Pwm->par_led_etat) ;
+    GPIO_OPEN_BROCHE( gp_Gpi_Par_Pwm->par_led_etat, 1) ;
+    GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 0 ) ;
   }
   
   // -----------------------------------------------------------------

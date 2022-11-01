@@ -32,7 +32,7 @@
 #               * ajout ASCx comme STRUCT_TIME dans STRUCT_ASTRE
 # 23/01/2022  | * suppression MODE_EQUATORIAL
 #               * changement type gp_Con_Par->par_default_menu
-#               * ajout constantes char * en fonction c_Menus
+#               * ajout constantes char * en fonction gc_const_menus
 # mars  2022  | * ajout signe a structure STRUCT_TIME
 #               * ajout c_si signe sous forme char
 # avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
@@ -145,7 +145,7 @@
 
 #define GPIO_MICROPAS_MAX           500
 // FIXME : creation entete de la fonction au format doxygen de la ligne suivante (2021)
-// #define gp_Gpi_Par->par_fre_pwm          750 
+// #define gp_Gpi_Par_Pwm->par_fre_pwm          750 
 #define GPIO_NB_PHASES_PAR_MOTEUR   4
 #define GPIO_FREQ_MAX               1000.0
 #define GPIO_VARG_STRING            115
@@ -171,8 +171,6 @@ typedef struct  STR_CODES                   STRUCT_CODES ;
 typedef struct  STR_CONFIG                  STRUCT_CONFIG ;
 typedef struct  STR_DATAS                   STRUCT_DATAS ;
 typedef struct  STR_DEVICES                 STRUCT_DEVICES ;
-typedef struct  STR_I2C_DEVICE              STRUCT_I2C_DEVICE ;
-typedef struct  STR_I2C_ACC_MAG             STRUCT_STR_I2C_ACC_MAG ;
 typedef struct  STR_KEYS                    STRUCT_KEYS ;
 typedef struct  STR_LCD                     STRUCT_LCD ;
 typedef struct  STR_LIEU                    STRUCT_LIEU ;
@@ -181,8 +179,11 @@ typedef struct  STR_MUTEXS                  STRUCT_MUTEXS ;
 typedef struct  STR_PTHREADS                STRUCT_PTHREADS ;
 typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
 typedef struct  STR_VOUTE                   STRUCT_VOUTE ;
-       
-typedef struct  STR_GPIO_BROCHES            STRUCT_GPIO_BROCHES ;
+
+typedef struct  STR_I2C_DEVICE              STRUCT_I2C_DEVICE ;
+typedef struct  STR_I2C_ACC_MAG             STRUCT_I2C_ACC_MAG ;
+typedef struct  STR_I2C_MCP23017            STRUCT_I2C_MCP23017 ;
+
 typedef struct  STR_GPIO_PWM_PHASE          STRUCT_GPIO_PWM_PHASE ;
 typedef struct  STR_GPIO_PWM_MOTEUR         STRUCT_GPIO_PWM_MOTEUR ;
        
@@ -190,12 +191,13 @@ typedef struct  STR_ASTRE_PARAMS            STRUCT_ASTRE_PARAMS ;
 typedef struct  STR_CALCULS_PARAMS          STRUCT_CALCULS_PARAMS ;
 typedef struct  STR_CONFIG_PARAMS           STRUCT_CONFIG_PARAMS ;
 typedef struct  STR_DEVICES_PARAMS          STRUCT_DEVICES_PARAMS ;
-typedef struct  STR_GPIO_PARAMS_PWM             STRUCT_GPIO_PARAMS ;
+typedef struct  STR_LIEU_PARAMS             STRUCT_LIEU_PARAMS ;
 typedef struct  STR_PID_PARAMS              STRUCT_PID_PARAMS ;
        
-typedef struct  STR_GPIO_PARAMS_MATRICIEL   STRUCT_GPIO_PAR_MAT ;
-typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PAR_RAQ ;
-
+typedef struct  STR_GPIO_PARAMS_PWM         STRUCT_GPIO_PARAMS_PWM ;
+typedef struct  STR_GPIO_PARAMS_MATRICIEL   STRUCT_GPIO_PARAMS_MAT ;
+typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PARAMS_RAQ ;
+typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 
 #include "astro_types.h"
 #include "astro_config.h"
@@ -230,7 +232,8 @@ typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PAR_RAQ ;
   extern STRUCT_DATAS *gp_Dat ; \
   extern STRUCT_DEVICES *gp_Dev ; \
   extern STRUCT_I2C_DEVICE *gp_I2c_Dev ; \
-  extern STRUCT_STR_I2C_ACC_MAG *gp_I2c_Acc ; \
+  extern STRUCT_I2C_ACC_MAG *gp_I2c_Acc ; \
+  extern STRUCT_I2C_MCP23017 *gp_I2c_Mcp ; \
   extern STRUCT_KEYS *gp_Key ; \
   extern STRUCT_LCD *gp_Lcd ; \
   extern STRUCT_LIEU *gp_Lie ; \
@@ -240,17 +243,21 @@ typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PAR_RAQ ;
   extern STRUCT_SUIVI *gp_Sui ; \
   extern STRUCT_TIME *gp_Tim ; \
   extern STRUCT_VOUTE *gp_Vou ; \
-  extern STRUCT_GPIO_BROCHES *gp_Gpi_Bro ; \
   extern STRUCT_GPIO_PWM_MOTEUR *gp_Mot_Alt ; \
   extern STRUCT_GPIO_PWM_MOTEUR *gp_Mot_Azi ; \
+
+#define MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS \
   extern STRUCT_ASTRE_PARAMS *gp_Ast_Par ; \
+  extern STRUCT_CALCULS_PARAMS *gp_Cal_Par ; \
   extern STRUCT_CONFIG_PARAMS *gp_Con_Par ; \
   extern STRUCT_DEVICES_PARAMS *gp_Dev_Par ; \
-  extern STRUCT_GPIO_PARAMS *gp_Gpi_Par ; \
-  extern STRUCT_CALCULS_PARAMS*gp_Cal_Par ; \
-  extern STRUCT_GPIO_PAR_OLD *gp_Gpi_Par_Old ; \
+  extern STRUCT_LIEU_PARAMS *gp_Lie_Par ; \
   extern STRUCT_TIME_PARAMS *gp_Tim_Par ; \
   extern STRUCT_PID_PARAMS *gp_Pid_Par ; \
+  extern STRUCT_GPIO_PARAMS_PWM *gp_Gpi_Par_Pwm ; \
+  extern STRUCT_GPIO_PARAMS_CON *gp_Gpi_Par_Con ; \
+  extern STRUCT_GPIO_PARAMS_MAT *gp_Gpi_Par_Mat ; \
+  extern STRUCT_GPIO_PARAMS_RAQ *gp_Gpi_Par_Raq ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS \
   extern double gd_gpio_frequence_pwm ; \
@@ -261,7 +268,8 @@ typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PAR_RAQ ;
   extern int    gi_gpio_azi    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
   extern int    gi_gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
 
-#define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS_OLD \
+#define MACRO_ASTRO_GLOBAL_EXTERN_CONST \
+  extern const char * gc_const_menus[]  ; \
 
 /*
 #ifndef CONFIG_DATAS_NB_LIGNES
@@ -301,7 +309,7 @@ typedef struct  STR_GPIO_PARAMS_RAQUETTE    STRUCT_GPIO_PAR_RAQ ;
 #endif
 */
 
-void GLOBAL_INIT(void) ;
+void ASTRO_GLOBAL_INIT(void) ;
 
 #endif
 

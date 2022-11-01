@@ -21,6 +21,23 @@
 
 typedef struct STR_LIEU STRUCT_LIEU ;
 
+/*---------------------------------------------------*/
+/* Parametres de fichier config (modif octobre 2022) */ 
+/*---------------------------------------------------*/
+
+struct STR_LIEU_PARAMS {
+  
+  double par_longitude ;
+  double par_latitude ;
+  double par_altitude ;
+} ;
+
+typedef struct STR_LIEU_PARAMS STRUCT_LIEU_PARAMS ;
+
+/*---------------------------------------------------*/
+/* Fin parametres de fichier config                  */ 
+/*---------------------------------------------------*/
+
 struct STR_LIEU {
  
  double       lat ;  // latitude

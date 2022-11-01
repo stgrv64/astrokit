@@ -11,6 +11,10 @@
 
 #include "astro_log.h"
 
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+
 FILE * gp_File_Flog ; 
 
 /*****************************************************************************************

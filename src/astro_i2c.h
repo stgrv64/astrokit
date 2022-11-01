@@ -82,6 +82,31 @@
 #define I2C_BUFFER_SIZE 10 
 #define I2C_SLEEP_MICRO 10000        
 
+/* ---------------------------------
+  la structure suivante sert si un expandeur I2C 
+   de port est utilise. 
+   Exemple = MCP23017 ou MCP23008 
+ ----------------------------------- */
+
+struct STR_I2C_MCP23017 {
+
+unsigned char mcp_alt_dir   ; // numero de port GPIO pour la direction de l'altitude
+unsigned char mcp_alt_clk   ; // numero de port GPIO pour l'horloge de l'altitude
+unsigned char mcp_alt_slp   ; // numero de port GPIO pour le sleep en altitude
+unsigned char mcp_alt_rst   ; // numero de port GPIO pour le reset en altitude
+unsigned char mcp_alt_m2    ; // numero de port GPIO pour le choix du micro pas en altitude
+unsigned char mcp_alt_m1    ; // numero de port GPIO pour le choix du micro pas en altitude 
+unsigned char mcp_alt_m0   ;  // numero de port GPIO pour le choix du micro pas en altitude
+
+unsigned char mcp_azi_dir   ; // numero de port GPIO pour la direction de l'azimut
+unsigned char mcp_azi_clk   ; // numero de port GPIO pour l'horloge de l'azimut
+unsigned char mcp_azi_slp   ; // numero de port GPIO pour le sleep en azimut
+unsigned char mcp_azi_rst   ; // numero de port GPIO pour le reset en azimut
+unsigned char mcp_azi_m2    ; // numero de port GPIO pour le choix du micro pas en azimut
+unsigned char mcp_azi_m1    ; // numero de port GPIO pour le choix du micro pas en azimut
+unsigned char mcp_azi_m0   ;  // numero de port GPIO pour le choix du micro pas en azimut
+} ;
+
 // structure decrivant un device
 //---------------------------------------------------
 struct STR_I2C_DEVICE {
@@ -157,14 +182,14 @@ struct STR_I2C_ACC_MAG {
 } ;
 
 typedef struct STR_I2C_DEVICE  STRUCT_I2C_DEVICE ;
-typedef struct STR_I2C_ACC_MAG STRUCT_STR_I2C_ACC_MAG ;
+typedef struct STR_I2C_ACC_MAG STRUCT_I2C_ACC_MAG ;
 
 int 	   I2C_INIT           ( STRUCT_I2C_DEVICE *, char * , char * ) ;
-void     I2C_CALCULS_ACCMAG ( STRUCT_STR_I2C_ACC_MAG * ) ;
+void     I2C_CALCULS_ACCMAG ( STRUCT_I2C_ACC_MAG * ) ;
 uint16_t I2C_GET            ( STRUCT_I2C_DEVICE *, char * ) ;
 void     I2C_GET_6          ( STRUCT_I2C_DEVICE *, char * ) ;
 int      I2C_SET_3          ( STRUCT_I2C_DEVICE *, unsigned long ) ;
 int      I2C_SET            ( STRUCT_I2C_DEVICE *, char * , char * ) ;
-void     I2C_GET_ACC        ( STRUCT_I2C_DEVICE *, STRUCT_STR_I2C_ACC_MAG * )  ;
+void     I2C_GET_ACC        ( STRUCT_I2C_DEVICE *, STRUCT_I2C_ACC_MAG * )  ;
 
 #endif

@@ -11,11 +11,9 @@ date        | commentaires
 
 #include "astro_voute.h"
 
-/*------------------------------------------------------------------------------
-                 variables globales specifiques au .o (.c / .h)     
--------------------------------------------------------------------------------*/
-
-STRUCT_VOUTE g_Voute, *gp_Vou ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
+MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
 * @fn     : VOUTE_INIT

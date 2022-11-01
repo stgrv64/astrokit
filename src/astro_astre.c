@@ -11,16 +11,8 @@
 #include "astro_astre.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
-
-static const char * c_Astre_Type[] = {
-  "ASTRE_INDETERMINE",
-  "ASTRE_CIEL_PROFOND",
-  "ASTRE_PLANETE",
-  "ASTRE_COMETE",
-  "ASTRE_ASTEROIDE",
-  "ASTRE_SATELLITE"
-} ;
 
 /*****************************************************************************************
 * @fn     : ASTRE_INIT

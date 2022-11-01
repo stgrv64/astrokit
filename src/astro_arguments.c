@@ -16,6 +16,7 @@
 #include "astro_arguments.h"
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
+MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 // extern ASTRO_TRAP_MAIN();
@@ -482,7 +483,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Old->GPIO_DIR_ALT, gp_Gpi_Par_Old->GPIO_CLK_ALT) ;
+     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_alt_dir, gp_Gpi_Par_Con->par_alt_clk) ;
 
      GPIO_SET_ALT( 0,0,0,0,0,0 ) ;
     }
@@ -494,7 +495,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->par_azi_red2 * gp_Cal_Par->par_azi_red3 * gp_Cal_Par->par_azi_red4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Old->GPIO_DIR_AZI, gp_Gpi_Par_Old->GPIO_CLK_AZI) ;
+     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_azi_dir, gp_Gpi_Par_Con->par_azi_clk) ;
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
@@ -514,7 +515,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Old->GPIO_DIR_ALT, gp_Gpi_Par_Old->GPIO_CLK_ALT) ;
+     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_alt_dir, gp_Gpi_Par_Con->par_alt_clk) ;
 
      GPIO_SET_ALT( 0,0,0,0,0,0 ) ;
     }
@@ -525,7 +526,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->par_azi_red2 * gp_Cal_Par->par_azi_red3 * gp_Cal_Par->par_azi_red4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Old->GPIO_DIR_AZI, gp_Gpi_Par_Old->GPIO_CLK_AZI) ;
+     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_azi_dir, gp_Gpi_Par_Con->par_azi_clk) ;
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
