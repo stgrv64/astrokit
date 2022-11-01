@@ -13,6 +13,29 @@
 #ifndef ASTRO_TIME_H
 #define ASTRO_TIME_H
 
+/* Definition de la structure associeee au fichier avant inclusion astro_global.h */
+/* Ceci est permis par le pre processeur */
+
+struct STR_TIME {
+  
+  /* L heure decimale sert pour la representation 
+   * d'un angle sous la forme  : 12h25mn05s 
+   * 360 degres = 24h
+   * -------------------------------------------- */
+   
+  double hd ;      // heure decimale
+  char   c_si ;    /* signe */ 
+  int    si ;      // signe
+  int    mm ;      // month
+  int    yy ;      // year
+  int    dd ;      // day
+  int    HH ;      // hour
+  int    MM ;      // minutes
+  int    SS ;      // secondes
+
+} ;
+typedef struct STR_TIME STRUCT_TIME ;
+
 #include "astro_global.h"
 
 //---------------------------------------------------------------------------------------
@@ -42,26 +65,7 @@
 #define  TEMPS_MICRO_SEC    1000000             // frequence d'une microseconde (pour les usleep et calculs)
 #define  TEMPS_NANO_SEC     1000000000          // frequence d'une nanoseconde (pour les nanosleep et calculs) 
 
-struct STR_TIME {
-  
-  /* L heure decimale sert pour la representation 
-   * d'un angle sous la forme  : 12h25mn05s 
-   * 360 degres = 24h
-   * -------------------------------------------- */
-   
-  double hd ;   // heure decimale
-  char c_si ; /* signe */ 
 
-  int si ;      // signe
-  int mm ;      // month
-  int yy ;      // year
-  int dd ;      // day
-  int HH ;      // hour
-  int MM ;      // minutes
-  int SS ;      // secondes
-
-} ;
-typedef struct STR_TIME STRUCT_TIME ;
 
 struct STR_TIME_PARAMS {
   

@@ -49,24 +49,27 @@ struct STR_CONFIG_PARAMS {
 /*---------------------------------------------------*/
 
 struct STR_CONFIG {
- char g_Char_Params  [CONFIG_DATAS_NB_LIGNES] [CONFIG_DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER_256] ;
+ char con_params  [CONFIG_DATAS_NB_LIGNES] [CONFIG_DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER_256] ;
 } ;
+typedef struct  STR_CONFIG STRUCT_CONFIG ;
 
-int    CONFIG_FORMAT_ADMIS(char c) ;
-int    CONFIG_FIN_LIGNE(char c) ;
-int    CONFIG_DEB_COM(char c);
-int    CONFIG_FIN_MOT(char c) ;
-int    CONFIG_FIN_FICHIER(char c) ;
-void   CONFIG_PARAMETRES_CONFIG(char g_Char_Params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) ;
-void   CONFIG_PARAMETRES_AFFICHER(void) ;
-void   CONFIG_AFFICHER_DATAS(char g_Char_Params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) ;
-int    CONFIG_READ(char g_Char_Params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) ;
-void   CONFIG_AFFICHER_MODE_LONG(void) ;
-void   CONFIG_AFFICHER_TOUT(void) ;          /* FIXME ajout 20191228 */
-void   CONFIG_AFFICHER_CHANGEMENTS (void) ;  /* FIXME ajout 20200102 */
+void   CONFIG_PARAMETRES_CONFIG     (STRUCT_CONFIG * ) ;
+void   CONFIG_AFFICHER_DATAS        (STRUCT_CONFIG *) ;
+int    CONFIG_READ                  (STRUCT_CONFIG *) ;
+
+void   CONFIG_PARAMETRES_AFFICHER   (void) ;
+void   CONFIG_AFFICHER_MODE_LONG    (void) ;
+void   CONFIG_AFFICHER_TOUT         (void) ;  /* FIXME ajout 20191228 */
+void   CONFIG_AFFICHER_CHANGEMENTS  (void) ;  /* FIXME ajout 20200102 */
 void   DEVICES_AFFICHER_UTILISATION (void) ;  /* FIXME ajout 20220312 */
 
-int    CONFIG_PATH_FIND                    ( char * , char *) ;
+int    CONFIG_FORMAT_ADMIS          (char c) ;
+int    CONFIG_FIN_LIGNE             (char c) ;
+int    CONFIG_DEB_COM               (char c);
+int    CONFIG_FIN_MOT               (char c) ;
+int    CONFIG_FIN_FICHIER           (char c) ;
+
+int    CONFIG_PATH_FIND             ( char * , char *) ;
 
 #endif
 

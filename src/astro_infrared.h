@@ -26,8 +26,8 @@
 #define IR_CODE_REPETE_AUTORISE_MIN 21 
 #define IR_CODE_REPETE_AUTORISE_MAX 24
 
-int   INFRARED_OPEN  (struct lirc_config *gp_LircConfig) ;
-void  INFRARED_CLOSE (struct lirc_config *gp_LircConfig) ;
-void  INFRARED_READ  (STRUCT_SUIVI * gp_Sui) ;
+int   INFRARED_OPEN  ( INFRARED_LIRC_CONFIG *gp_LircConfig) ;
+void  INFRARED_CLOSE ( INFRARED_LIRC_CONFIG *gp_LircConfig) ;
+void  INFRARED_READ  ( STRUCT_SUIVI         * gp_Sui) ;
 
 #endif

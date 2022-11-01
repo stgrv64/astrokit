@@ -25,8 +25,7 @@
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
-
-struct lirc_config *gp_LircConfig;
+MACRO_ASTRO_GLOBAL_EXTERN_INFRARED ;
 
 /*****************************************************************************************
 * @fn     : INFRARED_OPEN
@@ -38,7 +37,7 @@ struct lirc_config *gp_LircConfig;
 * @todo   : 
 *****************************************************************************************/
 
-int INFRARED_OPEN(struct lirc_config *gp_LircConfig) {
+int INFRARED_OPEN(INFRARED_LIRC_CONFIG *gp_LircConfig) {
 
   int retour = 0 ;
   
@@ -49,7 +48,7 @@ int INFRARED_OPEN(struct lirc_config *gp_LircConfig) {
 }
 //====================================================================================
   
-void INFRARED_CLOSE(struct lirc_config *gp_LircConfig) {
+void INFRARED_CLOSE(INFRARED_LIRC_CONFIG *gp_LircConfig) {
   
   // Frees the data structures associated with config.
   lirc_freeconfig(gp_LircConfig);

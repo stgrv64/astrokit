@@ -1,4 +1,5 @@
-/* #define _GNU_SOURCE */
+#define _GNU_SOURCE
+/* pour utilisation de pthread_getname_np / pthread_setname_np */
 
 /* -------------------------------------------------------------
 # astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
@@ -15,7 +16,9 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-int g_nb_threads ;  
+int gi_pthread_nb_threads ;  
+int gi_pthread_getuid ;
+int gi_pthread_nb_cpu ;
 
 static const char *  gi_Pth_Name[] = {
   "pth_phases" ,
@@ -52,12 +55,6 @@ static const int gi_Pth_Sched_Param[] = {
   SCHED_RR,
   SCHED_RR
 } ;
-
-STRUCT_MUTEXS   g_Mutex, *gp_Mut ;
-STRUCT_PTHREADS g_Pth,   *gp_Pth ;
-
-int             guit_user_getuid ;
-long            gl_number_of_processors ;
 
 /*****************************************************************************************
 * @fn     : PTHREADS_INIT
@@ -111,7 +108,7 @@ void PTHREADS_INIT( pthread_t pth_self ) {
   Trace("user is : %s (getuid) %d ", c_rlogin, getuid()) ;
   Trace("pthread_self = %ld", pthread_self()) ;
 
-  guit_user_getuid = getuid() ;
+  gi_pthread_getuid = getuid() ;
 
   // -----------------------------------------------------------------
   // Mise en place du temps reel et du parallelisme (parallelisme, priorites, ..)
@@ -123,7 +120,7 @@ void PTHREADS_INIT( pthread_t pth_self ) {
   /*
   system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ; 
   */
-  if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
 
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ; 
     mlockall(MCL_CURRENT | MCL_FUTURE);
@@ -179,7 +176,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
 
   CPU_ZERO(&cpu_set) ;
 
-  for(int i = 0 ; i< gl_number_of_processors; i++ ) {
+  for(int i = 0 ; i< gi_pthread_nb_cpu; i++ ) {
     CPU_SET(i,&cpu_set); 
   }
   
@@ -229,7 +226,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
   
   Trace("nom %-64s policy %d ordonn %d ", c_name, i_pri, i_ord) ;
 
-  if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
 
     if ( (i_error= pthread_setschedparam( pth_self, i_ord, & param )) != 0) { 
       i_errno=errno;        
@@ -239,7 +236,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
     } 
   }
   else { 
-    Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+    Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
   }
   /* erreur la plus courante de pthread_setname_np */
   /* ERANGE 34 Numerical result out of range */
@@ -252,12 +249,12 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
 
   if ( i_error == 0 ) {
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
-    strcpy( p_pth->pth_att[ g_nb_threads ].att_nam , c_name ) ;
-    p_pth->pth_att[ g_nb_threads ].att_pid                = pth_self ;
-    p_pth->pth_att[ g_nb_threads ].att_pri.sched_priority = i_pri ;
-    p_pth->pth_att[ g_nb_threads ].att_ord                = i_ord ; 
+    strcpy( p_pth->pth_att[ gi_pthread_nb_threads ].att_nam , c_name ) ;
+    p_pth->pth_att[ gi_pthread_nb_threads ].att_pid                = pth_self ;
+    p_pth->pth_att[ gi_pthread_nb_threads ].att_pri.sched_priority = i_pri ;
+    p_pth->pth_att[ gi_pthread_nb_threads ].att_ord                = i_ord ; 
     
-    g_nb_threads++ ;
+    gi_pthread_nb_threads++ ;
     
     Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   }
@@ -282,7 +279,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
   char c_name[16] ;
 
   pthread_mutex_lock( & gp_Mut->mut_pth) ;
-  l_nb_threads = g_nb_threads ;
+  l_nb_threads = gi_pthread_nb_threads ;
   Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   
   Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
@@ -305,7 +302,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
 }
 
   /*
-  if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
 
     param.sched_priority = PTHREADS_POLICY_1 ;
 
@@ -315,12 +312,12 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
     }
   }
   else { 
-    Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+    Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
   }
 
   pthread_mutex_lock( & gp_Mut->mut_pth) ;
   pthread_setname_np( pthread_self(), "SUIVI_VOUTE" ) ;
-  gp_Sui->p_pthpth_att->att_pid[ g_nb_threads++ ] = pthread_self() ;
+  gp_Sui->p_pthpth_att->att_pid[ gi_pthread_nb_threads++ ] = pthread_self() ;
   Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   */
 

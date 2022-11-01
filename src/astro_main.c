@@ -1,4 +1,4 @@
-/* #define _GNU_SOURCE */
+#define _GNU_SOURCE
 /* -------------------------------------------------------------
 # astrokit @ 2021  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
@@ -43,6 +43,9 @@
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+MACRO_ASTRO_GLOBAL_EXTERN_PTHREADS ;
+MACRO_ASTRO_GLOBAL_EXTERN_CONFIG ;
+MACRO_ASTRO_GLOBAL_EXTERN_INFRARED ;
 
 /*****************************************************************************************
 * @fn     : ASTRO_TRAP_MAIN
@@ -58,7 +61,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 void ASTRO_TRAP_MAIN(int sig) {
 
-  int l_nb_threads = g_nb_threads ;
+  int l_nb_threads = gi_pthread_nb_threads ;
   int i_num_thread=0 ;
   long id_thread =0;
   char c_thread_name [ 16 ] ; 
@@ -78,11 +81,11 @@ void ASTRO_TRAP_MAIN(int sig) {
   /* Si sig > positif on abandonne les threads et on quitte */
   /*--------------------------------------------------------*/
 
-  Trace("pthread_cancel : %d threads a abandonner", g_nb_threads ) ;
+  Trace("pthread_cancel : %d threads a abandonner", gi_pthread_nb_threads ) ;
 
   for( i_num_thread = l_nb_threads ; i_num_thread > 0 ; i_num_thread-- )   {
     
-    g_nb_threads-- ;
+    gi_pthread_nb_threads-- ;
     id_thread = gp_Pth->pth_att[i_num_thread].att_pid ;
 
     if ( id_thread >0 ) {
@@ -106,7 +109,7 @@ void ASTRO_TRAP_MAIN(int sig) {
   /*----------------------------------*/
 
   memset( c_cmd, 0, sizeof(c_cmd)) ;
-  sprintf(c_cmd,"%s sane", g_Path_Cmd_Stty ) ;
+  sprintf(c_cmd,"%s sane", gc_config_path_cmd_stty ) ;
 
   if ( system( c_cmd ) < 0 ) {
 
@@ -219,7 +222,7 @@ void ASTRO_TRAP_SUIVI_LCD(int sig)  {
 * @brief  : Ce mode permet de gerer les menus .
 * @param  : STRUCT_SUIVI   *gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : 
 *****************************************************************************************/
@@ -243,7 +246,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   /* Configuration du thread et des attributs de tread                            */
   /* ---------------------------------------------------------------------------- */
 /*
-  if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
 
     param.sched_priority = PTHREADS_POLICY_1 ;
     
@@ -253,7 +256,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
     }
   }
   else { 
-    Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+    Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
   }
 
   pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
@@ -505,7 +508,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 * @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
 * @param  : STRUCT_SUIVI   *gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : 
 *****************************************************************************************/
@@ -550,7 +553,7 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
   /* Configuration du thread et des attributs de tread                            */
   /* ---------------------------------------------------------------------------- */
 /*
-  if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
     param.sched_priority = PTHREADS_POLICY_1 ;
 
     if (pthread_setschedparam( pthread_self(), PTHREADS_SCHED_PARAM_SUIVI_VOUTE, & param) != 0) {
@@ -559,7 +562,7 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
     }
   }
   else { 
-    Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+    Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
   }
 
   pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
@@ -655,7 +658,7 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
 * @brief  : fonction de callback du thread suivi infrarouge
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qi est variable globale
 *****************************************************************************************/
@@ -676,7 +679,7 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
     /* Configuration du thread et des attributs de tread                            */
     /* ---------------------------------------------------------------------------- */
 /*
-    if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+    if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
       param.sched_priority = PTHREADS_POLICY_1  ;
       
       if (pthread_setschedparam( pthread_self(), PTHREADS_SCHED_PARAM_SUIVI_INFRA, & param) != 0) { 
@@ -685,7 +688,7 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
       }
     }
     else { 
-      Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+      Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
     } 
 
     pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
@@ -716,7 +719,7 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-04-12 creation 
 * @date   : 2022-04-27 mise en commentaire de LCD_DISPLAY_TEMPS_LIEU
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : TODO : reflechir a ce qui doit etre rafraichi
 *****************************************************************************************/
@@ -742,7 +745,7 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
     /* Configuration du thread et des attributs de tread                            */
     /* ---------------------------------------------------------------------------- */
 /*
-    if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+    if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
 
       param.sched_priority = PTHREADS_POLICY_1  ; 
 
@@ -752,7 +755,7 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
       }
     }
     else { 
-      Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+      Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
     } 
 
     pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
@@ -808,7 +811,7 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-04-12 correction code ( repetition if ( i_indice_code < CODES_CODE_NB_CODES ))
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
@@ -834,7 +837,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
     /* Configuration du thread et des attributs de tread                            */
     /* ---------------------------------------------------------------------------- */
 /*
-    if ( guit_user_getuid == PTHREADS_USERID_ROOT ) {
+    if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
 
       param.sched_priority = PTHREADS_POLICY_1  ;
       if (pthread_setschedparam( pthread_self(), PTHREADS_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
@@ -842,7 +845,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
       }
     }
     else { 
-      Trace("guit_user_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
+      Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
     } 
 
     pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
@@ -923,7 +926,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
 *           qui utilise directement getchar (aucun effet)
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
@@ -972,7 +975,7 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
 * @brief  : fonction de callback du thread suivi clavier en mode ncurses
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
@@ -1044,7 +1047,7 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
 * @brief  : fonction de callback du thread suivi capteurs (non utilisee)
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ g_nb_threads++ ]
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ]
 * @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
@@ -1172,17 +1175,16 @@ int main(int argc, char ** argv) {
   ARGUMENTS_GERER_REP_HOME(argc, argv) ;
   /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
 
-  CONFIG_PATH_FIND( g_Path_Cmd_Stty, "stty") ;
+  CONFIG_PATH_FIND( gc_config_path_cmd_stty, "stty") ;
   
   // -----------------------------------------------------------------
   // Initialisations diverses et variees
   // -----------------------------------------------------------------
 
-  CONFIG_READ       ( g_Char_Params ) ;
-  GPIO_READ         ( g_Char_Params ) ; 
-
-  CONFIG_AFFICHER_DATAS ( g_Char_Params ) ;
-  CONFIG_PARAMETRES_CONFIG       ( g_Char_Params ) ;
+  CONFIG_READ               ( gp_Con ) ;
+  GPIO_READ                 ( gp_Con ) ; 
+  CONFIG_AFFICHER_DATAS     ( gp_Con ) ;
+  CONFIG_PARAMETRES_CONFIG  ( gp_Con ) ;
 
   // CONFIG_PARAMETRES_AFFICHER() ;   
   LOG_INIT(); 

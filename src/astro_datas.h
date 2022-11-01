@@ -13,7 +13,9 @@
 #ifndef ASTRO_DATAS_H
 #define ASTRO_DATAS_H
 
-#include "astro_global.h"
+#ifndef CONFIG_TAILLE_BUFFER_256
+#define CONFIG_TAILLE_BUFFER_256 256
+#endif
 
 struct STR_DATAS {
   char dat_inf [ CONFIG_TAILLE_BUFFER_256 ] ;
@@ -21,7 +23,7 @@ struct STR_DATAS {
   char dat_bou [ CONFIG_TAILLE_BUFFER_256 ] ;
 } ;
 
-typedef struct STR_DATAS STRUCT_DATAS ;
+#include "astro_global.h"
 
 void   DATAS_INIT ( STRUCT_DATAS * ) ;
 

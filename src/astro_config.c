@@ -68,7 +68,7 @@ static const char * c_Bin_Possible_Paths[] = {
   "/usr/local/sbin"
 } ;
 
-char      g_Path_Cmd_Stty[ CONFIG_TAILLE_BUFFER_32 ] ;
+char  gc_config_path_cmd_stty[ CONFIG_TAILLE_BUFFER_32 ] ;
 
 // ------------------------------------------------------------------------
 // FIN definition des variables dependant du fichier de conf --------------
@@ -199,7 +199,7 @@ int CONFIG_FIN_FICHIER(char c) {
 * @todo   : 
 *****************************************************************************************/
 
-void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) {
+void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 
   int l ;
 
@@ -275,160 +275,160 @@ void CONFIG_PARAMETRES_CONFIG(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DA
      
       // FIXME : note 2021 : les variables GPIO_xxx sont gérées dans le ficheir gpio.c
 
-     if(!strcmp("gp_Ast_Par->par_default_object",lc_Params[l][0])) strcpy( gp_Ast_Par->par_default_object, lc_Params[l][1]) ;
+     if(!strcmp("gp_Ast_Par->par_default_object",lp_Con->con_params[l][0])) strcpy( gp_Ast_Par->par_default_object, lp_Con->con_params[l][1]) ;
 
-     if(!strcmp("gp_Con_Par->par_default_menu",lc_Params[l][0])) {
-      if(!strcmp(lc_Params[l][1],"MENU_AZIMUTAL" ))           gp_Con_Par->par_default_menu = MENU_AZIMUTAL ;
-      if(!strcmp(lc_Params[l][1],"MENU_EQUATORIAL" ))         gp_Con_Par->par_default_menu = MENU_EQUATORIAL ;
-      if(!strcmp(lc_Params[l][1],"MENU_MANUEL_BRUT" ))        gp_Con_Par->par_default_menu = MENU_MANUEL_BRUT ;
-      if(!strcmp(lc_Params[l][1],"MENU_MANUEL_NON_ASSERVI" )) gp_Con_Par->par_default_menu = MENU_MANUEL_NON_ASSERVI ;
-      if(!strcmp(lc_Params[l][1],"MENU_MANUEL_ASSERVI" ))     gp_Con_Par->par_default_menu = MENU_MANUEL_ASSERVI ;
-      if(!strcmp(lc_Params[l][1],"MENU_GOTO" ))               gp_Con_Par->par_default_menu = MENU_GOTO ;
-      if(!strcmp(lc_Params[l][1],"MENU_INFO" ))               gp_Con_Par->par_default_menu = MENU_INFO ;
-      if(!strcmp(lc_Params[l][1],"MENU_RESEAU_UP" ))          gp_Con_Par->par_default_menu = MENU_RESEAU_UP ;
-      if(!strcmp(lc_Params[l][1],"MENU_RESEAU_DOWN" ))        gp_Con_Par->par_default_menu = MENU_RESEAU_DOWN ;
-      if(!strcmp(lc_Params[l][1],"MENU_PROGRAMME_DOWN" ))     gp_Con_Par->par_default_menu = MENU_PROGRAMME_DOWN ;
-      if(!strcmp(lc_Params[l][1],"MENU_DOWN" ))               gp_Con_Par->par_default_menu = MENU_DOWN ;
+     if(!strcmp("gp_Con_Par->par_default_menu",lp_Con->con_params[l][0])) {
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_AZIMUTAL" ))           gp_Con_Par->par_default_menu = MENU_AZIMUTAL ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_EQUATORIAL" ))         gp_Con_Par->par_default_menu = MENU_EQUATORIAL ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_BRUT" ))        gp_Con_Par->par_default_menu = MENU_MANUEL_BRUT ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_NON_ASSERVI" )) gp_Con_Par->par_default_menu = MENU_MANUEL_NON_ASSERVI ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_ASSERVI" ))     gp_Con_Par->par_default_menu = MENU_MANUEL_ASSERVI ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_GOTO" ))               gp_Con_Par->par_default_menu = MENU_GOTO ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_INFO" ))               gp_Con_Par->par_default_menu = MENU_INFO ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_RESEAU_UP" ))          gp_Con_Par->par_default_menu = MENU_RESEAU_UP ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_RESEAU_DOWN" ))        gp_Con_Par->par_default_menu = MENU_RESEAU_DOWN ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_PROGRAMME_DOWN" ))     gp_Con_Par->par_default_menu = MENU_PROGRAMME_DOWN ;
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_DOWN" ))               gp_Con_Par->par_default_menu = MENU_DOWN ;
      } 
       /* Definition de valeurs par defauts pour les TEMPO */ 
-     if(!strcmp("gp_Tim_Par->par_tempo_Raq",lc_Params[l][0]))      gp_Tim_Par->par_tempo_Raq=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Menu",lc_Params[l][0]))     gp_Tim_Par->par_tempo_Menu=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Ir",lc_Params[l][0]))       gp_Tim_Par->par_tempo_Ir=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Termios",lc_Params[l][0]))  gp_Tim_Par->par_tempo_Termios=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Clavier",lc_Params[l][0]))  gp_Tim_Par->par_tempo_Clavier=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Capteurs",lc_Params[l][0])) gp_Tim_Par->par_tempo_Capteurs=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Lcd_Loop",lc_Params[l][0])) gp_Tim_Par->par_tempo_Lcd_Loop=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Tim_Par->par_tempo_Lcd_Disp",lc_Params[l][0])) gp_Tim_Par->par_tempo_Lcd_Disp=atol(lc_Params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Raq",lp_Con->con_params[l][0]))      gp_Tim_Par->par_tempo_Raq=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Menu",lp_Con->con_params[l][0]))     gp_Tim_Par->par_tempo_Menu=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Ir",lp_Con->con_params[l][0]))       gp_Tim_Par->par_tempo_Ir=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Termios",lp_Con->con_params[l][0]))  gp_Tim_Par->par_tempo_Termios=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Clavier",lp_Con->con_params[l][0]))  gp_Tim_Par->par_tempo_Clavier=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Capteurs",lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Capteurs=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Lcd_Loop",lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Lcd_Loop=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Tim_Par->par_tempo_Lcd_Disp",lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Lcd_Disp=atol(lp_Con->con_params[l][1]);
 
-     if(!strcmp("gp_Pid_Par->par_pid_ech",lc_Params[l][0])) gp_Pid_Par->par_pid_ech=atof(lc_Params[l][1]);
-     if(!strcmp("gp_Pid_Par->par_pid_kp", lc_Params[l][0])) gp_Pid_Par->par_pid_kp =atof(lc_Params[l][1]);
-     if(!strcmp("gp_Pid_Par->par_pid_ki", lc_Params[l][0])) gp_Pid_Par->par_pid_kp =atof(lc_Params[l][1]);
-     if(!strcmp("gp_Pid_Par->par_pid_kd", lc_Params[l][0])) gp_Pid_Par->par_pid_kd =atof(lc_Params[l][1]);
+     if(!strcmp("gp_Pid_Par->par_pid_ech",lp_Con->con_params[l][0])) gp_Pid_Par->par_pid_ech=atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Pid_Par->par_pid_kp", lp_Con->con_params[l][0])) gp_Pid_Par->par_pid_kp =atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Pid_Par->par_pid_ki", lp_Con->con_params[l][0])) gp_Pid_Par->par_pid_kp =atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Pid_Par->par_pid_kd", lp_Con->con_params[l][0])) gp_Pid_Par->par_pid_kd =atof(lp_Con->con_params[l][1]);
 
-     if(!strcmp("gp_Gpi_Par_Pwm->par_led_etat",lc_Params[l][0]))  gp_Gpi_Par_Pwm->par_led_etat=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Pwm->par_led_etat",lp_Con->con_params[l][0]))  gp_Gpi_Par_Pwm->par_led_etat=atoi(lp_Con->con_params[l][1]);
 
-     if(!strcmp("gp_Dev_Par->par_use_Controler",lc_Params[l][0]))  gp_Dev_Par->par_use_Controler=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Dev_Par->par_use_Capteurs",lc_Params[l][0]))   gp_Dev_Par->par_use_Capteurs=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Dev_Par->par_use_Raquette",lc_Params[l][0]))   gp_Dev_Par->par_use_Raquette=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Dev_Par->par_use_Bluetooth",lc_Params[l][0]))  gp_Dev_Par->par_use_Bluetooth=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Dev_Par->par_use_Infrared",lc_Params[l][0])) gp_Dev_Par->par_use_Infrared=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Dev_Par->par_use_Keyboard",lc_Params[l][0]))   gp_Dev_Par->par_use_Keyboard=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Dev_Par->par_use_Lcd",lc_Params[l][0]))        gp_Dev_Par->par_use_Lcd=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Controler",lp_Con->con_params[l][0]))  gp_Dev_Par->par_use_Controler=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Capteurs",lp_Con->con_params[l][0]))   gp_Dev_Par->par_use_Capteurs=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Raquette",lp_Con->con_params[l][0]))   gp_Dev_Par->par_use_Raquette=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Bluetooth",lp_Con->con_params[l][0]))  gp_Dev_Par->par_use_Bluetooth=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Infrared",lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Infrared=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Keyboard",lp_Con->con_params[l][0]))   gp_Dev_Par->par_use_Keyboard=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Dev_Par->par_use_Lcd",lp_Con->con_params[l][0]))        gp_Dev_Par->par_use_Lcd=atoi(lp_Con->con_params[l][1]);
 
-     if(!strcmp("gp_Cal_Par->par_alt_rev",lc_Params[l][0]))      gp_Cal_Par->par_alt_rev=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Cal_Par->par_azi_rev",lc_Params[l][0]))      gp_Cal_Par->par_azi_rev=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_rev",lp_Con->con_params[l][0]))      gp_Cal_Par->par_alt_rev=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_azi_rev",lp_Con->con_params[l][0]))      gp_Cal_Par->par_azi_rev=atoi(lp_Con->con_params[l][1]);
      
-     if(!strcmp("gp_Cal_Par->par_alt_f",lc_Params[l][0]))        gp_Cal_Par->par_alt_f=atol(lc_Params[l][1]);
-     if(!strcmp("gp_Cal_Par->par_azi_f",lc_Params[l][0]))        gp_Cal_Par->par_azi_f=atol(lc_Params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_f",lp_Con->con_params[l][0]))        gp_Cal_Par->par_alt_f=atol(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_azi_f",lp_Con->con_params[l][0]))        gp_Cal_Par->par_azi_f=atol(lp_Con->con_params[l][1]);
      
-     if(!strcmp("gp_Cal_Par->par_alt_n",lc_Params[l][0]))        gp_Cal_Par->par_alt_n=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Cal_Par->par_azi_n",lc_Params[l][0]))        gp_Cal_Par->par_azi_n=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_n",lp_Con->con_params[l][0]))        gp_Cal_Par->par_alt_n=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_azi_n",lp_Con->con_params[l][0]))        gp_Cal_Par->par_azi_n=atoi(lp_Con->con_params[l][1]);
      
-     if(!strcmp("gp_Cal_Par->par_alt_red_tot",lc_Params[l][0]))        gp_Cal_Par->par_alt_red_tot=atof(lc_Params[l][1]);
-     if(!strcmp("gp_Cal_Par->par_azi_red_tot",lc_Params[l][0]))        gp_Cal_Par->par_azi_red_tot=atof(lc_Params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_red_tot",lp_Con->con_params[l][0]))        gp_Cal_Par->par_alt_red_tot=atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_azi_red_tot",lp_Con->con_params[l][0]))        gp_Cal_Par->par_azi_red_tot=atof(lp_Con->con_params[l][1]);
      
-     if(!strcmp("gp_Gpi_Par_Raq->par_raq_ouest",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_ouest=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Raq->par_raq_est",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_est=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Raq->par_raq_sud",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_sud=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Raq->par_raq_nord",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_nord=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Raq->par_raq_v",lc_Params[l][0]))   gp_Gpi_Par_Raq->par_raq_v=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_ouest",lp_Con->con_params[l][0]))   gp_Gpi_Par_Raq->par_raq_ouest=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_est",lp_Con->con_params[l][0]))   gp_Gpi_Par_Raq->par_raq_est=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_sud",lp_Con->con_params[l][0]))   gp_Gpi_Par_Raq->par_raq_sud=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_nord",lp_Con->con_params[l][0]))   gp_Gpi_Par_Raq->par_raq_nord=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Raq->par_raq_v",lp_Con->con_params[l][0]))   gp_Gpi_Par_Raq->par_raq_v=atoi(lp_Con->con_params[l][1]);
      
-     if(!strcmp("gp_Gpi_Par_Mat->par_l1",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l1=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Mat->par_l2",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l2=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Mat->par_l3",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l3=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Mat->par_l4",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_l4=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l1",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_l1=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l2",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_l2=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l3",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_l3=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_l4",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_l4=atoi(lp_Con->con_params[l][1]);
      
-     if(!strcmp("gp_Gpi_Par_Mat->par_c1",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c1=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Mat->par_c2",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c2=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Mat->par_c3",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c3=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Mat->par_c4",lc_Params[l][0]))   gp_Gpi_Par_Mat->par_c4=atoi(lc_Params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c1",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_c1=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c2",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_c2=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c3",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_c3=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Mat->par_c4",lp_Con->con_params[l][0]))   gp_Gpi_Par_Mat->par_c4=atoi(lp_Con->con_params[l][1]);
 
-     if(!strcmp("gp_Lie_Par->par_longitude",lc_Params[l][0]))     gp_Lie_Par->par_longitude=atof(lc_Params[l][1]);
-     if(!strcmp("gp_Lie_Par->par_latitude",lc_Params[l][0]))      gp_Lie_Par->par_latitude=atof(lc_Params[l][1]);
-     if(!strcmp("gp_Lie_Par->par_altitude",lc_Params[l][0]))      gp_Lie_Par->par_altitude=atof(lc_Params[l][1]);
+     if(!strcmp("gp_Lie_Par->par_longitude",lp_Con->con_params[l][0]))     gp_Lie_Par->par_longitude=atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Lie_Par->par_latitude",lp_Con->con_params[l][0]))      gp_Lie_Par->par_latitude=atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Lie_Par->par_altitude",lp_Con->con_params[l][0]))      gp_Lie_Par->par_altitude=atof(lp_Con->con_params[l][1]);
 
      // devices de altitude
 
-     if(!strcmp("gp_Cal_Par->par_alt_red_1",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_1 = atof(lc_Params[l][1]);         
-     if(!strcmp("gp_Cal_Par->par_alt_red_2",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_2 = atof(lc_Params[l][1]);
-     if(!strcmp("gp_Cal_Par->par_alt_red_3",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_3 = atof(lc_Params[l][1]);         
-     if(!strcmp("gp_Cal_Par->par_alt_red_4",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_4 = atof(lc_Params[l][1]);  
-     if(!strcmp("gp_Cal_Par->par_alt_red_5",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_5 = atof(lc_Params[l][1]);
-     if(!strcmp("gp_Cal_Par->par_alt_red_6",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_6 = atof(lc_Params[l][1]);       
-     if(!strcmp("gp_Cal_Par->par_alt_red_7",lc_Params[l][0]))       gp_Cal_Par->par_alt_red_7 = atof(lc_Params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_red_1",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_1 = atof(lp_Con->con_params[l][1]);         
+     if(!strcmp("gp_Cal_Par->par_alt_red_2",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_2 = atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_red_3",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_3 = atof(lp_Con->con_params[l][1]);         
+     if(!strcmp("gp_Cal_Par->par_alt_red_4",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_4 = atof(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Cal_Par->par_alt_red_5",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_5 = atof(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Cal_Par->par_alt_red_6",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_6 = atof(lp_Con->con_params[l][1]);       
+     if(!strcmp("gp_Cal_Par->par_alt_red_7",lp_Con->con_params[l][0]))       gp_Cal_Par->par_alt_red_7 = atof(lp_Con->con_params[l][1]);
 
-     if(!strcmp("gp_Cal_Par->par_alt_acc",lc_Params[l][0]))      gp_Cal_Par->par_alt_acc= atof(lc_Params[l][1])      ;
+     if(!strcmp("gp_Cal_Par->par_alt_acc",lp_Con->con_params[l][0]))      gp_Cal_Par->par_alt_acc= atof(lp_Con->con_params[l][1])      ;
 
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_dir",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_dir=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_clk",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_clk=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_slp",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_slp=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_rst",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_rst=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_mmm",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_mmm=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_ena",lc_Params[l][0])) gp_Gpi_Par_Con->par_alt_ena=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_m2",lc_Params[l][0]))  gp_Gpi_Par_Con->par_alt_m2=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_m1",lc_Params[l][0]))  gp_Gpi_Par_Con->par_alt_m1=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_alt_m0",lc_Params[l][0]))  gp_Gpi_Par_Con->par_alt_m0=atoi(lc_Params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_dir",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_alt_dir=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_clk",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_alt_clk=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_slp",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_alt_slp=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_rst",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_alt_rst=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_mmm",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_alt_mmm=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_ena",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_alt_ena=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_m2",lp_Con->con_params[l][0]))  gp_Gpi_Par_Con->par_alt_m2=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_m1",lp_Con->con_params[l][0]))  gp_Gpi_Par_Con->par_alt_m1=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_alt_m0",lp_Con->con_params[l][0]))  gp_Gpi_Par_Con->par_alt_m0=atoi(lp_Con->con_params[l][1]);  
 
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_dir",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_dir=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_clk",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_clk=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_slp",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_slp=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_rst",lc_Params[l][0]))  gp_I2c_Mcp->mcp_alt_rst=atoi(lc_Params[l][1])  ;  
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_m2",lc_Params[l][0]))   gp_I2c_Mcp->mcp_alt_m2=atoi(lc_Params[l][1])   ;  
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_m1",lc_Params[l][0]))   gp_I2c_Mcp->mcp_alt_m1=atoi(lc_Params[l][1])   ;  
-     if(!strcmp("gp_I2c_Mcp->mcp_alt_m0",lc_Params[l][0]))   gp_I2c_Mcp->mcp_alt_m0=atoi(lc_Params[l][1])   ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_dir",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_alt_dir=atoi(lp_Con->con_params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_clk",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_alt_clk=atoi(lp_Con->con_params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_slp",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_alt_slp=atoi(lp_Con->con_params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_rst",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_alt_rst=atoi(lp_Con->con_params[l][1])  ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_m2",lp_Con->con_params[l][0]))   gp_I2c_Mcp->mcp_alt_m2=atoi(lp_Con->con_params[l][1])   ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_m1",lp_Con->con_params[l][0]))   gp_I2c_Mcp->mcp_alt_m1=atoi(lp_Con->con_params[l][1])   ;  
+     if(!strcmp("gp_I2c_Mcp->mcp_alt_m0",lp_Con->con_params[l][0]))   gp_I2c_Mcp->mcp_alt_m0=atoi(lp_Con->con_params[l][1])   ;  
      
      // devices de azimut
 
-     if(!strcmp("gp_Cal_Par->par_azi_red1",lc_Params[l][0]))       gp_Cal_Par->par_azi_red1 = atof(lc_Params[l][1])      ; 
-     if(!strcmp("gp_Cal_Par->par_azi_red2",lc_Params[l][0]))       gp_Cal_Par->par_azi_red2 = atof(lc_Params[l][1])      ; 
-     if(!strcmp("gp_Cal_Par->par_azi_red3",lc_Params[l][0]))       gp_Cal_Par->par_azi_red3 = atof(lc_Params[l][1])      ; 
-     if(!strcmp("gp_Cal_Par->par_azi_red4",lc_Params[l][0]))       gp_Cal_Par->par_azi_red4 = atof(lc_Params[l][1])      ; 
-     if(!strcmp("gp_Cal_Par->par_azi_red5",lc_Params[l][0]))       gp_Cal_Par->par_azi_red5 = atof(lc_Params[l][1])      ; 
-     if(!strcmp("gp_Cal_Par->par_azi_red6",lc_Params[l][0]))       gp_Cal_Par->par_azi_red6 = atof(lc_Params[l][1])      ; 
-     if(!strcmp("gp_Cal_Par->par_azi_red7",lc_Params[l][0]))       gp_Cal_Par->par_azi_red7 = atof(lc_Params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red1",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red1 = atof(lp_Con->con_params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red2",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red2 = atof(lp_Con->con_params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red3",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red3 = atof(lp_Con->con_params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red4",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red4 = atof(lp_Con->con_params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red5",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red5 = atof(lp_Con->con_params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red6",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red6 = atof(lp_Con->con_params[l][1])      ; 
+     if(!strcmp("gp_Cal_Par->par_azi_red7",lp_Con->con_params[l][0]))       gp_Cal_Par->par_azi_red7 = atof(lp_Con->con_params[l][1])      ; 
 
-     if(!strcmp("gp_Cal_Par->par_azi_acc",lc_Params[l][0]))      gp_Cal_Par->par_azi_acc= atof(lc_Params[l][1])      ;
+     if(!strcmp("gp_Cal_Par->par_azi_acc",lp_Con->con_params[l][0]))      gp_Cal_Par->par_azi_acc= atof(lp_Con->con_params[l][1])      ;
 
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_dir",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_dir=atoi(lc_Params[l][1]) ; 
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_clk",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_clk=atoi(lc_Params[l][1]) ; 
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_slp",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_slp=atoi(lc_Params[l][1]) ;
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_rst",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_rst=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_mmm",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_mmm=atoi(lc_Params[l][1]);  
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_ena",lc_Params[l][0])) gp_Gpi_Par_Con->par_azi_ena=atoi(lc_Params[l][1]);
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_m2",lc_Params[l][0]))  gp_Gpi_Par_Con->par_azi_m2=atoi(lc_Params[l][1])  ;
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_m1",lc_Params[l][0]))  gp_Gpi_Par_Con->par_azi_m1=atoi(lc_Params[l][1])  ; 
-     if(!strcmp("gp_Gpi_Par_Con->par_azi_m0",lc_Params[l][0]))  gp_Gpi_Par_Con->par_azi_m0=atoi(lc_Params[l][1])  ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_dir",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_azi_dir=atoi(lp_Con->con_params[l][1]) ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_clk",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_azi_clk=atoi(lp_Con->con_params[l][1]) ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_slp",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_azi_slp=atoi(lp_Con->con_params[l][1]) ;
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_rst",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_azi_rst=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_mmm",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_azi_mmm=atoi(lp_Con->con_params[l][1]);  
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_ena",lp_Con->con_params[l][0])) gp_Gpi_Par_Con->par_azi_ena=atoi(lp_Con->con_params[l][1]);
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_m2",lp_Con->con_params[l][0]))  gp_Gpi_Par_Con->par_azi_m2=atoi(lp_Con->con_params[l][1])  ;
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_m1",lp_Con->con_params[l][0]))  gp_Gpi_Par_Con->par_azi_m1=atoi(lp_Con->con_params[l][1])  ; 
+     if(!strcmp("gp_Gpi_Par_Con->par_azi_m0",lp_Con->con_params[l][0]))  gp_Gpi_Par_Con->par_azi_m0=atoi(lp_Con->con_params[l][1])  ; 
 
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_dir",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_dir=atoi(lc_Params[l][1])   ;
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_clk",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_clk=atoi(lc_Params[l][1])   ;
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_slp",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_slp=atoi(lc_Params[l][1])   ;
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_rst",lc_Params[l][0]))  gp_I2c_Mcp->mcp_azi_rst=atoi(lc_Params[l][1])   ; 
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_m2",lc_Params[l][0]))   gp_I2c_Mcp->mcp_azi_m2=atoi(lc_Params[l][1])    ;
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_m1",lc_Params[l][0]))   gp_I2c_Mcp->mcp_azi_m1=atoi(lc_Params[l][1])    ;
-     if(!strcmp("gp_I2c_Mcp->mcp_azi_m0",lc_Params[l][0]))   gp_I2c_Mcp->mcp_azi_m0=atoi(lc_Params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_dir",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_azi_dir=atoi(lp_Con->con_params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_clk",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_azi_clk=atoi(lp_Con->con_params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_slp",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_azi_slp=atoi(lp_Con->con_params[l][1])   ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_rst",lp_Con->con_params[l][0]))  gp_I2c_Mcp->mcp_azi_rst=atoi(lp_Con->con_params[l][1])   ; 
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_m2",lp_Con->con_params[l][0]))   gp_I2c_Mcp->mcp_azi_m2=atoi(lp_Con->con_params[l][1])    ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_m1",lp_Con->con_params[l][0]))   gp_I2c_Mcp->mcp_azi_m1=atoi(lp_Con->con_params[l][1])    ;
+     if(!strcmp("gp_I2c_Mcp->mcp_azi_m0",lp_Con->con_params[l][0]))   gp_I2c_Mcp->mcp_azi_m0=atoi(lp_Con->con_params[l][1])   ;
 
      // devices de azimut et altitude (qui concernent les 2 en mm temps)
      
-     if(!strcmp("gp_Cal_Par->par_altaz_slow_forward",lc_Params[l][0])) gp_Cal_Par->par_altaz_slow_forward= atof(lc_Params[l][1])      ;
-     if(!strcmp("gp_Cal_Par->par_altaz_slow_rewind",lc_Params[l][0]))  gp_Cal_Par->par_altaz_slow_rewind= atof(lc_Params[l][1])      ;
+     if(!strcmp("gp_Cal_Par->par_altaz_slow_forward",lp_Con->con_params[l][0])) gp_Cal_Par->par_altaz_slow_forward= atof(lp_Con->con_params[l][1])      ;
+     if(!strcmp("gp_Cal_Par->par_altaz_slow_rewind",lp_Con->con_params[l][0]))  gp_Cal_Par->par_altaz_slow_rewind= atof(lp_Con->con_params[l][1])      ;
 
-     if(!strcmp("gp_Cal_Par->par_altaz_fast_forward",lc_Params[l][0])) gp_Cal_Par->par_altaz_fast_forward= atof(lc_Params[l][1])      ;
-     if(!strcmp("gp_Cal_Par->par_altaz_fast_rewind",lc_Params[l][0]))  gp_Cal_Par->par_altaz_fast_rewind= atof(lc_Params[l][1])      ;
+     if(!strcmp("gp_Cal_Par->par_altaz_fast_forward",lp_Con->con_params[l][0])) gp_Cal_Par->par_altaz_fast_forward= atof(lp_Con->con_params[l][1])      ;
+     if(!strcmp("gp_Cal_Par->par_altaz_fast_rewind",lp_Con->con_params[l][0]))  gp_Cal_Par->par_altaz_fast_rewind= atof(lp_Con->con_params[l][1])      ;
 
      // chemins des repertoires et fichiers (2021)
 
-    if(!strcmp("gp_Con_Par->par_rep_cat",lc_Params[l][0]))  strcpy( gp_Con_Par->par_rep_cat, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_rep_cfg",lc_Params[l][0]))  strcpy( gp_Con_Par->par_rep_cfg, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_rep_log",lc_Params[l][0]))  strcpy( gp_Con_Par->par_rep_log, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_rep_in",lc_Params[l][0]))   strcpy( gp_Con_Par->par_rep_in, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_fic_log",lc_Params[l][0]))  strcpy( gp_Con_Par->par_fic_log, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_fic_pid",lc_Params[l][0]))  strcpy( gp_Con_Par->par_fic_pid, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_fic_led",lc_Params[l][0]))  strcpy( gp_Con_Par->par_fic_led, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_fic_dat",lc_Params[l][0])) strcpy( gp_Con_Par->par_fic_dat, lc_Params[l][1]) ;
-    if(!strcmp("gp_Con_Par->par_fic_hhm",lc_Params[l][0])) strcpy( gp_Con_Par->par_fic_hhm, lc_Params[l][1]) ;  
+    if(!strcmp("gp_Con_Par->par_rep_cat",lp_Con->con_params[l][0]))  strcpy( gp_Con_Par->par_rep_cat, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_rep_cfg",lp_Con->con_params[l][0]))  strcpy( gp_Con_Par->par_rep_cfg, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_rep_log",lp_Con->con_params[l][0]))  strcpy( gp_Con_Par->par_rep_log, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_rep_in",lp_Con->con_params[l][0]))   strcpy( gp_Con_Par->par_rep_in, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_fic_log",lp_Con->con_params[l][0]))  strcpy( gp_Con_Par->par_fic_log, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_fic_pid",lp_Con->con_params[l][0]))  strcpy( gp_Con_Par->par_fic_pid, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_fic_led",lp_Con->con_params[l][0]))  strcpy( gp_Con_Par->par_fic_led, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_fic_dat",lp_Con->con_params[l][0])) strcpy( gp_Con_Par->par_fic_dat, lp_Con->con_params[l][1]) ;
+    if(!strcmp("gp_Con_Par->par_fic_hhm",lp_Con->con_params[l][0])) strcpy( gp_Con_Par->par_fic_hhm, lp_Con->con_params[l][1]) ;  
 
-    if(!strcmp("gp_Con_Par->par_rep_scr",lc_Params[l][0]))    strcpy( gp_Con_Par->par_rep_scr, lc_Params[l][1]) ;  
-    if(!strcmp("gp_Con_Par->par_src_ker",lc_Params[l][0])) strcpy( gp_Con_Par->par_src_ker, lc_Params[l][1]) ;  
+    if(!strcmp("gp_Con_Par->par_rep_scr",lp_Con->con_params[l][0]))    strcpy( gp_Con_Par->par_rep_scr, lp_Con->con_params[l][1]) ;  
+    if(!strcmp("gp_Con_Par->par_src_ker",lp_Con->con_params[l][0])) strcpy( gp_Con_Par->par_src_ker, lp_Con->con_params[l][1]) ;  
   }
 
   //if ( gp_Cal_Par->par_alt_red_tot == 0 ) gp_Cal_Par->par_alt_red_tot = gp_Cal_Par->par_alt_red_1 * gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 ;
@@ -598,12 +598,12 @@ int CONFIG_GETCWD(char * c_getcwd) {
 * @fn     : CONFIG_READ
 * @author : s.gravois
 * @brief  : Cette fonction lit les parametres  dans le fichier de configuration
-* @param  : lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
+* @param  : lp_Con->con_params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : voir si un passage par librairie JSON plus pratique (comme pour mesDep)
 *****************************************************************************************/
 
-int CONFIG_READ(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) {
+int CONFIG_READ(STRUCT_CONFIG * lp_Con) {
 
   FILE * fin ;
   char buf   [CONFIG_TAILLE_BUFFER_256] ;
@@ -613,14 +613,14 @@ int CONFIG_READ(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNE
 
   ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  // FIXME : initialisation du tableau de valeurs lues dans le fichier = lc_Params
+  // FIXME : initialisation du tableau de valeurs lues dans le fichier = lp_Con->con_params
 
   Trace1(" CONFIG_DATAS_NB_COLONNES   = %d",   CONFIG_DATAS_NB_COLONNES) ;
   Trace1(" CONFIG_DATAS_NB_COLONNES = %d", CONFIG_DATAS_NB_COLONNES) ;
 
   for(L=0;L<CONFIG_DATAS_NB_COLONNES;L++) {
     for(C=0;C<CONFIG_DATAS_NB_COLONNES;C++) { 
-      memset(lc_Params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+      memset(lp_Con->con_params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
     }
   }
   
@@ -663,18 +663,18 @@ int CONFIG_READ(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNE
    if (CONFIG_FIN_MOT(c)||(CONFIG_FIN_LIGNE(c)&& i!=0)||i==CONFIG_TAILLE_BUFFER_256) {
     
     if (CONFIG_FIN_MOT(c)) {
-      memset(lc_Params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
-      strcpy(lc_Params[L][C],buf);
+      memset(lp_Con->con_params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+      strcpy(lp_Con->con_params[L][C],buf);
 
-      Trace1("lc_Params fin mot[%d][%d]=(%s)",L,C,lc_Params[L][C] );
+      Trace1("lp_Con->con_params fin mot[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
       
       C++;
     }
     if ((CONFIG_FIN_LIGNE(c)&& i!=0)||i==CONFIG_TAILLE_BUFFER_256) {
-      memset(lc_Params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
-      strcpy(lc_Params[L][C],buf);
+      memset(lp_Con->con_params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+      strcpy(lp_Con->con_params[L][C],buf);
       
-      Trace1("lc_Params fin lig[%d][%d]=(%s)",L,C,lc_Params[L][C] );
+      Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
       
       L++;
       C=0;
@@ -693,12 +693,12 @@ int CONFIG_READ(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNE
 * @fn     : CONFIG_AFFICHER_DATAS
 * @author : s.gravois
 * @brief  : Cette fonction affiche le tabeau de parametres lu a partir du fichier de config
-* @param  : char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256
+* @param  : char lp_Con->con_params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void CONFIG_AFFICHER_DATAS(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) {
+void CONFIG_AFFICHER_DATAS(STRUCT_CONFIG *lp_Con ) {
   int L, C ;  
 
   ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
@@ -708,8 +708,8 @@ void CONFIG_AFFICHER_DATAS(char lc_Params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS
       if ( C>0 ) {
          Trace2("") ;
       }
-      if (strlen(lc_Params[L][C])) {
-        Trace2(" %s " , lc_Params[L][C]) ;
+      if (strlen(lp_Con->con_params[L][C])) {
+        Trace2(" %s " , lp_Con->con_params[L][C]) ;
       }
     }
     Trace2("") ;

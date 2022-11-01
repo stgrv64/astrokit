@@ -79,7 +79,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
         Trace1("on incremente la phrase %s avec le mot %s\n",lp_Key->phrase,  lp_Key->mot ) ;
         // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
-        memset( s_buffer, IR_ZERO_CHAR, sizeof( s_buffer )) ;
+        memset( s_buffer, CONFIG_ZERO_CHAR, sizeof( s_buffer )) ;
         strcpy( s_buffer, lp_Key->phrase ) ;
 
         sprintf(lp_Key->phrase,"%s%s",s_buffer, lp_Key->mot);
@@ -95,7 +95,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
           Trace1("on incremente le nombre %s avec le mot %s\n",lp_Key->nombre,  lp_Key->mot ) ;
           // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
-          memset( s_buffer, IR_ZERO_CHAR, sizeof( s_buffer )) ;
+          memset( s_buffer, CONFIG_ZERO_CHAR, sizeof( s_buffer )) ;
           strcpy( s_buffer, lp_Key->nombre ) ;
 
           sprintf(lp_Key->nombre,"%s%s", s_buffer, lp_Key->mot);

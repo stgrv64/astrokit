@@ -70,7 +70,7 @@ while (0)
 
 #if defined(DEBUG) && DEBUG < 0
 
-#define Debug(fmt, args...) if(g_i_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Debug(fmt, args...) if(gi_pid_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 
 #define Trace(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
@@ -89,7 +89,7 @@ while (0)
 #if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
 
 #define Trace(fmt, args...)             { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Debug(fmt, args...) if(g_i_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Debug(fmt, args...) if(gi_pid_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
 #define TRACE(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }

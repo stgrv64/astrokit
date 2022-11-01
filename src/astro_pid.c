@@ -15,6 +15,10 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+int  gi_pid_trace ;
+int  gi_pid_trace_alt ;
+int  gi_pid_trace_azi ;
+
 /*****************************************************************************************
 * @fn     : PID_INIT
 * @author : s.gravois
@@ -44,13 +48,6 @@ void PID_INIT(STRUCT_PID * p_pid, double d_ech, double d_kp, double d_ki, double
 
   pthread_mutex_init( & p_pid->mut_pid, NULL ) ;
   
-  /* Initialisation pointeurs de fonctions */
-  
-  /* p_pid->pid_init */ 
-  p_pid->pid_reset = PID_RESET ;
-  p_pid->pid_run   = PID_CALCULATE ;
-  p_pid->pid_test  = PID_TEST ;
-
   /* Parametres de reglages du PID proportionnel integral derive*/
 
   p_pid->ech = d_ech ;
@@ -69,7 +66,15 @@ void PID_INIT(STRUCT_PID * p_pid, double d_ech, double d_kp, double d_ki, double
   p_pid->err_int_Ki = 0 ; /* calcul de la partie integrale */  
   p_pid->err_der_Kd = 0 ; /* calcul de la partie derivee */
   p_pid->err_pre = 0 ;
+  
   /* Reglages des coefficients Kp, Ki, Kd */
+
+  /* Initialisation pointeurs de fonctions */
+  
+  /* p_pid->pid_init */ 
+  p_pid->pid_reset = PID_RESET ;
+  p_pid->pid_run   = PID_CALCULATE ;
+  p_pid->pid_test  = PID_TEST ;
 
   return ;
 }

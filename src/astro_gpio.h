@@ -113,38 +113,44 @@ typedef enum {
 }
 t_en_Gpio_Red_Type ;
 
+/*---------------------------------------------------*/
+/* Structure servant a gerer la phase d un moteur    */ 
+/*---------------------------------------------------*/
+
 struct STR_GPIO_PWM_PHASE {
 
-  STRUCT_SUIVI         * p_sui ;
-  STRUCT_PTHREADS      * p_pth ;
-  pthread_mutex_t mutex ; 
+  STRUCT_SUIVI    * p_sui ;  
+  STRUCT_PTHREADS * p_pth ;
+  pthread_mutex_t   mut_pha ;    
 
-  struct timeval tval ;
+  struct timeval    tval ;
 
-  int     id ;  
-  double  Tpwm ;  
-
-  int     pas ;
-  int     micropas ;
-  
-  double  rap[ GPIO_MICROPAS_MAX ] ;
-  double  rc ;
-
-  int     gpio ;
-  int     gpio_open_statut ;
-  int     gi_gpio_fd ;
-  
-  double  periode_mic ;
-  double  periode_mot ;  
+  double            rap[ GPIO_MICROPAS_MAX ] ; 
+  int               id ;  
+  double            Tpwm ;  
+  int               pas ;
+  int               micropas ;
+  double            rc ;
+  int               gpio ;
+  int               gpio_open_statut ;
+  int               gi_gpio_fd ;
+  double            periode_mic ;
+  double            periode_mot ;  
 } ;
+
+/*---------------------------------------------------*/
+/* Structure servant a gerer la bobine d un moteur   */ 
+/* Un moteur PAP = 2 bobines de 2 phases (4 fils)    */
+/*---------------------------------------------------*/
 
 struct STR_GPIO_PWM_MOTEUR {
 
+  STRUCT_GPIO_PWM_PHASE * p_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   STRUCT_SUIVI          * p_sui ;
   STRUCT_PTHREADS       * p_pth ;
-  STRUCT_GPIO_PWM_PHASE * p_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  
 
-  pthread_mutex_t mutex ; 
+  pthread_mutex_t         mut_mot ; 
   
   int     id ;
 
@@ -236,10 +242,10 @@ static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
 void   GPIO_GETOPT(int argc, char ** argv) ;
 
 
-void   GPIO_TEST_MOTEURS      (void ) ;
-void   GPIO_CLIGNOTE         (int , int , int ) ;
-void   GPIO_READ         (char [CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) ;
-void   GPIO_READ2        (char [CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]) ;
+void   GPIO_TEST_MOTEURS (void ) ;
+void   GPIO_CLIGNOTE     (int , int , int ) ;
+void   GPIO_READ         (STRUCT_CONFIG *) ;
+void   GPIO_READ2        (STRUCT_CONFIG *) ;
 /*
 void   GPIO_CLAVIER_MATRICIEL_CONFIG  (int [4],int [4]) ;
 void   GPIO_CLAVIER_MATRICIEL_READ    (int [4],int [4],STRUCT_KEYS* ) ;

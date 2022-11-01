@@ -14,6 +14,7 @@ date        | commentaires
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
 const char * gc_const_menus[] = {
   "MENU_AZIMUTAL",
@@ -283,15 +284,15 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     If_Mot_Is("cfg_log_tps_reel_up") { 
       i=1 ; 
-      if ( g_i_trace == 0 ){
-        g_i_trace = gp_Sui->temporisation_pid_loop ; 
+      if ( gi_pid_trace == 0 ){
+        gi_pid_trace = gp_Sui->temporisation_pid_loop ; 
         sprintf(c_l0,"PID:activation") ;
-        sprintf(c_l1,"echant. = %d pas", g_i_trace) ;
+        sprintf(c_l1,"echant. = %d pas", gi_pid_trace) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
         Trace("%s : %s", c_l0, c_l1) ;
       } 
       else {
-        g_i_trace = 0 ; 
+        gi_pid_trace = 0 ; 
         sprintf(c_l0,"PID:") ;
         sprintf(c_l1,"desactivation") ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
@@ -303,15 +304,15 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     If_Mot_Is("cfg_log_tps_reel_trace_alt") { 
       i=1 ; 
-      if ( g_i_trace_alt == 0 ) {
-        g_i_trace_alt=1;      
+      if ( gi_pid_trace_alt == 0 ) {
+        gi_pid_trace_alt=1;      
         sprintf(c_l0,"PID:log alt") ;
-        sprintf(c_l1,"echant. = %d pas", g_i_trace) ;
+        sprintf(c_l1,"echant. = %d pas", gi_pid_trace) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
         Trace("%s : %s", c_l0, c_l1) ;
       }
       else {
-        g_i_trace_alt=0;      
+        gi_pid_trace_alt=0;      
         sprintf(c_l0,"PID:log alt") ;
         sprintf(c_l1,"desactivation") ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
@@ -323,15 +324,15 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     If_Mot_Is("cfg_log_tps_reel_trace_azi") { 
       i=1 ;
-      if ( g_i_trace_azi == 0 ) {
-        g_i_trace_azi=1 ; 
+      if ( gi_pid_trace_azi == 0 ) {
+        gi_pid_trace_azi=1 ; 
         sprintf(c_l0,"PID:log azi") ;
-        sprintf(c_l1,"echant. = %d pas", g_i_trace) ;
+        sprintf(c_l1,"echant. = %d pas", gi_pid_trace) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
         Trace("%s : %s", c_l0, c_l1) ;
       }
       else {
-        g_i_trace_azi=0 ; 
+        gi_pid_trace_azi=0 ; 
         sprintf(c_l0,"PID:log azi") ;
         sprintf(c_l1,"desactivation") ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
@@ -788,10 +789,10 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     gp_Sui->d_appui_raq_azi = 0 ;
     gp_Sui->d_appui_raq_alt = 0 ; 
 
-    gp_Sui->Ta_mic = MAIN_TA_RESET ;
-    gp_Sui->Th_mic = MAIN_TH_RESET ;
-    gp_Sui->Fa_mic = MAIN_FA_RESET ;
-    gp_Sui->Fh_mic = MAIN_FH_RESET ;
+    gp_Sui->Ta_mic = SUIVI_MAIN_TA_RESET ;
+    gp_Sui->Th_mic = SUIVI_MAIN_TH_RESET ;
+    gp_Sui->Fa_mic = SUIVI_MAIN_FA_RESET ;
+    gp_Sui->Fh_mic = SUIVI_MAIN_FH_RESET ;
     gp_Sui->reset = 0 ;
   }
   // -----------------------------------------------------------
@@ -802,11 +803,11 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   { 
     // On remet une periode inferieure a la seconde pour eviter aux deux autres threads d'attendre
     
-    if ( gp_Sui->Ta_mic == MAIN_TA_RESET && gp_Sui->Th_mic == MAIN_TH_RESET ) {
-      gp_Sui->Ta_mic = MAIN_TA_TRANSITOIRE ;
-      gp_Sui->Th_mic = MAIN_TH_TRANSITOIRE ;
-      gp_Sui->Fa_mic = MAIN_FA_TRANSITOIRE ;
-      gp_Sui->Fh_mic = MAIN_FH_TRANSITOIRE ;
+    if ( gp_Sui->Ta_mic == SUIVI_MAIN_TA_RESET && gp_Sui->Th_mic == SUIVI_MAIN_TH_RESET ) {
+      gp_Sui->Ta_mic = SUIVI_MAIN_TA_TRANSITOIRE ;
+      gp_Sui->Th_mic = SUIVI_MAIN_TH_TRANSITOIRE ;
+      gp_Sui->Fa_mic = SUIVI_MAIN_FA_TRANSITOIRE ;
+      gp_Sui->Fh_mic = SUIVI_MAIN_FH_TRANSITOIRE ;
     }
     
     // ----------------------------------------------------------------------------
@@ -884,8 +885,6 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   }
 
 }
-
-
 
 /*****************************************************************************************
 * @fn     : SUIVI_INIT
