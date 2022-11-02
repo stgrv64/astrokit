@@ -244,7 +244,7 @@ void   GPIO_GETOPT(int argc, char ** argv) ;
 
 void   GPIO_TEST_MOTEURS (void ) ;
 void   GPIO_CLIGNOTE     (int , int , int ) ;
-void   GPIO_READ         (STRUCT_CONFIG *) ;
+void   GPIO_CONFIG_FIC_READ         (STRUCT_CONFIG *) ;
 void   GPIO_READ2        (STRUCT_CONFIG *) ;
 /*
 void   GPIO_CLAVIER_MATRICIEL_CONFIG  (int [4],int [4]) ;

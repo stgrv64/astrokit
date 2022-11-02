@@ -72,6 +72,8 @@ void PTHREADS_INIT( pthread_t pth_self ) {
   struct sched_param param; 
   char c_rlogin[ 16] = {0} ;
 
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_alt, NULL )) != 0 ) {
     i_errno=errno;        
     Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
@@ -160,6 +162,8 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
   cpu_set_t cpu_set ;
   pthread_attr_t attr ;
 
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   /*-------------------------------------------------*/
   /* Recuperation des valeurs d 'attributs de treads */
   /*-------------------------------------------------*/
@@ -256,7 +260,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
     
     gi_pthread_nb_threads++ ;
     
-    Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   }
   return ;
 }
@@ -280,9 +284,9 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
 
   pthread_mutex_lock( & gp_Mut->mut_pth) ;
   l_nb_threads = gi_pthread_nb_threads ;
-  Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+  pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   
-  Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+  pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
   for( i = 0 ; i < l_nb_threads ; i++ ) {
 
@@ -293,7 +297,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
     i_pri = p_pth->pth_att[ i ].att_pri.sched_priority  ;
     i_ord = p_pth->pth_att[ i ].att_ord  ; 
     
-    Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
     Trace("thread %-16s : id %d ordonnancement (SCHED_FIFO/SCHED_RR ?) %d priority %d", c_name, i_id, i_ord, i_pri ) ;
 
@@ -318,7 +322,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
   pthread_mutex_lock( & gp_Mut->mut_pth) ;
   pthread_setname_np( pthread_self(), "SUIVI_VOUTE" ) ;
   gp_Sui->p_pthpth_att->att_pid[ gi_pthread_nb_threads++ ] = pthread_self() ;
-  Trace(""); pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+  pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   */
 
  /*****************************************************************************************
@@ -336,7 +340,7 @@ void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* p_pth) {
   int i_num_thread=0 ;
   long id_thread ;
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   for (i_num_thread=0; i_num_thread < PTHREADS_MAX_THREADS; i_num_thread++) {
 

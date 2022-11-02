@@ -91,6 +91,7 @@ struct STR_CALCULS_PARAMS {
 
   unsigned long par_alt_f ;        // frequence de reference (utile si on utilise CALCUL_DIVISEUR_FREQUENCE)
   unsigned int  par_alt_n ;        // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
+
   double        par_alt_red_tot ;  // reduction totale
   double        par_alt_red_1 ;    // reduction liee a la monture
   double        par_alt_red_2 ;    // reducteur du moteur
@@ -106,6 +107,7 @@ struct STR_CALCULS_PARAMS {
 
   unsigned long par_azi_f ;    // frequence de reference (utile si on utilise CALCUL_DIVISEUR_FREQUENCE)
   unsigned int  par_azi_n ;    // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
+  
   double        par_azi_red_tot ;    // reduction totale
   double        par_azi_red1 ;   // reduction liee\A0l axe en azimut
   double        par_azi_red2 ;   // reducteur du moteur

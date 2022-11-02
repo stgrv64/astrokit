@@ -17,7 +17,7 @@
 #               * nouveaux fichiers astro_keyboard.h / .c
 # 18/01/2022  | * ajout parametre gp_Con_Par->par_rep_scr
 #               * ajout parametre gp_Con_Par->par_src_ker
-#               * remplacement fonctions TRACE par Trace 
+#               * remplacement fonctions Trace1 par Trace 
 #               * refonte des macros de Trace
 # 19/01/2022  | * ajout ASTRE_INDETERMINE pour pouvoir calculer
 #                 meme sans nom d as => cela permettra a terme
@@ -32,7 +32,7 @@
 #               * ajout ASCx comme STRUCT_TIME dans STRUCT_ASTRE
 # 23/01/2022  | * suppression MODE_EQUATORIAL
 #               * changement type gp_Con_Par->par_default_menu
-#               * ajout constantes char * en fonction gc_const_menus
+#               * ajout constantes char * en fonction gc_hach_suivi_menus
 # mars  2022  | * ajout signe a structure STRUCT_TIME
 #               * ajout c_si signe sous forme char
 # avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
@@ -57,7 +57,7 @@
 #               * ajout structure PID 
 # 29/09/2022    * ajout type enum et tableaux associes pour les 
 #                 attributs de threads
-# 30/09/2022    * ajout systeme de trace par arbo (DEBUG_ARBO)
+# 30/09/2022    * ajout systeme de trace par arbo (ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS)
 # 
 # 07/10/2022    * refonte complete du code (consolidation .c / .h )
 #               * dispatch de tous les types dans leur .h respectif
@@ -69,6 +69,7 @@
 
 #include <curses.h>
 #include <errno.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <math.h>
 #include <ncurses.h>
@@ -290,7 +291,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern char   gc_config_path_cmd_stty[ CONFIG_TAILLE_BUFFER_32 ] ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_CONST \
-  extern const char * gc_const_menus[]  ; \
+  extern const char * gc_hach_suivi_menus[]  ; \
 
 /*
 #ifndef CONFIG_DATAS_NB_LIGNES

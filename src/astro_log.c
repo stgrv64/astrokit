@@ -30,11 +30,11 @@ FILE * gp_File_Flog ;
 void LOG_SYSTEM_LOG_0(int *incrlog) {
   int ret ;
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   (*incrlog)++ ;
   char cmd[255] ;
-  if ( DEBUG_LOG ) {
+  if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     // FIXME 01 mai 2021 : modification chemin relatif
     sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_log) ;
     ret = system(cmd) ;
@@ -63,7 +63,7 @@ void LOG_SYSTEM_LOG_1(char *txt) {
   tmp = localtime(&now);
   char s_date[16];
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   memset( s_date, 0, sizeof( s_date)) ;
   memset( c_out, 0, sizeof( c_out)) ;
@@ -73,7 +73,7 @@ void LOG_SYSTEM_LOG_1(char *txt) {
     exit(EXIT_FAILURE);
   }
 
-  if ( DEBUG_LOG ) {
+  if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     if ( strftime(s_date, sizeof(s_date), "%Y%m%d.%H%M", tmp) == 0 ) {
         fprintf(stderr, "strftime a renvoyé 0");
         exit(EXIT_FAILURE);
@@ -105,10 +105,11 @@ void LOG_INIT(void) {
 
   char buf[255] ;
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   Trace("") ;
   
-  if ( DEBUG_LOG ) {
+  if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     
     memset(buf, CALCUL_ZERO_CHAR, sizeof(buf));
     sprintf(buf,"%s/%s/%s", gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_log) ;

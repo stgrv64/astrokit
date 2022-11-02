@@ -108,14 +108,13 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
 
     pthread_mutex_lock(& gp_Mut->mut_dat );
     memset( gp_Sui->sui_dat.dat_inf,CONFIG_ZERO_CHAR, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
+    pthread_mutex_unlock(& gp_Mut->mut_dat );
 
     if ( k == 0 && i_indice_code < CODES_CODE_NB_CODES ) {
       
       pthread_mutex_lock(& gp_Mut->mut_dat );
-      Trace2("AA maj gp_Sui->sui_dat.dat_inf") ;
       strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
-      Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
+      pthread_mutex_unlock(& gp_Mut->mut_dat );
 
       GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
     }
@@ -126,9 +125,8 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
       pthread_mutex_lock(& gp_Mut->mut_dat );
-      Trace2("BB maj gp_Sui->sui_dat.dat_inf") ;
       strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
-      Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
+      pthread_mutex_unlock(& gp_Mut->mut_dat );
 
       GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
     }
@@ -149,7 +147,7 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
     Trace("raz de gp_Sui->sui_dat.dat_inf") ;
     memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
     strcpy( gp_Sui->sui_dat.dat_inf, "") ;
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
+    pthread_mutex_unlock(& gp_Mut->mut_dat );
   }
 }
 

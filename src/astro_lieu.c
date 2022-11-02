@@ -27,7 +27,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 void LIEU_INIT(STRUCT_LIEU *gp_Lie) {
  
-  /* ARBO(__func__,1,"") ; */ /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Lie->JJ  = 0 ; // jour julien
   gp_Lie->TS  = 0 ;  // temps sideral
@@ -49,7 +49,7 @@ void LIEU_INIT(STRUCT_LIEU *gp_Lie) {
 
 void LIEU_AFFICHER(STRUCT_LIEU *gp_Lie) {
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1(" latitude   :  %.2f", gp_Lie->lat * CALCUL_UN_RADIAN_EN_DEGRES ) ; 
   Trace1(" longitude  :  %.2f", gp_Lie->lon * CALCUL_UN_RADIAN_EN_DEGRES ) ;

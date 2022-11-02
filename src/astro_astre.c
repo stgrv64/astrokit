@@ -30,7 +30,7 @@ void ASTRE_INIT(STRUCT_ASTRE *gp_Ast ) {
 
   int C ;
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
     memset( gp_Ast->plus_proche[C], CALCUL_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
@@ -111,7 +111,7 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *gp_Ast ) {
   char  c_dd_alt[ 16] ;
   char  c_dd_dec[ 16] ;
 
-  ARBO(__func__,1,"") ;
+  TraceArbo(__func__,1,"") ;
 
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
@@ -204,7 +204,7 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *gp_Ast ) {
 
 void ASTRE_AFFICHER_MODE_STELLARIUM(STRUCT_ASTRE *gp_Ast) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->Va           , gp_Ast->Vh ) ;
   Trace("AD / Dec   : %s / %s"       , gp_Ast->c_hhmmss_asc , gp_Ast->c_ddmm_dec ) ;

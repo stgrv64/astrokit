@@ -90,21 +90,21 @@
 
 struct STR_I2C_MCP23017 {
 
-unsigned char mcp_alt_dir   ; // numero de port GPIO pour la direction de l'altitude
-unsigned char mcp_alt_clk   ; // numero de port GPIO pour l'horloge de l'altitude
-unsigned char mcp_alt_slp   ; // numero de port GPIO pour le sleep en altitude
-unsigned char mcp_alt_rst   ; // numero de port GPIO pour le reset en altitude
-unsigned char mcp_alt_m2    ; // numero de port GPIO pour le choix du micro pas en altitude
-unsigned char mcp_alt_m1    ; // numero de port GPIO pour le choix du micro pas en altitude 
-unsigned char mcp_alt_m0   ;  // numero de port GPIO pour le choix du micro pas en altitude
-
-unsigned char mcp_azi_dir   ; // numero de port GPIO pour la direction de l'azimut
-unsigned char mcp_azi_clk   ; // numero de port GPIO pour l'horloge de l'azimut
-unsigned char mcp_azi_slp   ; // numero de port GPIO pour le sleep en azimut
-unsigned char mcp_azi_rst   ; // numero de port GPIO pour le reset en azimut
-unsigned char mcp_azi_m2    ; // numero de port GPIO pour le choix du micro pas en azimut
-unsigned char mcp_azi_m1    ; // numero de port GPIO pour le choix du micro pas en azimut
-unsigned char mcp_azi_m0   ;  // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char mcp_alt_dir   ; // numero de port GPIO pour la direction de l'altitude
+  unsigned char mcp_alt_clk   ; // numero de port GPIO pour l'horloge de l'altitude
+  unsigned char mcp_alt_slp   ; // numero de port GPIO pour le sleep en altitude
+  unsigned char mcp_alt_rst   ; // numero de port GPIO pour le reset en altitude
+  unsigned char mcp_alt_m2    ; // numero de port GPIO pour le choix du micro pas en altitude
+  unsigned char mcp_alt_m1    ; // numero de port GPIO pour le choix du micro pas en altitude 
+  unsigned char mcp_alt_m0   ;  // numero de port GPIO pour le choix du micro pas en altitude
+  
+  unsigned char mcp_azi_dir   ; // numero de port GPIO pour la direction de l'azimut
+  unsigned char mcp_azi_clk   ; // numero de port GPIO pour l'horloge de l'azimut
+  unsigned char mcp_azi_slp   ; // numero de port GPIO pour le sleep en azimut
+  unsigned char mcp_azi_rst   ; // numero de port GPIO pour le reset en azimut
+  unsigned char mcp_azi_m2    ; // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char mcp_azi_m1    ; // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char mcp_azi_m0   ;  // numero de port GPIO pour le choix du micro pas en azimut
 } ;
 
 // structure decrivant un device

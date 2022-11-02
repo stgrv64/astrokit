@@ -16,23 +16,17 @@
 
 #include "astro_global.h"
 
-#define DEBUG       0
-#define DEBUG_ARBO  2
-#define DEBUG_LOG   0
-
-// quelques macros de debugging
-
-#ifndef DEBUG
-  #define TRACE(fmt, args...)      while(0) { } 
-  #define TRACE1(fmt, args...)     while(0) { } 
-  #define TRACE2(fmt, args...)     while(0) { } 
-#endif
+#define ASTRO_LOG_DEBUG                  0 /* valeurs possibles => 0 : pas de traces  , > 0 : traces progressives*/
+#define ASTRO_LOG_DEBUG_PID              0 /* valeurs possibles => 0 : pas de traces  ,   1 : traces */
+#define ASTRO_LOG_DEBUG_WRITE_FS         0 /* valeurs possibles => 0 : pas d ecriture ,   1 : ecriture */
+#define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  0
+/* gp_File_Flog */
 
 // ------------------------------------------------------------------------
 // Raccourci
 // ----------------------------------------------------------------
 
-#define If_Mot_Is(s)    if(!strcmp(gp_Key->mot,s))
+#define KEYS_If_Mot_Is(s)  if(!strcmp(gp_Key->mot,s))
 
 // ------------------------------------------------------------------------
 // Syslog
@@ -45,121 +39,114 @@
 #define SyslogErrFmt(fmt, args...) { syslog( LOG_ERR,"%s %s " fmt, __func__, strerror(errno), ##args) ; }
 
 // ------------------------------------------------------------------------
-// Exemple de MACRO avec expression
-// le do while semble necessaire .. 
-// ---------------------------------------------------------------------
+// Exemple de MACRO avec expression 
+// ------------------------------------------------------------------------
 
-/* #define ARBO(__func__,EXP) do { if (EXP) fprintf (stdout, "Warning: \n"); } while (0) */
-/* #define ARBO(__func__,fmt, EXP, args...) do { if (EXP) fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } while (0) */
-#define ARBO_TEST(EXP,string) do { if (EXP) fprintf(stderr, "\n%-30s : %s", __func__, string) ; } while (0)
-
-#define ARBO(fct,EXP,ch) \
+/* #define TraceArbo(__func__,exp) do { if (exp) fprintf (stdout, "Warning: \n"); } while (0) */
+/* #define TraceArbo(__func__,fmt, exp, args...) do { if (exp) fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; } while (0) */
+#define ARBO_TEST(exp,string) \
 do { \
-  if (EXP<=DEBUG_ARBO) { \
-    if ( EXP == 0 ) fprintf(stderr, "\n%-20s : %-25s", __func__, ch) ; \
-    if ( EXP == 1 ) fprintf(stderr, "\n%-30s : %-27s", __func__, ch) ; \
-    if ( EXP == 2 ) fprintf(stderr, "\n%-30s : %-29s", __func__, ch) ; \
-    if ( EXP == 3 ) fprintf(stderr, "\n%-30s : %-31s", __func__, ch) ; \
+    if (exp) fprintf(stdout, "\n%-30s : %s", __func__, string) ; } \
+while (0)
+
+// ------------------------------------------------------------------------
+// TraceArbo : traces suivants le niveau d arborescence en parametre ..
+// exemple :   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+// ------------------------------------------------------------------------
+
+#define TraceArbo(fct,nb,ch) \
+do { \
+  if (nb<=ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS) { \
+    if ( nb == 0 ) fprintf(stdout, "\n%-36s : %-50s", __func__, ch) ; \
+    if ( nb == 1 ) fprintf(stdout, "\n%-34s-- : %-50s", __func__, ch) ; \
+    if ( nb == 2 ) fprintf(stdout, "\n%-32s---- : %-50s", __func__, ch) ; \
+    if ( nb == 3 ) fprintf(stdout, "\n%-30s------ : %-50s", __func__, ch) ; \
   } \
 } \
 while (0)
 
 // ------------------------------------------------------------------------
-// Niveau -1 
+// TracePid : Niveau 0 : pas de traces 
 // ------------------------------------------------------------------------
 
-#if defined(DEBUG) && DEBUG < 0
+#define TracePid(fmt, args...) if(gi_pid_trace) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define TracePid(fmt, args...) if(gi_pid_trace) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
-#define Debug(fmt, args...) if(gi_pid_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+// ------------------------------------------------------------------------
+// ASTRO_LOG_DEBUG : Niveau 0 : pas de traces 
+// ------------------------------------------------------------------------
 
-#define Trace(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#if defined(ASTRO_LOG_DEBUG) && ASTRO_LOG_DEBUG < 0
 
-#define TRACE(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)  while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
 // ------------------------------------------------------------------------
-// Niveau 0 
+// ASTRO_LOG_DEBUG : Niveau 0
 // ------------------------------------------------------------------------
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG < 1
+#if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 0 && ASTRO_LOG_DEBUG_WRITE_FS == 0
 
-#define Trace(fmt, args...)             { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Debug(fmt, args...) if(gi_pid_trace) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
-#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s\t:" fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 0 && DEBUG_LOG >= 1
+#if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 0 && ASTRO_LOG_DEBUG_WRITE_FS == 1
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
 // ------------------------------------------------------------------------
-// Niveau 1
+// ASTRO_LOG_DEBUG : Niveau 1
 // ------------------------------------------------------------------------
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG < 1
+#if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 1 && ASTRO_LOG_DEBUG_WRITE_FS == 0
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 1 && DEBUG_LOG >= 1
+#if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 1 && ASTRO_LOG_DEBUG_WRITE_FS == 1
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
 // ------------------------------------------------------------------------
-// Niveau 2 
+// ASTRO_LOG_DEBUG : Niveau 3
 // ------------------------------------------------------------------------
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG < 1
+#if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 2 && ASTRO_LOG_DEBUG_WRITE_FS == 0
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...)          { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
-#if defined(DEBUG) && defined(DEBUG_LOG) && DEBUG == 2 && DEBUG_LOG >= 1
+#if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 2 && ASTRO_LOG_DEBUG_WRITE_FS == 1
 
-#define Trace(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE(fmt, args...)           { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE1(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE2(fmt, args...)          { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%s : " fmt, __func__, ##args) ; }
+#define Trace(fmt, args...)           { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...)          { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...)          { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
+
+// ------------------------------------------------------------------------
+// ASTRO_LOG_DEBUG : fin macros
+// ------------------------------------------------------------------------
 
 void   LOG_INIT         ( void )  ;
 void   LOG_SYSTEM_LOG_0 ( int * ) ;

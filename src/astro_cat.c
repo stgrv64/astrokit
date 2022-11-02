@@ -28,7 +28,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 int CAT_FIN_MOT(char c) {
   int i=(int)c ;
   int j ;
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   j=0;
   if ( i==59)j=1;  // point virgule
   return j ; 
@@ -47,7 +47,7 @@ void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFF
   char buffer[ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
   /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
   char buffer_recopie [ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   l=0 ;
   while( strcmp( catalogue[l][3], "_" ) ) {
    memset( buffer,CALCUL_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
@@ -58,7 +58,7 @@ void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFF
     /* sprintf( buffer, "%-10s %-10s", buffer, catalogue[l][c] ) ; */
     sprintf( buffer, "%-10s %-10s", buffer_recopie, catalogue[l][c] ) ; 
    }
-   TRACE("%5d = %s ",l,buffer) ;
+   Trace1("%5d = %s ",l,buffer) ;
    l++;
    if( l>=CAT_NB_LIGNES) break ;
   }
@@ -71,7 +71,7 @@ void CAT_READ(char * catalogue_txt, char l_char_Datas[CAT_NB_LIGNES][CAT_NB_COLO
   int  C,L ;
   char *str1, *token, *sptr ;
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++) {
@@ -87,7 +87,7 @@ void CAT_READ(char * catalogue_txt, char l_char_Datas[CAT_NB_LIGNES][CAT_NB_COLO
     SyslogErrFmt("probleme ouverture 0 %s\n",buf) ;
     exit(2) ;
   }
-  else TRACE1("open %s ok", buf) ;
+  else Trace1("open %s ok", buf) ;
 
   L=0;C=0;
   
@@ -114,13 +114,13 @@ void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_N
   double d_angulaire ;
   double d_min ;
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   asc = gp_Ast->AGH0 ;
   dec = gp_Ast->DEC ;
   L=0 ;
   d_min=deg ;
-  TRACE("Recherche dans la zone de %s : ASC=%f DEC=%f", gp_Ast->nom, gp_Ast->AGH0, gp_Ast->DEC) ;
+  Trace1("Recherche dans la zone de %s : ASC=%f DEC=%f", gp_Ast->nom, gp_Ast->AGH0, gp_Ast->DEC) ;
   
   while(strcmp(lc_Cat[L][3],"_") && strcmp(gp_Ast->nom,lc_Cat[L][0]) && strcmp(gp_Ast->nom,lc_Cat[L][1])) {
    
@@ -130,7 +130,7 @@ void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_N
     
     if (  d_angulaire < d_min )     // si objet dans le cercle recherche
     if ( deg > d_angulaire )  {
-      // TRACE("dans la zone => %s=%s : ASC=%s DEC=%s DIST=%f",lc_Cat[L][0],lc_Cat[L][1],lc_Cat[L][2],lc_Cat[L][3], d_angulaire) ;
+      // Trace1("dans la zone => %s=%s : ASC=%s DEC=%s DIST=%f",lc_Cat[L][0],lc_Cat[L][1],lc_Cat[L][2],lc_Cat[L][3], d_angulaire) ;
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
@@ -141,7 +141,7 @@ void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_N
     }
     L++;
   }
-  TRACE("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f",\
+  Trace1("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f",\
   gp_Ast->plus_proche[0], gp_Ast->plus_proche[1], gp_Ast->plus_proche[2], gp_Ast->plus_proche[3], d_min) ;
 }
 //============================================================================
@@ -151,7 +151,7 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
   int    i_ligne=0 ;
   int    i_trouve =FALSE ;
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
@@ -169,7 +169,7 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
 
   while( strcmp(lc_Cat[L][3],"_") && L < CAT_NB_LIGNES ) {
     //usleep(10000) ;
-    TRACE1("L=%d %s %s %s %s" , L , lc_Cat[L][0], lc_Cat[L][1] , lc_Cat[L][2] , lc_Cat[L][3] );
+    Trace1("L=%d %s %s %s %s" , L , lc_Cat[L][0], lc_Cat[L][1] , lc_Cat[L][2] , lc_Cat[L][3] );
 
     if(!strcmp(lc_Cat[L][0],gp_Ast->nom)) {
 
@@ -206,14 +206,14 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     
     gp_Ast->ASC = 0.0 ;
     gp_Ast->DEC = 0.0 ;
-    TRACE(" %s : non trouve dans catalogue",gp_Ast->nom) ;
+    Trace1(" %s : non trouve dans catalogue",gp_Ast->nom) ;
     strcpy( gp_Ast->nom, "undefined" ) ;
     strcpy( gp_Ast->infos, "undefined" ) ;
   }
 
   CALCUL_CONVERSIONS_ANGLES( gp_Ast ) ;
 
-  TRACE(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
+  Trace1(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
     gp_Ast->nom , \
     gp_Ast->ASCt.HH, \
     gp_Ast->ASCt.MM, \
@@ -243,7 +243,7 @@ void CAT_FORMAT_DECIMAL_NGC( \
   int    DEC_DEG,DEG_MIN ; // la 5eme et 6eme colonne sont DEG et MIN de l'ascension droite
   double asc, dec ;        // ascension droite et declinaison sous forme decimale
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
@@ -313,7 +313,7 @@ void CAT_FORMAT_DECIMAL_ETO( \
   int    ASC_HH,ASC_MM ;   // la 3eme et 4eme colonne sont HH  et MM  de la declinaison
   double asc, dec ;        // ascension droite et declinaison sous forme decimale
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
@@ -343,7 +343,7 @@ void CAT_FORMAT_DECIMAL_ETO( \
    
    asc = ( ASC_HH + ( ASC_MM / 60.0 ) )   * 15.0 ; // conversion en degres decimaux de type double
    
-   TRACE1("aschh=%d\tascmm=%d\tdec=%f\tasc_calculer=%f", ASC_HH,ASC_MM,dec,asc) ;
+   Trace1("aschh=%d\tascmm=%d\tdec=%f\tasc_calculer=%f", ASC_HH,ASC_MM,dec,asc) ;
    
    //dec =  (double)DEC_DEG + SGN(DEC_DEG)*(double)DEG_MIN / 60.0 ;
    

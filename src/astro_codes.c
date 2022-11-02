@@ -162,7 +162,7 @@ void CODES_INIT_CODE( \
   int          li_pos, \
   const char * gl_char_Codes[][CODES_NB_IN_OUT] ) {
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("li_pos %d %-16s %-16s %-16s", \
     li_pos, \
@@ -192,7 +192,7 @@ void CODES_INIT(STRUCT_CODES *gp_Cod) {
 
   int i_pos ;
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   for( i_pos=0 ; i_pos<CODES_CODE_NB_CODES ; i_pos++ ) memset( gp_Cod->out_act[i_pos], CONFIG_ZERO_CHAR, sizeof(gp_Cod->out_act[i_pos]) ) ;
   for( i_pos=0 ; i_pos<CODES_CODE_NB_CODES ; i_pos++ ) memset( gp_Cod->in_lirc[i_pos],  CONFIG_ZERO_CHAR, sizeof(gp_Cod->in_lirc[i_pos]) ) ;

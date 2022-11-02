@@ -37,7 +37,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 void DEVICES_INIT(STRUCT_DEVICES *gp_Dev) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Dev->use_capteurs    = gp_Dev_Par->par_use_Capteurs ;
   gp_Dev->use_raquette    = gp_Dev_Par->par_use_Raquette ;
@@ -60,15 +60,15 @@ void DEVICES_INIT(STRUCT_DEVICES *gp_Dev) {
 
 void DEVICES_AFFICHER_UTILISATION (void) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("gp_Dev->use_infrarouge = %d",gp_Dev->use_infrarouge) ;
-  Trace("gp_Dev->use_capteurs   = %d",gp_Dev->use_capteurs) ;
-  Trace("gp_Dev->use_raquette   = %d",gp_Dev->use_raquette) ;
-  Trace("gp_Dev->use_bluetooth  = %d",gp_Dev->use_bluetooth) ;
-  Trace("gp_Dev->use_keyboard   = %d",gp_Dev->use_keyboard) ;
-  Trace("gp_Dev->use_controler  = %d",gp_Dev->use_controler) ;
-  Trace("gp_Dev->use_lcd        = %d",gp_Dev->use_lcd) ;
+  Trace1("gp_Dev->use_infrarouge = %d",gp_Dev->use_infrarouge) ;
+  Trace1("gp_Dev->use_capteurs   = %d",gp_Dev->use_capteurs) ;
+  Trace1("gp_Dev->use_raquette   = %d",gp_Dev->use_raquette) ;
+  Trace1("gp_Dev->use_bluetooth  = %d",gp_Dev->use_bluetooth) ;
+  Trace1("gp_Dev->use_keyboard   = %d",gp_Dev->use_keyboard) ;
+  Trace1("gp_Dev->use_controler  = %d",gp_Dev->use_controler) ;
+  Trace1("gp_Dev->use_lcd        = %d",gp_Dev->use_lcd) ;
 
   return ;
 }

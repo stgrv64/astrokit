@@ -27,7 +27,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 void VOUTE_INIT(STRUCT_VOUTE *gp_Vou) {
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Vou->dt                = 0  ;
   gp_Vou->pourcentage_tempo = 0.96 ;   
@@ -56,7 +56,7 @@ void VOUTE_INIT(STRUCT_VOUTE *gp_Vou) {
 
 void VOUTE_CONFIG( STRUCT_VOUTE *gp_Vou, double dt, double acc, double percent ) {
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Vou->dt                 = dt  ;
   gp_Vou->pourcentage_tempo  = percent ; 
@@ -88,7 +88,7 @@ long VOUTE_TEMPORISATION(STRUCT_VOUTE *gp_Vou, struct timeval t00) {
   struct timeval t01 ;
   double  t_diff ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   usleep ( (long)(gp_Vou->DT * gp_Vou->pourcentage_tempo) ) ;
   
@@ -116,7 +116,7 @@ long VOUTE_TEMPORISATION(STRUCT_VOUTE *gp_Vou, struct timeval t00) {
 
 void VOUTE_AFFICHER( STRUCT_VOUTE * gp_Vou) {
 	
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 	Trace1("gp_Vou->num %lld", gp_Vou->num) ;
   Trace1("gp_Vou->pas %lld", gp_Vou->num) ;

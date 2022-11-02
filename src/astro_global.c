@@ -63,6 +63,8 @@ MACRO_ASTRO_GLOBAL_EXTERN_CONFIG ;
 
 void ASTRO_GLOBAL_INIT(void) {
   
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   gi_pthread_nb_cpu = sysconf(_SC_NPROCESSORS_ONLN);
 
   Trace("%d processors dispo", gi_pthread_nb_cpu ) ;

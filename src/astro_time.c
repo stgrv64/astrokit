@@ -25,7 +25,7 @@ int TEMPS_CALCUL_DATE(STRUCT_TIME * gp_Tim) {
   
   struct tm *tm ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Tim->HH = 0 ;
   gp_Tim->MM = 0 ;
@@ -67,7 +67,7 @@ int TEMPS_CALCUL_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim) {
   double T ;          // fraction de jour a ajouter au jour Julien	
   double JJ ;         // jour julien
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Y  = gp_Tim->yy ;
   M  = gp_Tim->mm ;
@@ -139,7 +139,7 @@ int TEMPS_CALCUL_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim ) {
   const double P_2000 = 2451545.5 ; 
   const double P_1900 = 2415020.0 ;
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   TEMPS_CALCUL_TEMPS_HMS_VERS_DEC_DIRECT(&jour_sideral_decimal , 23 , 56 , 4.09054) ;
 
@@ -257,7 +257,7 @@ int TEMPS_CALCUL_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim ) {
 
 void TEMPS_CALCUL_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double min, double sec) {
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   *hdec = hou + ( min / 60.0) + ( sec / 3600.0)  ;
 }
@@ -273,10 +273,9 @@ void TEMPS_CALCUL_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double mi
 
 void TEMPS_CALCUL_TEMPS_DEC_VERS_HMS(STRUCT_TIME * gp_Tim) {
   
-  Trace1(""); 
-  Trace1("TEMPS    decimal  = %.4f" , gp_Tim->hd) ;
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  Trace2("TEMPS    decimal  = %.4f" , gp_Tim->hd) ;
 
   if ( gp_Tim->hd >=0 ) { 
     gp_Tim->si   =  1 ;
@@ -288,13 +287,15 @@ void TEMPS_CALCUL_TEMPS_DEC_VERS_HMS(STRUCT_TIME * gp_Tim) {
   }
   
   gp_Tim->HH = (int)fabs(  gp_Tim->hd ) ;
-  Trace1("heure    decimale = %d" , gp_Tim->HH) ;
+  Trace2("heure    decimale = %d" , gp_Tim->HH) ;
   
   gp_Tim->MM = (int)fabs( (fabs(gp_Tim->hd) - gp_Tim->HH ) * 60.0 ) ;
-  Trace1("minutes  decimale = %d" , gp_Tim->MM) ;
+  Trace2("minutes  decimale = %d" , gp_Tim->MM) ;
 
   gp_Tim->SS = (int)fabs(((fabs(gp_Tim->hd) - gp_Tim->HH ) * 60.0 - gp_Tim->MM ) * 60.0 ) ;
-  Trace1("secondes decimale = %d" , gp_Tim->SS) ;
+  Trace2("secondes decimale = %d" , gp_Tim->SS) ;
+
+
 }
 
 //========================================================================================
@@ -308,7 +309,7 @@ long TEMPS_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct t
   struct timeval t01 ;
   unsigned long  t_diff ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // temporisation pour ne pas consommer de CPU
   // on sommeille = pourcentage_tempo du usleep 
@@ -337,7 +338,7 @@ double TEMPS_CALCUL_DUREE_SECONDES(struct timeval *t00) {
   struct timeval t01 ;
   double  t_diff ;
   
-  ARBO(__func__,4,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,4,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gettimeofday(&t01,NULL) ;
 
@@ -364,7 +365,7 @@ double TEMPS_CALCUL_DUREE_MICROSEC(struct timeval *t00) {
   struct timeval t01 ;
   double  t_diff ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gettimeofday(&t01,NULL) ;
 
@@ -391,7 +392,7 @@ double TEMPS_CALCUL_DUREE_NANOSEC(struct timeval *t00) {
   struct timeval t01 ;
   double  t_diff ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gettimeofday(&t01,NULL) ;
 
@@ -414,7 +415,7 @@ double TEMPS_CALCUL_DUREE_NANOSEC(struct timeval *t00) {
 
 void TEMPS_AFFICHER(STRUCT_TIME * lp_Tim) {
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace(" DATE / HOUR : %d-%d-%d %-2d:%-2d:%d : %f", lp_Tim->yy, lp_Tim->mm, lp_Tim->dd, lp_Tim->HH, lp_Tim->MM, lp_Tim->SS, lp_Tim->hd ) ;
 
@@ -442,7 +443,7 @@ void TEMPS_AFFICHER(STRUCT_TIME * lp_Tim) {
 
 void TEMPS_CALCUL_TEMPS_HMS_VERS_DEC(STRUCT_TIME * gp_Tim) {
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Tim->hd = gp_Tim->HH + (gp_Tim->MM / 60.0) + (gp_Tim->SS / 3600.0)  ;
 }
@@ -459,9 +460,9 @@ void TEMPS_CALCUL_TEMPS_HMS_VERS_DEC(STRUCT_TIME * gp_Tim) {
 
 void TEMPS_AFFICHER_MSG_HHMMSS( char * mesg, STRUCT_TIME * gp_Tim ) {
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("%s : %dh%dmn%ds : %f", mesg, gp_Tim->HH, gp_Tim->MM, gp_Tim->SS, gp_Tim->hd ) ;
+  Trace2("%s : %dh%dmn%ds : %f", mesg, gp_Tim->HH, gp_Tim->MM, gp_Tim->SS, gp_Tim->hd ) ;
 }
 
 /*****************************************************************************************
@@ -481,7 +482,7 @@ void TEMPS_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (
   char day [   CONFIG_TAILLE_BUFFER_4] ;
   int i = 0 ;
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( strlen(s_data) != 8 ){
 
@@ -528,7 +529,7 @@ void TEMPS_SET_HOUR_AND_MINUTES(char * s_data) {
   char min [ CONFIG_TAILLE_BUFFER_4] ;
   int i = 0 ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // FIXME : 20190822 : ajout Traces
 
@@ -567,7 +568,7 @@ void TEMPS_SET_HOUR_AND_MINUTES(char * s_data) {
 
 void TEMPS_INIT( STRUCT_TIME * lp_Tim) {
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   lp_Tim->c_si = '+' ; // signe 
   lp_Tim->mm = 0 ;  // month

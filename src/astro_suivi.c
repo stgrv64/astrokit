@@ -16,7 +16,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
-const char * gc_const_menus[] = {
+const char * gc_hach_suivi_menus[] = {
   "MENU_AZIMUTAL",
   "MENU_EQUATORIAL",
   "MENU_MANUEL_BRUT",
@@ -47,7 +47,7 @@ void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) {
   struct timeval t01 ;
   double t_diff ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // temporisation pour ne pas consommer de CPU
   // on sommeille = pourcentage_tempo du usleep 
@@ -80,7 +80,7 @@ void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) 
   struct timeval t01 ;
   double  t_diff ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // temporisation pour ne pas consommer de CPU
   // on sommeille = pourcentage_tempo du usleep 
@@ -110,46 +110,46 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 
   char c_act = '0' ;
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  if ( gp_Dev->use_infrarouge ) {
+  pthread_mutex_lock(& gp_Mut->mut_dat );
+
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "plus" ) )         { c_act='1'; gp_Sui->pas_acc_plus  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "moins" ) )        { c_act='1'; gp_Sui->pas_acc_moins = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forward" ) )      { c_act='1'; gp_Sui->pas_forward  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewind" ) )       { c_act='1'; gp_Sui->pas_rewind = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forwardfast" ) )  { c_act='1'; gp_Sui->pas_forward_fast  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewindfast" ) )   { c_act='1'; gp_Sui->pas_rewind_fast = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "ne" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "no" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "se" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "so" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "n" ) )            { c_act='1'; gp_Sui->pas_nord  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "o" ) )            { c_act='1'; gp_Sui->pas_ouest = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "e" ) )            { c_act='1'; gp_Sui->pas_est   = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "s" ) )            { c_act='1'; gp_Sui->pas_sud   = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "reset" ) )        { c_act='1'; gp_Sui->reset   = 1 ; }
+
+  /* Si gp_Sui->sui_dat.dat_inf a ete utilise, il peut etre remis a zero */
+
+  if ( c_act == '1' ) {
     
-    pthread_mutex_lock(& gp_Mut->mut_dat );
-
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "plus" ) )         { c_act='1'; gp_Sui->pas_acc_plus  = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "moins" ) )        { c_act='1'; gp_Sui->pas_acc_moins = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forward" ) )      { c_act='1'; gp_Sui->pas_forward  = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewind" ) )       { c_act='1'; gp_Sui->pas_rewind = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forwardfast" ) )  { c_act='1'; gp_Sui->pas_forward_fast  = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewindfast" ) )   { c_act='1'; gp_Sui->pas_rewind_fast = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "ne" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "no" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "se" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "so" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "n" ) )            { c_act='1'; gp_Sui->pas_nord  = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "o" ) )            { c_act='1'; gp_Sui->pas_ouest = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "e" ) )            { c_act='1'; gp_Sui->pas_est   = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "s" ) )            { c_act='1'; gp_Sui->pas_sud   = 1 ; }
-    if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "reset" ) )        { c_act='1'; gp_Sui->reset   = 1 ; }
-
-    /* Si gp_Sui->sui_dat.dat_inf a ete utilise, il peut etre remis a zero */
-
-    if ( c_act == '1' ) {
-      Trace("raz de gp_Sui->sui_dat.dat_inf") ;
-      memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
-      strcpy( gp_Sui->sui_dat.dat_inf, "") ;
-    }
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_dat );
-
-    TRACE2("%ld %ld %ld %ld %d %d\n", \
-      gp_Sui->pas_ouest, \
-      gp_Sui->pas_est, \
-      gp_Sui->pas_nord, \
-      gp_Sui->pas_sud, \
-      gp_Sui->pas_acc_plus, \
-      gp_Sui->pas_acc_moins );
+    memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
+    strcpy( gp_Sui->sui_dat.dat_inf, "") ;
   }
-  ARBO(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_mutex_unlock(& gp_Mut->mut_dat );
+
+  Trace2("raz de gp_Sui->sui_dat.dat_inf") ;
+
+  Trace2("%ld %ld %ld %ld %d %d\n", \
+    gp_Sui->pas_ouest, \
+    gp_Sui->pas_est, \
+    gp_Sui->pas_nord, \
+    gp_Sui->pas_sud, \
+    gp_Sui->pas_acc_plus, \
+    gp_Sui->pas_acc_moins );
+  
+  TraceArbo(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }
 
 /*****************************************************************************************
@@ -189,7 +189,7 @@ void SUIVI_OLD_0( STRUCT_SUIVI * gp_Sui) {
 
 void SUIVI_MENU_PREALABLE (STRUCT_SUIVI * gp_Sui) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   switch ( gp_Sui->menu ) {
     case MENU_AZIMUTAL            : gp_Sui->SUIVI_EQUATORIAL = 0 ; break ;
@@ -225,9 +225,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
   char c_l0[16] ={0};
   char c_l1[16] ={0};
 
-  ARBO(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  Trace("start") ;
-
+  TraceArbo(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   memset( c_l0, CALCUL_ZERO_CHAR, sizeof( c_l0 )) ;
   memset( c_l1, CALCUL_ZERO_CHAR, sizeof( c_l1 )) ;
 
@@ -253,36 +252,36 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
 
-    If_Mot_Is("o")     { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
-    If_Mot_Is("e" )    { gp_Sui->menu = MENU_MANUEL_BRUT ; i=1;}
-    If_Mot_Is("s")     { gp_Sui->menu = MENU_MANUEL_BRUT ; i=1;}
-    If_Mot_Is("n")     { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
-    If_Mot_Is("reset") { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
-    If_Mot_Is("stop")  { gp_Sui->SUIVI_VOUTE = 0 ; i=1;}
-    If_Mot_Is("play")  { gp_Sui->SUIVI_VOUTE = 1 ; i=1;}
+    KEYS_If_Mot_Is("o")     { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
+    KEYS_If_Mot_Is("e" )    { gp_Sui->menu = MENU_MANUEL_BRUT ; i=1;}
+    KEYS_If_Mot_Is("s")     { gp_Sui->menu = MENU_MANUEL_BRUT ; i=1;}
+    KEYS_If_Mot_Is("n")     { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
+    KEYS_If_Mot_Is("reset") { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
+    KEYS_If_Mot_Is("stop")  { gp_Sui->SUIVI_VOUTE = 0 ; i=1;}
+    KEYS_If_Mot_Is("play")  { gp_Sui->SUIVI_VOUTE = 1 ; i=1;}
     
     /* Quelques actions d 'affichage a l'ecran  */
 
-    If_Mot_Is("aff_variables")       { CONFIG_PARAMETRES_AFFICHER() ; i=1 ; } ;
+    KEYS_If_Mot_Is("aff_variables")       { CONFIG_PARAMETRES_AFFICHER() ; i=1 ; } ;
 
     /* Quelques actions d 'affichage a l'ecran LCD */
 
-    If_Mot_Is("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
-    If_Mot_Is("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
-    If_Mot_Is("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
-    If_Mot_Is("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
-    If_Mot_Is("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
-    If_Mot_Is("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
-    If_Mot_Is("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
-    If_Mot_Is("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
-    If_Mot_Is("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
-    If_Mot_Is("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
-    If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
-    If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
+    KEYS_If_Mot_Is("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
+    KEYS_If_Mot_Is("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
+    KEYS_If_Mot_Is("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
+    KEYS_If_Mot_Is("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
+    KEYS_If_Mot_Is("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
+    KEYS_If_Mot_Is("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
+    KEYS_If_Mot_Is("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
+    KEYS_If_Mot_Is("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
+    KEYS_If_Mot_Is("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
+    KEYS_If_Mot_Is("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
+    KEYS_If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
+    KEYS_If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
 
     /* Activation algorithme PID de regulation des periodes / frequences moteurs */
 
-    If_Mot_Is("cfg_log_tps_reel_up") { 
+    KEYS_If_Mot_Is("cfg_log_tps_reel_up") { 
       i=1 ; 
       if ( gi_pid_trace == 0 ){
         gi_pid_trace = gp_Sui->temporisation_pid_loop ; 
@@ -302,7 +301,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     /* Activation traces PID pour le moteur ALT */
 
-    If_Mot_Is("cfg_log_tps_reel_trace_alt") { 
+    KEYS_If_Mot_Is("cfg_log_tps_reel_trace_alt") { 
       i=1 ; 
       if ( gi_pid_trace_alt == 0 ) {
         gi_pid_trace_alt=1;      
@@ -322,7 +321,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     /* Activation traces PID pour le moteur AZI */
 
-    If_Mot_Is("cfg_log_tps_reel_trace_azi") { 
+    KEYS_If_Mot_Is("cfg_log_tps_reel_trace_azi") { 
       i=1 ;
       if ( gi_pid_trace_azi == 0 ) {
         gi_pid_trace_azi=1 ; 
@@ -340,9 +339,9 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
       }
     }
 
-    If_Mot_Is("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
+    KEYS_If_Mot_Is("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
 
-    If_Mot_Is("aff_infos") { 
+    KEYS_If_Mot_Is("aff_infos") { 
       Trace("Mot_Is aff_infos") ;
       CONFIG_AFFICHER_TOUT() ; 
       gp_Lcd->display_informations ( 2000000 ) ;
@@ -353,31 +352,31 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     /*  touche mode equatorial */
     
-    If_Mot_Is("key_equ")      { 
-      gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_const_menus[ MENU_EQUATORIAL ] ) ;
+    KEYS_If_Mot_Is("key_equ")      { 
+      gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
       gp_Sui->menu = MENU_EQUATORIAL ; 
       i=1;
     }    
 
     /*  touche mode azimutal */
 
-    If_Mot_Is("key_azi")      { 
-      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_const_menus[ MENU_AZIMUTAL ] ) ;
+    KEYS_If_Mot_Is("key_azi")      { 
+      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       gp_Sui->menu = MENU_AZIMUTAL ; 
       i=1;
     }       // mode azimutal
 
     /* touche POWER : arret su systeme */
 
-    If_Mot_Is("key_power")     { 
-      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_const_menus[ MENU_AZIMUTAL ] ) ;
+    KEYS_If_Mot_Is("key_power")     { 
+      gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       gp_Sui->menu = MENU_DOWN ; 
       i=1;
     } 
 
     /* touche EXIT : arret su programme */
 
-    If_Mot_Is("key_exit")      { 
+    KEYS_If_Mot_Is("key_exit")      { 
       gp_Sui->menu = MENU_PROGRAMME_DOWN ; 
       i=1;
     } 
@@ -385,7 +384,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     /* touche reseau : arret du reseau */
     /* TODO : non implemente : a definir et coder */
 
-    If_Mot_Is("key_reseau_up") { 
+    KEYS_If_Mot_Is("key_reseau_up") { 
       
       gp_Sui->menu = MENU_RESEAU_UP ; 
       /* TODO : a terminer */
@@ -518,7 +517,6 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     strcpy( gp_Key->mot, "" ) ;
     strcpy( gp_Key->nombre, "" ) ;
   }
-  Trace("end") ;
 }
 /*****************************************************************************************
 * @fn     : SUIVI_MANUEL_BRUT
@@ -543,18 +541,17 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   int flag_nord_sud_est_ouest = 0 ;
   int flag_calcul = 0 ;
 
-  ARBO(__func__,0,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  Trace("start") ;
-
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, gp_Sui) ; */
-
+/*
   SUIVI_MAJ_PAS( gp_Sui) ;
-
+*/
   if( strcmp( gp_Sui->sui_dat.dat_inf, "") != 0 ) {
-    Trace("0 gp_Sui->sui_dat.dat_inf = %s", gp_Sui->sui_dat.dat_inf ) ;
+    Trace1("0 gp_Sui->sui_dat.dat_inf = %s", gp_Sui->sui_dat.dat_inf ) ;
   }
   else {
-    Trace("dat_inf vide" ) ;
+    Trace1("dat_inf vide" ) ;
   }
   // -----------------------------------------------------------
   // reset = remise a zero des compteurs
@@ -562,8 +559,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   
   if ( gp_Sui->reset ) {
 
-    pthread_mutex_lock(& gp_Mut->mut_azi );
-    pthread_mutex_lock(& gp_Mut->mut_azi );
+    // pthread_mutex_lock(& gp_Mut->mut_azi );
+    // pthread_mutex_lock(& gp_Mut->mut_azi );
 
     if ( gp_Sui->Sh != 0 ) gp_Sui->pas_alt = gp_Sui->Sh ; else gp_Sui->pas_alt = 1 ;
     if ( gp_Sui->Sa != 0 ) gp_Sui->pas_azi = gp_Sui->Sa ; else gp_Sui->pas_azi = 1 ;
@@ -574,13 +571,13 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     else                             gp_Sui->acc_alt = 1.0 ;
 
     gp_Sui->reset = 0 ;
+           
+    // pthread_mutex_unlock(& gp_Mut->mut_azi );
+    // pthread_mutex_unlock(& gp_Mut->mut_alt );
 
-    TRACE("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "reset.." , \
+    Trace1("%-10s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "reset.." , \
            gp_Sui->Sh , gp_Sui->Sa, gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
            
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
-
     flag_calcul = 1 ;
   }
   // -----------------------------------------------------------
@@ -596,8 +593,9 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   if (flag_nord_sud_est_ouest ) { 
   
     Trace("flag_nord_sud_est_ouest") ;
-    pthread_mutex_lock(& gp_Mut->mut_azi );
-    pthread_mutex_lock(& gp_Mut->mut_alt );
+
+    // pthread_mutex_lock(& gp_Mut->mut_azi );
+    // pthread_mutex_lock(& gp_Mut->mut_alt );
 
     // On utilise les memes touches que dans SUIVI_MANUEL_ASSERVI
 
@@ -628,15 +626,12 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     gp_Sui->pas_nord    = 0 ;
     gp_Sui->pas_sud     = 0 ;
     gp_Sui->reset = 0 ;
-/*
-    Trace("pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", \
-         gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
-*/
+
+    // pthread_mutex_unlock(& gp_Mut->mut_azi );
+    // pthread_mutex_unlock(& gp_Mut->mut_alt );
+
     Trace("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "fleches.." , \
            gp_Sui->Sh , gp_Sui->Sa, gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
-
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
 
     flag_calcul = 1 ;
   }
@@ -647,37 +642,38 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   if ( gp_Sui->pas_forward ) {
 
-    pthread_mutex_lock(& gp_Mut->mut_azi );
-    pthread_mutex_lock(& gp_Mut->mut_alt );
+    // pthread_mutex_lock(& gp_Mut->mut_azi );
+    // pthread_mutex_lock(& gp_Mut->mut_alt );
 
     gp_Sui->acc_azi *= gp_Cal_Par->par_altaz_slow_forward ;
     gp_Sui->acc_alt *= gp_Cal_Par->par_altaz_slow_forward ; 
 
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
+    // pthread_mutex_unlock(& gp_Mut->mut_azi );
+    // pthread_mutex_unlock(& gp_Mut->mut_alt );
 /*
-    TRACE("acc*gp_Cal_Par->par_altaz_slow_forward %.4f acc_azi %.4f acc_alt %.4f", gp_Cal_Par->par_altaz_slow_forward, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
+    Trace1("acc*gp_Cal_Par->par_altaz_slow_forward %.4f acc_azi %.4f acc_alt %.4f", gp_Cal_Par->par_altaz_slow_forward, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
 */
-    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward.." , \
+    Trace1("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward.." , \
            gp_Sui->Sh , gp_Sui->Sa, gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
 
     gp_Sui->pas_forward = 0 ;
     flag_calcul = 1 ;
   }
+  
   if ( gp_Sui->pas_rewind ) {
 
-    pthread_mutex_lock(& gp_Mut->mut_azi );
-    pthread_mutex_lock(& gp_Mut->mut_alt );
+    // pthread_mutex_lock(& gp_Mut->mut_azi );
+    // pthread_mutex_lock(& gp_Mut->mut_alt );
 
     gp_Sui->acc_azi /= gp_Cal_Par->par_altaz_slow_rewind ;
     gp_Sui->acc_alt /= gp_Cal_Par->par_altaz_slow_rewind ; 
 
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
+    // pthread_mutex_unlock(& gp_Mut->mut_azi );
+    // pthread_mutex_unlock(& gp_Mut->mut_alt );
 /*
-    TRACE("acc/gp_Cal_Par->par_altaz_slow_rewind %.4f acc_azi %.4f acc_alt %.4f ", gp_Cal_Par->par_altaz_slow_rewind, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
+    Trace1("acc/gp_Cal_Par->par_altaz_slow_rewind %.4f acc_azi %.4f acc_alt %.4f ", gp_Cal_Par->par_altaz_slow_rewind, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
 */
-    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "rewind.." , \
+    Trace1("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "rewind.." , \
            gp_Sui->Sh , gp_Sui->Sa, gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
 
 
@@ -691,19 +687,19 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   if ( gp_Sui->pas_forward_fast ) {
 
-    pthread_mutex_lock(& gp_Mut->mut_azi );
-    pthread_mutex_lock(& gp_Mut->mut_alt );
+    // pthread_mutex_lock(& gp_Mut->mut_azi );
+    // pthread_mutex_lock(& gp_Mut->mut_alt );
 
     gp_Sui->acc_azi *= gp_Cal_Par->par_altaz_fast_forward ;          
     gp_Sui->acc_alt *= gp_Cal_Par->par_altaz_fast_forward ; 
 
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
+    // pthread_mutex_unlock(& gp_Mut->mut_azi );
+    // pthread_mutex_unlock(& gp_Mut->mut_alt );
 
 /*
-    TRACE("acc*gp_Cal_Par->par_altaz_fast_forward %.4f acc_azi %.4f acc_alt %.4f", gp_Cal_Par->par_altaz_fast_forward, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
+    Trace1("acc*gp_Cal_Par->par_altaz_fast_forward %.4f acc_azi %.4f acc_alt %.4f", gp_Cal_Par->par_altaz_fast_forward, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
 */
-    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
+    Trace2("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
            gp_Sui->Sh , gp_Sui->Sa, gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
 
     gp_Sui->pas_forward_fast = 0 ;
@@ -711,21 +707,22 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   }
   if ( gp_Sui->pas_rewind_fast ) {
 
-    pthread_mutex_lock(& gp_Mut->mut_azi );   
-    pthread_mutex_lock(& gp_Mut->mut_alt );
+    // pthread_mutex_lock(& gp_Mut->mut_azi );   
+    // pthread_mutex_lock(& gp_Mut->mut_alt );
 
     gp_Sui->acc_azi /= gp_Cal_Par->par_altaz_fast_rewind ;
     gp_Sui->acc_alt /= gp_Cal_Par->par_altaz_fast_rewind ; 
 
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
-    Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
+    // pthread_mutex_unlock(& gp_Mut->mut_azi );
+    // pthread_mutex_unlock(& gp_Mut->mut_alt );
 
 /*
-    TRACE("acc/gp_Cal_Par->par_altaz_fast_rewind  %.4f acc_azi %.4f acc_alt %.4f ", gp_Cal_Par->par_altaz_fast_rewind, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
+    Trace1("acc/gp_Cal_Par->par_altaz_fast_rewind  %.4f acc_azi %.4f acc_alt %.4f ", gp_Cal_Par->par_altaz_fast_rewind, gp_Sui->acc_azi, gp_Sui->acc_alt ) ;
 */
-    TRACE("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
+/*
+    Trace1("%-15s : Sh %d Sa %d pas_azi = %ld pas_alt = %ld acc_azi = %f acc_alt = %f", "forward fast.." , \
            gp_Sui->Sh , gp_Sui->Sa, gp_Sui->pas_azi, gp_Sui->pas_alt, gp_Sui->acc_azi , gp_Sui->acc_alt) ;
-               
+  */             
     gp_Sui->pas_rewind_fast  = 0 ;
     flag_calcul = 1 ;
   }
@@ -737,12 +734,12 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   
     Trace("flag_calcul") ;
 
-    pthread_mutex_lock( & gp_Mut->mut_cal );
+    // pthread_mutex_lock( & gp_Mut->mut_cal );
     
     CALCUL_VITESSES( gp_Lie, gp_Ast, gp_Sui) ;
     CALCUL_PERIODE ( gp_Ast, gp_Sui, gp_Vou) ;
     
-    Trace(""); pthread_mutex_unlock( & gp_Mut->mut_cal );
+    // pthread_mutex_unlock( & gp_Mut->mut_cal );
   }
 }
 
@@ -758,7 +755,7 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   struct timeval t01 ;
   int azi,alt ;
 
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   gp_Sui->pas_azi_old = gp_Sui->pas_azi ;
   gp_Sui->pas_alt_old = gp_Sui->pas_alt ;
@@ -866,8 +863,8 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   // FIN DE LA BOUCLE : TANT QUE J'APPUIE SUR UN BOUTON DE LA RAQUETTE
   // =================================================================
 
-  if ( azi ) { Trace(""); pthread_mutex_unlock( & gp_Mut->mut_azi ); }
-  if ( alt ) { Trace(""); pthread_mutex_unlock( & gp_Mut->mut_alt ); }
+  if ( azi ) { pthread_mutex_unlock( & gp_Mut->mut_azi ); }
+  if ( alt ) { pthread_mutex_unlock( & gp_Mut->mut_alt ); }
   
   gettimeofday(&t01,NULL) ;
 
@@ -879,7 +876,7 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 	 
   if ( gp_Sui->pas_azi_old != gp_Sui->pas_azi || gp_Sui->pas_alt_old != gp_Sui->pas_alt ) {
 
-   TRACE(" : Va = %2.4f Vh = %2.4f Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f Fam = %ld Fhm = %ld",\
+   Trace1(" : Va = %2.4f Vh = %2.4f Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f Fam = %ld Fhm = %ld",\
         gp_Ast->Va,gp_Ast->Vh,gp_Sui->Ta_mic,gp_Sui->Th_mic,gp_Sui->Fa_mic,gp_Sui->Fh_mic, \
 	(gp_Sui->Ia - gp_Sui->Ia_prec),(gp_Sui->Ih - gp_Sui->Ih_prec )) ;  
   }
@@ -902,7 +899,7 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
   
   int i ;
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Sui->SUIVI_MANUEL     = 0 ;
   gp_Sui->SUIVI_ALIGNEMENT = 0 ;

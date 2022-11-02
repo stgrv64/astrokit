@@ -33,7 +33,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   char val[255]={0} ;
   char s_buffer[CONFIG_TAILLE_BUFFER_32]={0} ;
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   Trace("" ) ;
 
   memset(val, 0, sizeof(val)) ;     
@@ -166,7 +166,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 
   int i ;
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("") ;
 
@@ -221,9 +221,11 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 
 void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
   
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
-  Trace("phr %s mot %s sym %s nom %s pre %s val %s menu %s",\
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  sprintf( c_cmd , "phr %s mot %s sym %s nom %s pre %s val %s menu %s",\
     lp_Key->phrase,\
     lp_Key->mot,\
     lp_Key->symbole,\
@@ -232,10 +234,13 @@ void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
     lp_Key->valider,\
     lp_Key->menu) ;
 
-  Trace1("lp_Key->mot         = %s",lp_Key->mot) ;
-  Trace1("lp_Key->premier     = %s",lp_Key->premier) ;
-  Trace1("lp_Key->phrase      = %s",lp_Key->phrase) ;
-  Trace1("lp_Key->nombre      = %s",lp_Key->nombre) ;
-  Trace1("lp_Key->symbole     = %s",lp_Key->symbole) ;
-  Trace1("lp_Key->phrase_lue  = %d",lp_Key->phrase_lue) ;
+  Trace2("lp_Key->mot         = %s",lp_Key->mot) ;
+  Trace2("lp_Key->premier     = %s",lp_Key->premier) ;
+  Trace2("lp_Key->phrase      = %s",lp_Key->phrase) ;
+  Trace2("lp_Key->nombre      = %s",lp_Key->nombre) ;
+  Trace2("lp_Key->symbole     = %s",lp_Key->symbole) ;
+  Trace2("lp_Key->phrase_lue  = %d",lp_Key->phrase_lue) ;
+
+  TraceArbo(__func__,1,c_cmd) ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }
+

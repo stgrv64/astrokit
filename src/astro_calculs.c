@@ -103,7 +103,7 @@ double DEG  (int degres, int minutes )                  { return (double)degres 
 
 double CALCUL_REDUCTION_TOTALE() {
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   return 0.0 ;
 }
 
@@ -118,7 +118,7 @@ double CALCUL_REDUCTION_TOTALE() {
 
 void CALCUL_GEODE(STRUCT_ASTRE *gp_Ast) {
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // on deduit de l'azimut et de l'altitude
   // les coordonnees x y et z dans la geode d'observation
@@ -159,13 +159,13 @@ void CALCUL_AZIMUT(STRUCT_LIEU *gp_Lie, STRUCT_ASTRE *gp_Ast) {
   
   double lat,A,H,a0,h,a1,a2,af ;
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   lat= gp_Lie->lat ;
   A  = gp_Ast->AGH ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
   H  = gp_Ast->DEC ; // FIXME : declinaison - seule valeur qui ne change pas 
   
-  TRACE1("agh = %2.3f\tH = %2.3f\t",(gp_Ast->AGH)*CALCUL_UN_RADIAN_EN_DEGRES,(gp_Ast->DEC)*CALCUL_UN_RADIAN_EN_DEGRES) ;
+  Trace2("agh = %2.3f\tH = %2.3f\t",(gp_Ast->AGH)*CALCUL_UN_RADIAN_EN_DEGRES,(gp_Ast->DEC)*CALCUL_UN_RADIAN_EN_DEGRES) ;
 
   h  = ALT(lat,A,H) ;
   gp_Ast->h = h ;
@@ -190,19 +190,19 @@ void CALCUL_AZIMUT(STRUCT_LIEU *gp_Lie, STRUCT_ASTRE *gp_Ast) {
 
   CALCUL_CONVERSIONS_ANGLES( gp_Ast) ;
 
-  Trace1("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
+  Trace2("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->AZI0t.HH, \
     gp_Ast->AZI0t.MM , \
     gp_Ast->AZI0t.SS, \
     gp_Ast->AZI0 * CALCUL_UN_RADIAN_EN_DEGRES );
 
-  Trace1("AZI1 = %d.%d.%d (hms) %.2f (deg)", \
+  Trace2("AZI1 = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->AZI1t.HH, \
     gp_Ast->AZI1t.MM , \
     gp_Ast->AZI1t.SS, \
     gp_Ast->AZI1 * CALCUL_UN_RADIAN_EN_DEGRES );
 
-  Trace1("AZI2 = %d.%d.%d (hms) %.2f (deg)", \
+  Trace2("AZI2 = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->AZI2t.HH, \
     gp_Ast->AZI2t.MM , \
     gp_Ast->AZI2t.SS, \
@@ -242,9 +242,9 @@ void CALCUL_EQUATEUR(STRUCT_LIEU *gp_Lie, STRUCT_ASTRE *gp_Ast) {
   
   double A0,A2,A1,a,h,lat,Af,agh,H ;
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TRACE1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
+  Trace1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
     (gp_Ast->a)   * CALCUL_UN_RADIAN_EN_DEGRES,\
     (gp_Ast->h)   * CALCUL_UN_RADIAN_EN_DEGRES,\
     (gp_Ast->AGH)* CALCUL_UN_RADIAN_EN_DEGRES,\
@@ -319,7 +319,7 @@ void CALCUL_EQUATEUR(STRUCT_LIEU *gp_Lie, STRUCT_ASTRE *gp_Ast) {
 
 void CALCUL_VITESSES_EQUATORIAL(STRUCT_ASTRE *gp_Ast) {
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Ast->Va = -15.0 ;
   gp_Ast->Vh = -15.0 ;
@@ -343,7 +343,7 @@ void CALCUL_VITESSES(STRUCT_LIEU *l_li, STRUCT_ASTRE *l_as, STRUCT_SUIVI * l_sui
  
   double G, Va, Vh, angle ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( l_sui->SUIVI_EQUATORIAL == 1 ) {
     l_as->Va = -15.0 ;
@@ -357,7 +357,7 @@ void CALCUL_VITESSES(STRUCT_LIEU *l_li, STRUCT_ASTRE *l_as, STRUCT_SUIVI * l_sui
     l_as->Va=Va ;
     l_as->Vh=Vh ;
   }
-  TRACE1("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n",(l_li->lat)*CALCUL_UN_RADIAN_EN_DEGRES,(l_as->AGH)*CALCUL_UN_RADIAN_EN_DEGRES,(l_as->DEC)*CALCUL_UN_RADIAN_EN_DEGRES,Va,Vh) ;
+  Trace2("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n",(l_li->lat)*CALCUL_UN_RADIAN_EN_DEGRES,(l_as->AGH)*CALCUL_UN_RADIAN_EN_DEGRES,(l_as->DEC)*CALCUL_UN_RADIAN_EN_DEGRES,Va,Vh) ;
 }
 
 /*****************************************************************************************
@@ -372,7 +372,7 @@ void CALCUL_VITESSES(STRUCT_LIEU *l_li, STRUCT_ASTRE *l_as, STRUCT_SUIVI * l_sui
 
 void CALCUL_DIVISEUR_FREQUENCE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI *gp_Sui) {
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Sui->Da = gp_Cal_Par->par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->par_azi_red_tot * pow(2.0, gp_Cal_Par->par_azi_n) * ( gp_Ast->Va / ( 60 * 60 * CALCUL_UN_RADIAN_EN_DEGRES ) )) ;
   gp_Sui->Dh = gp_Cal_Par->par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->par_alt_red_tot * pow(2.0, gp_Cal_Par->par_alt_n) * ( gp_Ast->Vh / ( 60 * 60 * CALCUL_UN_RADIAN_EN_DEGRES ) )) ;
@@ -398,7 +398,7 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   double freq_alt_bru, freq_azi_bru ;
   double azi_rot,   alt_rot ;
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // Calcul de la periode necessaire si pas de terme D ni 2 puissance N
   // ceci dans le cas ou on genere directement la frequence de reference
@@ -414,8 +414,8 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  TRACE2("%f %f %f %f %f",gp_Sui->acc_azi, gp_Vou->acc, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
-  TRACE2("%f %f %f %f %f",gp_Sui->acc_alt, gp_Vou->acc, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
+  Trace2("%f %f %f %f %f",gp_Sui->acc_azi, gp_Vou->acc, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
+  Trace2("%f %f %f %f %f",gp_Sui->acc_alt, gp_Vou->acc, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
 
   /*------------------------*/
   /* Calculs des frequences */
@@ -453,8 +453,6 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   /* Calculs des periodes  */
   /*------------------------*/
 
-  ARBO(__func__,2,"1er lock") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
   pthread_mutex_lock(& gp_Mut->mut_azi );
       
     gp_Sui->Sa_old = gp_Sui->Sa ; 
@@ -468,9 +466,9 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
     gp_Sui->Ta_bru = 1 / gp_Sui->Fa_bru ;
     gp_Sui->Ta_mot = 1 / gp_Sui->Fa_mot ;
 
-  Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
+  pthread_mutex_unlock(& gp_Mut->mut_azi );
   
-  ARBO(__func__,2,"2eme lock") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"2eme lock") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   pthread_mutex_lock(& gp_Mut->mut_alt );
 
@@ -485,9 +483,9 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
     gp_Sui->Th_bru = 1 / gp_Sui->Fh_bru ;
     gp_Sui->Th_mot = 1 / gp_Sui->Fh_mot ;
 
-  Trace(""); pthread_mutex_unlock(& gp_Mut->mut_alt );
+  pthread_mutex_unlock(& gp_Mut->mut_alt );
 
-  ARBO(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 }
 
@@ -511,7 +509,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
   double frequence ;
   double azi_rot, alt_rot ;
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // calcul de la periode en fonction des informations de suivi
   // renvoyer par les boutons de la raquette
@@ -532,9 +530,9 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
         gp_Sui->Fa_mic = fabs(frequence) ;
         gp_Sui->Ta_mic = 1 / gp_Sui->Fa_mic ;
     
-      Trace(""); pthread_mutex_unlock(& gp_Mut->mut_azi );
+      pthread_mutex_unlock(& gp_Mut->mut_azi );
     
-      TRACE1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
+      Trace1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
     }
   }
   if ( gp_Sui->pas_alt !=  gp_Sui->pas_alt_old ) {
@@ -554,9 +552,9 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
         gp_Sui->Th_mic     = 1 / gp_Sui->Fh_mic ;
   
         // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL relache le mutex\n");
-      Trace(""); pthread_mutex_unlock( & gp_Mut->mut_alt );
+      pthread_mutex_unlock( & gp_Mut->mut_alt );
     
-      TRACE1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
+      Trace1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
     }
   }
 }
@@ -573,7 +571,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
 
 void CALCUL_AFFICHER_MSG_ANGLE( char * mesg, STRUCT_ANGLE *angle ) {
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace2("%s : %d°%d'%.2f\" %.4f (deg)", mesg, angle->DD, angle->MM, (double)angle->SS, angle->ad ) ;
 }
@@ -589,11 +587,10 @@ void CALCUL_AFFICHER_MSG_ANGLE( char * mesg, STRUCT_ANGLE *angle ) {
 
 void CALCUL_ANGLE_VERS_DMS(STRUCT_ANGLE *angle) {
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1(""); 
-  Trace1("angle decimal (radian)  = %.4f" , angle->AD) ;
-  Trace1("angle decimal (degres)  = %.4f" , angle->ad) ;
+  Trace2("angle decimal (radian)  = %.4f" , angle->AD) ;
+  Trace2("angle decimal (degres)  = %.4f" , angle->ad) ;
 
   if ( angle->AD >=0 ) { 
     angle->si =  1 ;
@@ -605,13 +602,13 @@ void CALCUL_ANGLE_VERS_DMS(STRUCT_ANGLE *angle) {
   }
 
   angle->DD = (int)fabs(  angle->ad ) ;
-  Trace1("heure    decimale = %d" , angle->DD) ;
+  Trace2("heure    decimale = %d" , angle->DD) ;
   
   angle->MM = (int)fabs( (fabs(angle->ad) - angle->DD ) * 60.0 ) ;
-  Trace1("minutes  decimale = %d" , angle->MM) ;
+  Trace2("minutes  decimale = %d" , angle->MM) ;
 
   angle->SS = (int)fabs(((fabs(angle->ad) - angle->DD ) * 60.0 - angle->MM ) * 60.0 ) ;
-  Trace1("secondes decimale = %d" , angle->SS) ;
+  Trace2("secondes decimale = %d" , angle->SS) ;
 }
 
 /*****************************************************************************************
@@ -626,7 +623,7 @@ void CALCUL_ANGLE_VERS_DMS(STRUCT_ANGLE *angle) {
 
 void CALCUL_CONVERSIONS_ANGLES(STRUCT_ASTRE *gp_Ast) {
   
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* ----------------------------*/
   /* azimut et altitude          */
@@ -708,7 +705,7 @@ void CALCUL_CONVERSIONS_ANGLES(STRUCT_ASTRE *gp_Ast) {
 
 void CALCUL_ANGLE_HORAIRE( STRUCT_LIEU *l_li, STRUCT_ASTRE *gp_Ast ) {
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // en radians 
 
@@ -751,7 +748,7 @@ void CALCUL_ANGLE_HORAIRE( STRUCT_LIEU *l_li, STRUCT_ASTRE *gp_Ast ) {
 
 void CALCUL_ASCENSION_DROITE( STRUCT_LIEU *l_li, STRUCT_ASTRE *gp_Ast ) {
   
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // en radians 
   
@@ -795,7 +792,7 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
   int len=0 ;
   char c_sub[32];
 
-  ARBO(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la as peut avoir plusieurs
@@ -871,7 +868,7 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
 
 void CALCUL_TOUT(void) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   CALCUL_ASTRE_RECUP_TYPE_ET_NOM() ;
 
@@ -903,7 +900,7 @@ void CALCUL_TOUT(void) {
       CALCUL_VITESSES     ( gp_Lie, gp_Ast, gp_Sui) ;
       CALCUL_PERIODE      ( gp_Ast, gp_Sui, gp_Vou) ;
       
-      Trace(""); pthread_mutex_unlock( & gp_Mut->mut_cal ) ;
+      pthread_mutex_unlock( & gp_Mut->mut_cal ) ;
       
       break ;
 
@@ -921,7 +918,7 @@ void CALCUL_TOUT(void) {
       CALCUL_VITESSES     ( gp_Lie, gp_Ast, gp_Sui) ;
       CALCUL_PERIODE      ( gp_Ast, gp_Sui, gp_Vou) ;
       
-      Trace(""); pthread_mutex_unlock( & gp_Mut->mut_cal ) ;
+      pthread_mutex_unlock( & gp_Mut->mut_cal ) ;
       
       break ;
       
@@ -962,7 +959,7 @@ void CALCUL_TOUT(void) {
       CALCUL_VITESSES ( gp_Lie, gp_Ast, gp_Sui) ;
       CALCUL_PERIODE  ( gp_Ast, gp_Sui, gp_Vou) ;
 
-      Trace(""); pthread_mutex_unlock( & gp_Mut->mut_cal ) ;
+      pthread_mutex_unlock( & gp_Mut->mut_cal ) ;
       
       break ;
 
@@ -1023,7 +1020,7 @@ void CALCUL_VOUTE(void ) {
   // double A, H ;
   double a, h ;
 
-  ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 /*
   TEMPS_CALCUL_TEMPS_SIDERAL    ( gp_Lie, gp_Tim ) ;
   CALCUL_EQUATEUR         ( gp_Lie, gp_Ast ) ;

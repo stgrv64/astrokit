@@ -80,7 +80,7 @@ void  GPIO_TEST_MOTEURS(void ) {
     {10000,20000, 3}, \
   } ;  
   // signal(SIGTERM,TRAP_SUIVI_TEST) ; 
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
   GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
@@ -170,7 +170,7 @@ void GPIO_CLIGNOTE(int gpio, int nombre_clignotement, int duree_clignotement) {
  int i ;
  i=-1; 
  
- ARBO(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
  while(++i<nombre_clignotement) {
   GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 1 ) ; usleep(duree_clignotement*10000);
@@ -200,31 +200,31 @@ void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
    }
 }
 /*****************************************************************************************
-* @fn     : GPIO_READ
+* @fn     : GPIO_CONFIG_FIC_READ
 * @author : s.gravois
 * @brief  : Cette fonction lit les parametres GPIO dans le fichier de configuration
 *           (gp_Gpi_Par_Pwm->par_alt / gp_Gpi_Par_Pwm->par_azi / GPIO_MASQUE )
 *           Initilise la frequence PWM a 1000 si aucune entree gd_gpio_frequence_pwm
-* @param  : lp_Con->con_params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
+* @param  : lp_Con->con_params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_LIGNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void GPIO_READ(STRUCT_CONFIG * lp_Con) {
+void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
   int l,i, j ;
   char *str1, *token, *sptr ;
   
-  Trace("Lecture dans fichier de config") ;
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  for(l=0;l<CONFIG_DATAS_NB_COLONNES;l++) {
+  for(l=0;l<CONFIG_DATAS_NB_LIGNES;l++) {
 
-   if(!strcmp("gp_Gpi_Par_Pwm->par_alt",lp_Con->con_params[l][0])) {
+   if(!strcmp("GPIO_ALT",lp_Con->con_params[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( gp_Gpi_Par_Pwm->par_alt,0,sizeof(gp_Gpi_Par_Pwm->par_alt)) ;
     strcpy( gp_Gpi_Par_Pwm->par_alt, lp_Con->con_params[l][1] ) ;
 
-    Trace1("gp_Gpi_Par_Pwm->par_alt trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_alt) ;
+    Trace1("GPIO_ALT trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_alt) ;
 
     for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gi_gpio_in[j]=-1 ;
 
@@ -235,13 +235,13 @@ void GPIO_READ(STRUCT_CONFIG * lp_Con) {
     }
    }
    
-   if(!strcmp("gp_Gpi_Par_Pwm->par_azi",lp_Con->con_params[l][0])) {
+   if(!strcmp("GPIO_AZI",lp_Con->con_params[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( gp_Gpi_Par_Pwm->par_azi,0,sizeof(gp_Gpi_Par_Pwm->par_azi)) ;
     strcpy( gp_Gpi_Par_Pwm->par_azi, lp_Con->con_params[l][1] ) ;
 
-    Trace1("gp_Gpi_Par_Pwm->par_azi trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_azi) ;
+    Trace1("GPIO_AZI trouve ligne %d = (%s)", l,gp_Gpi_Par_Pwm->par_azi) ;
 
     for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_out[i]=-1 ;
 
@@ -270,8 +270,7 @@ void GPIO_READ(STRUCT_CONFIG * lp_Con) {
     }
    }
 
-
-   if(!strcmp("gp_Gpi_Par_Pwm->par_fre_pwm",lp_Con->con_params[l][0])) {
+   if(!strcmp("GPIO_FREQUENCE_PWM",lp_Con->con_params[l][0])) {
 
     // FIXME ajout stephane 2021
     memset( gp_Gpi_Par_Pwm->par_fre_pwm,0,sizeof(gp_Gpi_Par_Pwm->par_fre_pwm)) ;
@@ -288,17 +287,17 @@ void GPIO_READ(STRUCT_CONFIG * lp_Con) {
     }
    }
   }
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_azi[%d]=%d",i,gi_gpio_azi[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_alt[%d]=%d",i,gi_gpio_alt[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace1("gi_gpio_mas[%d]=%d",i,gi_gpio_mas[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_gpio_azi[%d]=%d",i,gi_gpio_azi[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_gpio_alt[%d]=%d",i,gi_gpio_alt[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_gpio_mas[%d]=%d",i,gi_gpio_mas[i]);
    
-  TRACE1("gp_Gpi_Par_Pwm->par_fre_pwm=%f", gd_gpio_frequence_pwm ) ;
+  Trace("gp_Gpi_Par_Pwm->par_fre_pwm=%f", gd_gpio_frequence_pwm ) ;
 }
 /*****************************************************************************************
 * @fn     : GPIO_READ2
 * @author : s.gravois
 * @brief  : Cette fonction lit GPIO_INPUT et GPIO_OUTPUT
-* @param  : lp_Con->con_params[CONFIG_DATAS_NB_COLONNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
+* @param  : lp_Con->con_params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : (obsolete) fonction ancienne, remplace explicitement par GPIO_LED_xx etc..
 *****************************************************************************************/
@@ -308,7 +307,7 @@ void GPIO_READ2(STRUCT_CONFIG *lp_Con) {
   int l,i, j ;
   char *str1, *token, *sptr ;
   
-  for(l=0;l<CONFIG_DATAS_NB_COLONNES;l++) {
+  for(l=0;l<CONFIG_DATAS_NB_LIGNES;l++) {
    if(!strcmp("GPIO_INPUT",lp_Con->con_params[l][0])) {
     for(j=0;j<GPIO_SIZE;j++) gi_gpio_in[j]=-1 ;
     for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
@@ -326,8 +325,8 @@ void GPIO_READ2(STRUCT_CONFIG *lp_Con) {
     }
    }
   }
-   for(i=0;i<GPIO_SIZE;i++) TRACE1("gi_gpio_in[%d] =%d\n",i,gi_gpio_in[i]);
-   for(i=0;i<GPIO_SIZE;i++) TRACE1("gi_gpio_out[%d]=%d\n",i,gi_gpio_out[i]);
+   for(i=0;i<GPIO_SIZE;i++) Trace1("gi_gpio_in[%d] =%d\n",i,gi_gpio_in[i]);
+   for(i=0;i<GPIO_SIZE;i++) Trace1("gi_gpio_out[%d]=%d\n",i,gi_gpio_out[i]);
 }
 
 //==========================================================
@@ -366,6 +365,9 @@ int GPIO_SET(int gpio,int val) {
   char buf[GPIO_BUFFER_SIZE_256] ;
   int retour ;
   retour=0 ;
+
+  TraceArbo(__func__,2,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   memset(buf,0,GPIO_BUFFER_SIZE_256);
   snprintf(buf,GPIO_BUFFER_SIZE_256,"%d\n",val) ;
 
@@ -388,6 +390,8 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
   char val[GPIO_BUFFER_SIZE_256] ;
   char exp[GPIO_BUFFER_SIZE_256] ;
   
+  TraceArbo(__func__,1,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   GPIO_OPEN_STATUT=0 ;
   
   memset(exp,0,GPIO_BUFFER_SIZE_256);
@@ -400,13 +404,13 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
   sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gpio) ;
   sprintf(val,"%s/gpio%d/value",GPIO_PATH,gpio) ;
   
-  TRACE1("exp=%s",exp);
-  TRACE1("dir=%s",dir);
-  TRACE1("val=%s",val);
+  Trace1("exp=%s",exp);
+  Trace1("dir=%s",dir);
+  Trace1("val=%s",val);
     
   if ( output ) {
     
-    TRACE("gpio ouverture en OUTPUT : dir= %s exp=%s val=%s",dir,exp,val);
+    Trace1("gpio ouverture en OUTPUT : dir= %s exp=%s val=%s",dir,exp,val);
     
     if ((f=fopen(exp,"w")) == NULL )                      { GPIO_OPEN_STATUT = -1  ; }
     else if ((fprintf(f,"%d\n",gpio))<=0)                 { GPIO_OPEN_STATUT = -2  ; }
@@ -418,7 +422,7 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
   }
   else {
 
-    TRACE("gpio ouverture en INPUT : dir=%s exp=%s val=%s",dir,exp,val);
+    Trace1("gpio ouverture en INPUT : dir=%s exp=%s val=%s",dir,exp,val);
     
     if ((f=fopen(exp,"w")) == NULL )                      { GPIO_OPEN_STATUT = -8   ; }
     else if ((fprintf(f,"%d\n",gpio))<=0)                 { GPIO_OPEN_STATUT = -9   ; }
@@ -560,6 +564,8 @@ int GPIO_CLOSE_BROCHE(int gpio) {
   FILE *f ;
   char une[GPIO_BUFFER_SIZE_256] ;
   
+  TraceArbo(__func__,1,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   memset(une,0,GPIO_BUFFER_SIZE_256);
   sprintf(une,"%s/unexport",GPIO_PATH) ;
 
@@ -853,12 +859,12 @@ double GPIO_FONCTION_RAPPORT_CYCLIQUE(int num_bobine, double t, STRUCT_GPIO_PWM_
 
   if ( num_bobine == 0 ) { 
     
-    TRACE1("%f %f %f %d %f %f", t, w, d, pm->type_fonction, pm->param0, pm->param1 ) ;
+    Trace1("%f %f %f %d %f %f", t, w, d, pm->type_fonction, pm->param0, pm->param1 ) ;
     
     switch ( pm->type_fonction) {  
-     case 1 : rc = pm->param1 * sin(w*t) ;                                      TRACE1("fonction sinusoidale") ;break;
-     case 0 : rc = pm->param1 * acos(cos(2*w*t))/(M_PI/2)-1 ;                     TRACE1("fonction triangulaire") ;break ;
-     case 2 : rc = pm->param1 * sin(w*t)+SGN(cos(w*t))* pm->param0 *sin(4*w*t) ;TRACE1("fonction mixte") ;break;
+     case 1 : rc = pm->param1 * sin(w*t) ;                                      Trace1("fonction sinusoidale") ;break;
+     case 0 : rc = pm->param1 * acos(cos(2*w*t))/(M_PI/2)-1 ;                     Trace1("fonction triangulaire") ;break ;
+     case 2 : rc = pm->param1 * sin(w*t)+SGN(cos(w*t))* pm->param0 *sin(4*w*t) ;Trace1("fonction mixte") ;break;
      case 3 : 
 // a=0.5 b=2
 // a=0.6 b=1.66
@@ -871,15 +877,15 @@ double GPIO_FONCTION_RAPPORT_CYCLIQUE(int num_bobine, double t, STRUCT_GPIO_PWM_
        if (pm->param0 != 0 ) dc   = ((-sc*(trc-sc))+(pm->param0))/pm->param0 ;
        else                  dc   = (-sc*(trc-sc))+(pm->param0) ;
        rc   = pm->param1 *  dc * sigc ;
-       TRACE1("fonction la meilleure pour les micro pas") ;
+       Trace1("fonction la meilleure pour les micro pas") ;
        break ;
     }
   }
   else {
     switch ( pm->type_fonction) {  
-     case 1 : rc = pm->param1 * sin(w*t+d) ;                                         TRACE1("fonction sinusoidale") ;break;
-     case 0 : rc = pm->param1 * acos(cos(2*w*t+d))/(M_PI/2)-1 ;                        TRACE1("fonction triangulaire") ;break;
-     case 2 : rc = pm->param1 * sin(w*t+d)+SGN(cos(w*t+d))* pm->param0 *sin(4*w*t) ; TRACE1("fonction mixte") ;break;
+     case 1 : rc = pm->param1 * sin(w*t+d) ;                                         Trace1("fonction sinusoidale") ;break;
+     case 0 : rc = pm->param1 * acos(cos(2*w*t+d))/(M_PI/2)-1 ;                        Trace1("fonction triangulaire") ;break;
+     case 2 : rc = pm->param1 * sin(w*t+d)+SGN(cos(w*t+d))* pm->param0 *sin(4*w*t) ; Trace1("fonction mixte") ;break;
      case 3 : 
        sigc = SGN(cos(w*t)) ;
        trc  = -(1+pm->param0)*(acos(cos(w*t-pi/2))/(pi/2)-1)	 ;
@@ -888,7 +894,7 @@ double GPIO_FONCTION_RAPPORT_CYCLIQUE(int num_bobine, double t, STRUCT_GPIO_PWM_
        else                  dc   = (-sc*(trc-sc))+(pm->param0) ;
        
        rc   = pm->param1 * dc * sigc ;
-       TRACE1("fonction la meilleure pour les micro pas") ;
+       Trace1("fonction la meilleure pour les micro pas") ;
        break ;
     }
   }
@@ -973,10 +979,11 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
   double TUpwm, TUpwm_haut, TUpwm_bas, rap ;
   double pmot =0 ;
   struct sched_param param;
-  Trace2("sleeping..") ;
-  sleep(1) ;
-  Trace1("start") ;
+  
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  sleep(1) ;
+  
   /* ---------------------------------------------------------------------------- */
   /* Configuration du thread et des attributs de tread                            */
   /* ---------------------------------------------------------------------------- */
@@ -1066,7 +1073,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   struct sched_param param;
   int     micropas=0 ;
 
-  Trace1("start") ;
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* ---------------------------------------------------------------------------- */
   /* Configuration du thread et des attributs de tread                            */
@@ -1326,6 +1333,8 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
   int i ;
   char cmd[255] ;
   
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   pthread_mutex_init( & pm->mut_mot, NULL ) ;
   
   memset(cmd, CONFIG_ZERO_CHAR ,sizeof(cmd)) ;
@@ -1375,7 +1384,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
       perror(cmd) ;
       system(cmd) ;
     }*/
-    /* TRACE("") ; */
+    /* Trace1("") ; */
     usleep(100000) ;
   }
   GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES( pm )  ;
@@ -1888,10 +1897,10 @@ void GPIO_CLAVIER_MATRICIEL_CONFIG (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_
 
         if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
 
-          TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d allumer\n",\
+          Trace1("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d allumer\n",\
             i,j,gp_Gpi_Par_Mat->par_c[i],gp_Gpi_Par_Mat->par_l[j]); }
         else {
-          TRACE("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d eteint\n",\
+          Trace1("Clavier ligne %d et colonne %d => %d mis a 5V et GPIO %d eteint\n",\
           i,j,gp_Gpi_Par_Mat->par_c[i],gp_Gpi_Par_Mat->par_l[j]); }
     }
   }
@@ -2015,7 +2024,7 @@ void GPIO_CLAVIER_MATRICIEL_READ (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Ma
       if ( ! strcmp( gp_Key->phrase, gp_Key->validations[i]) \
         || ! strcmp( gp_Key->mot,    gp_Key->valider )  ) {
 
-        TRACE1("APPUI sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
+        Trace1("APPUI sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1\n" ) ; 
         
         strcpy(gp_Key->symbole, gp_Key->premier)  ;
         
@@ -2023,7 +2032,7 @@ void GPIO_CLAVIER_MATRICIEL_READ (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Ma
         strcpy(gp_Key->phrase,"")  ;
         strcpy(gp_Key->mot,"") ;
         
-        TRACE1("TROIS = symbole = %s nombre = %s\n", gp_Key->symbole, gp_Key->nombre ) ;
+        Trace1("TROIS = symbole = %s nombre = %s\n", gp_Key->symbole, gp_Key->nombre ) ;
 
         gp_Key->phrase_lue=1 ;
       }

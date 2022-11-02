@@ -133,11 +133,11 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
 
   if ( nread >0  ) {
 
-    Trace1("nread positif = %d", nread) ;
+    Trace2("nread positif = %d", nread) ;
     
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
-      Trace1("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
+      Trace2("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
       *i_sum_ascii+=(int)peek_char[i] ;
     }
     strcpy( ch_chaine , chaine) ;  
@@ -152,7 +152,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
     return -1 ;
   }
   else {
-    Trace1("nread = %d", nread) ;
+    Trace2("nread = %d", nread) ;
   }
   return 0 ;
 }
@@ -257,12 +257,12 @@ void KEYBOARD_LOG_LAST_LINE(WINDOW *win) {
 
 void KEYBOARD_NCURSES_INIT(void) {
   int n = 0 ;
-  TRACE("start") ;
+  Trace1("start") ;
   /* unlink(MY_LOGFILE); */
 
   if (newterm(0, stdout, stdin) == 0) {
     fprintf(stderr, "Cannot initialize terminal\n");
-    TRACE("Cannot initialize terminal") ;
+    Trace1("Cannot initialize terminal") ;
     exit(2);
   }
   cbreak();		     /* take input chars one at a time, no wait for \n */

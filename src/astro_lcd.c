@@ -76,7 +76,7 @@ extern STRUCT_LCD     *gp_Lcd ;
 
 void LCD_INIT(STRUCT_LCD * p_lcd) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace("") ;
 
@@ -216,7 +216,7 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
     gp_Lcd->i_duree_us = i_duree_us ;
     gp_Lcd->i_change_current = TRUE ; 
 
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
   }
   return ;
 }
@@ -246,7 +246,7 @@ void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l
     gp_Lcd->i_duree_us = i_duree_us ;
     gp_Lcd->i_change_default = TRUE ;
 
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
   }
   return ;
 }
@@ -281,7 +281,7 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
 
     sprintf( c_l1, "%s", gp_Ast->nom ) ;
 
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
   }
   return ;
 }
@@ -319,7 +319,7 @@ void LCD_REFRESH_DEFAULT(void) {
       gp_Lcd->display_default() ;
     }
 
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
   }
   return ;
 }
@@ -339,7 +339,7 @@ void LCD_REFRESH_DEFAULT(void) {
 
 void LCD_DISPLAY_DEFAULT(void) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   Trace("%d",gp_Dev->use_lcd) ;
 
   if ( gp_Dev->use_lcd ) {
@@ -350,14 +350,14 @@ void LCD_DISPLAY_DEFAULT(void) {
       SyslogErr("LCD1602Clear : FAILED\n");
       Trace("LCD1602Clear : FAILED");
 
-      Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
 
       return ;
     }
     else {
       Trace1("LCD1602Clear : OK")
     }
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
     /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
     usleep( LCD_USLEEP_AFTER_CLEARING ) ;
@@ -373,14 +373,14 @@ void LCD_DISPLAY_DEFAULT(void) {
       SyslogErr("LCD1602DispLines : FAILED\n");
       Trace("LCD1602DispLines : FAILED");
       
-      Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
 
       return ;
     }
     else {
       Trace1("LCD1602DispLines : OK");
     }
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
   }
   return ;
 }
@@ -396,7 +396,7 @@ void LCD_DISPLAY_DEFAULT(void) {
 
 void LCD_DISPLAY_CURRENT(void) {
 
-  ARBO(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace("%d",gp_Dev->use_lcd) ;
 
@@ -408,7 +408,7 @@ void LCD_DISPLAY_CURRENT(void) {
       SyslogErr("LCD1602Clear : FAILED\n");
       Trace("LCD1602Clear : FAILED");
 
-      Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
 
       return ;
     }
@@ -416,7 +416,7 @@ void LCD_DISPLAY_CURRENT(void) {
       Trace1("LCD1602Clear : OK")
     }
     /* TODO  : mettre le usleep a interieur de mutex */
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
     /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
     usleep( LCD_USLEEP_AFTER_CLEARING ) ;
@@ -432,14 +432,14 @@ void LCD_DISPLAY_CURRENT(void) {
       SyslogErr("LCD1602DispLines : FAILED\n");
       Trace("LCD1602DispLines : FAILED");
       
-      Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
 
       return ;
     }
     else {
       Trace1("LCD1602DispLines : OK");
     }
-    Trace(""); pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
   }
   return ;
 }

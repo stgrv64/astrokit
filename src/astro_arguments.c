@@ -39,7 +39,7 @@ void ARGUMENTS_VOUTE( void) {
   int i_retour=0 ;
   FILE   *fout ;
 
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   double a, h ;
   
@@ -125,7 +125,7 @@ void ARGUMENTS_VARIABLES(const char *fmt, ... ) {
     va_list ap;
     va_start(ap, fmt);
 
-    ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+    TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
     
     while(*fmt) { 
        switch ((int)*fmt ++) {
@@ -159,7 +159,8 @@ void ARGUMENTS_VARIABLES(const char *fmt, ... ) {
 void ARGUMENTS_HELP(int argc, char** argv) {
 
   char binaire[255] ;
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   memset(binaire, CALCUL_ZERO_CHAR,sizeof(binaire)) ;
   strcpy(binaire,argv[0]) ;
@@ -216,7 +217,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 
 void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
 
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   /* ---------------------------------------------------------------
   * Gestion d un chemin externe (option -p <path>) si getcwd KO
   * ---------------------------------------------------------------*/
@@ -238,7 +239,7 @@ void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
       Trace1("gp_Con_Par->par_rep_home lu par getcwd = %s",gp_Con_Par->par_rep_home);
     }
   }
-  Trace1("gp_Con_Par->par_rep_home = %s",gp_Con_Par->par_rep_home);
+  Trace("gp_Con_Par->par_rep_home = %s",gp_Con_Par->par_rep_home);
 }
 /*****************************************************************************************
 * @fn     : ARGUMENTS_GERER
@@ -257,7 +258,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   double periode ;
   double nbpulse ;
   
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   incrlog=30 ;
 
   /* ---------------------------------------------------------------
@@ -285,7 +287,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
     if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
 
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */   
 
     exit(0) ;
@@ -306,7 +308,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
     if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
 
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */
   }
   /* ---------------------------------------------------------------
@@ -326,7 +328,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     gp_Ast->ASC = atof(argv[2]) / CALCUL_UN_RADIAN_EN_DEGRES ;
     gp_Ast->DEC = atof(argv[3]) / CALCUL_UN_RADIAN_EN_DEGRES ;
     
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ;  */
 	   
     exit(0) ;
@@ -348,7 +350,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     gp_Ast->a = atof(argv[2]) / CALCUL_UN_RADIAN_EN_DEGRES ;
     gp_Ast->h = atof(argv[3]) / CALCUL_UN_RADIAN_EN_DEGRES ;
     
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ;  */
 	   
     exit(0) ;
@@ -371,7 +373,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
     if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
 
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */   
 
     /* mode equateur */
@@ -380,7 +382,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
     strcpy( gp_Ast->nom, "EQU0" ) ;
     
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */ 
 
     exit(0) ;
@@ -395,7 +397,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
     strcpy( gp_Ast->nom, "AZI0" ) ;
 
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */    
 
     exit(0) ;
@@ -416,7 +418,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     gp_Vou->pas  = atof(argv[5]) ;
     gp_Vou->acc  = atof(argv[6]) ;
 
-    /* CALCUL_TOUT() ; */
+    CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */   
   }
   // -----------------------------------------------------------------
@@ -583,7 +585,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   }
   */
   // -----------------------------------------------------------------
-  TRACE("as %s pris en compte",argv[1]);
+  Trace1("as %s pris en compte",argv[1]);
   printf("fin %s\n","ARGUMENTS_GERER") ;
 }
 
@@ -601,7 +603,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
 
   char c=0 ;
 
-  ARBO(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   while ((c = getopt (argc, argv, "a:A:Lq:f:l:")) != -1) {
       switch (c) {
@@ -616,7 +618,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
           memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
           strcpy( gp_Ast->nom, optarg ) ;
 
-          /* CALCUL_TOUT() ; */
+          CALCUL_TOUT() ;
           /* CONFIG_AFFICHER_TOUT() ; */   
 
           exit(0) ;
@@ -628,7 +630,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
           memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
           strcpy( gp_Ast->nom, optarg ) ;
 
-          /* CALCUL_TOUT() ; */
+          CALCUL_TOUT() ;
           /* CONFIG_AFFICHER_TOUT() ; */   
 
           exit(0) ;

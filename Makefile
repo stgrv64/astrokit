@@ -163,8 +163,7 @@ OBJS	= $(SRCS:.c=.o)
 OBJSUP	= $(LEPH)
 
 .c.o:
-	@echo @$(CC) -c $(CFLAGS) $< -o $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 $(EXEC): $(OBJ)
 	$(CC) $(OBJ) $(LIBS) -o ${EXEC}

@@ -31,7 +31,7 @@ void PID_INIT(STRUCT_PID * p_pid, double d_ech, double d_kp, double d_ki, double
 
   char c_path_file_out[ CONFIG_TAILLE_BUFFER_64] ; 
 
-  Trace1("") ;
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Initialisation fichier */
 
