@@ -148,7 +148,14 @@ while (0)
 // ASTRO_LOG_DEBUG : fin macros
 // ------------------------------------------------------------------------
 
-void   LOG_INIT         ( void )  ;
+struct STR_LOG {
+ pthread_mutex_t log_mut ;
+ int             log_level ;
+} ;
+typedef struct STR_LOG STRUCT_LOG ;
+
+void   LOG_INIT         ( STRUCT_LOG * )  ;
+void   LOG_TRACE        ( char *l_String , ... ) ;
 void   LOG_SYSTEM_LOG_0 ( int * ) ;
 void   LOG_SYSTEM_LOG_1 ( char * )  ;
 

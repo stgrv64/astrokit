@@ -49,10 +49,7 @@ void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  // temporisation pour ne pas consommer de CPU
-  // on sommeille = pourcentage_tempo du usleep 
-  
-  usleep ( (long)(gp_Sui->DTa * gp_Sui->pourcentage_tempo) ) ;
+  usleep ( (long)(gp_Sui->DTa * gp_Sui->sui_tempo_percent) ) ;
   
   t_diff=0;
   while( t_diff < gp_Sui->DTa ) {
@@ -82,10 +79,7 @@ void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) 
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  // temporisation pour ne pas consommer de CPU
-  // on sommeille = pourcentage_tempo du usleep 
-  
-  usleep ( (long)(gp_Sui->DTh * gp_Sui->pourcentage_tempo) ) ;
+  usleep ( (long)(gp_Sui->DTh * gp_Sui->sui_tempo_percent) ) ;
   
   t_diff=0;
   while( t_diff < gp_Sui->DTh ) {
@@ -100,7 +94,7 @@ void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) 
 * @fn     : SUIVI_MAJ_PAS
 * @author : s.gravois
 * @brief  : Cette fonction met a jour les valeurs de gp_Sui->pas* en fonction
-* @brief  : du contenu de gp_Sui->sui_dat.dat_inf
+* @brief  : du contenu de gp_Sui->sui_dat->dat_inf
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
@@ -114,32 +108,32 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 
   pthread_mutex_lock(& gp_Mut->mut_dat );
 
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "plus" ) )         { c_act='1'; gp_Sui->pas_acc_plus  = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "moins" ) )        { c_act='1'; gp_Sui->pas_acc_moins = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forward" ) )      { c_act='1'; gp_Sui->pas_forward  = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewind" ) )       { c_act='1'; gp_Sui->pas_rewind = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "forwardfast" ) )  { c_act='1'; gp_Sui->pas_forward_fast  = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "rewindfast" ) )   { c_act='1'; gp_Sui->pas_rewind_fast = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "ne" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "no" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "se" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "so" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "n" ) )            { c_act='1'; gp_Sui->pas_nord  = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "o" ) )            { c_act='1'; gp_Sui->pas_ouest = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "e" ) )            { c_act='1'; gp_Sui->pas_est   = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "s" ) )            { c_act='1'; gp_Sui->pas_sud   = 1 ; }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "reset" ) )        { c_act='1'; gp_Sui->reset   = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "plus" ) )         { c_act='1'; gp_Sui->pas_acc_plus  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "moins" ) )        { c_act='1'; gp_Sui->pas_acc_moins = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "forward" ) )      { c_act='1'; gp_Sui->pas_forward  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "rewind" ) )       { c_act='1'; gp_Sui->pas_rewind = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "forwardfast" ) )  { c_act='1'; gp_Sui->pas_forward_fast  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "rewindfast" ) )   { c_act='1'; gp_Sui->pas_rewind_fast = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "ne" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "no" ) )           { c_act='1'; gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "se" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "so" ) )           { c_act='1'; gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "n" ) )            { c_act='1'; gp_Sui->pas_nord  = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "o" ) )            { c_act='1'; gp_Sui->pas_ouest = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "e" ) )            { c_act='1'; gp_Sui->pas_est   = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "s" ) )            { c_act='1'; gp_Sui->pas_sud   = 1 ; }
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "reset" ) )        { c_act='1'; gp_Sui->reset   = 1 ; }
 
-  /* Si gp_Sui->sui_dat.dat_inf a ete utilise, il peut etre remis a zero */
+  /* Si gp_Sui->sui_dat->dat_inf a ete utilise, il peut etre remis a zero */
 
   if ( c_act == '1' ) {
     
-    memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
-    strcpy( gp_Sui->sui_dat.dat_inf, "") ;
+    memset( gp_Sui->sui_dat->dat_inf, 0, strlen( gp_Sui->sui_dat->dat_inf ) ) ;
+    strcpy( gp_Sui->sui_dat->dat_inf, "") ;
   }
   pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-  Trace2("raz de gp_Sui->sui_dat.dat_inf") ;
+  Trace2("raz de gp_Sui->sui_dat->dat_inf") ;
 
   Trace2("%ld %ld %ld %ld %d %d\n", \
     gp_Sui->pas_ouest, \
@@ -166,38 +160,39 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 
 void SUIVI_OLD_0( STRUCT_SUIVI * gp_Sui) {
     
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "plus" ) )  {
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "plus" ) )  {
     gp_Sui->Ta_mic *=  gp_Sui->plus  ; gp_Sui->Fa_mic = 1 / gp_Sui->Ta_mic ;
     gp_Sui->Th_mic *=  gp_Sui->plus  ; gp_Sui->Fh_mic = 1 / gp_Sui->Th_mic ;
   }
-  if ( ! strcmp( gp_Sui->sui_dat.dat_inf, "moins" ) ) {
+  if ( ! strcmp( gp_Sui->sui_dat->dat_inf, "moins" ) ) {
     gp_Sui->Ta_mic *=  gp_Sui->moins  ; gp_Sui->Fa_mic = 1 / gp_Sui->Ta_mic ;
     gp_Sui->Th_mic *=  gp_Sui->moins  ; gp_Sui->Fh_mic = 1 / gp_Sui->Th_mic ;
   }
 }
 
 /*****************************************************************************************
-* @fn     : SUIVI_MENU_PREALABLE
+* @fn     : SUIVI_MENU_BEFORE_WHILE
 * @author : s.gravois
 * @brief  : fonction qui initialise des attributs 
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-10-07 deplacement code depuis astro.c 
-* @todo   : TODO : analyser la reelle utilite de cette fonction
-            en diminuant le bombre de variable gp_Sui->var
+* @date   : 2022-11-03 renommage SUIVI_MENU_PREALABLE -> SUIVI_MENU_BEFORE_WHILE
+* @date   : 2022-11-03 suppression de tous les champs suivi_xxx (inutile)
+* @todo   : (obsolete) 
 *****************************************************************************************/
 
-void SUIVI_MENU_PREALABLE (STRUCT_SUIVI * gp_Sui) {
+void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * gp_Sui) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   switch ( gp_Sui->menu ) {
-    case MENU_AZIMUTAL            : gp_Sui->SUIVI_EQUATORIAL = 0 ; break ;
-    case MENU_EQUATORIAL          : gp_Sui->SUIVI_EQUATORIAL = 1 ; break ;
-    case MENU_MANUEL_BRUT         : gp_Sui->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_NON_ASSERVI  : gp_Sui->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_MANUEL_ASSERVI      : gp_Sui->SUIVI_MANUEL     = 1 ; break ;
-    case MENU_GOTO                : gp_Sui->SUIVI_GOTO       = 1 ; break ;
+    case MENU_AZIMUTAL            : break ;
+    case MENU_EQUATORIAL          : break ;
+    case MENU_MANUEL_BRUT         : break ;
+    case MENU_MANUEL_NON_ASSERVI  : break ;
+    case MENU_MANUEL_ASSERVI      : break ;
+    case MENU_GOTO                : break ;
     case MENU_INFO                : break ;
     case MENU_RESEAU_UP           : break ;
     case MENU_RESEAU_DOWN         : break ; 
@@ -257,8 +252,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     KEYS_If_Mot_Is("s")     { gp_Sui->menu = MENU_MANUEL_BRUT ; i=1;}
     KEYS_If_Mot_Is("n")     { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
     KEYS_If_Mot_Is("reset") { gp_Sui->menu = MENU_MANUEL_BRUT ;i=1; }
-    KEYS_If_Mot_Is("stop")  { gp_Sui->SUIVI_VOUTE = 0 ; i=1;}
-    KEYS_If_Mot_Is("play")  { gp_Sui->SUIVI_VOUTE = 1 ; i=1;}
+    KEYS_If_Mot_Is("stop")  { gp_Sui->mode_voute = 0 ; i=1;}
+    KEYS_If_Mot_Is("play")  { gp_Sui->mode_voute = 1 ; i=1;}
     
     /* Quelques actions d 'affichage a l'ecran  */
 
@@ -446,7 +441,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
       
       /* Pour les planetes, le calcul est fait dans SOLAR_SYSTEM dans CALCUL_TOUT */
 
-      gp_Sui->SUIVI_ALIGNEMENT = 1 ;
+      gp_Ast->ast_new = TRUE ;
       //gp_Sui->menu = MENU_AZIMUTAL ;
 
       GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ; 
@@ -544,11 +539,11 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, gp_Sui) ; */
-/*
+
   SUIVI_MAJ_PAS( gp_Sui) ;
-*/
-  if( strcmp( gp_Sui->sui_dat.dat_inf, "") != 0 ) {
-    Trace1("0 gp_Sui->sui_dat.dat_inf = %s", gp_Sui->sui_dat.dat_inf ) ;
+
+  if( strcmp( gp_Sui->sui_dat->dat_inf, "") != 0 ) {
+    Trace1("0 gp_Sui->sui_dat->dat_inf = %s", gp_Sui->sui_dat->dat_inf ) ;
   }
   else {
     Trace1("dat_inf vide" ) ;
@@ -559,6 +554,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   
   if ( gp_Sui->reset ) {
 
+    Trace1("prise en compte : gp_Sui->reset" ) ;
+
     // pthread_mutex_lock(& gp_Mut->mut_azi );
     // pthread_mutex_lock(& gp_Mut->mut_azi );
 
@@ -567,7 +564,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
     gp_Sui->acc_azi = 1 ;
 
-    if ( gp_Sui->SUIVI_EQUATORIAL )  gp_Sui->acc_alt = 0.0 ;
+    if ( gp_Sui->mode_equatorial )  gp_Sui->acc_alt = 0.0 ;
     else                             gp_Sui->acc_alt = 1.0 ;
 
     gp_Sui->reset = 0 ;
@@ -592,7 +589,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   if (flag_nord_sud_est_ouest ) { 
   
-    Trace("flag_nord_sud_est_ouest") ;
+    Trace("prise en compte : flag_nord_sud_est_ouest") ;
 
     // pthread_mutex_lock(& gp_Mut->mut_azi );
     // pthread_mutex_lock(& gp_Mut->mut_alt );
@@ -642,6 +639,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   if ( gp_Sui->pas_forward ) {
 
+    Trace1("prise en compte : gp_Sui->pas_forward" ) ;
+
     // pthread_mutex_lock(& gp_Mut->mut_azi );
     // pthread_mutex_lock(& gp_Mut->mut_alt );
 
@@ -661,6 +660,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   }
   
   if ( gp_Sui->pas_rewind ) {
+
+    Trace1("prise en compte : gp_Sui->pas_rewind" ) ;
 
     // pthread_mutex_lock(& gp_Mut->mut_azi );
     // pthread_mutex_lock(& gp_Mut->mut_alt );
@@ -687,6 +688,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   if ( gp_Sui->pas_forward_fast ) {
 
+    Trace1("prise en compte : gp_Sui->pas_forward_fast" ) ;
+
     // pthread_mutex_lock(& gp_Mut->mut_azi );
     // pthread_mutex_lock(& gp_Mut->mut_alt );
 
@@ -705,8 +708,11 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     gp_Sui->pas_forward_fast = 0 ;
     flag_calcul = 1 ;
   }
+
   if ( gp_Sui->pas_rewind_fast ) {
 
+    Trace1("prise en compte : gp_Sui->pas_rewind_fast" ) ;
+    
     // pthread_mutex_lock(& gp_Mut->mut_azi );   
     // pthread_mutex_lock(& gp_Mut->mut_alt );
 
@@ -732,14 +738,14 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   if ( flag_calcul ) {
   
-    Trace("flag_calcul") ;
+    Trace("prise en compte : flag_calcul") ;
 
-    // pthread_mutex_lock( & gp_Mut->mut_cal );
+    /* pthread_mutex_lock( & gp_Mut->mut_cal ); */
     
     CALCUL_VITESSES( gp_Lie, gp_Ast, gp_Sui) ;
     CALCUL_PERIODE ( gp_Ast, gp_Sui, gp_Vou) ;
     
-    // pthread_mutex_unlock( & gp_Mut->mut_cal );
+    /* pthread_mutex_unlock( & gp_Mut->mut_cal ); */
   }
 }
 
@@ -754,6 +760,8 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   struct timeval t00 ;
   struct timeval t01 ;
   int azi,alt ;
+  long    t_diff =0;
+  double  t_diff_sec=0 ;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
@@ -867,12 +875,12 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   if ( alt ) { pthread_mutex_unlock( & gp_Mut->mut_alt ); }
   
   gettimeofday(&t01,NULL) ;
-
-  gp_Sui->t_diff     = (( t01.tv_sec - t00.tv_sec ) * TEMPS_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
-  gp_Sui->t_diff_sec = (double)gp_Sui->t_diff / (double)TEMPS_MICRO_SEC ;
+  /* t_diff a definir en local */
+  t_diff     = (( t01.tv_sec - t00.tv_sec ) * TEMPS_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
+  t_diff_sec = (double)t_diff / (double)TEMPS_MICRO_SEC ;
 	 
-  if ( gp_Sui->pas_azi_old != gp_Sui->pas_azi ) gp_Sui->d_appui_raq_azi += gp_Sui->t_diff_sec ;
-  if ( gp_Sui->pas_alt_old != gp_Sui->pas_alt ) gp_Sui->d_appui_raq_alt += gp_Sui->t_diff_sec ;
+  if ( gp_Sui->pas_azi_old != gp_Sui->pas_azi ) gp_Sui->d_appui_raq_azi += t_diff_sec ;
+  if ( gp_Sui->pas_alt_old != gp_Sui->pas_alt ) gp_Sui->d_appui_raq_alt += t_diff_sec ;
 	 
   if ( gp_Sui->pas_azi_old != gp_Sui->pas_azi || gp_Sui->pas_alt_old != gp_Sui->pas_alt ) {
 
@@ -901,11 +909,8 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Sui->SUIVI_MANUEL     = 0 ;
-  gp_Sui->SUIVI_ALIGNEMENT = 0 ;
-  gp_Sui->SUIVI_GOTO       = 0 ;
-  gp_Sui->SUIVI_VOUTE      = 1 ;
-  gp_Sui->SUIVI_EQUATORIAL = 0 ;
+  gp_Sui->mode_voute      = 1 ;
+  gp_Sui->mode_equatorial = 0 ;
 
   // a modifier  : instancier ces variables a l aide du fichier de config
 
@@ -939,9 +944,6 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
   gp_Sui->sgn_azi   = 1 ;
   gp_Sui->sgn_alt   = 1 ;
 
-  gp_Sui->t_diff = 0 ;
-  gp_Sui->t_diff_sec = 0 ;
-  gp_Sui->d_temps          = 0 ;   
   gp_Sui->d_appui_raq_azi  = 0 ;
   gp_Sui->d_appui_raq_alt  = 0 ;
   
@@ -990,7 +992,7 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
 
   gp_Sui->alarme = 0 ;
   
-  gp_Sui->pourcentage_tempo = 0.99 ; 
+  gp_Sui->sui_tempo_percent = 0.99 ; 
   
   gp_Sui->temporisation_menu     = gp_Tim_Par->par_tempo_Menu ;
   gp_Sui->temporisation_raq      = gp_Tim_Par->par_tempo_Raq ;
@@ -1002,7 +1004,7 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
   gp_Sui->temporisation_lcd_disp = gp_Tim_Par->par_tempo_Lcd_Disp ;
 
   gp_Sui->temporisation_pid_loop = gp_Pid_Par->par_pid_ech ;
-  gp_Sui->temporisation_voute    = gp_Vou->DT ;
+  gp_Sui->temporisation_voute    = gp_Vou->vou_dt_us ;
 
   gp_Sui->DTh = gp_Sui->Th_mic * TEMPS_MICRO_SEC ;
   gp_Sui->DTa = gp_Sui->Ta_mic * TEMPS_MICRO_SEC ;

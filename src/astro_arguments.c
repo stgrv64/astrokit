@@ -51,24 +51,24 @@ void ARGUMENTS_VOUTE( void) {
 
   /* -------------------------------------------
   *  On fait varier les coordonnees horaires / declinaison
-  * avec un pas = gp_Vou->pas
+  * avec un pas = gp_Vou->vou_pas
   * -------------------------------------------*/
   
-  for(h=-(M_PI/2)+(gp_Lie->lat)+0.001;h<M_PI/2;h+=gp_Vou->pas)
+  for(h=-(M_PI/2)+(gp_Lie->lat)+0.001;h<M_PI/2;h+=gp_Vou->vou_pas)
     if (h>=0) 
 
     /* -------------------------------------------
     *  On fait varier les coordonnees en ascension droite
-    * avec un pas = gp_Vou->pas
+    * avec un pas = gp_Vou->vou_pas
     * -------------------------------------------*/
 
-    for(a=-M_PI +0.001 ;a<M_PI;a+=gp_Vou->pas){
+    for(a=-M_PI +0.001 ;a<M_PI;a+=gp_Vou->vou_pas){
      
      gp_Ast->a=a ;
      gp_Ast->h=h ;
      
      CALCUL_EQUATEUR  ( gp_Lie, gp_Ast) ;        // calcul coordonnees horaires en fait
-     CALCUL_VITESSES  ( gp_Lie, gp_Ast, gp_Sui) ; // TODO : verifier gp_Sui->SUIVI_EQUATORIAL avant
+     CALCUL_VITESSES  ( gp_Lie, gp_Ast, gp_Sui) ; // TODO : verifier gp_Sui->mode_equatorial avant
      
      /* Calcul de la norme de la vitesse */
 
@@ -198,7 +198,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 
       printf("%s -g / gpios (gpios) : affiche le statut des broches GPIO\n",binaire) ;
 
-      printf("%s <LAT> <DEC> <deb voute> <fin voute> <pas voute> <acc voute>\n",binaire);
+      printf("%s <LAT> <DEC> <vou_begin voute> <fin voute> <pas voute> <acc voute>\n",binaire);
 
       exit(0) ;
     }
@@ -390,8 +390,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 2  ) &&  ! strcmp("tou",argv[1]) ) {
   
-    Trace("passage en mode azimutal : gp_Sui->SUIVI_EQUATORIAL=0") ;
-    gp_Sui->SUIVI_EQUATORIAL=0 ;
+    Trace("passage en mode azimutal : gp_Sui->mode_equatorial=0") ;
+    gp_Sui->mode_equatorial=0 ;
 
     Trace("as nom mis a la valeur TST0");
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
@@ -413,10 +413,10 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     gp_Lie->lat   = atof(argv[1]) / CALCUL_UN_RADIAN_EN_DEGRES ;
     gp_Ast->DEC    = atof(argv[2]) / CALCUL_UN_RADIAN_EN_DEGRES ;
-    gp_Vou->deb  = atof(argv[3]) ;
-    gp_Vou->fin  = atof(argv[4]) ;
-    gp_Vou->pas  = atof(argv[5]) ;
-    gp_Vou->acc  = atof(argv[6]) ;
+    gp_Vou->vou_begin  = atof(argv[3]) ;
+    gp_Vou->vou_end  = atof(argv[4]) ;
+    gp_Vou->vou_pas  = atof(argv[5]) ;
+    gp_Vou->vou_acceleration  = atof(argv[6]) ;
 
     CALCUL_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */   
@@ -438,7 +438,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      <norme vitesse>\n\
      <angle du vecteur vitesse>\n") ;
     */
-    gp_Vou->pas = atof(argv[2]) / CALCUL_UN_RADIAN_EN_DEGRES ;
+    gp_Vou->vou_pas = atof(argv[2]) / CALCUL_UN_RADIAN_EN_DEGRES ;
     gp_Lie->lat  = atof(argv[3]) / CALCUL_UN_RADIAN_EN_DEGRES ; 
     
     ARGUMENTS_VOUTE( ) ;

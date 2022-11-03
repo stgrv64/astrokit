@@ -33,7 +33,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_INFRARED ;
 * @brief  : Ouverture des flux IR a l aide du paquet LIRC
 * @param  : struct lirc_config *gp_LircConfig
 * @date   : 2022-04-12 creation entete de la fonction au format doxygen
-* @date   : 2022-04-12 mutex_lock sur gp_Sui->sui_dat.dat_inf
+* @date   : 2022-04-12 mutex_lock sur gp_Sui->sui_dat->dat_inf
 * @todo   : 
 *****************************************************************************************/
 
@@ -63,7 +63,7 @@ void INFRARED_CLOSE(INFRARED_LIRC_CONFIG *gp_LircConfig) {
 * @brief  :  car on utilise la fonction bloquante suivante : lirc_nextcode()
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-04-12 creation entete de la fonction au format doxygen
-* @date   : 2022-04-12 mutex_lock sur gp_Sui->sui_dat.dat_inf
+* @date   : 2022-04-12 mutex_lock sur gp_Sui->sui_dat->dat_inf
 * @todo   : 
 *****************************************************************************************/
 
@@ -107,13 +107,13 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
     Trace1("i_indice_code j k = %d %d %d", i_indice_code,j,k); 
 
     pthread_mutex_lock(& gp_Mut->mut_dat );
-    memset( gp_Sui->sui_dat.dat_inf,CONFIG_ZERO_CHAR, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
+    memset( gp_Sui->sui_dat->dat_inf,CONFIG_ZERO_CHAR, strlen( gp_Sui->sui_dat->dat_inf ) ) ;
     pthread_mutex_unlock(& gp_Mut->mut_dat );
 
     if ( k == 0 && i_indice_code < CODES_CODE_NB_CODES ) {
       
       pthread_mutex_lock(& gp_Mut->mut_dat );
-      strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
+      strcpy( gp_Sui->sui_dat->dat_inf, gp_Cod->out_act[i_indice_code] ) ;
       pthread_mutex_unlock(& gp_Mut->mut_dat );
 
       GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
@@ -125,7 +125,7 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
       pthread_mutex_lock(& gp_Mut->mut_dat );
-      strcpy( gp_Sui->sui_dat.dat_inf, gp_Cod->out_act[i_indice_code] ) ;
+      strcpy( gp_Sui->sui_dat->dat_inf, gp_Cod->out_act[i_indice_code] ) ;
       pthread_mutex_unlock(& gp_Mut->mut_dat );
 
       GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
@@ -133,10 +133,10 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
     
     // tres important !!
     // le usleep suivant permet de garder l information !!!!!!
-    // gp_Sui->sui_dat.dat_inf fonctionne comme un TAMPON
+    // gp_Sui->sui_dat->dat_inf fonctionne comme un TAMPON
     // il va etre lu par les threads du programme principal
     
-    Trace("gp_Sui->sui_dat.dat_inf = %s", gp_Sui->sui_dat.dat_inf ) ;
+    Trace("gp_Sui->sui_dat->dat_inf = %s", gp_Sui->sui_dat->dat_inf ) ;
     Trace("gp_Sui->temporisation_ir = %ld", gp_Sui->temporisation_ir ) ;
     
     usleep( gp_Sui->temporisation_ir ) ;
@@ -144,9 +144,11 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
     free(code);
 
     pthread_mutex_lock(& gp_Mut->mut_dat );
-    Trace("raz de gp_Sui->sui_dat.dat_inf") ;
-    memset( gp_Sui->sui_dat.dat_inf, 0, strlen( gp_Sui->sui_dat.dat_inf ) ) ;
-    strcpy( gp_Sui->sui_dat.dat_inf, "") ;
+
+    Trace("raz de gp_Sui->sui_dat->dat_inf") ;
+    memset( gp_Sui->sui_dat->dat_inf, 0, strlen( gp_Sui->sui_dat->dat_inf ) ) ;
+    strcpy( gp_Sui->sui_dat->dat_inf, "") ;
+    
     pthread_mutex_unlock(& gp_Mut->mut_dat );
   }
 }

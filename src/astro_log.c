@@ -101,8 +101,10 @@ void LOG_SYSTEM_LOG_1(char *txt) {
 * @todo   : rappatrier syslog init ICI ?
 *****************************************************************************************/
 
-void LOG_INIT(void) {
+void LOG_INIT(STRUCT_LOG* lp_Log) {
 
+  int i_error=0 ; 
+  int i_errno=0 ;
   char buf[255] ;
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
@@ -122,5 +124,98 @@ void LOG_INIT(void) {
     }
     else Trace("open %s ok", buf) ;
   }
+
+  if ( ( i_error = pthread_mutex_init( & lp_Log->log_mut, NULL )) != 0 ) {
+    i_errno=errno;        
+    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
+    perror("pthread_mutex_init");
+    exit(EXIT_FAILURE); 
+  }
+
+  lp_Log->log_level = ASTRO_LOG_DEBUG ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : LOG_TRACE
+* @author : s.gravois
+* @brief  : Fonction de trace dynamique qui utilise niveau de debug dynamiquement 
+*           modifee par le clavier en cours d execution
+* @param  : void
+* @date   : 2022-11-03 creation 
+* @todo   : rappatrier syslog init ICI ?
+*****************************************************************************************/
+
+void   LOG_TRACE  ( char *l_String , ... ) {
+  va_list valist;
+  va_start(valist, l_String);
+	unsigned long long u=0 ;
+	long long ll =0;
+	long l=0;
+	int i=0;
+	char *s ;
+	double f=0 ;
+	char c=0 ;
+	int d=0 ;
+  char c_out [ CONFIG_TAILLE_BUFFER_256 ]={0};
+  char c_out_tmp [ CONFIG_TAILLE_BUFFER_256 ]={0};
+
+  memset( c_out,0, sizeof(c_out));
+
+  va_start(valist, l_String);
+
+  while (*l_String) {
+    switch (*l_String++) {
+      case 'l':
+        l = va_arg(valist, long );
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %ld",c_out_tmp,l) ;
+        break;
+
+      case 'm':
+        ll = va_arg(valist, long long);
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %lld",c_out_tmp,ll) ;
+        break;
+
+      case 'u':
+        u = va_arg(valist, unsigned long long );
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %lld",c_out_tmp,u) ;
+        break;
+
+      case 'f':
+        f = va_arg(valist, double);
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %f",c_out_tmp,f) ;
+        break;
+
+      case 's':
+        s = va_arg(valist, char *);
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %s",c_out_tmp,s) ;
+        break;
+
+      case 'd':
+        d = va_arg(valist, int);
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %d",c_out_tmp,d) ;
+        break;
+
+      case 'c':
+        c = (char)va_arg(valist, int);
+        strcpy( c_out_tmp, c_out ) ;
+        sprintf(c_out,"%s %c",c_out_tmp,c) ;
+        break;
+
+      default:
+          break;
+    }
+  }
+  va_end(valist);
+
+  Trace("%s",c_out);
+
   return ;
 }

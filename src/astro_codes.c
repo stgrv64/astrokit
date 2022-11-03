@@ -37,10 +37,10 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 /* objets MES NGC ETO PLA         */
 /*--------------------------------*/
 
-{ "47",        "KEY_M","MES"},  /* 47 ascii = lettre '/' */
-{ "42",        "KEY_N","NGC"},  /* 42 ascii = lettre '*' */
-{ "45",        "KEY_E","ETO"},  /* 45 ascii = lettre '-' */
-{ "43",        "KEY_P","PLA"},  /* 43 ascii = lettre '+' */
+{ "47",        "KEY_M","MES"},  /* 47 ascii = touche '/' */
+{ "42",        "KEY_N","NGC"},  /* 42 ascii = touche '*' */
+{ "45",        "KEY_E","ETO"},  /* 45 ascii = touche '-' */
+{ "43",        "KEY_P","PLA"},  /* 43 ascii = touche '+' */
 
 /*--------------------------------*/
 /* touches de MENUS               */
@@ -48,7 +48,7 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 
 { "10",        "KEY_PLAY",    "valider"},  /* 10  ascii = touche 'ENTER' */
 { "obsolete",  "KEY_STOP",    "stop"},     /* 188 ascii = touche 'FIN' */
-{ "109",       "KEY_MENU",    "MENU"},     /* 109  ascii = lettre 'm' */
+{ "109",       "KEY_MENU",    "MENU"},     /* 109  ascii = touche 'm' */
 { "32",        "KEY_PAUSE",   "pause"},    /* 32 ascii = espace = pause */
 
 /*--------------------------------*/
@@ -74,7 +74,7 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 /* touches de gestion du temps    */
 /*--------------------------------*/
 
-{ "116",       "KEY_MUTE",   "TIME"},        /* 116 ascii = lettre 't' */
+{ "116",       "KEY_MUTE",   "TIME"},        /* 116 ascii = touche 't' */
 
 /*--------------------------------*/
 /* touches affichage informations */
@@ -85,27 +85,27 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 /* F1 : 274  F2 : 275  F3 : 276  F4  : 277  F5  : 278  F6  : 348 */
 /* F7 : 349  F8 : 350  F9 : 342  F10 : 343  F11 : 345  F12 : 346 */
 
-{ "274",       "KEY_SCREEN",  "aff_tps_lie" },  /* 274 sum ascii = lettre 'F1'  */ /* info 0 */
-{ "275",       "KEY_TV",      "aff_ast_vit" },  /* 274 sum ascii = lettre 'F2'  */ /* info 1 */
-{ "276",       "KEY_INFO",    "aff_azi_alt" },  /* 275 sum ascii = lettre 'F3'  */ /* info 2 */
-{ "277",       "KEY_ZOOM",    "aff_agh_dec" },  /* 277 sum ascii = lettre 'F4'  */ /* info 3 */
+{ "274",       "KEY_SCREEN",  "aff_tps_lie" },  /* 274 sum ascii = touche 'F1'  */ /* info 0 */
+{ "275",       "KEY_TV",      "aff_ast_vit" },  /* 274 sum ascii = touche 'F2'  */ /* info 1 */
+{ "276",       "KEY_INFO",    "aff_azi_alt" },  /* 275 sum ascii = touche 'F3'  */ /* info 2 */
+{ "277",       "KEY_ZOOM",    "aff_agh_dec" },  /* 277 sum ascii = touche 'F4'  */ /* info 3 */
 
-{ "278",       "non_defini",  "aff_asc_dec"       },   /* 278 sum ascii = lettre 'F5'  */ /* info 4 */
-{ "348",       "non_defini",  "cfg_gpios_alt_azi" },   /* 348 sum ascii = lettre 'F6'  */ /* info 5 */
-{ "349",       "non_defini",  "cfg_gpios_mas_fre" },   /* 348 sum ascii = lettre 'F7'  */ /* info 5 */
-{ "350",       "non_defini",  "cfg_gpios_leds"    },   /* 348 sum ascii = lettre 'F8'  */ /* info 5 */
-{ "342",       "non_defini",  "cfg_reduction"     },   /* 348 sum ascii = lettre 'F9'  */ /* info 5 */
-{ "343",       "non_defini",  "aff_ast_fre"       },   /* 348 sum ascii = lettre 'F10' */ /* info 5 */
-{ "345",       "non_defini",  "aff_ast_per"       },   /* 348 sum ascii = lettre 'F11' */ /* info 5 */
-{ "346",       "non_defini",  "aff_acc_alt_azi"   },   /* 346 sum ascii = lettre 'F12'  */ /* info 5 */
-{ "105",       "non_defini",  "aff_infos"         },   /* 346 sum ascii = lettre 'F12'  */ /* info 5 */
+{ "278",       "non_defini",  "aff_asc_dec"       },   /* 278 sum ascii = touche 'F5'  */ /* info 4 */
+{ "348",       "non_defini",  "cfg_gpios_alt_azi" },   /* 348 sum ascii = touche 'F6'  */ /* info 5 */
+{ "349",       "non_defini",  "cfg_gpios_mas_fre" },   /* 348 sum ascii = touche 'F7'  */ /* info 5 */
+{ "350",       "non_defini",  "cfg_gpios_leds"    },   /* 348 sum ascii = touche 'F8'  */ /* info 5 */
+{ "342",       "non_defini",  "cfg_reduction"     },   /* 348 sum ascii = touche 'F9'  */ /* info 5 */
+{ "343",       "non_defini",  "aff_ast_fre"       },   /* 348 sum ascii = touche 'F10' */ /* info 5 */
+{ "345",       "non_defini",  "aff_ast_per"       },   /* 348 sum ascii = touche 'F11' */ /* info 5 */
+{ "346",       "non_defini",  "aff_acc_alt_azi"   },   /* 346 sum ascii = touche 'F12'  */ /* info 5 */
+{ "105",       "non_defini",  "aff_infos"         },   /* 346 sum ascii = touche 'F12'  */ /* info 5 */
 
 /*--------------------------------*/
 /* touches de permutations        */
 /*--------------------------------*/
 
-{ "97",           "KEY_LIST",   "key_azi"},    /* a=azimutal   => lettre 'a' */
-{ "122",          "KEY_MODE",   "key_equ" },   /* z=equatorial => lettre 'z' */ 
+{ "97",           "KEY_LIST",   "key_azi"},    /* a=azimutal   => touche 'a' */
+{ "122",          "KEY_MODE",   "key_equ" },   /* z=equatorial => touche 'z' */ 
 
 /*--------------------------------*/
 /* arret du programme / de la carte */
@@ -119,7 +119,7 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 /* touches obsoletes */
 /*--------------------------------*/
 
-{ "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = lettre '>' */
+{ "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = touche '>' */
 { "obsolete",  "KEY_PREVIOUS","previous"}, /* action a definir */
 { "obsolete",  "KEY_SETUP",   "SETUP"},    /* non mis en place pour l instant (2022/04) */
 { "obsolete",  "KEY_SOUND",   "TIME"  },   /* remplace par KEY_MUTE sur la telecommande */
@@ -129,17 +129,21 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 { "obsolete",  "KEY_BLUE",    "blue"},     /* remplace par KEY_N (ngc) */
 { "obsolete",  "KEY_YELLOW",  "yellow"},   /* remplace par KEY_E (etoiles) */
 { "obsolete",  "KEY_GREEN",   "green"},    /* remplace par KEY_P (planetes) */
-{ "114", "key_reseau_up",   "cfg_reseau_up" },           /* 114 sum ascii = lettre 'r' = reseau */ 
-{ "108", "key_log",     "cfg_log_tps_reel_up" },         /* 108 sum ascii = lettre 'l' = activer les traces temps reel */ 
-{ "107", "key_log_alt", "cfg_log_tps_reel_trace_azi" },  /* 108 sum ascii = lettre 'k' = generer les traces azi */ 
-{ "106", "key_log_azi", "cfg_log_tps_reel_trace_alt" },  /* 108 sum ascii = lettre 'j' = generer les traces alt */ 
-{ "115", "undefined", "undefined"},  /* 115 sum ascii = lettre 's' = reseau */ 
-{ "117", "undefined", "undefined"},     /* 117 sum ascii = lettre 'u' = reseau */ 
-{ "118", "undefined", "aff_variables"},     /* 118 sum ascii = lettre 'v' = reseau */ 
-{ "119", "undefined", "undefined"},     /* 119 sum ascii = lettre 'w' = reseau */
-{ "undefined", "undefined", "undefined"}, /* 120 sum ascii = lettre 'w' = reseau */
-{ "undefined", "undefined", "undefined"}, /* 121 sum ascii = lettre 'w' = reseau */
-{ "undefined", "undefined", "undefined"}, /* 122 sum ascii = lettre 'w' = reseau */
+
+{ "114", "key_reseau_up",   "cfg_reseau_up" },           /* 114 sum ascii = touche 'r' = reseau */ 
+
+{ "108", "key_log_pid", "cfg_log_tps_reel_up" },         /* 108 sum ascii = touche 'l' = activer les traces pid temps reel */ 
+{ "107", "key_log_alt", "cfg_log_tps_reel_trace_azi" },  /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
+{ "106", "key_log_azi", "cfg_log_tps_reel_trace_alt" },  /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
+
+{ "115", "undefined", "undefined"},     /* 115 sum ascii = touche 's'        = log */ 
+{ "117", "undefined", "undefined"},     /* 117 sum ascii = touche 'u'     = log */ 
+{ "118", "undefined", "aff_variables"}, /* 118 sum ascii = touche 'v' = log */ 
+{ "119", "undefined", "undefined"},     /* 119 sum ascii = touche 'w'     = log */
+
+{ "undefined", "undefined", "undefined"}, /* 120 sum ascii = touche 'w' = reseau */
+{ "undefined", "undefined", "undefined"}, /* 121 sum ascii = touche 'w' = reseau */
+{ "undefined", "undefined", "undefined"}, /* 122 sum ascii = touche 'w' = reseau */
 { "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},
@@ -152,8 +156,8 @@ static const char *g_char_Codes[][ CODES_NB_IN_OUT ] = {
 * @brief  : Cette fonction initialise un code (appelle par CODES_INIT)
 * @param  : STRUCT_VOUTE *gp_Vou
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @todo   : passer par une lecture de parametre dans config.txt pour \
-*           pourcentage_tempo et calibration_voute
+* @todo   : TODO : passer par une lecture de parametre dans config.txt pour \
+*           pourcentage_tempo et vou_calibration_delta_t
 *****************************************************************************************/
 
 void CODES_INIT_CODE( \

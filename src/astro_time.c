@@ -311,9 +311,6 @@ long TEMPS_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct t
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  // temporisation pour ne pas consommer de CPU
-  // on sommeille = pourcentage_tempo du usleep 
-  
   usleep ( (long)(microsecondes * percent) ) ;
   
   t_diff=0;

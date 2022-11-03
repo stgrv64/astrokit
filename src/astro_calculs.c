@@ -345,7 +345,7 @@ void CALCUL_VITESSES(STRUCT_LIEU *l_li, STRUCT_ASTRE *l_as, STRUCT_SUIVI * l_sui
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  if ( l_sui->SUIVI_EQUATORIAL == 1 ) {
+  if ( l_sui->mode_equatorial == 1 ) {
     l_as->Va = -15.0 ;
     l_as->Vh = -15.0 ;
   }
@@ -414,8 +414,8 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  Trace2("%f %f %f %f %f",gp_Sui->acc_azi, gp_Vou->acc, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
-  Trace2("%f %f %f %f %f",gp_Sui->acc_alt, gp_Vou->acc, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
+  Trace2("%f %f %f %f %f",gp_Sui->acc_azi, gp_Vou->vou_acceleration, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
+  Trace2("%f %f %f %f %f",gp_Sui->acc_alt, gp_Vou->vou_acceleration, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
 
   /*------------------------*/
   /* Calculs des frequences */
@@ -430,8 +430,8 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   /* calcul des frequences corrigees avant prise en compte micro pas */
   /* ces frequences sont corrigees par les accelerations diverses */
 
-  freq_azi_mot = gp_Sui->acc_azi_pid * gp_Sui->acc_azi * gp_Vou->acc * freq_azi_bru  ;
-  freq_alt_mot = gp_Sui->acc_alt_pid * gp_Sui->acc_alt * gp_Vou->acc * freq_alt_bru  ;
+  freq_azi_mot = gp_Sui->acc_azi_pid * gp_Sui->acc_azi * gp_Vou->vou_acceleration * freq_azi_bru  ;
+  freq_alt_mot = gp_Sui->acc_alt_pid * gp_Sui->acc_alt * gp_Vou->vou_acceleration * freq_alt_bru  ;
 
   /* calcul des frequences finales UTILES */
   /* La frequence retenue est la frequence moteur multipliee par le nb de micro pas */
@@ -524,7 +524,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
     
       pthread_mutex_lock(& gp_Mut->mut_azi );
   
-        gp_Ast->Va    = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->acc * gp_Cal_Par->par_azi_red_tot ) ;
+        gp_Ast->Va    = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->vou_acceleration * gp_Cal_Par->par_azi_red_tot ) ;
         gp_Sui->Sa_old = gp_Sui->Sa ; 
         gp_Sui->Sa     = (int)SGN(frequence)  ;
         gp_Sui->Fa_mic = fabs(frequence) ;
@@ -545,7 +545,7 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
       // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL demande le mutex\n");
       pthread_mutex_lock( & gp_Mut->mut_alt );
     
-        gp_Ast->Vh     = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->acc * gp_Cal_Par->par_alt_red_tot ) ;
+        gp_Ast->Vh     = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->vou_acceleration * gp_Cal_Par->par_alt_red_tot ) ;
         gp_Sui->Sh_old = gp_Sui->Sh ; 
         gp_Sui->Sh     = (int)SGN(frequence)  ;
         gp_Sui->Fh_mic     = fabs(frequence) ;
@@ -1034,9 +1034,9 @@ void CALCUL_VOUTE(void ) {
 
   // On fait varier les coordonnees azimutales
   
-  for(h=-(M_PI/2)+(gp_Lie->lat)+0.001;h<M_PI/2;h+=gp_Vou->pas)
+  for(h=-(M_PI/2)+(gp_Lie->lat)+0.001;h<M_PI/2;h+=gp_Vou->vou_pas)
     if (h>=0) 
-    for(a=-M_PI +0.001 ;a<M_PI;a+=gp_Vou->pas){
+    for(a=-M_PI +0.001 ;a<M_PI;a+=gp_Vou->vou_pas){
      
      gp_Ast->a=a ;
      gp_Ast->h=h ;
@@ -1094,7 +1094,7 @@ void CALCUL_VOUTE(void ) {
       // si un alignement vient d etre effectue on affiche les vitesses calculees
       // TODO : verifier / completer / modifier ..
       /*
-      if ( gp_Sui->SUIVI_ALIGNEMENT  ) {
+      if ( gp_Ast->ast_new  ) {
 
         Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta_mic %.2f Th_mic %.2f Fa_mic=%.2f Fh_mic %.2f",\
           gp_Ast->nom,\
@@ -1118,7 +1118,7 @@ void CALCUL_VOUTE(void ) {
               gp_Sui->Fh_mic,\
               (gp_Sui->Ia - gp_Sui->Ia_prec),(gp_Sui->Ih - gp_Sui->Ih_prec ),gp_Sui->Tac, gp_Sui->Thc) ;
         
-        gp_Sui->SUIVI_ALIGNEMENT = 0 ;
+        gp_Ast->ast_new = 0 ;
 
       }
       */

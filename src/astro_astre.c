@@ -69,7 +69,8 @@ void ASTRE_INIT(STRUCT_ASTRE *gp_Ast ) {
   
   gp_Ast->en_type = ASTRE_INDETERMINE ;
   gp_Ast->en_mode = CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  gp_Ast->numero = 0 ;
+  gp_Ast->numero  = 0 ;
+  gp_Ast->ast_new = TRUE ;
 }
 
 

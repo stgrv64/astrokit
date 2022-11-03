@@ -47,21 +47,39 @@ typedef enum {
 }
 t_en_Menus ;
 
+struct STR_SUIVI_PAS {
+
+  // Variables utilisees en mode MANUEL EVOLUE
+  int    pas_acc_plus ;
+  int    pas_acc_moins ;
+  int    pas_forward ;
+  int    pas_rewind ;
+  int    pas_forward_fast ;
+  int    pas_rewind_fast ;
+  long   pas_azi ;
+  long   pas_alt ;
+  long   pas_azi_old ;
+  long   pas_alt_old ;
+  long   pas_asc ;
+  long   pas_dec ;
+  long   pas_ouest ;     // flag d'appui sur le touche OUEST
+  long   pas_est ;       // flag d'appui sur le touche EST
+  long   pas_nord ;      // flag d'appui sur le touche NORD
+  long   pas_sud ;       // flag d'appui sur le touche SUD
+
+} ;
+
+typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
+
 struct STR_SUIVI {
 
   STRUCT_PTHREADS     * p_pth ;
-  STRUCT_DATAS          sui_dat ;
-
-  int          SUIVI_MANUEL ;
-  int          SUIVI_ALIGNEMENT ;
-  int          SUIVI_GOTO ;
-  int          SUIVI_VOUTE ;
-  int          SUIVI_EQUATORIAL ;
-
-  long         t_diff ;
-  double       t_diff_sec ;
+  STRUCT_DATAS        * sui_dat ;
+  STRUCT_SUIVI_PAS    * sui_pas ;
   
-  double       d_temps ;   
+  int          mode_voute ;
+  int          mode_equatorial ;
+  
   double       d_appui_raq_azi ;
   double       d_appui_raq_alt ;
   
@@ -152,7 +170,7 @@ struct STR_SUIVI {
   int          alarme ; // si different de 0 provoque une alarm(alarme) au debut de main
   int          reset ;  // sert de reset pour remettre les compteeurs a zero dans diverses parties du programme
   
-  double       pourcentage_tempo ;
+  double       sui_tempo_percent ;
   double       DTh ;
   double       DTa ;
   
@@ -175,7 +193,7 @@ typedef struct STR_SUIVI STRUCT_SUIVI ;
 void   SUIVI_INIT           ( STRUCT_SUIVI * ) ;
 void   SUIVI_OLD_0          ( STRUCT_SUIVI * ) ;
 void   SUIVI_TRAITEMENT_MOT ( STRUCT_SUIVI *, STRUCT_KEYS * ) ;
-void   SUIVI_MENU_PREALABLE ( STRUCT_SUIVI * ) ;
+void   SUIVI_MENU_BEFORE_WHILE ( STRUCT_SUIVI * ) ;
 void   SUIVI_MANUEL_BRUT    ( STRUCT_SUIVI * , STRUCT_KEYS *) ;
 void   SUIVI_MANUEL_ASSERVI ( STRUCT_SUIVI * , STRUCT_KEYS *) ;
 /* old */

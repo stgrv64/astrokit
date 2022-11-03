@@ -135,7 +135,7 @@ void PTHREADS_INIT( pthread_t pth_self ) {
         perror("setschedparam main");
         exit(EXIT_FAILURE);
     }
-    // PTHREADS_CONFIG( gp_Pth, pth_self, PTHREADS_SUIVI_MAIN ) ;
+    // PTHREADS_CONFIG( gp_Pth, pth_self, PTHREAD_TYPE_MAIN ) ;
     
   }
   else {
@@ -152,7 +152,7 @@ void PTHREADS_INIT( pthread_t pth_self ) {
 * @date   : 2022-06-01 creation
 *****************************************************************************************/
 
-void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_Sched_Param l_en_thread ) {
+void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t pth_self, int l_en_thread ) {
 
   int   i_error=0 ;
   int   i_errno=0 ;
@@ -170,8 +170,10 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
 
   i_ord = gi_Pth_Sched_Param[ (int) l_en_thread ] ;
   i_pri = gi_Pth_Sched_Priority[ (int) l_en_thread ] ;
+
   memset( c_name, 0, sizeof(c_name)) ;
   strcpy( c_name, gi_Pth_Name[(int)l_en_thread]) ;
+  
   param.sched_priority = i_pri ;
 
   /*----------------------------------------------------------*/
@@ -253,10 +255,10 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
 
   if ( i_error == 0 ) {
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
-    strcpy( p_pth->pth_att[ gi_pthread_nb_threads ].att_nam , c_name ) ;
-    p_pth->pth_att[ gi_pthread_nb_threads ].att_pid                = pth_self ;
-    p_pth->pth_att[ gi_pthread_nb_threads ].att_pri.sched_priority = i_pri ;
-    p_pth->pth_att[ gi_pthread_nb_threads ].att_ord                = i_ord ; 
+    strcpy( lp_pth->pth_att[ gi_pthread_nb_threads ].att_nam , c_name ) ;
+    lp_pth->pth_att[ gi_pthread_nb_threads ].att_pid                = pth_self ;
+    lp_pth->pth_att[ gi_pthread_nb_threads ].att_pri.sched_priority = i_pri ;
+    lp_pth->pth_att[ gi_pthread_nb_threads ].att_ord                = i_ord ; 
     
     gi_pthread_nb_threads++ ;
     
@@ -273,7 +275,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* p_pth, pthread_t pth_self, t_en_Pthreads_
 * @date   : 2022-10-03 creation
 *****************************************************************************************/
 
-void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
+void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
 
   int i=0;
   int l_nb_threads = 0 ;
@@ -292,10 +294,10 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
 
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-    strcpy( c_name, p_pth->pth_att[ i ].att_nam ) ;
-    i_id  = p_pth->pth_att[ i ].att_pid  ;
-    i_pri = p_pth->pth_att[ i ].att_pri.sched_priority  ;
-    i_ord = p_pth->pth_att[ i ].att_ord  ; 
+    strcpy( c_name, lp_pth->pth_att[ i ].att_nam ) ;
+    i_id  = lp_pth->pth_att[ i ].att_pid  ;
+    i_pri = lp_pth->pth_att[ i ].att_pri.sched_priority  ;
+    i_ord = lp_pth->pth_att[ i ].att_ord  ; 
     
     pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
@@ -334,7 +336,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* p_pth) {
 * @todo   : a finir
 *****************************************************************************************/
 
-void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* p_pth) {
+void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* lp_pth) {
 
   char c_thread_name [ 16 ] ;
   int i_num_thread=0 ;
@@ -344,7 +346,7 @@ void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* p_pth) {
 
   for (i_num_thread=0; i_num_thread < PTHREADS_MAX_THREADS; i_num_thread++) {
 
-    id_thread = p_pth->pth_att[i_num_thread].att_pid ;
+    id_thread = lp_pth->pth_att[i_num_thread].att_pid ;
     
     memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
     

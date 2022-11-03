@@ -133,32 +133,24 @@
 #define GPIO_DEFAULT_AZI_MOTOR_GPIOS  "6,5,7,11"
 #define GPIO_DEFAULT_MAS_MOTOR_ORDER  "3,0,2,1"
 */
-#define GPIO_CURRENT_FONCTION          3       // 0 : triangle - 1 : sinus - 2 : mixte - 3  : sinus arrondi (best)
-#define GPIO_CURRENT_FONCTION_PARAM0   0.65    // ce parametre deforme la fonction 2 et 3
-#define GPIO_CURRENT_FONCTION_PARAM1   1.0     // ce parametre multiplie la fonction pour l'ajuster a 1 (5v)
-
-#define GPIO_SUIVI_PWM_PHASE_PRIORITY  10
-#define GPIO_SUIVI_MAIN_PRIORITY       5
+#define GPIO_CURRENT_FONCTION          3      // 0 : triangle - 1 : sinus - 2 : mixte - 3  : sinus arrondi (best)
+#define GPIO_CURRENT_FONCTION_PARAM0   0.65   // ce parametre deforme la fonction 2 et 3
+#define GPIO_CURRENT_FONCTION_PARAM1   1.0    // ce parametre multiplie la fonction pour l'ajuster a 1 (5v)
 #define GPIO_SUIVI_MAIN_ATTENTE_MAX    10     // attente maximum exprimee en seconde pour non blocage
-
-#define GPIO_SUIVI_PWM_PHASE_SCHED     SCHED_RR
-#define GPIO_SUIVI_MAIN_SCHED          SCHED_RR
-
-#define GPIO_MICROPAS_MAX           500
-
-#define GPIO_NB_PHASES_PAR_MOTEUR   4
-#define GPIO_FREQ_MAX               1000.0
-#define GPIO_VARG_STRING            115
-#define GPIO_VARG_INT               100
-#define GPIO_VARG_CHAR              99 
-#define GPIO_TIMEOUT                30 
-#define GPIO_SIZE                   16
-#define GPIO_FREQ_IR                38000.0
-#define GPIO_TEMPORISATION_PERCENT  0.5
-
-#define GPIO_BUFFER_SIZE_256       256
-#define GPIO_PATH                  "/sys/class/gpio" 
-#define GPIO_TAILLE_BUFFER         16
+#define GPIO_MICROPAS_MAX              500
+#define GPIO_NB_MOTEURS                2
+#define GPIO_NB_PHASES_PAR_MOTEUR      4
+#define GPIO_FREQ_MAX                  1000.0
+#define GPIO_VARG_STRING               115
+#define GPIO_VARG_INT                  100
+#define GPIO_VARG_CHAR                 99 
+#define GPIO_TIMEOUT                   30 
+#define GPIO_SIZE                      16
+#define GPIO_FREQ_IR                   38000.0
+#define GPIO_TEMPORISATION_PERCENT     0.5
+#define GPIO_BUFFER_SIZE_256           256
+#define GPIO_PATH                      "/sys/class/gpio" 
+#define GPIO_TAILLE_BUFFER             16
 
 #define  STATS_ASS                 3  
 
@@ -166,7 +158,7 @@ typedef enum    t_en_Reduction_Type         ENUM_CALCULS_REDUCTION_TYPE ;
 typedef enum    t_en_Calculs_Mode           ENUM_CALCULS_MODE ;
 
 typedef struct  lirc_config                 INFRARED_LIRC_CONFIG ;
-
+typedef struct  pthread_t                   STRUCT_PTHREAD_T ;
 typedef struct  STR_TIME                    STRUCT_TIME ;
 typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
 typedef struct  STR_ASTRE                   STRUCT_ASTRE ;
@@ -178,10 +170,12 @@ typedef struct  STR_DEVICES                 STRUCT_DEVICES ;
 typedef struct  STR_KEYS                    STRUCT_KEYS ;
 typedef struct  STR_LCD                     STRUCT_LCD ;
 typedef struct  STR_LIEU                    STRUCT_LIEU ;
+typedef struct  STR_LOG                     STRUCT_LOG ;
 typedef struct  STR_PID                     STRUCT_PID ;
 typedef struct  STR_MUTEXS                  STRUCT_MUTEXS ;
 typedef struct  STR_PTHREADS                STRUCT_PTHREADS ;
 typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
+typedef struct  STR_SUIVI_PAS               STRUCT_SUIVI_PAS ;
 typedef struct  STR_VOUTE                   STRUCT_VOUTE ;
 typedef struct  STR_I2C_DEVICE              STRUCT_I2C_DEVICE ;
 typedef struct  STR_I2C_ACC_MAG             STRUCT_I2C_ACC_MAG ;
@@ -241,14 +235,18 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_KEYS             g_Keys,             *gp_Key ; \
   extern STRUCT_LCD              g_Lcd,              *gp_Lcd ; \
   extern STRUCT_LIEU             g_Lieu,             *gp_Lie ; \
+  extern STRUCT_LOG              g_Log,              *gp_Log; \
   extern STRUCT_PID              g_Pid,              *gp_Pid ; \
   extern STRUCT_MUTEXS           g_Mutexs,           *gp_Mut ; \
   extern STRUCT_PTHREADS         g_Pthreads,         *gp_Pth ; \
+  extern STRUCT_PTHREADS         g_Pthreads_Alt,     *gp_Pth_Alt ; \
+  extern STRUCT_PTHREADS         g_Pthreads_Azi,     *gp_Pth_Azi ; \
   extern STRUCT_SUIVI            g_Suivi,            *gp_Sui ; \
+  extern STRUCT_SUIVI_PAS        g_Pas,              *gp_Pas ; \
   extern STRUCT_TIME             g_Time,             *gp_Tim ; \
   extern STRUCT_VOUTE            g_Voute,            *gp_Vou ; \
-  extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Mot_Alt ; \
-  extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Mot_Azi ; \
+  extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Gpio_Pwm_Mot_Alt ; \
+  extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Gpio_Pwm_Mot_Azi ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS \
   extern STRUCT_ASTRE_PARAMS     g_Astre_Params,     *gp_Ast_Par ; \

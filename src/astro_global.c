@@ -23,14 +23,18 @@ STRUCT_I2C_MCP23017     g_I2cMcp,           *gp_I2c_Mcp ;
 STRUCT_KEYS             g_Keys,             *gp_Key ;
 STRUCT_LCD              g_Lcd,              *gp_Lcd ;
 STRUCT_LIEU             g_Lieu,             *gp_Lie ;
+STRUCT_LOG              g_Log,              *gp_Log ;
 STRUCT_PID              g_Pid,              *gp_Pid ;
 STRUCT_MUTEXS           g_Mutexs,           *gp_Mut ;
 STRUCT_PTHREADS         g_Pthreads,         *gp_Pth ;
+STRUCT_PTHREADS         g_Pthreads_Alt,     *gp_Pth_Alt ;
+STRUCT_PTHREADS         g_Pthreads_Azi,     *gp_Pth_Azi ;
 STRUCT_SUIVI            g_Suivi,            *gp_Sui ;
+STRUCT_SUIVI_PAS        g_Pas,              *gp_Pas ;
 STRUCT_TIME             g_Time,             *gp_Tim ;
 STRUCT_VOUTE            g_Voute,            *gp_Vou ;
-STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Mot_Alt ; 
-STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Mot_Azi ;
+STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Gpio_Pwm_Mot_Alt ; 
+STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Gpio_Pwm_Mot_Azi ;
 STRUCT_ASTRE_PARAMS     g_Astre_Params,     *gp_Ast_Par ;
 STRUCT_CALCULS_PARAMS   g_Calculs_Params,   *gp_Cal_Par ;
 STRUCT_CONFIG_PARAMS    g_Config_Params,    *gp_Con_Par ;
@@ -94,14 +98,16 @@ void ASTRO_GLOBAL_INIT(void) {
   gp_Key         = & g_Keys ;
   gp_Lcd         = & g_Lcd ;
   gp_Lie         = & g_Lieu ;
+  gp_Log         = & g_Log ;
   gp_Pid         = & g_Pid ;     
   gp_Pth         = & g_Pthreads ;
+  gp_Pth_Alt     = & g_Pthreads_Alt ;
+  gp_Pth_Azi     = & g_Pthreads_Azi ;
   gp_Mut         = & g_Mutexs ;
   gp_Vou         = & g_Voute ;
   gp_Tim         = & g_Time ;
-  gp_Sui         = & g_Suivi ;     
-  gp_Mot_Azi     = & g_Mot_Azi ;
-  gp_Mot_Alt     = & g_Mot_Alt ; 
+  gp_Sui         = & g_Suivi ;  
+  gp_Pas         = & g_Pas ;       
   gp_Ast_Par     = & g_Astre_Params ;
   gp_Cal_Par     = & g_Calculs_Params ;
   gp_Con_Par     = & g_Config_Params ;
@@ -114,6 +120,9 @@ void ASTRO_GLOBAL_INIT(void) {
   gp_Gpi_Par_Con = & g_Gpio_Params_Con ;
   gp_Gpi_Par_Mat = & g_Gpio_Params_Mat ;
 
+  gp_Gpio_Pwm_Mot_Azi     = & g_Mot_Azi ;
+  gp_Gpio_Pwm_Mot_Alt     = & g_Mot_Alt ; 
+
   // -----------------------------------------------------------------
   // Initialisations des pointeurs d acces dans les structures
   // -----------------------------------------------------------------
@@ -121,15 +130,19 @@ void ASTRO_GLOBAL_INIT(void) {
   /* Pour permettre acces a STRUCT_PTHREADS* via struct STR_SUIVI* */
   /* TODO : FIXME : what ? */
   /* gp_Sui-> = (STRUCT_PTHREADS*) gp_Pth ; */
-
-  /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
-
-  gp_Mot_Azi->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
-  gp_Mot_Alt->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
+  
+  gp_Sui->sui_pas            = (STRUCT_SUIVI_PAS*) gp_Pas ;
+  gp_Sui->sui_dat            = (STRUCT_DATAS*)     gp_Dat ;
   
   /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
 
-  gp_Mot_Alt->p_pth = (STRUCT_PTHREADS*)gp_Pth ;
-  gp_Mot_Azi->p_pth = (STRUCT_PTHREADS*)gp_Pth ; 
+  gp_Gpio_Pwm_Mot_Azi->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
+  gp_Gpio_Pwm_Mot_Alt->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
+  
+  /* Pour permettre acces aux threads speccifiques de STRUCT_GPIO_PWM_MOTEUR* */
+  /* 2022-11-01 :>  non utilise pour l'instant (preparation portage) */
+  
+  gp_Gpio_Pwm_Mot_Alt->p_pth = (STRUCT_PTHREADS*)  gp_Pth_Alt ;
+  gp_Gpio_Pwm_Mot_Azi->p_pth = (STRUCT_PTHREADS*)  gp_Pth_Azi ; 
 
 }

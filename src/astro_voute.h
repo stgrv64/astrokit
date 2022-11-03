@@ -20,16 +20,16 @@
 typedef struct   STR_VOUTE STRUCT_VOUTE ;
 
 struct STR_VOUTE {
-   double    DT ; 
-   double    pourcentage_tempo ;
-   double    calibration_voute ;
-   double    deb ;
-   double    fin ;
-   double    pas ;
-   double    dt ;
-   double    acc ;
-   double    acc_old ;
-   long long num ; 
+   double    vou_tempo_percent ;
+   double    vou_calibration_delta_t ;
+   double    vou_begin ;
+   double    vou_end ;
+   double    vou_pas ;
+   double    vou_dt ;
+   double    vou_dt_us ; 
+   double    vou_acceleration ;
+   long long vou_num ; 
+   double    vou_temps_ecoule ;   
 } ;
 
 void  VOUTE_INIT            ( STRUCT_VOUTE * ) ;

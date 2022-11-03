@@ -49,7 +49,7 @@ struct STR_ASTRE {
 
   /* Numero de l objet dans un catalogue */
   int    numero ; 
-
+  int    ast_new ; /* ajout 2022-11 */
   /* les 2 structures sont placees ici en attendant une structure dediee */
   int    en_type ;
   int    en_mode ;

@@ -39,7 +39,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   memset(val, 0, sizeof(val)) ;     
 
   pthread_mutex_lock(& gp_Mut->mut_dat );
-  strcpy( val, lp_Sui->sui_dat.dat_inf ) ;
+  strcpy( val, lp_Sui->sui_dat->dat_inf ) ;
   pthread_mutex_unlock(& gp_Mut->mut_dat );
 
   Trace("val = %s\n", val ) ;

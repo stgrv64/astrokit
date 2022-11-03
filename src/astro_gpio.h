@@ -145,7 +145,7 @@ struct STR_GPIO_PWM_PHASE {
 
 struct STR_GPIO_PWM_MOTEUR {
 
-  STRUCT_GPIO_PWM_PHASE * p_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  STRUCT_GPIO_PWM_PHASE * mot_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   STRUCT_SUIVI          * p_sui ;
   STRUCT_PTHREADS       * p_pth ;
   

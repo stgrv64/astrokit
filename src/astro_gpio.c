@@ -922,7 +922,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) {
   
   for( i=0 ; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++ ) 
     for( j=0;j < GPIO_MICROPAS_MAX; j++ )
-      pm->p_pha[i]->rap[j] = 0 ;
+      pm->mot_pha[i]->rap[j] = 0 ;
     
   j=0 ; 
 
@@ -934,34 +934,34 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) {
     
     rc = GPIO_FONCTION_RAPPORT_CYCLIQUE(0, t, pm )  ;
     if ( rc >  0)  { 
-      pm->p_pha[1]->rap[j] = rc ;        
-      pm->p_pha[0]->rap[j] = 0.0 ; 
+      pm->mot_pha[1]->rap[j] = rc ;        
+      pm->mot_pha[0]->rap[j] = 0.0 ; 
     }
     else  { 
-      pm->p_pha[0]->rap[j] = rc * -1.0 ; 
-      pm->p_pha[1]->rap[j] = 0.0 ; 
+      pm->mot_pha[0]->rap[j] = rc * -1.0 ; 
+      pm->mot_pha[1]->rap[j] = 0.0 ; 
     }
 
     rc = GPIO_FONCTION_RAPPORT_CYCLIQUE(1, t, pm )  ;    
 
     if ( rc >  0)  { 
-      pm->p_pha[3]->rap[j] = rc ;        
-      pm->p_pha[2]->rap[j] = 0.0 ; 
+      pm->mot_pha[3]->rap[j] = rc ;        
+      pm->mot_pha[2]->rap[j] = 0.0 ; 
     }
     else { 
-      pm->p_pha[2]->rap[j] = rc * -1.0 ; 
-      pm->p_pha[3]->rap[j] = 0.0 ; 
+      pm->mot_pha[2]->rap[j] = rc * -1.0 ; 
+      pm->mot_pha[3]->rap[j] = 0.0 ; 
     }
  
     j++ ;
   }
   for( i=0 ; i< j ; i++ ) {
-    if( ( pm->p_pha[0]->rap[i]+ \
-          pm->p_pha[1]->rap[i]+ \
-	  pm->p_pha[2]->rap[i]+ \
-	  pm->p_pha[3]->rap[i] ) != 0 )
+    if( ( pm->mot_pha[0]->rap[i]+ \
+          pm->mot_pha[1]->rap[i]+ \
+	  pm->mot_pha[2]->rap[i]+ \
+	  pm->mot_pha[3]->rap[i] ) != 0 )
 
-    Trace2("%d\t%f\t%f\t%f\t%f",i,pm->p_pha[0]->rap[i],pm->p_pha[1]->rap[i],pm->p_pha[2]->rap[i],pm->p_pha[3]->rap[i]) ;
+    Trace2("%d\t%f\t%f\t%f\t%f",i,pm->mot_pha[0]->rap[i],pm->mot_pha[1]->rap[i],pm->mot_pha[2]->rap[i],pm->mot_pha[3]->rap[i]) ;
   }
 }
 // ##########################################################################################################
@@ -970,6 +970,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) {
 // avec les rapports cycliques calcules pour chaque micro pas
 // et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
 /* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ] */
+/* TODO : gerer autrement GPIO_SUIVI_MAIN_ATTENTE_MAX */
 // ##########################################################################################################
 
 void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
@@ -1000,7 +1001,7 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
   ph->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & ph->p_Pth->mutex_pthread) ;
 */
-  // PTHREADS_CONFIG( ph->p_pth, pthread_self(), PTHREADS_SUIVI_PWM_PHA ) ;
+  // PTHREADS_CONFIG( ph->p_pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
 
   TUpwm = TUpwm_haut  = TUpwm_bas = rap = 0 ;
 
@@ -1092,7 +1093,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   pm->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & pm->p_Pth->mutex_pthread) ;
 */
-  // PTHREADS_CONFIG( pm->p_pth, pthread_self(), PTHREADS_SUIVI_PWM_MOT  ) ;
+  // PTHREADS_CONFIG( pm->p_pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
 
   periode_mic = 0 ;
   periode_mot = 0 ;
@@ -1184,16 +1185,16 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
 
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
 
-      pthread_mutex_lock( & pm->p_pha[i]->mut_pha ) ;
+      pthread_mutex_lock( & pm->mot_pha[i]->mut_pha ) ;
 
-        pm->p_pha[i]->micropas    = micropas ;
-        pm->p_pha[i]->Tpwm        = Tpwm ;
-        pm->p_pha[i]->rc          = pm->p_pha[i]->rap[ micropas ] ;
-        pm->p_pha[i]->periode_mot = periode_mot ; 
-        pm->p_pha[i]->periode_mic = periode_mic ; 
+        pm->mot_pha[i]->micropas    = micropas ;
+        pm->mot_pha[i]->Tpwm        = Tpwm ;
+        pm->mot_pha[i]->rc          = pm->mot_pha[i]->rap[ micropas ] ;
+        pm->mot_pha[i]->periode_mot = periode_mot ; 
+        pm->mot_pha[i]->periode_mic = periode_mic ; 
 
-      pthread_mutex_unlock( & pm->p_pha[i]->mut_pha ) ;
-      //printf("\t%f",pm->p_pha[i]->rc ) ;
+      pthread_mutex_unlock( & pm->mot_pha[i]->mut_pha ) ;
+      //printf("\t%f",pm->mot_pha[i]->rc ) ;
     }
     pthread_mutex_unlock(& pm->mut_mot ) ;
 
@@ -1325,7 +1326,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   } // FIXME : fin boucle while 
 }
 // ##########################################################################################################
-/* mai 2022 : ajout pm->p_pha[i]->p_sui            = pm->p_sui ; */
+/* mai 2022 : ajout pm->mot_pha[i]->p_sui            = pm->p_sui ; */
 /* juin 2022 :  prise en compte tps_bru */
 
 void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) {
@@ -1364,23 +1365,26 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     
-    pm->p_pha[i]=(STRUCT_GPIO_PWM_PHASE *)malloc(sizeof(STRUCT_GPIO_PWM_PHASE)) ;
+    pm->mot_pha[i]=(STRUCT_GPIO_PWM_PHASE *)malloc(sizeof(STRUCT_GPIO_PWM_PHASE)) ;
     
-    pthread_mutex_init( & pm->p_pha[i]->mut_pha, NULL ) ;
+    pthread_mutex_init( & pm->mot_pha[i]->mut_pha, NULL ) ;
+
+    /* 2022-11-01 : p_pth > non utilise pour l'instant (preparation portage) */    
+    /* les threads sont utilises et initialises via  pthread_t [] dans main */
+    pm->mot_pha[i]->p_pth            = pm->p_pth; 
     
-    pm->p_pha[i]->p_pth            = pm->p_pth; 
-    pm->p_pha[i]->p_sui            = pm->p_sui ;
-    pm->p_pha[i]->gpio             = gpios[ masque[i] ]  ;
-    pm->p_pha[i]->id               = i ;
-    pm->p_pha[i]->Tpwm             = 0 ;
-    pm->p_pha[i]->micropas         = 0 ;
-    pm->p_pha[i]->gpio_open_statut = 0 ;
-    pm->p_pha[i]->gi_gpio_fd          = 0 ;
+    pm->mot_pha[i]->p_sui            = pm->p_sui ;
+    pm->mot_pha[i]->gpio             = gpios[ masque[i] ]  ;
+    pm->mot_pha[i]->id               = i ;
+    pm->mot_pha[i]->Tpwm             = 0 ;
+    pm->mot_pha[i]->micropas         = 0 ;
+    pm->mot_pha[i]->gpio_open_statut = 0 ;
+    pm->mot_pha[i]->gi_gpio_fd          = 0 ;
     
-    GPIO_OPEN_BROCHE_PWM( pm->p_pha[i] ) ;
+    GPIO_OPEN_BROCHE_PWM( pm->mot_pha[i] ) ;
     /*
-    if ( pm->p_pha[i]->gpio_open_statut < 0 )  {
-      sprintf(cmd,"printf \"GPIO_OPEN_BROCHE_PWM : ouverture gpio %d = %d\" > /tmp/astrokit.log", i, pm->p_pha[i]->gpio_open_statut ) ;
+    if ( pm->mot_pha[i]->gpio_open_statut < 0 )  {
+      sprintf(cmd,"printf \"GPIO_OPEN_BROCHE_PWM : ouverture gpio %d = %d\" > /tmp/astrokit.log", i, pm->mot_pha[i]->gpio_open_statut ) ;
       perror(cmd) ;
       system(cmd) ;
     }*/
@@ -1436,17 +1440,19 @@ int mainG(int argc, char **argv) {
   pthread_t p_thread_mot_azi ;
   pthread_t p_thread_getc ;
   
-  STRUCT_GPIO_PWM_MOTEUR *gp_Mot_Alt , m0 ; 
-  STRUCT_GPIO_PWM_MOTEUR *gp_Mot_Azi , m1 ;
+  STRUCT_GPIO_PWM_MOTEUR *gp_Gpio_Pwm_Mot_Alt , m0 ; 
+  STRUCT_GPIO_PWM_MOTEUR *gp_Gpio_Pwm_Mot_Azi , m1 ;
 
   Trace("BEGIN GPIO programme") ;  
 
   /* affectation / dereferencement de divers pointeurs */
 
-  gp_Mot_Alt  = & m0 ;
-  gp_Mot_Azi  = & m1 ;
+  gp_Gpio_Pwm_Mot_Alt  = & m0 ;
+  gp_Gpio_Pwm_Mot_Azi  = & m1 ;
   gp_Sui      = & g_Suivi ;
   gp_Pth      = & g_Pthreads ;
+  gp_Pth_Alt  = & g_Pthreads_Alt ;
+  gp_Pth_Azi  = & g_Pthreads_Azi ;
   gp_Mut      = & g_Mutexs ;
 
   /* Pour permettre acces a STRUCT_PTHREADS* via struct STR_SUIVI* */
@@ -1455,13 +1461,13 @@ int mainG(int argc, char **argv) {
 
   /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
 
-  gp_Mot_Azi->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
-  gp_Mot_Alt->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
+  gp_Gpio_Pwm_Mot_Azi->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
+  gp_Gpio_Pwm_Mot_Alt->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
   
   /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
 
-  gp_Mot_Alt->p_pth = (STRUCT_PTHREADS*)gp_Pth ;
-  gp_Mot_Azi->p_pth = (STRUCT_PTHREADS*)gp_Pth ; 
+  gp_Gpio_Pwm_Mot_Alt->p_pth = (STRUCT_PTHREADS*)gp_Pth_Alt ;
+  gp_Gpio_Pwm_Mot_Azi->p_pth = (STRUCT_PTHREADS*)gp_Pth_Azi ; 
 
   signal(SIGINT,GPIO_TRAP_SIG) ;
   signal(SIGALRM,GPIO_TRAP_SIG) ;
@@ -1675,32 +1681,32 @@ int mainG(int argc, char **argv) {
   for(i=0;i<4;i++) Trace1("gpio %d : %d",i,gpiosM2[i]) ;
   for(i=0;i<4;i++) Trace1("masq %d : %d",i,masque[i]) ;
 
-  gp_Mot_Alt->p_sui->Fa_mot = (double)fr_azi ;
-  gp_Mot_Azi->p_sui->Fh_mot = (double)fr_alt ;
+  gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot = (double)fr_azi ;
+  gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot = (double)fr_alt ;
 
-  gp_Mot_Alt->p_sui->Fa_bru = (double)fr_azi ;
-  gp_Mot_Azi->p_sui->Fh_bru = (double)fr_alt ;
+  gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_bru = (double)fr_azi ;
+  gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_bru = (double)fr_alt ;
 
-  gp_Mot_Alt->p_sui->Fa_mic     = gp_Mot_Alt->p_sui->Fa_mot * (double)upas  ;
-  gp_Mot_Azi->p_sui->Fh_mic     = gp_Mot_Azi->p_sui->Fh_mot * (double)upas ;
+  gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mic     = gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot * (double)upas  ;
+  gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mic     = gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot * (double)upas ;
 
-  gp_Mot_Alt->p_sui->Ta_mot = 1 / gp_Mot_Alt->p_sui->Fa_mot ;
-  gp_Mot_Azi->p_sui->Th_mot = 1 / gp_Mot_Azi->p_sui->Fh_mot ;
+  gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mot = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot ;
+  gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mot = 1 / gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot ;
 
-  gp_Mot_Alt->p_sui->Ta_bru = 1 / gp_Mot_Alt->p_sui->Fa_mot ;
-  gp_Mot_Azi->p_sui->Th_bru = 1 / gp_Mot_Azi->p_sui->Fh_mot ;
+  gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_bru = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot ;
+  gp_Gpio_Pwm_Mot_Azi->p_sui->Th_bru = 1 / gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot ;
 
-  gp_Mot_Alt->p_sui->Ta_mic = 1 / gp_Mot_Alt->p_sui->Fa_mic ;
-  gp_Mot_Azi->p_sui->Th_mic = 1 / gp_Mot_Alt->p_sui->Fh_mic ;
+  gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mic = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mic ;
+  gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mic = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fh_mic ;
 
   pid=getpid() ;
   nbcpus = sysconf(_SC_NPROCESSORS_ONLN) ;
   
-  Trace("gp_Lie_Par->par_altitude : periode mot = %.2f f = %.f ", gp_Mot_Alt->p_sui->Ta_mot, gp_Mot_Alt->p_sui->Fa_mot ) ; 
-  Trace("AZIMUT   : periode mot = %.2f f = %.f ", gp_Mot_Azi->p_sui->Th_mot, gp_Mot_Azi->p_sui->Fh_mot ) ; 
+  Trace("gp_Lie_Par->par_altitude : periode mot = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mot, gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot ) ; 
+  Trace("AZIMUT   : periode mot = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mot, gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot ) ; 
 
-  Trace("gp_Lie_Par->par_altitude : periode mic = %.2f f = %.f ", gp_Mot_Alt->p_sui->Ta_mic, gp_Mot_Alt->p_sui->Fa_mic ) ; 
-  Trace("AZIMUT   : periode mic = %.2f f = %.f ", gp_Mot_Azi->p_sui->Th_mic, gp_Mot_Azi->p_sui->Fh_mic ) ; 
+  Trace("gp_Lie_Par->par_altitude : periode mic = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mic, gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mic ) ; 
+  Trace("AZIMUT   : periode mic = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mic, gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mic ) ; 
 /*
   Trace("correct(y/n)?") ;
   nread = read( 0, &ch, 1)  ;
@@ -1724,7 +1730,7 @@ int mainG(int argc, char **argv) {
   } 
  
   GPIO_INIT_PWM_MOTEUR(\
-    gp_Mot_Alt, \
+    gp_Gpio_Pwm_Mot_Alt, \
     gpiosM1, \
     masque, \
     upas, \
@@ -1737,7 +1743,7 @@ int mainG(int argc, char **argv) {
 
   if(nbm) {
     GPIO_INIT_PWM_MOTEUR(\
-    gp_Mot_Azi, \
+    gp_Gpio_Pwm_Mot_Azi, \
     gpiosM2, \
     masque, \
     upas, \
@@ -1752,15 +1758,15 @@ int mainG(int argc, char **argv) {
   // lancement des pthreads moteurs ----------------------------------------------------
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-    pthread_create( &p_thread_pha_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, gp_Mot_Alt->p_pha[i] ) ;
+    pthread_create( &p_thread_pha_alt[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[i] ) ;
   }
-  pthread_create( &p_thread_mot_alt, NULL, (void*)suivi_main_M, gp_Mot_Alt ) ;
+  pthread_create( &p_thread_mot_alt, NULL, (void*)suivi_main_M, gp_Gpio_Pwm_Mot_Alt ) ;
   
   if(nbm) {
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
-      pthread_create( &p_thread_pha_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, gp_Mot_Azi->p_pha[i] ) ;
+      pthread_create( &p_thread_pha_azi[i], NULL,(void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[i] ) ;
     }
-    pthread_create( &p_thread_mot_azi, NULL, (void*)suivi_main_M, gp_Mot_Azi ) ;
+    pthread_create( &p_thread_mot_azi, NULL, (void*)suivi_main_M, gp_Gpio_Pwm_Mot_Azi ) ;
   }
 
   // lancement des autres pthreads  ----------------------------------------------------

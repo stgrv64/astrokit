@@ -26,6 +26,20 @@ typedef enum {
 t_en_Pthreads_User_Ids ;
 
 typedef enum {
+ PTHREAD_MOTOR_0=0,
+ PTHREAD_MOTOR_1
+} 
+t_en_Pthreads_Motors ;
+
+typedef enum {
+ PTHREAD_PHASE_0=0,
+ PTHREAD_PHASE_1,
+ PTHREAD_PHASE_2,
+ PTHREAD_PHASE_3,
+} 
+t_en_Pthreads_Phases ;
+
+typedef enum {
   PTHREADS_POLICY_0=0,
   PTHREADS_POLICY_1,
   PTHREADS_POLICY_2,
@@ -37,17 +51,38 @@ typedef enum {
 t_en_Pthreads_Sched_Priority ;
 
 typedef enum {
-  PTHREADS_SUIVI_PWM_PHA = 0,
-  PTHREADS_SUIVI_PWM_MOT   ,
-  PTHREADS_SUIVI_MENU       ,
-  PTHREADS_SUIVI_VOUTE      ,
-  PTHREADS_SUIVI_INFRA      ,
-  PTHREADS_SUIVI_LCD        ,
-  PTHREADS_SUIVI_CLAVIER    ,
-  PTHREADS_SUIVI_CAPTEUR    ,
-  PTHREADS_SUIVI_MAIN
+  PTHREAD_TYPE_PWM_PHASE = 0,
+  PTHREAD_TYPE_PWM_MOTOR   ,
+  PTHREAD_TYPE_MENU       ,
+  PTHREAD_TYPE_VOUTE      ,
+  PTHREAD_TYPE_INFRARED      ,
+  PTHREAD_TYPE_LCD        ,
+  PTHREAD_TYPE_CLAVIER    ,
+  PTHREAD_TYPE_CAPTEURS    ,
+  PTHREAD_TYPE_MAIN
 } 
-t_en_Pthreads_Sched_Param ;
+t_en_Pthreads_Type ;
+
+typedef enum {
+  PTHREAD_T_MOT_ALT_PHASE_0 = 0,
+  PTHREAD_T_MOT_ALT_PHASE_1 ,
+  PTHREAD_T_MOT_ALT_PHASE_2 ,
+  PTHREAD_T_MOT_ALT_PHASE_3 ,
+  PTHREAD_T_MOT_AZI_PHASE_0 ,
+  PTHREAD_T_MOT_AZI_PHASE_1 ,
+  PTHREAD_T_MOT_AZI_PHASE_2 ,
+  PTHREAD_T_MOT_AZI_PHASE_3 ,              
+  PTHREAD_T_MOT_ALT    ,
+  PTHREAD_T_MOT_AZI    ,
+  PTHREAD_T_MENU       ,
+  PTHREAD_T_VOUTE      ,
+  PTHREAD_T_INFRA      ,
+  PTHREAD_T_LCD        ,
+  PTHREAD_T_CLAVIER    ,
+  PTHREAD_T_CAPTEUR    ,
+  PTHREAD_T_MAIN
+} 
+t_en_Pthreads_T ;
 
 typedef enum {
   PTHREADS_USLEEP_BEFORE_START_SUIVI_PWM_PHASES = 250000,
@@ -100,26 +135,14 @@ typedef struct STR_MUTEXS STRUCT_MUTEXS ;
 
 struct STR_PTHREADS {
 
-  // Pthreads utilises comme pointeurs dans la structure passee en argument des fonctions de thread
-
-  pthread_t     pth_inf ;
-  pthread_t     pth_cap ;
-  pthread_t     pth_vou ;
-  pthread_t     pth_cla ;
-  pthread_t     pth_ter ;
-  pthread_t     pth_lcd ;
-  pthread_t     pth_alt ;
-  pthread_t     pth_azi ;
-  pthread_t     pth_men ;
-  pthread_t     pth_tst ;
-  
-  STRUCT_PTHREADS_ATTRIBUTS pth_att[ PTHREADS_MAX_THREADS ]  ; 
+  pthread_t                 pth_t   [ PTHREADS_MAX_THREADS ]  ;  
+  STRUCT_PTHREADS_ATTRIBUTS pth_att [ PTHREADS_MAX_THREADS ]  ; 
 } ;
 
 typedef struct STR_PTHREADS STRUCT_PTHREADS ;
 
 void PTHREADS_INIT          ( pthread_t ) ;
-void PTHREADS_CONFIG        ( STRUCT_PTHREADS * , pthread_t, t_en_Pthreads_Sched_Param  ) ;
+void PTHREADS_CONFIG        ( STRUCT_PTHREADS * , pthread_t, int  ) ;
 void PTHREADS_INFOS         ( STRUCT_PTHREADS * ) ;
 void PTHREADS_AFFICHER_ETAT ( STRUCT_PTHREADS *) ;
 
