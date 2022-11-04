@@ -345,7 +345,7 @@ void CALCUL_VITESSES(STRUCT_LIEU *l_li, STRUCT_ASTRE *l_as, STRUCT_SUIVI * l_sui
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  if ( l_sui->mode_equatorial == 1 ) {
+  if ( l_sui->sui_mode_equatorial == 1 ) {
     l_as->Va = -15.0 ;
     l_as->Vh = -15.0 ;
   }
@@ -414,8 +414,8 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  Trace2("%f %f %f %f %f",gp_Sui->acc_azi, gp_Vou->vou_acceleration, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
-  Trace2("%f %f %f %f %f",gp_Sui->acc_alt, gp_Vou->vou_acceleration, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
+  Trace2("%f %f %f %f %f",gp_Sui->sui_pas->pas_acc_azi, gp_Vou->vou_acc, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
+  Trace2("%f %f %f %f %f",gp_Sui->sui_pas->pas_acc_alt, gp_Vou->vou_acc, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
 
   /*------------------------*/
   /* Calculs des frequences */
@@ -430,8 +430,8 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   /* calcul des frequences corrigees avant prise en compte micro pas */
   /* ces frequences sont corrigees par les accelerations diverses */
 
-  freq_azi_mot = gp_Sui->acc_azi_pid * gp_Sui->acc_azi * gp_Vou->vou_acceleration * freq_azi_bru  ;
-  freq_alt_mot = gp_Sui->acc_alt_pid * gp_Sui->acc_alt * gp_Vou->vou_acceleration * freq_alt_bru  ;
+  freq_azi_mot = gp_Pid->pid_acc_azi * gp_Sui->sui_pas->pas_acc_azi * gp_Vou->vou_acc * freq_azi_bru  ;
+  freq_alt_mot = gp_Pid->pid_acc_alt * gp_Sui->sui_pas->pas_acc_alt * gp_Vou->vou_acc * freq_alt_bru  ;
 
   /* calcul des frequences finales UTILES */
   /* La frequence retenue est la frequence moteur multipliee par le nb de micro pas */
@@ -453,7 +453,7 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
   /* Calculs des periodes  */
   /*------------------------*/
 
-  pthread_mutex_lock(& gp_Mut->mut_azi );
+  pthread_mutex_lock(& gp_Mut->mut_glo_azi );
       
     gp_Sui->Sa_old = gp_Sui->Sa ; 
     gp_Sui->Sa     = (int)SGN(freq_azi_mic)  ;
@@ -466,11 +466,11 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
     gp_Sui->Ta_bru = 1 / gp_Sui->Fa_bru ;
     gp_Sui->Ta_mot = 1 / gp_Sui->Fa_mot ;
 
-  pthread_mutex_unlock(& gp_Mut->mut_azi );
+  pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
   
   TraceArbo(__func__,2,"2eme lock") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_lock(& gp_Mut->mut_alt );
+  pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
     gp_Sui->Sh_old = gp_Sui->Sh ; 
     gp_Sui->Sh     = (int)SGN(freq_alt_mic) ;
@@ -479,11 +479,11 @@ void CALCUL_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *g
     gp_Sui->Fh_bru = fabs(freq_alt_bru) ;
     gp_Sui->Fh_mot = fabs(freq_alt_mot) ;
     
-    gp_Sui->Th_mic     = 1 / gp_Sui->Fh_mic ;
+    gp_Sui->Th_mic = 1 / gp_Sui->Fh_mic ;
     gp_Sui->Th_bru = 1 / gp_Sui->Fh_bru ;
     gp_Sui->Th_mot = 1 / gp_Sui->Fh_mot ;
 
-  pthread_mutex_unlock(& gp_Mut->mut_alt );
+  pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
   TraceArbo(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -515,44 +515,42 @@ void CALCUL_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, S
   // renvoyer par les boutons de la raquette
   // on deduit la frequence du nombre de pas comptes et de la periode ecoulee
   
-  if ( gp_Sui->pas_azi !=  gp_Sui->pas_azi_old ) {
-    if ( gp_Sui->pas_azi !=0 ) {
+  if ( gp_Sui->sui_pas->pas_azi !=  gp_Sui->sui_pas->pas_azi_old ) {
+    if ( gp_Sui->sui_pas->pas_azi !=0 ) {
       if ( gp_Cal_Par->par_azi_rev == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
     
-      //frequence = azi_rot * (double)gp_Sui->pas_azi / gp_Sui->d_appui_raq_azi ;
-      frequence = azi_rot * (double)gp_Sui->pas_azi ;
+      //frequence = azi_rot * (double)gp_Sui->sui_pas->pas_azi / t_appui_raq_azi ;
+      frequence = azi_rot * (double)gp_Sui->sui_pas->pas_azi ;
     
-      pthread_mutex_lock(& gp_Mut->mut_azi );
+      pthread_mutex_lock(& gp_Mut->mut_glo_azi );
   
-        gp_Ast->Va    = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->vou_acceleration * gp_Cal_Par->par_azi_red_tot ) ;
+        gp_Ast->Va    = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->par_azi_red_tot ) ;
         gp_Sui->Sa_old = gp_Sui->Sa ; 
         gp_Sui->Sa     = (int)SGN(frequence)  ;
         gp_Sui->Fa_mic = fabs(frequence) ;
         gp_Sui->Ta_mic = 1 / gp_Sui->Fa_mic ;
     
-      pthread_mutex_unlock(& gp_Mut->mut_azi );
+      pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
     
       Trace1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
     }
   }
-  if ( gp_Sui->pas_alt !=  gp_Sui->pas_alt_old ) {
-    if ( gp_Sui->pas_alt !=0 ) {
+  if ( gp_Sui->sui_pas->pas_alt !=  gp_Sui->sui_pas->pas_alt_old ) {
+    if ( gp_Sui->sui_pas->pas_alt !=0 ) {
       if ( gp_Cal_Par->par_alt_rev == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
     
-      //frequence = alt_rot * (double)gp_Sui->pas_alt / gp_Sui->d_appui_raq_alt ;
-      frequence = alt_rot * (double)gp_Sui->pas_alt ;
+      //frequence = alt_rot * (double)gp_Sui->sui_pas->pas_alt / t_appui_raq_alt ;
+      frequence = alt_rot * (double)gp_Sui->sui_pas->pas_alt ;
     
-      // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL demande le mutex\n");
-      pthread_mutex_lock( & gp_Mut->mut_alt );
+      pthread_mutex_lock( & gp_Mut->mut_glo_alt );
     
-        gp_Ast->Vh     = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->vou_acceleration * gp_Cal_Par->par_alt_red_tot ) ;
+        gp_Ast->Vh     = frequence * CALCUL_DIVISEUR_SEPCIFIQUE * CALCUL_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->par_alt_red_tot ) ;
         gp_Sui->Sh_old = gp_Sui->Sh ; 
         gp_Sui->Sh     = (int)SGN(frequence)  ;
         gp_Sui->Fh_mic     = fabs(frequence) ;
         gp_Sui->Th_mic     = 1 / gp_Sui->Fh_mic ;
   
-        // fprintf(stderr, "CALCUL_PERIODES_SUIVI_MANUEL relache le mutex\n");
-      pthread_mutex_unlock( & gp_Mut->mut_alt );
+      pthread_mutex_unlock( & gp_Mut->mut_glo_alt );
     
       Trace1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n",gp_Sui->Ta_mic, gp_Sui->Th_mic, gp_Sui->Fa_mic, gp_Sui->Fh_mic) ;
     }
@@ -788,7 +786,7 @@ void CALCUL_ASCENSION_DROITE( STRUCT_LIEU *l_li, STRUCT_ASTRE *gp_Ast ) {
 
 void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
 
-  int pos=3;
+  int i_len_prefixe=3; /* longueur du prefixe exemple NGC1254 */
   int len=0 ;
   char c_sub[32];
 
@@ -804,9 +802,17 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
   gp_Ast->en_type = ASTRE_INDETERMINE ;
   gp_Ast->en_mode = CALCUL_AZIMUTAL_VERS_EQUATORIAL ;   
 
-  len = strlen(gp_Ast->nom)-pos ;
+  len = strlen(gp_Ast->nom)-i_len_prefixe ;
 
-  if ( len > pos ) {
+  Trace("nom %s i_len_prefixe %d len %d", gp_Ast->nom, i_len_prefixe, len ) ;
+  Trace("gp_Ast->nom %s CONFIG_MES %s", gp_Ast->nom, CONFIG_NGC ) ;
+  Trace("strstr( gp_Ast->nom, CONFIG_MES ) = %s", strstr( gp_Ast->nom, CONFIG_NGC )) ;
+
+  /* La chaine doit etre superieure en longueur a i_len_prefixe */
+
+  if ( strlen(gp_Ast->nom) > i_len_prefixe ) {
+
+    Trace("len>i_len_prefixe") ;
 
     if      ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) gp_Ast->en_type = ASTRE_CIEL_PROFOND ;
     else if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) gp_Ast->en_type = ASTRE_CIEL_PROFOND ;
@@ -814,7 +820,7 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
     else if ( strstr( gp_Ast->nom, CONFIG_PLA ) != NULL ) gp_Ast->en_type = ASTRE_PLANETE ;
     else if ( strstr( gp_Ast->nom, CONFIG_AZI ) != NULL ) gp_Ast->en_type = ASTRE_INDETERMINE ;
     else if ( strstr( gp_Ast->nom, CONFIG_EQU ) != NULL ) gp_Ast->en_type = ASTRE_INDETERMINE ;
-    else                                                   gp_Ast->en_type = ASTRE_INDETERMINE ;
+    else                                                  gp_Ast->en_type = ASTRE_INDETERMINE ;
     /* TODO : completer avec les types manquants */ 
 
     if      ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) gp_Ast->en_mode = CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
@@ -823,10 +829,11 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
     else if ( strstr( gp_Ast->nom, CONFIG_PLA ) != NULL ) gp_Ast->en_mode = CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
     else if ( strstr( gp_Ast->nom, CONFIG_AZI ) != NULL ) gp_Ast->en_mode = CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
     else if ( strstr( gp_Ast->nom, CONFIG_EQU ) != NULL ) gp_Ast->en_mode = CALCUL_AZIMUTAL_VERS_EQUATORIAL ;
-    else                                                   gp_Ast->en_mode = CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
+    else                                                  gp_Ast->en_mode = CALCUL_AZIMUTAL_VERS_EQUATORIAL ; 
     /* TODO : completer avec les types manquants */ 
   }
   else {
+    Trace("ASTRE_INDETERMINE") ;
     gp_Ast->en_type = ASTRE_INDETERMINE ;
   }
   /* recuperation du numero apres les 3 premiers caracteres */
@@ -835,12 +842,12 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
   
   if ( gp_Ast->en_type != ASTRE_INDETERMINE ) {
 
-    if( len > pos ) {
+    if( strlen(gp_Ast->nom) > i_len_prefixe ) {
 
       if ( len > sizeof(c_sub) ) { Trace("erreur : %d >  %d", len,(int)sizeof(c_sub) ) ;}
       if ( len <= 0 )            { Trace("erreur : %d <= 0",   len) ;}
 
-      memcpy( c_sub, &gp_Ast->nom[pos], len );
+      memcpy( c_sub, &gp_Ast->nom[i_len_prefixe], len );
 
       c_sub[len] = CONFIG_ZERO_CHAR ;
       gp_Ast->numero = atoi(c_sub) ;
@@ -869,8 +876,6 @@ void CALCUL_ASTRE_RECUP_TYPE_ET_NOM(void) {
 void CALCUL_TOUT(void) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  CALCUL_ASTRE_RECUP_TYPE_ET_NOM() ;
 
   switch (gp_Ast->en_type) {
 

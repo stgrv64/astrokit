@@ -8,7 +8,7 @@
 # 19/01/2022  | * ajout entete
 #               * ajouts fonctions utilisant getopt
 # 11/03/2022  | * ajout fonction ARGUMENTS_GERER_REP_HOME
-# 07/10/2022  | * refonte complete du code : deplacement code GPIO_TEST_MOTEURS
+# 07/10/2022  | * refonte complete du code : deplacement code GPIO_TEST_CONTROLER
 #  dans gpio.c
 # -------------------------------------------------------------- 
 */

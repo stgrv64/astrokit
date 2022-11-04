@@ -137,9 +137,9 @@ void INFRARED_READ(STRUCT_SUIVI * gp_Sui) {
     // il va etre lu par les threads du programme principal
     
     Trace("gp_Sui->sui_dat->dat_inf = %s", gp_Sui->sui_dat->dat_inf ) ;
-    Trace("gp_Sui->temporisation_ir = %ld", gp_Sui->temporisation_ir ) ;
+    Trace("gp_Sui->sui_tpo->tempo_ir = %ld", gp_Sui->sui_tpo->tempo_ir ) ;
     
-    usleep( gp_Sui->temporisation_ir ) ;
+    usleep( gp_Sui->sui_tpo->tempo_ir ) ;
     
     free(code);
 
@@ -166,7 +166,7 @@ void mainIr(int argc, char *argv[])  // void main(int argc, char *argv[])
   gp_Cod   = & g_Codes ;
   gp_Sui   = & g_Suivi ;
   
-  gp_Sui->temporisation_ir = 10000 ;
+  gp_Sui->sui_tpo->tempo_ir = 10000 ;
   
   CODES_INIT( gp_Cod ) ;
   INFRARED_OPEN( gp_LircConfig ) ;

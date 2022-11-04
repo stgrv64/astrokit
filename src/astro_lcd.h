@@ -89,7 +89,7 @@ t_en_Lcd_Type_Affichage ;
 
 struct STR_LCD {
 
-  pthread_mutex_t mut_lcd ;
+  pthread_mutex_t lcd_mutex ;
 
   int  i_type_affichage ; 
   int  i_fd ; 

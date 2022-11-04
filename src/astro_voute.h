@@ -27,7 +27,7 @@ struct STR_VOUTE {
    double    vou_pas ;
    double    vou_dt ;
    double    vou_dt_us ; 
-   double    vou_acceleration ;
+   double    vou_acc ;
    long long vou_num ; 
    double    vou_temps_ecoule ;   
 } ;

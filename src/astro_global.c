@@ -30,8 +30,9 @@ STRUCT_PTHREADS         g_Pthreads,         *gp_Pth ;
 STRUCT_PTHREADS         g_Pthreads_Alt,     *gp_Pth_Alt ;
 STRUCT_PTHREADS         g_Pthreads_Azi,     *gp_Pth_Azi ;
 STRUCT_SUIVI            g_Suivi,            *gp_Sui ;
-STRUCT_SUIVI_PAS        g_Pas,              *gp_Pas ;
+STRUCT_SUIVI_PAS        gp_Suivi_Pas,              *gp_Sui_Pas ;
 STRUCT_TIME             g_Time,             *gp_Tim ;
+STRUCT_TIME_TEMPOS      g_Time_Tempos,      *gp_Tim_Tem ;
 STRUCT_VOUTE            g_Voute,            *gp_Vou ;
 STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Gpio_Pwm_Mot_Alt ; 
 STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Gpio_Pwm_Mot_Azi ;
@@ -80,7 +81,7 @@ void ASTRO_GLOBAL_INIT(void) {
   gi_gpio_timeout = 0 ;
   gi_gpio_max_nb_pas = 0 ;
   gi_gpio_max_nb_upas = 0 ;
-  gi_pthread_nb_threads = 0 ;
+  gi_pth_numero = 0 ;
   
   // -----------------------------------------------------------------
   // Initialisations des structures et pointeurs sur structure
@@ -106,8 +107,9 @@ void ASTRO_GLOBAL_INIT(void) {
   gp_Mut         = & g_Mutexs ;
   gp_Vou         = & g_Voute ;
   gp_Tim         = & g_Time ;
+  gp_Tim_Tem     = & g_Time_Tempos ;
   gp_Sui         = & g_Suivi ;  
-  gp_Pas         = & g_Pas ;       
+  gp_Sui_Pas     = & gp_Suivi_Pas ;       
   gp_Ast_Par     = & g_Astre_Params ;
   gp_Cal_Par     = & g_Calculs_Params ;
   gp_Con_Par     = & g_Config_Params ;
@@ -127,22 +129,21 @@ void ASTRO_GLOBAL_INIT(void) {
   // Initialisations des pointeurs d acces dans les structures
   // -----------------------------------------------------------------
 
-  /* Pour permettre acces a STRUCT_PTHREADS* via struct STR_SUIVI* */
-  /* TODO : FIXME : what ? */
-  /* gp_Sui-> = (STRUCT_PTHREADS*) gp_Pth ; */
+  /* Pour permettre acces a differentes structures via struct STR_SUIVI* */
   
-  gp_Sui->sui_pas            = (STRUCT_SUIVI_PAS*) gp_Pas ;
-  gp_Sui->sui_dat            = (STRUCT_DATAS*)     gp_Dat ;
-  
+  gp_Sui->sui_pas            = (STRUCT_SUIVI_PAS*)   gp_Sui_Pas ;
+  gp_Sui->sui_dat            = (STRUCT_DATAS*)       gp_Dat ;
+  gp_Sui->sui_tpo            = (STRUCT_TIME_TEMPOS*) gp_Tim_Tem ;
+
   /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
 
-  gp_Gpio_Pwm_Mot_Azi->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
-  gp_Gpio_Pwm_Mot_Alt->p_sui = (STRUCT_SUIVI*)gp_Sui ;   
+  gp_Gpio_Pwm_Mot_Azi->p_sui = (STRUCT_SUIVI*)       gp_Sui ;   
+  gp_Gpio_Pwm_Mot_Alt->p_sui = (STRUCT_SUIVI*)       gp_Sui ;   
   
   /* Pour permettre acces aux threads speccifiques de STRUCT_GPIO_PWM_MOTEUR* */
   /* 2022-11-01 :>  non utilise pour l'instant (preparation portage) */
-  
+  /*
   gp_Gpio_Pwm_Mot_Alt->p_pth = (STRUCT_PTHREADS*)  gp_Pth_Alt ;
   gp_Gpio_Pwm_Mot_Azi->p_pth = (STRUCT_PTHREADS*)  gp_Pth_Azi ; 
-
+  */
 }

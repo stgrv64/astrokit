@@ -34,7 +34,6 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   char s_buffer[CONFIG_TAILLE_BUFFER_32]={0} ;
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  Trace("" ) ;
 
   memset(val, 0, sizeof(val)) ;     
 
@@ -42,7 +41,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   strcpy( val, lp_Sui->sui_dat->dat_inf ) ;
   pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-  Trace("val = %s\n", val ) ;
+  Trace1("val = %s\n", val ) ;
   
   if ( strcmp( val, "") ) {
     
@@ -190,7 +189,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   lp_Key->mot_en_cours   = 0 ;
   lp_Key->phrase_lue     = 0 ;
   lp_Key->appui_en_cours = 0 ;
-  lp_Key->temporisation_clavier = gp_Tim_Par->par_tempo_Clavier ;
+  lp_Key->tempo_clavier = gp_Tim_Par->par_tempo_Clavier ;
  
   // FIXME : definitions des actions : 
   // Les actions servent a 

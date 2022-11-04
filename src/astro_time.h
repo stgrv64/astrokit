@@ -16,6 +16,20 @@
 /* Definition de la structure associeee au fichier avant inclusion astro_global.h */
 /* Ceci est permis par le pre processeur */
 
+struct STR_TIME_TEMPOS {
+  unsigned long tempo_menu      ;
+  unsigned long tempo_voute     ;
+  unsigned long tempo_raq       ;
+  unsigned long tempo_ir        ; 
+  unsigned long tempo_termios   ; 
+  unsigned long tempo_capteurs  ; 
+  unsigned long tempo_clavier   ; 
+  unsigned long tempo_lcd_loop  ;
+  unsigned long tempo_lcd_disp  ;
+  unsigned long tempo_pid_loop  ;
+} ;
+typedef struct STR_TIME_TEMPOS STRUCT_TIME_TEMPOS ;
+
 struct STR_TIME {
   
   /* L heure decimale sert pour la representation 
@@ -82,7 +96,7 @@ typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
 // ------ TEMPORISATIONS DES BOUCLES ------------
 
-void   TEMPS_INIT   ( STRUCT_TIME * ) ;
+void   TEMPS_INIT                   ( STRUCT_TIME * ,STRUCT_TIME_TEMPOS *) ;
 
 void   TEMPS_AFFICHER               ( STRUCT_TIME *  ) ; /* FIXME ajout 20191228 */
 void   TEMPS_SET_YEAR_MONTH_AND_DAY ( char *  ) ; // FIXME ajout 20190822

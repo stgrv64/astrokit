@@ -36,7 +36,7 @@ struct STR_KEYS {
   int  phrase_lue ;
   int  premier_en_cours ;
   
-  unsigned long temporisation_clavier   ; 
+  unsigned long tempo_clavier   ; 
 } ;
 
 void   KEYS_INIT                  ( STRUCT_KEYS * )  ;

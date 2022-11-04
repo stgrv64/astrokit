@@ -33,9 +33,12 @@ struct STR_PID_PARAMS {
 
 struct STR_PID {
 
-  FILE          * f_out ; 
-  pthread_mutex_t mut_pid ;
-  
+  FILE          * pif_f_out ; 
+  pthread_mutex_t pid_mutex ;
+
+  double          pid_acc_azi ;  // acceleration deduite en azimut   pour asservissement
+  double          pid_acc_alt ;  // acceleration deduite en altitude pour asservissement
+
   /* Entree / sortie de l algorithme : input = consigne */ 
 
   unsigned long incr ; /* numero d increment du calcul */ 

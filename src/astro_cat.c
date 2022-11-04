@@ -200,7 +200,7 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     L++;
   }
   if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
-    Trace("(trouve) : (nom) %s (infos) %s: ",gp_Ast->nom , gp_Ast->infos ) ;
+    Trace1("(trouve) : (nom) %s (infos) %s: ",gp_Ast->nom , gp_Ast->infos ) ;
   }
   else {
     

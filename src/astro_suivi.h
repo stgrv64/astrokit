@@ -66,61 +66,21 @@ struct STR_SUIVI_PAS {
   long   pas_est ;       // flag d'appui sur le touche EST
   long   pas_nord ;      // flag d'appui sur le touche NORD
   long   pas_sud ;       // flag d'appui sur le touche SUD
-
+  double pas_acc_azi ;   // acceleration volontaire en azimut   
+  double pas_acc_alt ;   // acceleration volontaire en altitude 
 } ;
 
 typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
 
 struct STR_SUIVI {
 
-  STRUCT_PTHREADS     * p_pth ;
-  STRUCT_DATAS        * sui_dat ;
-  STRUCT_SUIVI_PAS    * sui_pas ;
-  
-  int          mode_voute ;
-  int          mode_equatorial ;
-  
-  double       d_appui_raq_azi ;
-  double       d_appui_raq_alt ;
-  
-  double       roll ;
-  double       pitch ;
-  double       heading ;
-     
-  long         l_NANO_MOINS ;     // a retirer sur les temporisations pour les tests
-  
-  unsigned int i_statut_suivi ;
-  
-  /* les variables suivantes compensent le calcul des */
-  /* frequences et periodes (par defaut sont egales à 1) */
-
-  double       acc_azi_pid ;  // acceleration deduite en azimut   pour asservissement
-  double       acc_alt_pid ;  // acceleration deduite en altitude pour asservissement
-
-  double       acc_azi ;      // acceleration volontaire en azimut   
-  double       acc_alt ;      // acceleration volontaire en altitude 
-
-  int          sgn_azi ;      // signe de la frequence en azimut  a modifier au besoin
-  int          sgn_alt ;      // signe de la frequence en altitude a modifier au besoin
-
-  // Variables utilisees en mode MANUEL EVOLUE
-  int          pas_acc_plus ;
-  int          pas_acc_moins ;
-  int          pas_forward ;
-  int          pas_rewind ;
-  int          pas_forward_fast ;
-  int          pas_rewind_fast ;
-  long         pas_azi ;
-  long         pas_alt ;
-  long         pas_azi_old ;
-  long         pas_alt_old ;
-  long         pas_asc ;
-  long         pas_dec ;
-  long         pas_ouest ;     // flag d'appui sur le touche OUEST
-  long         pas_est ;       // flag d'appui sur le touche EST
-  long         pas_nord ;      // flag d'appui sur le touche NORD
-  long         pas_sud ;       // flag d'appui sur le touche SUD
-  
+  STRUCT_DATAS       * sui_dat ;
+  STRUCT_SUIVI_PAS   * sui_pas ;
+  STRUCT_TIME_TEMPOS * sui_tpo ;
+  struct timeval       sui_tval ; 
+  int                  sui_mode_voute ;
+  int                  sui_mode_equatorial ;
+               
   double       Ta_mic ;       // periode de la frequence a injecter directement
   double       Th_mic ;       // periode de la frequence a injecter directement
   double       Ta_bru ;   // periode brute avant corrections (accelerations et micro pas)
@@ -173,19 +133,7 @@ struct STR_SUIVI {
   double       sui_tempo_percent ;
   double       DTh ;
   double       DTa ;
-  
-  unsigned long temporisation_menu      ;
-  unsigned long temporisation_voute     ;
-  unsigned long temporisation_raq       ;
-  unsigned long temporisation_ir        ; 
-  unsigned long temporisation_termios   ; 
-  unsigned long temporisation_capteurs  ; 
-  unsigned long temporisation_clavier   ; 
-  unsigned long temporisation_lcd_loop  ;
-  unsigned long temporisation_lcd_disp  ;
-  unsigned long temporisation_pid_loop  ;
-
-  struct timeval tval ; 
+    
 }  ;
 
 typedef struct STR_SUIVI STRUCT_SUIVI ;

@@ -13,7 +13,7 @@
 #                * => protection zone de code avec dat_inf
 #                * ajout fonction LCD_DISPLAY_AGH_DEC / LCD_DISPLAY_EQU_DEC
 #                * ASTRE_FORMATE_DONNEES_AFFICHAGE : ajout de 2 resolutions supplementaires
-#                * protection zones de code impliquant LCD* (mut_lcd)
+#                * protection zones de code impliquant LCD* (lcd_mutex)
 # mai  2022      * reprise intégralité code pour utilisation pointeur fct (gp_Lcd->display_xxx)
 # ######################################################################
 # juin 2022   * creation
@@ -82,7 +82,7 @@ void LCD_INIT(STRUCT_LCD * p_lcd) {
 
   /* Initialisation mutex */
 
-  pthread_mutex_init( & p_lcd->mut_lcd, NULL ) ;
+  pthread_mutex_init( & p_lcd->lcd_mutex, NULL ) ;
   
   /* Initialisation pointeurs de fonctions */
 
@@ -205,7 +205,7 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
 
   if ( gp_Dev->use_lcd ) {
 
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     memset( gp_Lcd->c_l0cur, 0, sizeof( gp_Lcd->c_l0cur )) ;
     memset( gp_Lcd->c_l1cur, 0, sizeof( gp_Lcd->c_l1cur )) ;
@@ -216,7 +216,7 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
     gp_Lcd->i_duree_us = i_duree_us ;
     gp_Lcd->i_change_current = TRUE ; 
 
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }
   return ;
 }
@@ -234,7 +234,7 @@ void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l
 
   if ( gp_Dev->use_lcd ) {
 
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     memset( gp_Lcd->c_l0def, 0, sizeof( gp_Lcd->c_l0def )) ;
     memset( gp_Lcd->c_l1def, 0, sizeof( gp_Lcd->c_l1def )) ;
@@ -246,7 +246,7 @@ void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l
     gp_Lcd->i_duree_us = i_duree_us ;
     gp_Lcd->i_change_default = TRUE ;
 
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }
   return ;
 }
@@ -264,7 +264,7 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
 
   if ( gp_Dev->use_lcd ) {
 
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     /*---------------------------------------------------------------------------------*/
     /* les valeurs par defaut de la ffichage sont la date l heure et l objet en cours */
@@ -281,7 +281,7 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
 
     sprintf( c_l1, "%s", gp_Ast->nom ) ;
 
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }
   return ;
 }
@@ -306,7 +306,7 @@ void LCD_REFRESH_DEFAULT(void) {
 
   if ( gp_Dev->use_lcd ) {
 
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
     
     gp_Lcd->define_default( c_l0, c_l1 ) ;
 
@@ -319,7 +319,7 @@ void LCD_REFRESH_DEFAULT(void) {
       gp_Lcd->display_default() ;
     }
 
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }
   return ;
 }
@@ -344,25 +344,25 @@ void LCD_DISPLAY_DEFAULT(void) {
 
   if ( gp_Dev->use_lcd ) {
 
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     if ( LCD1602Clear(gp_Lcd->i_fd) == -1) {
       SyslogErr("LCD1602Clear : FAILED\n");
       Trace("LCD1602Clear : FAILED");
 
-      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
 
       return ;
     }
     else {
       Trace1("LCD1602Clear : OK")
     }
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
     /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
     usleep( LCD_USLEEP_AFTER_CLEARING ) ;
     
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     if ( LCD1602DispLines(\
         gp_Lcd->i_fd, \
@@ -373,14 +373,14 @@ void LCD_DISPLAY_DEFAULT(void) {
       SyslogErr("LCD1602DispLines : FAILED\n");
       Trace("LCD1602DispLines : FAILED");
       
-      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
 
       return ;
     }
     else {
       Trace1("LCD1602DispLines : OK");
     }
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }
   return ;
 }
@@ -402,13 +402,13 @@ void LCD_DISPLAY_CURRENT(void) {
 
   if ( gp_Dev->use_lcd ) {
 
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     if ( LCD1602Clear(gp_Lcd->i_fd) == -1) {
       SyslogErr("LCD1602Clear : FAILED\n");
       Trace("LCD1602Clear : FAILED");
 
-      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
 
       return ;
     }
@@ -416,12 +416,12 @@ void LCD_DISPLAY_CURRENT(void) {
       Trace1("LCD1602Clear : OK")
     }
     /* TODO  : mettre le usleep a interieur de mutex */
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
     /* entre 2500 et 5000 semble une bonne valeur de usleep */
     /* si on ne fait pas de usleep , l ecran ne se clear pas completement (teste) */
     usleep( LCD_USLEEP_AFTER_CLEARING ) ;
     
-    pthread_mutex_lock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
     if ( LCD1602DispLines(\
         gp_Lcd->i_fd, \
@@ -432,14 +432,14 @@ void LCD_DISPLAY_CURRENT(void) {
       SyslogErr("LCD1602DispLines : FAILED\n");
       Trace("LCD1602DispLines : FAILED");
       
-      pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+      pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
 
       return ;
     }
     else {
       Trace1("LCD1602DispLines : OK");
     }
-    pthread_mutex_unlock( & gp_Lcd->mut_lcd ) ;
+    pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }
   return ;
 }
@@ -937,8 +937,8 @@ void   LCD_DISPLAY_ACC_ALT_AZI     ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui->acc_alt ) ;
-    sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui->acc_azi ) ;
+    sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui->sui_pas->pas_acc_alt ) ;
+    sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui->sui_pas->pas_acc_azi ) ;
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;

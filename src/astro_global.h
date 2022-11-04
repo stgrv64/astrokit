@@ -37,7 +37,7 @@
 #               * ajout c_si signe sous forme char
 # avril 2022  | * ajout type pour gestion ecran LCD1602 + PCA8574
 #               * ajout type enum pour les mois (affichage LCD)
-#               * ajout temporisation_voute et temporisation_lcd_loop
+#               * ajout tempo_voute et tempo_lcd_loop
 #               * ajout c_hhmmss_agh etc... a strcuture STRUCT_ASTRE
 #               * ajout mutex pth_mut->mut_dat pour proteger
 #                 lecture / exriture sur cette donnee
@@ -159,7 +159,6 @@ typedef enum    t_en_Calculs_Mode           ENUM_CALCULS_MODE ;
 
 typedef struct  lirc_config                 INFRARED_LIRC_CONFIG ;
 typedef struct  pthread_t                   STRUCT_PTHREAD_T ;
-typedef struct  STR_TIME                    STRUCT_TIME ;
 typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
 typedef struct  STR_ASTRE                   STRUCT_ASTRE ;
 typedef struct  STR_CAT                     STRUCT_CAT ;
@@ -176,6 +175,8 @@ typedef struct  STR_MUTEXS                  STRUCT_MUTEXS ;
 typedef struct  STR_PTHREADS                STRUCT_PTHREADS ;
 typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
 typedef struct  STR_SUIVI_PAS               STRUCT_SUIVI_PAS ;
+typedef struct  STR_TIME                    STRUCT_TIME ;
+typedef struct  STR_TIME_TEMPOS             STRUCT_TIME_TEMPOS ;
 typedef struct  STR_VOUTE                   STRUCT_VOUTE ;
 typedef struct  STR_I2C_DEVICE              STRUCT_I2C_DEVICE ;
 typedef struct  STR_I2C_ACC_MAG             STRUCT_I2C_ACC_MAG ;
@@ -242,8 +243,9 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_PTHREADS         g_Pthreads_Alt,     *gp_Pth_Alt ; \
   extern STRUCT_PTHREADS         g_Pthreads_Azi,     *gp_Pth_Azi ; \
   extern STRUCT_SUIVI            g_Suivi,            *gp_Sui ; \
-  extern STRUCT_SUIVI_PAS        g_Pas,              *gp_Pas ; \
+  extern STRUCT_SUIVI_PAS        gp_Suivi_Pas,              *gp_Sui_Pas ; \
   extern STRUCT_TIME             g_Time,             *gp_Tim ; \
+  extern STRUCT_TIME_TEMPOS      g_Time_Tempos,      *gp_Tim_Tem ; \
   extern STRUCT_VOUTE            g_Voute,            *gp_Vou ; \
   extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Gpio_Pwm_Mot_Alt ; \
   extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Gpio_Pwm_Mot_Azi ; \
@@ -276,7 +278,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern int    gi_gpio_max_nb_upas ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_PTHREADS \
-  extern int    gi_pthread_nb_threads ; \
+  extern int    gi_pth_numero ; \
   extern int    gi_pthread_getuid ; \
   extern int    gi_pthread_nb_cpu ; \
 

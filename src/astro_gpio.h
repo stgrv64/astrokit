@@ -121,7 +121,7 @@ struct STR_GPIO_PWM_PHASE {
 
   STRUCT_SUIVI    * p_sui ;  
   STRUCT_PTHREADS * p_pth ;
-  pthread_mutex_t   mut_pha ;    
+  pthread_mutex_t   pha_mutex ;    
 
   struct timeval    tval ;
 
@@ -150,7 +150,7 @@ struct STR_GPIO_PWM_MOTEUR {
   STRUCT_PTHREADS       * p_pth ;
   
 
-  pthread_mutex_t         mut_mot ; 
+  pthread_mutex_t         mot_mutex ; 
   
   int     id ;
 
@@ -242,7 +242,7 @@ static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
 void   GPIO_GETOPT(int argc, char ** argv) ;
 
 
-void   GPIO_TEST_MOTEURS (void ) ;
+void   GPIO_TEST_CONTROLER (void ) ;
 void   GPIO_CLIGNOTE     (int , int , int ) ;
 void   GPIO_CONFIG_FIC_READ         (STRUCT_CONFIG *) ;
 void   GPIO_READ2        (STRUCT_CONFIG *) ;

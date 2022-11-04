@@ -56,16 +56,17 @@ struct timespec gpio_tm_now;
 struct timespec gpio_tm_nxt;
 
 /*****************************************************************************************
-* @fn     : GPIO_TEST_MOTEURS
+* @fn     : GPIO_TEST_CONTROLER
 * @author : s.gravois
-* @brief  : fonction de test simple des moteurs
+* @brief  : fonction de test simple des moteurs avec un controler
 * @param  : 
 * @date   : 2022-01-19 creation entete de la fonction au format doxygen
 * @date   : 2022-10-07 deplacemement dans gpio.c depuis arguments.c
-* @todo   : completer 
+* @date   : 2022-11-04 renommmage GPIO_TEST_MOTEURS -> GPIO_TEST_CONTROLER
+* @todo   : remplacer par une fonction semblable qui utilise le PWM 
 *****************************************************************************************/
 
-void  GPIO_TEST_MOTEURS(void ) {
+void  GPIO_TEST_CONTROLER(void ) {
 
   int i ;
   struct timeval t00,t01 ;
@@ -80,7 +81,9 @@ void  GPIO_TEST_MOTEURS(void ) {
     {10000,20000, 3}, \
   } ;  
   // signal(SIGTERM,TRAP_SUIVI_TEST) ; 
+
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
   GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
@@ -102,7 +105,7 @@ void  GPIO_TEST_MOTEURS(void ) {
     f_fin = FREQ[i][1] ;
     delai = FREQ[i][2] ;
   
-    nb_puls = GPIO_ACCELERATION_2( gp_Gpi_Par_Con->par_alt_clk, gp_Gpi_Par_Con->par_azi_clk, f_deb, f_fin, delai, gp_Sui->l_NANO_MOINS) ;
+    nb_puls = GPIO_ACCELERATION_2( gp_Gpi_Par_Con->par_alt_clk, gp_Gpi_Par_Con->par_azi_clk, f_deb, f_fin, delai, 0) ;
     
     gettimeofday(&t01,NULL) ;
 
@@ -482,7 +485,7 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   else if ((gpwm->gi_gpio_fd =open(val, O_WRONLY))<0)      { gpwm->gpio_open_statut = -10  ; }
   
   // FIXME : synthese traces sur une ligne (2021)
-  Trace("open gpio %d : dir= %s exp=%s val=%s sta=%d",\
+  Trace1("open gpio %d : dir= %s exp=%s val=%s sta=%d",\
     gpwm->gpio,\
     dir,\
     exp,\
@@ -491,8 +494,12 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   
   if ( gpwm->gpio_open_statut != 0 ) {
     SyslogErrFmt("ouverture du gpio %d en erreur %d",gpwm->gpio,gpwm->gpio_open_statut);
-    Trace("ouverture du gpio %d en erreur %d",gpwm->gpio,gpwm->gpio_open_statut)
+    Trace("ouverture du gpio %d (KO) : %d",gpwm->gpio,gpwm->gpio_open_statut) ;
   }
+  else {
+    Trace("ouverture du gpio %d (OK)",gpwm->gpio) ;  
+  }
+
 }
 //====================================================================================================
 int GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
@@ -969,7 +976,7 @@ void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) {
 // module les etats hauts et bas de la phase
 // avec les rapports cycliques calcules pour chaque micro pas
 // et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
-/* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pthread_nb_threads++ ] */
+/* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pth_numero++ ] */
 /* TODO : gerer autrement GPIO_SUIVI_MAIN_ATTENTE_MAX */
 // ##########################################################################################################
 
@@ -979,7 +986,7 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
   char   buf1[GPIO_BUFFER_SIZE_256] ;
   double TUpwm, TUpwm_haut, TUpwm_bas, rap ;
   double pmot =0 ;
-  struct sched_param param;
+  // struct sched_param param;
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -988,20 +995,20 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
   /* ---------------------------------------------------------------------------- */
   /* Configuration du thread et des attributs de tread                            */
   /* ---------------------------------------------------------------------------- */
-
-  param.sched_priority = PTHREADS_POLICY_10 ;  
-
-  if (pthread_setschedparam( pthread_self(), PTHREADS_SCHED_PARAM_SUIVI_PWM_PHASES, & param) != 0) {
+  /*
+  param.sched_priority = PTHREAD_POLICY_10 ;  
+  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_PHASES, & param) != 0) {
     perror("GPIO_SUIVI_PWM_PHASE");
-    exit(EXIT_FAILURE);}
-
+    exit(EXIT_FAILURE);
+  }
+  */
 /*
   pthread_mutex_lock( & ph->p_Pth->mutex_pthread) ;
   pthread_setname_np( pthread_self(), "gpio_suivi_pwm" ) ;
   ph->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & ph->p_Pth->mutex_pthread) ;
 */
-  // PTHREADS_CONFIG( ph->p_pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
 
   TUpwm = TUpwm_haut  = TUpwm_bas = rap = 0 ;
 
@@ -1012,12 +1019,12 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
 
   while(1) {
     
-    pthread_mutex_lock( & ph->mut_pha ) ;
+    pthread_mutex_lock( & ph->pha_mutex ) ;
     
       rap   = ph->rap[ ph->micropas ] ;
       TUpwm = (double)TEMPS_MICRO_SEC * ph->Tpwm ;
       pmot  = ph->periode_mot ;
-    pthread_mutex_unlock( & ph->mut_pha ) ;
+    pthread_mutex_unlock( & ph->pha_mutex ) ;
     
     TUpwm_haut = TUpwm * rap  ; 
     TUpwm_bas  = TUpwm - TUpwm_haut ;
@@ -1080,9 +1087,9 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   /* Configuration du thread et des attributs de tread                            */
   /* ---------------------------------------------------------------------------- */
 
-  param.sched_priority = PTHREADS_POLICY_5 ;  
+  param.sched_priority = PTHREAD_POLICY_5 ;  
 
-  if (pthread_setschedparam( pthread_self(), PTHREADS_SCHED_PARAM_SUIVI_PWM_MAIN, & param) != 0) {
+  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_MAIN, & param) != 0) {
     perror("suivi_main_M");
     exit(EXIT_FAILURE);
   }
@@ -1093,13 +1100,13 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   pm->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
   pthread_mutex_unlock( & pm->p_Pth->mutex_pthread) ;
 */
-  // PTHREADS_CONFIG( pm->p_pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
 
   periode_mic = 0 ;
   periode_mot = 0 ;
   periode_bru = 0 ;
 
-  pthread_mutex_lock( & pm->mut_mot ) ;
+  pthread_mutex_lock( & pm->mot_mutex ) ;
 
   pm->micropas = 0 ;
   pm->pas = 0 ;
@@ -1107,11 +1114,11 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
 
   gettimeofday(&pm->tval,NULL) ; 
 
-  pthread_mutex_unlock( & pm->mut_mot ) ;
+  pthread_mutex_unlock( & pm->mot_mutex ) ;
   
   while (1) {
 
-    pthread_mutex_lock( & pm->mut_mot ) ;
+    pthread_mutex_lock( & pm->mot_mutex ) ;
 
     /* -----------------------------------------------------
        Recopie des donnees de suivi dans les variables locales 
@@ -1122,25 +1129,25 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
     switch ( pm->id ) {
 
       case 0 : 
-        pthread_mutex_lock( & gp_Mut->mut_alt ) ;
+        pthread_mutex_lock( & gp_Mut->mut_glo_alt ) ;
 
           periode_mic         = pm->p_sui->Th_mic ;
           periode_mot         = pm->p_sui->Th_mot / gp_Cal_Par->par_alt_red_4;
           periode_bru         = pm->p_sui->Th_bru / gp_Cal_Par->par_alt_red_4 ;
           sens                = pm->p_sui->Sh ;
 
-        pthread_mutex_unlock( & gp_Mut->mut_alt ) ;
+        pthread_mutex_unlock( & gp_Mut->mut_glo_alt ) ;
         break ;
 
       case 1 :
-        pthread_mutex_lock( & gp_Mut->mut_azi ) ;
+        pthread_mutex_lock( & gp_Mut->mut_glo_azi ) ;
 
           periode_mic         = pm->p_sui->Ta_mic ; 
           periode_mot         = pm->p_sui->Ta_mot / gp_Cal_Par->par_azi_red4 ;
           periode_bru         = pm->p_sui->Ta_bru / gp_Cal_Par->par_azi_red4 ;
           sens                = pm->p_sui->Sa ;
 
-        pthread_mutex_unlock( & gp_Mut->mut_azi ) ;
+        pthread_mutex_unlock( & gp_Mut->mut_glo_azi ) ;
         break ;
     }
 
@@ -1185,7 +1192,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
 
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
 
-      pthread_mutex_lock( & pm->mot_pha[i]->mut_pha ) ;
+      pthread_mutex_lock( & pm->mot_pha[i]->pha_mutex ) ;
 
         pm->mot_pha[i]->micropas    = micropas ;
         pm->mot_pha[i]->Tpwm        = Tpwm ;
@@ -1193,10 +1200,10 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
         pm->mot_pha[i]->periode_mot = periode_mot ; 
         pm->mot_pha[i]->periode_mic = periode_mic ; 
 
-      pthread_mutex_unlock( & pm->mot_pha[i]->mut_pha ) ;
+      pthread_mutex_unlock( & pm->mot_pha[i]->pha_mutex ) ;
       //printf("\t%f",pm->mot_pha[i]->rc ) ;
     }
-    pthread_mutex_unlock(& pm->mut_mot ) ;
+    pthread_mutex_unlock(& pm->mot_mutex ) ;
 
     /*  ----------------------------------------------------------
         gestion des temporisations correspondant aux periodes 
@@ -1212,7 +1219,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
 
     usleep( periode_eff * TEMPS_MICRO_SEC ) ;
     
-    pthread_mutex_lock(  & pm->mut_mot ) ;
+    pthread_mutex_lock(  & pm->mot_mutex ) ;
 
     periode_ree = TEMPS_CALCUL_DUREE_SECONDES( & pm->tval ) ;
 
@@ -1224,15 +1231,15 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
     pm->tps_mic += ( periode_eff ) ;
     pm->tps_ree += ( periode_ree ) ;
     
-    pthread_mutex_unlock(& pm->mut_mot ) ;
+    pthread_mutex_unlock(& pm->mot_mutex ) ;
 
     gp_Pid->pid_run( periode_bru, periode_ree ) ;
 
-    pthread_mutex_lock( & gp_Pid->mut_pid ) ;
+    pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
 
     d_ecart = gp_Pid->err ;
     
-    pthread_mutex_unlock( & gp_Pid->mut_pid ) ;
+    pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
 
     if ( gi_pid_trace>0 && i_pas_change && ( pm->pas % gi_pid_trace ) == 0 ) {
 
@@ -1245,47 +1252,38 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
       switch ( pm->id ) {
 
         case 0 : 
-          pthread_mutex_lock(  & pm->mut_mot ) ;
-          //pthread_mutex_lock( & gp_Mut->mut_alt ) ;
-          // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_sui->acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pthread_mutex_lock( & gp_Pid->mut_pid ) ;
+          // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_sui->pas_acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
+          pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
 
-          pm->p_sui->acc_alt_pid *= gp_Pid->pid ;
+          gp_Pid->pid_acc_alt *= gp_Pid->pid ;
 
-          pthread_mutex_unlock( & gp_Pid->mut_pid ) ;
-          // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_sui->acc_alt, pm->tps_ree, pm->tps_mic ) ;
-          pthread_mutex_unlock( & gp_Mut->mut_alt ) ;
-          pthread_mutex_unlock(  & pm->mut_mot ) ;
+          pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
+          // Trace("acc alt %f tps_reel %f tps_mic %f", pm->p_sui->pas_acc_alt, pm->tps_ree, pm->tps_mic ) ;
 
           break ;
 
         case 1 : 
-          pthread_mutex_lock(  & pm->mut_mot ) ;
-          pthread_mutex_lock( & gp_Mut->mut_azi ) ;
-          // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_sui->acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
-          pthread_mutex_lock( & gp_Pid->mut_pid ) ;
+          // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", pm->p_sui->pas_acc_azi, pm->tps_ree, pm->tps_mic, pm->pas ) ;
+          pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
 
-          pm->p_sui->acc_azi_pid *= gp_Pid->pid ;
+          gp_Pid->pid_acc_azi *= gp_Pid->pid ;
           
-          pthread_mutex_unlock( & gp_Pid->mut_pid ) ;
-          // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_sui->acc_azi, pm->tps_ree, pm->tps_mic ) ;
-          pthread_mutex_unlock( & gp_Mut->mut_azi ) ;
-          pthread_mutex_unlock(  & pm->mut_mot ) ;
-
+          pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
+          // Trace("acc azi %f tps_reel %f tps_mic %f", pm->p_sui->pas_acc_azi, pm->tps_ree, pm->tps_mic ) ;
           break ;
       }
 
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
-    Trace2("i_pas_change %d pm->pas %lld gp_Sui->tempo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
+    Trace2("i_pas_change %d pm->pas %lld gp_Sui->sui_tpo->tempo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
       i_pas_change, \
       pm->pas, \
-      gp_Sui->temporisation_pid_loop, \
+      gp_Sui->sui_tpo->tempo_pid_loop, \
       gp_Pid_Par->par_pid_ech \
     ) ;
 
-    if ( i_pas_change && ( pm->pas % gp_Sui->temporisation_pid_loop ) == 0 ) {
+    if ( i_pas_change && ( pm->pas % gp_Sui->sui_tpo->tempo_pid_loop ) == 0 ) {
 
       switch ( pm->id ) {
 
@@ -1336,7 +1334,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & pm->mut_mot, NULL ) ;
+  pthread_mutex_init( & pm->mot_mutex, NULL ) ;
   
   memset(cmd, CONFIG_ZERO_CHAR ,sizeof(cmd)) ;
 
@@ -1367,11 +1365,11 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
     
     pm->mot_pha[i]=(STRUCT_GPIO_PWM_PHASE *)malloc(sizeof(STRUCT_GPIO_PWM_PHASE)) ;
     
-    pthread_mutex_init( & pm->mot_pha[i]->mut_pha, NULL ) ;
+    pthread_mutex_init( & pm->mot_pha[i]->pha_mutex, NULL ) ;
 
     /* 2022-11-01 : p_pth > non utilise pour l'instant (preparation portage) */    
     /* les threads sont utilises et initialises via  pthread_t [] dans main */
-    pm->mot_pha[i]->p_pth            = pm->p_pth; 
+ /* pm->mot_pha[i]->p_pth            = pm->p_pth; */
     
     pm->mot_pha[i]->p_sui            = pm->p_sui ;
     pm->mot_pha[i]->gpio             = gpios[ masque[i] ]  ;
@@ -1485,7 +1483,7 @@ int mainG(int argc, char **argv) {
   gi_gpio_timeout = 0 ;
   gi_gpio_max_nb_pas = 0 ;
   gi_gpio_max_nb_upas = 0 ;
-  gi_pthread_nb_threads = 0 ;
+  gi_pth_numero = 0 ;
 
   strcpy( c_gpio_alt , GPIO_DEFAULT_ALT_MOTOR_GPIOS ) ;
   strcpy( c_gpio_azi , GPIO_DEFAULT_AZI_MOTOR_GPIOS ) ;
@@ -1802,7 +1800,7 @@ int mainG(int argc, char **argv) {
 Anciennes fonctions obsoletes
    -----------------------------------------------------------------------------------------*/
 
-/*****************************************************************************************
+/* ****************************************************************************************
 * @fn     : GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS
 * @author : s.gravois
 * @brief  : Cette fonction lie une touche sur un clavier matriciel 4-4
@@ -1838,16 +1836,16 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int gp_Gpi_Par_Mat->par_l[4],int gp_Gp
 
         if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
    
-          if ( ! strcmp( raquette[i][j], "plus" ) )  {  gp_Sui->pas_acc_plus =1 ; }
-          if ( ! strcmp( raquette[i][j], "moins" ) ) { gp_Sui->pas_acc_moins=1 ; }
-          if ( ! strcmp( raquette[i][j], "ne" ) )    { gp_Sui->pas_nord=1 ; gp_Sui->pas_est=1   ; }
-          if ( ! strcmp( raquette[i][j], "no" ) )    { gp_Sui->pas_nord=1 ; gp_Sui->pas_ouest=1 ; }
-          if ( ! strcmp( raquette[i][j], "se" ) )    { gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
-          if ( ! strcmp( raquette[i][j], "so" ) )    { gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
-          if ( ! strcmp( raquette[i][j], "n" ) )     { gp_Sui->pas_nord  = 1 ; }
-          if ( ! strcmp( raquette[i][j], "o" ) )     { gp_Sui->pas_ouest = 1 ; }
-          if ( ! strcmp( raquette[i][j], "e" ) )     { gp_Sui->pas_est   = 1 ; }
-          if ( ! strcmp( raquette[i][j], "s" ) )     { gp_Sui->pas_sud   = 1 ; }
+          if ( ! strcmp( raquette[i][j], "plus" ) )  {  gp_Sui->sui_pas->pas_acc_plus =1 ; }
+          if ( ! strcmp( raquette[i][j], "moins" ) ) { gp_Sui->sui_pas->pas_acc_moins=1 ; }
+          if ( ! strcmp( raquette[i][j], "ne" ) )    { gp_Sui->sui_pas->pas_nord=1 ; gp_Sui->sui_pas->pas_est=1   ; }
+          if ( ! strcmp( raquette[i][j], "no" ) )    { gp_Sui->sui_pas->pas_nord=1 ; gp_Sui->sui_pas->pas_ouest=1 ; }
+          if ( ! strcmp( raquette[i][j], "se" ) )    { gp_Sui->sui_pas->pas_sud=1  ; gp_Sui->sui_pas->pas_est=1   ; }
+          if ( ! strcmp( raquette[i][j], "so" ) )    { gp_Sui->sui_pas->pas_sud=1  ; gp_Sui->sui_pas->pas_ouest=1 ; }
+          if ( ! strcmp( raquette[i][j], "n" ) )     { gp_Sui->sui_pas->pas_nord  = 1 ; }
+          if ( ! strcmp( raquette[i][j], "o" ) )     { gp_Sui->sui_pas->pas_ouest = 1 ; }
+          if ( ! strcmp( raquette[i][j], "e" ) )     { gp_Sui->sui_pas->pas_est   = 1 ; }
+          if ( ! strcmp( raquette[i][j], "s" ) )     { gp_Sui->sui_pas->pas_sud   = 1 ; }
           if ( ! strcmp( raquette[i][j], "reset" ) ) { gp_Sui->reset   = 1 ; }
     
         }
@@ -1855,7 +1853,7 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int gp_Gpi_Par_Mat->par_l[4],int gp_Gp
     
       GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ;  
     }
-    // Trace("%ld %ld %ld %ld\n", gp_Sui->pas_ouest, gp_Sui->pas_est,  gp_Sui->pas_nord,gp_Sui->pas_sud);
+    // Trace("%ld %ld %ld %ld\n", gp_Sui->sui_pas->pas_ouest, gp_Sui->sui_pas->pas_est,  gp_Sui->sui_pas->pas_nord,gp_Sui->sui_pas->pas_sud);
   }
 }
 */
@@ -1955,7 +1953,7 @@ void GPIO_CLAVIER_MATRICIEL_READ (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Ma
     for(i=0;i<4;i++) {
       GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 1) ;
       
-      usleep( gp_Key->temporisation_clavier ) ;
+      usleep( gp_Key->tempo_clavier ) ;
       
       for(j=0;j<4;j++)  {
         if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {

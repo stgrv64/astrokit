@@ -37,7 +37,7 @@
 #                * => protection zone de code avec dat_inf
 #                * ajout fonction LCD_DISPLAY_AGH_DEC / LCD_DISPLAY_EQU_DEC
 #                * ASTRE_FORMATE_DONNEES_AFFICHAGE : ajout de 2 resolutions supplementaires
-#                * protection zones de code impliquant LCD* (mut_lcd)
+#                * protection zones de code impliquant LCD* (lcd_mutex)
 # mai  2022      * reprise intégralité code pour utilisation pointeur fct (gp_Lcd->display_xxx)
 # juin 2022      * deport du code concernant LCD dans lcd.c
 #                * ajout prise en charge fichier gp_Con_Par->par_fic_led (param config.txt)
@@ -463,7 +463,7 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
     if(!strcmp("DEVICE_USE_CAPTEURS",  lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Capteurs=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_RAQUETTE",  lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Raquette=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_BLUETOOTH", lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Bluetooth=atoi(lp_Con->con_params[l][1]);
-    if(!strcmp("DEVICE_USE_INFRARED",  lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Infrared=atoi(lp_Con->con_params[l][1]);
+    if(!strcmp("DEVICE_USE_INFRAROUGE",lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Infrared=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_KEYBOARD",  lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Keyboard=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_LCD",       lp_Con->con_params[l][0])) gp_Dev_Par->par_use_Lcd=atoi(lp_Con->con_params[l][1]);
 
@@ -604,15 +604,15 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
   Trace1("gp_Pid_Par->par_pid_kp = %f",  gp_Pid_Par->par_pid_kp);
   Trace1("gp_Pid_Par->par_pid_kd = %f",  gp_Pid_Par->par_pid_kd);
 
-  Trace1("gp_Dev_Par->par_use_Controler = %d",  gp_Dev_Par->par_use_Controler);
-  Trace1("gp_Dev_Par->par_use_Capteurs = %d",  gp_Dev_Par->par_use_Capteurs);
-  Trace1("gp_Dev_Par->par_use_Bluetooth = %d",  gp_Dev_Par->par_use_Bluetooth);
-  Trace1("gp_Dev_Par->par_use_Infrared = %d",  gp_Dev_Par->par_use_Infrared);
-  Trace1("gp_Dev_Par->par_use_Raquette = %d",  gp_Dev_Par->par_use_Raquette);
-  Trace1("gp_Dev_Par->par_use_Keyboard = %d",  gp_Dev_Par->par_use_Keyboard);
-  Trace1("gp_Dev_Par->par_use_Lcd = %d",  gp_Dev_Par->par_use_Lcd);
+  Trace("gp_Dev_Par->par_use_Controler = %d",  gp_Dev_Par->par_use_Controler);
+  Trace("gp_Dev_Par->par_use_Capteurs = %d",  gp_Dev_Par->par_use_Capteurs);
+  Trace("gp_Dev_Par->par_use_Bluetooth = %d",  gp_Dev_Par->par_use_Bluetooth);
+  Trace("gp_Dev_Par->par_use_Infrared = %d",  gp_Dev_Par->par_use_Infrared);
+  Trace("gp_Dev_Par->par_use_Raquette = %d",  gp_Dev_Par->par_use_Raquette);
+  Trace("gp_Dev_Par->par_use_Keyboard = %d",  gp_Dev_Par->par_use_Keyboard);
+  Trace("gp_Dev_Par->par_use_Lcd = %d",  gp_Dev_Par->par_use_Lcd);
 
-  Trace1("gp_Ast_Par->par_default_object = %s",  gp_Ast_Par->par_default_object );
+  Trace("gp_Ast_Par->par_default_object = %s",  gp_Ast_Par->par_default_object );
 
   Trace1("gp_Lie_Par->par_latitude  = %f",          gp_Lie_Par->par_latitude );
   Trace1("gp_Lie_Par->par_longitude = %f",          gp_Lie_Par->par_longitude );

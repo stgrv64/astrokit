@@ -27,7 +27,7 @@ int  gi_pid_trace_azi ;
 * @date   : 2022-06 creation
 *****************************************************************************************/
 
-void PID_INIT(STRUCT_PID * p_pid, double d_ech, double d_kp, double d_ki, double d_kd ) {
+void PID_INIT(STRUCT_PID * lp_pid, double d_ech, double d_kp, double d_ki, double d_kd ) {
 
   char c_path_file_out[ CONFIG_TAILLE_BUFFER_64] ; 
 
@@ -38,7 +38,7 @@ void PID_INIT(STRUCT_PID * p_pid, double d_ech, double d_kp, double d_ki, double
   memset(c_path_file_out, 0, sizeof(c_path_file_out)) ;
   sprintf( c_path_file_out, "%s/%s" , gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_pid) ;
 
-  if ( ( p_pid->f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
+  if ( ( lp_pid->pif_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
     Trace("ouverture %s (KO)",c_path_file_out );
   }
   else {
@@ -46,35 +46,40 @@ void PID_INIT(STRUCT_PID * p_pid, double d_ech, double d_kp, double d_ki, double
   }
   /* Initialisation mutex */
 
-  pthread_mutex_init( & p_pid->mut_pid, NULL ) ;
+  pthread_mutex_init( & lp_pid->pid_mutex, NULL ) ;
   
   /* Parametres de reglages du PID proportionnel integral derive*/
 
-  p_pid->ech = d_ech ;
-  p_pid->Kp  = d_kp ;
-  p_pid->Ki  = d_ki ;
-  p_pid->Kd  = d_kd ;
+  lp_pid->ech = d_ech ;
+  lp_pid->Kp  = d_kp ;
+  lp_pid->Ki  = d_ki ;
+  lp_pid->Kd  = d_kd ;
 
   /* Initialisation autres champs */
 
-  p_pid->incr = 0 ;
-  p_pid->inp = 0 ;  /* consigne */ 
-  p_pid->out = 0;   /* sortie */ 
-  p_pid->err = 0;   /* erreur  = out - inp */ 
+  lp_pid->incr = 0 ;
+  lp_pid->inp = 0 ;  /* consigne */ 
+  lp_pid->out = 0;   /* sortie */ 
+  lp_pid->err = 0;   /* erreur  = out - inp */ 
 
-  p_pid->err_sum = 0 ; /* calcul de la somme des erreurs */ 
-  p_pid->err_int_Ki = 0 ; /* calcul de la partie integrale */  
-  p_pid->err_der_Kd = 0 ; /* calcul de la partie derivee */
-  p_pid->err_pre = 0 ;
+  lp_pid->err_sum = 0 ; /* calcul de la somme des erreurs */ 
+  lp_pid->err_int_Ki = 0 ; /* calcul de la partie integrale */  
+  lp_pid->err_der_Kd = 0 ; /* calcul de la partie derivee */
+  lp_pid->err_pre = 0 ;
   
   /* Reglages des coefficients Kp, Ki, Kd */
 
+  /* Mettre les accelerations a 1 */
+
+  lp_pid->pid_acc_azi   = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+  lp_pid->pid_acc_alt   = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+
   /* Initialisation pointeurs de fonctions */
   
-  /* p_pid->pid_init */ 
-  p_pid->pid_reset = PID_RESET ;
-  p_pid->pid_run   = PID_CALCULATE ;
-  p_pid->pid_test  = PID_TEST ;
+  /* lp_pid->pid_init */ 
+  lp_pid->pid_reset = PID_RESET ;
+  lp_pid->pid_run   = PID_CALCULATE ;
+  lp_pid->pid_test  = PID_TEST ;
 
   return ;
 }
@@ -104,7 +109,7 @@ else {
   Trace("division par zero") ;
 }
 */
-  pthread_mutex_lock( & gp_Pid->mut_pid ) ;
+  pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
 
   gp_Pid->err  = d_out - d_inp ;
 
@@ -151,7 +156,7 @@ else {
   gp_Pid->err_pre = gp_Pid->err ;
   gp_Pid->incr++ ;
 
-  pthread_mutex_unlock( & gp_Pid->mut_pid ) ;
+  pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
 
   return ;
 }

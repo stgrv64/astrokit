@@ -563,7 +563,7 @@ void TEMPS_SET_HOUR_AND_MINUTES(char * s_data) {
 * @todo   : configurer directement heure locale (?)
 *****************************************************************************************/
 
-void TEMPS_INIT( STRUCT_TIME * lp_Tim) {
+void TEMPS_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tempos) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -575,4 +575,13 @@ void TEMPS_INIT( STRUCT_TIME * lp_Tim) {
   lp_Tim->MM = 0 ;  // minutes
   lp_Tim->SS = 0 ;  // secondes
   lp_Tim->hd = 0.0 ;  // heure decimale (double)
+
+  lp_Tempos->tempo_menu     = gp_Tim_Par->par_tempo_Menu ;
+  lp_Tempos->tempo_raq      = gp_Tim_Par->par_tempo_Raq ;
+  lp_Tempos->tempo_ir       = gp_Tim_Par->par_tempo_Ir ;  
+  lp_Tempos->tempo_termios  = gp_Tim_Par->par_tempo_Termios ;
+  lp_Tempos->tempo_clavier  = gp_Tim_Par->par_tempo_Clavier ; 
+  lp_Tempos->tempo_capteurs = gp_Tim_Par->par_tempo_Capteurs ;
+  lp_Tempos->tempo_lcd_loop = gp_Tim_Par->par_tempo_Lcd_Loop ;
+  lp_Tempos->tempo_lcd_disp = gp_Tim_Par->par_tempo_Lcd_Disp ;
 }

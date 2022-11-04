@@ -18,56 +18,56 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 /*****************************************************************************************
 * @fn     : VOUTE_INIT
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure STRUCT_VOUTE *gp_Vou
-* @param  : STRUCT_VOUTE *gp_Vou
+* @brief  : Cette fonction initialise la structure STRUCT_VOUTE *lp_Vou
+* @param  : STRUCT_VOUTE *lp_Vou
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : passer par une lecture de parametre dans config.txt pour \
 *           vou_tempo_percent et vou_calibration_delta_t
 *****************************************************************************************/
 
-void VOUTE_INIT(STRUCT_VOUTE *gp_Vou) {
+void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  gp_Vou->vou_temps_ecoule        = 0 ;
-  gp_Vou->vou_dt                  = 0  ;
-  gp_Vou->vou_tempo_percent       = 0.96 ;   
-  gp_Vou->vou_calibration_delta_t = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
-  gp_Vou->vou_num                 = 0 ;
-  gp_Vou->vou_begin               = 0 ;
-  gp_Vou->vou_end                 = 0 ;
-  gp_Vou->vou_acceleration        = 1 ;
-  gp_Vou->vou_pas                 = gp_Vou->vou_dt * CALCUL_VIT_ROT_EARTH_RAD_PER_SEC ;
+  lp_Vou->vou_temps_ecoule        = 0 ;
+  lp_Vou->vou_dt                  = 0  ;
+  lp_Vou->vou_tempo_percent       = 0.96 ;   
+  lp_Vou->vou_calibration_delta_t = 0.97 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
+  lp_Vou->vou_num                 = 0 ;
+  lp_Vou->vou_begin               = 0 ;
+  lp_Vou->vou_end                 = 0 ;
+  lp_Vou->vou_acc        = 1 ;
+  lp_Vou->vou_pas                 = lp_Vou->vou_dt * CALCUL_VIT_ROT_EARTH_RAD_PER_SEC ;
   /* dt en micro-sec */
 
-  gp_Vou->vou_dt_us = (unsigned long)( gp_Vou->vou_dt * TEMPS_MICRO_SEC / gp_Vou->vou_acceleration ) ;   
+  lp_Vou->vou_dt_us = (unsigned long)( lp_Vou->vou_dt * TEMPS_MICRO_SEC / lp_Vou->vou_acc ) ;   
 }
-
 
 /*****************************************************************************************
 * @fn     : VOUTE_CONFIG
 * @author : s.gravois
-* @brief  : Cette fonction configure la structure STRUCT_VOUTE *gp_Vou
-* @param  : STRUCT_VOUTE *gp_Vou
+* @brief  : Cette fonction configure la structure STRUCT_VOUTE *lp_Vou
+* @param  : STRUCT_VOUTE *lp_Vou
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : passer par une lecture de parametre dans config.txt pour \
 *           vou_tempo_percent et vou_calibration_delta_t
 *****************************************************************************************/
 
-void VOUTE_CONFIG( STRUCT_VOUTE *gp_Vou, double dt, double acc, double percent ) {
+void VOUTE_CONFIG( STRUCT_VOUTE *lp_Vou, double dt, double acc, double percent ) {
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Vou->vou_dt                  = dt  ;
-  gp_Vou->vou_tempo_percent       = percent ; 
-  gp_Vou->vou_calibration_delta_t = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
-  gp_Vou->vou_begin               = 0 ;
-  gp_Vou->vou_end                 = CALCUL_PI_FOIS_DEUX ;
-  gp_Vou->vou_num                     = 0 ;
-  gp_Vou->vou_acceleration        = acc ;
-  gp_Vou->vou_pas                 = gp_Vou->vou_dt * CALCUL_VIT_ROT_EARTH_RAD_PER_SEC ;
+  lp_Vou->vou_temps_ecoule        = 0 ;
+  lp_Vou->vou_dt                  = dt  ;
+  lp_Vou->vou_tempo_percent       = percent ; 
+  lp_Vou->vou_calibration_delta_t = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
+  lp_Vou->vou_begin               = 0 ;
+  lp_Vou->vou_end                 = CALCUL_PI_FOIS_DEUX ;
+  lp_Vou->vou_num                     = 0 ;
+  lp_Vou->vou_acc        = acc ;
+  lp_Vou->vou_pas                 = lp_Vou->vou_dt * CALCUL_VIT_ROT_EARTH_RAD_PER_SEC ;
   /* dt en micro-sec */
-  gp_Vou->vou_dt_us                      = (unsigned long)( gp_Vou->vou_dt * TEMPS_MICRO_SEC / gp_Vou->vou_acceleration ) ;
+  lp_Vou->vou_dt_us                      = (unsigned long)( lp_Vou->vou_dt * TEMPS_MICRO_SEC / lp_Vou->vou_acc ) ;
 }
 
 /*****************************************************************************************
@@ -81,21 +81,21 @@ void VOUTE_CONFIG( STRUCT_VOUTE *gp_Vou, double dt, double acc, double percent )
 *           la priorite du thread egalement
 *****************************************************************************************/
 
-long VOUTE_TEMPORISATION(STRUCT_VOUTE *gp_Vou, struct timeval t00) {
+long VOUTE_TEMPORISATION(STRUCT_VOUTE *lp_Vou, struct timeval t00) {
   
   struct timeval t01 ;
   double  t_diff ;
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  usleep ( (long)(gp_Vou->vou_dt_us * gp_Vou->vou_tempo_percent) ) ;
+  usleep ( (long)(lp_Vou->vou_dt_us * lp_Vou->vou_tempo_percent) ) ;
   
   t_diff=0;
   
-  // FIXME : rappel : gp_Vou->vou_calibration_delta_t = 0.99 normalement
+  // FIXME : rappel : lp_Vou->vou_calibration_delta_t = 0.99 normalement
   // FIXME : pour eviter de faire appel a la boucle while 99% du temps
   
-  while( t_diff < ( gp_Vou->vou_dt_us * gp_Vou->vou_calibration_delta_t ) ) {
+  while( t_diff < ( lp_Vou->vou_dt_us * lp_Vou->vou_calibration_delta_t ) ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (double)(( t01.tv_sec - t00.tv_sec)  * TEMPS_MICRO_SEC ) + t01.tv_usec - t00.tv_usec;
@@ -112,12 +112,12 @@ long VOUTE_TEMPORISATION(STRUCT_VOUTE *gp_Vou, struct timeval t00) {
 * @todo   : a completer eventuellement
 *****************************************************************************************/
 
-void VOUTE_AFFICHER( STRUCT_VOUTE * gp_Vou) {
+void VOUTE_AFFICHER( STRUCT_VOUTE * lp_Vou) {
 	
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-	Trace1("gp_Vou->vou_num %lld", gp_Vou->vou_num) ;
-  Trace1("gp_Vou->vou_pas %lld", gp_Vou->vou_num) ;
+	Trace1("lp_Vou->vou_num %lld", lp_Vou->vou_num) ;
+  Trace1("lp_Vou->vou_pas %lld", lp_Vou->vou_num) ;
 
   Trace1("----------------------------") ;
 
