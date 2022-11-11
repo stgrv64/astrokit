@@ -1,8 +1,8 @@
 #ifndef __FRIENDLYARM_HARDWARE_PCF8574_H__
 #define __FRIENDLYARM_HARDWARE_PCF8574_H__
 
-// #define     PCF8574_ADDRESS         (0x27)    
-#define     PCF8574_ADDRESS         (0x20)
+#define     PCF8574_ADDRESS         (0x27)    
+// #define     PCF8574_ADDRESS         (0x20)
 
 int  pcf8574Init(int i2cDev);
 int  pcf8574WriteData8(int devFD, unsigned char data);

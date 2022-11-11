@@ -161,17 +161,6 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
 
     system("echo -1 >/proc/sys/kernel/sched_rt_runtime_us") ; 
     mlockall(MCL_CURRENT | MCL_FUTURE);
-
-    /* Code a executer avec compte rroot uniqumeent */ 
-    /*
-    param.sched_priority = PTHREAD_POLICY_1 ;
-
-    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_MAIN, & param) != 0) {
-        perror("setschedparam main");
-        exit(EXIT_FAILURE);
-    }
-    // PTHREADS_CONFIG( gp_Pth, i_pth_self, PTHREAD_TYPE_MAIN ) ;
-    */
   }
   else {
     perror("Execute with root privilege (because of threads -> sched_priority used)") ;
@@ -316,6 +305,18 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_th
   if ( i_error == 0 ) {
     Trace("thread %-16s : id %ld ord %s prio %d sta %s num %d", c_name, i_pth_self, c_ord, i_pri, "PTHREAD_RUNNING", i_num_thread ) ;
   }
+
+  /*-------------------------------------------------------------*/
+  /* La priorite est l arret du programme en cas de cancellation */
+  /* de tous les threads par le thread principal appellant (main)*/
+  /* Ne doit pas attendre une requete d annulation correlle a un */
+  /* d annulation du thread                                      */
+  /* Etat de cancel approprie = PTHREAD_CANCEL_ASYNCHRONOUS      */
+  /*-------------------------------------------------------------*/
+/*
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+*/ 
   return ;
 }
 
@@ -344,7 +345,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
   l_nb_threads = gi_pth_numero ;
   pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
-  for( i_num_thread = 0 ; i_num_thread < l_nb_threads ; i_num_thread++ ) {
+  for( i_num_thread = 0 ; i_num_thread <= l_nb_threads ; i_num_thread++ ) {
 
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
@@ -428,7 +429,7 @@ void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* lp_pth) {
 }
 
  /*****************************************************************************************
-* @fn     : PTHREADS_CANCEL
+* @fn     : PTHREADS_CANCEL_OR_KILL
 * @author : s.gravois
 * @brief  : Cette fonction organise le code pour annuler tous les threads 
 * @brief  :   (il doit etre JOINABLE & CANCELLABLE)
@@ -437,7 +438,7 @@ void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* lp_pth) {
 * @todo   : 
 *****************************************************************************************/
 
-void PTHREADS_CANCEL ( STRUCT_PTHREADS *lp_pth) {
+void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
 
   int i_num_thread=0 ;
   char c_thread_name [ 16 ] ; 
@@ -452,11 +453,11 @@ void PTHREADS_CANCEL ( STRUCT_PTHREADS *lp_pth) {
   char c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
   pthread_t i_id = 0 ;
 
-  for( i_num_thread = PTHREADS_MAX_THREADS-1 ; i_num_thread >=0  ; i_num_thread-- )   {
+  for( i_num_thread = 0 ; i_num_thread < PTHREADS_MAX_THREADS  ; i_num_thread++ )   {
 
     i_abandon=0 ;
 
-    // pthread_mutex_lock( & gp_Mut->mut_pth) ;
+    pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
     strcpy( c_nam,  lp_pth->pth_att[ i_num_thread ].att_c_nam ) ;
     strcpy( c_ord,  lp_pth->pth_att[ i_num_thread ].att_c_ord ) ;
@@ -465,26 +466,52 @@ void PTHREADS_CANCEL ( STRUCT_PTHREADS *lp_pth) {
             i_pri = lp_pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
             i_sta = lp_pth->pth_att[ i_num_thread ].att_sta ;
 
-    // pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
-    if ( i_sta == PTHREAD_RUNNING ) {
+    if ( i_sta == PTHREAD_RUNNING \
+      && strcmp( "pth_clavier" , c_nam ) != 0 \
+      && strcmp( "pth_main" , c_nam ) != 0 \
+    ) {
       memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
 /*
       if ( pthread_getname_np( i_id , c_thread_name, 16 ) ) {
         Trace1("pthread_getname_np : %ld : error", i_id) ;
       }
   */    
-      if ( pthread_cancel( i_id ) != 0 ) { 
+      // if ( pthread_cancel( i_id ) != 0 ) { 
+       if ( pthread_cancel ( i_id ) != 0 ) { 
         i_abandon = 0 ; 
+        Trace("erreur");
       }
       else {
         i_abandon = 1 ; 
         // pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-        lp_pth->pth_att[ i_num_thread ].att_sta                = (int) PTHREAD_CANCELLED ;    
-        strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , "PTHREAD_CANCELLED" ) ;
+        i_sta = (int)PTHREAD_CANCELLED ;
+        strcpy( c_sta, "PTHREAD_CANCELLED");
+        lp_pth->pth_att[ i_num_thread ].att_sta = i_sta ;    
+        strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
         
         // pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+/*
+        sleep(1) ;
+
+        if ( pthread_kill ( i_id, SIGTERM ) != 0 ) { 
+          i_abandon = 0 ; 
+          Trace("erreur");
+        }
+        else {
+          i_abandon = 1 ; 
+          // pthread_mutex_lock( & gp_Mut->mut_pth) ;
+
+          i_sta = (int)PTHREAD_KILLED ;
+          strcpy( c_sta, "PTHREAD_KILLED");
+          lp_pth->pth_att[ i_num_thread ].att_sta = (int) i_sta ;    
+          strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
+          
+          // pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+        }
+*/
       }
     }
     else {

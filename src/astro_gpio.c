@@ -987,28 +987,13 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
   double TUpwm, TUpwm_haut, TUpwm_bas, rap ;
   double pmot =0 ;
   // struct sched_param param;
-  
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
+
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   sleep(1) ;
-  
-  /* ---------------------------------------------------------------------------- */
-  /* Configuration du thread et des attributs de tread                            */
-  /* ---------------------------------------------------------------------------- */
-  /*
-  param.sched_priority = PTHREAD_POLICY_10 ;  
-  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_PHASES, & param) != 0) {
-    perror("GPIO_SUIVI_PWM_PHASE");
-    exit(EXIT_FAILURE);
-  }
-  */
-/*
-  pthread_mutex_lock( & ph->p_Pth->mutex_pthread) ;
-  pthread_setname_np( pthread_self(), "gpio_suivi_pwm" ) ;
-  ph->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-  pthread_mutex_unlock( & ph->p_Pth->mutex_pthread) ;
-*/
-  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
 
   TUpwm = TUpwm_haut  = TUpwm_bas = rap = 0 ;
 
@@ -1080,27 +1065,11 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   long long   i_incr=0 ; 
   struct sched_param param;
   int     micropas=0 ;
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  /* ---------------------------------------------------------------------------- */
-  /* Configuration du thread et des attributs de tread                            */
-  /* ---------------------------------------------------------------------------- */
-
-  param.sched_priority = PTHREAD_POLICY_5 ;  
-
-  if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_PWM_MAIN, & param) != 0) {
-    perror("suivi_main_M");
-    exit(EXIT_FAILURE);
-  }
-  
-/*
-  pthread_mutex_lock( & pm->p_Pth->mutex_pthread) ;
-  pthread_setname_np( pthread_self(), "suivi_main_m" ) ;
-  pm->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-  pthread_mutex_unlock( & pm->p_Pth->mutex_pthread) ;
-*/
-  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
 
   periode_mic = 0 ;
   periode_mot = 0 ;

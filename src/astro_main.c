@@ -85,7 +85,7 @@ void ASTRO_TRAP_MAIN(int sig) {
 
   for( i_num_thread = PTHREADS_MAX_THREADS-1 ; i_num_thread >=0  ; i_num_thread-- )   {
 
-    PTHREADS_CANCEL ( gp_Pth ) ;
+    PTHREADS_CANCEL_OR_KILL ( gp_Pth ) ;
   }
   Trace("fin des abandons de threads") ;
   
@@ -219,37 +219,11 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   void * (*ptr_fct)(STRUCT_SUIVI *)  = SUIVI_MENU ;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  
-   // La temporisation dans les boucles du thread SUIVI_MENU depend de  gp_Sui->sui_tpo->tempo_menu
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;  
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_MENU ) ;
    
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU ) ;
-  
-
-  /* ---------------------------------------------------------------------------- */
-  /* Configuration du thread et des attributs de tread                            */
-  /* ---------------------------------------------------------------------------- */
-/*
-  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
-
-    param.sched_priority = PTHREAD_POLICY_1 ;
-    
-    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_MENU, & param) != 0) { 
-      perror("setschedparam SUIVI_MENU");
-      exit(EXIT_FAILURE); 
-    }
-  }
-  else { 
-    Trace1("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
-  }
-
-  pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
-  pthread_setname_np( pthread_self(), "SUIVI_MENU" ) ;
-  gp_Sui->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-  pthread_mutex_unlock( & gp_Sui->p_Pth->mutex_pthread) ;
-*/
-  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_MENU ) ;
-
-  // signal(SIGTERM,ASTRO_TRAP_SUIVI_MENU) ;
   
   SUIVI_MENU_BEFORE_WHILE ( gp_Sui) ;
 
@@ -519,49 +493,16 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  
-  sleep(2) ;
-  /*
-  char   c_Vitesses[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ;
-  */
-  // La temporisation dans la boucle du thread SUIVI_VOUTE depend de gp_Vou->vou_dt_us (en us)
-  // a completer / modifier :
-  // il FAUT calculer / mettre a jour a,h,A,H de l'as quand est utliser les menus
-  // suivi manuel et suivi capteurs , qui renvoient l'azimut et l'altitude
-  // ==> CALCUL_EQUATEUR pour les devices altitude et azimut venant du capteur
-  // ==> autre calcul plus complique quand on a les devices de vitesses et periodes provenant de la raquette !!!!!
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;  
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
+
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
+
+  sleep(1) ;
   
   memset( c_l0, CALCUL_ZERO_CHAR, sizeof( c_l0 )) ;
   memset( c_l1, CALCUL_ZERO_CHAR, sizeof( c_l1 )) ;
-
-  Trace2("sleeping..") ;
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
-  Trace1("start") ;
-
-  /* ---------------------------------------------------------------------------- */
-  /* Configuration du thread et des attributs de tread                            */
-  /* ---------------------------------------------------------------------------- */
-/*
-  if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
-    param.sched_priority = PTHREAD_POLICY_1 ;
-
-    if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_VOUTE, & param) != 0) {
-      perror("setschedparam SUIVI_VOUTE"); 
-      exit(EXIT_FAILURE);
-    }
-  }
-  else { 
-    Trace1("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
-  }
-
-  pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
-  pthread_setname_np( pthread_self(), "SUIVI_VOUTE" ) ;
-  gp_Sui->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-  pthread_mutex_unlock( & gp_Sui->p_Pth->mutex_pthread) ;
-*/
-  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
-
-  // signal( SIGTERM, ASTRO_TRAP_SUIVI_VOUTE) ;
   
   ul_vou_while_incr =0 ;
   
@@ -657,35 +598,13 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
     
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_INFRARED ) ;
+  
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA ) ;
-  Trace1("start") ;
   
   if ( gp_Dev->use_infrarouge ) {
-
-    /* ---------------------------------------------------------------------------- */
-    /* Configuration du thread et des attributs de tread                            */
-    /* ---------------------------------------------------------------------------- */
-/*
-    if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
-      param.sched_priority = PTHREAD_POLICY_1  ;
-      
-      if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_INFRA, & param) != 0) { 
-        perror("setschedparam SUIVI_INFRAROUGE"); 
-        exit(EXIT_FAILURE);
-      }
-    }
-    else { 
-      Trace1("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
-    } 
-
-    pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
-    pthread_setname_np( pthread_self(), "SUIVI_IR" ) ;
-    gp_Sui->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-    pthread_mutex_unlock( & gp_Sui->p_Pth->mutex_pthread) ;
-*/
-    PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_INFRARED ) ;
-
-    // signal( SIGTERM, ASTRO_TRAP_SUIVI_INFRAROUGE) ;
   
     i_ret = INFRARED_OPEN( gp_LircConfig ) ;
     Trace1("INFRARED_OPEN : retour = %d" , i_ret ) ;
@@ -718,41 +637,18 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
   char c_l0[16] ={0};
   char c_l1[16] ={0};
+
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;  
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_LCD ) ;
+
   memset( c_l0, CALCUL_ZERO_CHAR, sizeof( c_l0 )) ;
   memset( c_l1, CALCUL_ZERO_CHAR, sizeof( c_l1 )) ;
     
-  Trace2("sleeping..") ;
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
-  Trace1("start") ;
   
   if ( gp_Dev->use_lcd ) {
-
-    /* ---------------------------------------------------------------------------- */
-    /* Configuration du thread et des attributs de tread                            */
-    /* ---------------------------------------------------------------------------- */
-/*
-    if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
-
-      param.sched_priority = PTHREAD_POLICY_1  ; 
-
-      if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_LCD, & param) != 0) { 
-        perror("setschedparam SUIVI_LCD"); 
-        exit(EXIT_FAILURE);
-      }
-    }
-    else { 
-      Trace1("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
-    } 
-
-    pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
-    pthread_setname_np( pthread_self(), "SUIVI_LCD" ) ;
-    gp_Sui->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-    pthread_mutex_unlock( & gp_Sui->p_Pth->mutex_pthread) ;
-*/
-    PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_LCD ) ;
-
-    // signal( SIGTERM, ASTRO_TRAP_SUIVI_LCD) ;
 
     gp_Lcd->display_default() ;
 
@@ -815,34 +711,13 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
   struct timeval t00,t01  ;
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
     
   if ( gp_Dev->use_keyboard ) {
-
-    /* ---------------------------------------------------------------------------- */
-    /* Configuration du thread et des attributs de tread                            */
-    /* ---------------------------------------------------------------------------- */
-/*
-    if ( gi_pthread_getuid == PTHREADS_USERID_ROOT ) {
-
-      param.sched_priority = PTHREAD_POLICY_1  ;
-      if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_CLAVIER, & param) != 0) { 
-        perror("setschedparam SUIVI_CLAVIER_TERMIOS"); exit(EXIT_FAILURE);
-      }
-    }
-    else { 
-      Trace1("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
-    } 
-
-    pthread_mutex_lock( & gp_Sui->p_Pth->mutex_pthread) ;
-    pthread_setname_np( pthread_self(), "SUIVI_TERMIOS" ) ;
-    gp_Sui->p_Pth->p_thread_t_id[ g_id_thread++ ] = pthread_self() ;
-    pthread_mutex_unlock( & gp_Sui->p_Pth->mutex_pthread) ;
-*/
-    PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
-
-    // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
   
     KEYBOARD_TERMIOS_INIT() ;
 
@@ -919,20 +794,16 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
   struct sched_param param;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  Trace1("start") ;
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
+  
   if ( gp_Dev->use_keyboard ) {
 
-    /* ---------------------------------------------------------------------------- */
-    /* Configuration du thread et des attributs de tread                            */
-    /* ---------------------------------------------------------------------------- */
-
-    PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
-
-    // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
-
     /* Debut boucle SUIVI_CLAVIER_getchar */
+
     while( ( c_char = getchar () ) != 'q' ) {
       usleep(100000) ;
       Trace1("%c %d entre au clavier", c_char,c_char  ) ; 
@@ -969,16 +840,13 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
   struct sched_param param;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
+
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  Trace1("start") ;
   
   if ( gp_Dev->use_keyboard ) {
-
-    /* ---------------------------------------------------------------------------- */
-    /* Configuration du thread et des attributs de tread                            */
-    /* ---------------------------------------------------------------------------- */
-
-    PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
     // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
     
@@ -1043,8 +911,11 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   STRUCT_I2C_ACC_MAG  accmag,  *lp_acc ;
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CAPTEURS ) ;
+
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
-  Trace1("start") ;
 
   lp_dev = & exemple ;
   lp_acc = & accmag ;
@@ -1052,23 +923,7 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   lp_dev->fd = 0 ;
   
   if ( gp_Dev->use_capteurs ) {
-      
-    // La temporisation dans la boucle du thread SUIVI_CAPTEURS depend de gp_Sui->sui_tpo->tempo_capteurs (en us)
-    // present dans la fonction bloquante INFRARED_READ 
-    
-    // on laisse le temps aux autres threads de demarrer
-    // notamment pour arriver dans la fonction SUIVI_TRAITEMENT_MENU
-    // qui initialise a 1 SUIVI_CAPTEURS
 
-    /* ---------------------------------------------------------------------------- */
-    /* Configuration du thread et des attributs de tread                            */
-    /* ---------------------------------------------------------------------------- */
-
-    PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CAPTEURS ) ;
-
-    // signal( SIGTERM, ASTRO_TRAP_SUIVI_CAPTEURS) ;
-    
-    // a modifier pour definir le choix de l'infrarouge ou pas (config.txt ? .h ? )
     
     /* Debut boucle SUIVI_CAPTEURS */
     
@@ -1186,7 +1041,6 @@ int main(int argc, char ** argv) {
   ASTRE_INIT     ( gp_Ast ) ;
   LIEU_INIT      ( gp_Lie  ) ;
   
-
   TEMPS_CALCUL_TEMPS_SIDERAL  ( gp_Lie, gp_Tim) ;
   
   DEVICES_INIT   ( gp_Dev ) ;
