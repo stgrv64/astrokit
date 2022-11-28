@@ -48,8 +48,8 @@
 #               * ajout enum pour le masque
 #               * correction code tremios pour 'FIN'
 #               * modif PTHREADS_MAX_THREADS a 20
-#               * ajout gp_Tim_Par->par_tempo_Lcd_Loop et gp_Tim_Par->par_tempo_Lcd_Disp en remplacement
-#                 de gp_Tim_Par->par_tempo_LCD (remaniement affichage LCD)
+#               * ajout gp_Tim_Par->par_tpo_Lcd_Loop et gp_Tim_Par->par_tpo_Lcd_Disp en remplacement
+#                 de gp_Tim_Par->par_tpo_LCD (remaniement affichage LCD)
 # juin 2022     * ajout paramatres pid_azi et pid_alt 
 #                 et autres params pour tenter un asservissement des frequences
 #                 (voir code gpio.c et calcul.c sur les frequences et periodes)
@@ -158,9 +158,11 @@ typedef enum    t_en_Reduction_Type         ENUM_CALCULS_REDUCTION_TYPE ;
 typedef enum    t_en_Calculs_Mode           ENUM_CALCULS_MODE ;
 
 typedef struct  lirc_config                 INFRARED_LIRC_CONFIG ;
+
 typedef struct  pthread_t                   STRUCT_PTHREAD_T ;
 typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
 typedef struct  STR_ASTRE                   STRUCT_ASTRE ;
+typedef struct  STR_CALCULS                 STRUCT_CALCULS ;
 typedef struct  STR_CAT                     STRUCT_CAT ;
 typedef struct  STR_CODES                   STRUCT_CODES ;
 typedef struct  STR_CONFIG                  STRUCT_CONFIG ;
@@ -175,6 +177,7 @@ typedef struct  STR_MUTEXS                  STRUCT_MUTEXS ;
 typedef struct  STR_PTHREADS                STRUCT_PTHREADS ;
 typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
 typedef struct  STR_SUIVI_PAS               STRUCT_SUIVI_PAS ;
+typedef struct  STR_SUIVI_FREQUENCES        STRUCT_SUIVI_FREQUENCES ;
 typedef struct  STR_TIME                    STRUCT_TIME ;
 typedef struct  STR_TIME_TEMPOS             STRUCT_TIME_TEMPOS ;
 typedef struct  STR_VOUTE                   STRUCT_VOUTE ;
@@ -225,6 +228,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 #define MACRO_ASTRO_GLOBAL_EXTERN_STRUCT \
   extern STRUCT_ANGLE            g_Angle,            *gp_Ang ; \
   extern STRUCT_ASTRE            g_Astre,            *gp_Ast ; \
+  extern STRUCT_CALCULS          g_Calculs,          *gp_Cal ; \
   extern STRUCT_CAT              g_Catalogue,        *gp_Cat ; \
   extern STRUCT_CODES            g_Codes,            *gp_Cod ; \
   extern STRUCT_CONFIG           g_Config,           *gp_Con ; \
@@ -243,9 +247,9 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_PTHREADS         g_Pthreads_Alt,     *gp_Pth_Alt ; \
   extern STRUCT_PTHREADS         g_Pthreads_Azi,     *gp_Pth_Azi ; \
   extern STRUCT_SUIVI            g_Suivi,            *gp_Sui ; \
-  extern STRUCT_SUIVI_PAS        gp_Suivi_Pas,              *gp_Sui_Pas ; \
+  extern STRUCT_SUIVI_PAS        g_Suivi_Pas,        *gp_Sui_Pas ; \
   extern STRUCT_TIME             g_Time,             *gp_Tim ; \
-  extern STRUCT_TIME_TEMPOS      g_Time_Tempos,      *gp_Tim_Tem ; \
+  extern STRUCT_TIME_TEMPOS      g_Time_Tempos,      *gp_Tpo ; \
   extern STRUCT_VOUTE            g_Voute,            *gp_Vou ; \
   extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Alt,          *gp_Gpio_Pwm_Mot_Alt ; \
   extern STRUCT_GPIO_PWM_MOTEUR  g_Mot_Azi,          *gp_Gpio_Pwm_Mot_Azi ; \
@@ -292,44 +296,6 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_CONST \
   extern const char * gc_hach_suivi_menus[]  ; \
-
-/*
-#ifndef CONFIG_DATAS_NB_LIGNES
-#define CONFIG_DATAS_NB_LIGNES 200
-#endif
-
-#ifndef CONFIG_DATAS_NB_COLONNES
-#define CONFIG_DATAS_NB_COLONNES 2
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_4
-#define  CONFIG_TAILLE_BUFFER_4   4
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_5
-#define  CONFIG_TAILLE_BUFFER_5   5
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_8
-#define  CONFIG_TAILLE_BUFFER_8   8
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_16
-#define  CONFIG_TAILLE_BUFFER_16  16
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_32
-#define  CONFIG_TAILLE_BUFFER_32  32
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_64
-#define  CONFIG_TAILLE_BUFFER_64  64
-#endif
-
-#ifndef CONFIG_TAILLE_BUFFER_256
-#define  CONFIG_TAILLE_BUFFER_256 256
-#endif
-*/
 
 void ASTRO_GLOBAL_INIT(void) ;
 

@@ -29,24 +29,26 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 /*****************************************************************************************
 * @fn     : DEVICES_INIT
 * @author : s.gravois
-* @brief  : Cette fonction configure la structure STRUCT_DEVICES *gp_Dev
-* @param  : STRUCT_DEVICES *gp_Dev
+* @brief  : Cette fonction configure la structure STRUCT_DEVICES *lp_Dev
+* @param  : STRUCT_DEVICES *lp_Dev
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : (obsolete) les devices sont lues depuis le fichier de configuration
 *****************************************************************************************/
 
-void DEVICES_INIT(STRUCT_DEVICES *gp_Dev) {
+void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Dev->use_capteurs    = gp_Dev_Par->par_use_Capteurs ;
-  gp_Dev->use_raquette    = gp_Dev_Par->par_use_Raquette ;
-  gp_Dev->use_bluetooth   = gp_Dev_Par->par_use_Bluetooth ;
-  gp_Dev->use_infrarouge  = gp_Dev_Par->par_use_Infrared ;
-  gp_Dev->use_controler   = gp_Dev_Par->par_use_Controler ;
-  gp_Dev->use_keyboard    = gp_Dev_Par->par_use_Keyboard ;
-  gp_Dev->use_lcd         = gp_Dev_Par->par_use_Lcd ; 
-  gp_Dev->init_capteurs = 0 ; 
+  pthread_mutex_init( & lp_Dev->dev_mutex, NULL ) ;
+
+  lp_Dev->use_capteurs    = gp_Dev_Par->par_use_Capteurs ;
+  lp_Dev->use_raquette    = gp_Dev_Par->par_use_Raquette ;
+  lp_Dev->use_bluetooth   = gp_Dev_Par->par_use_Bluetooth ;
+  lp_Dev->use_infrarouge  = gp_Dev_Par->par_use_Infrared ;
+  lp_Dev->use_controler   = gp_Dev_Par->par_use_Controler ;
+  lp_Dev->use_keyboard    = gp_Dev_Par->par_use_Keyboard ;
+  lp_Dev->use_lcd         = gp_Dev_Par->par_use_Lcd ; 
+  lp_Dev->init_capteurs = 0 ; 
 }
 
 /*****************************************************************************************
@@ -58,17 +60,17 @@ void DEVICES_INIT(STRUCT_DEVICES *gp_Dev) {
 * @date   : 2022-10-08 rapatriement et changement de nom depuis config.c
 *****************************************************************************************/
 
-void DEVICES_AFFICHER_UTILISATION (void) {
+void DEVICES_AFFICHER_UTILISATION (STRUCT_DEVICES *lp_Dev) {
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("gp_Dev->use_infrarouge = %d",gp_Dev->use_infrarouge) ;
-  Trace1("gp_Dev->use_capteurs   = %d",gp_Dev->use_capteurs) ;
-  Trace1("gp_Dev->use_raquette   = %d",gp_Dev->use_raquette) ;
-  Trace1("gp_Dev->use_bluetooth  = %d",gp_Dev->use_bluetooth) ;
-  Trace1("gp_Dev->use_keyboard   = %d",gp_Dev->use_keyboard) ;
-  Trace1("gp_Dev->use_controler  = %d",gp_Dev->use_controler) ;
-  Trace1("gp_Dev->use_lcd        = %d",gp_Dev->use_lcd) ;
+  Trace1("lp_Dev->use_infrarouge = %d",lp_Dev->use_infrarouge) ;
+  Trace1("lp_Dev->use_capteurs   = %d",lp_Dev->use_capteurs) ;
+  Trace1("lp_Dev->use_raquette   = %d",lp_Dev->use_raquette) ;
+  Trace1("lp_Dev->use_bluetooth  = %d",lp_Dev->use_bluetooth) ;
+  Trace1("lp_Dev->use_keyboard   = %d",lp_Dev->use_keyboard) ;
+  Trace1("lp_Dev->use_controler  = %d",lp_Dev->use_controler) ;
+  Trace1("lp_Dev->use_lcd        = %d",lp_Dev->use_lcd) ;
 
   return ;
 }

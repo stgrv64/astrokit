@@ -135,7 +135,9 @@ showrd( "    Apparent:", p, polar );
 dradt = 0.0;
 ddecdt = 0.0;
 polar[2] = 1.0e38; /* make it ignore diurnal parallax */
+
 altaz( infos, polar, UT );
+
 return(0);
 }
 

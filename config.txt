@@ -56,14 +56,14 @@ CONFIG_SCR_KERNEL    script_kernel.sh
 # tempo_menu     doit etre legerement inferieur aux autres tempo
 # tempo_raq      doit etre etre deux fois inferieur aux autres tempos
 
-TEMPO_MENU      100000
-TEMPO_RAQ        75000
-TEMPO_IR        110000
-TEMPO_TERMIOS   120002
-TEMPO_CLAVIER   130003
-TEMPO_CAPTEURS  140004
-TEMPO_LCD_LOOP  150004
-TEMPO_LCD_DISP  160000
+TEMPO_MENU      23000
+TEMPO_RAQ       10000
+TEMPO_IR        25001
+TEMPO_TERMIOS   25002 
+TEMPO_CLAVIER   25003
+TEMPO_CAPTEURS  25004
+TEMPO_LCD_LOOP  1000000
+TEMPO_LCD_DISP  25006
 TEMPO_PID_LOOP  5
 
 PID_ECH 1.0
@@ -75,11 +75,11 @@ PID_KD  0.05
 
 DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
 DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
-DEVICE_USE_LCD              1  # flag qui indique utilisation de ecran LCD1602 / PCA8574
-DEVICE_USE_CONTROLER        1  # flag qui indique utilisation des controleurs de moteur externes
-DEVICE_USE_CAPTEURS         1  # flag qui indique utilisation de capteurs comme source input
-DEVICE_USE_RAQUETTE         1  # flag qui indique utilisation d une raquette (gpio) comme source input
-DEVICE_USE_BLUETOOTH        1  # flag qui indique utilisation du bluetooth comme source input
+DEVICE_USE_LCD              0  # flag qui indique utilisation de ecran LCD1602 / PCA8574
+DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
+DEVICE_USE_CAPTEURS         0  # flag qui indique utilisation de capteurs comme source input
+DEVICE_USE_RAQUETTE         0  # flag qui indique utilisation d une raquette (gpio) comme source input
+DEVICE_USE_BLUETOOTH        0  # flag qui indique utilisation du bluetooth comme source input
 
 # ----------------------- parametres geographiques
 

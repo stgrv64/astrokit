@@ -16,6 +16,7 @@
 #include "astro_global.h"
 
 struct STR_DEVICES_PARAMS {
+  pthread_mutex_t dev_par_mutex ;
   int par_use_Capteurs    ;
   int par_use_Raquette     ;
   int par_use_Bluetooth    ;
@@ -26,7 +27,7 @@ struct STR_DEVICES_PARAMS {
 } ;
 
 struct STR_DEVICES {
-
+  pthread_mutex_t dev_mutex ;
   int  use_bluetooth ;
   int  use_capteurs ;
   int  use_infrarouge ;
@@ -41,6 +42,7 @@ struct STR_DEVICES {
 typedef struct STR_DEVICES_PARAMS STRUCT_DEVICES_PARAMS ;
 typedef struct STR_DEVICES STRUCT_DEVICES ;
 
-void   DEVICES_INIT ( STRUCT_DEVICES * ) ;
+void   DEVICES_INIT                 ( STRUCT_DEVICES * ) ;
+void   DEVICES_AFFICHER_UTILISATION ( STRUCT_DEVICES * ) ;  
 
 #endif

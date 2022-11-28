@@ -15,7 +15,7 @@ void STAT_MESURE_PULSATIONS_INJECTEES(STRUCT_SUIVI * gp_Sui) {
 	for(i=0;i<STATS_ASS;i++) gp_Sui->Ias += gp_Sui->Iat[i] ;
 	gp_Sui->Ias = gp_Sui->Ias / STATS_ASS ;
 	
-	// if ( incr > STATS_ASS )   gp_Sui->Tac = gp_Sui->Tacc * gp_Sui->Ias / gp_Sui->Fa_mic   ;
+	// if ( incr > STATS_ASS )   gp_Sui->Tac = gp_Sui->Tacc * gp_Sui->Ias / gp_Sui_Fre->fre_fa_mic   ;
 	if ( incr > STATS_ASS )   gp_Sui->Tac = gp_Sui->Tacc ;
 	//gp_Sui->Tac = pow(gp_Sui->Tac, 1.02) ;
 	
@@ -30,7 +30,7 @@ void STAT_MESURE_PULSATIONS_INJECTEES(STRUCT_SUIVI * gp_Sui) {
 	for(i=0;i<STATS_ASS;i++) gp_Sui->Ihs += gp_Sui->Iht[i] ;
 	gp_Sui->Ihs = gp_Sui->Ihs / STATS_ASS ;
 	
-	// if ( incr > STATS_ASS )   gp_Sui->Thc = gp_Sui->Thcc * gp_Sui->Ihs / gp_Sui->Fh_mic ;
+	// if ( incr > STATS_ASS )   gp_Sui->Thc = gp_Sui->Thcc * gp_Sui->Ihs / gp_Sui_Fre->fre_fh_mic ;
 	if ( incr > STATS_ASS )   gp_Sui->Thc = gp_Sui->Thcc ;
 	//gp_Sui->Thc = pow(gp_Sui->Thc, 1.02) ;
 	

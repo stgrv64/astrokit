@@ -20,16 +20,18 @@
 typedef struct   STR_VOUTE STRUCT_VOUTE ;
 
 struct STR_VOUTE {
-   double    vou_tempo_percent ;
-   double    vou_calibration_delta_t ;
-   double    vou_begin ;
-   double    vou_end ;
-   double    vou_pas ;
-   double    vou_dt ;
-   double    vou_dt_us ; 
-   double    vou_acc ;
-   long long vou_num ; 
-   double    vou_temps_ecoule ;   
+   pthread_mutex_t vou_mutex ;
+   unsigned long   vou_tempo ;
+   unsigned long   vou_dt_us ; 
+   long long       vou_num ; 
+   double          vou_tempo_percent ;
+   double          vou_calibration_delta_t ;
+   double          vou_begin ;
+   double          vou_end ;
+   double          vou_pas ;
+   double          vou_dt ;
+   double          vou_acc ;
+   double          vou_temps_ecoule ;   
 } ;
 
 void  VOUTE_INIT            ( STRUCT_VOUTE * ) ;

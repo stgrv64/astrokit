@@ -18,51 +18,53 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 /*****************************************************************************************
 * @fn     : LIEU_INIT
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure STRUCT_LIEU *gp_Lie
-* @param  : STRUCT_LIEU *gp_Lie
+* @brief  : Cette fonction initialise la structure STRUCT_LIEU *lp_Lie
+* @param  : STRUCT_LIEU *lp_Lie
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-10-07 deplacement depuis config.c dans ce fichier
 * @todo   : cf si JJ etc.. sont utiles dans la structure (parametres de temps)
 *****************************************************************************************/
 
-void LIEU_INIT(STRUCT_LIEU *gp_Lie) {
+void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
  
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Lie->JJ  = 0 ; // jour julien
-  gp_Lie->TS  = 0 ;  // temps sideral
-  gp_Lie->TSR = 0 ;  // temps sideral en radians
-  gp_Lie->JD  = 0 ;  // jour decimal
-  gp_Lie->lat = gp_Lie_Par->par_latitude / CALCUL_UN_RADIAN_EN_DEGRES ;
-  gp_Lie->lon = gp_Lie_Par->par_longitude / CALCUL_UN_RADIAN_EN_DEGRES ;
-  gp_Lie->alt = gp_Lie_Par->par_altitude ;
+  pthread_mutex_init( & lp_Lie->lie_mutex, NULL ) ;
+
+  lp_Lie->lie_jj  = 0 ; // jour julien
+  lp_Lie->lie_ts  = 0 ;  // temps sideral
+  lp_Lie->lie_tsr = 0 ;  // temps sideral en radians
+  lp_Lie->lie_jd  = 0 ;  // jour decimal
+  lp_Lie->lie_lat = gp_Lie_Par->par_latitude / CALCULS_UN_RADIAN_EN_DEGRES ;
+  lp_Lie->lie_lon = gp_Lie_Par->par_longitude / CALCULS_UN_RADIAN_EN_DEGRES ;
+  lp_Lie->lie_alt = gp_Lie_Par->par_altitude ;
 }
 
 /*****************************************************************************************
 * @fn     : LIEU_AFFICHER
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations du lieu d observation
-* @param  : STRUCT_LIEU *gp_Lie
+* @param  : STRUCT_LIEU *lp_Lie
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-void LIEU_AFFICHER(STRUCT_LIEU *gp_Lie) {
+void LIEU_AFFICHER(STRUCT_LIEU *lp_Lie) {
 
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1(" latitude   :  %.2f", gp_Lie->lat * CALCUL_UN_RADIAN_EN_DEGRES ) ; 
-  Trace1(" longitude  :  %.2f", gp_Lie->lon * CALCUL_UN_RADIAN_EN_DEGRES ) ;
-  Trace1("gp_Lie->JD    : %f",gp_Lie->JD) ;
-  Trace1("gp_Lie->JJ    : %f",gp_Lie->JJ) ;
-  Trace1("gp_Lie->TS    : %f",gp_Lie->TS) ;
-  Trace1("gp_Lie->TSR   : %f",gp_Lie->TSR) ;
+  Trace1(" latitude   :  %.2f", lp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES ) ; 
+  Trace1(" longitude  :  %.2f", lp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace1("lp_Lie->lie_jd    : %f",lp_Lie->lie_jd) ;
+  Trace1("lp_Lie->lie_jj    : %f",lp_Lie->lie_jj) ;
+  Trace1("lp_Lie->lie_ts    : %f",lp_Lie->lie_ts) ;
+  Trace1("lp_Lie->lie_tsr   : %f",lp_Lie->lie_tsr) ;
 
-  Trace1("gp_Lie->alt = %f",gp_Lie->alt ) ;
+  Trace1("lp_Lie->lie_alt = %f",lp_Lie->lie_alt ) ;
 
 
-  Trace1("gp_Lie->lat (deg) = %f",gp_Lie->lat * CALCUL_UN_RADIAN_EN_DEGRES ) ;
-  Trace1("gp_Lie->lon (deg) = %f",gp_Lie->lon * CALCUL_UN_RADIAN_EN_DEGRES ) ;
+  Trace1("lp_Lie->lie_lat (deg) = %f",lp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace1("lp_Lie->lie_lon (deg) = %f",lp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES ) ;
 
   Trace1("----------------------------") ;
 }

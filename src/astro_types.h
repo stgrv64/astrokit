@@ -19,15 +19,7 @@
 #ifndef ASTRO_TYPES_H
 #define ASTRO_TYPES_H
 
-struct STR_ANGLE {
-  char   c_si ; 
-  double AD ;   
-  double ad ;   
-  int    si ;      
-  int    DD ;      
-  int    MM ;      
-  int    SS ; 
-} ;
+
 
 #endif
 

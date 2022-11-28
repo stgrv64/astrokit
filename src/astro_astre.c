@@ -14,6 +14,8 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 */
+
+
 /*****************************************************************************************
 * @fn     : ASTRE_INIT
 * @author : s.gravois
@@ -32,13 +34,17 @@ void ASTRE_INIT(STRUCT_ASTRE *gp_Ast ) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  pthread_mutex_init( & gp_Ast->ast_mutex, NULL ) ;
+
+  pthread_mutex_lock( & gp_Ast->ast_mutex ) ;
+
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
-    memset( gp_Ast->plus_proche[C], CALCUL_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+    memset( gp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
     strcpy( gp_Ast->plus_proche[C], "") ;
   }
-  memset( gp_Ast->nom,   CALCUL_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( gp_Ast->infos, CALCUL_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( gp_Ast->plus_proche, CALCUL_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( gp_Ast->nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( gp_Ast->infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( gp_Ast->plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   
   gp_Ast->a   = 0  ;
   gp_Ast->h   = 0  ;
@@ -67,10 +73,11 @@ void ASTRE_INIT(STRUCT_ASTRE *gp_Ast ) {
   gp_Ast->z =0;
   gp_Ast->zz =0;
   
-  gp_Ast->en_type = ASTRE_INDETERMINE ;
-  gp_Ast->en_mode = CALCUL_EQUATORIAL_VERS_AZIMUTAL ;
-  gp_Ast->numero  = 0 ;
+  gp_Ast->ast_typ = ASTRE_INDETERMINE ;
+  gp_Ast->ast_num  = 0 ;
   gp_Ast->ast_new = TRUE ;
+
+  pthread_mutex_unlock( & gp_Ast->ast_mutex ) ;
 }
 
 
@@ -140,35 +147,37 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *gp_Ast ) {
 
   /* traitement des donnees en heures / minutes / secondes */
 
-  sprintf( c_hhmmss_agh, " %3dh%2dm%2ds",  gp_Ast->AGHt.HH, gp_Ast->AGHt.MM, gp_Ast->AGHt.SS  ) ;
-  sprintf( c_hhmmss_asc, " %3dh%2dm%2ds",  gp_Ast->ASCt.HH, gp_Ast->ASCt.MM, gp_Ast->ASCt.SS  ) ;
-  sprintf( c_hhmmss_azi, " %3dh%2dm%2ds",  gp_Ast->AZIt.HH, gp_Ast->AZIt.MM, gp_Ast->AZIt.SS  ) ;
-  sprintf( c_hhmmss_alt, " %3dh%2dm%2ds",  gp_Ast->ALTt.HH, gp_Ast->ALTt.MM, gp_Ast->ALTt.SS  ) ;
-  sprintf( c_hhmmss_dec, " %3dh%2dm%2ds",  gp_Ast->DECt.HH, gp_Ast->DECt.MM, gp_Ast->DECt.SS  ) ;
+  sprintf( c_hhmmss_agh, " %3dh%2dm%2ds",  gp_Ast->AGHt.tim_HH, gp_Ast->AGHt.tim_MM, gp_Ast->AGHt.tim_SS  ) ;
+  sprintf( c_hhmmss_asc, " %3dh%2dm%2ds",  gp_Ast->ASCt.tim_HH, gp_Ast->ASCt.tim_MM, gp_Ast->ASCt.tim_SS  ) ;
+  sprintf( c_hhmmss_azi, " %3dh%2dm%2ds",  gp_Ast->AZIt.tim_HH, gp_Ast->AZIt.tim_MM, gp_Ast->AZIt.tim_SS  ) ;
+  sprintf( c_hhmmss_alt, " %3dh%2dm%2ds",  gp_Ast->ALTt.tim_HH, gp_Ast->ALTt.tim_MM, gp_Ast->ALTt.tim_SS  ) ;
+  sprintf( c_hhmmss_dec, " %3dh%2dm%2ds",  gp_Ast->DECt.tim_HH, gp_Ast->DECt.tim_MM, gp_Ast->DECt.tim_SS  ) ;
 
-  sprintf( c_hhmm_agh, " %3d h %2d m",  gp_Ast->AGHt.HH, gp_Ast->AGHt.MM ) ;
-  sprintf( c_hhmm_asc, " %3d h %2d m",  gp_Ast->ASCt.HH, gp_Ast->ASCt.MM ) ;
-  sprintf( c_hhmm_azi, " %3d h %2d m",  gp_Ast->AZIt.HH, gp_Ast->AZIt.MM ) ;
-  sprintf( c_hhmm_alt, " %3d h %2d m",  gp_Ast->ALTt.HH, gp_Ast->ALTt.MM ) ;
-  sprintf( c_hhmm_dec, " %3d h %2d m",  gp_Ast->DECt.HH, gp_Ast->DECt.MM ) ;
+  sprintf( c_hhmm_agh,   " %3d h %2d m",   gp_Ast->AGHt.tim_HH, gp_Ast->AGHt.tim_MM ) ;
+  sprintf( c_hhmm_asc,   " %3d h %2d m",   gp_Ast->ASCt.tim_HH, gp_Ast->ASCt.tim_MM ) ;
+  sprintf( c_hhmm_azi,   " %3d h %2d m",   gp_Ast->AZIt.tim_HH, gp_Ast->AZIt.tim_MM ) ;
+  sprintf( c_hhmm_alt,   " %3d h %2d m",   gp_Ast->ALTt.tim_HH, gp_Ast->ALTt.tim_MM ) ;
+  sprintf( c_hhmm_dec,   " %3d h %2d m",   gp_Ast->DECt.tim_HH, gp_Ast->DECt.tim_MM ) ;
 
   /* traitement des donnees en degres / minutes / secondes */
   /* est inclus dans l affichage le signe */
 
-  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Ast->AGHa.c_si, gp_Ast->AGHa.DD, gp_Ast->AGHa.MM ) ;
-  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Ast->ASCa.c_si, gp_Ast->ASCa.DD, gp_Ast->ASCa.MM ) ;
-  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Ast->AZIa.c_si, gp_Ast->AZIa.DD, gp_Ast->AZIa.MM ) ;
-  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Ast->ALTa.c_si, gp_Ast->ALTa.DD, gp_Ast->ALTa.MM ) ;
-  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Ast->DECa.c_si, gp_Ast->DECa.DD, gp_Ast->DECa.MM ) ;
+  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Ast->AGHa.ang_sig, gp_Ast->AGHa.ang_DD, gp_Ast->AGHa.ang_MM ) ;
+  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Ast->ASCa.ang_sig, gp_Ast->ASCa.ang_DD, gp_Ast->ASCa.ang_MM ) ;
+  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Ast->AZIa.ang_sig, gp_Ast->AZIa.ang_DD, gp_Ast->AZIa.ang_MM ) ;
+  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Ast->ALTa.ang_sig, gp_Ast->ALTa.ang_DD, gp_Ast->ALTa.ang_MM ) ;
+  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Ast->DECa.ang_sig, gp_Ast->DECa.ang_DD, gp_Ast->DECa.ang_MM ) ;
 
-  sprintf( c_dd_agh, "%c %-3d deg", gp_Ast->AGHa.c_si, gp_Ast->AGHa.DD ) ;
-  sprintf( c_dd_asc, "%c %-3d deg", gp_Ast->ASCa.c_si, gp_Ast->ASCa.DD ) ;
-  sprintf( c_dd_azi, "%c %-3d deg", gp_Ast->AZIa.c_si, gp_Ast->AZIa.DD ) ;
-  sprintf( c_dd_alt, "%c %-3d deg", gp_Ast->ALTa.c_si, gp_Ast->ALTa.DD ) ;
-  sprintf( c_dd_dec, "%c %-3d deg", gp_Ast->DECa.c_si, gp_Ast->DECa.DD ) ;
+  sprintf( c_dd_agh,   "%c %-3d deg",   gp_Ast->AGHa.ang_sig, gp_Ast->AGHa.ang_DD ) ;
+  sprintf( c_dd_asc,   "%c %-3d deg",   gp_Ast->ASCa.ang_sig, gp_Ast->ASCa.ang_DD ) ;
+  sprintf( c_dd_azi,   "%c %-3d deg",   gp_Ast->AZIa.ang_sig, gp_Ast->AZIa.ang_DD ) ;
+  sprintf( c_dd_alt,   "%c %-3d deg",   gp_Ast->ALTa.ang_sig, gp_Ast->ALTa.ang_DD ) ;
+  sprintf( c_dd_dec,   "%c %-3d deg",   gp_Ast->DECa.ang_sig, gp_Ast->DECa.ang_DD ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   
+  MUTEX_AST_LOCK
+
   strcpy( gp_Ast->c_hhmmss_agh, c_hhmmss_agh)  ;
   strcpy( gp_Ast->c_hhmmss_asc, c_hhmmss_asc)  ;
   strcpy( gp_Ast->c_hhmmss_azi, c_hhmmss_azi)  ;
@@ -192,6 +201,8 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *gp_Ast ) {
   strcpy( gp_Ast->c_dd_azi, c_dd_azi)  ;
   strcpy( gp_Ast->c_dd_alt, c_dd_alt)  ;
   strcpy( gp_Ast->c_dd_dec, c_dd_dec)  ;
+
+  MUTEX_AST_UNLOCK
 }
 
 /*****************************************************************************************

@@ -99,6 +99,8 @@ int I2C_INIT( STRUCT_I2C_DEVICE * p_i2c_dev, char * c_i2c_device_name, char * ad
   int ret ;
   ret =0 ;
   
+  pthread_mutex_init(&p_i2c_dev->i2c_dev_mutex,NULL) ;
+  
   if ( ( p_i2c_dev->fd = open(c_i2c_device_name, O_RDWR)) < 0)  ret = -1 ;
   else if ( ioctl( p_i2c_dev->fd, I2C_SLAVE, strtoul(adress,NULL,16) ) < 0) ret = -2 ;
   else p_i2c_dev->adress = strtoul(adress,NULL,16) ;

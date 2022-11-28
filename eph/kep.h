@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "plantbl.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #ifndef DEBUG
 #define TRACE(fmt, args...)  while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 

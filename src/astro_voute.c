@@ -37,7 +37,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
   lp_Vou->vou_begin               = 0 ;
   lp_Vou->vou_end                 = 0 ;
   lp_Vou->vou_acc        = 1 ;
-  lp_Vou->vou_pas                 = lp_Vou->vou_dt * CALCUL_VIT_ROT_EARTH_RAD_PER_SEC ;
+  lp_Vou->vou_pas                 = lp_Vou->vou_dt * CALCULS_VIT_ROT_EARTH_RAD_PER_SEC ;
   /* dt en micro-sec */
 
   lp_Vou->vou_dt_us = (unsigned long)( lp_Vou->vou_dt * TEMPS_MICRO_SEC / lp_Vou->vou_acc ) ;   
@@ -62,10 +62,10 @@ void VOUTE_CONFIG( STRUCT_VOUTE *lp_Vou, double dt, double acc, double percent )
   lp_Vou->vou_tempo_percent       = percent ; 
   lp_Vou->vou_calibration_delta_t = 0.99 ; // permet de calibrer la boucle de calcul voute pour qu'elle fasse pile une seconde
   lp_Vou->vou_begin               = 0 ;
-  lp_Vou->vou_end                 = CALCUL_PI_FOIS_DEUX ;
+  lp_Vou->vou_end                 = CALCULS_PI_FOIS_DEUX ;
   lp_Vou->vou_num                     = 0 ;
   lp_Vou->vou_acc        = acc ;
-  lp_Vou->vou_pas                 = lp_Vou->vou_dt * CALCUL_VIT_ROT_EARTH_RAD_PER_SEC ;
+  lp_Vou->vou_pas                 = lp_Vou->vou_dt * CALCULS_VIT_ROT_EARTH_RAD_PER_SEC ;
   /* dt en micro-sec */
   lp_Vou->vou_dt_us                      = (unsigned long)( lp_Vou->vou_dt * TEMPS_MICRO_SEC / lp_Vou->vou_acc ) ;
 }
@@ -114,7 +114,7 @@ long VOUTE_TEMPORISATION(STRUCT_VOUTE *lp_Vou, struct timeval t00) {
 
 void VOUTE_AFFICHER( STRUCT_VOUTE * lp_Vou) {
 	
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 	Trace1("lp_Vou->vou_num %lld", lp_Vou->vou_num) ;
   Trace1("lp_Vou->vou_pas %lld", lp_Vou->vou_num) ;

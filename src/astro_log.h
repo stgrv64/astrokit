@@ -19,7 +19,7 @@
 #define ASTRO_LOG_DEBUG                  0 /* valeurs possibles => 0 : pas de traces  , > 0 : traces progressives*/
 #define ASTRO_LOG_DEBUG_PID              0 /* valeurs possibles => 0 : pas de traces  ,   1 : traces */
 #define ASTRO_LOG_DEBUG_WRITE_FS         0 /* valeurs possibles => 0 : pas d ecriture ,   1 : ecriture */
-#define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  0
+#define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  0 /* valeurs possibles => 0 : fcontions de base , > 0 : suivantes */
 /* gp_File_Flog */
 
 // ------------------------------------------------------------------------

@@ -919,7 +919,7 @@ double GPIO_FONCTION_RAPPORT_CYCLIQUE(int num_bobine, double t, STRUCT_GPIO_PWM_
   // rc =  acos(cos(2*M_PI*pm->Fm*2*t+M_PI/2))/(M_PI/2)-1 ; // fonction triangulaire
 }
 // ##########################################################################################################
-void GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) {
+void GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) {
   
   int i, j;
   double t  ;
@@ -987,11 +987,10 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
   double TUpwm, TUpwm_haut, TUpwm_bas, rap ;
   double pmot =0 ;
   // struct sched_param param;
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   sleep(1) ;
 
@@ -1004,12 +1003,16 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) {
 
   while(1) {
     
-    pthread_mutex_lock( & ph->pha_mutex ) ;
+    /* Creee un point d 'annulation pour la fonction pthread_cancel */
+    pthread_testcancel() ;
+
+    MUTEX_PHA_LOCK
     
-      rap   = ph->rap[ ph->micropas ] ;
-      TUpwm = (double)TEMPS_MICRO_SEC * ph->Tpwm ;
-      pmot  = ph->periode_mot ;
-    pthread_mutex_unlock( & ph->pha_mutex ) ;
+    rap   = ph->rap[ ph->micropas ] ;
+    TUpwm = ph->Tpwm * (double)TEMPS_MICRO_SEC ;
+    pmot  = ph->periode_mot ;
+
+    MUTEX_PHA_UNLOCK
     
     TUpwm_haut = TUpwm * rap  ; 
     TUpwm_bas  = TUpwm - TUpwm_haut ;
@@ -1054,7 +1057,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   double d_ecart =0;       /* ecart entre Periodes attendues et reelles */
   double d_pid = 0 ;         /* parametre PID a appliquer */
 
-  double periode_bru=0 ; /* periode brute calculee dans CALCUL_PERIODE */
+  double periode_bru=0 ; /* periode brute calculee dans CALCULS_PERIODE */
   double periode_eff=0 ; /* periode effective pour la temporisation */
   double periode_ree=0 ; /* periode effective reelle consommee pour la temporisation */
   double periode_mic=0 ; /* periode de referefence (micro pas) pour la temporisation */
@@ -1065,11 +1068,10 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   long long   i_incr=0 ; 
   struct sched_param param;
   int     micropas=0 ;
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   periode_mic = 0 ;
   periode_mot = 0 ;
@@ -1087,6 +1089,9 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
   
   while (1) {
 
+    /* Creee un point d 'annulation pour la fonction pthread_cancel */
+    pthread_testcancel() ;
+
     pthread_mutex_lock( & pm->mot_mutex ) ;
 
     /* -----------------------------------------------------
@@ -1095,15 +1100,15 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
        En fonction de l'id moteur (ALT ou AZI) 
        -----------------------------------------------------*/ 
 
-    switch ( pm->id ) {
+    switch ( pm->mot_id ) {
 
       case 0 : 
         pthread_mutex_lock( & gp_Mut->mut_glo_alt ) ;
 
-          periode_mic         = pm->p_sui->Th_mic ;
-          periode_mot         = pm->p_sui->Th_mot / gp_Cal_Par->par_alt_red_4;
-          periode_bru         = pm->p_sui->Th_bru / gp_Cal_Par->par_alt_red_4 ;
-          sens                = pm->p_sui->Sh ;
+          periode_mic         = gp_Sui_Fre->fre_th_mic ;
+          periode_mot         = gp_Sui_Fre->fre_th_mot / gp_Cal_Par->par_alt_red_4;
+          periode_bru         = gp_Sui_Fre->fre_th_bru / gp_Cal_Par->par_alt_red_4 ;
+          sens                = gp_Sui_Fre->fre_sh ;
 
         pthread_mutex_unlock( & gp_Mut->mut_glo_alt ) ;
         break ;
@@ -1111,10 +1116,10 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
       case 1 :
         pthread_mutex_lock( & gp_Mut->mut_glo_azi ) ;
 
-          periode_mic         = pm->p_sui->Ta_mic ; 
-          periode_mot         = pm->p_sui->Ta_mot / gp_Cal_Par->par_azi_red4 ;
-          periode_bru         = pm->p_sui->Ta_bru / gp_Cal_Par->par_azi_red4 ;
-          sens                = pm->p_sui->Sa ;
+          periode_mic         = gp_Sui_Fre->fre_ta_mic ; 
+          periode_mot         = gp_Sui_Fre->fre_ta_mot / gp_Cal_Par->par_azi_red_4 ;
+          periode_bru         = gp_Sui_Fre->fre_ta_bru / gp_Cal_Par->par_azi_red_4 ;
+          sens                = gp_Sui_Fre->fre_sa ;
 
         pthread_mutex_unlock( & gp_Mut->mut_glo_azi ) ;
         break ;
@@ -1190,7 +1195,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
     
     pthread_mutex_lock(  & pm->mot_mutex ) ;
 
-    periode_ree = TEMPS_CALCUL_DUREE_SECONDES( & pm->tval ) ;
+    periode_ree = TEMPS_CALCULS_DUREE_SECONDES( & pm->tval ) ;
 
     /* les temps sont mis a jour en considerant que le passage
        dans la boucle while se fait au regard des temps micro pas */
@@ -1218,7 +1223,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
 
       /* Correction du calcul asservissement juin 2022 */
 
-      switch ( pm->id ) {
+      switch ( pm->mot_id ) {
 
         case 0 : 
           // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", pm->p_sui->pas_acc_alt, pm->tps_ree, pm->tps_mic, pm->pas ) ;
@@ -1245,21 +1250,21 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
-    Trace2("i_pas_change %d pm->pas %lld gp_Sui->sui_tpo->tempo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
+    Trace2("i_pas_change %d pm->pas %lld gp_Tpo->tpo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
       i_pas_change, \
       pm->pas, \
-      gp_Sui->sui_tpo->tempo_pid_loop, \
+      gp_Tpo->tpo_pid_loop, \
       gp_Pid_Par->par_pid_ech \
     ) ;
 
-    if ( i_pas_change && ( pm->pas % gp_Sui->sui_tpo->tempo_pid_loop ) == 0 ) {
+    if ( i_pas_change && ( pm->pas % gp_Tpo->tpo_pid_loop ) == 0 ) {
 
-      switch ( pm->id ) {
+      switch ( pm->mot_id ) {
 
         case 0 : 
           if ( gi_pid_trace_alt ) {
             Trace("mot %-3d => pas %-5lld : tps_bru %f tps_ree %f : per_bru %f per_ree %f ecart %f",\
-              pm->id,       \
+              pm->mot_id,       \
               pm->pas,      \
               pm->tps_bru,  \
               pm->tps_ree,  \
@@ -1273,7 +1278,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
         case 1 : 
           if ( gi_pid_trace_azi ) {
             Trace("mot %-3d => pas %-5lld : tps_bru %f tps_ree %f : per_bru %f per_ree %f ecart %f",\
-              pm->id,       \
+              pm->mot_id,       \
               pm->pas,      \
               pm->tps_bru,  \
               pm->tps_ree,  \
@@ -1288,7 +1293,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) {
 
     // FIXME : calcule la duree reelle d une iteration dans la boucle
 
-    //tdiff = TEMPS_CALCUL_DUREE_MICROSEC( &pm->tval ) ; 
+    //tdiff = TEMPS_CALCULS_DUREE_MICROSEC( &pm->tval ) ; 
     i_incr++ ;
   } // FIXME : fin boucle while 
 }
@@ -1310,7 +1315,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
   pm->type_fonction = type_fonction ;
   pm->param0        = param0 ;
   pm->param1        = param1 ;
-  pm->id            = id ;
+  pm->mot_id            = id ;
   pm->Fpwm          = fpwm ;
   pm->Fm            = fm / 8 ;
   pm->nbmicropas    = upas ;
@@ -1358,7 +1363,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_
     /* Trace1("") ; */
     usleep(100000) ;
   }
-  GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES( pm )  ;
+  GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES( pm )  ;
 }
 // ======================================= suivi clavier ===================================================
 void * suivi_clavier() {
@@ -1648,32 +1653,41 @@ int mainG(int argc, char **argv) {
   for(i=0;i<4;i++) Trace1("gpio %d : %d",i,gpiosM2[i]) ;
   for(i=0;i<4;i++) Trace1("masq %d : %d",i,masque[i]) ;
 
-  gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot = (double)fr_azi ;
-  gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot = (double)fr_alt ;
+  MUTEX_SUI_FRE_LOCK
 
-  gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_bru = (double)fr_azi ;
-  gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_bru = (double)fr_alt ;
+  gp_Sui_Fre->fre_fa_mot = (double)fr_azi ;
+  gp_Sui_Fre->fre_fh_mot = (double)fr_alt ;
+  gp_Sui_Fre->fre_fa_bru = (double)fr_azi ;
+  gp_Sui_Fre->fre_fh_bru = (double)fr_alt ;
+  gp_Sui_Fre->fre_fa_mic =     gp_Sui_Fre->fre_fa_mot * (double)upas  ;
+  gp_Sui_Fre->fre_fh_mic =     gp_Sui_Fre->fre_fh_mot * (double)upas ;
+  gp_Sui_Fre->fre_ta_mot = 1 / gp_Sui_Fre->fre_fa_mot ;
+  gp_Sui_Fre->fre_th_mot = 1 / gp_Sui_Fre->fre_fh_mot ;
+  gp_Sui_Fre->fre_ta_bru = 1 / gp_Sui_Fre->fre_fa_mot ;
+  gp_Sui_Fre->fre_th_bru = 1 / gp_Sui_Fre->fre_fh_mot ;
+  gp_Sui_Fre->fre_ta_mic = 1 / gp_Sui_Fre->fre_fa_mic ;
+  gp_Sui_Fre->fre_th_mic = 1 / gp_Sui_Fre->fre_fh_mic ;
 
-  gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mic     = gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot * (double)upas  ;
-  gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mic     = gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot * (double)upas ;
-
-  gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mot = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot ;
-  gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mot = 1 / gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot ;
-
-  gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_bru = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot ;
-  gp_Gpio_Pwm_Mot_Azi->p_sui->Th_bru = 1 / gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot ;
-
-  gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mic = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mic ;
-  gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mic = 1 / gp_Gpio_Pwm_Mot_Alt->p_sui->Fh_mic ;
+  MUTEX_SUI_FRE_UNLOCK
 
   pid=getpid() ;
   nbcpus = sysconf(_SC_NPROCESSORS_ONLN) ;
   
-  Trace("gp_Lie_Par->par_altitude : periode mot = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mot, gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mot ) ; 
-  Trace("AZIMUT   : periode mot = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mot, gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mot ) ; 
+  Trace("gp_Lie_Par->par_altitude : periode mot = %.2f f = %.f ", \
+    gp_Sui_Fre->fre_ta_mot, \
+    gp_Sui_Fre->fre_fa_mot ) ; 
 
-  Trace("gp_Lie_Par->par_altitude : periode mic = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Alt->p_sui->Ta_mic, gp_Gpio_Pwm_Mot_Alt->p_sui->Fa_mic ) ; 
-  Trace("AZIMUT   : periode mic = %.2f f = %.f ", gp_Gpio_Pwm_Mot_Azi->p_sui->Th_mic, gp_Gpio_Pwm_Mot_Azi->p_sui->Fh_mic ) ; 
+  Trace("AZIMUT   : periode mot = %.2f f = %.f ", \
+    gp_Sui_Fre->fre_th_mot, \
+    gp_Sui_Fre->fre_fh_mot ) ; 
+
+  Trace("gp_Lie_Par->par_altitude : periode mic = %.2f f = %.f ", \
+    gp_Sui_Fre->fre_ta_mic, \
+    gp_Sui_Fre->fre_fa_mic ) ; 
+
+  Trace("AZIMUT   : periode mic = %.2f f = %.f ", \
+    gp_Sui_Fre->fre_th_mic, \
+    gp_Sui_Fre->fre_fh_mic ) ; 
 /*
   Trace("correct(y/n)?") ;
   nread = read( 0, &ch, 1)  ;
@@ -1805,16 +1819,16 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int gp_Gpi_Par_Mat->par_l[4],int gp_Gp
 
         if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
    
-          if ( ! strcmp( raquette[i][j], "plus" ) )  {  gp_Sui->sui_pas->pas_acc_plus =1 ; }
-          if ( ! strcmp( raquette[i][j], "moins" ) ) { gp_Sui->sui_pas->pas_acc_moins=1 ; }
-          if ( ! strcmp( raquette[i][j], "ne" ) )    { gp_Sui->sui_pas->pas_nord=1 ; gp_Sui->sui_pas->pas_est=1   ; }
-          if ( ! strcmp( raquette[i][j], "no" ) )    { gp_Sui->sui_pas->pas_nord=1 ; gp_Sui->sui_pas->pas_ouest=1 ; }
-          if ( ! strcmp( raquette[i][j], "se" ) )    { gp_Sui->sui_pas->pas_sud=1  ; gp_Sui->sui_pas->pas_est=1   ; }
-          if ( ! strcmp( raquette[i][j], "so" ) )    { gp_Sui->sui_pas->pas_sud=1  ; gp_Sui->sui_pas->pas_ouest=1 ; }
-          if ( ! strcmp( raquette[i][j], "n" ) )     { gp_Sui->sui_pas->pas_nord  = 1 ; }
-          if ( ! strcmp( raquette[i][j], "o" ) )     { gp_Sui->sui_pas->pas_ouest = 1 ; }
-          if ( ! strcmp( raquette[i][j], "e" ) )     { gp_Sui->sui_pas->pas_est   = 1 ; }
-          if ( ! strcmp( raquette[i][j], "s" ) )     { gp_Sui->sui_pas->pas_sud   = 1 ; }
+          if ( ! strcmp( raquette[i][j], "plus" ) )  {  gp_Sui_Pas->pas_acc_plus =1 ; }
+          if ( ! strcmp( raquette[i][j], "moins" ) ) { gp_Sui_Pas->pas_acc_moins=1 ; }
+          if ( ! strcmp( raquette[i][j], "ne" ) )    { gp_Sui_Pas->pas_nord=1 ; gp_Sui_Pas->pas_est=1   ; }
+          if ( ! strcmp( raquette[i][j], "no" ) )    { gp_Sui_Pas->pas_nord=1 ; gp_Sui_Pas->pas_ouest=1 ; }
+          if ( ! strcmp( raquette[i][j], "se" ) )    { gp_Sui_Pas->pas_sud=1  ; gp_Sui_Pas->pas_est=1   ; }
+          if ( ! strcmp( raquette[i][j], "so" ) )    { gp_Sui_Pas->pas_sud=1  ; gp_Sui_Pas->pas_ouest=1 ; }
+          if ( ! strcmp( raquette[i][j], "n" ) )     { gp_Sui_Pas->pas_nord  = 1 ; }
+          if ( ! strcmp( raquette[i][j], "o" ) )     { gp_Sui_Pas->pas_ouest = 1 ; }
+          if ( ! strcmp( raquette[i][j], "e" ) )     { gp_Sui_Pas->pas_est   = 1 ; }
+          if ( ! strcmp( raquette[i][j], "s" ) )     { gp_Sui_Pas->pas_sud   = 1 ; }
           if ( ! strcmp( raquette[i][j], "reset" ) ) { gp_Sui->reset   = 1 ; }
     
         }
@@ -1822,7 +1836,7 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int gp_Gpi_Par_Mat->par_l[4],int gp_Gp
     
       GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 0) ;  
     }
-    // Trace("%ld %ld %ld %ld\n", gp_Sui->sui_pas->pas_ouest, gp_Sui->sui_pas->pas_est,  gp_Sui->sui_pas->pas_nord,gp_Sui->sui_pas->pas_sud);
+    // Trace("%ld %ld %ld %ld\n", gp_Sui_Pas->pas_ouest, gp_Sui_Pas->pas_est,  gp_Sui_Pas->pas_nord,gp_Sui_Pas->pas_sud);
   }
 }
 */
@@ -1921,9 +1935,7 @@ void GPIO_CLAVIER_MATRICIEL_READ (int gp_Gpi_Par_Mat->par_l[4],int gp_Gpi_Par_Ma
       
     for(i=0;i<4;i++) {
       GPIO_SET( gp_Gpi_Par_Mat->par_c[i], 1) ;
-      
-      usleep( gp_Key->tempo_clavier ) ;
-      
+
       for(j=0;j<4;j++)  {
         if( GPIO_GET(gp_Gpi_Par_Mat->par_l[j])) {
           I=i; J=j ;

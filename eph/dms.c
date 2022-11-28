@@ -34,8 +34,9 @@ int showrd( msg, p, pol ) char *msg; double p[], pol[]; {
   }
   r = sqrt(r);
   x = zatan2( p[0], p[1] );
-  pol[0] = x;
   y = asin( p[2]/r );
+
+  pol[0] = x;
   pol[1] = y; 
   pol[2] = r;
 
@@ -130,6 +131,7 @@ int hms( x ) double x; {
 
  sint = sfrac / 1000;
  sfrac -= sint * 1000;
+ 
  TRACE1( "%3dh %02dm %02ld.%03lds  ", h, m, sint, sfrac );
  
 return(0);

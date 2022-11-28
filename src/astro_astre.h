@@ -13,10 +13,22 @@
 #ifndef ASTRO_ASTRE_H
 #define ASTRO_ASTRE_H
 
+#define MUTEX_AST_LOCK   pthread_mutex_lock(   & gp_Ast->ast_mutex ) ;  
+#define MUTEX_AST_UNLOCK pthread_mutex_unlock( & gp_Ast->ast_mutex ) ; 
+
 #include "astro_global.h"
 
 #define  ASTRE_TAILLE_BUFFER  256
 #define  ASTRE_NB_COLONNES    10000
+
+static const char * gc_hach_astre_types[] = {
+  "ASTRE_INDETERMINE",
+  "ASTRE_CIEL_PROFOND",
+  "ASTRE_PLANETE",
+  "ASTRE_COMETE",
+  "ASTRE_ASTEROIDE",
+  "ASTRE_SATELLITE"
+} ;
 
 typedef enum {
 
@@ -47,12 +59,12 @@ typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;
 
 struct STR_ASTRE {
 
+  pthread_mutex_t ast_mutex ;
   /* Numero de l objet dans un catalogue */
-  int    numero ; 
+  int    ast_num ; 
   int    ast_new ; /* ajout 2022-11 */
   /* les 2 structures sont placees ici en attendant une structure dediee */
-  int    en_type ;
-  int    en_mode ;
+  int    ast_typ ;
 
   /* structure STRUCT_TIME pour azimut et altitude */ 
   /* structure struct STR_TIME pour ascension droite, declinaison et angle horaire */ 
@@ -176,15 +188,9 @@ struct STR_ASTRE {
 } ;
 typedef struct STR_ASTRE STRUCT_ASTRE ;
 
-static const char * c_Astre_Type[] = {
-  "ASTRE_INDETERMINE",
-  "ASTRE_CIEL_PROFOND",
-  "ASTRE_PLANETE",
-  "ASTRE_COMETE",
-  "ASTRE_ASTEROIDE",
-  "ASTRE_SATELLITE"
-} ;
-
+/* Le contenu de cette variable permet le hachage avec 
+ les valeurs de l enum t_en_Astre_Type defini dans astre.h */
+ 
 void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
 void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE * ) ;
 void ASTRE_AFFICHER_MODE_STELLARIUM  ( STRUCT_ASTRE * ) ;

@@ -24,14 +24,16 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @todo   : ras
 *****************************************************************************************/
 
-void DATAS_INIT ( STRUCT_DATAS * lp_Datas ) {
+void DATAS_INIT ( STRUCT_DATAS * lp_Dat ) {
 
   int i =0 ;
   
-  memset( lp_Datas, 0, sizeof (STRUCT_DATAS ) ) ;
-  strcpy( lp_Datas->dat_acc, ""  ) ;
-  strcpy( lp_Datas->dat_bou, ""  ) ;
-  strcpy( lp_Datas->dat_inf, ""  ) ;
+  pthread_mutex_init( & lp_Dat->dat_mutex, NULL ) ;
+
+  memset( lp_Dat, 0, sizeof (STRUCT_DATAS ) ) ;
+  strcpy( lp_Dat->dat_acc, ""  ) ;
+  strcpy( lp_Dat->dat_bou, ""  ) ;
+  strcpy( lp_Dat->dat_inf, ""  ) ;
 
   return ;
 }

@@ -40,7 +40,8 @@
         "astro_log.h": "c",
         "astro_lcd.h": "c",
         "fcntl.h": "c",
-        "curses.h": "c"
+        "curses.h": "c",
+        "astro_suivi.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

@@ -13,39 +13,49 @@
 #ifndef ASTRO_TIME_H
 #define ASTRO_TIME_H
 
+#define MUTEX_TIM_LOCK     pthread_mutex_lock( & gp_Tim->tim_mutex ) ;  
+#define MUTEX_TIM_UNLOCK pthread_mutex_unlock( & gp_Tim->tim_mutex ) ; 
+
+#define MUTEX_TPO_LOCK     pthread_mutex_lock( & gp_Tpo->tpo_mutex ) ;  
+#define MUTEX_TPO_UNLOCK pthread_mutex_unlock( & gp_Tpo->tpo_mutex ) ; 
+
+#include <pthread.h>
+
 /* Definition de la structure associeee au fichier avant inclusion astro_global.h */
 /* Ceci est permis par le pre processeur */
 
 struct STR_TIME_TEMPOS {
-  unsigned long tempo_menu      ;
-  unsigned long tempo_voute     ;
-  unsigned long tempo_raq       ;
-  unsigned long tempo_ir        ; 
-  unsigned long tempo_termios   ; 
-  unsigned long tempo_capteurs  ; 
-  unsigned long tempo_clavier   ; 
-  unsigned long tempo_lcd_loop  ;
-  unsigned long tempo_lcd_disp  ;
-  unsigned long tempo_pid_loop  ;
+  pthread_mutex_t tpo_mutex ;
+  
+  unsigned long   tpo_menu      ;
+  unsigned long   tpo_voute     ;
+  unsigned long   tpo_raq       ;
+  unsigned long   tpo_ir        ; 
+  unsigned long   tpo_termios   ; 
+  unsigned long   tpo_capteurs  ; 
+  unsigned long   tpo_lcd_loop  ;
+  unsigned long   tpo_lcd_disp  ;
+  unsigned long   tpo_pid_loop  ;
 } ;
 typedef struct STR_TIME_TEMPOS STRUCT_TIME_TEMPOS ;
 
 struct STR_TIME {
   
+  pthread_mutex_t tim_mutex ;
   /* L heure decimale sert pour la representation 
    * d'un angle sous la forme  : 12h25mn05s 
    * 360 degres = 24h
    * -------------------------------------------- */
    
-  double hd ;      // heure decimale
-  char   c_si ;    /* signe */ 
-  int    si ;      // signe
-  int    mm ;      // month
-  int    yy ;      // year
-  int    dd ;      // day
-  int    HH ;      // hour
-  int    MM ;      // minutes
-  int    SS ;      // secondes
+  double tim_hd ;      // heure decimale
+  char   tim_sig ;    /* signe */ 
+  int    tim_si ;      // signe
+  int    tim_mm ;      // month
+  int    tim_yy ;      // year
+  int    tim_dd ;      // day
+  int    tim_HH ;      // hour
+  int    tim_MM ;      // minutes
+  int    tim_SS ;      // secondes
 
 } ;
 typedef struct STR_TIME STRUCT_TIME ;
@@ -83,14 +93,13 @@ typedef struct STR_TIME STRUCT_TIME ;
 
 struct STR_TIME_PARAMS {
   
-  unsigned long par_tempo_Menu ;
-  unsigned long par_tempo_Raq ;
-  unsigned long par_tempo_Ir ;
-  unsigned long par_tempo_Termios ;
-  unsigned long par_tempo_Clavier ;
-  unsigned long par_tempo_Capteurs ;
-  unsigned long par_tempo_Lcd_Loop ;
-  unsigned long par_tempo_Lcd_Disp ;
+  unsigned long par_tpo_Menu ;
+  unsigned long par_tpo_Raq ;
+  unsigned long par_tpo_Ir ;
+  unsigned long par_tpo_Termios ;
+  unsigned long par_tpo_Capteurs ;
+  unsigned long par_tpo_Lcd_Loop ;
+  unsigned long par_tpo_Lcd_Disp ;
 } ;
 typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
@@ -103,18 +112,18 @@ void   TEMPS_SET_YEAR_MONTH_AND_DAY ( char *  ) ; // FIXME ajout 20190822
 void   TEMPS_SET_MONTH_AND_DAY      ( char *  ) ;
 void   TEMPS_SET_HOUR_AND_MINUTES   ( char *  ) ;
 
-double TEMPS_CALCUL_DUREE_SECONDES        (struct timeval * )  ;
-double TEMPS_CALCUL_DUREE_MICROSEC        (struct timeval * ) ;
-double TEMPS_CALCUL_DUREE_NANOSEC         (struct timeval * ) ;
+double TEMPS_CALCULS_DUREE_SECONDES        (struct timeval * )  ;
+double TEMPS_CALCULS_DUREE_MICROSEC        (struct timeval * ) ;
+double TEMPS_CALCULS_DUREE_NANOSEC         (struct timeval * ) ;
 long   TEMPS_TEMPORISATION_MICROSEC       (double , double , struct timeval ) ;
 
 void  TEMPS_AFFICHER_MSG_HHMMSS          ( char * , STRUCT_TIME *  ) ;
 
-int    TEMPS_CALCUL_TEMPS_SIDERAL           ( STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim ) ;
-int    TEMPS_CALCUL_JOUR_JULIEN             ( STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim) ;
-int    TEMPS_CALCUL_DATE                    ( STRUCT_TIME * gp_Tim ) ;
-void   TEMPS_CALCUL_TEMPS_HMS_VERS_DEC      ( STRUCT_TIME * gp_Tim ) ;
-void   TEMPS_CALCUL_TEMPS_DEC_VERS_HMS      ( STRUCT_TIME * gp_Tim ) ;
-void   TEMPS_CALCUL_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
+int    TEMPS_CALCULS_TEMPS_SIDERAL           ( STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim ) ;
+int    TEMPS_CALCULS_JOUR_JULIEN             ( STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim) ;
+int    TEMPS_CALCULS_DATE                    ( STRUCT_TIME * gp_Tim ) ;
+void   TEMPS_CALCULS_TEMPS_HMS_VERS_DEC      ( STRUCT_TIME * gp_Tim ) ;
+void   TEMPS_CALCULS_TEMPS_DEC_VERS_HMS      ( STRUCT_TIME * gp_Tim ) ;
+void   TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
 
 #endif

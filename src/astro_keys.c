@@ -38,10 +38,8 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   memset(val, 0, sizeof(val)) ;     
 
   pthread_mutex_lock(& gp_Mut->mut_dat );
-  strcpy( val, lp_Sui->sui_dat->dat_inf ) ;
+  strcpy( val, gp_Dat->dat_inf ) ;
   pthread_mutex_unlock(& gp_Mut->mut_dat );
-
-  Trace1("val = %s\n", val ) ;
   
   if ( strcmp( val, "") ) {
     
@@ -169,13 +167,13 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 
   Trace1("") ;
 
-  memset( lp_Key->phrase,  CALCUL_ZERO_CHAR, sizeof( lp_Key->phrase ) );
-  memset( lp_Key->valider, CALCUL_ZERO_CHAR, sizeof( lp_Key->valider ) );
-  memset( lp_Key->symbole, CALCUL_ZERO_CHAR, sizeof( lp_Key->symbole ) );
-  memset( lp_Key->menu,    CALCUL_ZERO_CHAR, sizeof( lp_Key->menu ) );
-  memset( lp_Key->premier, CALCUL_ZERO_CHAR, sizeof( lp_Key->premier ) );
-  memset( lp_Key->nombre,  CALCUL_ZERO_CHAR, sizeof( lp_Key->nombre ) );
-  memset( lp_Key->mot,     CALCUL_ZERO_CHAR, sizeof( lp_Key->mot ) );
+  memset( lp_Key->phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->phrase ) );
+  memset( lp_Key->valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->valider ) );
+  memset( lp_Key->symbole, CALCULS_ZERO_CHAR, sizeof( lp_Key->symbole ) );
+  memset( lp_Key->menu,    CALCULS_ZERO_CHAR, sizeof( lp_Key->menu ) );
+  memset( lp_Key->premier, CALCULS_ZERO_CHAR, sizeof( lp_Key->premier ) );
+  memset( lp_Key->nombre,  CALCULS_ZERO_CHAR, sizeof( lp_Key->nombre ) );
+  memset( lp_Key->mot,     CALCULS_ZERO_CHAR, sizeof( lp_Key->mot ) );
   
   strcpy( lp_Key->valider, "valider" ) ;
   strcpy( lp_Key->menu,    "MENU" ) ;
@@ -189,15 +187,15 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   lp_Key->mot_en_cours   = 0 ;
   lp_Key->phrase_lue     = 0 ;
   lp_Key->appui_en_cours = 0 ;
-  lp_Key->tempo_clavier = gp_Tim_Par->par_tempo_Clavier ;
+  /* lp_Key->tempo_clavier = gp_Tim_Par->par_tpo_Clavier ; */ 
  
   // FIXME : definitions des actions : 
   // Les actions servent a 
   
   for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
-    memset( lp_Key->actions[i], CALCUL_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+    memset( lp_Key->actions[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
   }
-  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->validations[i], CALCUL_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->validations[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
 
   strcpy( lp_Key->actions[0], "MENU" ) ;
   strcpy( lp_Key->actions[1], "SETUP" ) ;
@@ -224,7 +222,7 @@ void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  sprintf( c_cmd , "phr %s mot %s sym %s nom %s pre %s val %s menu %s",\
+  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (val) %-5s (menu) %-10s",\
     lp_Key->phrase,\
     lp_Key->mot,\
     lp_Key->symbole,\
@@ -232,6 +230,9 @@ void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
     lp_Key->premier,\
     lp_Key->valider,\
     lp_Key->menu) ;
+
+  
+  Trace1( "%s", c_cmd) ;
 
   Trace2("lp_Key->mot         = %s",lp_Key->mot) ;
   Trace2("lp_Key->premier     = %s",lp_Key->premier) ;

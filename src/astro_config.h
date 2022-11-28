@@ -51,7 +51,6 @@ TEMPO_MENU      1000000
 TEMPO_RAQ       500000
 TEMPO_IR        1000010
 TEMPO_TERMIOS   1000020
-TEMPO_CLAVIER   50000
 TEMPO_CAPTEURS  50000
 TEMPO_LCD_LOOP  1000000
 TEMPO_LCD_DISP  1000000
@@ -169,7 +168,6 @@ typedef enum {
   TEMPO_RAQ,
   TEMPO_IR,
   TEMPO_TERMIOS,
-  TEMPO_CLAVIER,
   TEMPO_CAPTEURS,
   TEMPO_LCD_LOOP,
   TEMPO_LCD_DISP,
@@ -238,22 +236,21 @@ t_en_Config_Parametres_Obligatoires_Types ;
 
 struct STR_CONFIG_PARAMS {
 
-  int  par_default_menu ;
-
-  char par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
-  char par_rep_log    [ CONFIG_TAILLE_BUFFER_64 ] ;      
-  char par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
-  char par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
-  char par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
-  
-  char par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
-  char par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
-  char par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
-  char par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
-  char par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  pthread_mutex_t cfg_par_mutex ;
+  int             par_default_menu ;
+  char            par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
+  char            par_rep_log    [ CONFIG_TAILLE_BUFFER_64 ] ;      
+  char            par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
+  char            par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
+  char            par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+  char            par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
+  char            par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
+  char            par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
+  char            par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+  char            par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/
@@ -261,9 +258,149 @@ struct STR_CONFIG_PARAMS {
 /*---------------------------------------------------*/
 
 struct STR_CONFIG {
+ pthread_mutex_t cfg_mutex ;
  char con_params  [CONFIG_DATAS_NB_LIGNES] [CONFIG_DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER_256] ;
 } ;
 typedef struct  STR_CONFIG STRUCT_CONFIG ;
+
+static const char * c_Bin_Possible_Paths[] = {
+  "/bin",
+  "/sbin",
+  "/usr/bin",
+  "/usr/sbin",
+  "/usr/local/bin",
+  "/usr/local/sbin"
+} ;
+
+static const char * gc_Config_Params_Obligatoires[] = {
+  "MENU_PAR_DEFAUT",
+  "ASTRE_PAR_DEFAUT",
+  "CONFIG_REP_CAT",
+  "CONFIG_REP_CFG",
+  "CONFIG_REP_LOG",
+  "CONFIG_REP_IN",
+  "CONFIG_REP_OUT",
+  "CONFIG_REP_SCR",
+  "CONFIG_FIC_LED",
+  "CONFIG_FIC_LOG",
+  "CONFIG_FIC_DATE",
+  "CONFIG_FIC_HHMM",
+  "CONFIG_SCR_KERNEL",
+  "TEMPO_MENU",
+  "TEMPO_RAQ",
+  "TEMPO_IR",
+  "TEMPO_TERMIOS",
+  "TEMPO_CAPTEURS",
+  "TEMPO_LCD_LOOP",
+  "TEMPO_LCD_DISP",
+  "TEMPO_PID_LOOP",
+  "PID_ECH",
+  "PID_KP",
+  "PID_KI",
+  "PID_KD",
+  "DEVICE_USE_INFRAROUGE",
+  "DEVICE_USE_KEYBOARD",
+  "DEVICE_USE_LCD",
+  "DEVICE_USE_CONTROLER",
+  "DEVICE_USE_CAPTEURS",
+  "DEVICE_USE_RAQUETTE",
+  "DEVICE_USE_BLUETOOTH",
+  "LATITUDE",
+  "LONGITUDE",
+  "ALTITUDE",
+  "GPIO_LED_ETAT",
+  "GPIO_ALT",
+  "GPIO_AZI",
+  "GPIO_MASQUE",
+  "GPIO_FREQUENCE_PWM",
+  "ALT_R1",
+  "ALT_R2",
+  "ALT_R3",
+  "ALT_R4",
+  "ALT_R5",
+  "ALT_R6",
+  "ALT_R7",
+  "ALT_ROT",
+  "ALT_ACC",
+  "AZI_R1",
+  "AZI_R2",
+  "AZI_R3",
+  "AZI_R4",
+  "AZI_R5",
+  "AZI_R6",
+  "AZI_R7",
+  "AZI_ROT",
+  "AZI_ACC",
+  "ALTAZ_FORWARD",
+  "ALTAZ_REWIND",
+  "ALTAZ_FORWARD_FAST",
+  "ALTAZ_REWIND_FAST"
+} ;
+
+static const int gi_Config_Params_Obligatoires_Type[] = {
+  CONFIG_TYPE_INT, // "MENU_PAR_DEFAUT",
+  CONFIG_TYPE_INT, // "ASTRE_PAR_DEFAUT",
+  CONFIG_TYPE_INT, // "CONFIG_REP_CAT",
+  CONFIG_TYPE_INT, // "CONFIG_REP_CFG",
+  CONFIG_TYPE_INT, // "CONFIG_REP_LOG",
+  CONFIG_TYPE_INT, // "CONFIG_REP_IN",
+  CONFIG_TYPE_INT, // "CONFIG_REP_OUT",
+  CONFIG_TYPE_INT, // "CONFIG_REP_SCR",
+  CONFIG_TYPE_INT, // "CONFIG_FIC_LED",
+  CONFIG_TYPE_INT, // "CONFIG_FIC_LOG",
+  CONFIG_TYPE_INT, // "CONFIG_FIC_DATE",
+  CONFIG_TYPE_INT, // "CONFIG_FIC_HHMM",
+  CONFIG_TYPE_INT, // "CONFIG_SCR_KERNEL",
+  CONFIG_TYPE_INT, // "TEMPO_MENU",
+  CONFIG_TYPE_INT, // "TEMPO_RAQ",
+  CONFIG_TYPE_INT, // "TEMPO_IR",
+  CONFIG_TYPE_INT, // "TEMPO_TERMIOS",
+  CONFIG_TYPE_INT, // "TEMPO_CAPTEURS",
+  CONFIG_TYPE_INT, // "TEMPO_LCD_LOOP",
+  CONFIG_TYPE_INT, // "TEMPO_LCD_DISP",
+  CONFIG_TYPE_INT, // "TEMPO_PID_LOOP",
+  CONFIG_TYPE_INT, // "PID_ECH",
+  CONFIG_TYPE_INT, // "PID_KP",
+  CONFIG_TYPE_INT, // "PID_KI",
+  CONFIG_TYPE_INT, // "PID_KD",
+  CONFIG_TYPE_INT, // "DEVICE_USE_INFRAROUGE",
+  CONFIG_TYPE_INT, // "DEVICE_USE_KEYBOARD",
+  CONFIG_TYPE_INT, // "DEVICE_USE_LCD",
+  CONFIG_TYPE_INT, // "DEVICE_USE_CONTROLER",
+  CONFIG_TYPE_INT, // "DEVICE_USE_CAPTEURS",
+  CONFIG_TYPE_INT, // "DEVICE_USE_RAQUETTE",
+  CONFIG_TYPE_INT, // "DEVICE_USE_BLUETOOTH",
+  CONFIG_TYPE_INT, // "LATITUDE",
+  CONFIG_TYPE_INT, // "LONGITUDE",
+  CONFIG_TYPE_INT, // "ALTITUDE",
+  CONFIG_TYPE_INT, // "GPIO_LED_ETAT",
+  CONFIG_TYPE_INT, // "GPIO_ALT",
+  CONFIG_TYPE_INT, // "GPIO_AZI",
+  CONFIG_TYPE_INT, // "GPIO_MASQUE",
+  CONFIG_TYPE_INT, // "GPIO_FREQUENCE_PWM",
+  CONFIG_TYPE_INT, // "ALT_R1",
+  CONFIG_TYPE_INT, // "ALT_R2",
+  CONFIG_TYPE_INT, // "ALT_R3",
+  CONFIG_TYPE_INT, // "ALT_R4",
+  CONFIG_TYPE_INT, // "ALT_R5",
+  CONFIG_TYPE_INT, // "ALT_R6",
+  CONFIG_TYPE_INT, // "ALT_R7",
+  CONFIG_TYPE_INT, // "ALT_ROT",
+  CONFIG_TYPE_INT, // "ALT_ACC",
+  CONFIG_TYPE_INT, // "AZI_R1",
+  CONFIG_TYPE_INT, // "AZI_R2",
+  CONFIG_TYPE_INT, // "AZI_R3",
+  CONFIG_TYPE_INT, // "AZI_R4",
+  CONFIG_TYPE_INT, // "AZI_R5",
+  CONFIG_TYPE_INT, // "AZI_R6",
+  CONFIG_TYPE_INT, // "AZI_R7",
+  CONFIG_TYPE_INT, // "AZI_ROT",
+  CONFIG_TYPE_INT, // "AZI_ACC",
+  CONFIG_TYPE_INT, // "ALTAZ_FORWARD",
+  CONFIG_TYPE_INT, // "ALTAZ_REWIND",
+  CONFIG_TYPE_INT, // "ALTAZ_FORWARD_FAST",
+  CONFIG_TYPE_INT, // "ALTAZ_REWIND_FAST"
+} ;
 
 void   CONFIG_PARAMETRES_CONFIG     (STRUCT_CONFIG * ) ;
 void   CONFIG_FIC_DISPLAY           (STRUCT_CONFIG * ) ;
@@ -272,8 +409,7 @@ int    CONFIG_FIC_READ              (STRUCT_CONFIG * ) ;
 void   CONFIG_PARAMETRES_AFFICHER   (void) ;
 void   CONFIG_AFFICHER_MODE_LONG    (void) ;
 void   CONFIG_AFFICHER_TOUT         (void) ;  /* FIXME ajout 20191228 */
-void   CONFIG_MENU_CHANGE_DETECT  (void) ;  /* FIXME ajout 20200102 */
-void   DEVICES_AFFICHER_UTILISATION (void) ;  /* FIXME ajout 20220312 */
+void   CONFIG_MENU_CHANGE_DETECT    (void) ;  /* FIXME ajout 20200102 */
 
 int    CONFIG_FORMAT_ADMIS          (char c) ;
 int    CONFIG_FIN_LIGNE             (char c) ;

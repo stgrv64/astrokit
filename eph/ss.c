@@ -302,93 +302,10 @@ static int ntab = 1;
 struct orbit       *elobject;	/* pointer to orbital elements of object */
 TOPOCENTRIC inf, *infos ;
 
-
-
 //===========================================================================================
 // Fonction appelée depuis mes sources
 //===========================================================================================
 
-void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, double alt,double jd, int num) {
-
-  int     i;
-  double  zgetdate(), gethms();
-  double  tlongg, glatt, heightt;
- // int     yearr, monthh, dayy, hourr, minn, secc ;
-  //char    result[1024] ;
-  infos = &inf ;
-  
-  tlongg  = lon;
-  glatt   = lat ;
-  heightt = alt ;
-  objnum  = num;
-
-  djd=0 ;
-  ntab=1 ;
-
-  KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
-  //JD = zgetdate_moi( yearr, monthh, dayy) ; 
-  //JD +=  gethms_moi( hourr, minn,   secc ) ;
-  
-  JD = jd ;
-  
-  update();        
-  
-  memset( infos->nom, 0, sizeof( infos->nom) ) ;
-
-  TRACE1("objnum=%d",objnum) ;
-  
-  switch(objnum) {
-    case -1: exit(0);
-    case 0:  elobject = 0;        strcpy( infos->nom, "soleil" ) ;  break;
-    case 1:  elobject = &mercury; strcpy( infos->nom, "mercure" ) ; break;
-    case 2:  elobject = &venus;   strcpy( infos->nom, "venus" ) ;   break;
-    case 3:  elobject = 0;        strcpy( infos->nom, "lune" ) ;    break;
-    case 4:  elobject = &mars;    strcpy( infos->nom, "mars" ) ;    break;
-    case 5:  elobject = &jupiter; strcpy( infos->nom, "jupiter" ) ; break;
-    case 6:  elobject = &saturn;  strcpy( infos->nom, "saturne" ) ; break;
-    case 7:  elobject = &uranus;  strcpy( infos->nom, "uranus" ) ;  break;
-    case 8:  elobject = &neptune; strcpy( infos->nom, "neptune" ) ; break;
-    case 9:  elobject = &pluto;   strcpy( infos->nom, "pluton" ) ;  break;
-    case 10: elobject = &test;    strcpy( infos->nom, "test" ) ;    break;
-    case 88: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); // fonction
-    case 99: elobject = &forbit;
-         i = getorbit( elobject ); // fonction
-         //if( i == 1 ) goto loop1;
-         if( i == 0 ) break;
-    default: return ;
-  }
-
-  TRACE1("infos->nom=%s",infos->nom) ;
-
-  if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
-  else if( elobject )                      TRACE1( "\n\t%s", &elobject->obname[0] ); 
-
-  for( i=0; i<ntab; i++ ) {
-    /* print Julian date */
-  
-    TRACE1( "\nJD %.2f,  ", JD );
-    update(); // fonction
-
-    /* Always calculate heliocentric position of the earth */
-  
-    kepler( TDT, &earth, rearth, eapolar );
-
-    switch( objnum ) {
-      case 0:   dosun(     infos);  /* iter_trnsit( dosun ); */    break;
-      case 3:   domoon(    infos);  /* iter_trnsit( domoon );*/    break;
-      case 88:  dostar(    infos);  /* iter_trnsit( dostar );*/    break;
-      default:  doplanet(  infos);  /* iter_trnsit( doplanet );*/  break;
-    }
-    printf( "infos->nom = %s\n" , infos->nom );
-    printf( "infos->azi = %f\n" , infos->azi );
-    printf( "infos->alt = %f\n" , infos->alt );
-    JD += djd;
-  }
-  strcpy( nom, infos->nom ) ;
-
-  *a = infos->azi ;
-  *h = infos->alt ;
-}
 //===========================================================================================
 // Fonction appelee depuis mes sources : on entre la date et l heure plutot que le jour julien
 // ATTENTION !!!! 
@@ -396,9 +313,22 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
 // ajout 2022 avril : verification numero planete (<10)
 //===========================================================================================
 
-void SOLAR_SYSTEM( char * nom, \
-   double * ASC, double * H, double * a, double * h, double lat, double lon, double alt, \
-   int annee, int mois, int jour, int heure, int minute, int seconde, int num ) {
+void SOLAR_SYSTEM( \
+  char   * nom, \
+  double * ASC, \
+  double * H, \
+  double * a, \
+  double * h, \
+  double   lat, \
+  double   lon, \
+  double   alt, \
+  int      annee, \
+  int      mois, \
+  int      jour, \
+  int      heure, \
+  int      minute, \
+  int      seconde, \
+  int      num ) {
 
   int i;
   double zgetdate(), gethms();
@@ -627,10 +557,10 @@ int mainSS(int argc , char ** argv) {
         case 88:  dostar(    infos);  /* iter_trnsit( dostar );*/    break;
         default:  doplanet(  infos);  /* iter_trnsit( doplanet );*/  break;
       }
-      printf( "infos->asc = %f\n" , infos->asc * RTD );
-      printf( "infos->dec = %f\n" , infos->dec * RTD );
-      printf( "infos->alt = %f\n" , infos->alt * RTD );
-      printf( "infos->azi = %f\n" , infos->azi * RTD );
+      TRACE1( "infos->asc = %f\n" , infos->asc * RTD );
+      TRACE1( "infos->dec = %f\n" , infos->dec * RTD );
+      TRACE1( "infos->alt = %f\n" , infos->alt * RTD );
+      TRACE1( "infos->azi = %f\n" , infos->azi * RTD );
     
       JD += djd;
      }
@@ -641,3 +571,89 @@ int mainSS(int argc , char ** argv) {
 //===========================================================================================
 // Fin main
 //===========================================================================================
+
+
+
+/*
+void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, double alt,double jd, int num) {
+
+  int     i;
+  double  zgetdate(), gethms();
+  double  tlongg, glatt, heightt;
+ // int     yearr, monthh, dayy, hourr, minn, secc ;
+  //char    result[1024] ;
+  infos = &inf ;
+  
+  tlongg  = lon;
+  glatt   = lat ;
+  heightt = alt ;
+  objnum  = num;
+
+  djd=0 ;
+  ntab=1 ;
+
+  KINIT_ASTROKIT( tlongg,  glatt,  heightt, 10.0,  1015,  2,  0 ) ;
+  //JD = zgetdate_moi( yearr, monthh, dayy) ; 
+  //JD +=  gethms_moi( hourr, minn,   secc ) ;
+  
+  JD = jd ;
+  
+  update();        
+  
+  memset( infos->nom, 0, sizeof( infos->nom) ) ;
+
+  TRACE1("objnum=%d",objnum) ;
+  
+  switch(objnum) {
+    case -1: exit(0);
+    case 0:  elobject = 0;        strcpy( infos->nom, "soleil" ) ;  break;
+    case 1:  elobject = &mercury; strcpy( infos->nom, "mercure" ) ; break;
+    case 2:  elobject = &venus;   strcpy( infos->nom, "venus" ) ;   break;
+    case 3:  elobject = 0;        strcpy( infos->nom, "lune" ) ;    break;
+    case 4:  elobject = &mars;    strcpy( infos->nom, "mars" ) ;    break;
+    case 5:  elobject = &jupiter; strcpy( infos->nom, "jupiter" ) ; break;
+    case 6:  elobject = &saturn;  strcpy( infos->nom, "saturne" ) ; break;
+    case 7:  elobject = &uranus;  strcpy( infos->nom, "uranus" ) ;  break;
+    case 8:  elobject = &neptune; strcpy( infos->nom, "neptune" ) ; break;
+    case 9:  elobject = &pluto;   strcpy( infos->nom, "pluton" ) ;  break;
+    case 10: elobject = &test;    strcpy( infos->nom, "test" ) ;    break;
+    case 88: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); // fonction
+    case 99: elobject = &forbit;
+         i = getorbit( elobject ); // fonction
+         //if( i == 1 ) goto loop1;
+         if( i == 0 ) break;
+    default: return ;
+  }
+
+  TRACE1("infos->nom=%s",infos->nom) ;
+
+  if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
+  else if( elobject )                      TRACE1( "\n\t%s", &elobject->obname[0] ); 
+
+  for( i=0; i<ntab; i++ ) {
+    // print Julian date
+  
+    TRACE1( "\nJD %.2f,  ", JD );
+    update(); // fonction
+
+    // Always calculate heliocentric position of the earth
+
+    kepler( TDT, &earth, rearth, eapolar );
+
+    switch( objnum ) {
+      case 0:   dosun(     infos);  break;
+      case 3:   domoon(    infos);  break;
+      case 88:  dostar(    infos);  break;
+      default:  doplanet(  infos);  break;
+    }
+    printf( "infos->nom = %s\n" , infos->nom );
+    printf( "infos->azi = %f\n" , infos->azi );
+    printf( "infos->alt = %f\n" , infos->alt );
+    JD += djd;
+  }
+  strcpy( nom, infos->nom ) ;
+
+  *a = infos->azi ;
+  *h = infos->alt ;
+}
+*/

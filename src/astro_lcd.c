@@ -27,7 +27,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static const char * c_Lcd_Display_Months[] = {
+static const char * gc_hach_lcd_Display_Months[] = {
  "Jan",
  "Feb",
  "Mar",
@@ -42,13 +42,13 @@ static const char * c_Lcd_Display_Months[] = {
  "Dec"
 } ;
 
-static const char * c_Lcd_Display_Hours[] = {
+static const char * gc_hach_lcd_Display_Hours[] = {
  "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
  "20", "21", "22", "23", "24"
 } ;
 
-static const char * c_Lcd_Display_Minutes[] = {
+static const char * gc_hach_lcd_Display_Minutes[] = {
  "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
  "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
@@ -71,10 +71,10 @@ extern STRUCT_LCD     *gp_Lcd ;
 * @param  : STRUCT_LIEU *gp_Lie
 * @date   : 2022-04-08 creation
 * @date   : 2022-04-08 ajout sauvegarde des lignes dans old
-* @date   : 2022-04-27 mise en commentaire de TEMPS_CALCUL_TEMPS_SIDERAL
+* @date   : 2022-04-27 mise en commentaire de TEMPS_CALCULS_TEMPS_SIDERAL
 *****************************************************************************************/
 
-void LCD_INIT(STRUCT_LCD * p_lcd) {
+void LCD_INIT(STRUCT_LCD * lp_Lcd) {
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -82,56 +82,56 @@ void LCD_INIT(STRUCT_LCD * p_lcd) {
 
   /* Initialisation mutex */
 
-  pthread_mutex_init( & p_lcd->lcd_mutex, NULL ) ;
+  pthread_mutex_init( & lp_Lcd->lcd_mutex, NULL ) ;
   
   /* Initialisation pointeurs de fonctions */
 
-  p_lcd->define_default  = LCD_DEFINE_DEFAULT ;
-  p_lcd->refresh_default = LCD_REFRESH_DEFAULT ;
+  lp_Lcd->define_default  = LCD_DEFINE_DEFAULT ;
+  lp_Lcd->refresh_default = LCD_REFRESH_DEFAULT ;
 
-  p_lcd->display_default = LCD_DISPLAY_DEFAULT ;
-  p_lcd->display_current = LCD_DISPLAY_CURRENT ;
+  lp_Lcd->display_default = LCD_DISPLAY_DEFAULT ;
+  lp_Lcd->display_current = LCD_DISPLAY_CURRENT ;
 
-  p_lcd->change_default = LCD_CHANGE_DEFAULT ;
-  p_lcd->change_current = LCD_CHANGE_CURRENT ;
+  lp_Lcd->change_default = LCD_CHANGE_DEFAULT ;
+  lp_Lcd->change_current = LCD_CHANGE_CURRENT ;
 
-  p_lcd->display_str_str = LCD_DISPLAY_STRING_STRING ;
-  p_lcd->display_str_int = LCD_DISPLAY_STRING_INT ;
-  p_lcd->display_int_int = LCD_DISPLAY_INT_INT ;
-  /* p_lcd->display_str_lng =  */
-  p_lcd->display_tps_lie = LCD_DISPLAY_TEMPS_LIEU ;
-  p_lcd->display_ast_vit = LCD_DISPLAY_ASTRE_VITESSES ;
-  p_lcd->display_azi_alt = LCD_DISPLAY_AZI_ALT ;
-  p_lcd->display_agh_dec = LCD_DISPLAY_AGH_DEC ;
-  p_lcd->display_asc_dec = LCD_DISPLAY_ASC_DEC ;
+  lp_Lcd->display_str_str = LCD_DISPLAY_STRING_STRING ;
+  lp_Lcd->display_str_int = LCD_DISPLAY_STRING_INT ;
+  lp_Lcd->display_int_int = LCD_DISPLAY_INT_INT ;
+  /* lp_Lcd->display_str_lng =  */
+  lp_Lcd->display_tps_lie = LCD_DISPLAY_TEMPS_LIEU ;
+  lp_Lcd->display_ast_vit = LCD_DISPLAY_ASTRE_VITESSES ;
+  lp_Lcd->display_azi_alt = LCD_DISPLAY_AZI_ALT ;
+  lp_Lcd->display_agh_dec = LCD_DISPLAY_AGH_DEC ;
+  lp_Lcd->display_asc_dec = LCD_DISPLAY_ASC_DEC ;
 
-  p_lcd->display_ast_fre = LCD_DISPLAY_AST_FREQUENCES ;
-  p_lcd->display_ast_per = LCD_DISPLAY_AST_PERIODES ;
+  lp_Lcd->display_ast_fre = LCD_DISPLAY_AST_FREQUENCES ;
+  lp_Lcd->display_ast_per = LCD_DISPLAY_AST_PERIODES ;
 
-  p_lcd->display_mod_ste = LCD_DISPLAY_MODE_STELLARIUM ;
+  lp_Lcd->display_mod_ste = LCD_DISPLAY_MODE_STELLARIUM ;
 
-  p_lcd->display_cfg_gpios_alt_azi  = LCD_DISPLAY_CFG_GPIOS_ALT_AZI ;
-  p_lcd->display_cfg_gpios_mas_fre  = LCD_DISPLAY_CFG_GPIOS_MAS_FRE ;
-  p_lcd->display_cfg_gpios_leds     = LCD_DISPLAY_CFG_GPIOS_LEDS ;
-  p_lcd->display_cfg_reduction      = LCD_DISPLAY_CFG_REDUCTION ;
+  lp_Lcd->display_cfg_gpios_alt_azi  = LCD_DISPLAY_CFG_GPIOS_ALT_AZI ;
+  lp_Lcd->display_cfg_gpios_mas_fre  = LCD_DISPLAY_CFG_GPIOS_MAS_FRE ;
+  lp_Lcd->display_cfg_gpios_leds     = LCD_DISPLAY_CFG_GPIOS_LEDS ;
+  lp_Lcd->display_cfg_reduction      = LCD_DISPLAY_CFG_REDUCTION ;
 
-  p_lcd->display_informations       = LCD_DISPLAY_INFORMATIONS ;
-  p_lcd->display_acc_alt_azi        = LCD_DISPLAY_ACC_ALT_AZI ;
+  lp_Lcd->display_informations       = LCD_DISPLAY_INFORMATIONS ;
+  lp_Lcd->display_acc_alt_azi        = LCD_DISPLAY_ACC_ALT_AZI ;
 
   /* Initialisation autres champs */
 
-  memset( p_lcd->c_l0cur, 0 , sizeof( p_lcd->c_l0cur )) ;
-  memset( p_lcd->c_l1cur, 0 , sizeof( p_lcd->c_l1cur )) ;
-  memset( p_lcd->c_l0def, 0 , sizeof( p_lcd->c_l0def )) ;
-  memset( p_lcd->c_l1def, 0 , sizeof( p_lcd->c_l1def )) ;
+  memset( lp_Lcd->c_l0cur, 0 , sizeof( lp_Lcd->c_l0cur )) ;
+  memset( lp_Lcd->c_l1cur, 0 , sizeof( lp_Lcd->c_l1cur )) ;
+  memset( lp_Lcd->c_l0def, 0 , sizeof( lp_Lcd->c_l0def )) ;
+  memset( lp_Lcd->c_l1def, 0 , sizeof( lp_Lcd->c_l1def )) ;
 
-  strcpy( p_lcd->c_l0cur, "") ; 
-  strcpy( p_lcd->c_l1cur, "") ; 
-  strcpy( p_lcd->c_l0def, "") ; 
-  strcpy( p_lcd->c_l1def, "") ; 
+  strcpy( lp_Lcd->c_l0cur, "") ; 
+  strcpy( lp_Lcd->c_l1cur, "") ; 
+  strcpy( lp_Lcd->c_l0def, "") ; 
+  strcpy( lp_Lcd->c_l1def, "") ; 
 
-  p_lcd->i_board = 0 ;
-  p_lcd->i_i2c_num = LCD_I2C_DEFAULT_DEV_PORT ; 
+  lp_Lcd->i_board = 0 ;
+  lp_Lcd->i_i2c_num = LCD_I2C_DEFAULT_DEV_PORT ; 
   
   /*--------------------------*/
   /* Initialisation ecran LCD */ 
@@ -139,7 +139,7 @@ void LCD_INIT(STRUCT_LCD * p_lcd) {
 
   if ( gp_Dev->use_lcd ) {
 
-    if ((p_lcd->i_fd = LCD1602Init(p_lcd->i_i2c_num)) == -1) {
+    if ((lp_Lcd->i_fd = LCD1602Init(lp_Lcd->i_i2c_num)) == -1) {
       SyslogErr("Fail to init LCD1602Init\n");
       Trace("Fail to init LCD1602Init") ;
       return ;
@@ -152,24 +152,24 @@ void LCD_INIT(STRUCT_LCD * p_lcd) {
   /* Affichage phrases init   */ 
   /*--------------------------*/
 
-  sprintf(p_lcd->c_l0cur, "%d%s%d %-2d:%-2d", \
-    gp_Tim->yy , \
-    c_Lcd_Display_Months[ gp_Tim->mm -1  ] , \
-    gp_Tim->dd, \
-    gp_Tim->HH, \
-    gp_Tim->MM ) ;
+  sprintf(lp_Lcd->c_l0cur, "%d%s%d %-2d:%-2d", \
+    gp_Tim->tim_yy , \
+    gc_hach_lcd_Display_Months[ gp_Tim->tim_mm -1  ] , \
+    gp_Tim->tim_dd, \
+    gp_Tim->tim_HH, \
+    gp_Tim->tim_MM ) ;
   
-  sprintf(p_lcd->c_l1cur, "%.2f %.2f", \
-    gp_Lie->lat * CALCUL_UN_RADIAN_EN_DEGRES, \
-    gp_Lie->lon * CALCUL_UN_RADIAN_EN_DEGRES ) ;
+  sprintf(lp_Lcd->c_l1cur, "%.2f %.2f", \
+    gp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES, \
+    gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES ) ;
 
   /* ajout 26 mai 2022 */
-  strcpy( p_lcd->c_l0def, p_lcd->c_l0cur ) ;
-  strcpy( p_lcd->c_l1def, p_lcd->c_l1cur ) ;
+  strcpy( lp_Lcd->c_l0def, lp_Lcd->c_l0cur ) ;
+  strcpy( lp_Lcd->c_l1def, lp_Lcd->c_l1cur ) ;
 
   if ( gp_Dev->use_lcd ) {
 
-    if ( LCD1602Clear(p_lcd->i_fd) == -1) {
+    if ( LCD1602Clear(lp_Lcd->i_fd) == -1) {
       SyslogErr("Fail to LCD1602Clear\n");
       Trace("Fail to LCD1602Clear") ;
       return ;
@@ -180,7 +180,7 @@ void LCD_INIT(STRUCT_LCD * p_lcd) {
   
     usleep(LCD_USLEEP_AFTER_CLEARING) ;
   
-    if (LCD1602DispLines(p_lcd->i_fd, p_lcd->c_l0cur, p_lcd->c_l1cur ) == -1) {
+    if (LCD1602DispLines(lp_Lcd->i_fd, lp_Lcd->c_l0cur, lp_Lcd->c_l1cur ) == -1) {
       SyslogErr("Fail to LCD1602DispLines\n");
       Trace("Fail to LCD1602DispLines");
     }
@@ -270,14 +270,14 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
     /* les valeurs par defaut de la ffichage sont la date l heure et l objet en cours */
     /*---------------------------------------------------------------------------------*/
 
-    TEMPS_CALCUL_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+    TEMPS_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
 
     sprintf( c_l0, "%d%s%d %-2d:%-2d", \
-      gp_Tim->yy , \
-      c_Lcd_Display_Months[ gp_Tim->mm -1  ] , \
-      gp_Tim->dd, \
-      gp_Tim->HH, \
-      gp_Tim->MM ) ;
+      gp_Tim->tim_yy , \
+      gc_hach_lcd_Display_Months[ gp_Tim->tim_mm -1  ] , \
+      gp_Tim->tim_dd, \
+      gp_Tim->tim_HH, \
+      gp_Tim->tim_MM ) ;
 
     sprintf( c_l1, "%s", gp_Ast->nom ) ;
 
@@ -524,20 +524,20 @@ void LCD_DISPLAY_TEMPS_LIEU( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0) ) ; 
     memset( c_l1, 0, sizeof(c_l1) ) ; 
 
-    TEMPS_CALCUL_TEMPS_SIDERAL(gp_Lie, gp_Tim) ;
+    TEMPS_CALCULS_TEMPS_SIDERAL(gp_Lie, gp_Tim) ;
 
     /* Remplissage de line 0 et line 1 */
 
     sprintf( c_l0, "%d%s%d %d:%d", \
-      gp_Tim->yy ,\
-      c_Lcd_Display_Months[ gp_Tim->mm -1  ] , \
-      gp_Tim->dd, \
-      gp_Tim->HH, \
-      gp_Tim->MM ) ;
+      gp_Tim->tim_yy ,\
+      gc_hach_lcd_Display_Months[ gp_Tim->tim_mm -1  ] , \
+      gp_Tim->tim_dd, \
+      gp_Tim->tim_HH, \
+      gp_Tim->tim_MM ) ;
     
     sprintf( c_l1, "%.2f %.2f", \
-      gp_Lie->lat * CALCUL_UN_RADIAN_EN_DEGRES, \
-      gp_Lie->lon * CALCUL_UN_RADIAN_EN_DEGRES ) ;
+      gp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES, \
+      gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES ) ;
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -844,7 +844,7 @@ void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
 void   LCD_DISPLAY_CFG_REDUCTION    ( const int i_duree_us ) {
 
   int h1=gp_Cal_Par->par_alt_red_1, h2= gp_Cal_Par->par_alt_red_2, h3= gp_Cal_Par->par_alt_red_3, h4= gp_Cal_Par->par_alt_red_4, h5= gp_Cal_Par->par_alt_red_5, h6= gp_Cal_Par->par_alt_red_6 ;
-  int a1=gp_Cal_Par->par_azi_red1, a2= gp_Cal_Par->par_azi_red2, a3= gp_Cal_Par->par_azi_red3, a4= gp_Cal_Par->par_azi_red4, a5= gp_Cal_Par->par_azi_red5, a6= gp_Cal_Par->par_azi_red6 ;
+  int a1=gp_Cal_Par->par_azi_red_1, a2= gp_Cal_Par->par_azi_red_2, a3= gp_Cal_Par->par_azi_red_3, a4= gp_Cal_Par->par_azi_red_4, a5= gp_Cal_Par->par_azi_red_5, a6= gp_Cal_Par->par_azi_red_6 ;
 
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ={0};
@@ -881,8 +881,8 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(F alt) %.2f", gp_Sui->Fh_mic ) ;
-    sprintf( c_l1, "(F azi) %.2f", gp_Sui->Fa_mic ) ;
+    sprintf( c_l0, "(F alt) %.2f", gp_Sui_Fre->fre_fh_mic ) ;
+    sprintf( c_l1, "(F azi) %.2f", gp_Sui_Fre->fre_fa_mic ) ;
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -909,8 +909,8 @@ void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(T alt) %.2f", gp_Sui->Th_mic ) ;
-    sprintf( c_l1, "(T azi) %.2f", gp_Sui->Ta_mic ) ;
+    sprintf( c_l0, "(T alt) %.2f", gp_Sui_Fre->fre_th_mic ) ;
+    sprintf( c_l1, "(T azi) %.2f", gp_Sui_Fre->fre_ta_mic ) ;
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -937,8 +937,8 @@ void   LCD_DISPLAY_ACC_ALT_AZI     ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui->sui_pas->pas_acc_alt ) ;
-    sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui->sui_pas->pas_acc_azi ) ;
+    sprintf( c_l0, "(Acc Alt) %.4f", gp_Sui_Pas->pas_acc_alt ) ;
+    sprintf( c_l1, "(Acc Azi) %.4f", gp_Sui_Pas->pas_acc_azi ) ;
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;

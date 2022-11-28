@@ -218,9 +218,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
   void * (*ptr_fct)(STRUCT_SUIVI *)  = SUIVI_MENU ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;  
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_MENU ) ;
    
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU ) ;
@@ -239,19 +238,19 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
   while(TRUE) {
 
-    Trace1("temporisation %ld", gp_Sui->sui_tpo->tempo_menu ) ;
-    usleep( gp_Sui->sui_tpo->tempo_menu ) ;
+    /* Creee un point d 'annulation pour la fonction pthread_cancel */
+    pthread_testcancel() ;
+
+    Trace1("temporisation %ld", gp_Tpo->tpo_menu ) ;
+    usleep( gp_Tpo->tpo_menu ) ;
 
     /* GPIO_CLAVIER_MATRICIEL_READ( gpio_key_l, gpio_key_c, gp_Key) ; */
     KEYS_INPUTS_GESTION_APPUIS( gp_Sui, gp_Key) ;
-
+    KEYS_AFFICHER( gp_Key ) ;	
     /* SUIVI_OLD_0( gp_Sui) ; */
     SUIVI_TRAITEMENT_MOT( gp_Sui, gp_Key ) ;
 
     CONFIG_MENU_CHANGE_DETECT() ;
-
-    KEYS_AFFICHER( gp_Key ) ;	
-
 
     switch( gp_Sui->menu ) {
 
@@ -261,7 +260,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         
         Trace1("MENU_AZIMUTAL") ;
         
-        // a modifier / completer : TEMPS_CALCUL_TEMPS_SIDERAL et CALCUL_ANGLE_HORAIRE
+        // a modifier / completer : TEMPS_CALCULS_TEMPS_SIDERAL et CALCULS_ANGLE_HORAIRE
         // sont a supprimer car deja calculer dans SUIVI_
 
         Trace1("appel : %d : MENU_AZIMUTAL" , gp_Sui->menu) ;
@@ -269,19 +268,18 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui->sui_pas->pas_acc_alt          = 1 ;
-        gp_Sui->sui_pas->pas_acc_azi          = 1 ;
+        gp_Sui_Pas->pas_acc_alt          = 1 ;
+        gp_Sui_Pas->pas_acc_azi          = 1 ;
+        gp_Sui->sui_mode_equatorial           = 0 ;
+        gp_Sui->sui_mode_voute                = 1 ; 
 
         pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui->sui_mode_equatorial = 0 ;
-        gp_Sui->sui_mode_voute      = 1 ; 
-
-        CALCUL_ASTRE_RECUP_TYPE_ET_NOM() ;
-
-				CALCUL_TOUT() ;
-
+/*
+        CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
+				CALCULS_TOUT() ;
+*/
         gp_Sui->menu_old         = gp_Sui->menu ;
         gp_Sui->menu             = MENU_MANUEL_BRUT ; 
 
@@ -296,19 +294,19 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui->sui_pas->pas_acc_alt          = 0 ;
-        gp_Sui->sui_pas->pas_acc_azi          = 1 ;
-
-        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+        gp_Sui_Pas->pas_acc_alt          = 0 ;
+        gp_Sui_Pas->pas_acc_azi          = 1 ;
 
         gp_Sui->sui_mode_equatorial = 1 ;
         gp_Sui->sui_mode_voute      = 0 ; 
 
-        CALCUL_ASTRE_RECUP_TYPE_ET_NOM() ;
+        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
+        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
-				CALCUL_TOUT() ;
-
+/*
+        CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
+				CALCULS_TOUT() ;
+*/
         gp_Sui->menu_old         = gp_Sui->menu ;
         gp_Sui->menu             = MENU_MANUEL_BRUT ;
 
@@ -325,14 +323,20 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         // sur le N-S-E-O (pas de recalcul des periodes) 
         // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
 
-        if( strcmp( gp_Sui->sui_dat->dat_inf, "") != 0 ) {
-          Trace1("1 gp_Sui->sui_dat->dat_inf = %s", gp_Sui->sui_dat->dat_inf ) ;
+        if( strcmp( gp_Dat->dat_inf, "") != 0 ) {
+          Trace1("1 gp_Dat->dat_inf = %s", gp_Dat->dat_inf ) ;
         }
 
         SUIVI_MANUEL_BRUT(gp_Sui, gp_Key) ;
   
+        pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
+        pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+
         gp_Sui->menu_old         = gp_Sui->menu ;
         gp_Sui->menu             = MENU_MANUEL_BRUT ; 
+
+        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
+        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
       break ;
 
@@ -354,18 +358,18 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui->sui_pas->pas_acc_alt          = 0 ;
-        gp_Sui->sui_pas->pas_acc_azi          = 0 ;
-
-        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
-
-        CALCUL_ASTRE_RECUP_TYPE_ET_NOM() ;
-
-				CALCUL_TOUT() ;
+        gp_Sui_Pas->pas_acc_alt          = 0 ;
+        gp_Sui_Pas->pas_acc_azi          = 0 ;
 
         gp_Sui->menu_old         = gp_Sui->menu ;
         gp_Sui->menu             = MENU_MANUEL_NON_ASSERVI ; 
+
+        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
+        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+/*
+        CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
+				CALCULS_TOUT() ;
+*/
 
       break ;
 
@@ -379,7 +383,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         // TODO : les periodes / frequences en azimut et altitude
 
         SUIVI_MANUEL_ASSERVI(gp_Sui, gp_Key) ; 
-        CALCUL_PERIODES_SUIVI_MANUEL(gp_Ast,gp_Sui,gp_Vou)  ;
+        CALCULS_PERIODES_SUIVI_MANUEL(gp_Ast,gp_Sui,gp_Vou)  ;
 
         gp_Sui->menu_old         = gp_Sui->menu ;
         gp_Sui->menu             = MENU_MANUEL_ASSERVI ; 
@@ -492,17 +496,16 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
   struct timeval t00 ;
   struct sched_param param;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;  
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
 
   sleep(1) ;
   
-  memset( c_l0, CALCUL_ZERO_CHAR, sizeof( c_l0 )) ;
-  memset( c_l1, CALCUL_ZERO_CHAR, sizeof( c_l1 )) ;
+  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
+  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
   
   ul_vou_while_incr =0 ;
   
@@ -523,13 +526,18 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
   /* Debut boucle SUIVI_VOUTE */
   while(TRUE) {
     
+        /* Creee un point d 'annulation pour la fonction pthread_cancel */
+    pthread_testcancel() ;
+
     Trace1("while") ;
 
     if ( gp_Sui->sui_mode_voute ) {
       
-      /* FIXME : modification 20121225 : tous les calculs generiques dans CALCUL_TOUT */
+      Trace1("gp_Sui->sui_mode_voute == true") ;
+
+      /* FIXME : modification 20121225 : tous les calculs generiques dans CALCULS_TOUT */
       
-      CALCUL_TOUT() ;
+      CALCULS_TOUT() ;
       
       /* Exceptionnellement , utilisation variables globales */ 
       /* LCD_DISPLAY_TEMPS_LIEU(0,gp_Lie,gp_Tim) ;*/
@@ -541,7 +549,6 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
         ASTRE_AFFICHER_MODE_STELLARIUM(gp_Ast) ;
         
         gp_Lcd->display_ast_vit(2000000) ;
-
         gp_Lcd->refresh_default() ;
         
         gp_Ast->ast_new = FALSE ;
@@ -553,6 +560,8 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
 */
       gp_Ast->AGH += gp_Vou->vou_pas ;
       gp_Vou->vou_begin += gp_Vou->vou_pas ;
+
+      Trace1("voute : temporisation") ;
 
       gp_Vou->vou_temps_ecoule += VOUTE_TEMPORISATION( gp_Vou, t00 ) ; 
       gettimeofday(&t00,NULL) ;
@@ -573,6 +582,9 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
       // uniquement utiliser pour les tests
       // system("/bin/date >> /root/astrokit.begin.log") ;
       //Trace1("La voute ne tourne pas") ;
+
+      Trace("usleep %ld", gp_Vou->vou_dt_us ) ;
+
       usleep( gp_Vou->vou_dt_us );
     }
   }
@@ -597,9 +609,8 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
   int i_ret=0 ; 
   struct sched_param param;
     
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_INFRARED ) ;
   
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA ) ;
@@ -608,9 +619,11 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
   
     i_ret = INFRARED_OPEN( gp_LircConfig ) ;
     Trace1("INFRARED_OPEN : retour = %d" , i_ret ) ;
+    
     // ATTENTION !!! la fonction INFRARED_READ est bloquante (voir ir.c) !!!!!
     
     INFRARED_READ( gp_Sui ) ;
+
     INFRARED_CLOSE(gp_LircConfig) ;
   }
 
@@ -638,13 +651,12 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
   char c_l0[16] ={0};
   char c_l1[16] ={0};
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;  
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_LCD ) ;
 
-  memset( c_l0, CALCUL_ZERO_CHAR, sizeof( c_l0 )) ;
-  memset( c_l1, CALCUL_ZERO_CHAR, sizeof( c_l1 )) ;
+  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
+  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
     
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
   
@@ -654,10 +666,13 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 
     /* Debut boucle SUIVI_LCD */
     while(TRUE) {
-      
+
+      /* Creee un point d 'annulation pour la fonction pthread_cancel */
+      pthread_testcancel() ;
+
       Trace1("while") ;
 
-      usleep( gp_Sui->sui_tpo->tempo_lcd_loop );
+      usleep( gp_Tpo->tpo_lcd_loop );
       
       /* Si un changement de lignes a ete effectue dans une partie du programme */
 
@@ -701,6 +716,7 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 
 void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
 
+  unsigned long u_sleep_termios_demi_periode = 0 ; 
   long long ll_inrc=0 ;
   int i_indice_code=0 ;
   int c_char =0 ;
@@ -710,9 +726,12 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
   struct sched_param param;
   struct timeval t00,t01  ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  pthread_mutex_lock(& gp_Tpo->tpo_mutex) ;
+  u_sleep_termios_demi_periode = (unsigned long)((double)gp_Tpo->tpo_termios / 2.0) ;
+  pthread_mutex_unlock(& gp_Tpo->tpo_mutex) ;
+
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
@@ -723,49 +742,55 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
 
     /* Debut boucle SUIVI_CLAVIER_TERMIOS */
     while( c_char != 'q' ) {
-      
+
+      /* Creee un point d 'annulation pour la fonction pthread_cancel */
+      pthread_testcancel() ;
+
       memset(&c_char,0,sizeof(c_char)) ;
       memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
-      if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine,&i_sum_ascii)) {
+      if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine, &i_sum_ascii)) {
 
         c_char=ch_chaine[0] ;
 
-        Trace2("keycode %d %s", i_sum_ascii, ch_chaine) ;
+        Trace("chaine %s (ascii %d)", ch_chaine, i_sum_ascii) ;
 
         if ( i_sum_ascii == 27 ) Trace1("exit detecte %d", i_sum_ascii) ;
         memset(c_sum_ascii,0, sizeof(c_sum_ascii));
         sprintf(c_sum_ascii,"%d",i_sum_ascii);
         i_indice_code=0 ;
-        while(strcmp(gp_Cod->in_term[i_indice_code],c_sum_ascii) && ( i_indice_code < CODES_CODE_NB_CODES ) ){ 
-           Trace2("%s = %s ?", c_sum_ascii, gp_Cod->in_term[i_indice_code]) ;  
+        while(strcmp(gp_Cod->cod_in_term[i_indice_code],c_sum_ascii) && ( i_indice_code < CODES_CODE_NB_CODES ) ){ 
+           Trace2("%s = %s ?", c_sum_ascii, gp_Cod->cod_in_term[i_indice_code]) ;  
            i_indice_code++ ; 
         }
         pthread_mutex_lock(& gp_Mut->mut_dat );
-        memset( gp_Sui->sui_dat->dat_inf, CONFIG_ZERO_CHAR, strlen( gp_Sui->sui_dat->dat_inf ) ) ;
+        memset( gp_Dat->dat_inf, CONFIG_ZERO_CHAR, strlen( gp_Dat->dat_inf ) ) ;
         pthread_mutex_unlock(& gp_Mut->mut_dat );
 
         if ( i_indice_code < CODES_CODE_NB_CODES ) {
           pthread_mutex_lock(& gp_Mut->mut_dat );
-          strcpy( gp_Sui->sui_dat->dat_inf, gp_Cod->out_act[i_indice_code] ) ;
+          strcpy( gp_Dat->dat_inf, gp_Cod->cod_out_act[i_indice_code] ) ;
           pthread_mutex_unlock(& gp_Mut->mut_dat );
 
           GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
         }
         // tres important !!
         // le usleep suivant permet de garder l information !!!!!!
-        // gp_Sui->sui_dat->dat_inf fonctionne comme un TAMPON
+        // gp_Dat->dat_inf fonctionne comme un TAMPON
         // il va etre lu par les threads du programme principal
 
-        Trace1(" -> datas lus = %s", gp_Sui->sui_dat->dat_inf ) ;
-        Trace1("gp_Sui->sui_tpo->tempo_termios = %ld", gp_Sui->sui_tpo->tempo_termios ) ;
+        Trace1("datas = %s", gp_Dat->dat_inf ) ;
+        Trace1("gp_Tpo->tpo_termios = %ld", gp_Tpo->tpo_termios ) ;
+        Trace1("usleep tempo_termios") ;
+        
+        usleep( gp_Tpo->tpo_termios ) ;
 
-        usleep( gp_Sui->sui_tpo->tempo_termios ) ;
-
+        Trace1("raz de gp_Dat->dat_inf") ;
         pthread_mutex_lock(& gp_Mut->mut_dat );
-        memset( gp_Sui->sui_dat->dat_inf, 0, strlen( gp_Sui->sui_dat->dat_inf ) ) ;
-        strcpy( gp_Sui->sui_dat->dat_inf, "") ;
+        memset( gp_Dat->dat_inf, 0, strlen( gp_Dat->dat_inf ) ) ;
+        strcpy( gp_Dat->dat_inf, "") ;
         pthread_mutex_unlock(& gp_Mut->mut_dat );
+        
       }
     }
 
@@ -793,9 +818,8 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
   int c_char = 0 ;
   struct sched_param param;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
@@ -839,9 +863,8 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
   unsigned long l_incr=0 ;
   struct sched_param param;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
@@ -910,9 +933,8 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   STRUCT_I2C_DEVICE   exemple, *lp_dev ;
   STRUCT_I2C_ACC_MAG  accmag,  *lp_acc ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
-  pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
+  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CAPTEURS ) ;
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
@@ -928,7 +950,10 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
     /* Debut boucle SUIVI_CAPTEURS */
     
     while(TRUE) {
-      
+
+      /* Creee un point d 'annulation pour la fonction pthread_cancel */
+      pthread_testcancel() ;
+
       Trace1("while") ;
 
       if ( ! gp_Dev->init_capteurs ) {
@@ -963,7 +988,7 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
         Trace1("%.0f\t%.0f\t%.0f\n", lp_acc->pitch * I2C_DEGRAD, lp_acc->roll * I2C_DEGRAD, lp_acc->heading * I2C_DEGRAD) ;
       }	
       
-      usleep( gp_Sui->sui_tpo->tempo_capteurs );
+      usleep( gp_Tpo->tpo_capteurs );
     }
   }
   Trace1("Stop") ;
@@ -1031,24 +1056,26 @@ int main(int argc, char ** argv) {
 
   LOG_INIT        (gp_Log); 
 
-  TEMPS_INIT     ( gp_Tim, gp_Tim_Tem ) ;
+  TEMPS_INIT     ( gp_Tim, gp_Tpo ) ;
   
   /* GPIO_CLAVIER_MATRICIEL_CONFIG( gpio_key_l, gpio_key_c ) ; */
   
+  CAT_INIT       ( gp_Cat ) ;
+  CALCULS_INIT   ( gp_Cal ) ;
   VOUTE_INIT     ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
   CODES_INIT     ( gp_Cod ) ;
   KEYS_INIT      ( gp_Key ) ;   
   ASTRE_INIT     ( gp_Ast ) ;
-  LIEU_INIT      ( gp_Lie  ) ;
+  LIEU_INIT      ( gp_Lie ) ;
   
-  TEMPS_CALCUL_TEMPS_SIDERAL  ( gp_Lie, gp_Tim) ;
+  TEMPS_CALCULS_TEMPS_SIDERAL  ( gp_Lie, gp_Tim) ;
   
   DEVICES_INIT   ( gp_Dev ) ;
   SUIVI_INIT     ( gp_Sui ) ;
   LCD_INIT       ( gp_Lcd ) ;
   PID_INIT       ( gp_Pid, gp_Pid_Par->par_pid_ech, gp_Pid_Par->par_pid_kp, gp_Pid_Par->par_pid_ki, gp_Pid_Par->par_pid_kd ) ;
 
-  DEVICES_AFFICHER_UTILISATION() ;
+  DEVICES_AFFICHER_UTILISATION( gp_Dev) ;
 
   Trace1("pthread_self = %ld", pthread_self()) ;
 
@@ -1089,6 +1116,8 @@ int main(int argc, char ** argv) {
 
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
     strcpy( gp_Ast->nom, gp_Ast_Par->par_default_object ) ;
+
+    CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
     if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
     if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
@@ -1133,7 +1162,7 @@ int main(int argc, char ** argv) {
     gp_Gpio_Pwm_Mot_Azi,\
     gi_gpio_azi,\
     gi_gpio_mas,\
-    gp_Cal_Par->par_azi_red4 ,\
+    gp_Cal_Par->par_azi_red_4 ,\
     100,\
     gd_gpio_frequence_pwm, \
     1, \
@@ -1186,12 +1215,6 @@ int main(int argc, char ** argv) {
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_LCD],             NULL, (void*)SUIVI_LCD,            gp_Sui ) ;
 
   /* Affichage d'informations sur les threads lancés */
-
-  sleep(5) ;
-
-  PTHREADS_INFOS(gp_Pth) ;
-
-  sleep(1) ;
 
   // ============================== join des threads  ===================================
   /* TODO : statut cancellable implique de ne pas forcement mettre en join */

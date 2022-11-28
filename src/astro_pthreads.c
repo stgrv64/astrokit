@@ -20,7 +20,7 @@ int gi_pth_numero ;
 int gi_pthread_getuid ;
 int gi_pthread_nb_cpu ;
 
-static const char *  gi_Pth_Name[] = {
+static const char *  gc_hach_pth_name[] = {
   "pth_phases" ,
   "pth_moteurs"   ,
   "pth_menu"       ,
@@ -59,7 +59,7 @@ static const int gi_Pth_Sched_Param[] = {
   SCHED_RR
 } ;
 
-static const char * gc_Pth_Sched_Param[] = {
+static const char * gc_hach_pth_sched_param[] = {
   "SCHED_RR",
   "SCHED_RR",
   "SCHED_RR",
@@ -189,7 +189,10 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_th
   cpu_set_t cpu_set ;
   pthread_attr_t attr ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
+  pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) ;  
+
+  TraceArbo(__func__,1,"----------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   /*-------------------------------------------------*/
   /* Recuperation des valeurs d 'attributs de treads */
@@ -199,10 +202,10 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_th
   i_pri = gi_Pth_Sched_Priority[ (int) l_en_thread ] ;
 
   memset( c_name, 0, sizeof(c_name)) ;
-  strcpy( c_name, gi_Pth_Name[(int)l_en_thread]) ;
+  strcpy( c_name, gc_hach_pth_name[(int)l_en_thread]) ;
 
   memset( c_ord, 0, sizeof(c_ord)) ;
-  strcpy( c_ord, gc_Pth_Sched_Param[(int)l_en_thread]) ;
+  strcpy( c_ord, gc_hach_pth_sched_param[(int)l_en_thread]) ;
 
   param.sched_priority = i_pri ;
 
@@ -337,6 +340,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
   int i_pri=0 ;
   int i_sta=0 ;
   pthread_t i_id=0 ;
+  pthread_t i_id_pth=0 ;
   char c_nam[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
   char c_ord[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
   char c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
@@ -356,11 +360,12 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
            i_pri = lp_pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
            i_ord = lp_pth->pth_att[ i_num_thread ].att_ord  ; 
            i_sta = lp_pth->pth_att[ i_num_thread ].att_sta ;
-
+           i_id_pth = lp_pth->pth_t[ i_num_thread ] ;
     pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
-    Trace("thread %-16s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
+    Trace("thread %-16s : id %ld id2 %ld ord %s prio %d sta %s num %d", c_nam, i_id, i_id_pth,  c_ord, i_pri, c_sta, i_num_thread ) ;
   }
+
   return ;
 }
 
@@ -446,6 +451,7 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
   int l_nb_threads = 0 ;
   int i_ord =0 ;
   int i_pri=0 ;
+  int i_err=0 ;
   int i_abandon=0 ;
   int i_sta=0 ;
   char c_nam[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
@@ -453,7 +459,24 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
   char c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
   pthread_t i_id = 0 ;
 
-  for( i_num_thread = 0 ; i_num_thread < PTHREADS_MAX_THREADS  ; i_num_thread++ )   {
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_LCD] ) != 0 )             {  Trace("pthread_cancel error PTHREAD_T_LCD") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_CLAVIER] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_CLAVIER") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_CAPTEUR] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_CAPTEUR") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_INFRA] ) != 0 )           {  Trace("pthread_cancel error PTHREAD_T_INFRA") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_VOUTE] ) != 0 )           {  Trace("pthread_cancel error PTHREAD_T_VOUTE") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MENU] ) != 0 )            {  Trace("pthread_cancel error PTHREAD_T_MENU") ; } 
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI") ; }              
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_0") ; }  
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_1") ; }  
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_2") ; }  
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_3") ; }
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_0") ; }  
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_1") ; }  
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_2") ; }  
+  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_3") ; }
+
+  for( i_num_thread = PTHREADS_MAX_THREADS ; i_num_thread >=0  ; i_num_thread-- )   {
 
     i_abandon=0 ;
 
@@ -468,10 +491,7 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
 
     pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
-    if ( i_sta == PTHREAD_RUNNING \
-      && strcmp( "pth_clavier" , c_nam ) != 0 \
-      && strcmp( "pth_main" , c_nam ) != 0 \
-    ) {
+    if ( i_sta == PTHREAD_RUNNING ) {
       memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
 /*
       if ( pthread_getname_np( i_id , c_thread_name, 16 ) ) {
@@ -479,39 +499,40 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
       }
   */    
       // if ( pthread_cancel( i_id ) != 0 ) { 
-       if ( pthread_cancel ( i_id ) != 0 ) { 
-        i_abandon = 0 ; 
-        Trace("erreur");
-      }
-      else {
+
+      if ( ( i_err = pthread_cancel ( i_id )) != 0 ) { 
         i_abandon = 1 ; 
-        // pthread_mutex_lock( & gp_Mut->mut_pth) ;
-
-        i_sta = (int)PTHREAD_CANCELLED ;
-        strcpy( c_sta, "PTHREAD_CANCELLED");
-        lp_pth->pth_att[ i_num_thread ].att_sta = i_sta ;    
-        strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
-        
-        // pthread_mutex_unlock( & gp_Mut->mut_pth) ;
-/*
-        sleep(1) ;
-
+/*      
         if ( pthread_kill ( i_id, SIGTERM ) != 0 ) { 
-          i_abandon = 0 ; 
-          Trace("erreur");
+          i_abandon = 2 ; 
         }
         else {
-          i_abandon = 1 ; 
-          // pthread_mutex_lock( & gp_Mut->mut_pth) ;
-
+          i_abandon = 3 ; 
+          
           i_sta = (int)PTHREAD_KILLED ;
           strcpy( c_sta, "PTHREAD_KILLED");
+
+          pthread_mutex_lock( & gp_Mut->mut_pth) ;
+
           lp_pth->pth_att[ i_num_thread ].att_sta = (int) i_sta ;    
           strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
           
-          // pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+          pthread_mutex_unlock( & gp_Mut->mut_pth) ;
         }
 */
+      }
+      else {
+          i_abandon = 4 ; 
+
+          i_sta = (int)PTHREAD_CANCELLED ;
+          strcpy( c_sta, "PTHREAD_CANCELLED");
+
+          pthread_mutex_lock( & gp_Mut->mut_pth) ;
+
+          lp_pth->pth_att[ i_num_thread ].att_sta = i_sta ;    
+          strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
+          
+          pthread_mutex_unlock( & gp_Mut->mut_pth) ;
       }
     }
     else {
@@ -519,15 +540,21 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
     }
     
     if ( i_abandon == 0 ) {
-      Trace("canc KO %-15s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
-    }
-    if ( i_abandon == 1 ) {
-      Trace("canc OK %-15s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
-    }
-    if ( i_abandon == 2 ) {
       Trace("not run %-15s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
     }
-    usleep(10000) ;
+    if ( i_abandon == 1 ) {
+      Trace("canc KO %-15s : id %ld ord %s prio %d sta %s num %d err %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread, i_err ) ;
+    }
+    if ( i_abandon == 2 ) {
+      Trace("kill KO %-15s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
+    }
+    if ( i_abandon == 3 ) {
+      Trace("kill ok %-15s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
+    }
+    if ( i_abandon == 3 ) {
+      Trace("canc ok %-15s : id %ld ord %s prio %d sta %s num %d", c_nam, i_id, c_ord, i_pri, c_sta, i_num_thread ) ;
+    }
+    // sleep(1) ;
   }
   return ;
 }

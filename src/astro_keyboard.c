@@ -74,7 +74,7 @@ int KEYBOARD_TERMIOS_KBHIT() {
   int nread ; 
 
   if ( peek_caractere != -1 ) {
-    Trace("peek_caractere != -1") ;
+    // Trace("peek_caractere != -1") ;
     return 1 ;
   }
   config_finale.c_cc[VMIN] = 0 ;
@@ -89,11 +89,11 @@ int KEYBOARD_TERMIOS_KBHIT() {
   tcsetattr( 0, TCSANOW, &config_finale )  ;
 
   if ( nread >0  ) {
-    Trace1("nread = %d", nread) ;
+    // Trace1("nread = %d", nread) ;
   }
   if (nread == 1 ) {
     peek_caractere = ch ; 
-    Trace1("peek_caractere = ch = %c", ch) ;
+    // Trace1("peek_caractere = ch = %c", ch) ;
     return -1 ;
   }
   return 0 ;
@@ -107,6 +107,7 @@ int KEYBOARD_TERMIOS_KBHIT() {
 * @date   : 2022-01-18 creation
 * @date   : passage du buffer de lecture de char a char[]
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+* @todo   : eviter les traces a l interieur de cette fonction
 *****************************************************************************************/
 
 int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
@@ -118,7 +119,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
   memset(chaine, 0, sizeof(chaine)) ;
 
   if ( peek_char[0] != -1 ) {
-    Trace("peek_char[0] != -1") ;
+    // Trace("peek_char[0] != -1") ;
     return 1 ;
   }
   config_finale.c_cc[VMIN] = 0 ;
@@ -133,11 +134,11 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
 
   if ( nread >0  ) {
 
-    Trace2("nread positif = %d", nread) ;
+    Trace("nread positif = %d", nread) ;
     
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
-      Trace2("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
+      Trace("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
       *i_sum_ascii+=(int)peek_char[i] ;
     }
     strcpy( ch_chaine , chaine) ;  
@@ -149,10 +150,11 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
     memset(chaine, 0, sizeof(chaine)) ;
 
     Trace("nread %-3d i_sum_ascii %-5d ch_chaine %-10s", nread, *i_sum_ascii, ch_chaine ) ;
+    // usleep(10000) ;
     return -1 ;
   }
   else {
-    Trace2("nread = %d", nread) ;
+    // Trace2("nread = %d", nread) ;
   }
   return 0 ;
 }
@@ -172,14 +174,14 @@ int KEYBOARD_TERMIOS_READCH() {
   if(peek_caractere != -1 ) {
     ch = peek_caractere ;
     peek_caractere = -1 ;
-    Trace("ch = %c (peek_caractere != -1)", ch) ;
+    // Trace("ch = %c (peek_caractere != -1)", ch) ;
     return ch ;
   }
 
   // nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
   nread = read( 0, &ch, 1)  ;
 
-  Trace("ch = %c nread = %d", ch, nread) ;
+  // Trace("ch = %c nread = %d", ch, nread) ;
   return ch ;
 }
 
@@ -257,12 +259,12 @@ void KEYBOARD_LOG_LAST_LINE(WINDOW *win) {
 
 void KEYBOARD_NCURSES_INIT(void) {
   int n = 0 ;
-  Trace1("start") ;
+  // Trace1("start") ;
   /* unlink(MY_LOGFILE); */
 
   if (newterm(0, stdout, stdin) == 0) {
     fprintf(stderr, "Cannot initialize terminal\n");
-    Trace1("Cannot initialize terminal") ;
+    // Trace1("Cannot initialize terminal") ;
     exit(2);
   }
   cbreak();		     /* take input chars one at a time, no wait for \n */

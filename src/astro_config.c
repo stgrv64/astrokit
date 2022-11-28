@@ -59,147 +59,6 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_CONST ;
 
-static const char * c_Bin_Possible_Paths[] = {
-  "/bin",
-  "/sbin",
-  "/usr/bin",
-  "/usr/sbin",
-  "/usr/local/bin",
-  "/usr/local/sbin"
-} ;
-
-static const char * gc_Config_Params_Obligatoires[] = {
-  "MENU_PAR_DEFAUT",
-  "ASTRE_PAR_DEFAUT",
-  "CONFIG_REP_CAT",
-  "CONFIG_REP_CFG",
-  "CONFIG_REP_LOG",
-  "CONFIG_REP_IN",
-  "CONFIG_REP_OUT",
-  "CONFIG_REP_SCR",
-  "CONFIG_FIC_LED",
-  "CONFIG_FIC_LOG",
-  "CONFIG_FIC_DATE",
-  "CONFIG_FIC_HHMM",
-  "CONFIG_SCR_KERNEL",
-  "TEMPO_MENU",
-  "TEMPO_RAQ",
-  "TEMPO_IR",
-  "TEMPO_TERMIOS",
-  "TEMPO_CLAVIER",
-  "TEMPO_CAPTEURS",
-  "TEMPO_LCD_LOOP",
-  "TEMPO_LCD_DISP",
-  "TEMPO_PID_LOOP",
-  "PID_ECH",
-  "PID_KP",
-  "PID_KI",
-  "PID_KD",
-  "DEVICE_USE_INFRAROUGE",
-  "DEVICE_USE_KEYBOARD",
-  "DEVICE_USE_LCD",
-  "DEVICE_USE_CONTROLER",
-  "DEVICE_USE_CAPTEURS",
-  "DEVICE_USE_RAQUETTE",
-  "DEVICE_USE_BLUETOOTH",
-  "LATITUDE",
-  "LONGITUDE",
-  "ALTITUDE",
-  "GPIO_LED_ETAT",
-  "GPIO_ALT",
-  "GPIO_AZI",
-  "GPIO_MASQUE",
-  "GPIO_FREQUENCE_PWM",
-  "ALT_R1",
-  "ALT_R2",
-  "ALT_R3",
-  "ALT_R4",
-  "ALT_R5",
-  "ALT_R6",
-  "ALT_R7",
-  "ALT_ROT",
-  "ALT_ACC",
-  "AZI_R1",
-  "AZI_R2",
-  "AZI_R3",
-  "AZI_R4",
-  "AZI_R5",
-  "AZI_R6",
-  "AZI_R7",
-  "AZI_ROT",
-  "AZI_ACC",
-  "ALTAZ_FORWARD",
-  "ALTAZ_REWIND",
-  "ALTAZ_FORWARD_FAST",
-  "ALTAZ_REWIND_FAST"
-} ;
-
-static const int gi_Config_Params_Obligatoires_Type[] = {
-  CONFIG_TYPE_INT, // "MENU_PAR_DEFAUT",
-  CONFIG_TYPE_INT, // "ASTRE_PAR_DEFAUT",
-  CONFIG_TYPE_INT, // "CONFIG_REP_CAT",
-  CONFIG_TYPE_INT, // "CONFIG_REP_CFG",
-  CONFIG_TYPE_INT, // "CONFIG_REP_LOG",
-  CONFIG_TYPE_INT, // "CONFIG_REP_IN",
-  CONFIG_TYPE_INT, // "CONFIG_REP_OUT",
-  CONFIG_TYPE_INT, // "CONFIG_REP_SCR",
-  CONFIG_TYPE_INT, // "CONFIG_FIC_LED",
-  CONFIG_TYPE_INT, // "CONFIG_FIC_LOG",
-  CONFIG_TYPE_INT, // "CONFIG_FIC_DATE",
-  CONFIG_TYPE_INT, // "CONFIG_FIC_HHMM",
-  CONFIG_TYPE_INT, // "CONFIG_SCR_KERNEL",
-  CONFIG_TYPE_INT, // "TEMPO_MENU",
-  CONFIG_TYPE_INT, // "TEMPO_RAQ",
-  CONFIG_TYPE_INT, // "TEMPO_IR",
-  CONFIG_TYPE_INT, // "TEMPO_TERMIOS",
-  CONFIG_TYPE_INT, // "TEMPO_CLAVIER",
-  CONFIG_TYPE_INT, // "TEMPO_CAPTEURS",
-  CONFIG_TYPE_INT, // "TEMPO_LCD_LOOP",
-  CONFIG_TYPE_INT, // "TEMPO_LCD_DISP",
-  CONFIG_TYPE_INT, // "TEMPO_PID_LOOP",
-  CONFIG_TYPE_INT, // "PID_ECH",
-  CONFIG_TYPE_INT, // "PID_KP",
-  CONFIG_TYPE_INT, // "PID_KI",
-  CONFIG_TYPE_INT, // "PID_KD",
-  CONFIG_TYPE_INT, // "DEVICE_USE_INFRAROUGE",
-  CONFIG_TYPE_INT, // "DEVICE_USE_KEYBOARD",
-  CONFIG_TYPE_INT, // "DEVICE_USE_LCD",
-  CONFIG_TYPE_INT, // "DEVICE_USE_CONTROLER",
-  CONFIG_TYPE_INT, // "DEVICE_USE_CAPTEURS",
-  CONFIG_TYPE_INT, // "DEVICE_USE_RAQUETTE",
-  CONFIG_TYPE_INT, // "DEVICE_USE_BLUETOOTH",
-  CONFIG_TYPE_INT, // "LATITUDE",
-  CONFIG_TYPE_INT, // "LONGITUDE",
-  CONFIG_TYPE_INT, // "ALTITUDE",
-  CONFIG_TYPE_INT, // "GPIO_LED_ETAT",
-  CONFIG_TYPE_INT, // "GPIO_ALT",
-  CONFIG_TYPE_INT, // "GPIO_AZI",
-  CONFIG_TYPE_INT, // "GPIO_MASQUE",
-  CONFIG_TYPE_INT, // "GPIO_FREQUENCE_PWM",
-  CONFIG_TYPE_INT, // "ALT_R1",
-  CONFIG_TYPE_INT, // "ALT_R2",
-  CONFIG_TYPE_INT, // "ALT_R3",
-  CONFIG_TYPE_INT, // "ALT_R4",
-  CONFIG_TYPE_INT, // "ALT_R5",
-  CONFIG_TYPE_INT, // "ALT_R6",
-  CONFIG_TYPE_INT, // "ALT_R7",
-  CONFIG_TYPE_INT, // "ALT_ROT",
-  CONFIG_TYPE_INT, // "ALT_ACC",
-  CONFIG_TYPE_INT, // "AZI_R1",
-  CONFIG_TYPE_INT, // "AZI_R2",
-  CONFIG_TYPE_INT, // "AZI_R3",
-  CONFIG_TYPE_INT, // "AZI_R4",
-  CONFIG_TYPE_INT, // "AZI_R5",
-  CONFIG_TYPE_INT, // "AZI_R6",
-  CONFIG_TYPE_INT, // "AZI_R7",
-  CONFIG_TYPE_INT, // "AZI_ROT",
-  CONFIG_TYPE_INT, // "AZI_ACC",
-  CONFIG_TYPE_INT, // "ALTAZ_FORWARD",
-  CONFIG_TYPE_INT, // "ALTAZ_REWIND",
-  CONFIG_TYPE_INT, // "ALTAZ_FORWARD_FAST",
-  CONFIG_TYPE_INT, // "ALTAZ_REWIND_FAST"
-} ;
-
 char  gc_config_path_cmd_stty[ CONFIG_TAILLE_BUFFER_32 ] ;
 
 // ------------------------------------------------------------------------
@@ -355,13 +214,13 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
    gp_Cal_Par->par_alt_red_6 = 1.0;   // reduction liee au cpu
    gp_Cal_Par->par_alt_red_7 = 1.0;   // reduction non decrite plus haut
 
-   gp_Cal_Par->par_azi_red1 = 1.0 ;  // reduction liee a la monture
-   gp_Cal_Par->par_azi_red2 = 1.0;   // reducteur du moteur
-   gp_Cal_Par->par_azi_red3 = 1.0;   // nombre de pas du moteur en azimut
-   gp_Cal_Par->par_azi_red4 = 1.0;   // mode micro pas utilisee (1/R4)
-   gp_Cal_Par->par_azi_red5 = 1.0;   // reduction liee a la poulie
-   gp_Cal_Par->par_azi_red6 = 1.0;   // reduction liee au cpu
-   gp_Cal_Par->par_azi_red7 = 1.0;   // reduction non decrite plus haut
+   gp_Cal_Par->par_azi_red_1 = 1.0 ;  // reduction liee a la monture
+   gp_Cal_Par->par_azi_red_2 = 1.0;   // reducteur du moteur
+   gp_Cal_Par->par_azi_red_3 = 1.0;   // nombre de pas du moteur en azimut
+   gp_Cal_Par->par_azi_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
+   gp_Cal_Par->par_azi_red_5 = 1.0;   // reduction liee a la poulie
+   gp_Cal_Par->par_azi_red_6 = 1.0;   // reduction liee au cpu
+   gp_Cal_Par->par_azi_red_7 = 1.0;   // reduction non decrite plus haut
 
    gp_Dev_Par->par_use_Capteurs = 0    ;
    gp_Dev_Par->par_use_Raquette = 0    ;
@@ -375,14 +234,13 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 
    /* Definition de valeurs par defauts pour les TEMPO */ 
 
-  gp_Tim_Par->par_tempo_Menu     = 50000;
-  gp_Tim_Par->par_tempo_Raq      = 51000; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
-  gp_Tim_Par->par_tempo_Ir       = 52000;
-  gp_Tim_Par->par_tempo_Termios  = 53000;
-  gp_Tim_Par->par_tempo_Clavier  = 25000;
-  gp_Tim_Par->par_tempo_Capteurs = 50000;
-  gp_Tim_Par->par_tempo_Lcd_Loop = 250000 ; 
-  gp_Tim_Par->par_tempo_Lcd_Disp = 100000 ; 
+  gp_Tim_Par->par_tpo_Menu     = 50000;
+  gp_Tim_Par->par_tpo_Raq      = 51000; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
+  gp_Tim_Par->par_tpo_Ir       = 52000;
+  gp_Tim_Par->par_tpo_Termios  = 53000;
+  gp_Tim_Par->par_tpo_Capteurs = 50000;
+  gp_Tim_Par->par_tpo_Lcd_Loop = 250000 ; 
+  gp_Tim_Par->par_tpo_Lcd_Disp = 100000 ; 
 
   gp_Pid_Par->par_pid_ech = 3 ;
 
@@ -390,21 +248,21 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
    // Lecture des variables dans la config lue dans le fichier de config
    //-----------gp_Ast_Par->par_default_object-------------------------------------------
 
-  memset( gp_Ast_Par->par_default_object, CALCUL_ZERO_CHAR, sizeof( gp_Ast_Par->par_default_object ) ) ;
+  memset( gp_Ast_Par->par_default_object, CALCULS_ZERO_CHAR, sizeof( gp_Ast_Par->par_default_object ) ) ;
 
-  memset( gp_Con_Par->par_rep_cat, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_cat ) ) ;
-  memset( gp_Con_Par->par_rep_cfg, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_cfg ) ) ;
-  memset( gp_Con_Par->par_rep_log, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_log ) ) ;
-  memset( gp_Con_Par->par_rep_in,  CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_in ) ) ;
-  memset( gp_Con_Par->par_rep_out, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_out ) ) ;
-  memset( gp_Con_Par->par_rep_scr, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_scr ) ) ;
+  memset( gp_Con_Par->par_rep_cat, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_cat ) ) ;
+  memset( gp_Con_Par->par_rep_cfg, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_cfg ) ) ;
+  memset( gp_Con_Par->par_rep_log, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_log ) ) ;
+  memset( gp_Con_Par->par_rep_in,  CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_in ) ) ;
+  memset( gp_Con_Par->par_rep_out, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_out ) ) ;
+  memset( gp_Con_Par->par_rep_scr, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_scr ) ) ;
 
-  memset( gp_Con_Par->par_fic_led, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_led ) ) ;
-  memset( gp_Con_Par->par_fic_log, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_log ) ) ;
-  memset( gp_Con_Par->par_fic_pid, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_pid ) ) ;
-  memset( gp_Con_Par->par_fic_dat, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_dat ) ) ;
-  memset( gp_Con_Par->par_fic_hhm, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_hhm ) ) ;
-  memset( gp_Con_Par->par_src_ker, CALCUL_ZERO_CHAR, sizeof( gp_Con_Par->par_src_ker ) ) ;
+  memset( gp_Con_Par->par_fic_led, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_led ) ) ;
+  memset( gp_Con_Par->par_fic_log, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_log ) ) ;
+  memset( gp_Con_Par->par_fic_pid, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_pid ) ) ;
+  memset( gp_Con_Par->par_fic_dat, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_dat ) ) ;
+  memset( gp_Con_Par->par_fic_hhm, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_hhm ) ) ;
+  memset( gp_Con_Par->par_src_ker, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_src_ker ) ) ;
 
   for(l=0;l<CONFIG_DATAS_NB_LIGNES;l++) {
 
@@ -428,14 +286,13 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
     } 
     /* Definition de valeurs par defauts pour les TEMPO */ 
     
-    if(!strcmp("TEMPO_RAQ",        lp_Con->con_params[l][0]))      gp_Tim_Par->par_tempo_Raq=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_MENU",       lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Menu=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_IR",         lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Ir=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_TERMIOS",    lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Termios=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_CLAVIER",    lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Clavier=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_CAPTEURS",   lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Capteurs=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_LCD_LOOP",   lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Lcd_Loop=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_LCD_DISP",   lp_Con->con_params[l][0])) gp_Tim_Par->par_tempo_Lcd_Disp=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_RAQ",        lp_Con->con_params[l][0]))      gp_Tim_Par->par_tpo_Raq=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_MENU",       lp_Con->con_params[l][0])) gp_Tim_Par->par_tpo_Menu=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_IR",         lp_Con->con_params[l][0])) gp_Tim_Par->par_tpo_Ir=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_TERMIOS",    lp_Con->con_params[l][0])) gp_Tim_Par->par_tpo_Termios=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_CAPTEURS",   lp_Con->con_params[l][0])) gp_Tim_Par->par_tpo_Capteurs=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_LCD_LOOP",   lp_Con->con_params[l][0])) gp_Tim_Par->par_tpo_Lcd_Loop=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_LCD_DISP",   lp_Con->con_params[l][0])) gp_Tim_Par->par_tpo_Lcd_Disp=atol(lp_Con->con_params[l][1]);
 
     // chemins des repertoires et fichiers (2021)
 
@@ -481,13 +338,13 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
     if(!strcmp("ALT_REV",    lp_Con->con_params[l][0])) gp_Cal_Par->par_alt_rev   = atoi(lp_Con->con_params[l][1]);
     if(!strcmp("ALT_ACC",    lp_Con->con_params[l][0])) gp_Cal_Par->par_alt_acc   = atof(lp_Con->con_params[l][1]) ;
         
-    if(!strcmp("AZI_R1",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red1  = atof(lp_Con->con_params[l][1]) ; 
-    if(!strcmp("AZI_R2",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red2  = atof(lp_Con->con_params[l][1]) ; 
-    if(!strcmp("AZI_R3",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red3  = atof(lp_Con->con_params[l][1]) ; 
-    if(!strcmp("AZI_R4",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red4  = atof(lp_Con->con_params[l][1]) ; 
-    if(!strcmp("AZI_R5",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red5  = atof(lp_Con->con_params[l][1]) ; 
-    if(!strcmp("AZI_R6",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red6  = atof(lp_Con->con_params[l][1]) ; 
-    if(!strcmp("AZI_R7",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red7  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R1",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_1  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R2",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_2  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R3",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_3  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R4",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_4  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R5",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_5  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R6",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_6  = atof(lp_Con->con_params[l][1]) ; 
+    if(!strcmp("AZI_R7",     lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_red_7  = atof(lp_Con->con_params[l][1]) ; 
     if(!strcmp("AZI_REV",    lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_rev   = atoi(lp_Con->con_params[l][1]);
     if(!strcmp("AZI_ACC",    lp_Con->con_params[l][0])) gp_Cal_Par->par_azi_acc   = atof(lp_Con->con_params[l][1]) ;
 
@@ -559,7 +416,7 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
   }
 
   //if ( gp_Cal_Par->par_alt_red_tot == 0 ) gp_Cal_Par->par_alt_red_tot = gp_Cal_Par->par_alt_red_1 * gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 ;
-  //if ( gp_Cal_Par->par_azi_red_tot == 0 ) gp_Cal_Par->par_azi_red_tot = gp_Cal_Par->par_azi_red1 * gp_Cal_Par->par_azi_red2 * gp_Cal_Par->par_azi_red3 * gp_Cal_Par->par_azi_red4 ;
+  //if ( gp_Cal_Par->par_azi_red_tot == 0 ) gp_Cal_Par->par_azi_red_tot = gp_Cal_Par->par_azi_red_1 * gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4 ;
   
   /* Attention gp_Cal_Par->par_alt_red_4 (micro pas) est traite independamment */
 
@@ -569,7 +426,7 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
   /* Attention gp_Cal_Par->par_alt_red_4 (micro pas) est traite independamment */
 
   if ( gp_Cal_Par->par_azi_red_tot == 0 ) {
-    gp_Cal_Par->par_azi_red_tot = gp_Cal_Par->par_azi_red1 * gp_Cal_Par->par_azi_red2 * gp_Cal_Par->par_azi_red3 * gp_Cal_Par->par_azi_red5 * gp_Cal_Par->par_azi_red6 * gp_Cal_Par->par_azi_red7 ;
+    gp_Cal_Par->par_azi_red_tot = gp_Cal_Par->par_azi_red_1 * gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_5 * gp_Cal_Par->par_azi_red_6 * gp_Cal_Par->par_azi_red_7 ;
   }
 }
 
@@ -579,7 +436,7 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 * @brief  : Cette fonction affiche les parametres 
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @date   : 2022-05-30 ajout gp_Tim_Par->par_tempo_LCD_xxx 
+* @date   : 2022-05-30 ajout gp_Tim_Par->par_tpo_LCD_xxx 
 * @date   : 2022-06-17 ajout gp_Pid_Par->par_pid_ech
 * @todo   : 
 *****************************************************************************************/
@@ -590,14 +447,13 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
 
   Trace1("gp_Con_Par->par_default_menu = %s",   gc_hach_suivi_menus[ gp_Con_Par->par_default_menu ] ) ;
   
-  Trace1("gp_Tim_Par->par_tempo_Raq = %ld",  gp_Tim_Par->par_tempo_Raq);
-  Trace1("gp_Tim_Par->par_tempo_Menu = %ld",  gp_Tim_Par->par_tempo_Menu);
-  Trace1("gp_Tim_Par->par_tempo_Ir = %ld",  gp_Tim_Par->par_tempo_Ir);
-  Trace1("gp_Tim_Par->par_tempo_Termios = %ld",  gp_Tim_Par->par_tempo_Termios);
-  Trace1("gp_Tim_Par->par_tempo_Clavier = %ld",  gp_Tim_Par->par_tempo_Clavier);
-  Trace1("gp_Tim_Par->par_tempo_Capteurs = %ld",  gp_Tim_Par->par_tempo_Capteurs);
-  Trace1("gp_Tim_Par->par_tempo_Lcd_Loop = %ld",  gp_Tim_Par->par_tempo_Lcd_Loop);
-  Trace1("gp_Tim_Par->par_tempo_Lcd_Disp = %ld",  gp_Tim_Par->par_tempo_Lcd_Disp);
+  Trace1("gp_Tim_Par->par_tpo_Raq = %ld",  gp_Tim_Par->par_tpo_Raq);
+  Trace1("gp_Tim_Par->par_tpo_Menu = %ld",  gp_Tim_Par->par_tpo_Menu);
+  Trace1("gp_Tim_Par->par_tpo_Ir = %ld",  gp_Tim_Par->par_tpo_Ir);
+  Trace1("gp_Tim_Par->par_tpo_Termios = %ld",  gp_Tim_Par->par_tpo_Termios);
+  Trace1("gp_Tim_Par->par_tpo_Capteurs = %ld",  gp_Tim_Par->par_tpo_Capteurs);
+  Trace1("gp_Tim_Par->par_tpo_Lcd_Loop = %ld",  gp_Tim_Par->par_tpo_Lcd_Loop);
+  Trace1("gp_Tim_Par->par_tpo_Lcd_Disp = %ld",  gp_Tim_Par->par_tpo_Lcd_Disp);
 
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
   Trace1("gp_Pid_Par->par_pid_ki = %f",  gp_Pid_Par->par_pid_ki);
@@ -627,10 +483,10 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
   Trace1("gp_Cal_Par->par_alt_rev = %d",      gp_Cal_Par->par_alt_rev);
   Trace1("gp_Cal_Par->par_alt_acc = %f",      gp_Cal_Par->par_alt_acc);
 
-  Trace1("gp_Cal_Par->par_azi_red1 = %f",       gp_Cal_Par->par_azi_red1)      ; 
-  Trace1("gp_Cal_Par->par_azi_red2 = %f",       gp_Cal_Par->par_azi_red2)      ; 
-  Trace1("gp_Cal_Par->par_azi_red3 = %f",       gp_Cal_Par->par_azi_red3)      ; 
-  Trace1("gp_Cal_Par->par_azi_red4 = %f",       gp_Cal_Par->par_azi_red4)      ; 
+  Trace1("gp_Cal_Par->par_azi_red_1 = %f",       gp_Cal_Par->par_azi_red_1)      ; 
+  Trace1("gp_Cal_Par->par_azi_red_2 = %f",       gp_Cal_Par->par_azi_red_2)      ; 
+  Trace1("gp_Cal_Par->par_azi_red_3 = %f",       gp_Cal_Par->par_azi_red_3)      ; 
+  Trace1("gp_Cal_Par->par_azi_red_4 = %f",       gp_Cal_Par->par_azi_red_4)      ; 
   Trace1("gp_Cal_Par->par_azi_rev = %d",      gp_Cal_Par->par_azi_rev)     ;
   Trace1("gp_Cal_Par->par_azi_acc = %f",      gp_Cal_Par->par_azi_acc)     ; 
 
@@ -752,21 +608,21 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
   for(L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
     for(C=0;C<CONFIG_DATAS_NB_COLONNES;C++) { 
-      memset(lp_Con->con_params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+      memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
     }
   }
   
   // FIXME : construction du chemin du fichier de configuration
   // FIXME : la variable gp_Con_Par->par_rep_home doit etre lue auparavant (getcwd) (2021)
 
-  memset(buf,CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+  memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
   sprintf(buf,"%s/%s",gp_Con_Par->par_rep_home, CONFIG_FIC_CFG) ;
   
   // FIXME : ouverture du fichier de configuration
 
 
   if ( (fin=fopen(buf,"r")) == NULL) {
-   memset(buffer,CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+   memset(buffer,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
    sprintf(buffer,"Pbme ouverture %s",buf) ;
    //LOG(buffer) ;
    Trace("probleme ouverture 4 %s",buf) ; 
@@ -774,7 +630,7 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
   }
   else Trace("open %s ok", buf) ;
 
-  memset(buf,CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+  memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
   i_Mot_Caractere_Lu_En_cours=0;
   L=0;
   C=0;
@@ -807,9 +663,9 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
       /* Si un mot est en cours de lecture */
       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
-        memset(lp_Con->con_params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+        memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
         strcpy(lp_Con->con_params[L][C],buf);
-        memset(buf,CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+        memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
 
         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
 
@@ -824,9 +680,9 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
       /* Si un mot est en cours de lecture */
       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
-        memset(lp_Con->con_params[L][C],CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+        memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
         strcpy(lp_Con->con_params[L][C],buf);
-        memset(buf,CALCUL_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+        memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
 
         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
 
@@ -910,8 +766,8 @@ void CONFIG_FIC_DISPLAY(STRUCT_CONFIG *lp_Con ) {
 void CONFIG_AFFICHER_MODE_LONG(void) {
   
   const char * c_nom  = gp_Ast->nom ;
-  const char * c_type = c_Astre_Type [ gp_Ast->en_type ] ;
-  const char * c_mode = c_Calculs_Mode[ gp_Ast->en_mode ] ;
+  const char * c_type = gc_hach_astre_types [ gp_Ast->ast_typ ] ;
+  const char * c_mode = gc_hach_calcul_mode[ gp_Cal->cal_mode ] ;
 
   char  c_hhmmss_agh0[ 16] ;
   char  c_hhmmss_agh1[ 16] ;
@@ -932,36 +788,36 @@ void CONFIG_AFFICHER_MODE_LONG(void) {
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
 
-  sprintf( c_hhmmss_agh, "%dh%dm%ds",   gp_Ast->AGHt.HH,  gp_Ast->AGHt.MM,  gp_Ast->AGHt.SS  ) ;
-  sprintf( c_hhmmss_asc,  "%dh%dm%ds",  gp_Ast->ASCt.HH,   gp_Ast->ASCt.MM,   gp_Ast->ASCt.SS  ) ;
+  sprintf( c_hhmmss_agh, "%dh%dm%ds",   gp_Ast->AGHt.tim_HH,  gp_Ast->AGHt.tim_MM,  gp_Ast->AGHt.tim_SS  ) ;
+  sprintf( c_hhmmss_asc,  "%dh%dm%ds",  gp_Ast->ASCt.tim_HH,   gp_Ast->ASCt.tim_MM,   gp_Ast->ASCt.tim_SS  ) ;
 
-  sprintf( c_hhmmss_agh0, "%dh%dm%ds", gp_Ast->AGH0t.HH, gp_Ast->AGH0t.MM, gp_Ast->AGH0t.SS  ) ;
-  sprintf( c_hhmmss_agh1, "%dh%dm%ds", gp_Ast->AGH1t.HH, gp_Ast->AGH1t.MM, gp_Ast->AGH1t.SS  ) ;
-  sprintf( c_hhmmss_agh2, "%dh%dm%ds", gp_Ast->AGH2t.HH, gp_Ast->AGH2t.MM, gp_Ast->AGH2t.SS  ) ;
+  sprintf( c_hhmmss_agh0, "%dh%dm%ds", gp_Ast->AGH0t.tim_HH, gp_Ast->AGH0t.tim_MM, gp_Ast->AGH0t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh1, "%dh%dm%ds", gp_Ast->AGH1t.tim_HH, gp_Ast->AGH1t.tim_MM, gp_Ast->AGH1t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh2, "%dh%dm%ds", gp_Ast->AGH2t.tim_HH, gp_Ast->AGH2t.tim_MM, gp_Ast->AGH2t.tim_SS  ) ;
 
-  sprintf( c_hhmmss_azi0, "%dh%dm%ds", gp_Ast->AZI0t.HH, gp_Ast->AZI0t.MM, gp_Ast->AZI0t.SS  ) ;
-  sprintf( c_hhmmss_azi1, "%dh%dm%ds", gp_Ast->AZI1t.HH, gp_Ast->AZI1t.MM, gp_Ast->AZI1t.SS  ) ;
-  sprintf( c_hhmmss_azi2, "%dh%dm%ds", gp_Ast->AZI2t.HH, gp_Ast->AZI2t.MM, gp_Ast->AZI2t.SS  ) ;
+  sprintf( c_hhmmss_azi0, "%dh%dm%ds", gp_Ast->AZI0t.tim_HH, gp_Ast->AZI0t.tim_MM, gp_Ast->AZI0t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi1, "%dh%dm%ds", gp_Ast->AZI1t.tim_HH, gp_Ast->AZI1t.tim_MM, gp_Ast->AZI1t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi2, "%dh%dm%ds", gp_Ast->AZI2t.tim_HH, gp_Ast->AZI2t.tim_MM, gp_Ast->AZI2t.tim_SS  ) ;
 
   Trace(" %s : infos         : %s", c_nom , gp_Ast->infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;
   Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
-  Trace(" %s : latitude      : %.2f (deg) ", c_nom, gp_Lie->lat    * CALCUL_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : longitude     : %.2f (deg) ", c_nom, gp_Lie->lon    * CALCUL_UN_RADIAN_EN_DEGRES ) ;
+  Trace(" %s : latitude      : %.2f (deg) ", c_nom, gp_Lie->lie_lat    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace(" %s : longitude     : %.2f (deg) ", c_nom, gp_Lie->lie_lon    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
   Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Ast->Va,  gp_Ast->Vh ) ; 
-  Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Ast->a    * CALCUL_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Ast->h    * CALCUL_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Ast->DEC  * CALCUL_UN_RADIAN_EN_DEGRES  ) ;
-  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ASC    * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH   * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
+  Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Ast->a    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Ast->h    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Ast->DEC  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
+  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ASC    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
+  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
 
-  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH0  * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
-  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH1  * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
-  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH2  * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_agh2 ) ;
+  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
+  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
+  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh2 ) ;
 
-  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI0  * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_azi0 ) ;
-  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI1  * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
-  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI2  * CALCUL_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
+  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi0 ) ;
+  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
+  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
 
   Trace("----------------------------") ;
 }
@@ -977,14 +833,14 @@ void CONFIG_AFFICHER_MODE_LONG(void) {
 
 void CONFIG_AFFICHER_TOUT(void) {
 
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   TEMPS_AFFICHER(   gp_Tim ) ;
   LIEU_AFFICHER(    gp_Lie );
   CONFIG_AFFICHER_MODE_LONG(  ) ;
   VOUTE_AFFICHER(   gp_Vou ) ;
 
-  Trace("\n") ;
+  TraceArbo(__func__,1,"end") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }
 /*****************************************************************************************
 * @fn     : CONFIG_MENU_CHANGE_DETECT

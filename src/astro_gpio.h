@@ -16,6 +16,9 @@
 #ifndef ASTRO_GPIO_H
 #define ASTRO_GPIO_H
 
+#define MUTEX_PHA_LOCK   pthread_mutex_lock(   & ph->pha_mutex ) ;
+#define MUTEX_PHA_UNLOCK pthread_mutex_unlock( & ph->pha_mutex ) ;
+
 #include "astro_global.h"
 
 /*---------------------------------------------------*/
@@ -119,9 +122,10 @@ t_en_Gpio_Red_Type ;
 
 struct STR_GPIO_PWM_PHASE {
 
+  pthread_mutex_t   pha_mutex ;    
+
   STRUCT_SUIVI    * p_sui ;  
   STRUCT_PTHREADS * p_pth ;
-  pthread_mutex_t   pha_mutex ;    
 
   struct timeval    tval ;
 
@@ -145,33 +149,27 @@ struct STR_GPIO_PWM_PHASE {
 
 struct STR_GPIO_PWM_MOTEUR {
 
+  pthread_mutex_t         mot_mutex ; 
+
   STRUCT_GPIO_PWM_PHASE * mot_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   STRUCT_SUIVI          * p_sui ;
   STRUCT_PTHREADS       * p_pth ;
   
-
-  pthread_mutex_t         mot_mutex ; 
-  
-  int     id ;
-
-  long long  pas ;
-  int        micropas ;
-  
-  double  periode_mic ;
-  double  periode_mot ;
-  double  t ;
-
-  double  Fm ;  
-  double  Tm ;  
-  double  Fpwm ;  
-  double  Tpwm ; 
-
-  double  nbmicropas ; 
-  long    nbdeltat ;
-  int     type_fonction ; 
-
-  double  param0 ;
-  double  param1 ;
+  int                     mot_id ;
+  long long               pas ;
+  int                     micropas ;
+  double                  periode_mic ;
+  double                  periode_mot ;
+  double                  t ;
+  double                  Fm ;  
+  double                  Tm ;  
+  double                  Fpwm ;  
+  double                  Tpwm ; 
+  double                  nbmicropas ; 
+  long                    nbdeltat ;
+  int                     type_fonction ; 
+  double                  param0 ;
+  double                  param1 ;
 
   // FIXME : la difference entre temps et  tps_ree : voir fonction *suivi_main_M
   //         *  temps      : on utilise periode , qui sert pour le usleep 
@@ -190,7 +188,7 @@ struct STR_GPIO_PWM_MOTEUR {
   */
   double  tps_mic ; /* somme des usleep dans la fonction de thread void * SUIVI_MAIN */
   double  tps_ree ; /* somme des temps reels consomme entre les usleep (en utilisant gettimeofday )*/
-  double  tps_bru ; /* somme des periodes T<x>_bru brutes calculees dans CALCUL_PERIODE */
+  double  tps_bru ; /* somme des periodes T<x>_bru brutes calculees dans CALCULS_PERIODE */
   double  tps_mot ; /* somme des periodes T<x>_mot (T<x>_bru * accelerations) */ 
   double  temps_moyen ;       
 
@@ -270,7 +268,7 @@ long   GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double d
 
 // PWM
 void   GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
-void   GPIO_CALCUL_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) ;
+void   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) ;
 
 // Fonction de threads
 

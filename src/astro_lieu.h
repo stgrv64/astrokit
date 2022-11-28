@@ -15,8 +15,8 @@
 
 #include "astro_global.h"
 
-#ifndef  CALCUL_UN_RADIAN_EN_DEGRES
-#define  CALCUL_UN_RADIAN_EN_DEGRES  57.29577951308232
+#ifndef  CALCULS_UN_RADIAN_EN_DEGRES
+#define  CALCULS_UN_RADIAN_EN_DEGRES  57.29577951308232
 #endif
 
 typedef struct STR_LIEU STRUCT_LIEU ;
@@ -40,13 +40,14 @@ typedef struct STR_LIEU_PARAMS STRUCT_LIEU_PARAMS ;
 
 struct STR_LIEU {
  
- double       lat ;  // latitude
- double       lon ;  // longitude
- double       alt ;
- double       JJ  ;  // jour julien
- double       TS ;   // temps sideral
- double       TSR ;  // temps sideral ramene en radians
- double       JD ;   // jour decimal
+ pthread_mutex_t lie_mutex ;
+ double          lie_lat ;  // latitude
+ double          lie_lon ;  // longitude
+ double          lie_alt ;
+ double          lie_jj ;  // jour julien
+ double          lie_ts ;   // temps sideral
+ double          lie_tsr ;  // temps sideral ramene en radians
+ double          lie_jd ;   // jour decimal
 } ;
 
 void   LIEU_INIT    ( STRUCT_LIEU    * ) ;

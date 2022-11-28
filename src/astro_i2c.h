@@ -110,6 +110,8 @@ struct STR_I2C_MCP23017 {
 // structure decrivant un device
 //---------------------------------------------------
 struct STR_I2C_DEVICE {
+
+  pthread_mutex_t i2c_dev_mutex ;
   
   unsigned long usleep ;         // sleep entre chaque lecture (microseconde)
   int  statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
@@ -117,13 +119,14 @@ struct STR_I2C_DEVICE {
   int  registre ;               // registre
   int  adress ;                 // adress du device (en hexa)
   unsigned char buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
-    
 } ;
 
 //---------------------------------------------------
 
 struct STR_I2C_ACC_MAG {
   
+  pthread_mutex_t i2c_acc_mag_mutex ;
+
   float A_norme_max ; 
   float M_norme_max ;
   

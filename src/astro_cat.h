@@ -31,6 +31,7 @@
 /* TODO : finir de modifier le code pour passer partout par la structure STRUCT_CAT */
 
 struct STR_CAT {
+ pthread_mutex_t cat_mutex ;
  char c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
  char c_cat_dec     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
  char c_cat_eto     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;

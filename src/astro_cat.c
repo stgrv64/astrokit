@@ -34,6 +34,28 @@ int CAT_FIN_MOT(char c) {
   return j ; 
 }
 /*****************************************************************************************
+* @fn     : CAT_INIT
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure de catalogues
+* @param  : char c
+* @date   : 2022-11-21 creation
+* @todo   : ras
+*****************************************************************************************/
+
+void CAT_INIT (STRUCT_CAT * lp_Cat) {
+ 
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  pthread_mutex_init( & lp_Cat->cat_mutex, NULL ) ;
+
+  for(int L=0;L<CAT_NB_LIGNES;L++) {
+    for(int C=0;C<CAT_NB_COLONNES;C++) {
+      memset(lp_Cat->c_cat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+    }
+  }
+  return ;
+}
+/*****************************************************************************************
 * @fn     : CAT_AFFICHER
 * @author : s.gravois
 * @brief  : Cette fonction affiche le catalogue passe en parametre
@@ -50,7 +72,7 @@ void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFF
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   l=0 ;
   while( strcmp( catalogue[l][3], "_" ) ) {
-   memset( buffer,CALCUL_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
+   memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
    for(c=0;c<CAT_NB_COLONNES;c++) {
     /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
     memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
@@ -75,11 +97,11 @@ void CAT_READ(char * catalogue_txt, char l_char_Datas[CAT_NB_LIGNES][CAT_NB_COLO
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++) {
-      memset(l_char_Datas[L][C],CALCUL_ZERO_CHAR,CAT_TAILLE_BUFFER);
+      memset(l_char_Datas[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
       strcpy(l_char_Datas[L][C],"_") ;
     }
   
-  memset(buf,CALCUL_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
+  memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
   sprintf(buf,"%s/%s/%s",gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_cat,catalogue_txt) ;
   
   if ( (fin=fopen(buf,"r")) == NULL)  {
@@ -134,7 +156,7 @@ void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_N
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
-          memset( gp_Ast->plus_proche[C], CALCUL_ZERO_CHAR, CAT_TAILLE_BUFFER);
+          memset( gp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
           strcpy( gp_Ast->plus_proche[C], lc_Cat[L][C]) ;
         }
       }
@@ -169,7 +191,7 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
 
   while( strcmp(lc_Cat[L][3],"_") && L < CAT_NB_LIGNES ) {
     //usleep(10000) ;
-    Trace1("L=%d %s %s %s %s" , L , lc_Cat[L][0], lc_Cat[L][1] , lc_Cat[L][2] , lc_Cat[L][3] );
+    Trace2("L=%d %s %s %s %s" , L , lc_Cat[L][0], lc_Cat[L][1] , lc_Cat[L][2] , lc_Cat[L][3] );
 
     if(!strcmp(lc_Cat[L][0],gp_Ast->nom)) {
 
@@ -178,8 +200,8 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
        * dans la structure STRUCT_ASTRE 
        **************************************************/
 
-      gp_Ast->ASC = atof( lc_Cat[L][2] ) / CALCUL_UN_RADIAN_EN_DEGRES ;
-      gp_Ast->DEC = atof( lc_Cat[L][3] ) / CALCUL_UN_RADIAN_EN_DEGRES ;
+      gp_Ast->ASC = atof( lc_Cat[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      gp_Ast->DEC = atof( lc_Cat[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       strcpy( gp_Ast->infos, lc_Cat[L][0] ) ;
 
       i_ligne = L ;
@@ -189,8 +211,8 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
 
     if(!strcmp(lc_Cat[L][1],gp_Ast->nom)) {
 
-      gp_Ast->ASC = atof( lc_Cat[L][2] ) / CALCUL_UN_RADIAN_EN_DEGRES ;
-      gp_Ast->DEC = atof( lc_Cat[L][3] ) / CALCUL_UN_RADIAN_EN_DEGRES ;
+      gp_Ast->ASC = atof( lc_Cat[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      gp_Ast->DEC = atof( lc_Cat[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       strcpy( gp_Ast->infos, lc_Cat[L][1] ) ;
 
       i_ligne = L ; 
@@ -211,14 +233,14 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     strcpy( gp_Ast->infos, "undefined" ) ;
   }
 
-  CALCUL_CONVERSIONS_ANGLES( gp_Ast ) ;
+  CALCULS_CONVERSIONS_ANGLES( gp_Ast ) ;
 
-  Trace1(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
+  Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
     gp_Ast->nom , \
-    gp_Ast->ASCt.HH, \
-    gp_Ast->ASCt.MM, \
-    gp_Ast->ASCt.SS, \
-    gp_Ast->DEC * CALCUL_UN_RADIAN_EN_DEGRES
+    gp_Ast->ASCt.tim_HH, \
+    gp_Ast->ASCt.tim_MM, \
+    gp_Ast->ASCt.tim_SS, \
+    gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES
   ) ; 
 
   return ; 
@@ -247,11 +269,11 @@ void CAT_FORMAT_DECIMAL_NGC( \
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
-      memset(l_char_DatasDec[L][C],CALCUL_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+      memset(l_char_DatasDec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
       strcpy(l_char_DatasDec[L][C],"_") ;
   } 
   
-  memset(buf,CALCUL_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+  memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
   sprintf(buf,"%s/%s/%s", gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_cat,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
@@ -317,11 +339,11 @@ void CAT_FORMAT_DECIMAL_ETO( \
   
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
-      memset(l_char_DatasDec[L][C],CALCUL_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+      memset(l_char_DatasDec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
       strcpy(l_char_DatasDec[L][C],"_") ;
   } 
   
-  memset(buf,CALCUL_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+  memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
   sprintf(buf,"%s/%s/%s",gp_Con_Par->par_rep_home,gp_Con_Par->par_rep_cat,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {

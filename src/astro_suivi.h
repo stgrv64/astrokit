@@ -72,55 +72,58 @@ struct STR_SUIVI_PAS {
 
 typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
 
+struct STR_SUIVI_FREQUENCES {
+
+  double  Ta_mic ; // periode de la frequence a injecter directement
+  double  Th_mic ; // periode de la frequence a injecter directement
+  double  Fa_mic ; // frequence a injecter directement (tient compte des micro pas)
+  double  Fh_mic ; // frequence a injecter directement (tient compte des micro pas)
+
+  double  Ta_bru ; // periode brute avant corrections (accelerations et micro pas)
+  double  Th_bru ; // periode brute avant corrections (accelerations et micro pas)
+  double  Fa_bru ; // frequence brute avant corrections (accelerations et micro pas)
+  double  Fh_bru ; // frequence brute avant corrections (accelerations et micro pas)
+
+  double  Ta_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
+  double  Th_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
+  double  Fa_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
+  double  Fh_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
+
+  int     Sa ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
+  int     Sh ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
+  int     Sa_old ;  // flag de comparaison pour raffraichir ou non les ecritures
+  int     Sh_old ;  // flag de comparaison pour raffraichir ou non les ecritures
+
+} ;
+
+typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FREQUENCES ;
+
+struct STR_SUIVI_STATS {
+  double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
+  double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
+  double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
+  double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
+  unsigned long Ia ;              // nombre d'impulsions mesurees sur azimut
+  unsigned long Ih ;              // nombre d'impulsions mesureees sur altitude
+  unsigned long Ia_prec ;         // nombre d'impulsions mesurees sur azimut
+  unsigned long Ih_prec ;         // nombre d'impulsions mesureees sur altitude 
+  double        Ias ;             // somme sur nombres d'impulsions mesurees 
+  double        Ihs ;             // somme sur nombres d'impulsions mesurees 
+  unsigned long Iat[STATS_ASS] ; // tableau des nombres d'impulsions mesurees
+  unsigned long Iht[STATS_ASS] ; // tableau des nombres d'impulsions mesurees
+} ;
+
 struct STR_SUIVI {
 
-  STRUCT_DATAS       * sui_dat ;
   STRUCT_SUIVI_PAS   * sui_pas ;
   STRUCT_TIME_TEMPOS * sui_tpo ;
   struct timeval       sui_tval ; 
   int                  sui_mode_voute ;
   int                  sui_mode_equatorial ;
                
-  double       Ta_mic ;       // periode de la frequence a injecter directement
-  double       Th_mic ;       // periode de la frequence a injecter directement
-  double       Ta_bru ;   // periode brute avant corrections (accelerations et micro pas)
-  double       Th_bru ;   // periode brute avant corrections (accelerations et micro pas)
-  double       Ta_mot ;   // periode de la frequence moteur (ne tient compte des micro pas)
-  double       Th_mot ;   // periode de la frequence moteur (ne tient compte des micro pas)
-
-  double       Fa_bru ;   // frequence brute avant corrections (accelerations et micro pas)
-  double       Fh_bru ;   // frequence brute avant corrections (accelerations et micro pas)
-  double       Fa_mot ;   // frequence du moteur deduite      (ne tient compte des micro pas)
-  double       Fh_mot ;   // frequence du moteur deduite      (ne tient compte des micro pas)
-  double       Fa_mic ;       // frequence a injecter directement (tient compte des micro pas)
-  double       Fh_mic ;       // frequence a injecter directement (tient compte des micro pas)
-
-  double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
-  double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
-
-  double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
-  double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
-
-  unsigned long Ia ;              // nombre d'impulsions mesurees sur azimut
-  unsigned long Ih ;              // nombre d'impulsions mesureees sur altitude
-
-  unsigned long Ia_prec ;         // nombre d'impulsions mesurees sur azimut
-  unsigned long Ih_prec ;         // nombre d'impulsions mesureees sur altitude 
-
-  double        Ias ;             // somme sur nombres d'impulsions mesurees 
-  double        Ihs ;             // somme sur nombres d'impulsions mesurees 
-
-  unsigned long Iat[STATS_ASS] ; // tableau des nombres d'impulsions mesurees
-  unsigned long Iht[STATS_ASS] ; // tableau des nombres d'impulsions mesurees
-  
   double       plus ;    // multiplicateur ajustement des periodes si besoin
   double       moins ;   // multiplicateur ajustement des periodes si besoin
-  
-  int          Sa ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
-  int          Sh ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
-  int          Sa_old ;  // flag de comparaison pour raffraichir ou non les ecritures
-  int          Sh_old ;  // flag de comparaison pour raffraichir ou non les ecritures
-  
+    
   double       Da ;  // nombre a injecter dans les diviseurs de frequence
   double       Dh ;  // nombre a injecter dans les diviseurs de frequence
   
@@ -137,6 +140,20 @@ struct STR_SUIVI {
 }  ;
 
 typedef struct STR_SUIVI STRUCT_SUIVI ;
+
+static const char * gc_hach_suivi_menus[] = {
+  "MENU_AZIMUTAL",
+  "MENU_EQUATORIAL",
+  "MENU_MANUEL_BRUT",
+  "MENU_MANUEL_NON_ASSERVI",
+  "MENU_MANUEL_ASSERVI",
+  "MENU_GOTO",
+  "MENU_INFO",
+  "MENU_RESEAU_UP",
+  "MENU_RESEAU_DOWN",
+  "MENU_PROGRAMME_DOWN",
+  "MENU_DOWN"
+} ;
 
 void   SUIVI_INIT           ( STRUCT_SUIVI * ) ;
 void   SUIVI_OLD_0          ( STRUCT_SUIVI * ) ;
