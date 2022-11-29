@@ -82,49 +82,45 @@ typedef enum t_en_Calculs_Mode ENUM_CALCULS_MODE ;
 struct STR_CALCULS_PARAMS {
 
   pthread_mutex_t cal_par_mutex ;
-  /* TODO : verifier OBSOLETE */
-  double        par_alt_red_x[ REDUCTION_CPU_CORRECTION + 1 ] ; /* tableau des reductions en altittue */
-  double        par_azi_red_x[ REDUCTION_CPU_CORRECTION + 1 ] ; /* tableau des reductions en azimut */
-  /* fin TODO */
 
   // ------ PARAMETRES DE altitude   ------------
 
-  unsigned long par_alt_f ;        // frequence de reference (utile si on utilise CALCULS_DIVISEUR_FREQUENCE)
-  unsigned int  par_alt_n ;        // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
+  unsigned long cal_par_alt_f ;        // frequence de reference (utile si on utilise CALCULS_DIVISEUR_FREQUENCE)
+  unsigned int  cal_par_alt_n ;        // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
 
-  double        par_alt_red_tot ;  // reduction totale
-  double        par_alt_red_1 ;    // reduction liee a la monture
-  double        par_alt_red_2 ;    // reducteur du moteur
-  double        par_alt_red_3 ;    // nombre de pas du moteur en azimut
-  double        par_alt_red_4 ;    // mode micro pas utilisee (1/R4)
-  double        par_alt_red_5 ;    // reduction liee a la poulie
-  double        par_alt_red_6 ;    // reduction liee au cpu
-  double        par_alt_red_7 ;    // reduction non decrite plus haut
-  int           par_alt_rev ;      // Flag de reversibilitee du sens de rotation (en cas d'erreur)
-  double        par_alt_acc ;      // Facteur de multiplication en mo
+  double        cal_par_alt_red_tot ;  // reduction totale
+  double        cal_par_alt_red_1 ;    // reduction liee a la monture
+  double        cal_par_alt_red_2 ;    // reducteur du moteur
+  double        cal_par_alt_red_3 ;    // nombre de pas du moteur en azimut
+  double        cal_par_alt_red_4 ;    // mode micro pas utilisee (1/R4)
+  double        cal_par_alt_red_5 ;    // reduction liee a la poulie
+  double        cal_par_alt_red_6 ;    // reduction liee au cpu
+  double        cal_par_alt_red_7 ;    // reduction non decrite plus haut
+  int           cal_par_alt_rev ;      // Flag de reversibilitee du sens de rotation (en cas d'erreur)
+  double        cal_par_alt_acc ;      // Facteur de multiplication en mo
 
   // ------ PARAMETRES DE azimut   ------------
 
-  unsigned long par_azi_f ;    // frequence de reference (utile si on utilise CALCULS_DIVISEUR_FREQUENCE)
-  unsigned int  par_azi_n ;    // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
+  unsigned long cal_par_azi_f ;    // frequence de reference (utile si on utilise CALCULS_DIVISEUR_FREQUENCE)
+  unsigned int  cal_par_azi_n ;    // prediviseur de frequence si il existe (2 puissance N : 1 2 4 16 32 ..)
   
-  double        par_azi_red_tot ;    // reduction totale
-  double        par_azi_red_1 ;   // reduction liee\A0l axe en azimut
-  double        par_azi_red_2 ;   // reducteur du moteur
-  double        par_azi_red_3 ;   // nombre de pas du moteur en azimut
-  double        par_azi_red_4 ;   // mode micro pas utilisee (1/R4)
-  double        par_azi_red_5 ;   // reduction liee a la poulie
-  double        par_azi_red_6 ;   // reduction liee au cpu
-  double        par_azi_red_7 ;   // reduction non decrite plus haut
-  int           par_azi_rev ;  // Flag de reversibilitee du sens de rotation (en cas d'erreur)
-  double        par_azi_acc ;  // Facteur de multiplication en mode MANUEL_0
+  double        cal_par_azi_red_tot ;    // reduction totale
+  double        cal_par_azi_red_1 ;   // reduction liee\A0l axe en azimut
+  double        cal_par_azi_red_2 ;   // reducteur du moteur
+  double        cal_par_azi_red_3 ;   // nombre de pas du moteur en azimut
+  double        cal_par_azi_red_4 ;   // mode micro pas utilisee (1/R4)
+  double        cal_par_azi_red_5 ;   // reduction liee a la poulie
+  double        cal_par_azi_red_6 ;   // reduction liee au cpu
+  double        cal_par_azi_red_7 ;   // reduction non decrite plus haut
+  int           cal_par_azi_rev ;  // Flag de reversibilitee du sens de rotation (en cas d'erreur)
+  double        cal_par_azi_acc ;  // Facteur de multiplication en mode MANUEL_0
 
   // ------ PARAMETRES DE ALT et AZI   ------------
 
-  double        par_altaz_slow_forward ; // Facteur de multiplication des vitesses pour rattrapages tres tres lent 
-  double        par_altaz_slow_rewind ;  // Facteur de multiplication des vitesses pour rattrapages tres tres lent 
-  double        par_altaz_fast_forward ; // Facteur de multiplication des vitesses pour rattrapages tres rapides 
-  double        par_altaz_fast_rewind ;  // Facteur de multiplication des vitesses pour rattrapages tres rapides
+  double        cal_par_altaz_slow_forward ; // Facteur de multiplication des vitesses pour rattrapages tres tres lent 
+  double        cal_par_altaz_slow_rewind ;  // Facteur de multiplication des vitesses pour rattrapages tres tres lent 
+  double        cal_par_altaz_fast_forward ; // Facteur de multiplication des vitesses pour rattrapages tres rapides 
+  double        cal_par_altaz_fast_rewind ;  // Facteur de multiplication des vitesses pour rattrapages tres rapides
 } ;
 
 typedef struct STR_CALCULS_PARAMS STRUCT_CALCULS_PARAMS ;

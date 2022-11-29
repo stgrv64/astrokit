@@ -26,7 +26,7 @@
 // Raccourci
 // ----------------------------------------------------------------
 
-#define KEYS_If_Mot_Is(s)  if(!strcmp(gp_Key->mot,s))
+#define KEYS_If_Mot_Is(s)  if(!strcmp(gp_Key->key_mot,s))
 
 // ------------------------------------------------------------------------
 // Syslog
@@ -144,12 +144,21 @@ while (0)
 
 #endif
 
+#define HANDLE_ERROR_PTHREAD_MUTEX_INIT(string) { \
+ int i_error=0 ; \
+ int i_errno=0 ; \
+ if ( ( i_error = pthread_mutex_init( string, NULL )) != 0 ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pthread_mutex_init"); \
+  exit(EXIT_FAILURE); }}
+
 // ------------------------------------------------------------------------
 // ASTRO_LOG_DEBUG : fin macros
 // ------------------------------------------------------------------------
 
 struct STR_LOG {
- pthread_mutex_t log_mut ;
+ pthread_mutex_t log_mutex ;
  int             log_level ;
 } ;
 typedef struct STR_LOG STRUCT_LOG ;

@@ -20,21 +20,20 @@
 
 struct STR_KEYS {
 
-  char symbole  [CONFIG_TAILLE_BUFFER_32] ;
-  char nombre   [CONFIG_TAILLE_BUFFER_32] ;
-  char mot      [CONFIG_TAILLE_BUFFER_32] ;
-  char phrase   [CONFIG_TAILLE_BUFFER_32] ;
-  char premier  [CONFIG_TAILLE_BUFFER_32] ;
-  char valider  [CONFIG_TAILLE_BUFFER_32] ;
-  char menu     [CONFIG_TAILLE_BUFFER_32] ;
-  
-  char actions[     KEYS_ACTIONS_SIZE     ][ CONFIG_TAILLE_BUFFER_32 ]  ;
-  char validations[ KEYS_VALIDATIONS_SIZE ][ CONFIG_TAILLE_BUFFER_32 ]  ;
-  
-  int  appui_en_cours ;
-  int  mot_en_cours ;
-  int  phrase_lue ;
-  int  premier_en_cours ;
+  pthread_mutex_t key_mutex ;
+
+  char key_symbole     [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_nombre      [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_mot         [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_phrase      [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_premier     [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_valider     [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_menu        [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char key_actions     [ KEYS_ACTIONS_SIZE       ][ CONFIG_TAILLE_BUFFER_32 ]  ;
+  char key_validations [ KEYS_VALIDATIONS_SIZE   ][ CONFIG_TAILLE_BUFFER_32 ]  ;
+  int  key_appui_en_cours ;
+  int  key_mot_en_cours ;
+  int  key_phrase_lue ;
 } ;
 
 void   KEYS_INIT                  ( STRUCT_KEYS * )  ;

@@ -7,6 +7,6 @@ reel23.save.20191225 et reel30 et suivant :
 - simplification du code
 - programmation de la touche A/D (KEY_MODE) pour switcher azimutal / equatorial en une fois
 - correction BUG : il manquait semble-t-il le rafraichissement des calculs 
-  de temps dans suivi_voute (pour mode azimutal) TEMPS_CALCULS_TEMPS_SIDERAL
+  de temps dans suivi_voute (pour mode azimutal) TIME_CALCULS_TEMPS_SIDERAL
   
   

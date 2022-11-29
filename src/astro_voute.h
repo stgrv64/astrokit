@@ -32,6 +32,7 @@ struct STR_VOUTE {
    double          vou_dt ;
    double          vou_acc ;
    double          vou_temps_ecoule ;   
+   int             vou_run ;
 } ;
 
 void  VOUTE_INIT            ( STRUCT_VOUTE * ) ;

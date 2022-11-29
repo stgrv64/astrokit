@@ -49,13 +49,9 @@ t_en_Menus ;
 
 struct STR_SUIVI_PAS {
 
-  // Variables utilisees en mode MANUEL EVOLUE
-  int    pas_acc_plus ;
-  int    pas_acc_moins ;
-  int    pas_forward ;
-  int    pas_rewind ;
-  int    pas_forward_fast ;
-  int    pas_rewind_fast ;
+  pthread_mutex_t   pas_mutex ;
+  double pas_acc_azi ;   // acceleration volontaire en azimut   
+  double pas_acc_alt ;   // acceleration volontaire en altitude 
   long   pas_azi ;
   long   pas_alt ;
   long   pas_azi_old ;
@@ -66,73 +62,56 @@ struct STR_SUIVI_PAS {
   long   pas_est ;       // flag d'appui sur le touche EST
   long   pas_nord ;      // flag d'appui sur le touche NORD
   long   pas_sud ;       // flag d'appui sur le touche SUD
-  double pas_acc_azi ;   // acceleration volontaire en azimut   
-  double pas_acc_alt ;   // acceleration volontaire en altitude 
+  int    pas_acc_plus ;
+  int    pas_acc_moins ;
+  int    pas_forward ;
+  int    pas_rewind ;
+  int    pas_forward_fast ;
+  int    pas_rewind_fast ;
 } ;
 
 typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
 
 struct STR_SUIVI_FREQUENCES {
 
-  double  Ta_mic ; // periode de la frequence a injecter directement
-  double  Th_mic ; // periode de la frequence a injecter directement
-  double  Fa_mic ; // frequence a injecter directement (tient compte des micro pas)
-  double  Fh_mic ; // frequence a injecter directement (tient compte des micro pas)
+  pthread_mutex_t   fre_mutex ;
 
-  double  Ta_bru ; // periode brute avant corrections (accelerations et micro pas)
-  double  Th_bru ; // periode brute avant corrections (accelerations et micro pas)
-  double  Fa_bru ; // frequence brute avant corrections (accelerations et micro pas)
-  double  Fh_bru ; // frequence brute avant corrections (accelerations et micro pas)
-
-  double  Ta_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
-  double  Th_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
-  double  Fa_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
-  double  Fh_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
-
-  int     Sa ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
-  int     Sh ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
-  int     Sa_old ;  // flag de comparaison pour raffraichir ou non les ecritures
-  int     Sh_old ;  // flag de comparaison pour raffraichir ou non les ecritures
+  double fre_ta_mic ; // periode de la frequence a injecter directement
+  double fre_th_mic ; // periode de la frequence a injecter directement
+  double fre_fa_mic ; // frequence a injecter directement (tient compte des micro pas)
+  double fre_fh_mic ; // frequence a injecter directement (tient compte des micro pas)
+  double fre_ta_bru ; // periode brute avant corrections (accelerations et micro pas)
+  double fre_th_bru ; // periode brute avant corrections (accelerations et micro pas)
+  double fre_fa_bru ; // frequence brute avant corrections (accelerations et micro pas)
+  double fre_fh_bru ; // frequence brute avant corrections (accelerations et micro pas)
+  double fre_ta_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
+  double fre_th_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
+  double fre_fa_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
+  double fre_fh_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
+  int    fre_sa ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
+  int    fre_sh ;      // signe de la vitesse (direction), tenir compte du flag de reversibilite
+  int    fre_sa_old ;  // flag de comparaison pour raffraichir ou non les ecritures
+  int    fre_sh_old ;  // flag de comparaison pour raffraichir ou non les ecritures
 
 } ;
 
 typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FREQUENCES ;
-
-struct STR_SUIVI_STATS {
-  double        Tac ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
-  double        Thc ;             // correcteur de periode, pour corriger les effets des latences du systeme, calculer par suivi voute
-  double        Tacc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
-  double        Thcc ;            // correcteur de correcteur de periode, pour corriger les insuffisances du correcteur de base 
-  unsigned long Ia ;              // nombre d'impulsions mesurees sur azimut
-  unsigned long Ih ;              // nombre d'impulsions mesureees sur altitude
-  unsigned long Ia_prec ;         // nombre d'impulsions mesurees sur azimut
-  unsigned long Ih_prec ;         // nombre d'impulsions mesureees sur altitude 
-  double        Ias ;             // somme sur nombres d'impulsions mesurees 
-  double        Ihs ;             // somme sur nombres d'impulsions mesurees 
-  unsigned long Iat[STATS_ASS] ; // tableau des nombres d'impulsions mesurees
-  unsigned long Iht[STATS_ASS] ; // tableau des nombres d'impulsions mesurees
-} ;
 
 struct STR_SUIVI {
 
   STRUCT_SUIVI_PAS   * sui_pas ;
   STRUCT_TIME_TEMPOS * sui_tpo ;
   struct timeval       sui_tval ; 
-  int                  sui_mode_voute ;
   int                  sui_mode_equatorial ;
                
-  double       plus ;    // multiplicateur ajustement des periodes si besoin
-  double       moins ;   // multiplicateur ajustement des periodes si besoin
-    
-  double       Da ;  // nombre a injecter dans les diviseurs de frequence
-  double       Dh ;  // nombre a injecter dans les diviseurs de frequence
-  
-  t_en_Menus   menu;      // valeur du menu courant 
-  t_en_Menus   menu_old ; // sauvegarde du menu precedent
-
+  double       sui_plus ;    // multiplicateur ajustement des periodes si besoin
+  double       sui_moins ;   // multiplicateur ajustement des periodes si besoin
+  double       sui_Da ;  // nombre a injecter dans les diviseurs de frequence
+  double       sui_Dh ;  // nombre a injecter dans les diviseurs de frequence
+  t_en_Menus   sui_menu;      // valeur du menu courant 
+  t_en_Menus   sui_menu_old ; // sauvegarde du menu precedent
   int          alarme ; // si different de 0 provoque une alarm(alarme) au debut de main
-  int          reset ;  // sert de reset pour remettre les compteeurs a zero dans diverses parties du programme
-  
+  int          reset ;  // sert de reset pour remettre les compteurs a zero dans diverses parties du programme
   double       sui_tempo_percent ;
   double       DTh ;
   double       DTa ;

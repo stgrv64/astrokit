@@ -15,11 +15,11 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 //========================================================================================
-// FIXME : TEMPS_CALCULS_DATE : 
+// FIXME : TIME_CALCULS_DATE : 
 // FIXME : * calcule la date locale servant a tous les calculs ulterieurs
 //========================================================================================
 
-int TEMPS_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
+int TIME_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
   
   time_t t ;
   
@@ -48,7 +48,7 @@ int TEMPS_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
   lp_Tim->tim_dd = tm->tm_mday ;
   lp_Tim->tim_mm = tm->tm_mon + 1 ;
   
-  TEMPS_CALCULS_TEMPS_HMS_VERS_DEC (lp_Tim ) ;
+  TIME_CALCULS_TEMPS_HMS_VERS_DEC (lp_Tim ) ;
   
   //printf("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
   Trace2("%d %d %d %d %d %d %f", \
@@ -63,12 +63,12 @@ int TEMPS_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
   return 0 ;
 }
 //========================================================================================
-// FIXME : TEMPS_CALCULS_JOUR_JULIEN
+// FIXME : TIME_CALCULS_JOUR_JULIEN
 // FIXME : * calcul la date julienne 
 // TODO : * valider / comparer avec valeurs de logiciels astronomiques (stellarium etc..)
 //========================================================================================
 
-int TEMPS_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
+int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
   
   int    yy,mm,A,B,C,Y,M,D ;
   double T ;          // fraction de jour a ajouter au jour Julien	
@@ -119,13 +119,13 @@ int TEMPS_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
   return 0 ;
 }
 //========================================================================================
-// FIXME : TEMPS_CALCULS_TEMPS_SIDERAL
+// FIXME : TIME_CALCULS_TEMPS_SIDERAL
 // FIXME :  * calcul le temps sideral local en fonction du jour julien, de la longitude
-// FIXME :  * a besoin de TEMPS_CALCULS_DATE  et de TEMPS_CALCULS_JOUR_JULIEN et du STRUCT_LIEU
+// FIXME :  * a besoin de TIME_CALCULS_DATE  et de TIME_CALCULS_JOUR_JULIEN et du STRUCT_LIEU
 
 /* La fonction comprend l appel aux deux fonctions suivantes dans le corps de la fonction : 
-  TEMPS_CALCULS_DATE( lp_Tim ) ;   
-  TEMPS_CALCULS_JOUR_JULIEN  ( gp_Lie, lp_Tim ) ;
+  TIME_CALCULS_DATE( lp_Tim ) ;   
+  TIME_CALCULS_JOUR_JULIEN  ( gp_Lie, lp_Tim ) ;
 */
 
 // TODO  : valider 1ere methode / 2eme methode et tester sur le ciel ou comparer
@@ -144,7 +144,7 @@ int TEMPS_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
 */
 //========================================================================================
 
-int TEMPS_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
+int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   
   double d, T, TSMG, TSMG2, TSH, TSMGH, TSMGH2, TSMH ;
   double TSMGS, TSMH2,TSMH3, GMSTO, GMST, LMST ;
@@ -154,12 +154,12 @@ int TEMPS_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(&jour_sideral_decimal , 23 , 56 , 4.09054) ;
+  TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(&jour_sideral_decimal , 23 , 56 , 4.09054) ;
 
   Trace1("jour sideral : %f", jour_sideral_decimal) ;
   
-  TEMPS_CALCULS_DATE( lp_Tim ) ;   
-  TEMPS_CALCULS_JOUR_JULIEN  ( gp_Lie, lp_Tim ) ;
+  TIME_CALCULS_DATE( lp_Tim ) ;   
+  TIME_CALCULS_JOUR_JULIEN  ( gp_Lie, lp_Tim ) ;
   
   STRUCT_TIME Temps0 ;
   STRUCT_TIME TSMG3 ;
@@ -188,14 +188,14 @@ int TEMPS_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   TSMG2 = fmod(TSMG,360.0) ;
   TSMG3.tim_hd = TSMG2 * jour_sideral_decimal / 360 ; /* pour ramener en heures */
   
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS( & TSMG3 ) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMG3 ) ;
   /* *15 = pour ramener en degres */
   TSH       = lp_Tim->tim_hd * 1.00273790935 * 15 ;
   TSMGH     = TSMG + TSH ;
   TSMGH2    = fmod(TSMGH, 360.0) ;
   TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360 ;
 
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS( & TSMGH3) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMGH3) ;
 
   TSMH  = TSMGH + ( gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES )  ;
   /*
@@ -205,11 +205,11 @@ int TEMPS_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   TSMH2 = fmod(TSMH, 360.0) ;
   TSR2.tim_hd = TSMH2 * jour_sideral_decimal / 360 ;
  
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS( & TSR2 ) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSR2 ) ;
   
-  TEMPS_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
-  TEMPS_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
-  TEMPS_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR2) ;
+  TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
+  TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
+  TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR2) ;
   
   // =======================  Deuxieme methode ==========================
   /* cette methode ne tient pas compte du terme 36525 */
@@ -231,13 +231,13 @@ int TEMPS_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360.0 ;
   TSR3.tim_hd  = TSMH2  * jour_sideral_decimal / 360.0 ;
   
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS( & TSMG3) ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS( & TSMGH3 ) ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS( & TSR3) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMG3) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMGH3 ) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSR3) ;
   
-  TEMPS_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
-  TEMPS_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
-  TEMPS_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR3) ;
+  TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
+  TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
+  TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR3) ;
   
   // =======================  Troisieme methode ==========================
   /* unite = la seconde */ 
@@ -263,12 +263,12 @@ int TEMPS_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
 }
 
 //========================================================================================
-// FIXME : TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT : 
+// FIXME : TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT : 
 // FIXME : * Convertit heure minutes secondes en heure decimale 
-/* 2022-09-26 : remplacement du nom HDEC -> TEMPS_VERS_HDEC */
+/* 2022-09-26 : remplacement du nom HDEC -> TIME_VERS_HDEC */
 //========================================================================================
 
-void TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double min, double sec) {
+void TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double min, double sec) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -276,7 +276,7 @@ void TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double m
 }
 
 /*****************************************************************************************
-* @fn     : TEMPS_CALCULS_TEMPS_DEC_VERS_HMS
+* @fn     : TIME_CALCULS_TEMPS_DEC_VERS_HMS
 * @author : s.gravois
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
 * @param  : STRUCT_TIME * lp_Tim
@@ -284,7 +284,7 @@ void TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double m
 * @todo   : ras
 *****************************************************************************************/
 
-void TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
+void TIME_CALCULS_TEMPS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -312,12 +312,12 @@ void TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
 }
 
 //========================================================================================
-// FIXME : TEMPS_TEMPORISATION_MICROSEC : 
+// FIXME : TIME_TEMPORISATION_MICROSEC : 
 // FIXME : * permet de faire une temporisation 
 // TODO  : * supprimer ? non utilise actuellement
 //========================================================================================
 
-long TEMPS_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct timeval t00) {
+long TIME_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct timeval t00) {
   
   struct timeval t01 ;
   unsigned long  t_diff ;
@@ -329,13 +329,13 @@ long TEMPS_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct t
   t_diff=0;
   while( t_diff < microsecondes ) {
    gettimeofday(&t01,NULL) ;
-   t_diff = (( t01.tv_sec - t00.tv_sec)  * TEMPS_MICRO_SEC ) + t01.tv_usec - t00.tv_usec;
+   t_diff = (( t01.tv_sec - t00.tv_sec)  * TIME_MICRO_SEC ) + t01.tv_usec - t00.tv_usec;
   }
   return t_diff ;
 }
 
 /*****************************************************************************************
-* @fn     : TEMPS_CALCULS_DUREE_SECONDES
+* @fn     : TIME_CALCULS_DUREE_SECONDES
 * @author : s.gravois
 * @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
 * @brief  : resultat en secondes
@@ -343,7 +343,7 @@ long TEMPS_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct t
 * @date   : 2022-03-20 creation entete
 *****************************************************************************************/
 
-double TEMPS_CALCULS_DUREE_SECONDES(struct timeval *t00) {
+double TIME_CALCULS_DUREE_SECONDES(struct timeval *t00) {
   
   struct timeval t01 ;
   double  t_diff ;
@@ -352,8 +352,8 @@ double TEMPS_CALCULS_DUREE_SECONDES(struct timeval *t00) {
 
   gettimeofday(&t01,NULL) ;
 
-  t_diff = TEMPS_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
-  t_diff = t_diff / TEMPS_MICRO_SEC ;
+  t_diff = TIME_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
+  t_diff = t_diff / TIME_MICRO_SEC ;
 
   t00->tv_sec  = t01.tv_sec ; 
   t00->tv_usec = t01.tv_usec ;
@@ -362,7 +362,7 @@ double TEMPS_CALCULS_DUREE_SECONDES(struct timeval *t00) {
 }
 
 /*****************************************************************************************
-* @fn     : TEMPS_CALCULS_DUREE_MICROSEC
+* @fn     : TIME_CALCULS_DUREE_MICROSEC
 * @author : s.gravois
 * @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
 * @brief  : resultat en microsecondes
@@ -370,7 +370,7 @@ double TEMPS_CALCULS_DUREE_SECONDES(struct timeval *t00) {
 * @date   : 2022-03-20 creation entete
 *****************************************************************************************/
 
-double TEMPS_CALCULS_DUREE_MICROSEC(struct timeval *t00) {
+double TIME_CALCULS_DUREE_MICROSEC(struct timeval *t00) {
   
   struct timeval t01 ;
   double  t_diff ;
@@ -379,7 +379,7 @@ double TEMPS_CALCULS_DUREE_MICROSEC(struct timeval *t00) {
 
   gettimeofday(&t01,NULL) ;
 
-  t_diff = TEMPS_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
+  t_diff = TIME_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
 
   t00->tv_sec  = t01.tv_sec ; 
   t00->tv_usec = t01.tv_usec ;
@@ -388,7 +388,7 @@ double TEMPS_CALCULS_DUREE_MICROSEC(struct timeval *t00) {
 }
 
 /*****************************************************************************************
-* @fn     : TEMPS_CALCULS_DUREE_NANOSEC
+* @fn     : TIME_CALCULS_DUREE_NANOSEC
 * @author : s.gravois
 * @brief  : permet de calculer une duree depuis un dernier appel a cette meme fonction
 * @brief  : resultat en nanosecondes
@@ -397,7 +397,7 @@ double TEMPS_CALCULS_DUREE_MICROSEC(struct timeval *t00) {
 * @todo   : finir ( modifier pour passer en nanosecondes)
 *****************************************************************************************/
 
-double TEMPS_CALCULS_DUREE_NANOSEC(struct timeval *t00) {
+double TIME_CALCULS_DUREE_NANOSEC(struct timeval *t00) {
   
   struct timeval t01 ;
   double  t_diff ;
@@ -406,7 +406,7 @@ double TEMPS_CALCULS_DUREE_NANOSEC(struct timeval *t00) {
 
   gettimeofday(&t01,NULL) ;
 
-  t_diff = TEMPS_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
+  t_diff = TIME_MICRO_SEC * ( t01.tv_sec  - t00->tv_sec ) + ( t01.tv_usec - t00->tv_usec ) ;
 
   t00->tv_sec  = t01.tv_sec ; 
   t00->tv_usec = t01.tv_usec ;
@@ -414,7 +414,7 @@ double TEMPS_CALCULS_DUREE_NANOSEC(struct timeval *t00) {
   return t_diff ;
 }
 /*****************************************************************************************
-* @fn     : TEMPS_AFFICHER
+* @fn     : TIME_AFFICHER
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations de temps
 * @param  : STRUCT_TIME * lp_Tim
@@ -423,7 +423,7 @@ double TEMPS_CALCULS_DUREE_NANOSEC(struct timeval *t00) {
 * @todo   : ras
 *****************************************************************************************/
 
-void TEMPS_AFFICHER(STRUCT_TIME * lp_Tim) {
+void TIME_AFFICHER(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -448,17 +448,17 @@ void TEMPS_AFFICHER(STRUCT_TIME * lp_Tim) {
 
 }
 /*****************************************************************************************
-* @fn     : TEMPS_CALCULS_TEMPS_HMS_VERS_DEC
+* @fn     : TIME_CALCULS_TEMPS_HMS_VERS_DEC
 * @author : s.gravois
 * @brief  : Convertit heure minutes secondes en heure decimale 
 * @param  : STRUCT_ANGLE *angle
 * @param  : char * mesg
 * @date   : 2022-10-11 creation entete doxygen 
-* @date   : 2022-09-26 : remplacement du nom HDEC -> TEMPS_VERS_HDEC 
+* @date   : 2022-09-26 : remplacement du nom HDEC -> TIME_VERS_HDEC 
 * @todo   : ras
 *****************************************************************************************/
 
-void TEMPS_CALCULS_TEMPS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
+void TIME_CALCULS_TEMPS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -466,7 +466,7 @@ void TEMPS_CALCULS_TEMPS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
 }
 
 /*****************************************************************************************
-* @fn     : TEMPS_AFFICHER_MSG_HHMMSS
+* @fn     : TIME_AFFICHER_MSG_HHMMSS
 * @author : s.gravois
 * @brief  : Affiche un message suivi du temps
 * @param  : STRUCT_TIME * lp_Tim
@@ -475,7 +475,7 @@ void TEMPS_CALCULS_TEMPS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
 * @todo   : ras
 *****************************************************************************************/
 
-void TEMPS_AFFICHER_MSG_HHMMSS( char * mesg, STRUCT_TIME * lp_Tim ) {
+void TIME_AFFICHER_MSG_HHMMSS( char * mesg, STRUCT_TIME * lp_Tim ) {
 
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -483,7 +483,7 @@ void TEMPS_AFFICHER_MSG_HHMMSS( char * mesg, STRUCT_TIME * lp_Tim ) {
 }
 
 /*****************************************************************************************
-* @fn     : TEMPS_SET_YEAR_MONTH_AND_DAY
+* @fn     : TIME_SET_YEAR_MONTH_AND_DAY
 * @author : s.gravois
 * @brief  : Cette fonction configure la date (annee mois jour)
 * @param  : char * s_data
@@ -491,7 +491,7 @@ void TEMPS_AFFICHER_MSG_HHMMSS( char * mesg, STRUCT_TIME * lp_Tim ) {
 * @todo   : remplacer fonction system par une fonction C (eviter passage par /bin/bash date)
 *****************************************************************************************/
 
-void TEMPS_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (unite de l'annee en premier)
+void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (unite de l'annee en premier)
  
   char buf [   CONFIG_TAILLE_BUFFER_64 ] ;
   char year [  CONFIG_TAILLE_BUFFER_8] ;
@@ -531,7 +531,7 @@ void TEMPS_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (
 
 }
 /*****************************************************************************************
-* @fn     : TEMPS_SET_HOUR_AND_MINUTES
+* @fn     : TIME_SET_HOUR_AND_MINUTES
 * @author : s.gravois
 * @brief  : Cette fonction configure l heure (heure et minutes)
 * @param  : char * s_data
@@ -539,7 +539,7 @@ void TEMPS_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (
 * @todo   : remplacer fonction system par une fonction C (eviter passage par /bin/bash date)
 *****************************************************************************************/
 
-void TEMPS_SET_HOUR_AND_MINUTES(char * s_data) {
+void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
 
   char buf [ CONFIG_TAILLE_BUFFER_64 ]  ;
   char hou [ CONFIG_TAILLE_BUFFER_4] ;
@@ -575,7 +575,7 @@ void TEMPS_SET_HOUR_AND_MINUTES(char * s_data) {
   if ( system( buf ) < 0 ) perror( buf) ;
 }
 /*****************************************************************************************
-* @fn     : TEMPS_INIT
+* @fn     : TIME_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure STRUCT_TIME * lp_Tim
 * @param  : STRUCT_TIME * lp_Tim
@@ -583,7 +583,7 @@ void TEMPS_SET_HOUR_AND_MINUTES(char * s_data) {
 * @todo   : configurer directement heure locale (?)
 *****************************************************************************************/
 
-void TEMPS_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
+void TIME_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -599,11 +599,11 @@ void TEMPS_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
   lp_Tim->tim_SS = 0 ;  // secondes
   lp_Tim->tim_hd = 0.0 ;  // heure decimale (double)
 
-  lp_Tpo->tpo_menu     = gp_Tim_Par->par_tpo_Menu ;
-  lp_Tpo->tpo_raq      = gp_Tim_Par->par_tpo_Raq ;
-  lp_Tpo->tpo_ir       = gp_Tim_Par->par_tpo_Ir ;  
-  lp_Tpo->tpo_termios  = gp_Tim_Par->par_tpo_Termios ;
-  lp_Tpo->tpo_capteurs = gp_Tim_Par->par_tpo_Capteurs ;
-  lp_Tpo->tpo_lcd_loop = gp_Tim_Par->par_tpo_Lcd_Loop ;
-  lp_Tpo->tpo_lcd_disp = gp_Tim_Par->par_tpo_Lcd_Disp ;
+  lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo_menu ;
+  lp_Tpo->tpo_raq      = gp_Tim_Par->tim_par_tpo_raq ;
+  lp_Tpo->tpo_ir       = gp_Tim_Par->tim_par_tpo_ir ;  
+  lp_Tpo->tpo_termios  = gp_Tim_Par->tim_par_tpo_termios ;
+  lp_Tpo->tpo_capteurs = gp_Tim_Par->tim_par_tpo_capteurs ;
+  lp_Tpo->tpo_lcd_loop = gp_Tim_Par->tim_par_tpo_lcd_loop ;
+  lp_Tpo->tpo_lcd_disp = gp_Tim_Par->tim_par_tpo_lcd_disp ;
 }

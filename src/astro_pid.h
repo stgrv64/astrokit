@@ -20,7 +20,7 @@
 /*--------------------------------------------*/
 
 struct STR_PID_PARAMS {
-
+  pthread_mutex_t pid_par_mutex ;
   double par_pid_ech ; /* echantillonage en nombre de pas moteurs */
   double par_pid_kp ;
   double par_pid_ki ;
@@ -33,7 +33,7 @@ struct STR_PID_PARAMS {
 
 struct STR_PID {
 
-  FILE          * pif_f_out ; 
+  FILE          * pid_f_out ; 
   pthread_mutex_t pid_mutex ;
 
   double          pid_acc_azi ;  // acceleration deduite en azimut   pour asservissement

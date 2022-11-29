@@ -112,13 +112,13 @@ struct STR_I2C_MCP23017 {
 struct STR_I2C_DEVICE {
 
   pthread_mutex_t i2c_dev_mutex ;
-  
-  unsigned long usleep ;         // sleep entre chaque lecture (microseconde)
-  int  statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
-  int  fd ;                     // file descriptor pour le device utilise
-  int  registre ;               // registre
-  int  adress ;                 // adress du device (en hexa)
-  unsigned char buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
+
+  unsigned char i2c_dev_buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
+  unsigned long i2c_dev_usleep ;         // sleep entre chaque lecture (microseconde)
+  int           i2c_dev_statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
+  int           i2c_dev_fd ;                     // file descriptor pour le device utilise
+  int           i2c_dev_registre ;               // registre
+  int           i2c_dev_adress ;                 // adress du device (en hexa)
 } ;
 
 //---------------------------------------------------

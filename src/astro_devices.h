@@ -17,26 +17,25 @@
 
 struct STR_DEVICES_PARAMS {
   pthread_mutex_t dev_par_mutex ;
-  int par_use_Capteurs    ;
-  int par_use_Raquette     ;
-  int par_use_Bluetooth    ;
-  int par_use_Infrared ;
-  int par_use_Controler ;
-  int par_use_Keyboard  ;
-  int par_use_Lcd ; 
+  int dev_par_use_capteurs    ;
+  int dev_par_use_raquette     ;
+  int dev_par_use_bluetooth    ;
+  int dev_par_use_infrared ;
+  int dev_par_use_controler ;
+  int dev_par_use_keyboard  ;
+  int dev_par_use_lcd ; 
 } ;
 
 struct STR_DEVICES {
   pthread_mutex_t dev_mutex ;
-  int  use_bluetooth ;
-  int  use_capteurs ;
-  int  use_infrarouge ;
-  int  use_raquette ;
-  int  use_controler ; 
-  int  use_keyboard ;
-  int  use_lcd ; 
-  
-  int  init_capteurs ;
+  int dev_use_bluetooth ;
+  int dev_use_capteurs ;
+  int dev_use_infrarouge ;
+  int dev_use_raquette ;
+  int dev_use_controler ; 
+  int dev_use_keyboard ;
+  int dev_use_lcd ; 
+  int dev_init_capteurs ;
 } ;
 
 typedef struct STR_DEVICES_PARAMS STRUCT_DEVICES_PARAMS ;

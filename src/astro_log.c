@@ -109,6 +109,8 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Log->log_mutex )
+
   Trace("") ;
   
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
@@ -123,13 +125,6 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
       exit(2) ;
     }
     else Trace("open %s ok", buf) ;
-  }
-
-  if ( ( i_error = pthread_mutex_init( & lp_Log->log_mut, NULL )) != 0 ) {
-    i_errno=errno;        
-    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
-    perror("pthread_mutex_init");
-    exit(EXIT_FAILURE); 
   }
 
   lp_Log->log_level = ASTRO_LOG_DEBUG ;

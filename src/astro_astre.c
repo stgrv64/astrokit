@@ -34,7 +34,7 @@ void ASTRE_INIT(STRUCT_ASTRE *gp_Ast ) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & gp_Ast->ast_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Ast->ast_mutex ) ;
 
   pthread_mutex_lock( & gp_Ast->ast_mutex ) ;
 
@@ -176,7 +176,7 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *gp_Ast ) {
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   
-  MUTEX_AST_LOCK
+  MUTEX_GLO_AST_LOCK
 
   strcpy( gp_Ast->c_hhmmss_agh, c_hhmmss_agh)  ;
   strcpy( gp_Ast->c_hhmmss_asc, c_hhmmss_asc)  ;
@@ -202,7 +202,7 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *gp_Ast ) {
   strcpy( gp_Ast->c_dd_alt, c_dd_alt)  ;
   strcpy( gp_Ast->c_dd_dec, c_dd_dec)  ;
 
-  MUTEX_AST_UNLOCK
+  MUTEX_GLO_AST_UNLOCK
 }
 
 /*****************************************************************************************

@@ -44,11 +44,11 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   if ( strcmp( val, "") ) {
     
     //printf("val = %s\n", val ) ;
-    strcpy( lp_Key->mot, val ) ; 
-    lp_Key->appui_en_cours = 1 ;
-    lp_Key->mot_en_cours = 1 ;    
+    strcpy( lp_Key->key_mot, val ) ; 
+    lp_Key->key_appui_en_cours = 1 ;
+    lp_Key->key_mot_en_cours = 1 ;    
   }
-  else lp_Key->appui_en_cours = 0 ; 
+  else lp_Key->key_appui_en_cours = 0 ; 
   
   // =======================================================================
   // Quand la touche est relacheee, on traite
@@ -56,9 +56,9 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   // dans cette partie de code
   // =======================================================================
   
-  if ( lp_Key->mot_en_cours && lp_Key->appui_en_cours == 0 ) {
+  if ( lp_Key->key_mot_en_cours && lp_Key->key_appui_en_cours == 0 ) {
   
-    Trace1("mot trouver = %s", lp_Key->mot ) ;
+    Trace1("mot trouver = %s", lp_Key->key_mot ) ;
 		
 		GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 5) ;
 
@@ -67,46 +67,46 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
     // On incremente le nombre avec le mot si premier n'est pas vide
     //------------------------------------------------------------
     
-    if ( strcmp( lp_Key->mot, lp_Key->valider) != 0 ) { 
+    if ( strcmp( lp_Key->key_mot, lp_Key->key_valider) != 0 ) { 
       
       Trace1("Si mot != valider : on incremente la phrase avec le mot !!\n" ) ;
 
-      if ( strlen(lp_Key->phrase) + strlen(lp_Key->mot) < CONFIG_TAILLE_BUFFER_32) {
+      if ( strlen(lp_Key->key_phrase) + strlen(lp_Key->key_mot) < CONFIG_TAILLE_BUFFER_32) {
 
-        Trace1("on incremente la phrase %s avec le mot %s\n",lp_Key->phrase,  lp_Key->mot ) ;
+        Trace1("on incremente la phrase %s avec le mot %s\n",lp_Key->key_phrase,  lp_Key->key_mot ) ;
         // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
         memset( s_buffer, CONFIG_ZERO_CHAR, sizeof( s_buffer )) ;
-        strcpy( s_buffer, lp_Key->phrase ) ;
+        strcpy( s_buffer, lp_Key->key_phrase ) ;
 
-        sprintf(lp_Key->phrase,"%s%s",s_buffer, lp_Key->mot);
+        sprintf(lp_Key->key_phrase,"%s%s",s_buffer, lp_Key->key_mot);
       }
-      Trace1("resultat => phrase = %s \n",lp_Key->phrase ) ;
+      Trace1("resultat => phrase = %s \n",lp_Key->key_phrase ) ;
       
       Trace1("Si mot != valider et premier non vide => on met nombre + mot dans le nombre !!\n" ) ;
 
-      if ( strcmp( lp_Key->premier, "")) {
+      if ( strcmp( lp_Key->key_premier, "")) {
         
-	      if ( strlen(lp_Key->nombre) + strlen(lp_Key->mot) < CONFIG_TAILLE_BUFFER_32) {
+	      if ( strlen(lp_Key->key_nombre) + strlen(lp_Key->key_mot) < CONFIG_TAILLE_BUFFER_32) {
 
-          Trace1("on incremente le nombre %s avec le mot %s\n",lp_Key->nombre,  lp_Key->mot ) ;
+          Trace1("on incremente le nombre %s avec le mot %s\n",lp_Key->key_nombre,  lp_Key->key_mot ) ;
           // correction bug 28/12/2017 : recopie de la chaine dans un buffer avant le sprintf
 
           memset( s_buffer, CONFIG_ZERO_CHAR, sizeof( s_buffer )) ;
-          strcpy( s_buffer, lp_Key->nombre ) ;
+          strcpy( s_buffer, lp_Key->key_nombre ) ;
 
-          sprintf(lp_Key->nombre,"%s%s", s_buffer, lp_Key->mot);
+          sprintf(lp_Key->key_nombre,"%s%s", s_buffer, lp_Key->key_mot);
         }
       }
-      Trace1("resultat => nombre = %s \n",lp_Key->nombre ) ;
+      Trace1("resultat => nombre = %s \n",lp_Key->key_nombre ) ;
     }    
     //------------------------------------------------------------
     // On met le mot dans premier si il est vide 
     //------------------------------------------------------------
     
-    if ( ! strcmp( lp_Key->premier, "")){ 
-      if ( strlen(lp_Key->mot) < CONFIG_TAILLE_BUFFER_32)
-      strcpy( lp_Key->premier, lp_Key->mot);
+    if ( ! strcmp( lp_Key->key_premier, "")){ 
+      if ( strlen(lp_Key->key_mot) < CONFIG_TAILLE_BUFFER_32)
+      strcpy( lp_Key->key_premier, lp_Key->key_mot);
     }
     //------------------------------------------------------------
     // Si le mot en cours est une VALIDATION 
@@ -117,13 +117,13 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
     //------------------------------------------------------------
 
     for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )
-    if ( ! strcmp( lp_Key->mot,    lp_Key->valider )  ) {
+    if ( ! strcmp( lp_Key->key_mot,    lp_Key->key_valider )  ) {
       Trace1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
 
-      strcpy(lp_Key->premier,"") ;
-      strcpy(lp_Key->phrase,"")  ;
-      strcpy(lp_Key->mot,"") ;
-      lp_Key->phrase_lue=1 ;
+      strcpy(lp_Key->key_premier,"") ;
+      strcpy(lp_Key->key_phrase,"")  ;
+      strcpy(lp_Key->key_mot,"") ;
+      lp_Key->key_phrase_lue=1 ;
     }
     //------------------------------------------------------------
     // Si le mot est une ACTION, on efface la phrase en cours    
@@ -132,19 +132,19 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
     //------------------------------------------------------------
     
     for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ )
-    if ( ! strcmp( lp_Key->mot, lp_Key->actions[i] )) {
+    if ( ! strcmp( lp_Key->key_mot, lp_Key->key_actions[i] )) {
         Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
-        strcpy(lp_Key->premier,lp_Key->mot) ;
-        strcpy(lp_Key->symbole,lp_Key->mot)  ;
+        strcpy(lp_Key->key_premier,lp_Key->key_mot) ;
+        strcpy(lp_Key->key_symbole,lp_Key->key_mot)  ;
 
-        strcpy(lp_Key->nombre,"")  ;
-        strcpy(lp_Key->phrase,"")  ;
-        strcpy(lp_Key->mot,"") ;
-        lp_Key->phrase_lue=0 ;
+        strcpy(lp_Key->key_nombre,"")  ;
+        strcpy(lp_Key->key_phrase,"")  ;
+        strcpy(lp_Key->key_mot,"") ;
+        lp_Key->key_phrase_lue=0 ;
     }
     
-    lp_Key->mot_en_cours = 0 ;
-    lp_Key->appui_en_cours = 0 ;
+    lp_Key->key_mot_en_cours = 0 ;
+    lp_Key->key_appui_en_cours = 0 ;
   }
 }
 
@@ -167,43 +167,43 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 
   Trace1("") ;
 
-  memset( lp_Key->phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->phrase ) );
-  memset( lp_Key->valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->valider ) );
-  memset( lp_Key->symbole, CALCULS_ZERO_CHAR, sizeof( lp_Key->symbole ) );
-  memset( lp_Key->menu,    CALCULS_ZERO_CHAR, sizeof( lp_Key->menu ) );
-  memset( lp_Key->premier, CALCULS_ZERO_CHAR, sizeof( lp_Key->premier ) );
-  memset( lp_Key->nombre,  CALCULS_ZERO_CHAR, sizeof( lp_Key->nombre ) );
-  memset( lp_Key->mot,     CALCULS_ZERO_CHAR, sizeof( lp_Key->mot ) );
+  memset( lp_Key->key_phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
+  memset( lp_Key->key_valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
+  memset( lp_Key->key_symbole, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_symbole ) );
+  memset( lp_Key->key_menu,    CALCULS_ZERO_CHAR, sizeof( lp_Key->key_menu ) );
+  memset( lp_Key->key_premier, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_premier ) );
+  memset( lp_Key->key_nombre,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_nombre ) );
+  memset( lp_Key->key_mot,     CALCULS_ZERO_CHAR, sizeof( lp_Key->key_mot ) );
   
-  strcpy( lp_Key->valider, "valider" ) ;
-  strcpy( lp_Key->menu,    "MENU" ) ;
+  strcpy( lp_Key->key_valider, "valider" ) ;
+  strcpy( lp_Key->key_menu,    "MENU" ) ;
   
-  strcpy( lp_Key->symbole,  "" ) ;
-  strcpy( lp_Key->phrase,   "" ) ;
-  strcpy( lp_Key->premier,  "" ) ;
-  strcpy( lp_Key->nombre,   "" ) ;
-  strcpy( lp_Key->mot,      "" ) ;
+  strcpy( lp_Key->key_symbole,  "" ) ;
+  strcpy( lp_Key->key_phrase,   "" ) ;
+  strcpy( lp_Key->key_premier,  "" ) ;
+  strcpy( lp_Key->key_nombre,   "" ) ;
+  strcpy( lp_Key->key_mot,      "" ) ;
 
-  lp_Key->mot_en_cours   = 0 ;
-  lp_Key->phrase_lue     = 0 ;
-  lp_Key->appui_en_cours = 0 ;
-  /* lp_Key->tempo_clavier = gp_Tim_Par->par_tpo_Clavier ; */ 
+  lp_Key->key_mot_en_cours   = 0 ;
+  lp_Key->key_phrase_lue     = 0 ;
+  lp_Key->key_appui_en_cours = 0 ;
+  /* lp_Key->tempo_clavier = gp_Tim_Par->tim_par_tpo_Clavier ; */ 
  
   // FIXME : definitions des actions : 
   // Les actions servent a 
   
   for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
-    memset( lp_Key->actions[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+    memset( lp_Key->key_actions[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
   }
-  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->validations[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->key_validations[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
 
-  strcpy( lp_Key->actions[0], "MENU" ) ;
-  strcpy( lp_Key->actions[1], "SETUP" ) ;
-  strcpy( lp_Key->actions[2], "MES" ) ;
-  strcpy( lp_Key->actions[3], "NGC" ) ;
-  strcpy( lp_Key->actions[4], "ETO" ) ;
-  strcpy( lp_Key->actions[5], "PLA" ) ;
-  strcpy( lp_Key->actions[6], "TIME" ) ;
+  strcpy( lp_Key->key_actions[0], "MENU" ) ;
+  strcpy( lp_Key->key_actions[1], "SETUP" ) ;
+  strcpy( lp_Key->key_actions[2], "MES" ) ;
+  strcpy( lp_Key->key_actions[3], "NGC" ) ;
+  strcpy( lp_Key->key_actions[4], "ETO" ) ;
+  strcpy( lp_Key->key_actions[5], "PLA" ) ;
+  strcpy( lp_Key->key_actions[6], "TIME" ) ;
    
 } 
 
@@ -223,23 +223,23 @@ void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (val) %-5s (menu) %-10s",\
-    lp_Key->phrase,\
-    lp_Key->mot,\
-    lp_Key->symbole,\
-    lp_Key->nombre,\
-    lp_Key->premier,\
-    lp_Key->valider,\
-    lp_Key->menu) ;
+    lp_Key->key_phrase,\
+    lp_Key->key_mot,\
+    lp_Key->key_symbole,\
+    lp_Key->key_nombre,\
+    lp_Key->key_premier,\
+    lp_Key->key_valider,\
+    lp_Key->key_menu) ;
 
   
   Trace1( "%s", c_cmd) ;
 
-  Trace2("lp_Key->mot         = %s",lp_Key->mot) ;
-  Trace2("lp_Key->premier     = %s",lp_Key->premier) ;
-  Trace2("lp_Key->phrase      = %s",lp_Key->phrase) ;
-  Trace2("lp_Key->nombre      = %s",lp_Key->nombre) ;
-  Trace2("lp_Key->symbole     = %s",lp_Key->symbole) ;
-  Trace2("lp_Key->phrase_lue  = %d",lp_Key->phrase_lue) ;
+  Trace2("lp_Key->key_mot         = %s",lp_Key->key_mot) ;
+  Trace2("lp_Key->key_premier     = %s",lp_Key->key_premier) ;
+  Trace2("lp_Key->key_phrase      = %s",lp_Key->key_phrase) ;
+  Trace2("lp_Key->key_nombre      = %s",lp_Key->key_nombre) ;
+  Trace2("lp_Key->key_symbole     = %s",lp_Key->key_symbole) ;
+  Trace2("lp_Key->key_phrase_lue  = %d",lp_Key->key_phrase_lue) ;
 
   TraceArbo(__func__,1,c_cmd) ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }

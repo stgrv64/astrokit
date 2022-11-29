@@ -64,7 +64,7 @@ void CODES_INIT(STRUCT_CODES *lp_Cod) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & lp_Cod->cod_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cod->cod_mutex ) ;
 
   for( i_pos=0 ; i_pos<CODES_CODE_NB_CODES ; i_pos++ ) memset( lp_Cod->cod_out_act[i_pos], CONFIG_ZERO_CHAR, sizeof(lp_Cod->cod_out_act[i_pos]) ) ;
   for( i_pos=0 ; i_pos<CODES_CODE_NB_CODES ; i_pos++ ) memset( lp_Cod->cod_in_lirc[i_pos],  CONFIG_ZERO_CHAR, sizeof(lp_Cod->cod_in_lirc[i_pos]) ) ;

@@ -41,14 +41,14 @@ void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
 
   pthread_mutex_init( & lp_Dev->dev_mutex, NULL ) ;
 
-  lp_Dev->use_capteurs    = gp_Dev_Par->par_use_Capteurs ;
-  lp_Dev->use_raquette    = gp_Dev_Par->par_use_Raquette ;
-  lp_Dev->use_bluetooth   = gp_Dev_Par->par_use_Bluetooth ;
-  lp_Dev->use_infrarouge  = gp_Dev_Par->par_use_Infrared ;
-  lp_Dev->use_controler   = gp_Dev_Par->par_use_Controler ;
-  lp_Dev->use_keyboard    = gp_Dev_Par->par_use_Keyboard ;
-  lp_Dev->use_lcd         = gp_Dev_Par->par_use_Lcd ; 
-  lp_Dev->init_capteurs = 0 ; 
+  lp_Dev->dev_use_capteurs    = gp_Dev_Par->dev_par_use_capteurs ;
+  lp_Dev->dev_use_raquette    = gp_Dev_Par->dev_par_use_raquette ;
+  lp_Dev->dev_use_bluetooth   = gp_Dev_Par->dev_par_use_bluetooth ;
+  lp_Dev->dev_use_infrarouge  = gp_Dev_Par->dev_par_use_infrared ;
+  lp_Dev->dev_use_controler   = gp_Dev_Par->dev_par_use_controler ;
+  lp_Dev->dev_use_keyboard    = gp_Dev_Par->dev_par_use_keyboard ;
+  lp_Dev->dev_use_lcd         = gp_Dev_Par->dev_par_use_lcd ; 
+  lp_Dev->dev_init_capteurs = 0 ; 
 }
 
 /*****************************************************************************************
@@ -64,13 +64,13 @@ void DEVICES_AFFICHER_UTILISATION (STRUCT_DEVICES *lp_Dev) {
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("lp_Dev->use_infrarouge = %d",lp_Dev->use_infrarouge) ;
-  Trace1("lp_Dev->use_capteurs   = %d",lp_Dev->use_capteurs) ;
-  Trace1("lp_Dev->use_raquette   = %d",lp_Dev->use_raquette) ;
-  Trace1("lp_Dev->use_bluetooth  = %d",lp_Dev->use_bluetooth) ;
-  Trace1("lp_Dev->use_keyboard   = %d",lp_Dev->use_keyboard) ;
-  Trace1("lp_Dev->use_controler  = %d",lp_Dev->use_controler) ;
-  Trace1("lp_Dev->use_lcd        = %d",lp_Dev->use_lcd) ;
+  Trace1("lp_Dev->dev_use_infrarouge = %d",lp_Dev->dev_use_infrarouge) ;
+  Trace1("lp_Dev->dev_use_capteurs   = %d",lp_Dev->dev_use_capteurs) ;
+  Trace1("lp_Dev->dev_use_raquette   = %d",lp_Dev->dev_use_raquette) ;
+  Trace1("lp_Dev->dev_use_bluetooth  = %d",lp_Dev->dev_use_bluetooth) ;
+  Trace1("lp_Dev->dev_use_keyboard   = %d",lp_Dev->dev_use_keyboard) ;
+  Trace1("lp_Dev->dev_use_controler  = %d",lp_Dev->dev_use_controler) ;
+  Trace1("lp_Dev->dev_use_lcd        = %d",lp_Dev->dev_use_lcd) ;
 
   return ;
 }

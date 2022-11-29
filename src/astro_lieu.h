@@ -26,7 +26,7 @@ typedef struct STR_LIEU STRUCT_LIEU ;
 /*---------------------------------------------------*/
 
 struct STR_LIEU_PARAMS {
-  
+  pthread_mutex_t lie_par_mutex ;
   double par_longitude ;
   double par_latitude ;
   double par_altitude ;

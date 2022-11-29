@@ -137,6 +137,8 @@ typedef struct STR_PTHREADS_ATTRIBUTS STRUCT_PTHREADS_ATTRIBUTS ;
 /* All concerning STRUCT_PTHREADS */ 
 
 struct STR_MUTEXS {
+  pthread_mutex_t  mut_mutex ; /* protege les membres de la structure */
+  
   pthread_mutex_t  mut_dat ;
   pthread_mutex_t  mut_glo_alt ;
   pthread_mutex_t  mut_glo_azi ;
@@ -146,14 +148,14 @@ struct STR_MUTEXS {
 typedef struct STR_MUTEXS STRUCT_MUTEXS ;
 
 struct STR_PTHREADS {
-
-  unsigned int              pth_i_nb ; 
+  pthread_t                 pth_mutex ; /* protege les membres de la structure */
   pthread_t                 pth_t   [ PTHREADS_MAX_THREADS ]  ;  
   STRUCT_PTHREADS_ATTRIBUTS pth_att [ PTHREADS_MAX_THREADS ]  ; 
+  unsigned int              pth_i_nb ; 
 } ;
 typedef struct STR_PTHREADS STRUCT_PTHREADS ;
 
-void PTHREADS_INIT_MUTEXS    (void) ;
+void PTHREADS_INIT_MUTEXS     (void) ;
 void PTHREADS_INIT            ( STRUCT_PTHREADS * , pthread_t ) ;
 void PTHREADS_CONFIG          ( STRUCT_PTHREADS * , pthread_t, int  ) ;
 void PTHREADS_INFOS           ( STRUCT_PTHREADS * ) ;

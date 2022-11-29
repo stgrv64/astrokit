@@ -38,7 +38,7 @@ void PID_INIT(STRUCT_PID * lp_pid, double d_ech, double d_kp, double d_ki, doubl
   memset(c_path_file_out, 0, sizeof(c_path_file_out)) ;
   sprintf( c_path_file_out, "%s/%s" , gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_pid) ;
 
-  if ( ( lp_pid->pif_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
+  if ( ( lp_pid->pid_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
     Trace("ouverture %s (KO)",c_path_file_out );
   }
   else {

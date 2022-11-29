@@ -16,9 +16,6 @@
 #ifndef ASTRO_GPIO_H
 #define ASTRO_GPIO_H
 
-#define MUTEX_PHA_LOCK   pthread_mutex_lock(   & ph->pha_mutex ) ;
-#define MUTEX_PHA_UNLOCK pthread_mutex_unlock( & ph->pha_mutex ) ;
-
 #include "astro_global.h"
 
 /*---------------------------------------------------*/
@@ -32,25 +29,25 @@
 
 struct STR_GPIO_PARAMS_CONTROLER {
 
-  unsigned char par_alt_dir ;  // numero de port GPIO pour le sens de rotation en altitude
-  unsigned char par_alt_clk ;  // numero de port GPIO pour l'horloge de l'altitude
-  unsigned char par_alt_slp ;  // numero de port GPIO pour le sleep en altitude
-  unsigned char par_alt_rst ;  // numero de port GPIO pour le reset en altitude
-  unsigned char par_alt_mmm ;  // numero de port GPIO pour le mmm en altitude
-  unsigned char par_alt_ena ;  // numero de port GPIO pour le enable en altitude
-  unsigned char par_alt_m2  ;  // numero de port GPIO pour le choix du micro pas en altitude
-  unsigned char par_alt_m1  ;  // numero de port GPIO pour le choix du micro pas en altitude
-  unsigned char par_alt_m0  ;  // numero de port GPIO pour le choix du micro pas en altitude
-
-  unsigned char par_azi_dir ;  // numero de port GPIO pour le sens de rotation en azimut
-  unsigned char par_azi_clk ;  // numero de port GPIO pour l'horloge de l'azimut
-  unsigned char par_azi_slp ;  // numero de port GPIO pour le sleep en azimut
-  unsigned char par_azi_rst ;  // numero de port GPIO pour le reset en azimut
-  unsigned char par_azi_mmm ;  // numero de port GPIO pour le mmm en azimut
-  unsigned char par_azi_ena ;  // numero de port GPIO pour le enable en azimut
-  unsigned char par_azi_m2  ;  // numero de port GPIO pour le choix du micro pas en azimut
-  unsigned char par_azi_m1  ;  // numero de port GPIO pour le choix du micro pas en azimut
-  unsigned char par_azi_m0  ;  // numero de port GPIO pour le choix du micro pas en azimut
+  pthread_mutex_t par_mutex ;
+  unsigned char   par_alt_dir ;  // numero de port GPIO pour le sens de rotation en altitude
+  unsigned char   par_alt_clk ;  // numero de port GPIO pour l'horloge de l'altitude
+  unsigned char   par_alt_slp ;  // numero de port GPIO pour le sleep en altitude
+  unsigned char   par_alt_rst ;  // numero de port GPIO pour le reset en altitude
+  unsigned char   par_alt_mmm ;  // numero de port GPIO pour le mmm en altitude
+  unsigned char   par_alt_ena ;  // numero de port GPIO pour le enable en altitude
+  unsigned char   par_alt_m2  ;  // numero de port GPIO pour le choix du micro pas en altitude
+  unsigned char   par_alt_m1  ;  // numero de port GPIO pour le choix du micro pas en altitude
+  unsigned char   par_alt_m0  ;  // numero de port GPIO pour le choix du micro pas en altitude
+  unsigned char   par_azi_dir ;  // numero de port GPIO pour le sens de rotation en azimut
+  unsigned char   par_azi_clk ;  // numero de port GPIO pour l'horloge de l'azimut
+  unsigned char   par_azi_slp ;  // numero de port GPIO pour le sleep en azimut
+  unsigned char   par_azi_rst ;  // numero de port GPIO pour le reset en azimut
+  unsigned char   par_azi_mmm ;  // numero de port GPIO pour le mmm en azimut
+  unsigned char   par_azi_ena ;  // numero de port GPIO pour le enable en azimut
+  unsigned char   par_azi_m2  ;  // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char   par_azi_m1  ;  // numero de port GPIO pour le choix du micro pas en azimut
+  unsigned char   par_azi_m0  ;  // numero de port GPIO pour le choix du micro pas en azimut
 } ;
 
 /* 
@@ -60,6 +57,7 @@ struct STR_GPIO_PARAMS_CONTROLER {
 
 struct STR_GPIO_PARAMS_RAQUETTE {
 
+  pthread_mutex_t par_mutex ;
   int par_raq_ouest  ; 
   int par_raq_est  ;
   int par_raq_sud  ;
@@ -74,6 +72,7 @@ struct STR_GPIO_PARAMS_RAQUETTE {
 
 struct STR_GPIO_PARAMS_MATRICIEL {
 
+  pthread_mutex_t par_mutex ;
   int par_l1  ;
   int par_l2  ;
   int par_l3  ;
@@ -82,7 +81,6 @@ struct STR_GPIO_PARAMS_MATRICIEL {
   int par_c2  ;
   int par_c3  ;
   int par_c4  ;
-
 } ;
 
 /* 
@@ -92,11 +90,13 @@ struct STR_GPIO_PARAMS_MATRICIEL {
 */
 
 struct STR_GPIO_PARAMS_PWM {
-  int  par_led_etat ;
-  char par_fre_pwm [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char par_azi     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char par_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
+
+  pthread_mutex_t par_mutex ;
+  int             par_led_etat ;
+  char            par_fre_pwm [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_azi     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/
@@ -124,8 +124,8 @@ struct STR_GPIO_PWM_PHASE {
 
   pthread_mutex_t   pha_mutex ;    
 
-  STRUCT_SUIVI    * p_sui ;  
-  STRUCT_PTHREADS * p_pth ;
+  /* STRUCT_SUIVI    * p_sui ; */
+  /* STRUCT_PTHREADS * p_pth ; */
 
   struct timeval    tval ;
 
@@ -152,8 +152,8 @@ struct STR_GPIO_PWM_MOTEUR {
   pthread_mutex_t         mot_mutex ; 
 
   STRUCT_GPIO_PWM_PHASE * mot_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  STRUCT_SUIVI          * p_sui ;
-  STRUCT_PTHREADS       * p_pth ;
+  /* STRUCT_SUIVI          * p_sui ; */
+  /* STRUCT_PTHREADS       * p_pth ; */
   
   int                     mot_id ;
   long long               pas ;
@@ -267,12 +267,12 @@ long   GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,lon
 long   GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double delai,long nano_moins) ;
 
 // PWM
-void   GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *pm, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
-void   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *pm) ;
+void   GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
+void   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
 
 // Fonction de threads
 
-void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *ph ) ;
-void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *pm) ;
+void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) ;
+void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
 
 #endif

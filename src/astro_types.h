@@ -19,7 +19,5 @@
 #ifndef ASTRO_TYPES_H
 #define ASTRO_TYPES_H
 
-
-
 #endif
 

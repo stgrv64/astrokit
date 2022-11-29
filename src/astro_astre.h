@@ -13,9 +13,6 @@
 #ifndef ASTRO_ASTRE_H
 #define ASTRO_ASTRE_H
 
-#define MUTEX_AST_LOCK   pthread_mutex_lock(   & gp_Ast->ast_mutex ) ;  
-#define MUTEX_AST_UNLOCK pthread_mutex_unlock( & gp_Ast->ast_mutex ) ; 
-
 #include "astro_global.h"
 
 #define  ASTRE_TAILLE_BUFFER  256
@@ -48,7 +45,8 @@ typedef enum t_en_Astre_Type ENUM_ASTRE_TYPE ;
 /*---------------------------------------------------*/
 
 struct STR_ASTRE_PARAMS {
-  char par_default_object[ CONFIG_TAILLE_BUFFER_256 ] ;
+  pthread_mutex_t ast_par_mutex ;
+  char ast_par_default_object[ CONFIG_TAILLE_BUFFER_256 ] ;
 } ;
 
 typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;

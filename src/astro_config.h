@@ -236,7 +236,7 @@ t_en_Config_Parametres_Obligatoires_Types ;
 
 struct STR_CONFIG_PARAMS {
 
-  pthread_mutex_t cfg_par_mutex ;
+  pthread_mutex_t con_par_mutex ;
   int             par_default_menu ;
   char            par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
@@ -258,7 +258,7 @@ struct STR_CONFIG_PARAMS {
 /*---------------------------------------------------*/
 
 struct STR_CONFIG {
- pthread_mutex_t cfg_mutex ;
+ pthread_mutex_t con_mutex ;
  char con_params  [CONFIG_DATAS_NB_LIGNES] [CONFIG_DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER_256] ;
 } ;
 typedef struct  STR_CONFIG STRUCT_CONFIG ;
@@ -401,6 +401,8 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
   CONFIG_TYPE_INT, // "ALTAZ_FORWARD_FAST",
   CONFIG_TYPE_INT, // "ALTAZ_REWIND_FAST"
 } ;
+
+void   CONFIG_INIT                  (STRUCT_CONFIG * ) ;
 
 void   CONFIG_PARAMETRES_CONFIG     (STRUCT_CONFIG * ) ;
 void   CONFIG_FIC_DISPLAY           (STRUCT_CONFIG * ) ;

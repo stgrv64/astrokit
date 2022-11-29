@@ -13,12 +13,6 @@
 #ifndef ASTRO_TIME_H
 #define ASTRO_TIME_H
 
-#define MUTEX_TIM_LOCK     pthread_mutex_lock( & gp_Tim->tim_mutex ) ;  
-#define MUTEX_TIM_UNLOCK pthread_mutex_unlock( & gp_Tim->tim_mutex ) ; 
-
-#define MUTEX_TPO_LOCK     pthread_mutex_lock( & gp_Tpo->tpo_mutex ) ;  
-#define MUTEX_TPO_UNLOCK pthread_mutex_unlock( & gp_Tpo->tpo_mutex ) ; 
-
 #include <pthread.h>
 
 /* Definition de la structure associeee au fichier avant inclusion astro_global.h */
@@ -39,14 +33,14 @@ struct STR_TIME_TEMPOS {
 } ;
 typedef struct STR_TIME_TEMPOS STRUCT_TIME_TEMPOS ;
 
+/* Parametre hd = L' heure decimale sert pour la representation 
+  * d'un angle sous la forme  : 12h25mn05s ( 360 degres = 24h )
+  */
+
 struct STR_TIME {
   
   pthread_mutex_t tim_mutex ;
-  /* L heure decimale sert pour la representation 
-   * d'un angle sous la forme  : 12h25mn05s 
-   * 360 degres = 24h
-   * -------------------------------------------- */
-   
+
   double tim_hd ;      // heure decimale
   char   tim_sig ;    /* signe */ 
   int    tim_si ;      // signe
@@ -62,68 +56,61 @@ typedef struct STR_TIME STRUCT_TIME ;
 
 #include "astro_global.h"
 
-//---------------------------------------------------------------------------------------
-// man date sur noyau compile 
-// Display time (using +FMT), or set time
-//
-//	[-s,--set] TIME	Set time to TIME
-//	-u,--utc	Work in UTC (don't convert to local time)
-//	-R,--rfc-2822	Output RFC-2822 compliant date string
-//	-I[SPEC]	Output ISO-8601 compliant date string
-//			SPEC='date' (default) for date only,
-//			'hours', 'minutes', or 'seconds' for date and
-//			time to the indicated precision
-//	-r,--reference FILE	Display last modification time of FILE
-//	-d,--date TIME	Display TIME, not 'now'
-//	-D FMT		Use FMT for -d TIME conversion
-//
-//Recognized TIME formats:
-//	hh:mm[:ss]
-//	[YYYY.]MM.DD-hh:mm[:ss]
-//	YYYY-MM-DD hh:mm[:ss]
-//	[[[[[YY]YY]MM]DD]hh]mm[.ss]
-//	'date TIME' form accepts MMDDhhmm[[YY]YY][.ss] instead
-//---------------------------------------------------------------------------------------
-
-#define  TEMPS_MILLI_SEC    1000                // frequence d'une microseconde (pour les usleep et calculs)
-#define  TEMPS_MICRO_SEC    1000000             // frequence d'une microseconde (pour les usleep et calculs)
-#define  TEMPS_NANO_SEC     1000000000          // frequence d'une nanoseconde (pour les nanosleep et calculs) 
-
-
-
 struct STR_TIME_PARAMS {
-  
-  unsigned long par_tpo_Menu ;
-  unsigned long par_tpo_Raq ;
-  unsigned long par_tpo_Ir ;
-  unsigned long par_tpo_Termios ;
-  unsigned long par_tpo_Capteurs ;
-  unsigned long par_tpo_Lcd_Loop ;
-  unsigned long par_tpo_Lcd_Disp ;
+  pthread_mutex_t tim_par_mutex ;
+  unsigned long   tim_par_tpo_menu ;
+  unsigned long   tim_par_tpo_raq ;
+  unsigned long   tim_par_tpo_ir ;
+  unsigned long   tim_par_tpo_termios ;
+  unsigned long   tim_par_tpo_capteurs ;
+  unsigned long   tim_par_tpo_lcd_loop ;
+  unsigned long   tim_par_tpo_lcd_disp ;
 } ;
 typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
 // ------ TEMPORISATIONS DES BOUCLES ------------
 
-void   TEMPS_INIT                   ( STRUCT_TIME * ,STRUCT_TIME_TEMPOS *) ;
+void   TIME_INIT                   ( STRUCT_TIME * , STRUCT_TIME_TEMPOS *) ;
 
-void   TEMPS_AFFICHER               ( STRUCT_TIME *  ) ; /* FIXME ajout 20191228 */
-void   TEMPS_SET_YEAR_MONTH_AND_DAY ( char *  ) ; // FIXME ajout 20190822
-void   TEMPS_SET_MONTH_AND_DAY      ( char *  ) ;
-void   TEMPS_SET_HOUR_AND_MINUTES   ( char *  ) ;
+void   TIME_AFFICHER               ( STRUCT_TIME *  ) ; /* FIXME ajout 20191228 */
+void   TIME_SET_YEAR_MONTH_AND_DAY ( char *  ) ; // FIXME ajout 20190822
+void   TIME_SET_MONTH_AND_DAY      ( char *  ) ;
+void   TIME_SET_HOUR_AND_MINUTES   ( char *  ) ;
 
-double TEMPS_CALCULS_DUREE_SECONDES        (struct timeval * )  ;
-double TEMPS_CALCULS_DUREE_MICROSEC        (struct timeval * ) ;
-double TEMPS_CALCULS_DUREE_NANOSEC         (struct timeval * ) ;
-long   TEMPS_TEMPORISATION_MICROSEC       (double , double , struct timeval ) ;
+double TIME_CALCULS_DUREE_SECONDES        ( struct timeval * )  ;
+double TIME_CALCULS_DUREE_MICROSEC        ( struct timeval * ) ;
+double TIME_CALCULS_DUREE_NANOSEC         ( struct timeval * ) ;
+long   TIME_TEMPORISATION_MICROSEC        ( double , double , struct timeval ) ;
+void   TIME_AFFICHER_MSG_HHMMSS           ( char * , STRUCT_TIME *  ) ;
 
-void  TEMPS_AFFICHER_MSG_HHMMSS          ( char * , STRUCT_TIME *  ) ;
-
-int    TEMPS_CALCULS_TEMPS_SIDERAL           ( STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim ) ;
-int    TEMPS_CALCULS_JOUR_JULIEN             ( STRUCT_LIEU* gp_Lie, STRUCT_TIME * gp_Tim) ;
-int    TEMPS_CALCULS_DATE                    ( STRUCT_TIME * gp_Tim ) ;
-void   TEMPS_CALCULS_TEMPS_HMS_VERS_DEC      ( STRUCT_TIME * gp_Tim ) ;
-void   TEMPS_CALCULS_TEMPS_DEC_VERS_HMS      ( STRUCT_TIME * gp_Tim ) ;
-void   TEMPS_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
+int    TIME_CALCULS_TEMPS_SIDERAL           ( STRUCT_LIEU * gp_Lie, STRUCT_TIME * gp_Tim ) ;
+int    TIME_CALCULS_JOUR_JULIEN             ( STRUCT_LIEU * gp_Lie, STRUCT_TIME * gp_Tim) ;
+int    TIME_CALCULS_DATE                    ( STRUCT_TIME * gp_Tim ) ;
+void   TIME_CALCULS_TEMPS_HMS_VERS_DEC      ( STRUCT_TIME * gp_Tim ) ;
+void   TIME_CALCULS_TEMPS_DEC_VERS_HMS      ( STRUCT_TIME * gp_Tim ) ;
+void   TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
 
 #endif
+
+/* ---------------------------------------------------------------------------------------
+ man date sur noyau compile 
+ Display time (using +FMT), or set time
+
+	[-s,--set] TIME	Set time to TIME
+	-u,--utc	Work in UTC (don't convert to local time)
+	-R,--rfc-2822	Output RFC-2822 compliant date string
+	-I[SPEC]	Output ISO-8601 compliant date string
+			SPEC='date' (default) for date only,
+			'hours', 'minutes', or 'seconds' for date and
+			time to the indicated precision
+	-r,--reference FILE	Display last modification time of FILE
+	-d,--date TIME	Display TIME, not 'now'
+	-D FMT		Use FMT for -d TIME conversion
+
+Recognized TIME formats:
+	hh:mm[:ss]
+	[YYYY.]MM.DD-hh:mm[:ss]
+	YYYY-MM-DD hh:mm[:ss]
+	[[[[[YY]YY]MM]DD]hh]mm[.ss]
+	'date TIME' form accepts MMDDhhmm[[YY]YY][.ss] instead
+--------------------------------------------------------------------------------------- */

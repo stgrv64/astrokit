@@ -252,7 +252,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
     CONFIG_MENU_CHANGE_DETECT() ;
 
-    switch( gp_Sui->menu ) {
+    switch( gp_Sui->sui_menu ) {
 
       // ------------------------------- ALIGNEMENT - MODE AZIMUTAL ----------------------------
      
@@ -260,18 +260,18 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         
         Trace1("MENU_AZIMUTAL") ;
         
-        // a modifier / completer : TEMPS_CALCULS_TEMPS_SIDERAL et CALCULS_ANGLE_HORAIRE
+        // a modifier / completer : TIME_CALCULS_TEMPS_SIDERAL et CALCULS_ANGLE_HORAIRE
         // sont a supprimer car deja calculer dans SUIVI_
 
-        Trace1("appel : %d : MENU_AZIMUTAL" , gp_Sui->menu) ;
+        Trace1("appel : %d : MENU_AZIMUTAL" , gp_Sui->sui_menu) ;
 
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui_Pas->pas_acc_alt          = 1 ;
-        gp_Sui_Pas->pas_acc_azi          = 1 ;
+        gp_Pas->pas_acc_alt          = 1 ;
+        gp_Pas->pas_acc_azi          = 1 ;
         gp_Sui->sui_mode_equatorial           = 0 ;
-        gp_Sui->sui_mode_voute                = 1 ; 
+        gp_Vou->vou_run                = 1 ; 
 
         pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -280,8 +280,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 				CALCULS_TOUT() ;
 */
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_BRUT ; 
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ; 
 
       break ;
 
@@ -294,11 +294,11 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui_Pas->pas_acc_alt          = 0 ;
-        gp_Sui_Pas->pas_acc_azi          = 1 ;
+        gp_Pas->pas_acc_alt          = 0 ;
+        gp_Pas->pas_acc_azi          = 1 ;
 
         gp_Sui->sui_mode_equatorial = 1 ;
-        gp_Sui->sui_mode_voute      = 0 ; 
+        gp_Vou->vou_run      = 0 ; 
 
         pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -307,8 +307,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 				CALCULS_TOUT() ;
 */
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_BRUT ;
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ;
 
       break ;
 
@@ -332,8 +332,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_BRUT ; 
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ; 
 
         pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -353,16 +353,16 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         // Suivi le plus simple : seules les touches est nord sud ouest et reset sont prises en compte
         // TODO : verifier
 
-        Trace1("appel : %d : MENU_MANUEL_NON_ASSERVI" , gp_Sui->menu) ;
+        Trace1("appel : %d : MENU_MANUEL_NON_ASSERVI" , gp_Sui->sui_menu) ;
 
         pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-        gp_Sui_Pas->pas_acc_alt          = 0 ;
-        gp_Sui_Pas->pas_acc_azi          = 0 ;
+        gp_Pas->pas_acc_alt          = 0 ;
+        gp_Pas->pas_acc_azi          = 0 ;
 
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_NON_ASSERVI ; 
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_NON_ASSERVI ; 
 
         pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -385,8 +385,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         SUIVI_MANUEL_ASSERVI(gp_Sui, gp_Key) ; 
         CALCULS_PERIODES_SUIVI_MANUEL(gp_Ast,gp_Sui,gp_Vou)  ;
 
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_ASSERVI ; 
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_ASSERVI ; 
 
       break ;
 
@@ -394,10 +394,10 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
       case MENU_GOTO :
 
-        Trace1("appel : %d : MENU_GOTO" , gp_Sui->menu) ;
+        Trace1("appel : %d : MENU_GOTO" , gp_Sui->sui_menu) ;
 
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_BRUT ;
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ;
 
       break ; 
 
@@ -405,12 +405,12 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
       case MENU_INFO :
 
-        Trace1("appel : %d : MENU_INFO" , gp_Sui->menu) ;
+        Trace1("appel : %d : MENU_INFO" , gp_Sui->sui_menu) ;
 
         CONFIG_AFFICHER_TOUT() ;
 
-        gp_Sui->menu_old         = gp_Sui->menu ;
-        gp_Sui->menu             = MENU_MANUEL_BRUT ;
+        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
+        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ;
 
       break ; 
 
@@ -418,15 +418,15 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
      
       case MENU_RESEAU_UP :
 
-        Trace1("appel : %d : MENU_RESEAU_UP" , gp_Sui->menu) ;
+        Trace1("appel : %d : MENU_RESEAU_UP" , gp_Sui->sui_menu) ;
 
         if ( system("/etc/init.d/OLD/S40network start")) {
          perror("Probleme avec system(/etc/init.d/OLD/S40network start)"); 
          Trace1("Probleme avec system(/etc/init.d/OLD/S40network start)\n") ;
         }
 
-        gp_Sui->menu = gp_Sui->menu_old ;
-        gp_Sui->menu = MENU_MANUEL_BRUT ;
+        gp_Sui->sui_menu = gp_Sui->sui_menu_old ;
+        gp_Sui->sui_menu = MENU_MANUEL_BRUT ;
 
       break ;
 
@@ -434,21 +434,21 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
      
       case MENU_RESEAU_DOWN :
      
-        Trace1("appel : %d : MENU_RESEAU_DOWN" , gp_Sui->menu) ;
+        Trace1("appel : %d : MENU_RESEAU_DOWN" , gp_Sui->sui_menu) ;
 
         if ( system("/etc/init.d/OLD/S40network stop")) {
           perror("Probleme avec system(/etc/init.d/OLD/S40network stop)"); 
           Trace1("Probleme avec system(/etc/init.d/OLD/S40network stop)\n") ;
         }
 
-        gp_Sui->menu = gp_Sui->menu_old ;
-        gp_Sui->menu = MENU_MANUEL_BRUT ;
+        gp_Sui->sui_menu = gp_Sui->sui_menu_old ;
+        gp_Sui->sui_menu = MENU_MANUEL_BRUT ;
 
       break ;
       // ------------------------------ ARRET DU PROGRAMME ------------------------------------
       case MENU_PROGRAMME_DOWN :
      
-        Trace("appel : %d : MENU_PROGRAMME_DOWN" , gp_Sui->menu) ;
+        Trace("appel : %d : MENU_PROGRAMME_DOWN" , gp_Sui->sui_menu) ;
 
         ASTRO_TRAP_MAIN(1) ;
         break ;
@@ -456,7 +456,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
       // ------------------------------ ARRET DU SYSTEME EMBARQUE -----------------------------
       case MENU_DOWN :
 
-        Trace("appel : %d : MENU_DOWN" , gp_Sui->menu) ;
+        Trace("appel : %d : MENU_DOWN" , gp_Sui->sui_menu) ;
 
         ASTRO_TRAP_MAIN(0) ;
 
@@ -531,9 +531,9 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
 
     Trace1("while") ;
 
-    if ( gp_Sui->sui_mode_voute ) {
+    if ( gp_Vou->vou_run ) {
       
-      Trace1("gp_Sui->sui_mode_voute == true") ;
+      Trace1("gp_Vou->vou_run == true") ;
 
       /* FIXME : modification 20121225 : tous les calculs generiques dans CALCULS_TOUT */
       
@@ -554,7 +554,7 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
         gp_Ast->ast_new = FALSE ;
       }
 /*
-      if ( gp_Sui->menu_old != gp_Sui->menu  ) {
+      if ( gp_Sui->sui_menu_old != gp_Sui->sui_menu  ) {
         CONFIG_AFFICHER_TOUT() ;
       }
 */
@@ -615,7 +615,7 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
   
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA ) ;
   
-  if ( gp_Dev->use_infrarouge ) {
+  if ( gp_Dev->dev_use_infrarouge ) {
   
     i_ret = INFRARED_OPEN( gp_LircConfig ) ;
     Trace1("INFRARED_OPEN : retour = %d" , i_ret ) ;
@@ -660,7 +660,7 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
     
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
   
-  if ( gp_Dev->use_lcd ) {
+  if ( gp_Dev->dev_use_lcd ) {
 
     gp_Lcd->display_default() ;
 
@@ -736,7 +736,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
     
-  if ( gp_Dev->use_keyboard ) {
+  if ( gp_Dev->dev_use_keyboard ) {
   
     KEYBOARD_TERMIOS_INIT() ;
 
@@ -824,7 +824,7 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
   
-  if ( gp_Dev->use_keyboard ) {
+  if ( gp_Dev->dev_use_keyboard ) {
 
     /* Debut boucle SUIVI_CLAVIER_getchar */
 
@@ -869,7 +869,7 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
   
-  if ( gp_Dev->use_keyboard ) {
+  if ( gp_Dev->dev_use_keyboard ) {
 
     // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
     
@@ -930,8 +930,8 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
   int ret ;
   
-  STRUCT_I2C_DEVICE   exemple, *lp_dev ;
-  STRUCT_I2C_ACC_MAG  accmag,  *lp_acc ;
+  STRUCT_I2C_DEVICE   exemple, *lp_i2c_dev ;
+  STRUCT_I2C_ACC_MAG  accmag,  *lp_i2c_acc ;
 
   TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -939,12 +939,12 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
 
-  lp_dev = & exemple ;
-  lp_acc = & accmag ;
+  lp_i2c_dev = & exemple ;
+  lp_i2c_acc = & accmag ;
 
-  lp_dev->fd = 0 ;
+  lp_i2c_dev->i2c_dev_fd = 0 ;
   
-  if ( gp_Dev->use_capteurs ) {
+  if ( gp_Dev->dev_use_capteurs ) {
 
     
     /* Debut boucle SUIVI_CAPTEURS */
@@ -956,36 +956,36 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
 
       Trace1("while") ;
 
-      if ( ! gp_Dev->init_capteurs ) {
+      if ( ! gp_Dev->dev_init_capteurs ) {
         
-        ret = I2C_INIT(lp_dev, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
+        ret = I2C_INIT(lp_i2c_dev, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
 
         if ( ! ret ) {
           Trace1("Pas de capteur disponible") ;
-          gp_Dev->use_capteurs = 0 ;
-          gp_Dev->init_capteurs = 0 ;
+          gp_Dev->dev_use_capteurs = 0 ;
+          gp_Dev->dev_init_capteurs = 0 ;
           break ;
         }
         else {
-          I2C_SET( lp_dev, REG_CTRL1, "0x57" ) ;
-          I2C_SET( lp_dev, REG_CTRL2, "0x00" ) ;
-          I2C_SET( lp_dev, REG_CTRL5, "0x64" ) ;
-          I2C_SET( lp_dev, REG_CTRL6, "0x20" ) ;
-          I2C_SET( lp_dev, REG_CTRL7, "0x00" ) ;
+          I2C_SET( lp_i2c_dev, REG_CTRL1, "0x57" ) ;
+          I2C_SET( lp_i2c_dev, REG_CTRL2, "0x00" ) ;
+          I2C_SET( lp_i2c_dev, REG_CTRL5, "0x64" ) ;
+          I2C_SET( lp_i2c_dev, REG_CTRL6, "0x20" ) ;
+          I2C_SET( lp_i2c_dev, REG_CTRL7, "0x00" ) ;
     
-          gp_Dev->init_capteurs = 1 ;
+          gp_Dev->dev_init_capteurs = 1 ;
         }
       }
-      if ( gp_Dev->init_capteurs ) {
+      if ( gp_Dev->dev_init_capteurs ) {
       
-        I2C_GET_ACC( lp_dev, lp_acc )   ;
-        I2C_CALCULS_ACCMAG( lp_acc ) ;
+        I2C_GET_ACC( lp_i2c_dev, lp_i2c_acc )   ;
+        I2C_CALCULS_ACCMAG( lp_i2c_acc ) ;
       /*
-        gp_Sui->roll    =  lp_acc->roll  ; 
-        gp_Sui->pitch   =  lp_acc->pitch ;
-        gp_Sui->heading =  lp_acc->heading ;
+        gp_Sui->roll    =  lp_i2c_acc->roll  ; 
+        gp_Sui->pitch   =  lp_i2c_acc->pitch ;
+        gp_Sui->heading =  lp_i2c_acc->heading ;
       */
-        Trace1("%.0f\t%.0f\t%.0f\n", lp_acc->pitch * I2C_DEGRAD, lp_acc->roll * I2C_DEGRAD, lp_acc->heading * I2C_DEGRAD) ;
+        Trace1("%.0f\t%.0f\t%.0f\n", lp_i2c_acc->pitch * I2C_DEGRAD, lp_i2c_acc->roll * I2C_DEGRAD, lp_i2c_acc->heading * I2C_DEGRAD) ;
       }	
       
       usleep( gp_Tpo->tpo_capteurs );
@@ -1043,6 +1043,7 @@ int main(int argc, char ** argv) {
   // Initialisations diverses et variees
   // -----------------------------------------------------------------
 
+  CONFIG_INIT                ( gp_Con ) ;
   CONFIG_FIC_READ            ( gp_Con ) ;
   GPIO_CONFIG_FIC_READ       ( gp_Con ) ; 
   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
@@ -1056,7 +1057,7 @@ int main(int argc, char ** argv) {
 
   LOG_INIT        (gp_Log); 
 
-  TEMPS_INIT     ( gp_Tim, gp_Tpo ) ;
+  TIME_INIT     ( gp_Tim, gp_Tpo ) ;
   
   /* GPIO_CLAVIER_MATRICIEL_CONFIG( gpio_key_l, gpio_key_c ) ; */
   
@@ -1068,7 +1069,7 @@ int main(int argc, char ** argv) {
   ASTRE_INIT     ( gp_Ast ) ;
   LIEU_INIT      ( gp_Lie ) ;
   
-  TEMPS_CALCULS_TEMPS_SIDERAL  ( gp_Lie, gp_Tim) ;
+  TIME_CALCULS_TEMPS_SIDERAL  ( gp_Lie, gp_Tim) ;
   
   DEVICES_INIT   ( gp_Dev ) ;
   SUIVI_INIT     ( gp_Sui ) ;
@@ -1095,7 +1096,7 @@ int main(int argc, char ** argv) {
   Trace1("gi_gpio_azi         : %d %d %d %d", gi_gpio_azi[0], gi_gpio_azi[1], gi_gpio_azi[2], gi_gpio_azi[3] ) ;
   Trace1("gi_gpio_mas         : %d %d %d %d", gi_gpio_mas[0], gi_gpio_mas[1], gi_gpio_mas[2], gi_gpio_mas[3] ) ;
   Trace1("gp_Gpi_Par_Pwm->par_led_etat    : %d", gp_Gpi_Par_Pwm->par_led_etat );
-  Trace1("gp_Ast_Par->par_default_object : %s", gp_Ast_Par->par_default_object) ;
+  Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
   
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
   
@@ -1112,10 +1113,10 @@ int main(int argc, char ** argv) {
   CAT_FORMAT_DECIMAL_ETO( "eto.csv.dec" , g_c_cat_eto, g_c_cat_eto_dec) ; // CAT_AFFICHER ( g_c_cat_eto_dec ) ;
   // -----------------------------------------------------------------
   
-  if ( strcmp(gp_Ast_Par->par_default_object,"") != 0 ) {
+  if ( strcmp(gp_Ast_Par->ast_par_default_object,"") != 0 ) {
 
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, gp_Ast_Par->par_default_object ) ;
+    strcpy( gp_Ast->nom, gp_Ast_Par->ast_par_default_object ) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
@@ -1150,7 +1151,7 @@ int main(int argc, char ** argv) {
     gp_Gpio_Pwm_Mot_Alt,\
     gi_gpio_alt,\
     gi_gpio_mas,\
-    gp_Cal_Par->par_alt_red_4 ,\
+    gp_Cal_Par->cal_par_alt_red_4 ,\
     100,\
     gd_gpio_frequence_pwm, \
     0, \
@@ -1162,7 +1163,7 @@ int main(int argc, char ** argv) {
     gp_Gpio_Pwm_Mot_Azi,\
     gi_gpio_azi,\
     gi_gpio_mas,\
-    gp_Cal_Par->par_azi_red_4 ,\
+    gp_Cal_Par->cal_par_azi_red_4 ,\
     100,\
     gd_gpio_frequence_pwm, \
     1, \
@@ -1173,7 +1174,7 @@ int main(int argc, char ** argv) {
   Trace1("gp_Gpio_Pwm_Mot_Azi->Fm %f gp_Gpio_Pwm_Mot_Azi->periode_mot = %f", gp_Gpio_Pwm_Mot_Azi->Fm, gp_Gpio_Pwm_Mot_Azi->periode_mot ) ;
   Trace1("gp_Gpio_Pwm_Mot_Alt->Fm %f gp_Gpio_Pwm_Mot_Alt->periode_mot = %f", gp_Gpio_Pwm_Mot_Alt->Fm, gp_Gpio_Pwm_Mot_Alt->periode_mot ) ;
 
-  for( i=0 ; i< gp_Cal_Par->par_alt_red_4 ; i++ ) {
+  for( i=0 ; i< gp_Cal_Par->cal_par_alt_red_4 ; i++ ) {
     Trace1("%d\t%f\t%f\t%f\t%f",i,\
       gp_Gpio_Pwm_Mot_Azi->mot_pha[0]->rap[i],\
       gp_Gpio_Pwm_Mot_Azi->mot_pha[1]->rap[i],\
@@ -1219,10 +1220,10 @@ int main(int argc, char ** argv) {
   // ============================== join des threads  ===================================
   /* TODO : statut cancellable implique de ne pas forcement mettre en join */
 
-  if ( gp_Dev->use_lcd )         pthread_join( gp_Pth->pth_t[PTHREAD_T_LCD], NULL) ;
-  if ( gp_Dev->use_keyboard )    pthread_join( gp_Pth->pth_t[PTHREAD_T_CLAVIER], NULL) ;
-  if ( gp_Dev->use_capteurs )    pthread_join( gp_Pth->pth_t[PTHREAD_T_CAPTEUR], NULL) ;
-  if ( gp_Dev->use_infrarouge )  pthread_join( gp_Pth->pth_t[PTHREAD_T_INFRA], NULL) ;
+  if ( gp_Dev->dev_use_lcd )         pthread_join( gp_Pth->pth_t[PTHREAD_T_LCD], NULL) ;
+  if ( gp_Dev->dev_use_keyboard )    pthread_join( gp_Pth->pth_t[PTHREAD_T_CLAVIER], NULL) ;
+  if ( gp_Dev->dev_use_capteurs )    pthread_join( gp_Pth->pth_t[PTHREAD_T_CAPTEUR], NULL) ;
+  if ( gp_Dev->dev_use_infrarouge )  pthread_join( gp_Pth->pth_t[PTHREAD_T_INFRA], NULL) ;
 
   pthread_join( gp_Pth->pth_t[PTHREAD_T_VOUTE], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MENU],  NULL) ;

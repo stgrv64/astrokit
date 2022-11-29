@@ -118,6 +118,8 @@ double CALCULS_REDUCTION_TOTALE() {
 
 void   CALCULS_INIT ( STRUCT_CALCULS * lp_Cal) {
 
+ HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal->cal_mutex ) ;
+ 
  lp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
 }
 
@@ -388,8 +390,8 @@ void CALCULS_DIVISEUR_FREQUENCE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI *gp_Sui) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Sui->Da = gp_Cal_Par->par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->par_azi_red_tot * pow(2.0, gp_Cal_Par->par_azi_n) * ( gp_Ast->Va / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
-  gp_Sui->Dh = gp_Cal_Par->par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->par_alt_red_tot * pow(2.0, gp_Cal_Par->par_alt_n) * ( gp_Ast->Vh / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
+  gp_Sui->sui_Da = gp_Cal_Par->cal_par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_azi_red_tot * pow(2.0, gp_Cal_Par->cal_par_azi_n) * ( gp_Ast->Va / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
+  gp_Sui->sui_Dh = gp_Cal_Par->cal_par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_alt_red_tot * pow(2.0, gp_Cal_Par->cal_par_alt_n) * ( gp_Ast->Vh / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
 }
 
 /*****************************************************************************************
@@ -401,7 +403,7 @@ void CALCULS_DIVISEUR_FREQUENCE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI *gp_Sui) {
 * @param  : STRUCT_SUIVI * gp_Sui
 * @param  : STRUCT_VOUTE * gp_Vou
 * @date   : 2022-05 ajout non prise en compte des micro-pas pour la frequence moteur
-* @date   : 2022-06 correction petite erreur sur Fa_mot / Fh_mot
+* @date   : 2022-06 correction petite erreur sur fre_fa_mot / fre_fh_mot
 * @date   : 2022-06 ajout champs xxx_bru freq /periode avant multiplication par acceleration
 *****************************************************************************************/
 
@@ -422,14 +424,14 @@ void CALCULS_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *
   
   // Les flags de reversibilite *_ROT permettent de ne pas etre dependant du sens de branchement des moteurs !
 
-  if ( gp_Cal_Par->par_azi_rev == 0 )       azi_rot = -1.0 ; else azi_rot = 1.0 ;
-  if ( gp_Cal_Par->par_alt_rev == 0 )       alt_rot = -1.0 ; else alt_rot = 1.0 ;
+  if ( gp_Cal_Par->cal_par_azi_rev == 0 )       azi_rot = -1.0 ; else azi_rot = 1.0 ;
+  if ( gp_Cal_Par->cal_par_alt_rev == 0 )       alt_rot = -1.0 ; else alt_rot = 1.0 ;
 
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  Trace2("%f %f %f %f %f",gp_Sui_Pas->pas_acc_azi, gp_Vou->vou_acc, gp_Cal_Par->par_azi_red_tot, gp_Ast->Va, azi_rot);
-  Trace2("%f %f %f %f %f",gp_Sui_Pas->pas_acc_alt, gp_Vou->vou_acc, gp_Cal_Par->par_alt_red_tot, gp_Ast->Vh, alt_rot);
+  Trace2("%f %f %f %f %f",gp_Pas->pas_acc_azi, gp_Vou->vou_acc, gp_Cal_Par->cal_par_azi_red_tot, gp_Ast->Va, azi_rot);
+  Trace2("%f %f %f %f %f",gp_Pas->pas_acc_alt, gp_Vou->vou_acc, gp_Cal_Par->cal_par_alt_red_tot, gp_Ast->Vh, alt_rot);
 
   /*------------------------*/
   /* Calculs des frequences */
@@ -438,27 +440,27 @@ void CALCULS_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *
   /* calcul des frequences brutes non corrigees = brutes */
   /* ces frequences ne sont pas corrigees par les accelerations diverses */
 
-  freq_azi_bru = gp_Cal_Par->par_azi_red_tot * gp_Ast->Va * azi_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
-  freq_alt_bru = gp_Cal_Par->par_alt_red_tot * gp_Ast->Vh * alt_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
+  freq_azi_bru = gp_Cal_Par->cal_par_azi_red_tot * gp_Ast->Va * azi_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
+  freq_alt_bru = gp_Cal_Par->cal_par_alt_red_tot * gp_Ast->Vh * alt_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
 
   /* calcul des frequences corrigees avant prise en compte micro pas */
   /* ces frequences sont corrigees par les accelerations diverses */
 
-  freq_azi_mot = gp_Pid->pid_acc_azi * gp_Sui_Pas->pas_acc_azi * gp_Vou->vou_acc * freq_azi_bru  ;
-  freq_alt_mot = gp_Pid->pid_acc_alt * gp_Sui_Pas->pas_acc_alt * gp_Vou->vou_acc * freq_alt_bru  ;
+  freq_azi_mot = gp_Pid->pid_acc_azi * gp_Pas->pas_acc_azi * gp_Vou->vou_acc * freq_azi_bru  ;
+  freq_alt_mot = gp_Pid->pid_acc_alt * gp_Pas->pas_acc_alt * gp_Vou->vou_acc * freq_alt_bru  ;
 
   /* calcul des frequences finales UTILES */
   /* La frequence retenue est la frequence moteur multipliee par le nb de micro pas */
 
-  freq_azi_mic     = freq_azi_mot * gp_Cal_Par->par_azi_red_4 ;
-  freq_alt_mic     = freq_alt_mot * gp_Cal_Par->par_alt_red_4 ;
+  freq_azi_mic     = freq_azi_mot * gp_Cal_Par->cal_par_azi_red_4 ;
+  freq_alt_mic     = freq_alt_mot * gp_Cal_Par->cal_par_alt_red_4 ;
 
   /*-----------------------------------------------------*/
   /* Le calcul est different si on utilise un controleur                    */
   /* la frequence est la frequence moteur (sans tenir compte des micro pas) */
   /*-----------------------------------------------------*/
 
-  if ( gp_Dev->use_controler ) {
+  if ( gp_Dev->dev_use_controler ) {
     freq_azi_mic   = freq_azi_mot ;
     freq_alt_mic   = freq_alt_mot ;
   }
@@ -469,16 +471,16 @@ void CALCULS_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *
 
   pthread_mutex_lock(& gp_Mut->mut_glo_azi );
       
-    gp_Sui_Fre->fre_sa_old = gp_Sui_Fre->fre_sa ; 
-    gp_Sui_Fre->fre_sa     = (int)SGN(freq_azi_mic)  ;
+    gp_Fre->fre_sa_old = gp_Fre->fre_sa ; 
+    gp_Fre->fre_sa     = (int)SGN(freq_azi_mic)  ;
 
-    gp_Sui_Fre->fre_fa_mic = fabs(freq_azi_mic )  ;
-    gp_Sui_Fre->fre_fa_bru = fabs(freq_azi_bru )  ;    
-    gp_Sui_Fre->fre_fa_mot = fabs(freq_azi_mot) ;
+    gp_Fre->fre_fa_mic = fabs(freq_azi_mic )  ;
+    gp_Fre->fre_fa_bru = fabs(freq_azi_bru )  ;    
+    gp_Fre->fre_fa_mot = fabs(freq_azi_mot) ;
 
-    gp_Sui_Fre->fre_ta_mic = 1 / gp_Sui_Fre->fre_fa_mic ;
-    gp_Sui_Fre->fre_ta_bru = 1 / gp_Sui_Fre->fre_fa_bru ;
-    gp_Sui_Fre->fre_ta_mot = 1 / gp_Sui_Fre->fre_fa_mot ;
+    gp_Fre->fre_ta_mic = 1 / gp_Fre->fre_fa_mic ;
+    gp_Fre->fre_ta_bru = 1 / gp_Fre->fre_fa_bru ;
+    gp_Fre->fre_ta_mot = 1 / gp_Fre->fre_fa_mot ;
 
   pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
   
@@ -486,16 +488,16 @@ void CALCULS_PERIODE(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, STRUCT_VOUTE *
 
   pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
-    gp_Sui_Fre->fre_sh_old = gp_Sui_Fre->fre_sh ; 
-    gp_Sui_Fre->fre_sh     = (int)SGN(freq_alt_mic) ;
+    gp_Fre->fre_sh_old = gp_Fre->fre_sh ; 
+    gp_Fre->fre_sh     = (int)SGN(freq_alt_mic) ;
 
-    gp_Sui_Fre->fre_fh_mic = fabs(freq_alt_mic)  ;
-    gp_Sui_Fre->fre_fh_bru = fabs(freq_alt_bru) ;
-    gp_Sui_Fre->fre_fh_mot = fabs(freq_alt_mot) ;
+    gp_Fre->fre_fh_mic = fabs(freq_alt_mic)  ;
+    gp_Fre->fre_fh_bru = fabs(freq_alt_bru) ;
+    gp_Fre->fre_fh_mot = fabs(freq_alt_mot) ;
     
-    gp_Sui_Fre->fre_th_mic = 1 / gp_Sui_Fre->fre_fh_mic ;
-    gp_Sui_Fre->fre_th_bru = 1 / gp_Sui_Fre->fre_fh_bru ;
-    gp_Sui_Fre->fre_th_mot = 1 / gp_Sui_Fre->fre_fh_mot ;
+    gp_Fre->fre_th_mic = 1 / gp_Fre->fre_fh_mic ;
+    gp_Fre->fre_th_bru = 1 / gp_Fre->fre_fh_bru ;
+    gp_Fre->fre_th_mot = 1 / gp_Fre->fre_fh_mot ;
 
   pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
@@ -529,52 +531,52 @@ void CALCULS_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE *gp_Ast, STRUCT_SUIVI * gp_Sui, 
   // renvoyer par les boutons de la raquette
   // on deduit la frequence du nombre de pas comptes et de la periode ecoulee
   
-  if ( gp_Sui_Pas->pas_azi !=  gp_Sui_Pas->pas_azi_old ) {
-    if ( gp_Sui_Pas->pas_azi !=0 ) {
-      if ( gp_Cal_Par->par_azi_rev == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
+  if ( gp_Pas->pas_azi !=  gp_Pas->pas_azi_old ) {
+    if ( gp_Pas->pas_azi !=0 ) {
+      if ( gp_Cal_Par->cal_par_azi_rev == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
     
-      //frequence = azi_rot * (double)gp_Sui_Pas->pas_azi / t_appui_raq_azi ;
-      frequence = azi_rot * (double)gp_Sui_Pas->pas_azi ;
+      //frequence = azi_rot * (double)gp_Pas->pas_azi / t_appui_raq_azi ;
+      frequence = azi_rot * (double)gp_Pas->pas_azi ;
     
       pthread_mutex_lock(& gp_Mut->mut_glo_azi );
   
-        gp_Ast->Va = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->par_azi_red_tot ) ;
-        gp_Sui_Fre->fre_sa_old = gp_Sui_Fre->fre_sa ; 
-        gp_Sui_Fre->fre_sa     = (int)SGN(frequence)  ;
-        gp_Sui_Fre->fre_fa_mic = fabs(frequence) ;
-        gp_Sui_Fre->fre_ta_mic = 1 / gp_Sui_Fre->fre_fa_mic ;
+        gp_Ast->Va = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_azi_red_tot ) ;
+        gp_Fre->fre_sa_old = gp_Fre->fre_sa ; 
+        gp_Fre->fre_sa     = (int)SGN(frequence)  ;
+        gp_Fre->fre_fa_mic = fabs(frequence) ;
+        gp_Fre->fre_ta_mic = 1 / gp_Fre->fre_fa_mic ;
     
       pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
     
-      Trace1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n", \
-        gp_Sui_Fre->fre_ta_mic, \
-        gp_Sui_Fre->fre_th_mic, \
-        gp_Sui_Fre->fre_fa_mic, \
-        gp_Sui_Fre->fre_fh_mic) ;
+      Trace1("fre_ta_mic = %2.4f fre_th_mic = %2.4f fre_fa_mic = %2.4f fre_fh_mic = %2.4f\n", \
+        gp_Fre->fre_ta_mic, \
+        gp_Fre->fre_th_mic, \
+        gp_Fre->fre_fa_mic, \
+        gp_Fre->fre_fh_mic) ;
     }
   }
-  if ( gp_Sui_Pas->pas_alt !=  gp_Sui_Pas->pas_alt_old ) {
-    if ( gp_Sui_Pas->pas_alt !=0 ) {
-      if ( gp_Cal_Par->par_alt_rev == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
+  if ( gp_Pas->pas_alt !=  gp_Pas->pas_alt_old ) {
+    if ( gp_Pas->pas_alt !=0 ) {
+      if ( gp_Cal_Par->cal_par_alt_rev == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
     
-      //frequence = alt_rot * (double)gp_Sui_Pas->pas_alt / t_appui_raq_alt ;
-      frequence = alt_rot * (double)gp_Sui_Pas->pas_alt ;
+      //frequence = alt_rot * (double)gp_Pas->pas_alt / t_appui_raq_alt ;
+      frequence = alt_rot * (double)gp_Pas->pas_alt ;
     
       pthread_mutex_lock( & gp_Mut->mut_glo_alt );
     
-        gp_Ast->Vh     = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->par_alt_red_tot ) ;
-        gp_Sui_Fre->fre_sh_old = gp_Sui_Fre->fre_sh ; 
-        gp_Sui_Fre->fre_sh         = (int)SGN(frequence)  ;
-        gp_Sui_Fre->fre_fh_mic = fabs(frequence) ;
-        gp_Sui_Fre->fre_th_mic = 1 / gp_Sui_Fre->fre_fh_mic ;
+        gp_Ast->Vh     = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_alt_red_tot ) ;
+        gp_Fre->fre_sh_old = gp_Fre->fre_sh ; 
+        gp_Fre->fre_sh         = (int)SGN(frequence)  ;
+        gp_Fre->fre_fh_mic = fabs(frequence) ;
+        gp_Fre->fre_th_mic = 1 / gp_Fre->fre_fh_mic ;
   
       pthread_mutex_unlock( & gp_Mut->mut_glo_alt );
     
-      Trace1("Ta_mic = %2.4f Th_mic = %2.4f Fa_mic = %2.4f Fh_mic = %2.4f\n", \
-        gp_Sui_Fre->fre_ta_mic, \
-        gp_Sui_Fre->fre_th_mic, \
-        gp_Sui_Fre->fre_fa_mic, \
-        gp_Sui_Fre->fre_fh_mic) ;
+      Trace1("fre_ta_mic = %2.4f fre_th_mic = %2.4f fre_fa_mic = %2.4f fre_fh_mic = %2.4f\n", \
+        gp_Fre->fre_ta_mic, \
+        gp_Fre->fre_th_mic, \
+        gp_Fre->fre_fa_mic, \
+        gp_Fre->fre_fh_mic) ;
     }
   }
 }
@@ -650,14 +652,14 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE *gp_Ast) {
   /* ----------------------------*/
 
   (gp_Ast->at).tim_hd = gp_Ast->a * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->at) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->at) ;
 
   (gp_Ast->AZIa).ang_dec_rad = gp_Ast->a ;
   (gp_Ast->AZIa).ang_dec_deg = gp_Ast->a * CALCULS_UN_RADIAN_EN_DEGRES ;
   CALCULS_ANGLE_VERS_DMS(&gp_Ast->AZIa) ;
   
   (gp_Ast->ht).tim_hd = gp_Ast->h * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->ht) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->ht) ;
   
   (gp_Ast->ALTa).ang_dec_rad = gp_Ast->h ;
   (gp_Ast->ALTa).ang_dec_deg = gp_Ast->h * CALCULS_UN_RADIAN_EN_DEGRES ;
@@ -669,13 +671,13 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE *gp_Ast) {
   /* -----------------------------*/
 
   (gp_Ast->AGHt).tim_hd = gp_Ast->AGH * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGHt) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGHt) ;
   
   (gp_Ast->DECt).tim_hd = gp_Ast->DEC * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->DECt) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->DECt) ;
 
   (gp_Ast->ASCt).tim_hd  = gp_Ast->ASC * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->ASCt) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->ASCt) ;
 
   /* -------------------------------*/
 
@@ -696,22 +698,22 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE *gp_Ast) {
   /* -------------------------------*/
 
   (gp_Ast->AGH0t).tim_hd = gp_Ast->AGH0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGH0t) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGH0t) ;
 
   (gp_Ast->AGH1t).tim_hd = gp_Ast->AGH1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGH1t) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGH1t) ;
 
   (gp_Ast->AGH2t).tim_hd = gp_Ast->AGH2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGH2t) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AGH2t) ;
 
   (gp_Ast->AZI0t).tim_hd = gp_Ast->AZI0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AZI0t) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AZI0t) ;
 
   (gp_Ast->AZI1t).tim_hd = gp_Ast->AZI1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AZI1t) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AZI1t) ;
 
   (gp_Ast->AZI2t).tim_hd = gp_Ast->AZI2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  TEMPS_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AZI2t) ;
+  TIME_CALCULS_TEMPS_DEC_VERS_HMS(&gp_Ast->AZI2t) ;
 }
 
 /*****************************************************************************************
@@ -913,7 +915,7 @@ void CALCULS_TOUT(void) {
     
       pthread_mutex_lock( & gp_Mut->mut_cal );
       
-      TEMPS_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+      TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
       /* CALCULS_AZIMUT       ( gp_Lie, gp_Ast) ; */
 
       if ( gp_Cal->cal_mode == CALCULS_AZIMUTAL_VERS_EQUATORIAL ) {
@@ -939,7 +941,7 @@ void CALCULS_TOUT(void) {
     
       pthread_mutex_lock( & gp_Mut->mut_cal );
       
-      TEMPS_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+      TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
 
       CALCULS_ANGLE_HORAIRE( gp_Lie, gp_Ast ) ;
       CALCULS_AZIMUT       ( gp_Lie, gp_Ast) ;
@@ -957,7 +959,7 @@ void CALCULS_TOUT(void) {
       
       pthread_mutex_lock( & gp_Mut->mut_cal );
             
-      TEMPS_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+      TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
       
       if ( gp_Ast->ast_num > 9 ) {
         Trace("numero de planete interdit = %d", gp_Ast->ast_num ) ;
@@ -1025,11 +1027,11 @@ void CALCULS_TOUT(void) {
       /* 
       case CAPTEURS :
 
-        TEMPS_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+        TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
         
         // TODO : modifier / completer / corriger ..
         
-        if ( gp_Dev->use_capteurs ) { 
+        if ( gp_Dev->dev_use_capteurs ) { 
           gp_Ast->a = gp_Sui->pitch ;         // FIXME : donne azimut
           gp_Ast->h = gp_Sui->heading ;       // FIXME : donne altitude 
           CALCULS_EQUATEUR ( gp_Lie, gp_Ast) ;  // FIXME : donnes ASC et DEC
@@ -1058,7 +1060,7 @@ void CALCULS_VOUTE(void ) {
 
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 /*
-  TEMPS_CALCULS_TEMPS_SIDERAL    ( gp_Lie, gp_Tim ) ;
+  TIME_CALCULS_TEMPS_SIDERAL    ( gp_Lie, gp_Tim ) ;
   CALCULS_EQUATEUR         ( gp_Lie, gp_Ast ) ;
   CALCULS_ASCENSION_DROITE ( gp_Lie, gp_Ast ) ;
   CALCULS_VITESSES         ( gp_Lie, gp_Ast, gp_Sui) ;
@@ -1066,7 +1068,7 @@ void CALCULS_VOUTE(void ) {
 */
   fout=fopen("voute.csv","w") ;
   
-  TEMPS_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+  TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
 
   // On fait varier les coordonnees azimutales
   
@@ -1132,7 +1134,7 @@ void CALCULS_VOUTE(void ) {
       /*
       if ( gp_Ast->ast_new  ) {
 
-        Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f Ta_mic %.2f Th_mic %.2f Fa_mic=%.2f Fh_mic %.2f",\
+        Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f fre_ta_mic %.2f fre_th_mic %.2f fre_fa_mic=%.2f fre_fh_mic %.2f",\
           gp_Ast->nom,\
           (int)((gp_Ast->a)*CALCULS_UN_RADIAN_EN_DEGRES),\
           (int)((gp_Ast->h)*CALCULS_UN_RADIAN_EN_DEGRES),\
@@ -1140,19 +1142,19 @@ void CALCULS_VOUTE(void ) {
           (int)((gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES),\
           gp_Ast->Va,\
           gp_Ast->Vh,\
-          gp_Sui_Fre->fre_ta_mic,\
-          gp_Sui_Fre->fre_th_mic,\
-          gp_Sui_Fre->fre_fa_mic,\
-          gp_Sui_Fre->fre_fh_mic ) ;
+          gp_Fre->fre_ta_mic,\
+          gp_Fre->fre_th_mic,\
+          gp_Fre->fre_fa_mic,\
+          gp_Fre->fre_fh_mic ) ;
 
-        Trace1("Va=%2.4f Vh=%2.4f Ta_mic=%2.4f Th_mic=%2.4f Fa_mic=%2.4f Fh_mic=%2.4f Fam = %ld Fhm = %ld Tac = %f Thc = %f\n",\
+        Trace1("Va=%2.4f Vh=%2.4f fre_ta_mic=%2.4f fre_th_mic=%2.4f fre_fa_mic=%2.4f fre_fh_mic=%2.4f Fam = %ld Fhm = %ld sta_Tac = %f sta_Thc = %f\n",\
               gp_Ast->Va,\
               gp_Ast->Vh,\
-              gp_Sui_Fre->fre_ta_mic,\
-              gp_Sui_Fre->fre_th_mic,\
-              gp_Sui_Fre->fre_fa_mic,\
-              gp_Sui_Fre->fre_fh_mic,\
-              (gp_Sui->Ia - gp_Sui->Ia_prec),(gp_Sui->Ih - gp_Sui->Ih_prec ),gp_Sui->Tac, gp_Sui->Thc) ;
+              gp_Fre->fre_ta_mic,\
+              gp_Fre->fre_th_mic,\
+              gp_Fre->fre_fa_mic,\
+              gp_Fre->fre_fh_mic,\
+              (gp_Sta->sta_Ia - gp_Sta->sta_Ia_prec),(gp_Sta->sta_Ih - gp_Sta->sta_Ih_prec ),gp_Sta->sta_Tac, gp_Sta->sta_Thc) ;
         
         gp_Ast->ast_new = 0 ;
 

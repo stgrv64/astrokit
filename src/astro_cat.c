@@ -46,7 +46,7 @@ void CAT_INIT (STRUCT_CAT * lp_Cat) {
  
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & lp_Cat->cat_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cat->cat_mutex ) ;
 
   for(int L=0;L<CAT_NB_LIGNES;L++) {
     for(int C=0;C<CAT_NB_COLONNES;C++) {
@@ -142,12 +142,19 @@ void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_N
   dec = gp_Ast->DEC ;
   L=0 ;
   d_min=deg ;
-  Trace1("Recherche dans la zone de %s : ASC=%f DEC=%f", gp_Ast->nom, gp_Ast->AGH0, gp_Ast->DEC) ;
+
+  Trace1("Recherche dans la zone de %s : ASC=%f DEC=%f",\
+    gp_Ast->nom, \
+    gp_Ast->AGH0, \
+    gp_Ast->DEC) ;
   
-  while(strcmp(lc_Cat[L][3],"_") && strcmp(gp_Ast->nom,lc_Cat[L][0]) && strcmp(gp_Ast->nom,lc_Cat[L][1])) {
+  while( strcmp( lc_Cat[L][3],"_") \
+      && strcmp( gp_Ast->nom,lc_Cat[L][0]) \
+      && strcmp( gp_Ast->nom,lc_Cat[L][1])) {
    
     asc_b = atof( lc_Cat[L][2] ) ;
     dec_b = atof( lc_Cat[L][3] ) ;
+    
     d_angulaire = sqrt(sqr( asc_b - asc ) + sqr ( dec_b -dec )) ;
     
     if (  d_angulaire < d_min )     // si objet dans le cercle recherche

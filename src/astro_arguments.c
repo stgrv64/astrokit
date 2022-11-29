@@ -488,10 +488,10 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     
     if ( ! strcmp("alt", argv[5]) ) {
 
-     printf("reduction totale altitude  = %f\n", gp_Cal_Par->par_alt_red_tot) ;
+     printf("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
-     nbpulse = atof(argv[4]) * gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4  ;
-     periode = 60 / ( gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 * atof(argv[3]) ) ;
+     nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4  ;
+     periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_alt_dir, gp_Gpi_Par_Con->par_alt_clk) ;
@@ -500,10 +500,10 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     }
     if ( ! strcmp("azi", argv[5]) ) {
 
-     printf("reduction totale azimut    = %f\n", gp_Cal_Par->par_azi_red_tot) ; 
+     printf("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
-     nbpulse = atof(argv[4]) * gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4   ;
-     periode = 60 / ( gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4 * atof(argv[3]) ) ;
+     nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4   ;
+     periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_azi_dir, gp_Gpi_Par_Con->par_azi_clk) ;
@@ -520,10 +520,10 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
     if ( ! strcmp("alt", argv[5]) ) {
-     printf("reduction totale altitude  = %f\n", gp_Cal_Par->par_alt_red_tot) ;
+     printf("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
-     nbpulse = atof(argv[4]) * gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4  ;
-     periode = 60 / ( gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 * atof(argv[3]) ) ;
+     nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4  ;
+     periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_alt_dir, gp_Gpi_Par_Con->par_alt_clk) ;
@@ -531,10 +531,10 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      GPIO_SET_ALT( 0,0,0,0,0,0 ) ;
     }
     if ( ! strcmp("azi", argv[5]) ) {
-     printf("reduction totale azimut    = %f\n", gp_Cal_Par->par_azi_red_tot) ; 
+     printf("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
-     nbpulse = atof(argv[4]) * gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4   ;
-     periode = 60 / ( gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4 * atof(argv[3]) ) ;
+     nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4   ;
+     periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_azi_dir, gp_Gpi_Par_Con->par_azi_clk) ;
@@ -550,21 +550,21 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
     printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
-     printf("reduction totale altitude  = %f\n", gp_Cal_Par->par_alt_red_tot) ;
+     printf("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
-     nbpulse = atof(argv[4]) * gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4  ;
-     periode = 60 / ( gp_Cal_Par->par_alt_red_2 * gp_Cal_Par->par_alt_red_3 * gp_Cal_Par->par_alt_red_4 * atof(argv[3]) ) ;
+     nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4  ;
+     periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
      
-     gp_Sui_Fre->fre_th_mic = periode ;
+     gp_Fre->fre_th_mic = periode ;
     
-     printf("reduction totale azimut    = %f\n", gp_Cal_Par->par_azi_red_tot) ; 
+     printf("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
-     nbpulse = atof(argv[4]) * gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4   ;
-     periode = 60 / ( gp_Cal_Par->par_azi_red_2 * gp_Cal_Par->par_azi_red_3 * gp_Cal_Par->par_azi_red_4 * atof(argv[3]) ) ;
+     nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4   ;
+     periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
      
-     gp_Sui_Fre->fre_ta_mic = periode ;
+     gp_Fre->fre_ta_mic = periode ;
   }    
   /* (obsolete)
   if ( ( argc == 2 ) &&  ! strcmp("ir",argv[1]) ) {
@@ -578,8 +578,8 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     while(1) {
       //usleep( (long)(1000000/38000.0)) ;
       //gettimeofday(&t01,NULL) ;
-      //t_diff = (( t01.tv_sec - t00.tv_sec ) * TEMPS_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
-      //if ( (double)t_diff >= TEMPS_MICRO_SEC / ARGUMENTS_FREQ_TRAME_INFRAROUGE ) {
+      //t_diff = (( t01.tv_sec - t00.tv_sec ) * TIME_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
+      //if ( (double)t_diff >= TIME_MICRO_SEC / ARGUMENTS_FREQ_TRAME_INFRAROUGE ) {
       //	gettimeofday(&t00,NULL) ;
       ir = GPIO_GET(21) ;
       if ( ir == 0 && ir_old == 0 ) { c_ir_0++ ; }
