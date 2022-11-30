@@ -58,12 +58,10 @@ struct timespec gpio_tm_nxt;
 /*****************************************************************************************
 * @fn     : GPIO_TEST_CONTROLER
 * @author : s.gravois
-* @brief  : fonction de test simple des moteurs avec un controler
-* @param  : 
-* @date   : 2022-01-19 creation entete de la fonction au format doxygen
-* @date   : 2022-10-07 deplacemement dans gpio.c depuis arguments.c
-* @date   : 2022-11-04 renommmage GPIO_TEST_MOTEURS -> GPIO_TEST_CONTROLER
-* @todo   : remplacer par une fonction semblable qui utilise le PWM 
+* @brief  : fonction de test simple des moteurs avec un controleur externe
+* @param  : void
+* @date   : 2022-11-30 creation entete de la fonction au format doxygen
+* @todo   : verifier code pour test moteur sans controleur externe
 *****************************************************************************************/
 
 void  GPIO_TEST_CONTROLER(void ) {
@@ -131,6 +129,7 @@ void  GPIO_TEST_CONTROLER(void ) {
 * @author : s.gravois
 * @brief  : fonction appelle quand un signal est trape dans main gpio
 * @param  : int     sig
+* @param  : char[]  gc_config_path_cmd_stty (chemin de stty)
 * @date   : 2022-05-20 creation 
 * @todo   : voir s il est preferable de trapper egalement depuis les threads (si c possible)
 *****************************************************************************************/
@@ -332,7 +331,15 @@ void GPIO_READ2(STRUCT_CONFIG *lp_Con) {
    for(i=0;i<GPIO_SIZE;i++) Trace1("gi_gpio_out[%d]=%d\n",i,gi_gpio_out[i]);
 }
 
-//==========================================================
+/*****************************************************************************************
+* @fn     : GPIO_STATUT
+* @author : s.gravois
+* @brief  : fonction qui obtient le statut d'une broche gpio
+* @param  : int     sig
+* @date   : 2022-05-20 creation 
+* @todo   : voir s il est preferable de trapper egalement depuis les threads (si c possible)
+*****************************************************************************************/
+
 void GPIO_STATUT(void) {
 
   int i ;
@@ -345,7 +352,16 @@ void GPIO_STATUT(void) {
   
   printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
 }
-//====================================================================================================
+
+/*****************************************************************************************
+* @fn     : GPIO_GET
+* @author : s.gravois
+* @brief  : Lit la broche gpio de numero gpio
+* @param  : int[] gi_gpio_fd
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : (obsolete a priori)
+*****************************************************************************************/
+
 int GPIO_GET(int gpio) {
   
   char buf[GPIO_BUFFER_SIZE_256] ;
@@ -362,7 +378,18 @@ int GPIO_GET(int gpio) {
   }
   return 0 ;
 }
-//====================================================================================================
+/*****************************************************************************************
+* @fn     : GPIO_GET
+* @author : s.gravois
+* @brief  : Ecrit sur la broche gpio de numero gpio la valeur val (0 ou 1)
+* @brief  :   est utilisé pour la led d etat (ecriture simple) par exemple
+* @param  : int gpio
+* @param  : int val
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : (cette fonction encapsule l'appel a pwrite, qui est utilise
+* @todo   :   directement dans GPIO_SUIVI_PWM_PHASE
+*****************************************************************************************/
+
 int GPIO_SET(int gpio,int val) {
   
   char buf[GPIO_BUFFER_SIZE_256] ;
@@ -384,7 +411,16 @@ int GPIO_SET(int gpio,int val) {
   }
   return retour ;
 }
-//====================================================================================================
+/*****************************************************************************************
+* @fn     : GPIO_OPEN_BROCHE
+* @author : s.gravois
+* @brief  : Ouvre la broche gpio de numero gpio en input ou output
+* @param  : int gpio
+* @param  : int output
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : fusionner le if et le else (seul le fprintf sur "dir" differe)
+*****************************************************************************************/
+
 int GPIO_OPEN_BROCHE(int gpio,int output) {
   
   FILE *f ;
@@ -438,11 +474,17 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
   
   return GPIO_OPEN_STATUT ;
 }
-//====================================================================================================
-// modifier / finir :
-// faire fonction close_broche_pwm
+/*****************************************************************************************
+* @fn     : GPIO_OPEN_BROCHE_PWM
+* @author : s.gravois
+* @brief  : Meme fonction que precedemment mais en utilisant la struct STRUCT_GPIO_PWM_PHASE
+* @brief  :  seule l ouverture en ecriture est fonctionnelle (par definition de out+pwm)
+* @param  : STRUCT_GPIO_PWM_PHASE *lp_Pha
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : 
+*****************************************************************************************/
 
-void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
+void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *lp_Pha) {
   
   FILE *f ;
   char dir[GPIO_BUFFER_SIZE_256] ;
@@ -456,53 +498,63 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *gpwm) {
   memset(val,0,GPIO_BUFFER_SIZE_256);
   
   sprintf(unexport,"%s/unexport",GPIO_PATH) ;
-  //close( gpwm->gi_gpio_fd ) ;
+  //close( lp_Pha->gi_gpio_fd ) ;
   
-  gpwm->gpio_open_statut = 0 ;
+  lp_Pha->gpio_open_statut = 0 ;
   
-  if ((f=fopen(unexport,"w")) == NULL )        { gpwm->gpio_open_statut = -1 ;}
-  else if ((fprintf(f,"%d\n",gpwm->gpio))<=0)  { gpwm->gpio_open_statut = -2 ;}
-  else if ((fclose(f)) != 0 )                  { gpwm->gpio_open_statut = -3 ;}
+  if ((f=fopen(unexport,"w")) == NULL )        { lp_Pha->gpio_open_statut = -1 ;}
+  else if ((fprintf(f,"%d\n",lp_Pha->gpio))<=0)  { lp_Pha->gpio_open_statut = -2 ;}
+  else if ((fclose(f)) != 0 )                  { lp_Pha->gpio_open_statut = -3 ;}
   
-  gpwm->gpio_open_statut = 0 ;
+  lp_Pha->gpio_open_statut = 0 ;
   
-  gpwm->gi_gpio_fd=0;
+  lp_Pha->gi_gpio_fd=0;
     
   sprintf(exp,"%s/export",          GPIO_PATH ) ;
-  sprintf(dir,"%s/gpio%d/direction",GPIO_PATH, gpwm->gpio) ;
-  sprintf(val,"%s/gpio%d/value",    GPIO_PATH, gpwm->gpio) ;
+  sprintf(dir,"%s/gpio%d/direction",GPIO_PATH, lp_Pha->gpio) ;
+  sprintf(val,"%s/gpio%d/value",    GPIO_PATH, lp_Pha->gpio) ;
   
   Trace1("exp=%s",exp);
   Trace1("dir=%s",dir);
   Trace1("val=%s",val);
     
-  if ((f=fopen(exp,"w")) == NULL )                      { gpwm->gpio_open_statut = -4  ; }
-  else if ((fprintf(f,"%d\n",gpwm->gpio))<=0)           { gpwm->gpio_open_statut = -5  ; }
-  else if ((fclose(f)) != 0 )                           { gpwm->gpio_open_statut = -6  ; }
-  else if ((f=fopen(dir,"w")) == NULL)                  { gpwm->gpio_open_statut = -7  ; }
-  else if ((fprintf(f,"out\n")<=0))                     { gpwm->gpio_open_statut = -8  ; }
-  else if ((fclose(f)!=0))                              { gpwm->gpio_open_statut = -9  ; }
-  else if ((gpwm->gi_gpio_fd =open(val, O_WRONLY))<0)      { gpwm->gpio_open_statut = -10  ; }
+  if      ((f=fopen(exp,"w")) == NULL )                 { lp_Pha->gpio_open_statut = -4  ; }
+  else if ((fprintf(f,"%d\n",lp_Pha->gpio))<=0)         { lp_Pha->gpio_open_statut = -5  ; }
+  else if ((fclose(f)) != 0 )                           { lp_Pha->gpio_open_statut = -6  ; }
+  else if ((f=fopen(dir,"w")) == NULL)                  { lp_Pha->gpio_open_statut = -7  ; }
+  else if ((fprintf(f,"out\n")<=0))                     { lp_Pha->gpio_open_statut = -8  ; }
+  else if ((fclose(f)!=0))                              { lp_Pha->gpio_open_statut = -9  ; }
+  else if ((lp_Pha->gi_gpio_fd =open(val, O_WRONLY))<0)      { lp_Pha->gpio_open_statut = -10  ; }
   
   // FIXME : synthese traces sur une ligne (2021)
   Trace1("open gpio %d : dir= %s exp=%s val=%s sta=%d",\
-    gpwm->gpio,\
+    lp_Pha->gpio,\
     dir,\
     exp,\
     val,\
-    gpwm->gpio_open_statut);
+    lp_Pha->gpio_open_statut);
   
-  if ( gpwm->gpio_open_statut != 0 ) {
-    SyslogErrFmt("ouverture du gpio %d en erreur %d",gpwm->gpio,gpwm->gpio_open_statut);
-    Trace("ouverture du gpio %d (KO) : %d",gpwm->gpio,gpwm->gpio_open_statut) ;
+  if ( lp_Pha->gpio_open_statut != 0 ) {
+    SyslogErrFmt("ouverture du gpio %d en erreur %d",lp_Pha->gpio,lp_Pha->gpio_open_statut);
+    Trace("ouverture du gpio %d (KO) : %d",lp_Pha->gpio,lp_Pha->gpio_open_statut) ;
   }
   else {
-    Trace("ouverture du gpio %d (OK)",gpwm->gpio) ;  
+    Trace("ouverture du gpio %d (OK)",lp_Pha->gpio) ;  
   }
 
 }
-//====================================================================================================
+/*****************************************************************************************
+* @fn     : GPIO_OPEN
+* @author : s.gravois
+* @brief  : Ouvre plusieurs broches GPIO, en utilisant gi_gpio_in[] & gi_gpio_out[]
+* @param  : int[] gi_gpio_in
+* @param  : int[] gi_gpio_out
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : (est utilisee par GPIO_STATUT et GPIO_TEST_CONTROLER)
+*****************************************************************************************/
+
 int GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
+
   FILE *f ;
   char exp[GPIO_BUFFER_SIZE_256] ;
   char dir[GPIO_BUFFER_SIZE_256] ;
@@ -565,7 +617,15 @@ int GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
   
   return GPIO_OPEN_STATUT ;
 }
-//====================================================================================================
+/*****************************************************************************************
+* @fn     : GPIO_CLOSE_BROCHE
+* @author : s.gravois
+* @brief  : Ferme une broche GPIO, en utilisant son numero gpio
+* @param  : int gpio
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int GPIO_CLOSE_BROCHE(int gpio) {
   
   FILE *f ;
@@ -584,8 +644,18 @@ int GPIO_CLOSE_BROCHE(int gpio) {
 
   return 0 ;
 }
-//====================================================================================================
+/*****************************************************************************************
+* @fn     : GPIO_CLOSE
+* @author : s.gravois
+* @brief  : Ferme plusieurs broches GPIO, en utilisant gi_gpio_in[] & gi_gpio_out[]
+* @param  : int[] gi_gpio_in
+* @param  : int[] gi_gpio_out
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
 int GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
+  
   FILE *f ;
   char une[GPIO_BUFFER_SIZE_256] ;
   int i ;
@@ -610,7 +680,17 @@ int GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
   }
   return 0 ;
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : GPIO_SET_ALT
+* @author : s.gravois
+* @brief  : Ecrit sur 6 broches gpio via la struct gp_Gpi_Par_Con (parametres controleur)
+* @brief  :  (prevu ici pour "altitude")
+* @param  : int dir, int slp, int clk, int rst, int mmm, int ena
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer par un nom plus approprie
+* @todo   : passer par un argument pour gp_Gpi_Par_Con
+*****************************************************************************************/
+
 void GPIO_SET_ALT(int dir, int slp, int clk, int rst, int mmm, int ena) {
 
   GPIO_SET( gp_Gpi_Par_Con->par_alt_dir,dir);   
@@ -620,7 +700,18 @@ void GPIO_SET_ALT(int dir, int slp, int clk, int rst, int mmm, int ena) {
   GPIO_SET( gp_Gpi_Par_Con->par_alt_mmm,mmm);      
   GPIO_SET( gp_Gpi_Par_Con->par_alt_ena,ena);  
 }
-//==========================================================
+
+/*****************************************************************************************
+* @fn     : GPIO_SET_AZI
+* @author : s.gravois
+* @brief  : Ecrit sur 6 broches gpio via la struct gp_Gpi_Par_Con (parametres controleur)
+* @brief  :  (prevu ici pour "azimut")
+* @param  : int dir, int slp, int clk, int rst, int mmm, int ena
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer par un nom plus approprie
+* @todo   : passer par un argument pour gp_Gpi_Par_Con
+*****************************************************************************************/
+
 void GPIO_SET_AZI(int dir, int slp, int clk, int rst, int mmm, int ena) {
 
   GPIO_SET( gp_Gpi_Par_Con->par_azi_dir,dir);   
@@ -630,7 +721,15 @@ void GPIO_SET_AZI(int dir, int slp, int clk, int rst, int mmm, int ena) {
   GPIO_SET( gp_Gpi_Par_Con->par_azi_mmm,mmm);      
   GPIO_SET( gp_Gpi_Par_Con->par_azi_ena,ena);  
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : GPIO_MOVE_1
+* @author : s.gravois
+* @brief  : Deplace un moteur en utilisant GPIO_SET et plusieurs parametres dont 
+* @param  : int sens, double periode,double nb_pulse, int gpio_dir, int gpio_clk
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec controleur externe
+*****************************************************************************************/
+
 void GPIO_MOVE_1(int sens, double periode,double nb_pulse, int gpio_dir, int gpio_clk) {
   
   unsigned long demi_periode ;
@@ -658,7 +757,16 @@ void GPIO_MOVE_1(int sens, double periode,double nb_pulse, int gpio_dir, int gpi
   }
   printf("Fin GPIO_MOVE_1\n ") ;
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : GPIO_MOVE_2
+* @author : s.gravois
+* @brief  : Deplace un moteur en utilisant GPIO_SET et plusieurs parametres dont 
+* @param  : int sens, double periode,double nb_pulse
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec controleur externe
+* @todo   : (utilise struct gp_Gpi_Par_Con <=> controleur )
+*****************************************************************************************/
+
 void GPIO_MOVE_2(int sens, double periode,unsigned  long nb_pulse) {
   
   double periode_micro ;
@@ -690,7 +798,16 @@ void GPIO_MOVE_2(int sens, double periode,unsigned  long nb_pulse) {
     GPIO_SET( gp_Gpi_Par_Con->par_azi_clk, 1 );
   }
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : GPIO_MOVE_3
+* @author : s.gravois
+* @brief  : Deplace un moteur en utilisant GPIO_SET et plusieurs parametres dont 
+* @param  : int sens, double periode,double nb_pulse, int gpio_dir, int gpio_clk
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec controleur externe
+* @todo   : analyser a quoi sert cette fonction (1 dure plus longtemps que 0)
+*****************************************************************************************/
+
 void GPIO_MOVE_3(int sens, double periode,double nb_pulse, int gpio_dir, int gpio_clk) {
   
   double         demi_periode_sleep ;
@@ -700,8 +817,8 @@ void GPIO_MOVE_3(int sens, double periode,double nb_pulse, int gpio_dir, int gpi
   
   gettimeofday(&t00,NULL) ;
   
-  duree_microsec       =  periode * TIME_MICRO_SEC ;    
-  demi_periode_sleep   = periode * TIME_MICRO_SEC / 2.2 ;
+  duree_microsec       = periode * TIME_MICRO_SEC ;    
+  demi_periode_sleep   = duree_microsec / 2.2 ;
   
   printf("deplacement sens=%d / demi_periode(us)=%f / nombre impulsions=%f\n",sens ,demi_periode_sleep	 , nb_pulse) ;
     
@@ -729,7 +846,16 @@ void GPIO_MOVE_3(int sens, double periode,double nb_pulse, int gpio_dir, int gpi
   }
   printf("Fin GPIO_MOVE_3\n ") ;
 }
-//====================================================================================================================
+/*****************************************************************************************
+* @fn     : GPIO_ACCELERATION_1
+* @author : s.gravois
+* @brief  : Accelere un moteur en utilisant GPIO_SET et plusieurs parametres dont 
+* @param  : int gpio, double f_deb,double f_fin, double delai,long nano_moins
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec controleur externe
+* @todo   : analyser le contionnement
+*****************************************************************************************/
+
 long GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,long nano_moins)
 {
   long   incr, demi_slp ;
@@ -761,6 +887,7 @@ long GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,long 
     incr++ ;
   }
   if ( per_deb > per_fin )
+
   while( per_deb > per_fin ) {
     demi_slp = (long)((double)(TIME_NANO_SEC-nano_moins) * (double)per_deb / 2.0 ) ;
     nt.tv_sec  = 0 ;
@@ -776,6 +903,7 @@ long GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,long 
     incr++ ;
   }
   if ( per_deb == per_fin )
+
   while( incr < nb_pulsation_totales ) {
     demi_slp = (long)((double)(TIME_NANO_SEC-nano_moins) * (double)per_deb / 2.0 ) ;
     nt.tv_sec  = 0 ;
@@ -792,7 +920,16 @@ long GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,long 
   }
   return incr ;
 }
-//==========================================================
+/*****************************************************************************************
+* @fn     : GPIO_ACCELERATION_2
+* @author : s.gravois
+* @brief  : Idem GPIO_ACCELERATION_1 mais sur altitude & azimut en meme temps
+* @param  : int alt, int azi, double f_deb,double f_fin, double delai,long nano_moins
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec controleur externe
+* @todo   : analyser le contionnement
+*****************************************************************************************/
+
 long GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double delai,long nano_moins)
 {
   long   incr, demi_slp ;
@@ -814,10 +951,12 @@ long GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double del
     nt.tv_sec = 0 ;
     nt.tv_nsec = demi_slp ;
     
-    GPIO_SET(alt,1) ; GPIO_SET(azi,1) ; 
+    GPIO_SET(alt,1) ; 
+    GPIO_SET(azi,1) ; 
     nanosleep(&nt,&ntt) ;
     
-    GPIO_SET(alt,0) ; GPIO_SET(azi,0) ; 
+    GPIO_SET(alt,0) ; 
+    GPIO_SET(azi,0) ; 
     nanosleep(&nt,&ntt) ;
     
     per_deb += incr_per ;
@@ -829,10 +968,12 @@ long GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double del
     nt.tv_sec  = 0 ;
     nt.tv_nsec = demi_slp ;
     
-    GPIO_SET(alt,1) ; GPIO_SET(azi,1) ; 
+    GPIO_SET(alt,1) ; 
+    GPIO_SET(azi,1) ; 
     nanosleep(&nt,&ntt) ;
     
-    GPIO_SET(alt,0) ; GPIO_SET(azi,0) ; 
+    GPIO_SET(alt,0) ; 
+    GPIO_SET(azi,0) ; 
     nanosleep(&nt,&ntt) ;
     
     per_deb -= incr_per ;
@@ -844,10 +985,12 @@ long GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double del
     nt.tv_sec  = 0 ;
     nt.tv_nsec = demi_slp ;
     
-    GPIO_SET(alt,1) ; GPIO_SET(azi,1) ; 
+    GPIO_SET(alt,1) ; 
+    GPIO_SET(azi,1) ; 
     nanosleep(&nt,&ntt) ;
     
-    GPIO_SET(alt,0) ; GPIO_SET(azi,0) ; 
+    GPIO_SET(alt,0) ; 
+    GPIO_SET(azi,0) ; 
     nanosleep(&nt,&ntt) ;
     
     per_deb += incr_per ;
@@ -855,7 +998,18 @@ long GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double del
   }
   return incr ;
 }
-// ##########################################################################################################
+/*****************************************************************************************
+* @fn     : GPIO_FONCTION_RAPPORT_CYCLIQUE
+* @author : s.gravois
+* @brief  : Fonction qui calcule la forme pseudo sinusoidale appropriee pour la modulation PWM
+* @param  : int num_bobine
+* @param  : double t
+* @param  : STRUCT_GPIO_PWM_MOTEUR *lp_Mot
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec PWM 4 broches
+* @todo   : axe d amelioration possible sur generation de la fonction mixte
+*****************************************************************************************/
+
 double GPIO_FONCTION_RAPPORT_CYCLIQUE(int num_bobine, double t, STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   
   double rc  ;         // rapport cyclique a calculer
@@ -918,7 +1072,17 @@ double GPIO_FONCTION_RAPPORT_CYCLIQUE(int num_bobine, double t, STRUCT_GPIO_PWM_
   // rc = sin(2*M_PI*lp_Mot->Fm*t+M_PI/2)+SGN(cos(2*M_PI*lp_Mot->Fm*t+M_PI/2))*0.15*sin(2*M_PI*4*lp_Mot->Fm*t) ;
   // rc =  acos(cos(2*M_PI*lp_Mot->Fm*2*t+M_PI/2))/(M_PI/2)-1 ; // fonction triangulaire
 }
-// ##########################################################################################################
+/*****************************************************************************************
+* @fn     : GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES
+* @author : s.gravois
+* @brief  : Fonction qui calcule les rapports cycliques et les charge en memoire 
+* @brief  : en utilisant GPIO_FONCTION_RAPPORT_CYCLIQUE pour la forme de la fct sin.
+* @param  : STRUCT_GPIO_PWM_MOTEUR *lp_Mot
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : renommer : fonction prevue avec PWM 4 broches
+* @todo   : se base sur un echantilonnage du temps sur un segment borne par lp_Mot->periode_mic
+*****************************************************************************************/
+
 void GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   
   int i, j;
@@ -940,6 +1104,7 @@ void GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
     Trace2("t = %f\t%f\t%f",t,lp_Mot->Tm ,lp_Mot->periode_mic) ;
     
     rc = GPIO_FONCTION_RAPPORT_CYCLIQUE(0, t, lp_Mot )  ;
+
     if ( rc >  0)  { 
       lp_Mot->mot_pha[1]->rap[j] = rc ;        
       lp_Mot->mot_pha[0]->rap[j] = 0.0 ; 
@@ -971,14 +1136,24 @@ void GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
     Trace2("%d\t%f\t%f\t%f\t%f",i,lp_Mot->mot_pha[0]->rap[i],lp_Mot->mot_pha[1]->rap[i],lp_Mot->mot_pha[2]->rap[i],lp_Mot->mot_pha[3]->rap[i]) ;
   }
 }
-// ##########################################################################################################
-// Cette fonction, pour chaque phase, en parallele dans 4 threads de meme priorite,
-// module les etats hauts et bas de la phase
-// avec les rapports cycliques calcules pour chaque micro pas
-// et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
-/* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pth_numero++ ] */
-/* TODO : gerer autrement GPIO_SUIVI_MAIN_ATTENTE_MAX */
-// ##########################################################################################################
+/*****************************************************************************************
+ Cette fonction, pour chaque phase, en parallele dans 4 threads de meme priorite,
+ module les etats hauts et bas de la phase
+ avec les rapports cycliques calcules pour chaque micro pas
+ et suivant une frequence fPWM superieure a la frequence max potentielle de deplacement des axes
+ @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pth_numero++ ]
+ TODO : gerer autrement GPIO_SUIVI_MAIN_ATTENTE_MAX
+ *****************************************************************************************/
+
+/*****************************************************************************************
+* @fn     : GPIO_SUIVI_PWM_PHASE
+* @author : s.gravois
+* @brief  : Fonction de callback de thread qui gere la generation
+* @brief  : des signaux sur les phases par modulation PWM 
+* @param  : STRUCT_GPIO_PWM_PHASE *lp_Pha
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : 
+*****************************************************************************************/
 
 void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
   
@@ -1041,12 +1216,15 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
 /*****************************************************************************************
 * @fn     : suivi_main_M
 * @author : s.gravois
-* @brief  : thread de rafraichissement des rapports cycliques tous les micro pas
+* @brief  : Fonction de callback de thread qui gere la generation des signaux sur les phases
+* @brief  : par modulation PWM (en collaboration avec GPIO_SUIVI_PWM_PHASE*)
+* @brief  : Rafraichis les rapports cycliques de tous les micro pas
 * @brief  : et gestion du temps reel par algorithme PID
 * @param  : STRUCT_GPIO_PWM_MOTEUR *lp_Mot
 * @date   : 2022-05    ajout non prise en compte des micro-pas pour la frequence moteur
 * @date   : 2022-05-24 correction lp_Mot->tps_mic += lp_Mot->periode ;  + m->tps_mic += lp_Mot->periode_mot
 * @date   : 2022-06-14 correction petite erreur sur fre_ta_mot / fre_th_mot
+* @todo   : avancement sur algo PID => terminer / evoluer
 *****************************************************************************************/
 
 void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
@@ -1297,9 +1475,18 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
     i_incr++ ;
   } // FIXME : fin boucle while 
 }
-// ##########################################################################################################
-/* mai 2022 : ajout lp_Mot->mot_pha[i]->p_sui            = lp_Mot->p_sui ; */
-/* juin 2022 :  prise en compte tps_bru */
+/*****************************************************************************************
+* @fn     : GPIO_INIT_PWM_MOTEUR
+* @author : s.gravois
+* @brief  : Initialise la structure lp_Mot
+* @brief  : des signaux sur les phases par modulation PWM 
+* @param  : STRUCT_GPIO_PWM_MOTEUR *lp_Mot
+* @param  : int[] gpios
+* @param  : int[] masque
+* @param  : double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : 
+*****************************************************************************************/
 
 void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) {
 
@@ -1315,15 +1502,15 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
   lp_Mot->type_fonction = type_fonction ;
   lp_Mot->param0        = param0 ;
   lp_Mot->param1        = param1 ;
-  lp_Mot->mot_id            = id ;
+  lp_Mot->mot_id        = id ;
   lp_Mot->Fpwm          = fpwm ;
   lp_Mot->Fm            = fm / 8 ;
   lp_Mot->nbmicropas    = upas ;
   lp_Mot->Tm            = 1 / lp_Mot->Fm ;
   lp_Mot->Tpwm          = 1 / lp_Mot->Fpwm ;
   lp_Mot->nbdeltat      = (long)(lp_Mot->Fm * lp_Mot->nbmicropas) ;
-  lp_Mot->periode_mot   =  1 / lp_Mot->Fm ;
-  lp_Mot->periode_mic   =  1 / ( lp_Mot->Fm * lp_Mot->nbmicropas ) ;
+  lp_Mot->periode_mot   = 1 / lp_Mot->Fm ;
+  lp_Mot->periode_mic   = 1 / ( lp_Mot->Fm * lp_Mot->nbmicropas ) ;
 
   lp_Mot->tps_mic       = 0 ; 
   lp_Mot->tps_ree       = 0 ; 
@@ -1351,7 +1538,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
     lp_Mot->mot_pha[i]->Tpwm             = 0 ;
     lp_Mot->mot_pha[i]->micropas         = 0 ;
     lp_Mot->mot_pha[i]->gpio_open_statut = 0 ;
-    lp_Mot->mot_pha[i]->gi_gpio_fd          = 0 ;
+    lp_Mot->mot_pha[i]->gi_gpio_fd       = 0 ;
     
     GPIO_OPEN_BROCHE_PWM( lp_Mot->mot_pha[i] ) ;
     /*
@@ -1365,8 +1552,17 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
   }
   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES( lp_Mot )  ;
 }
-// ======================================= suivi clavier ===================================================
-void * suivi_clavier() {
+/*****************************************************************************************
+* @fn     : suivi_clavier
+* @author : s.gravois
+* @brief  : Callback de phtread generique (utilise par mainG )
+* @brief  : des signaux sur les phases par modulation PWM 
+* @param  : void
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : recopier le code de SUIVI_CLAVIER (?) en adaptant
+*****************************************************************************************/
+
+void * suivi_clavier(void) {
   printf("------ %c -------\n", getc(stdin));
   return NULL ;
 }

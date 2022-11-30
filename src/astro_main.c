@@ -270,8 +270,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
         gp_Pas->pas_acc_alt          = 1 ;
         gp_Pas->pas_acc_azi          = 1 ;
-        gp_Sui->sui_mode_equatorial           = 0 ;
-        gp_Vou->vou_run                = 1 ; 
+        gp_Sui->sui_mode_equatorial  = 0 ;
+        gp_Vou->vou_run              = 1 ; 
 
         pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
         pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -1019,6 +1019,7 @@ int main(int argc, char ** argv) {
   pthread_t p_thread_pha_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_mot_alt ;
   pthread_t p_thread_mot_azi ;
+  
 /*
   STRUCT_GPIO_PWM_MOTEUR *gp_Gpio_Pwm_Mot_Alt , g_mot_alt ; 
   STRUCT_GPIO_PWM_MOTEUR *gp_Gpio_Pwm_Mot_Azi , g_mot_azi ;

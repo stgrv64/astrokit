@@ -14,10 +14,14 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-//========================================================================================
-// FIXME : TIME_CALCULS_DATE : 
-// FIXME : * calcule la date locale servant a tous les calculs ulterieurs
-//========================================================================================
+/*****************************************************************************************
+* @fn     : TIME_CALCULS_DATE
+* @author : s.gravois
+* @brief  : Calcule la date locale servant a tous les calculs ulterieurs
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-11-30 creation entete format doxygen
+* @todo   : est appelle par TIME_CALCULS_TEMPS_SIDERAL
+*****************************************************************************************/
 
 int TIME_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
   
@@ -62,11 +66,16 @@ int TIME_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
   
   return 0 ;
 }
-//========================================================================================
-// FIXME : TIME_CALCULS_JOUR_JULIEN
-// FIXME : * calcul la date julienne 
-// TODO : * valider / comparer avec valeurs de logiciels astronomiques (stellarium etc..)
-//========================================================================================
+
+/*****************************************************************************************
+* @fn     : TIME_CALCULS_JOUR_JULIEN
+* @author : s.gravois
+* @brief  : Calcule le jour julien 
+* @param  : STRUCT_LIEU * gp_Lie
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-11-30 creation entete format doxygen
+* @todo   : valider / comparer avec valeurs de logiciels astronomiques (stellarium etc..)
+*****************************************************************************************/
 
 int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
   
@@ -143,6 +152,17 @@ int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
     on doit utiliser le temps sideral et non pas le temps solaire
 */
 //========================================================================================
+
+/*****************************************************************************************
+* @fn     : TIME_CALCULS_TEMPS_SIDERAL
+* @author : s.gravois
+* @brief  : Calcule le temps sideral local 
+* @param  : STRUCT_LIEU * gp_Lie
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-09-xx correction de 2 bugs en utilisant TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT
+* @date   : 2022-11-30 creation entete format doxygen
+* @todo   : 
+*****************************************************************************************/
 
 int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   
@@ -262,11 +282,16 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   return 0 ;
 }
 
-//========================================================================================
-// FIXME : TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT : 
-// FIXME : * Convertit heure minutes secondes en heure decimale 
-/* 2022-09-26 : remplacement du nom HDEC -> TIME_VERS_HDEC */
-//========================================================================================
+/*****************************************************************************************
+* @fn     : TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT
+* @author : s.gravois
+* @brief  : Convertit heure minutes secondes en heure decimale 
+* @param  : double * hdec, double hou, double min, double sec
+* @date   : 2022-03-18 creation 
+* @date   : 2022-09-26 remplacement du nom HDEC -> TIME_VERS_HDEC
+* @date   : 2022-11-30 mise a jour entete format doxygen
+* @todo   : 
+*****************************************************************************************/
 
 void TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double min, double sec) {
   
@@ -281,7 +306,7 @@ void TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double mi
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
 * @param  : STRUCT_TIME * lp_Tim
 * @date   : 2022-03-18 creation 
-* @todo   : ras
+* @todo   : 
 *****************************************************************************************/
 
 void TIME_CALCULS_TEMPS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
@@ -587,17 +612,20 @@ void TIME_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & lp_Tpo->tpo_mutex, NULL ) ;
-  pthread_mutex_init( & lp_Tim->tim_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tpo->tpo_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tim->tim_mutex ) ;
 
   lp_Tim->tim_sig = '+' ; // signe 
-  lp_Tim->tim_mm = 0 ;  // month
-  lp_Tim->tim_yy = 0 ;  // year
-  lp_Tim->tim_dd = 0 ;  // day
-  lp_Tim->tim_HH = 0 ;  // hour
-  lp_Tim->tim_MM = 0 ;  // minutes
-  lp_Tim->tim_SS = 0 ;  // secondes
-  lp_Tim->tim_hd = 0.0 ;  // heure decimale (double)
+  lp_Tim->tim_mm  = 0 ;  // month
+  lp_Tim->tim_yy  = 0 ;  // year
+  lp_Tim->tim_dd  = 0 ;  // day
+  lp_Tim->tim_HH  = 0 ;  // hour
+  lp_Tim->tim_MM  = 0 ;  // minutes
+  lp_Tim->tim_SS  = 0 ;  // secondes
+  lp_Tim->tim_hd  = 0 ;  // heure decimale (double)
+
+  /* Suppose que la lecture du fichier de config a ete faite */
+  /* cf fonction CONFIG_PARAMETRES_CONFIG */
 
   lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo_menu ;
   lp_Tpo->tpo_raq      = gp_Tim_Par->tim_par_tpo_raq ;

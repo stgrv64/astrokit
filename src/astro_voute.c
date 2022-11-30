@@ -29,7 +29,7 @@ void VOUTE_INIT(STRUCT_VOUTE *gp_Vou) {
   
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  pthread_mutex_init( &gp_Vou->vou_mutex, NULL) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( &gp_Vou->vou_mutex) ;
 
   gp_Vou->vou_temps_ecoule        = 0 ;
   gp_Vou->vou_dt                  = 0  ;
