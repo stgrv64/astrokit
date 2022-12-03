@@ -15,44 +15,50 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
-* @fn     : TIME_CALCULS_DATE
+* @fn     : TIME_CALCULS_LOCAL_DATE
 * @author : s.gravois
 * @brief  : Calcule la date locale servant a tous les calculs ulterieurs
 * @param  : STRUCT_TIME * lp_Tim
 * @date   : 2022-11-30 creation entete format doxygen
-* @todo   : est appelle par TIME_CALCULS_TEMPS_SIDERAL
+* @todo   : est appelle par TIME_CALCULS_SIDERAL_TIME
 *****************************************************************************************/
 
-int TIME_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
+int TIME_CALCULS_LOCAL_DATE(STRUCT_TIME * lp_Tim) {
   
   time_t t ;
-  
   struct tm *tm ;
-  
+  STRUCT_TIME l_Tim  ;
+
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
 
   lp_Tim->tim_HH = 0 ;
   lp_Tim->tim_MM = 0 ;
   lp_Tim->tim_SS = 0 ;
-  
   lp_Tim->tim_yy = 0 ;
   lp_Tim->tim_dd = 0 ;
   lp_Tim->tim_mm = 0 ;
   
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+
   time(&t) ;
   // tzset() ;
   // tm=localtime(&t) ; // pour le temps local (UTC+1 en hiver et UTC+2 en ete)
   tm=gmtime(&t);   // pour UTC
   
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+
   lp_Tim->tim_HH = tm->tm_hour ;
   lp_Tim->tim_MM = tm->tm_min ;
-  lp_Tim->tim_SS = tm->tm_sec ;
-  
+  lp_Tim->tim_SS = tm->tm_sec ;  
   lp_Tim->tim_yy = 1900 + tm->tm_year ;
   lp_Tim->tim_dd = tm->tm_mday ;
   lp_Tim->tim_mm = tm->tm_mon + 1 ;
   
-  TIME_CALCULS_TEMPS_HMS_VERS_DEC (lp_Tim ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+
+  TIME_CALCULS_HMS_VERS_DEC (lp_Tim ) ;
   
   //printf("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
   Trace2("%d %d %d %d %d %d %f", \
@@ -68,31 +74,44 @@ int TIME_CALCULS_DATE(STRUCT_TIME * lp_Tim) {
 }
 
 /*****************************************************************************************
-* @fn     : TIME_CALCULS_JOUR_JULIEN
+* @fn     : TIME_CALCULS_JULIAN_DAY
 * @author : s.gravois
 * @brief  : Calcule le jour julien 
-* @param  : STRUCT_LIEU * gp_Lie
+* @param  : STRUCT_LIEU * lp_Lie
 * @param  : STRUCT_TIME * lp_Tim
 * @date   : 2022-11-30 creation entete format doxygen
 * @todo   : valider / comparer avec valeurs de logiciels astronomiques (stellarium etc..)
 *****************************************************************************************/
 
-int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
+int TIME_CALCULS_JULIAN_DAY(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie) {
   
   int    yy,mm,A,B,C,Y,M,D ;
   double T ;          // fraction de jour a ajouter au jour Julien	
   double JJ ;         // jour julien
-  
+  STRUCT_TIME l_Tim  ;
+
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+
+  memcpy( &l_Tim , lp_Tim, sizeof( STRUCT_TIME) ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
 
   Y  = lp_Tim->tim_yy ;
   M  = lp_Tim->tim_mm ;
   D  = lp_Tim->tim_dd ;
-  
   yy = lp_Tim->tim_yy ;
   mm = lp_Tim->tim_mm ;
   
-  gp_Lie->lie_jj = 0 ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ; ;
+
+  lp_Lie->lie_jj = 0 ;
+  
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ; ;
+  
   JJ=0 ;
   
   if ( lp_Tim->tim_mm < 3) {
@@ -102,15 +121,7 @@ int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
   A  = yy ;
   C  = floor(yy / 100  ) ;  
   B  = 2-C+floor(C/4) ;
-  
-  Trace2("%d %d %d %d %d %d", \
-    lp_Tim->tim_yy, \
-    lp_Tim->tim_mm, \
-    lp_Tim->tim_dd, \
-    lp_Tim->tim_HH, \
-    lp_Tim->tim_MM, \
-    lp_Tim->tim_SS ) ;
-  
+    
   T  = (double)lp_Tim->tim_HH / 24.0 + (double)lp_Tim->tim_MM / 1440.0 + (double)lp_Tim->tim_SS / 86400.0 ;
   
   Trace2("A B C T = %d %d %d %8.8f",A,B,C,T) ;
@@ -123,18 +134,22 @@ int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
   
   Trace1("Date Julienne = %7.9f",JJ) ;
   
-  gp_Lie->lie_jj = JJ ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ; ;
+
+  lp_Lie->lie_jj = JJ ;
   
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ; ;
+
   return 0 ;
 }
 //========================================================================================
-// FIXME : TIME_CALCULS_TEMPS_SIDERAL
+// FIXME : TIME_CALCULS_SIDERAL_TIME
 // FIXME :  * calcul le temps sideral local en fonction du jour julien, de la longitude
-// FIXME :  * a besoin de TIME_CALCULS_DATE  et de TIME_CALCULS_JOUR_JULIEN et du STRUCT_LIEU
+// FIXME :  * a besoin de TIME_CALCULS_LOCAL_DATE  et de TIME_CALCULS_JULIAN_DAY et du STRUCT_LIEU
 
 /* La fonction comprend l appel aux deux fonctions suivantes dans le corps de la fonction : 
-  TIME_CALCULS_DATE( lp_Tim ) ;   
-  TIME_CALCULS_JOUR_JULIEN  ( gp_Lie, lp_Tim ) ;
+  TIME_CALCULS_LOCAL_DATE( lp_Tim ) ;   
+  TIME_CALCULS_JULIAN_DAY  ( lp_Lie, lp_Tim ) ;
 */
 
 // TODO  : valider 1ere methode / 2eme methode et tester sur le ciel ou comparer
@@ -144,7 +159,7 @@ int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
    utilisee etait proche de ce celle de GREENWICH ( -0.36 pour escout) => 
    La correction local / greenwich n 'etait pas correct
    bug 1 : 
-     dans methode 1 et 2 , le terme gp_Lie->lie_lon est a multiplier par CALCULS_UN_RADIAN_EN_DEGRES
+     dans methode 1 et 2 , le terme lp_Lie->lie_lon est a multiplier par CALCULS_UN_RADIAN_EN_DEGRES
      bug constate quand on passait a un endroit de la Terre eloigne de Greenwich
      (verification sur stellarium)
    bug 2 :
@@ -154,17 +169,17 @@ int TIME_CALCULS_JOUR_JULIEN(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim) {
 //========================================================================================
 
 /*****************************************************************************************
-* @fn     : TIME_CALCULS_TEMPS_SIDERAL
+* @fn     : TIME_CALCULS_SIDERAL_TIME
 * @author : s.gravois
 * @brief  : Calcule le temps sideral local 
-* @param  : STRUCT_LIEU * gp_Lie
+* @param  : STRUCT_LIEU * lp_Lie
 * @param  : STRUCT_TIME * lp_Tim
-* @date   : 2022-09-xx correction de 2 bugs en utilisant TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT
+* @date   : 2022-09-xx correction de 2 bugs en utilisant TIME_CALCULS_HMS_VERS_DEC_DIR
 * @date   : 2022-11-30 creation entete format doxygen
 * @todo   : 
 *****************************************************************************************/
 
-int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
+int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
   
   double d, T, TSMG, TSMG2, TSH, TSMGH, TSMGH2, TSMH ;
   double TSMGS, TSMH2,TSMH3, GMSTO, GMST, LMST ;
@@ -172,27 +187,26 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   const double P_2000 = 2451545.5 ; 
   const double P_1900 = 2415020.0 ;
 
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(&jour_sideral_decimal , 23 , 56 , 4.09054) ;
-
-  Trace1("jour sideral : %f", jour_sideral_decimal) ;
-  
-  TIME_CALCULS_DATE( lp_Tim ) ;   
-  TIME_CALCULS_JOUR_JULIEN  ( gp_Lie, lp_Tim ) ;
-  
   STRUCT_TIME Temps0 ;
   STRUCT_TIME TSMG3 ;
   STRUCT_TIME TSMGH3 ;
-
   STRUCT_TIME TSR2 ;
   STRUCT_TIME TSR3 ;
 
-  if ( gp_Lie->lie_jj == 0 ) return 1 ;
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  TIME_CALCULS_HMS_VERS_DEC_DIR(&jour_sideral_decimal , 23 , 56 , 4.09054) ;
+
+  Trace1("jour sideral : %f", jour_sideral_decimal) ;
   
-  d = gp_Lie->lie_jj - P_2000 ;
+  TIME_CALCULS_LOCAL_DATE( lp_Tim ) ;   
+  TIME_CALCULS_JULIAN_DAY( lp_Lie, lp_Tim ) ;
+  
+  if ( lp_Lie->lie_jj == 0 ) return 1 ;
+  
+  d = lp_Lie->lie_jj - P_2000 ;
   T = d / 36525.0 ;
-  T = ( gp_Lie->lie_jj - P_2000) / 36525.0 ; 
+  T = ( lp_Lie->lie_jj - P_2000) / 36525.0 ; 
   
   Trace2("T = %f",T);
   
@@ -208,24 +222,24 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   TSMG2 = fmod(TSMG,360.0) ;
   TSMG3.tim_hd = TSMG2 * jour_sideral_decimal / 360 ; /* pour ramener en heures */
   
-  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMG3 ) ;
+  TIME_CALCULS_DEC_VERS_HMS( & TSMG3 ) ;
   /* *15 = pour ramener en degres */
   TSH       = lp_Tim->tim_hd * 1.00273790935 * 15 ;
   TSMGH     = TSMG + TSH ;
   TSMGH2    = fmod(TSMGH, 360.0) ;
   TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360 ;
 
-  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMGH3) ;
+  TIME_CALCULS_DEC_VERS_HMS( & TSMGH3) ;
 
-  TSMH  = TSMGH + ( gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES )  ;
+  TSMH  = TSMGH + ( lp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES )  ;
   /*
   Trace("TSMGH  TSMGH2  TSMGH3.tim_hd    : %0.5f   %0.5f   %0.5f", TSMGH, TSMGH2, TSMGH3.tim_hd) ;
-  Trace("TSMH = TSMGH - gp_Lie->lie_lon : %0.5f = %0.5f - %0.5f ", TSMH, TSMGH, gp_Lie->lie_lon) ; 
+  Trace("TSMH = TSMGH - lp_Lie->lie_lon : %0.5f = %0.5f - %0.5f ", TSMH, TSMGH, lp_Lie->lie_lon) ; 
   */
   TSMH2 = fmod(TSMH, 360.0) ;
   TSR2.tim_hd = TSMH2 * jour_sideral_decimal / 360 ;
  
-  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSR2 ) ;
+  TIME_CALCULS_DEC_VERS_HMS( & TSR2 ) ;
   
   TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
   TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
@@ -238,10 +252,10 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   GMSTO = 100.460618375 + 0.985647366286 * d ;
   GMST  = GMSTO + 1.00273790935 * 15 * lp_Tim->tim_hd  ;
   
-  LMST = GMST - ( gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES )  ; // FIXME : attention !! ici la longitude du lien intervient !!
+  LMST = GMST - ( lp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES )  ; // FIXME : attention !! ici la longitude du lien intervient !!
   /*
   Trace("GMST  GMSTO  lp_Tim->tim_hd    : %0.5f   %0.5f   %0.5f", GMST, GMSTO, lp_Tim->tim_hd) ;
-  Trace("LMST = GMST  - gp_Lie->lie_lon : %0.5f = %0.5f - %0.5f ", LMST, GMST, gp_Lie->lie_lon) ; 
+  Trace("LMST = GMST  - lp_Lie->lie_lon : %0.5f = %0.5f - %0.5f ", LMST, GMST, lp_Lie->lie_lon) ; 
   */
   TSMG2  = fmod(GMSTO, 360.0) ;
   TSMGH2 = fmod(GMST,  360.0) ;
@@ -251,9 +265,9 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
   TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360.0 ;
   TSR3.tim_hd  = TSMH2  * jour_sideral_decimal / 360.0 ;
   
-  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMG3) ;
-  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSMGH3 ) ;
-  TIME_CALCULS_TEMPS_DEC_VERS_HMS( & TSR3) ;
+  TIME_CALCULS_DEC_VERS_HMS( & TSMG3) ;
+  TIME_CALCULS_DEC_VERS_HMS( & TSMGH3 ) ;
+  TIME_CALCULS_DEC_VERS_HMS( & TSR3) ;
   
   TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
   TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
@@ -272,18 +286,21 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
 
   // =======================   ==========================
 
-  gp_Lie->lie_ts  = TSR2.tim_hd ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ; ;
 
-  // gp_Lie->lie_tsr = (TSR3.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
-  gp_Lie->lie_tsr = (TSR2.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
+  lp_Lie->lie_ts  = TSR2.tim_hd ;
+  // lp_Lie->lie_tsr = (TSR3.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
+  lp_Lie->lie_tsr = (TSR2.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
 
-  Trace1("JJ %f gp_Lie->lie_tsr = %f",gp_Lie->lie_jj, gp_Lie->lie_tsr ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ; ;
+
+  Trace1("JJ %f lp_Lie->lie_tsr = %f",lp_Lie->lie_jj, lp_Lie->lie_tsr ) ;
 
   return 0 ;
 }
 
 /*****************************************************************************************
-* @fn     : TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT
+* @fn     : TIME_CALCULS_HMS_VERS_DEC_DIR
 * @author : s.gravois
 * @brief  : Convertit heure minutes secondes en heure decimale 
 * @param  : double * hdec, double hou, double min, double sec
@@ -293,7 +310,7 @@ int TIME_CALCULS_TEMPS_SIDERAL(STRUCT_LIEU* gp_Lie, STRUCT_TIME * lp_Tim ) {
 * @todo   : 
 *****************************************************************************************/
 
-void TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double min, double sec) {
+void TIME_CALCULS_HMS_VERS_DEC_DIR(double * hdec, double hou, double min, double sec) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -301,7 +318,7 @@ void TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double mi
 }
 
 /*****************************************************************************************
-* @fn     : TIME_CALCULS_TEMPS_DEC_VERS_HMS
+* @fn     : TIME_CALCULS_DEC_VERS_HMS
 * @author : s.gravois
 * @brief  : Convertit heure decimale en heure minutes secondes decimales
 * @param  : STRUCT_TIME * lp_Tim
@@ -309,11 +326,13 @@ void TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT(double * hdec, double hou, double mi
 * @todo   : 
 *****************************************************************************************/
 
-void TIME_CALCULS_TEMPS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
+void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace2("TEMPS    decimal  = %.4f" , lp_Tim->tim_hd) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
 
   if ( lp_Tim->tim_hd >=0 ) { 
     lp_Tim->tim_si   =  1 ;
@@ -325,15 +344,14 @@ void TIME_CALCULS_TEMPS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
   }
   
   lp_Tim->tim_HH = (int)fabs(  lp_Tim->tim_hd ) ;
-  Trace2("heure    decimale = %d" , lp_Tim->tim_HH) ;
-  
   lp_Tim->tim_MM = (int)fabs( (fabs(lp_Tim->tim_hd) - lp_Tim->tim_HH ) * 60.0 ) ;
-  Trace2("minutes  decimale = %d" , lp_Tim->tim_MM) ;
-
   lp_Tim->tim_SS = (int)fabs(((fabs(lp_Tim->tim_hd) - lp_Tim->tim_HH ) * 60.0 - lp_Tim->tim_MM ) * 60.0 ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+
+  Trace2("heure    decimale = %d" , lp_Tim->tim_HH) ;
+  Trace2("minutes  decimale = %d" , lp_Tim->tim_MM) ;
   Trace2("secondes decimale = %d" , lp_Tim->tim_SS) ;
-
-
 }
 
 //========================================================================================
@@ -473,7 +491,7 @@ void TIME_AFFICHER(STRUCT_TIME * lp_Tim) {
 
 }
 /*****************************************************************************************
-* @fn     : TIME_CALCULS_TEMPS_HMS_VERS_DEC
+* @fn     : TIME_CALCULS_HMS_VERS_DEC
 * @author : s.gravois
 * @brief  : Convertit heure minutes secondes en heure decimale 
 * @param  : STRUCT_ANGLE *angle
@@ -483,11 +501,15 @@ void TIME_AFFICHER(STRUCT_TIME * lp_Tim) {
 * @todo   : ras
 *****************************************************************************************/
 
-void TIME_CALCULS_TEMPS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
+void TIME_CALCULS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+
   lp_Tim->tim_hd = lp_Tim->tim_HH + (lp_Tim->tim_MM / 60.0) + (lp_Tim->tim_SS / 3600.0)  ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
 }
 
 /*****************************************************************************************
@@ -547,7 +569,14 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
 	Trace("buf = %s", buf) ;
 
   memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", year, month, day, gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_cfg, gp_Con_Par->par_fic_dat ) ;
+  sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", \
+    year, \
+    month, \
+    day, \
+    gp_Con_Par->par_rep_home, \
+    gp_Con_Par->par_rep_cfg, \
+    gp_Con_Par->par_fic_dat ) ;
+
   Trace("buf = %s", buf) ;
 
   if ( system( buf ) < 0 ) perror( buf) ;
@@ -595,7 +624,14 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
   if ( system( buf ) < 0 ) perror( buf) ;
 
   memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", hou, min, gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_cfg, gp_Con_Par->par_fic_hhm ) ;
+
+  sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", \
+    hou, \
+    min, \
+    gp_Con_Par->par_rep_home, \
+    gp_Con_Par->par_rep_cfg, \
+    gp_Con_Par->par_fic_hhm ) ;
+
   Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 }
@@ -634,4 +670,5 @@ void TIME_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
   lp_Tpo->tpo_capteurs = gp_Tim_Par->tim_par_tpo_capteurs ;
   lp_Tpo->tpo_lcd_loop = gp_Tim_Par->tim_par_tpo_lcd_loop ;
   lp_Tpo->tpo_lcd_disp = gp_Tim_Par->tim_par_tpo_lcd_disp ;
+
 }

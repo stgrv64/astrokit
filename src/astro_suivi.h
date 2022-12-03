@@ -134,12 +134,12 @@ static const char * gc_hach_suivi_menus[] = {
   "MENU_DOWN"
 } ;
 
-void   SUIVI_INIT           ( STRUCT_SUIVI * ) ;
-void   SUIVI_OLD_0          ( STRUCT_SUIVI * ) ;
-void   SUIVI_TRAITEMENT_MOT ( STRUCT_SUIVI *, STRUCT_KEYS * ) ;
-void   SUIVI_MENU_BEFORE_WHILE ( STRUCT_SUIVI * ) ;
-void   SUIVI_MANUEL_BRUT    ( STRUCT_SUIVI * , STRUCT_KEYS *) ;
-void   SUIVI_MANUEL_ASSERVI ( STRUCT_SUIVI * , STRUCT_KEYS *) ;
+void   SUIVI_INIT                    ( STRUCT_SUIVI * ) ;
+void   SUIVI_TRAITEMENT_MOT          ( STRUCT_SUIVI * , STRUCT_KEYS * ) ;
+void   SUIVI_MANUEL_BRUT             ( STRUCT_SUIVI * , STRUCT_KEYS * ) ;
+void   SUIVI_MANUEL_ASSERVI          ( STRUCT_SUIVI * , STRUCT_KEYS * ) ;
+void   SUIVI_OLD_0                   ( STRUCT_SUIVI * ) ;
+void   SUIVI_MENU_BEFORE_WHILE       ( STRUCT_SUIVI * ) ;
 /* old */
 void   SUIVI_TEMPORISATION_ALTITUDE  ( STRUCT_SUIVI * , struct timeval * )  ;
 void   SUIVI_TEMPORISATION_AZIMUT    ( STRUCT_SUIVI * , struct timeval * ) ;

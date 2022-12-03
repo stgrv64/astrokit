@@ -34,6 +34,6 @@ typedef struct STR_INFRARED STRUCT_INFRARED ;
 
 int   INFRARED_OPEN  ( INFRARED_LIRC_CONFIG *gp_LircConfig) ;
 void  INFRARED_CLOSE ( INFRARED_LIRC_CONFIG *gp_LircConfig) ;
-void  INFRARED_READ  ( STRUCT_SUIVI         * gp_Sui) ;
+void  INFRARED_READ  ( void) ;
 
 #endif

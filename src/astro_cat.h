@@ -32,10 +32,11 @@
 
 struct STR_CAT {
  pthread_mutex_t cat_mutex ;
- char c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
- char c_cat_dec     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
- char c_cat_eto     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
- char c_cat_eto_dec [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
+ STRUCT_ASTRE  * cat_p_ast ;
+ char            c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
+ char            c_cat_dec     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
+ char            c_cat_eto     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
+ char            c_cat_eto_dec [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
 } ;
 
 char g_c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
@@ -45,13 +46,13 @@ char g_c_cat_eto_dec [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
 
 /* TODO : creer une structure de catalogues STRUCT_CAT */ 
 
-void      CAT_INIT          (STRUCT_CAT * ) ;
+void      CAT_INIT          (STRUCT_CAT *, STRUCT_ASTRE * ) ;
 
 int       CAT_FIN_MOT       ( char c) ;
 void      CAT_AFFICHER      ( char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 void      CAT_READ          ( char * , char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 void      CAT_FIND          ( STRUCT_ASTRE *, char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
-void      CAT_FIND_OLD      ( char * ,STRUCT_ASTRE *,char *) ;
+
 void      CAT_FORMAT_DECIMAL_NGC( char * , char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
                            char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
 void      CAT_FORMAT_DECIMAL_ETO( char * , char     [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \

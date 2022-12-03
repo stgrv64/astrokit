@@ -1,0 +1,963 @@
+Exemple de programme d'interruption dans le noyau Linux
+Avant d'écrire un programme d'interruption, vous devez garder à l'esprit les points suivants.
+
+Les gestionnaires d'interruptions ne peuvent pas entrer en veille, afin d'éviter les appels à certaines fonctions qui ont sleep.
+Lorsque le gestionnaire d'interruptions dispose d'une partie du code pour entrer dans la section critique, utilisez des verrous tournants plutôt que des mutex. Parce que s'il ne pouvait pas prendre le mutex, il s'endormirait jusqu'à ce qu'il prenne le muet.
+Les gestionnaires d'interruptions ne peuvent pas échanger de données avec l'espace utilisateur.
+Les gestionnaires d'interruption doivent être exécutés dès que possible. Pour ce faire, il est préférable de diviser la mise en œuvre en deux parties, la moitié supérieure et la moitié inférieure. La moitié supérieure du gestionnaire fera le travail dès que possible et travaillera ensuite tard sur la moitié inférieure, ce qui peut être fait avec softirq ou tasklet ou workqueue.
+Les gestionnaires d'interruption ne peuvent pas être appelés à plusieurs reprises. Lorsqu'un gestionnaire est déjà en cours d'exécution, son IRQ correspondante doit être désactivée jusqu'à ce que le gestionnaire ait terminé.
+Les gestionnaires d'interruption peuvent être interrompus par des gestionnaires d'autorité supérieure. Si vous souhaitez éviter d'être interrompu par un gestionnaire hautement qualifié, vous pouvez marquer le gestionnaire d'interruption comme un gestionnaire rapide. Cependant, si un trop grand nombre sont marqués comme gestionnaires rapides, les performances du système seront dégradées, car la latence d'interruption sera plus longue.
+Fonctions liées à l'interruption
+Avant de programmer, il faut connaître les fonctions de base utiles pour les interruptions. Ce tableau explique l'utilisation de toutes les fonctions.
+
+Fonction	La description
+request_irq
+(
+unsigned int irq,
+irq_handler_t handler,
+unsigned long flags,
+const char *name,
+void *dev_id)	Enregistrez une IRQ, les paramètres sont les suivants :
+
+irq: numéro d'IRQ à allouer.
+
+handler: Il s'agit de la fonction de gestionnaire d'interruption. Cette fonction sera appelée chaque fois que le système d'exploitation recevra l'interruption. Le type de données de retour est irq_handler_t, si sa valeur de retour est IRQ_HANDLED, cela indique que le traitement s'est terminé avec succès, mais si la valeur de retour est IRQ_NONE, le traitement échoue.
+
+flags: peut être zéro ou un masque binaire d'un ou plusieurs des drapeaux définis dans linux/interrupt.h. Les plus importants de ces drapeaux sont :
+IRQF_DISABLED
+IRQF_SAMPLE_RANDOM
+IRQF_SHARED
+IRQF_TIMER
+(expliqué après ce tableau)
+
+name: Utilisé pour identifier le nom du périphérique à l'aide de cet IRQ, par exemple, cat / proc / interrupts listera le numéro d'IRQ et le nom du périphérique.
+
+dev_id: IRQ partagé par de nombreux appareils. Lorsqu'un gestionnaire d'interruption est libéré, dev fournit un cookie unique pour permettre de supprimer uniquement le gestionnaire d'interruption souhaité de la ligne d'interruption. Sans ce paramètre, il serait impossible pour le noyau de savoir quel gestionnaire supprimer sur une ligne d'interruption donnée. Vous pouvez passer NULL ici si la ligne n'est pas partagée, mais vous devez passer un cookie unique si votre ligne d'interruption est partagée. Ce pointeur est également transmis au gestionnaire d'interruption à chaque invocation. Une pratique courante consiste à transmettre la structure de périphérique du pilote. Ce pointeur est unique et peut être utile dans les gestionnaires.
+
+Revenir
+renvoie zéro en cas de succès et une valeur différente de zéro indique une erreur.
+
+request_irq() ne peut pas être appelé à partir d'un contexte d'interruption (autres situations où le code ne peut pas bloquer), car il peut bloquer.
+free_irq(
+unsigned int irq,
+void *dev_id)	Libère une IRQ enregistrée par request_irq()avec les paramètres suivants :
+
+irq: numéro d'IRQ.
+dev_id: est le dernier paramètre de request_irq.
+
+Si la ligne d'interruption spécifiée n'est pas partagée, cette fonction supprime le gestionnaire et désactive la ligne.
+Si la ligne d'interruption est partagée, le gestionnaire identifié via dev_id est supprimé, mais la ligne d'interruption n'est désactivée que lorsque le dernier gestionnaire est supprimé. Avec les lignes d'interruption partagées, un cookie unique est requis pour différencier les multiples gestionnaires qui peuvent exister sur une seule ligne et permettre free_irq()de supprimer uniquement le gestionnaire correct.
+Dans les deux cas (partagé ou non partagé), si dev_id n'est pas NULL, il doit correspondre au gestionnaire souhaité. Un appel à free_irq()doit être effectué à partir du contexte du processus.
+enable_irq(unsigned int irq)	Réactiver l'interruption désactivée par disable_irq ou disable_irq_nosync.
+disable_irq(unsigned int irq)	Empêcher une IRQ d'émettre une interruption.
+disable_irq_nosync(unsigned int irq)	Empêchez une IRQ d'émettre une interruption, mais attendez qu'un gestionnaire d'interruption soit en cours d'exécution.
+in_irq()	renvoie vrai lorsqu'il est dans le gestionnaire d'interruption
+in_interrupt()	renvoie vrai lorsqu'il est dans le gestionnaire d'interruption ou la moitié inférieure
+Indicateurs d'interruptions
+Ce sont les deuxièmes paramètres de la fonction. Il a plusieurs drapeaux. Ici, j'ai expliqué les drapeaux importants.
+
+IRQF_DISABLED.
+
+
+
+Lorsqu'il est défini, cet indicateur demande au noyau de désactiver toutes les interruptions lors de l'exécution de ce gestionnaire d'interruptions.
+Lorsqu'ils ne sont pas définis, les gestionnaires d'interruptions s'exécutent avec toutes les interruptions sauf la leur activée.
+La plupart des gestionnaires d'interruptions ne définissent pas cet indicateur, car la désactivation de toutes les interruptions est une mauvaise forme. Son utilisation est réservée aux interruptions sensibles aux performances qui s'exécutent rapidement. Ce drapeau est la manifestation actuelle du  SA_INTERRUPT drapeau, qui dans le passé distinguait les interruptions « rapides » et « lentes ».
+
+IRQF_SAMPLE_RANDOM. Cet indicateur spécifie que les interruptions générées par ce périphérique doivent contribuer au pool d'entropie du noyau  . Le pool d'entropie du noyau fournit des nombres véritablement aléatoires dérivés de divers événements aléatoires. Si cet indicateur est spécifié, la synchronisation des interruptions de ce périphérique est transmise au pool sous forme d'entropie. Ne le définissez pas si votre appareil émet des interruptions à un rythme prévisible (par exemple, la minuterie système) ou peut être influencé par des attaquants externes (par exemple, un périphérique réseau). D'autre part, la plupart des autres matériels génèrent une interruption à des moments non déterministes et constituent donc une bonne source d'entropie.
+IRQF_TIMER. Cet indicateur spécifie que ce processus de gestionnaire interrompt le temporisateur système.
+IRQF_SHARED. Cet indicateur spécifie que la ligne d'interruption peut être partagée entre plusieurs gestionnaires d'interruption. Chaque gestionnaire enregistré sur une ligne donnée doit spécifier ce drapeau ; sinon, un seul gestionnaire peut exister par ligne.
+Enregistrement d'un gestionnaire d'interruptions
+#define IRQ_NO 11
+si ( request_irq ( IRQ_NO, irq_handler, IRQF_SHARED, "etx_device" , ( void * )( irq_handler ))) {  
+            printk ( KERN_INFO "my_device: can not register IRQ " ) ;
+            aller à irq ;
+}
+Libération d'un gestionnaire d'interruptions
+free_irq ( IRQ_NO, ( void * )( irq_handler )) ;
+Gestionnaire d'interruptions
+statique irqreturn_t irq_handler ( int irq, void *dev_id ) { 
+  printk ( KERN_INFO "IRQ partagé : une interruption s'est produite" ) ;
+  renvoie IRQ_HANDLED ;
+}
+Exemple de programme d'interruption dans le noyau Linux - Programmation
+L'interruption peut provenir de n'importe où (n'importe quel matériel) et n'importe quand. Dans notre tutoriel, nous n'utiliserons aucun matériel. Ici, au lieu d'utiliser du matériel, nous allons déclencher une interruption en simulant. Si vous n'avez qu'un PC (sans matériel), mais que vous voulez jouer avec les interruptions sous Linux, vous pouvez suivre notre méthode. Si vous avez le matériel, je demanderais de ne pas utiliser cette méthode. Au lieu de cela, vous pouvez utiliser les interruptions matérielles. Nous avons couvert l'interruption matérielle dans ce tutoriel .
+
+Déclenchement d'une interruption matérielle via le logiciel
+Les processeurs Intel gèrent les interruptions à l'aide de l'IDT (Interrupt Descriptor Table). L'IDT se compose de 256 entrées, chaque entrée correspondant à un vecteur et de 8 octets. Toutes les entrées sont un pointeur vers la fonction de gestion des interruptions. Le CPU utilise IDTR pour pointer vers IDT. La relation entre ces deux peut être représentée comme ci-dessous,
+
+
+
+Une interruption peut être déclenchée par programme à l'aide de l' instructionint ' '  . Par  exemple, l'appel système Linux utilisait int $0x80.
+
+Dans Linux IRQ to vector, le mappage est effectué dans arch/x86/include/asm/irq_vectors.h. La plage vectorielle utilisée est la suivante,
+
+
+
+
+
+L'IRQ0 est mappé au vecteur à l'aide de la macro,
+
+#define IRQ0_VECTOR (FIRST_EXTERNAL_VECTOR + 0x10)
+
+où, FIRST_EXTERNAL_VECTOR = 0x20 (32 en décimal)
+
+Donc, si nous voulons déclencher une interruption IRQ11, nous devons ajouter par programme 11 à un vecteur d'IRQ0.
+
+0x20 + 0x10 + 11 = 0x3B (59 en décimal).
+
+Hence executing “asm("int $0x3B")“, will raise interrupt IRQ 11.
+
+The instruction will be executed while reading the device file of our driver (/dev/etx_device).
+
+Driver Source Code
+Here I took the old source code from the sysfs tutorial. In that source, I have just added interrupt code like request_irq, free_irq along with the interrupt handler.
+
+In this program, interrupt will be triggered whenever we are reading the device file of our driver (/dev/etx_device).
+
+Whenever Interrupt triggers, it will print the “Shared IRQ: Interrupt Occurred” Text.
+
+
+
+[Get the source from the GitHub]
+
+/***************************************************************************//**
+*  \file       driver.c
+*
+*  \details    Interrupt Example
+*
+*  \author     EmbeTronicX
+*
+*******************************************************************************/
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kdev_t.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/device.h>
+#include<linux/slab.h>                 //kmalloc()
+#include<linux/uaccess.h>              //copy_to/from_user()
+#include<linux/sysfs.h> 
+#include<linux/kobject.h> 
+#include <linux/interrupt.h>
+#include <asm/io.h>
+#include <linux/err.h>
+#define IRQ_NO 11
+//Interrupt handler for IRQ 11. 
+static irqreturn_t irq_handler(int irq,void *dev_id) {
+  printk(KERN_INFO "Shared IRQ: Interrupt Occurred");
+  return IRQ_HANDLED;
+}
+volatile int etx_value = 0;
+ 
+dev_t dev = 0;
+static struct class *dev_class;
+static struct cdev etx_cdev;
+struct kobject *kobj_ref;
+ 
+static int __init etx_driver_init(void);
+static void __exit etx_driver_exit(void);
+/*************** Driver Fuctions **********************/
+static int etx_open(struct inode *inode, struct file *file);
+static int etx_release(struct inode *inode, struct file *file);
+static ssize_t etx_read(struct file *filp, 
+                char __user *buf, size_t len,loff_t * off);
+static ssize_t etx_write(struct file *filp, 
+                const char *buf, size_t len, loff_t * off);
+/*************** Sysfs Fuctions **********************/
+static ssize_t sysfs_show(struct kobject *kobj, 
+                struct kobj_attribute *attr, char *buf);
+static ssize_t sysfs_store(struct kobject *kobj, 
+                struct kobj_attribute *attr,const char *buf, size_t count);
+struct kobj_attribute etx_attr = __ATTR(etx_value, 0660, sysfs_show, sysfs_store);
+ 
+static struct file_operations fops =
+{
+        .owner          = THIS_MODULE,
+        .read           = etx_read,
+        .write          = etx_write,
+        .open           = etx_open,
+        .release        = etx_release,
+};
+ 
+static ssize_t sysfs_show(struct kobject *kobj, 
+                struct kobj_attribute *attr, char *buf)
+{
+        printk(KERN_INFO "Sysfs - Read!!!\n");
+        return sprintf(buf, "%d", etx_value);
+}
+static ssize_t sysfs_store(struct kobject *kobj, 
+                struct kobj_attribute *attr,const char *buf, size_t count)
+{
+        printk(KERN_INFO "Sysfs - Write!!!\n");
+        sscanf(buf,"%d",&etx_value);
+        return count;
+}
+static int etx_open(struct inode *inode, struct file *file)
+{
+        printk(KERN_INFO "Device File Opened...!!!\n");
+        return 0;
+}
+ 
+static int etx_release(struct inode *inode, struct file *file)
+{
+        printk(KERN_INFO "Device File Closed...!!!\n");
+        return 0;
+}
+ 
+static ssize_t etx_read(struct file *filp, 
+                char __user *buf, size_t len, loff_t *off)
+{
+        printk(KERN_INFO "Read function\n");
+        asm("int $0x3B");  // Corresponding to irq 11
+        return 0;
+}
+static ssize_t etx_write(struct file *filp, 
+                const char __user *buf, size_t len, loff_t *off)
+{
+        printk(KERN_INFO "Write Function\n");
+        return len;
+}
+ 
+static int __init etx_driver_init(void)
+{
+        /*Allocating Major number*/
+        if((alloc_chrdev_region(&dev, 0, 1, "etx_Dev")) <0){
+                printk(KERN_INFO "Cannot allocate major number\n");
+                return -1;
+        }
+        printk(KERN_INFO "Major = %d Minor = %d \n",MAJOR(dev), MINOR(dev));
+ 
+        /*Creating cdev structure*/
+        cdev_init(&etx_cdev,&fops);
+ 
+        /*Adding character device to the system*/
+        if((cdev_add(&etx_cdev,dev,1)) < 0){
+            printk(KERN_INFO "Cannot add the device to the system\n");
+            goto r_class;
+        }
+ 
+        /*Creating struct class*/
+        if(IS_ERR(dev_class = class_create(THIS_MODULE,"etx_class"))){
+            printk(KERN_INFO "Cannot create the struct class\n");
+            goto r_class;
+        }
+ 
+        /*Creating device*/
+        if(IS_ERR(device_create(dev_class,NULL,dev,NULL,"etx_device"))){
+            printk(KERN_INFO "Cannot create the Device 1\n");
+            goto r_device;
+        }
+ 
+        /*Creating a directory in /sys/kernel/ */
+        kobj_ref = kobject_create_and_add("etx_sysfs",kernel_kobj);
+ 
+        /*Creating sysfs file for etx_value*/
+        if(sysfs_create_file(kobj_ref,&etx_attr.attr)){
+                printk(KERN_INFO"Cannot create sysfs file......\n");
+                goto r_sysfs;
+        }
+        if (request_irq(IRQ_NO, irq_handler, IRQF_SHARED, "etx_device", (void *)(irq_handler))) {
+            printk(KERN_INFO "my_device: cannot register IRQ ");
+                    goto irq;
+        }
+        printk(KERN_INFO "Device Driver Insert...Done!!!\n");
+    return 0;
+irq:
+        free_irq(IRQ_NO,(void *)(irq_handler));
+r_sysfs:
+        kobject_put(kobj_ref); 
+        sysfs_remove_file(kernel_kobj, &etx_attr.attr);
+ 
+r_device:
+        class_destroy(dev_class);
+r_class:
+        unregister_chrdev_region(dev,1);
+        cdev_del(&etx_cdev);
+        return -1;
+}
+ 
+static void __exit etx_driver_exit(void)
+{
+        free_irq(IRQ_NO,(void *)(irq_handler));
+        kobject_put(kobj_ref); 
+        sysfs_remove_file(kernel_kobj, &etx_attr.attr);
+        device_destroy(dev_class,dev);
+        class_destroy(dev_class);
+        cdev_del(&etx_cdev);
+        unregister_chrdev_region(dev, 1);
+        printk(KERN_INFO "Device Driver Remove...Done!!!\n");
+}
+ 
+module_init(etx_driver_init);
+module_exit(etx_driver_exit);
+ 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("EmbeTronicX <embetronicx@gmail.com>");
+MODULE_DESCRIPTION("A simple device driver - Interrupts");
+MODULE_VERSION("1.9");
+MakeFile
+obj-m += driver.o
+ 
+KDIR = /lib/modules/$(shell uname -r)/build
+ 
+ 
+all:
+    make -C $(KDIR)  M=$(shell pwd) modules
+ 
+clean:
+    make -C $(KDIR)  M=$(shell pwd) clean
+Building and Testing Driver
+Build the driver by using Makefile (sudo make)
+Load the driver using sudo insmod driver.ko
+To trigger the interrupt read device file (sudo cat /dev/etx_device)
+Now see the Dmesg (dmesg)
+linux@embetronicx-VirtualBox: dmesg
+[19743.366386] Major = 246 Minor = 0
+[19743.370707] Device Driver Insert...Done!!!
+[19745.580487] Device File Opened...!!!
+[19745.580507] Read function
+[19745.580531] Shared IRQ: Interrupt Occurred
+[19745.580540] Device File Closed...!!!
+We can able to see the print “Shared IRQ: Interrupt Occurred“
+Unload the module using sudo rmmod driver
+A problem in New Linux kernel
+If you are using the newer Linux kernel, then this may not work properly. You may get something like below.
+
+do_IRQ: 1.59 No irq handler for vector
+
+In order to solve that, you have to change the Linux kernel source code, Compile it, then install it.
+
+Note: The complete process will take more than an hour and you need to download the Linux kernel source also. 
+
+Modify and Build the Linux Kernel
+Step 1: Previously, I have used an old kernel. Now I am updating the kernel to 5.4.47 with ubuntu 18.04 (Virtualbox). First, you need to download the Linux kernel source code using the below command.
+
+wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.4.47.tar.xz
+
+
+
+Step 2: Once you have downloaded the kernel source, then extract it using the below command.
+
+sudo tar -xvf ../linux-5.4.47.tar
+Step 3: Get into the directory and copy the config.
+
+cd linux-5.4.47/
+cp -v /boot/config-$ ( uname -r ) .confi
+
+Étape 4 : installons les outils requis pour compiler le code source.
+sudo apt install build-essentiel kernel-package fakeroot libncurses5-dev libssl-dev ccache flex libelf-dev bison libncurses-dev
+Étape 5 : Nous avons maintenant le code source et les outils nécessaires à la compilation. Faisons notre modification. Ajoutez la ligne ci-dessous dans le fichier du noyau Linux téléchargé arch/x86/kernel/irq.c juste après toutes les lignes d'inclusion.
+
+EXPORT_SYMBOL ( vector_irq ) ; 
+Étape 6 : Créez maintenant la configuration à l'aide des commandes ci-dessous.
+
+créer une ancienne configuration
+faire menuconfig
+Étape 7 : Commençons à compiler le noyau à l'aide de la commande ci-dessous.
+
+faire sudo
+
+
+
+Si vous voulez accélérer le temps de compilation, utilisez simplement comme ci-dessous.
+
+sudo faire -j 4
+Il faut être plus patient car une compilation prend plus de temps. Le temps de construction dépend des ressources de votre système telles que le cœur de processeur disponible et la charge actuelle du système. Pour moi, cela a pris plus de 2 heures car je construis sur Virtualbox.
+
+Installer le noyau modifié
+Étape 8 : Entrez en mode administrateur et installez les modules du noyau.
+
+sudo su
+faire modules_install
+
+Étape 9 : Installez le noyau Linux modifié à l'aide de la commande ci-dessous.
+sudo faire installer
+Étape 10 : Mettez à jour la configuration grub à l'aide des commandes ci-dessous.
+
+sudo update-initramfs -c -k 5.4 . 47
+sudo update-grub
+Finally, Here we are. We have installed the new kernel. In order to reflect the changes, reboot it. Then check the kernel version.
+
+reboot
+uname-r
+You should see the updated kernel version if there is no issues in compilation and installation like below.
+
+
+
+
+owl@owl-VirtualBox:~/Desktop/LDD$ uname -r
+5.4.47
+If you have any doubts, please refer .
+
+Driver source code for a modified kernel
+We have customized the kernel. Let’s take the below source code try it.
+
+[Get the source from the GitHub]
+
+/***************************************************************************//**
+*  \file       driver.c
+*
+*  \details    Interrupt Example
+*
+*  \author     EmbeTronicX
+*
+*  \Tested with kernel 5.4.47
+*
+*******************************************************************************/
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kdev_t.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/device.h>
+#include<linux/slab.h>                 //kmalloc()
+#include<linux/uaccess.h>              //copy_to/from_user()
+#include<linux/sysfs.h> 
+#include<linux/kobject.h> 
+#include <linux/interrupt.h>
+#include <asm/io.h>
+#include <asm/hw_irq.h>
+#include <linux/err.h>
+#define IRQ_NO 11
+ 
+//Interrupt handler for IRQ 11. 
+static irqreturn_t irq_handler(int irq,void *dev_id) {
+  printk(KERN_INFO "Shared IRQ: Interrupt Occurred");
+  return IRQ_HANDLED;
+}
+ 
+ 
+volatile int etx_value = 0;
+ 
+ 
+dev_t dev = 0;
+static struct class *dev_class;
+static struct cdev etx_cdev;
+struct kobject *kobj_ref;
+ 
+static int __init etx_driver_init(void);
+static void __exit etx_driver_exit(void);
+ 
+/*************** Driver Fuctions **********************/
+static int etx_open(struct inode *inode, struct file *file);
+static int etx_release(struct inode *inode, struct file *file);
+static ssize_t etx_read(struct file *filp, 
+                char __user *buf, size_t len,loff_t * off);
+static ssize_t etx_write(struct file *filp, 
+                const char *buf, size_t len, loff_t * off);
+ 
+/*************** Sysfs Fuctions **********************/
+static ssize_t sysfs_show(struct kobject *kobj, 
+                struct kobj_attribute *attr, char *buf);
+static ssize_t sysfs_store(struct kobject *kobj, 
+                struct kobj_attribute *attr,const char *buf, size_t count);
+ 
+struct kobj_attribute etx_attr = __ATTR(etx_value, 0660, sysfs_show, sysfs_store);
+ 
+static struct file_operations fops =
+{
+        .owner          = THIS_MODULE,
+        .read           = etx_read,
+        .write          = etx_write,
+        .open           = etx_open,
+        .release        = etx_release,
+};
+ 
+static ssize_t sysfs_show(struct kobject *kobj, 
+                struct kobj_attribute *attr, char *buf)
+{
+        printk(KERN_INFO "Sysfs - Read!!!\n");
+        return sprintf(buf, "%d", etx_value);
+}
+ 
+static ssize_t sysfs_store(struct kobject *kobj, 
+                struct kobj_attribute *attr,const char *buf, size_t count)
+{
+        printk(KERN_INFO "Sysfs - Write!!!\n");
+        sscanf(buf,"%d",&etx_value);
+        return count;
+}
+ 
+static int etx_open(struct inode *inode, struct file *file)
+{
+        printk(KERN_INFO "Device File Opened...!!!\n");
+        return 0;
+}
+ 
+static int etx_release(struct inode *inode, struct file *file)
+{
+        printk(KERN_INFO "Device File Closed...!!!\n");
+        return 0;
+}
+ 
+static ssize_t etx_read(struct file *filp, 
+                char __user *buf, size_t len, loff_t *off)
+{
+        struct irq_desc *desc;
+        printk(KERN_INFO "Read function\n");
+        desc = irq_to_desc(11);
+        if (!desc) 
+        {
+            return -EINVAL;
+        }
+        __this_cpu_write(vector_irq[59], desc);
+        asm("int $0x3B");  // Corresponding to irq 11
+        return 0;
+}
+static ssize_t etx_write(struct file *filp, 
+                const char __user *buf, size_t len, loff_t *off)
+{
+        printk(KERN_INFO "Write Function\n");
+        return len;
+}
+ 
+static int __init etx_driver_init(void)
+{
+        /*Allocating Major number*/
+        if((alloc_chrdev_region(&dev, 0, 1, "etx_Dev")) <0){
+                printk(KERN_INFO "Cannot allocate major number\n");
+                return -1;
+        }
+        printk(KERN_INFO "Major = %d Minor = %d \n",MAJOR(dev), MINOR(dev));
+ 
+        /*Creating cdev structure*/
+        cdev_init(&etx_cdev,&fops);
+ 
+        /*Adding character device to the system*/
+        if((cdev_add(&etx_cdev,dev,1)) < 0){
+            printk(KERN_INFO "Cannot add the device to the system\n");
+            goto r_class;
+        }
+ 
+        /*Creating struct class*/
+        if(IS_ERR(dev_class = class_create(THIS_MODULE,"etx_class"))){
+            printk(KERN_INFO "Cannot create the struct class\n");
+            goto r_class;
+        }
+ 
+        /*Creating device*/
+        if(IS_ERR(device_create(dev_class,NULL,dev,NULL,"etx_device"))){
+            printk(KERN_INFO "Cannot create the Device 1\n");
+            goto r_device;
+        }
+ 
+        /*Creating a directory in /sys/kernel/ */
+        kobj_ref = kobject_create_and_add("etx_sysfs",kernel_kobj);
+ 
+        /*Creating sysfs file for etx_value*/
+        if(sysfs_create_file(kobj_ref,&etx_attr.attr)){
+                printk(KERN_INFO"Cannot create sysfs file......\n");
+                goto r_sysfs;
+        }
+        if (request_irq(IRQ_NO, irq_handler, IRQF_SHARED, "etx_device", (void *)(irq_handler))) {
+            printk(KERN_INFO "my_device: cannot register IRQ ");
+                    goto irq;
+        }
+        printk(KERN_INFO "Device Driver Insert...Done!!!\n");
+    return 0;
+ 
+irq:
+        free_irq(IRQ_NO,(void *)(irq_handler));
+ 
+r_sysfs:
+        kobject_put(kobj_ref); 
+        sysfs_remove_file(kernel_kobj, &etx_attr.attr);
+ 
+r_device:
+        class_destroy(dev_class);
+r_class:
+        unregister_chrdev_region(dev,1);
+        cdev_del(&etx_cdev);
+        return -1;
+}
+ 
+static void __exit etx_driver_exit(void)
+{
+        free_irq(IRQ_NO,(void *)(irq_handler));
+        kobject_put(kobj_ref); 
+        sysfs_remove_file(kernel_kobj, &etx_attr.attr);
+        device_destroy(dev_class,dev);
+        class_destroy(dev_class);
+        cdev_del(&etx_cdev);
+        unregister_chrdev_region(dev, 1);
+        printk(KERN_INFO "Device Driver Remove...Done!!!\n");
+}
+ 
+module_init(etx_driver_init);
+module_exit(etx_driver_exit);
+ 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("EmbeTronicX <embetronicx@gmail.com>");
+MODULE_DESCRIPTION("A simple device driver - Interrupts");
+MODULE_VERSION("1.9");
+This is a simple example of using Interrupts in the device drivers. This is just basic. You can also try using hardware. I hope this might helped you.
+
+In our next tutorial, we will discuss one of the bottom half, which is workqueue. You can also look at the GPIO interrupt tutorial here.
+
+Please find the other Linux device driver tutorials here.
+
+You can also read the below tutorials.
+
+Linux Device Driver Tutorials	C Programming Tutorials
+FreeRTOS Tutorials	NuttX RTOS Tutorials
+RTX RTOS Tutorials	Interrupts Basics
+I2C Protocol – Part 1 (Basics)	I2C Protocol – Part 2 (Advanced Topics)
+STM32 Tutorials	LPC2148 (ARM7) Tutorials
+PIC16F877A Tutorials	8051 Tutorials
+Unit Testing in C Tutorials	ESP32-IDF Tutorials
+Raspberry Pi Tutorials	Embedded Interview Topics
+Reset Sequence in ARM Cortex-M4	BLE Basics
+VIC and NVIC in ARM	SPI – Serial Peripheral Interface Protocol
+Bootloader Tutorials	Raspberry PI Pico Tutorials
+Zephyr RTOS Tutorials - STM32	Zephyr RTOS Tutorials - ESP32
+VHDL Tutorials	UDS Protocol Tutorials
+Product Reviews	
+SLR
+SLR
+Embedded Software | Firmware | Linux Devic Deriver | RTOS
+
+ Hits (since 1 July 2022) - 19,907
+Related
+Interruptions dans le noyau Linux
+Interrupts in Linux Kernel – Linux Device Driver Tutorial Part 12
+In "Device Drivers"
+
+File d'attente dans le noyau Linux
+Workqueue in Linux Kernel Part 1 – Linux Device Driver Tutorial Part 14
+In "Device Drivers"
+
+Tasklets dans le pilote Linux
+Tasklets in Linux kernel | Dynamic Method – Linux Device Driver Tutorial Part 21
+In "Device Drivers"
+
+CategoriesDevice Drivers
+TagsCharacter Device Driver, Device Driver, Interrupts, Linux, sysfs, Tutorials
+Interrupts in Linux Kernel – Linux Device Driver Tutorial Part 12
+Workqueue in Linux Kernel Part 1 – Linux Device Driver Tutorial Part 14
+Subscribe
+Login
+invité
+
+
+{}[+]
+This site uses Akismet to reduce spam. Learn how your comment data is processed.
+
+32 COMMENTS
+Le plus ancien
+manoj
+manoj
+Guest
+February 27, 2018 2:52 PM
+Also please add a tutorial on different ways to handle situations when critial region code is being accessed by cpu (such as spinlocks, mutexes, semaphones etc implementation in kernel space)
+
+0
+ Reply
+arun
+arun
+Guest
+August 30, 2018 1:24 AM
+do_IRQ: 2.59 No irq handler for vector
+
+im getting this error plz help me out.
+
+0
+ Reply
+EmbeTronicx India
+EmbeTronicx India
+Guest
+Reply to  arun
+August 31, 2018 3:48 AM
+Hi Arun,
+
+Its looks like your hardware issue. Did you update the kernel recently? Please go through this below link.
+https://unix.stackexchange.com/questions/367503/do-irq-0-163-no-irq-handler-for-vector-irq-1
+
+0
+ Reply
+EmbeTronicX
+EmbeTronicX
+Guest
+Reply to  arun
+April 1, 2020 5:50 AM
+Please refer this link.
+
+0
+ Reply
+nguyendang
+nguyendang
+Guest
+April 30, 2019 2:23 AM
+do_IRQ: 2.59 No irq handler for vector
+
+I have the same trouble as Arun but I cannot fix it so far, although following your instruction you replied to Arun.
+
+Please help me, thank you!
+
+0
+ Reply
+EmbeTronicX
+EmbeTronicX
+Guest
+Reply to  nguyendang
+April 1, 2020 5:46 AM
+Hi,
+
+Please refer this Link to fix.
+
+0
+ Reply
+Kunapareddy Jeevan
+Kunapareddy Jeevan
+Guest
+Reply to  EmbeTronicX
+June 16, 2020 9:36 PM
+I am unable to find the file in arch/x86/kernel/irq.c
+I am using Virtualbox. does this giving me a problem to enable an hardware interrupt?
+please help me
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  Kunapareddy Jeevan
+June 16, 2020 9:54 PM
+Can you tell me, what is the issue you are facing? Which version of the kernel you are using?
+
+0
+ Reply
+kunapareddy Jeevan
+kunapareddy Jeevan
+Guest
+Reply to  SLR
+June 17, 2020 8:32 PM
+my issue is same as nguyendang and arun
+ 
+do_IRQ: 2.59 No irq handler for vector
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  kunapareddy Jeevan
+June 17, 2020 8:39 PM
+If you are using new kernel, then it is not available I guess. Anyway please try the above link i have provided.
+
+0
+ Reply
+Kunapareddy Jeevan
+Kunapareddy Jeevan
+Guest
+Reply to  SLR
+June 17, 2020 11:11 PM
+In the link, it given to add a line EXPORT_SYMBOL(vector_irq); in file arch/x86/kernel/irq.c   problem is that im unable to find that file in my kernel folder. when i add these lines in read function static ssize_t etx_read(struct file *filp,         char __user *buf, size_t len, loff_t *off) {     struct irq_desc *desc;       printk(KERN_INFO “Read function\n”);     desc = irq_to_desc(11);     if (!desc) return -EINVAL;     __this_cpu_write(vector_irq[59], desc);     asm(“int $0x3B”); // Corresponding to irq 11     return 0; }   im getting error at vector_irq[59] because of not able to use export_symbol.   i checked /proc/interrupts also.there i can see the interrupt.but when i check dmesg… Read more »
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  Kunapareddy Jeevan
+June 20, 2020 9:23 AM
+Hello,
+We have updated the tutorial with step by step. Please see the updated tutorial. This may help you.
+
+0
+ Reply
+Kalpesh
+Kalpesh
+Guest
+August 22, 2019 12:59 AM
+What does IRQ 11 stands for(For which process is this IRQ number)
+
+0
+ Reply
+Sunil Vaghela
+Sunil Vaghela
+Guest
+July 5, 2020 4:44 PM
+Hi Thank you very much for such a good tutorials. I am trying above program on beaglebone black (armv7l). The same x86 assembly instructions won’t work in arm, so need to update instructions to generate software interrupts on arm. I explored armv7 assembly instruction set, TI am355x(beaglebone black processor) Technical reference manual and many other stuffs to what are the instructions and interrupt vector mapping there in armv7. It might be possible using SWI instruction in arm, but I am not sure how can I use it. Or I am not sure,if I misunderstood anything. It would be great if… Read more »
+
+0
+ Reply
+Tony
+Tony
+Guest
+August 5, 2020 1:51 PM
+Hi, may I know how to detect the available interrupt line automatically and assign that specific interrupt line to the new driver to be added? Looking forward for your answer. Thanks
+
+0
+ Reply
+Naveen
+Naveen
+Guest
+March 10, 2021 6:10 PM
+I am getting below error after updating my kernel __common_interrupt: 1.59 No irq handler for vector
+
+waiting for your reply………………
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  Naveen
+March 10, 2021 11:12 PM
+Hello Naveen,
+
+I think you have updated to the new kernel it seems. Please refer the below link to solve the problem.
+
+https://embetronicx.com/tutorials/linux/device-drivers/linux-device-driver-tutorial-part-13-interrupt-example-program-in-linux-kernel/#A_problem_in_New_Linux_kernel
+
+0
+ Reply
+M VENKATA RAMANAIAH
+M VENKATA RAMANAIAH
+Guest
+May 4, 2021 7:42 PM
+After loading the driver into the kernel. Without reading the interrupt is generated continuously. My kernel version is 3.13.
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  M VENKATA RAMANAIAH
+May 4, 2021 8:51 PM
+Hello,
+Can you tell me which version of the code you are trying? Whether new kernel driver or old kernel driver?
+
+And did you made any changes from the code?
+
+0
+ Reply
+M VENKATA RAMANAIAH
+M VENKATA RAMANAIAH
+Guest
+Reply to  SLR
+May 8, 2021 10:38 AM
+Old kernel driver.My kernel version is 3.13.And i did not change the code.
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  M VENKATA RAMANAIAH
+May 9, 2021 12:49 AM
+can you attach the dmesg?
+
+0
+ Reply
+M VENKATA RAMANAIAH
+M VENKATA RAMANAIAH
+Guest
+Reply to  SLR
+May 9, 2021 11:48 AM
+[ 1054.189403] Major:250 Minor:1 [ 1054.193717] [UserClass] is created,Can check in /sys/class [ 1054.201361] [UserDevice] is created,Can check in /dev [ 1054.202901] Interrupt is requested [ 1055.706743] Irq is generated,Irq:11 Conter::1 [ 1055.712532] Irq is generated,Irq:11 Conter::2 [ 1057.976677] Irq is generated,Irq:11 Conter::3 [ 1057.979062] Irq is generated,Irq:11 Conter::4 [ 1059.591340] Irq is generated,Irq:11 Conter::5 [ 1059.596817] Irq is generated,Irq:11 Conter::6 [ 1059.598235] Irq is generated,Irq:11 Conter::7 [ 1059.600341] Irq is generated,Irq:11 Conter::8 [ 1060.729089] Irq is generated,Irq:11 Conter::9 [ 1060.733015] Irq is generated,Irq:11 Conter::10 The above snippet is the dmesg output. I loaded the driver and the interrupt is… Read more »
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  M VENKATA RAMANAIAH
+May 11, 2021 9:13 PM
+Hi, Still are you facing this issue? If yes, then please try with the hardware interrupts like gpio with some microcontroller dev board.
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  M VENKATA RAMANAIAH
+May 14, 2021 6:56 PM
+Hi, We have gone through the code that you sent us. Actually, you are enabling the keyboard interrupt ( #define IRQ_NO 1). But we have configured other interrupts (#defin IRQ_NO 11). So, whenever you type something on the keyboard, you should get the interrupt even if you type dmesg. So, it is actually working as expected.
+
+I have just added the files that you have sent to us for other people’s reference.
+
+SignalDriver.c
+SignalUserSpaceProg.c
+
+0
+ Reply
+Mukund
+Mukund
+Guest
+September 1, 2021 4:23 PM
+tell about the arguments of interrupt handler.
+What does IRQ_NO 11 stands where we can see that 11 is for read
+
+0
+ Reply
+trackback
+.NET IoT. Часть 5. Обработка прерываний (interrupt) на примере событий кнопки - DevDotNet.ORG
+December 18, 2021 4:38 PM
+[…] Interrupts Example Program in Linux Kernel – Linux Device Driver Tutorial Part 13 embetronicx.com […]
+
+0
+ Reply
+deepak kumar
+deepak kumar
+Guest
+March 19, 2022 12:44 PM
+Hi I have tried to compile both given code but above code gives error /tmp/cc8D0CkX.s:113: Error: bad instruction `int $0x3B’ and beow code gives error of vector. You have given the solution for kernel 5.4 but I am using 5.10 in respberry pi 4. Please advise because i do not want to downgrade my kernel version
+
+0
+ Reply
+deepak kumar
+deepak kumar
+Guest
+March 19, 2022 1:33 PM
+I am using respberry pi with kernel version 5.10.63-v7l+’. I getting this error
+
+/home/pi/driver/driver.c: In function ‘etx_read’:
+/home/pi/driver/driver.c:109:26: error: ‘vector_irq’ undeclared (first use in this function); did you mean ‘sector_t’?
+     __this_cpu_write(vector_irq[59], desc);
+
+please help me out
+
+0
+ Reply
+Abhishek
+Abhishek
+Guest
+May 20, 2022 12:24 PM
+For error: do_IRQ: 1.59 No irq handler for vector
+
+There is a alternative solution, rather than doing it through the vector and recompiling.
+
+A simple straight forward to check if the interrupt registration of interrupt is working, you can use existing interrupts like keyboard interrupts(IRQ = 1), so you can register for 1 instead of IRQ=11.
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  Abhishek
+May 20, 2022 12:42 PM
+Thank you Abhishek for your valuable input.
+
+0
+ Reply
+Avinash
+Avinash
+Guest
+September 6, 2022 12:36 PM
+please add modify kernal for raspberrypi
+
+0
+ Reply
+SLR
+SLR
+Author
+Reply to  Avinash
+September 6, 2022 1:39 PM
+Hi Avinash, We no need to modify the kernel for Raspberry PI. Because we can use the GPIO interrupt. You can learn the GPIO interrupt here.
+
+0
+ Reply

@@ -58,38 +58,33 @@ typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;
 struct STR_ASTRE {
 
   pthread_mutex_t ast_mutex ;
+
+  STRUCT_TIME  ast_at ;
+  STRUCT_TIME  ast_ht ;
+  STRUCT_TIME  ast_azi_t ;
+  STRUCT_TIME  ast_alt_t ;
+  STRUCT_TIME  ast_dec_t ;
+  STRUCT_TIME  ast_asc_t ;   
+  STRUCT_TIME  ast_agh_t ;   
+  STRUCT_ANGLE ast_azi_a ; 
+  STRUCT_ANGLE ast_alt_a ;
+  STRUCT_ANGLE ast_dec_a ; 
+  STRUCT_ANGLE ast_asc_a ;
+  STRUCT_ANGLE ast_agh_a ;
+  STRUCT_TIME  ast_agh0_t ;  
+  STRUCT_TIME  ast_agh1_t ; 
+  STRUCT_TIME  ast_agh2_t ;  
+  STRUCT_TIME  ast_azi0_t ;
+  STRUCT_TIME  ast_azi1_t ;
+  STRUCT_TIME  ast_azi2_t ;
   /* Numero de l objet dans un catalogue */
+  
   int    ast_num ; 
   int    ast_new ; /* ajout 2022-11 */
   /* les 2 structures sont placees ici en attendant une structure dediee */
   int    ast_typ ;
 
-  /* structure STRUCT_TIME pour azimut et altitude */ 
-  /* structure struct STR_TIME pour ascension droite, declinaison et angle horaire */ 
-  /* structure struct STR_ANGLE pour ascension droite, declinaison et angle horaire */
 
-  struct STR_TIME  at ;
-  struct STR_TIME  ht ;
-  struct STR_TIME  AZIt ;
-  struct STR_TIME  ALTt ;
-  struct STR_TIME  DECt ;
-  struct STR_TIME  ASCt ;   
-  struct STR_TIME  AGHt ;   
-  struct STR_TIME  AGH0t ;  
-  struct STR_TIME  AGH1t ; 
-  struct STR_TIME  AGH2t ;  
-  struct STR_TIME  AZI0t ;
-  struct STR_TIME  AZI1t ;
-  struct STR_TIME  AZI2t ;
-
-  /* structure STRUCT_ANGLE et STRUCT_TIME pour azimut et altitude */
-  /* structure struct STR_TIME pour calculs intermediares */ 
-
-  struct STR_ANGLE  AZIa ; 
-  struct STR_ANGLE  ALTa ;
-  struct STR_ANGLE  DECa ; 
-  struct STR_ANGLE  ASCa ;
-  struct STR_ANGLE  AGHa ;
 
   char   nom         [ ASTRE_TAILLE_BUFFER ] ;
   char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
@@ -189,8 +184,10 @@ typedef struct STR_ASTRE STRUCT_ASTRE ;
 /* Le contenu de cette variable permet le hachage avec 
  les valeurs de l enum t_en_Astre_Type defini dans astre.h */
  
-void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
-void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE * ) ;
-void ASTRE_AFFICHER_MODE_STELLARIUM  ( STRUCT_ASTRE * ) ;
+void ASTRE_INIT ( STRUCT_ASTRE * ) ;
+
+void ASTRE_RESET                     (void) ;
+void ASTRE_FORMATE_DONNEES_AFFICHAGE (void) ;
+void ASTRE_AFFICHER_MODE_STELLARIUM  (void) ;
 
 #endif

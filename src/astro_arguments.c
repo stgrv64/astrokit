@@ -67,8 +67,8 @@ void ARGUMENTS_VOUTE( void) {
      gp_Ast->a=a ;
      gp_Ast->h=h ;
      
-     CALCULS_EQUATEUR  ( gp_Lie, gp_Ast) ;        // calcul coordonnees horaires en fait
-     CALCULS_VITESSES  ( gp_Lie, gp_Ast, gp_Sui) ; // TODO : verifier gp_Sui->sui_mode_equatorial avant
+     CALCULS_EQUATEUR() ; // calcul coordonnees horaires en fait
+     CALCULS_VITESSES() ; // TODO : verifier gp_Sui->sui_mode_equatorial avant
      
      /* Calcul de la norme de la vitesse */
 
@@ -79,7 +79,7 @@ void ARGUMENTS_VOUTE( void) {
      else
        gp_Ast->An = M_PI/2 ;
      
-     CALCULS_GEODE( gp_Ast ) ;
+     CALCULS_COORD_R3() ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
        gp_Ast->a * CALCULS_UN_RADIAN_EN_DEGRES, \
@@ -333,6 +333,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     gp_Ast->ASC = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
     gp_Ast->DEC = atof(argv[3]) / CALCULS_UN_RADIAN_EN_DEGRES ;
+
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ;  */
@@ -355,6 +356,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     gp_Ast->a = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
     gp_Ast->h = atof(argv[3]) / CALCULS_UN_RADIAN_EN_DEGRES ;
+
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ;  */
@@ -390,6 +392,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     Trace("as nom mis a la valeur EQU0");
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
     strcpy( gp_Ast->nom, "EQU0" ) ;
+
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */ 
@@ -405,6 +408,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     Trace("as nom mis a la valeur TST0");
     memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
     strcpy( gp_Ast->nom, "AZI0" ) ;
+
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
     /* CONFIG_AFFICHER_TOUT() ; */    
@@ -420,7 +424,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( argc == 7 ) {
 
-    gp_Lie->lie_lat       = atof(argv[1]) / CALCULS_UN_RADIAN_EN_DEGRES ;
+    gp_Lie->lie_lat   = atof(argv[1]) / CALCULS_UN_RADIAN_EN_DEGRES ;
     gp_Ast->DEC       = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
     gp_Vou->vou_begin = atof(argv[3]) ;
     gp_Vou->vou_end   = atof(argv[4]) ;
@@ -494,7 +498,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_alt_dir, gp_Gpi_Par_Con->par_alt_clk) ;
+     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_alt_dir, gp_Ctl_Par->par_alt_clk) ;
 
      GPIO_SET_ALT( 0,0,0,0,0,0 ) ;
     }
@@ -506,7 +510,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_azi_dir, gp_Gpi_Par_Con->par_azi_clk) ;
+     GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_azi_dir, gp_Ctl_Par->par_azi_clk) ;
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
@@ -526,7 +530,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_alt_dir, gp_Gpi_Par_Con->par_alt_clk) ;
+     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_alt_dir, gp_Ctl_Par->par_alt_clk) ;
 
      GPIO_SET_ALT( 0,0,0,0,0,0 ) ;
     }
@@ -537,7 +541,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
      periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
      printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
-     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Gpi_Par_Con->par_azi_dir, gp_Gpi_Par_Con->par_azi_clk) ;
+     GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_azi_dir, gp_Ctl_Par->par_azi_clk) ;
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }

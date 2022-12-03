@@ -21,12 +21,15 @@
 
 struct STR_DATAS {
   pthread_mutex_t dat_mutex ;
-  char            dat_inf [ CONFIG_TAILLE_BUFFER_256 ] ;
-  char            dat_acc [ CONFIG_TAILLE_BUFFER_256 ] ;
-  char            dat_bou [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char dat_act [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char dat_acc [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char dat_bou [ CONFIG_TAILLE_BUFFER_256 ] ;
 } ;
 typedef struct STR_DATAS STRUCT_DATAS ;
 
-void   DATAS_INIT ( STRUCT_DATAS * ) ;
+void DATAS_INIT         ( STRUCT_DATAS * ) ;
+void DATAS_RESET        ( STRUCT_DATAS * )  ;
+void DATAS_ACTION_RESET ( STRUCT_DATAS * )  ;
+void DATAS_ACTION_COPY  ( STRUCT_DATAS * , const char * ) ;
 
 #endif

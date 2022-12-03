@@ -71,7 +71,7 @@ extern STRUCT_LCD     *gp_Lcd ;
 * @param  : STRUCT_LIEU *gp_Lie
 * @date   : 2022-04-08 creation
 * @date   : 2022-04-08 ajout sauvegarde des lignes dans old
-* @date   : 2022-04-27 mise en commentaire de TIME_CALCULS_TEMPS_SIDERAL
+* @date   : 2022-04-27 mise en commentaire de TIME_CALCULS_SIDERAL_TIME
 *****************************************************************************************/
 
 void LCD_INIT(STRUCT_LCD * lp_Lcd) {
@@ -270,7 +270,7 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
     /* les valeurs par defaut de la ffichage sont la date l heure et l objet en cours */
     /*---------------------------------------------------------------------------------*/
 
-    TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+    TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
 
     sprintf( c_l0, "%d%s%d %-2d:%-2d", \
       gp_Tim->tim_yy , \
@@ -524,7 +524,7 @@ void LCD_DISPLAY_TEMPS_LIEU( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0) ) ; 
     memset( c_l1, 0, sizeof(c_l1) ) ; 
 
-    TIME_CALCULS_TEMPS_SIDERAL(gp_Lie, gp_Tim) ;
+    TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
 
     /* Remplissage de line 0 et line 1 */
 
@@ -742,8 +742,8 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(h) %s", gp_Gpi_Par_Pwm->par_alt ) ;
-    sprintf( c_l1, "(a) %s", gp_Gpi_Par_Pwm->par_azi );
+    sprintf( c_l0, "(h) %s", gp_Pwm_Par->par_alt ) ;
+    sprintf( c_l1, "(a) %s", gp_Pwm_Par->par_azi );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -769,8 +769,8 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(Masq) %s", gp_Gpi_Par_Pwm->par_mas ) ;
-    sprintf( c_l1, "(Fpwm) %s", gp_Gpi_Par_Pwm->par_fre_pwm );
+    sprintf( c_l0, "(Masq) %s", gp_Pwm_Par->par_mas ) ;
+    sprintf( c_l1, "(Fpwm) %s", gp_Pwm_Par->par_fre_pwm );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -823,7 +823,7 @@ void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
     }
     /* Lecture LED ETAT */
 
-    sprintf( c_l0, "(LED ETAT) %d", gp_Gpi_Par_Pwm->par_led_etat ) ;
+    sprintf( c_l0, "(LED ETAT) %d", gp_Pwm_Par->par_led_etat ) ;
     
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;

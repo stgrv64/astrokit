@@ -13,7 +13,7 @@
 #                 pour inverser les calculs quand on a azi et alt
 # 29/09/2022  | * correction buffer overfow => 
 #     deplacement et correction code de recuperation type et nom de astre
-#     dans CALCULS_RECUP_MODE_ET_ASTRE_TYPE
+#     dans CALCULS_RECUP_MODE_ET_ASTRE_TYPE()
 # -------------------------------------------------------------- 
 */
 
@@ -130,8 +130,19 @@ typedef struct STR_CALCULS_PARAMS STRUCT_CALCULS_PARAMS ;
 /*---------------------------------------------------*/
 
 struct STR_CALCULS {
-  pthread_mutex_t  cal_mutex ;
-  int              cal_mode ;
+  pthread_mutex_t           cal_mutex ;
+  STRUCT_SUIVI_FREQUENCES * cal_p_Fre ;
+  STRUCT_SUIVI_STATS      * cal_p_Sta ;
+  STRUCT_SUIVI_PAS        * cal_p_Pas ;
+  STRUCT_ASTRE            * cal_p_Ast ;
+  STRUCT_CALCULS          * cal_p_Cal ;
+  STRUCT_VOUTE            * cal_p_Vou ;
+  STRUCT_LIEU             * cal_p_Lie ;
+  STRUCT_DEVICES          * cal_p_Dev ;
+  STRUCT_MUTEXS           * cal_p_Mut ;
+  STRUCT_TIME             * cal_p_Tim ;
+  STRUCT_SUIVI            * cal_p_Sui ;
+  int                       cal_mode ;
 } ;
 typedef struct STR_CALCULS STRUCT_CALCULS ;
 
@@ -173,32 +184,39 @@ double DEG  (int degres, int minutes )                  ;
 // en profitant d'un sleep parametrable (eviter une consommation CPU
 // avant de rentrer en boucle active d'attente
 
-void   CALCULS_INIT                    ( STRUCT_CALCULS * ) ;
+void CALCULS_INIT ( \
+ STRUCT_CALCULS          * , \
+ STRUCT_SUIVI_FREQUENCES * , \
+ STRUCT_SUIVI_STATS      * , \
+ STRUCT_SUIVI_PAS        * , \
+ STRUCT_ASTRE            * , \
+ STRUCT_VOUTE            * , \
+ STRUCT_LIEU             * , \
+ STRUCT_DEVICES          * , \
+ STRUCT_MUTEXS           * , \
+ STRUCT_TIME             * , \
+ STRUCT_SUIVI            * ) ;
 
-void   CALCULS_GEODE                   ( STRUCT_ASTRE *) ;
-void   CALCULS_AZIMUT                  ( STRUCT_LIEU *, STRUCT_ASTRE *) ;
-void   CALCULS_EQUATEUR                ( STRUCT_LIEU *, STRUCT_ASTRE *) ;
-
-void   CALCULS_VITESSES_EQUATORIAL     ( STRUCT_ASTRE *) ;
-void   CALCULS_VITESSES                ( STRUCT_LIEU *, STRUCT_ASTRE *, STRUCT_SUIVI * ) ;
-
-void   CALCULS_ANGLE_HORAIRE           ( STRUCT_LIEU *, STRUCT_ASTRE *) ;
-void   CALCULS_ASCENSION_DROITE        ( STRUCT_LIEU *, STRUCT_ASTRE *) ; 
-void   CALCULS_DIVISEUR_FREQUENCE      ( STRUCT_ASTRE *, STRUCT_SUIVI * ) ;   
-void   CALCULS_PERIODE                 ( STRUCT_ASTRE *, STRUCT_SUIVI * ,STRUCT_VOUTE *)  ;
-void   CALCULS_PERIODES_SUIVI_MANUEL   ( STRUCT_ASTRE *, STRUCT_SUIVI * , STRUCT_VOUTE *) ;
-
-void   CALCULS_CONVERSIONS_ANGLES      ( STRUCT_ASTRE *) ;
-void   CALCULS_AFFICHER_MSG_ANGLE       ( char * , STRUCT_ANGLE * ) ;
-
+void   CALCULS_VOUTE                   (void) ;
+void   CALCULS_COORD_R3                 (void) ;
+void   CALCULS_AZIMUT                  (void) ;
+void   CALCULS_EQUATEUR                (void) ;
+void   CALCULS_VITESSES_EQUATORIAL     (void) ;
+void   CALCULS_PERIODE                 (void) ;
+void   CALCULS_PERIODES_SUIVI_MANUEL   (void) ;
+void   CALCULS_VITESSES                (void) ;
+void   CALCULS_ANGLE_HORAIRE           (void) ;
+void   CALCULS_ASCENSION_DROITE        (void) ; 
+void   CALCULS_DIVISEUR_FREQUENCE      (void) ;   
+void   CALCULS_CONVERSIONS_ANGLES      (void) ;
+void   CALCULS_TOUT                    (void) ;
+void   CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
+void   CALCULS_ANGLE_VERS_DMS          (STRUCT_ANGLE *) ;
 /* TODO : decommenter
 void   SET_ASTRE ( STRUCT_ASTRE *gp_Ast,char *parametre, double valeur) ;
 void   SET_LIEU  ( STRUCT_LIEU *gp_Lie,char *parametre, double valeur) ;
 void   SET_VOUTE ( STRUCT_VOUTE *gp_Vou,char *parametre, double valeur) ;
 */
-
-void   CALCULS_TOUT                    (void) ;
-void   CALCULS_RECUP_MODE_ET_ASTRE_TYPE (void) ;
 
 #endif
 

@@ -37,8 +37,8 @@ struct STR_KEYS {
 } ;
 
 void   KEYS_INIT                  ( STRUCT_KEYS * )  ;
-void   KEYS_INPUTS_GESTION_APPUIS ( STRUCT_SUIVI * , STRUCT_KEYS *) ;
-void   KEYS_AFFICHER              ( STRUCT_KEYS *) ;
+void   KEYS_INPUTS_GESTION_APPUIS ( STRUCT_KEYS * ) ;
+void   KEYS_AFFICHER              ( STRUCT_KEYS * ) ;
 
 #endif
 

@@ -35,6 +35,7 @@ void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
   lp_Lie->lie_ts  = 0 ;  // temps sideral
   lp_Lie->lie_tsr = 0 ;  // temps sideral en radians
   lp_Lie->lie_jd  = 0 ;  // jour decimal
+  
   lp_Lie->lie_lat = gp_Lie_Par->par_latitude / CALCULS_UN_RADIAN_EN_DEGRES ;
   lp_Lie->lie_lon = gp_Lie_Par->par_longitude / CALCULS_UN_RADIAN_EN_DEGRES ;
   lp_Lie->lie_alt = gp_Lie_Par->par_altitude ;

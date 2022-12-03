@@ -42,17 +42,19 @@ int CAT_FIN_MOT(char c) {
 * @todo   : ras
 *****************************************************************************************/
 
-void CAT_INIT (STRUCT_CAT * lp_Cat) {
+void CAT_INIT (STRUCT_CAT * gp_Cat, STRUCT_ASTRE * gp_Ast) {
  
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cat->cat_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Cat->cat_mutex ) ;
 
   for(int L=0;L<CAT_NB_LIGNES;L++) {
     for(int C=0;C<CAT_NB_COLONNES;C++) {
-      memset(lp_Cat->c_cat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+      memset(gp_Cat->c_cat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
     }
   }
+  gp_Cat->cat_p_ast = gp_Ast ;
+
   return ;
 }
 /*****************************************************************************************
@@ -240,13 +242,13 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     strcpy( gp_Ast->infos, "undefined" ) ;
   }
 
-  CALCULS_CONVERSIONS_ANGLES( gp_Ast ) ;
+  CALCULS_CONVERSIONS_ANGLES() ;
 
   Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
     gp_Ast->nom , \
-    gp_Ast->ASCt.tim_HH, \
-    gp_Ast->ASCt.tim_MM, \
-    gp_Ast->ASCt.tim_SS, \
+    gp_Ast->ast_asc_t.tim_HH, \
+    gp_Ast->ast_asc_t.tim_MM, \
+    gp_Ast->ast_asc_t.tim_SS, \
     gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES
   ) ; 
 

@@ -1,0 +1,1 @@
+cmd_/home/stef/git/astrokit/drv/embetronicx/modules.order := {   echo /home/stef/git/astrokit/drv/embetronicx/drv_example_0.ko; :; } | awk '!x[$$0]++' - > /home/stef/git/astrokit/drv/embetronicx/modules.order

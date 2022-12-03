@@ -125,62 +125,61 @@ struct STR_I2C_DEVICE {
 
 struct STR_I2C_ACC_MAG {
   
-  pthread_mutex_t i2c_acc_mag_mutex ;
+  pthread_mutex_t acc_mutex ;
 
-  float A_norme_max ; 
-  float M_norme_max ;
-  
-  float roll ;
-  float pitch ;
-  float heading ;
+  float acc_acc_norme_max ; 
+  float acc_mag_norme_max ;
+  float acc_roll ;
+  float acc_pitch ;
+  float acc_heading ;
   
   // Measerements for Magnetometer 
   
-  float Mx;
-  float My ;
-  float Mz ;
+  float acc_mag_x;
+  float acc_mag_y ;
+  float acc_mag_z ;
   
   // Measerements for Accelerometer 
   
-  float Ax;
-  float Ay ;
-  float Az ;
+  float acc_acc_x;
+  float acc_acc_y ;
+  float acc_acc_z ;
   
-  // Normalized values for Magnetometer sqrt( Xh*Xh + Yh*Yh + Zh*Zh ) = 1
+  // Normalized values for Magnetometer sqrt( acc_gauss_field_x*acc_gauss_field_x + acc_gauss_field_y*acc_gauss_field_y + acc_gauss_field_z*acc_gauss_field_z ) = 1
   
-  float Xm ;
-  float Ym ;
-  float Zm ;
+  float acc_mag_norm_x ;
+  float acc_mag_norm_y ;
+  float acc_mag_norm_z ;
   
-  // Normalized values for Accelerometer sqrt( Ax1*Ax + Yh*Yh + Zh*Zh ) = 1
+  // Normalized values for Accelerometer sqrt( Ax1*acc_acc_x + acc_gauss_field_y*acc_gauss_field_y + acc_gauss_field_z*acc_gauss_field_z ) = 1
   
-  float Xa ;
-  float Ya ;
-  float Za ;
+  float acc_acc_norm_x ;
+  float acc_acc_norm_y ;
+  float acc_acc_norm_z ;
   
   // Values of projection of gauss field component into (XYZ) plane 
   
-  float Xh;
-  float Yh ;
-  float Zh ;
+  float acc_gauss_field_x;
+  float acc_gauss_field_y ;
+  float acc_gauss_field_z ;
   
-  uint16_t axl ;
-  uint16_t ayl ;
-  uint16_t azl ;
+  uint16_t acc_axl ;
+  uint16_t acc_ayl ;
+  uint16_t acc_azl ;
   
-  uint16_t axh ;
-  uint16_t ayh ;
-  uint16_t azh ;
+  uint16_t acc_axh ;
+  uint16_t acc_ayh ;
+  uint16_t acc_azh ;
   
-  uint16_t mxl ;
-  uint16_t myl ;
-  uint16_t mzl ; 
+  uint16_t acc_mxl ;
+  uint16_t acc_myl ;
+  uint16_t acc_mzl ; 
   
-  uint16_t mxh ;
-  uint16_t myh ; 
-  uint16_t mzh ;
+  uint16_t acc_mxh ;
+  uint16_t acc_myh ; 
+  uint16_t acc_mzh ;
   
-  int gpio ; // port GPIO pour tester la sortie son 
+  int acc_gpio ; // port GPIO pour tester la sortie son 
   
 } ;
 

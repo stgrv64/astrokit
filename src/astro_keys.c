@@ -20,31 +20,30 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @author : s.gravois
 * @brief  : Cette fonction gere les appuis sur les "touches" (clavier, ir, ..)
 * @brief  : et en deduit le contenu de la structure clavier (mot, action, etc..)
-* @param  : STRUCT_SUIVI * lp_Sui
 * @param  : STRUCT_KEYS  * lp_Key
 * @date   : 2022-03-22 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
 * @date   : 2022-04-12 protection zone de code dat_inf
 *****************************************************************************************/
 
-void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
+void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
 
   int  i = 0 ;
-  char val[255]={0} ;
+  char c_mot[255]={0} ;
   char s_buffer[CONFIG_TAILLE_BUFFER_32]={0} ;
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  memset(val, 0, sizeof(val)) ;     
+  memset(c_mot, 0, sizeof(c_mot)) ;     
 
   pthread_mutex_lock(& gp_Mut->mut_dat );
-  strcpy( val, gp_Dat->dat_inf ) ;
+  strcpy( c_mot, gp_Dat->dat_act ) ;
   pthread_mutex_unlock(& gp_Mut->mut_dat );
   
-  if ( strcmp( val, "") ) {
+  if ( strcmp( c_mot, "") ) {
     
-    //printf("val = %s\n", val ) ;
-    strcpy( lp_Key->key_mot, val ) ; 
+    //printf("c_mot = %s\n", c_mot ) ;
+    strcpy( lp_Key->key_mot, c_mot ) ; 
     lp_Key->key_appui_en_cours = 1 ;
     lp_Key->key_mot_en_cours = 1 ;    
   }
@@ -60,7 +59,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_SUIVI * lp_Sui, STRUCT_KEYS *lp_Key) {
   
     Trace1("mot trouver = %s", lp_Key->key_mot ) ;
 		
-		GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 5) ;
+		GPIO_LED_ETAT_CLIGNOTE(1, 5) ;
 
     //------------------------------------------------------------
     // On incremente la phrase avec le mot et
@@ -222,7 +221,7 @@ void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (val) %-5s (menu) %-10s",\
+  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mot) %-5s (menu) %-10s",\
     lp_Key->key_phrase,\
     lp_Key->key_mot,\
     lp_Key->key_symbole,\

@@ -408,8 +408,9 @@ void   CONFIG_PARAMETRES_CONFIG     (STRUCT_CONFIG * ) ;
 void   CONFIG_FIC_DISPLAY           (STRUCT_CONFIG * ) ;
 int    CONFIG_FIC_READ              (STRUCT_CONFIG * ) ;
 
+void   CONFIG_AFFICHER_MODE_LONG    (STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_CALCULS *) ;
+
 void   CONFIG_PARAMETRES_AFFICHER   (void) ;
-void   CONFIG_AFFICHER_MODE_LONG    (void) ;
 void   CONFIG_AFFICHER_TOUT         (void) ;  /* FIXME ajout 20191228 */
 void   CONFIG_MENU_CHANGE_DETECT    (void) ;  /* FIXME ajout 20200102 */
 

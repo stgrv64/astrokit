@@ -15,7 +15,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-FILE * gp_File_Flog ; 
+FILE * gp_File_Flog ; /* TODO : mettre ailleurs */
 
 /*****************************************************************************************
 * @fn     : LOG_SYSTEM_LOG_0
@@ -35,9 +35,17 @@ void LOG_SYSTEM_LOG_0(int *incrlog) {
   (*incrlog)++ ;
   char cmd[255] ;
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
+
     // FIXME 01 mai 2021 : modification chemin relatif
-    sprintf(cmd,"echo %d >> %s/%s/%s",*incrlog, gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_log) ;
+
+    sprintf(cmd,"echo %d >> %s/%s/%s", \
+      *incrlog, \
+      gp_Con_Par->par_rep_home, \
+      gp_Con_Par->par_rep_log, \
+      gp_Con_Par->par_fic_log) ;
+
     ret = system(cmd) ;
+
     if ( ret < 0 ) Trace("Probleme avec %s : retourner avec error negative",cmd) ;
     //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
   }
@@ -79,7 +87,12 @@ void LOG_SYSTEM_LOG_1(char *txt) {
         exit(EXIT_FAILURE);
     }
     sprintf( c_out, "%s : %s", s_date, txt ) ;
-    sprintf( cmd,"echo %s >> %s/%s/%s",c_out, gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_log) ;
+
+    sprintf( cmd,"echo %s >> %s/%s/%s", \
+      c_out, \
+      gp_Con_Par->par_rep_home, \
+      gp_Con_Par->par_rep_log, \
+      gp_Con_Par->par_fic_log ) ;
 
     ret =  system(cmd) ;
     

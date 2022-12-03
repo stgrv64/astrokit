@@ -1,0 +1,1 @@
+cmd_/home/stef/git/astrokit/drv/embetronicx/drv_example_0.ko := ld -r  -m elf_x86_64  --build-id=sha1  -T scripts/module.lds -o /home/stef/git/astrokit/drv/embetronicx/drv_example_0.ko /home/stef/git/astrokit/drv/embetronicx/drv_example_0.o /home/stef/git/astrokit/drv/embetronicx/drv_example_0.mod.o;  true

@@ -41,50 +41,45 @@ struct STR_PID {
 
   /* Entree / sortie de l algorithme : input = consigne */ 
 
-  unsigned long incr ; /* numero d increment du calcul */ 
+  unsigned long   pid_long_incr ; /* numero d increment du calcul */ 
 
-  double inp ;     /* consigne */ 
-  double out ;     /* sortie */ 
-  double ech ;     /* echantillonage */
-  double err ;     /* erreur  = out - inp */
-
-  double err_sum ; /* calcul de la somme des erreurs */ 
-
-  double err_pro_Kp ; /* calcul de la partie proportionnelle */  
-  double err_int_Ki ; /* calcul de la partie integrale */  
-  double err_der_Kd ; /* calcul de la partie derivee */
+  double          pid_input_consigne ;     /* consigne */ 
+  double          pid_output ;     /* sortie */ 
+  double          pid_ech ;     /* echantillonage */
+  double          pid_err ;     /* erreur  = out - inp */
+  double          pid_err_sum ; /* calcul de la somme des erreurs */ 
+  double          pid_err_kp ; /* calcul de la partie proportionnelle */  
+  double          pid_err_ki ; /* calcul de la partie integrale */  
+  double          pid_err_kd ; /* calcul de la partie derivee */
 
   /* resultat du calcul complet =
       Kp * (terme proportionnel ) + Ki * (terme integral) + Kd * (terme derivee) 
   */
-  double pid ; /* resultat du calcul complet */
-  double err_pre ; /* sauvegarde de erreur precedente */ 
+  double          pid_result ; /* resultat du calcul complet */
+  double          pid_err_pre ; /* sauvegarde de erreur precedente */ 
   /* Parametres de regalges du PID proportionnel integral derive*/
 
-  double Kp ;
-  double Ki ;
-  double Kd ;
+  double          pid_kp ;
+  double          pid_ki ;
+  double          pid_kd ;
 
   /*------------------------------------------------*/
   /* Pointeurs de fonctions associes a la structure */
   /*------------------------------------------------*/
   
-  void (* pid_init)(void) ; 
-  void (* pid_reset)(void) ; 
-  void (* pid_run)(double,double) ; 
-  /* void (* pid_calcul)(void) ;  */
-  void (* pid_test)(void) ;
+  void (* pid_run)   (double,double) ; 
+  void (* pid_reset) (void) ; 
+  void (* pid_test)  (void) ;
 } ;
 
 typedef struct STR_PID STRUCT_PID ;
 typedef struct STR_PID_PARAMS STRUCT_PID_PARAMS ;
 
-void   PID_INIT             (STRUCT_PID *, double, double, double, double) ;
-
-void   PID_RESET            ( void)  ;
-void   PID_TEST             ( void)  ;
-void   PID_ACTIVATE         ( void) ;
-int    PID_IS_IN_CONDITION  ( void) ;
-void   PID_CALCULATE        ( double, double ) ;
+void   PID_INIT             (STRUCT_PID * , STRUCT_PID_PARAMS * , STRUCT_CONFIG_PARAMS * ) ;
+void   PID_RUN              (double, double ) ;
+void   PID_RESET            (void) ;
+void   PID_TEST             (void) ;
+void   PID_ACTIVATE         (void) ;
+int    PID_IS_IN_CONDITION  (void) ;
 
 #endif

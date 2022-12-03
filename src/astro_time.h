@@ -70,25 +70,26 @@ typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
 // ------ TEMPORISATIONS DES BOUCLES ------------
 
-void   TIME_INIT                   ( STRUCT_TIME * , STRUCT_TIME_TEMPOS *) ;
+void   TIME_INIT                      ( STRUCT_TIME * , STRUCT_TIME_TEMPOS *) ;
+int    TIME_CALCULS_SIDERAL_TIME      ( STRUCT_TIME * , STRUCT_LIEU * ) ;
+int    TIME_CALCULS_JULIAN_DAY        ( STRUCT_TIME * , STRUCT_LIEU * ) ;
+int    TIME_CALCULS_LOCAL_DATE        ( STRUCT_TIME *  ) ;
+void   TIME_CALCULS_HMS_VERS_DEC      ( STRUCT_TIME *  ) ;
+void   TIME_CALCULS_DEC_VERS_HMS      ( STRUCT_TIME *  ) ;
+void   TIME_AFFICHER                  ( STRUCT_TIME *  ) ; 
+void   TIME_AFFICHER_MSG_HHMMSS       ( STRUCT_TIME * , char * ) ;
 
-void   TIME_AFFICHER               ( STRUCT_TIME *  ) ; /* FIXME ajout 20191228 */
-void   TIME_SET_YEAR_MONTH_AND_DAY ( char *  ) ; // FIXME ajout 20190822
-void   TIME_SET_MONTH_AND_DAY      ( char *  ) ;
-void   TIME_SET_HOUR_AND_MINUTES   ( char *  ) ;
+void   TIME_CALCULS_HMS_VERS_DEC_DIR  ( double *, double, double, double) ;
 
-double TIME_CALCULS_DUREE_SECONDES        ( struct timeval * )  ;
-double TIME_CALCULS_DUREE_MICROSEC        ( struct timeval * ) ;
-double TIME_CALCULS_DUREE_NANOSEC         ( struct timeval * ) ;
-long   TIME_TEMPORISATION_MICROSEC        ( double , double , struct timeval ) ;
-void   TIME_AFFICHER_MSG_HHMMSS           ( char * , STRUCT_TIME *  ) ;
+double TIME_CALCULS_DUREE_SECONDES    ( struct timeval * )  ;
+double TIME_CALCULS_DUREE_MICROSEC    ( struct timeval * ) ;
+double TIME_CALCULS_DUREE_NANOSEC     ( struct timeval * ) ;
+long   TIME_TEMPORISATION_MICROSEC    ( struct timeval , double , double ) ;
 
-int    TIME_CALCULS_TEMPS_SIDERAL           ( STRUCT_LIEU * gp_Lie, STRUCT_TIME * gp_Tim ) ;
-int    TIME_CALCULS_JOUR_JULIEN             ( STRUCT_LIEU * gp_Lie, STRUCT_TIME * gp_Tim) ;
-int    TIME_CALCULS_DATE                    ( STRUCT_TIME * gp_Tim ) ;
-void   TIME_CALCULS_TEMPS_HMS_VERS_DEC      ( STRUCT_TIME * gp_Tim ) ;
-void   TIME_CALCULS_TEMPS_DEC_VERS_HMS      ( STRUCT_TIME * gp_Tim ) ;
-void   TIME_CALCULS_TEMPS_HMS_VERS_DEC_DIRECT  ( double *, double, double, double) ;
+
+void   TIME_SET_YEAR_MONTH_AND_DAY    ( char *  ) ; // FIXME ajout 20190822
+void   TIME_SET_MONTH_AND_DAY         ( char *  ) ;
+void   TIME_SET_HOUR_AND_MINUTES      ( char *  ) ;
 
 #endif
 

@@ -38,7 +38,7 @@ void  ARGUMENTS_GERER_FACON_CLASSIQUE  (int , char** )  ;
 void  ARGUMENTS_GERER_GETOPT           (int , char** )  ;
 void  ARGUMENTS_GERER_REP_HOME         (int , char** ) ;
 
-void  ARGUMENTS_VOUTE        (void) ;
+void  ARGUMENTS_VOUTE (void) ;
 
 #endif
 

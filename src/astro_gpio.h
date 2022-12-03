@@ -6,7 +6,7 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 01/05/2021  | ajout entete
-# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Gpi_Par_Pwm->par_fre_pwm 
+# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Pwm_Par->par_fre_pwm 
 #   suite a ajout de la variable du meme nom dans types.h
 # mai 2022    | ajout / modifications sur les threads  
 #               ajout / renommage membres champs struct PMW phases et moteurs
@@ -127,19 +127,20 @@ struct STR_GPIO_PWM_PHASE {
   /* STRUCT_SUIVI    * p_sui ; */
   /* STRUCT_PTHREADS * p_pth ; */
 
-  struct timeval    tval ;
+  struct timeval    pha_tval ;
 
-  double            rap[ GPIO_MICROPAS_MAX ] ; 
-  int               id ;  
-  double            Tpwm ;  
-  int               pas ;
-  int               micropas ;
-  double            rc ;
-  int               gpio ;
-  int               gpio_open_statut ;
-  int               gi_gpio_fd ;
-  double            periode_mic ;
-  double            periode_mot ;  
+  double            pha_rap[ GPIO_MICROPAS_MAX ] ; 
+  double            pha_per_pwm ;  
+  double            pha_per_mic ;
+  double            pha_per_mot ;  
+  double            pha_rc ;
+  int               pha_id ;  
+  int               pha_pas ;
+  int               pha_upas ;
+  int               pha_gpio ;
+  int               pha_gpio_open_statut ;
+  int               pha_gpio_fd ;
+
 } ;
 
 /*---------------------------------------------------*/
@@ -152,20 +153,22 @@ struct STR_GPIO_PWM_MOTEUR {
   pthread_mutex_t         mot_mutex ; 
 
   STRUCT_GPIO_PWM_PHASE * mot_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+
+  struct timeval          mot_timeval ;
   /* STRUCT_SUIVI          * p_sui ; */
   /* STRUCT_PTHREADS       * p_pth ; */
   
   int                     mot_id ;
-  long long               pas ;
-  int                     micropas ;
-  double                  periode_mic ;
-  double                  periode_mot ;
-  double                  t ;
-  double                  Fm ;  
-  double                  Tm ;  
-  double                  Fpwm ;  
-  double                  Tpwm ; 
-  double                  nbmicropas ; 
+  long long               mot_pas ;
+  int                     mot_upas ;
+  double                  mot_per_mic ;
+  double                  mot_per_mot ;
+  double                  mot_t ;
+  double                  mot_fm ;  
+  double                  mot_tm ;  
+  double                  mot_fre_pwm ;  
+  double                  mot_per_pwm ; 
+  double                  mot_nb_upas ; 
   long                    nbdeltat ;
   int                     type_fonction ; 
   double                  param0 ;
@@ -193,9 +196,6 @@ struct STR_GPIO_PWM_MOTEUR {
   double  temps_moyen ;       
 
   double  temps_reel_moyen ;  
-
-  struct timeval tval ;
-
 } ;
 
 /* ------------------------------------------------------------------------
@@ -241,7 +241,7 @@ void   GPIO_GETOPT(int argc, char ** argv) ;
 
 
 void   GPIO_TEST_CONTROLER (void ) ;
-void   GPIO_CLIGNOTE     (int , int , int ) ;
+void   GPIO_LED_ETAT_CLIGNOTE     (int , int ) ;
 void   GPIO_CONFIG_FIC_READ         (STRUCT_CONFIG *) ;
 void   GPIO_READ2        (STRUCT_CONFIG *) ;
 /*

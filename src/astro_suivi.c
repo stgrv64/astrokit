@@ -80,7 +80,7 @@ void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) 
 * @fn     : SUIVI_MAJ_PAS
 * @author : s.gravois
 * @brief  : Cette fonction met a jour les valeurs de gp_Sui->pas* en fonction
-* @brief  : du contenu de gp_Dat->dat_inf
+* @brief  : du contenu de gp_Dat->dat_act
 * @param  : STRUCT_SUIVI * gp_Sui
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
@@ -94,32 +94,47 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 
   pthread_mutex_lock(& gp_Mut->mut_dat );
 
-  if ( ! strcmp( gp_Dat->dat_inf, "plus" ) )         { c_act++; gp_Pas->pas_acc_plus  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "moins" ) )        { c_act++; gp_Pas->pas_acc_moins = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "forward" ) )      { c_act++; gp_Pas->pas_forward  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "rewind" ) )       { c_act++; gp_Pas->pas_rewind = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "forwardfast" ) )  { c_act++; gp_Pas->pas_forward_fast  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "rewindfast" ) )   { c_act++; gp_Pas->pas_rewind_fast = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "ne" ) )           { c_act++; gp_Pas->pas_nord=1 ; gp_Pas->pas_est=1   ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "no" ) )           { c_act++; gp_Pas->pas_nord=1 ; gp_Pas->pas_ouest=1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "se" ) )           { c_act++; gp_Pas->pas_sud=1  ; gp_Pas->pas_est=1   ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "so" ) )           { c_act++; gp_Pas->pas_sud=1  ; gp_Pas->pas_ouest=1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "n" ) )            { c_act++; gp_Pas->pas_nord  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "o" ) )            { c_act++; gp_Pas->pas_ouest = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "e" ) )            { c_act++; gp_Pas->pas_est   = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "s" ) )            { c_act++; gp_Pas->pas_sud   = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_inf, "reset" ) )        { c_act++; gp_Sui->reset   = 1 ; }
+  /* TODO : supprimer : obsolete ----------
+  if ( ! strcmp( gp_Dat->dat_act, "plus" ) )  {
+    gp_Fre->fre_ta_mic *=  gp_Sui->sui_plus  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
+    gp_Fre->fre_th_mic *=  gp_Sui->sui_plus  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
+  }
+  if ( ! strcmp( gp_Dat->dat_act, "moins" ) ) {
+    gp_Fre->fre_ta_mic *=  gp_Sui->sui_moins  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
+    gp_Fre->fre_th_mic *=  gp_Sui->sui_moins  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
+  }
+  */
+  /* TODO : supprimer : obsolete ----------
+    touche + et - utilise pour PLA et ETO sur le clavier 
+  */
+ /*
+  if ( ! strcmp( gp_Dat->dat_act, "plus" ) )         { c_act++; gp_Pas->pas_acc_plus  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "moins" ) )        { c_act++; gp_Pas->pas_acc_moins = 1 ; }
+*/
+  if ( ! strcmp( gp_Dat->dat_act, "forward" ) )      { c_act++; gp_Pas->pas_forward  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "rewind" ) )       { c_act++; gp_Pas->pas_rewind = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "forwardfast" ) )  { c_act++; gp_Pas->pas_forward_fast  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "rewindfast" ) )   { c_act++; gp_Pas->pas_rewind_fast = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "ne" ) )           { c_act++; gp_Pas->pas_nord=1 ; gp_Pas->pas_est=1   ; }
+  if ( ! strcmp( gp_Dat->dat_act, "no" ) )           { c_act++; gp_Pas->pas_nord=1 ; gp_Pas->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "se" ) )           { c_act++; gp_Pas->pas_sud=1  ; gp_Pas->pas_est=1   ; }
+  if ( ! strcmp( gp_Dat->dat_act, "so" ) )           { c_act++; gp_Pas->pas_sud=1  ; gp_Pas->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "n" ) )            { c_act++; gp_Pas->pas_nord  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "o" ) )            { c_act++; gp_Pas->pas_ouest = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "e" ) )            { c_act++; gp_Pas->pas_est   = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "s" ) )            { c_act++; gp_Pas->pas_sud   = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "reset" ) )        { c_act++; gp_Sui->reset   = 1 ; }
 
-  /* Si gp_Dat->dat_inf a ete utilise, il peut etre remis a zero */
+  /* Si gp_Dat->dat_act a ete utilise, il peut etre remis a zero */
 
   if ( c_act > 0 ) {
     
-    memset( gp_Dat->dat_inf, 0, strlen( gp_Dat->dat_inf ) ) ;
-    strcpy( gp_Dat->dat_inf, "") ;
+    memset( gp_Dat->dat_act, 0, strlen( gp_Dat->dat_act ) ) ;
+    strcpy( gp_Dat->dat_act, "") ;
   }
   pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-  Trace2("raz de gp_Dat->dat_inf") ;
+  Trace2("raz de gp_Dat->dat_act") ;
 
   Trace2("%ld %ld %ld %ld %d %d\n", \
     gp_Pas->pas_ouest, \
@@ -146,14 +161,7 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 
 void SUIVI_OLD_0( STRUCT_SUIVI * gp_Sui) {
     
-  if ( ! strcmp( gp_Dat->dat_inf, "plus" ) )  {
-    gp_Fre->fre_ta_mic *=  gp_Sui->sui_plus  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
-    gp_Fre->fre_th_mic *=  gp_Sui->sui_plus  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
-  }
-  if ( ! strcmp( gp_Dat->dat_inf, "moins" ) ) {
-    gp_Fre->fre_ta_mic *=  gp_Sui->sui_moins  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
-    gp_Fre->fre_th_mic *=  gp_Sui->sui_moins  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
-  }
+
 }
 
 /*****************************************************************************************
@@ -231,7 +239,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     Trace("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
 
-    ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
+    ASTRE_FORMATE_DONNEES_AFFICHAGE();
 
     KEYS_If_Mot_Is("o")     { gp_Sui->sui_menu = MENU_MANUEL_BRUT ;i=1; }
     KEYS_If_Mot_Is("e" )    { gp_Sui->sui_menu = MENU_MANUEL_BRUT ; i=1;}
@@ -385,10 +393,10 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     }
     if (i) { 
       strcpy(gp_Key->key_mot,"") ; 
-      Trace1("raz de gp_Dat->dat_inf") ;
+      Trace1("raz de gp_Dat->dat_act") ;
       pthread_mutex_lock(& gp_Mut->mut_dat );
-      memset( gp_Dat->dat_inf, 0, strlen( gp_Dat->dat_inf ) ) ;
-      strcpy( gp_Dat->dat_inf, "") ;
+      memset( gp_Dat->dat_act, 0, strlen( gp_Dat->dat_act ) ) ;
+      strcpy( gp_Dat->dat_act, "") ;
       pthread_mutex_unlock(& gp_Mut->mut_dat );
     }
   }
@@ -448,7 +456,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
       gp_Ast->ast_new = TRUE ;
       //gp_Sui->sui_menu = MENU_AZIMUTAL ;
 
-      GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ; 
+      GPIO_LED_ETAT_CLIGNOTE(1, 10) ; 
     }
     //---------------------------------------------------------------------------------------------------------
     // Si une DEMANDE de MISE A JOUR relative au temps (sauf mois et jour)
@@ -456,7 +464,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     
     if(  ! strcmp( gp_Key->key_symbole, "TIME" ) )  {
 
-      GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, strlen( gp_Key->key_nombre ), 10) ;
+      GPIO_LED_ETAT_CLIGNOTE(strlen( gp_Key->key_nombre ), 10) ;
 
       switch ( strlen( gp_Key->key_nombre ) ) {
 
@@ -498,16 +506,16 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
         case 1 : break ; // a completer 
 
         case 2 : // TODO : exemple d'une demande de capteur : a modifier / completer
-          TIME_CALCULS_TEMPS_SIDERAL( gp_Lie, gp_Tim ) ;
+          TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
 
           if ( gp_Dev->dev_use_capteurs ) { 
             /* TODO : FIXME :  use global var for pitch & heading as member of STR_I2C_xx */
             /*
-            gp_Ast->a = gp_Sui->pitch ;
-            gp_Ast->h = gp_Sui->heading ; 
+            gp_Ast->a = gp_Sui->_pitch ;
+            gp_Ast->h = gp_Sui->_heading ; 
             */
           }
-          CALCULS_EQUATEUR ( gp_Lie, gp_Ast) ;
+          CALCULS_EQUATEUR () ;
 
           gp_Sui->sui_menu_old = gp_Sui->sui_menu ;
           gp_Sui->sui_menu = MENU_AZIMUTAL ;
@@ -550,8 +558,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   SUIVI_MAJ_PAS( gp_Sui) ;
 
-  if( strcmp( gp_Dat->dat_inf, "") != 0 ) {
-    Trace1("0 gp_Dat->dat_inf = %s", gp_Dat->dat_inf ) ;
+  if( strcmp( gp_Dat->dat_act, "") != 0 ) {
+    Trace1("0 gp_Dat->dat_act = %s", gp_Dat->dat_act ) ;
   }
   else {
     Trace1("dat_inf vide" ) ;
@@ -734,8 +742,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
     /* pthread_mutex_lock( & gp_Mut->mut_cal ); */
     
-    CALCULS_VITESSES( gp_Lie, gp_Ast, gp_Sui) ;
-    CALCULS_PERIODE ( gp_Ast, gp_Sui, gp_Vou) ;
+    CALCULS_VITESSES() ;
+    CALCULS_PERIODE() ;
     
     /* pthread_mutex_unlock( & gp_Mut->mut_cal ); */
   }

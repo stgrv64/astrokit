@@ -73,7 +73,7 @@ void ASTRO_TRAP_MAIN(int sig) {
   Trace1("Signal trappe de valeur (sig) %d",sig) ;
   Trace1("Envoi d'un signal %d (SIGTERM) aux threads",SIGTERM) ;
   
-  GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 100) ;
+  GPIO_LED_ETAT_CLIGNOTE(1,100) ;
 
   //Trace1("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
 
@@ -113,7 +113,7 @@ void ASTRO_TRAP_MAIN(int sig) {
 
     gp_Lcd->display_str_int(0,"Halt with sig :", sig) ;
 
-    GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 100) ;
+    GPIO_LED_ETAT_CLIGNOTE(1,100) ;
 
     if ( system("/sbin/halt") < 0 ) {
       SyslogErr("Probleme avec /sbin/halt\n") ;
@@ -123,7 +123,7 @@ void ASTRO_TRAP_MAIN(int sig) {
       exit(2) ;
     } 
   }
-  GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 0 ) ;
+  GPIO_SET( gp_Pwm_Par->par_led_etat, 0 ) ;
 
   closelog();
 /*
@@ -245,7 +245,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
     usleep( gp_Tpo->tpo_menu ) ;
 
     /* GPIO_CLAVIER_MATRICIEL_READ( gpio_key_l, gpio_key_c, gp_Key) ; */
-    KEYS_INPUTS_GESTION_APPUIS( gp_Sui, gp_Key) ;
+    KEYS_INPUTS_GESTION_APPUIS( gp_Key) ;
     KEYS_AFFICHER( gp_Key ) ;	
     /* SUIVI_OLD_0( gp_Sui) ; */
     SUIVI_TRAITEMENT_MOT( gp_Sui, gp_Key ) ;
@@ -260,7 +260,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         
         Trace1("MENU_AZIMUTAL") ;
         
-        // a modifier / completer : TIME_CALCULS_TEMPS_SIDERAL et CALCULS_ANGLE_HORAIRE
+        // a modifier / completer : TIME_CALCULS_SIDERAL_TIME et CALCULS_ANGLE_HORAIRE
         // sont a supprimer car deja calculer dans SUIVI_
 
         Trace1("appel : %d : MENU_AZIMUTAL" , gp_Sui->sui_menu) ;
@@ -323,8 +323,8 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         // sur le N-S-E-O (pas de recalcul des periodes) 
         // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
 
-        if( strcmp( gp_Dat->dat_inf, "") != 0 ) {
-          Trace1("1 gp_Dat->dat_inf = %s", gp_Dat->dat_inf ) ;
+        if( strcmp( gp_Dat->dat_act, "") != 0 ) {
+          Trace1("1 gp_Dat->dat_act = %s", gp_Dat->dat_act ) ;
         }
 
         SUIVI_MANUEL_BRUT(gp_Sui, gp_Key) ;
@@ -383,7 +383,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         // TODO : les periodes / frequences en azimut et altitude
 
         SUIVI_MANUEL_ASSERVI(gp_Sui, gp_Key) ; 
-        CALCULS_PERIODES_SUIVI_MANUEL(gp_Ast,gp_Sui,gp_Vou)  ;
+        CALCULS_PERIODES_SUIVI_MANUEL()  ;
 
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_ASSERVI ; 
@@ -544,9 +544,9 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
 
       if ( gp_Ast->ast_new ) { 
 
-        ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;
-        CONFIG_AFFICHER_MODE_LONG() ; 
-        ASTRE_AFFICHER_MODE_STELLARIUM(gp_Ast) ;
+        ASTRE_FORMATE_DONNEES_AFFICHAGE() ;
+        CONFIG_AFFICHER_MODE_LONG(gp_Ast,gp_Lie,gp_Cal) ; 
+        ASTRE_AFFICHER_MODE_STELLARIUM() ;
         
         gp_Lcd->display_ast_vit(2000000) ;
         gp_Lcd->refresh_default() ;
@@ -622,7 +622,7 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
     
     // ATTENTION !!! la fonction INFRARED_READ est bloquante (voir ir.c) !!!!!
     
-    INFRARED_READ( gp_Sui ) ;
+    INFRARED_READ() ;
 
     INFRARED_CLOSE(gp_LircConfig) ;
   }
@@ -726,9 +726,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
   struct sched_param param;
   struct timeval t00,t01  ;
   
-  pthread_mutex_lock(& gp_Tpo->tpo_mutex) ;
   u_sleep_termios_demi_periode = (unsigned long)((double)gp_Tpo->tpo_termios / 2.0) ;
-  pthread_mutex_unlock(& gp_Tpo->tpo_mutex) ;
 
   TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -755,45 +753,38 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
 
         Trace("chaine %s (ascii %d)", ch_chaine, i_sum_ascii) ;
 
-        if ( i_sum_ascii == 27 ) Trace1("exit detecte %d", i_sum_ascii) ;
+        if ( i_sum_ascii == 27 ) {
+          Trace1("exit detecte %d", i_sum_ascii) ;
+        }
         memset(c_sum_ascii,0, sizeof(c_sum_ascii));
         sprintf(c_sum_ascii,"%d",i_sum_ascii);
         i_indice_code=0 ;
-        while(strcmp(gp_Cod->cod_in_term[i_indice_code],c_sum_ascii) && ( i_indice_code < CODES_CODE_NB_CODES ) ){ 
+
+        while( strcmp(gp_Cod->cod_in_term[i_indice_code],c_sum_ascii) \
+               && ( i_indice_code < CODES_CODE_NB_CODES ) ) { 
            Trace2("%s = %s ?", c_sum_ascii, gp_Cod->cod_in_term[i_indice_code]) ;  
            i_indice_code++ ; 
         }
-        pthread_mutex_lock(& gp_Mut->mut_dat );
-        memset( gp_Dat->dat_inf, CONFIG_ZERO_CHAR, strlen( gp_Dat->dat_inf ) ) ;
-        pthread_mutex_unlock(& gp_Mut->mut_dat );
-
+        DATAS_ACTION_RESET(gp_Dat) ;
+        
         if ( i_indice_code < CODES_CODE_NB_CODES ) {
-          pthread_mutex_lock(& gp_Mut->mut_dat );
-          strcpy( gp_Dat->dat_inf, gp_Cod->cod_out_act[i_indice_code] ) ;
-          pthread_mutex_unlock(& gp_Mut->mut_dat );
-
-          GPIO_CLIGNOTE(gp_Gpi_Par_Pwm->par_led_etat, 1, 10) ;
+          
+          DATAS_ACTION_COPY( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;          
         }
         // tres important !!
         // le usleep suivant permet de garder l information !!!!!!
-        // gp_Dat->dat_inf fonctionne comme un TAMPON
+        // gp_Dat->dat_act fonctionne comme un TAMPON
         // il va etre lu par les threads du programme principal
 
-        Trace1("datas = %s", gp_Dat->dat_inf ) ;
+        Trace1("datas = %s", gp_Dat->dat_act ) ;
         Trace1("gp_Tpo->tpo_termios = %ld", gp_Tpo->tpo_termios ) ;
         Trace1("usleep tempo_termios") ;
         
         usleep( gp_Tpo->tpo_termios ) ;
-
-        Trace1("raz de gp_Dat->dat_inf") ;
-        pthread_mutex_lock(& gp_Mut->mut_dat );
-        memset( gp_Dat->dat_inf, 0, strlen( gp_Dat->dat_inf ) ) ;
-        strcpy( gp_Dat->dat_inf, "") ;
-        pthread_mutex_unlock(& gp_Mut->mut_dat );
         
+        DATAS_ACTION_RESET(gp_Dat) ;        
       }
     }
-
     KEYBOARD_TERMIOS_EXIT() ;
   }
   Trace("Stop") ;
@@ -837,7 +828,7 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
     }
     /* appels LIRC pour memoire : 
     INFRARED_OPEN( gp_LircConfig ) ;
-    INFRARED_READ( gp_Sui ) ;
+    INFRARED_READ() ;
     INFRARED_CLOSE(gp_LircConfig) ;*/
   }
   Trace1("Stop") ;
@@ -930,8 +921,8 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
   int ret ;
   
-  STRUCT_I2C_DEVICE   exemple, *lp_i2c_dev ;
-  STRUCT_I2C_ACC_MAG  accmag,  *lp_i2c_acc ;
+  STRUCT_I2C_DEVICE   l_I2c, *lp_I2c ;
+  STRUCT_I2C_ACC_MAG  l_Acc, *lp_Acc ;
 
   TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -939,10 +930,10 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
 
-  lp_i2c_dev = & exemple ;
-  lp_i2c_acc = & accmag ;
+  lp_I2c = & l_I2c ;
+  lp_Acc = & l_Acc ;
 
-  lp_i2c_dev->i2c_dev_fd = 0 ;
+  lp_I2c->i2c_dev_fd = 0 ;
   
   if ( gp_Dev->dev_use_capteurs ) {
 
@@ -958,7 +949,7 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
 
       if ( ! gp_Dev->dev_init_capteurs ) {
         
-        ret = I2C_INIT(lp_i2c_dev, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
+        ret = I2C_INIT(lp_I2c, DEVICE_RASPI_2, DEVICE_LSM_ADRESS ) ;
 
         if ( ! ret ) {
           Trace1("Pas de capteur disponible") ;
@@ -967,25 +958,28 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
           break ;
         }
         else {
-          I2C_SET( lp_i2c_dev, REG_CTRL1, "0x57" ) ;
-          I2C_SET( lp_i2c_dev, REG_CTRL2, "0x00" ) ;
-          I2C_SET( lp_i2c_dev, REG_CTRL5, "0x64" ) ;
-          I2C_SET( lp_i2c_dev, REG_CTRL6, "0x20" ) ;
-          I2C_SET( lp_i2c_dev, REG_CTRL7, "0x00" ) ;
+          I2C_SET( lp_I2c, REG_CTRL1, "0x57" ) ;
+          I2C_SET( lp_I2c, REG_CTRL2, "0x00" ) ;
+          I2C_SET( lp_I2c, REG_CTRL5, "0x64" ) ;
+          I2C_SET( lp_I2c, REG_CTRL6, "0x20" ) ;
+          I2C_SET( lp_I2c, REG_CTRL7, "0x00" ) ;
     
           gp_Dev->dev_init_capteurs = 1 ;
         }
       }
       if ( gp_Dev->dev_init_capteurs ) {
       
-        I2C_GET_ACC( lp_i2c_dev, lp_i2c_acc )   ;
-        I2C_CALCULS_ACCMAG( lp_i2c_acc ) ;
+        I2C_GET_ACC( lp_I2c, lp_Acc )   ;
+        I2C_CALCULS_ACCMAG( lp_Acc ) ;
       /*
-        gp_Sui->roll    =  lp_i2c_acc->roll  ; 
-        gp_Sui->pitch   =  lp_i2c_acc->pitch ;
-        gp_Sui->heading =  lp_i2c_acc->heading ;
+        gp_Sui->_roll    =  lp_Acc->acc_roll  ; 
+        gp_Sui->_pitch   =  lp_Acc->acc_pitch ;
+        gp_Sui->_heading =  lp_Acc->acc_heading ;
       */
-        Trace1("%.0f\t%.0f\t%.0f\n", lp_i2c_acc->pitch * I2C_DEGRAD, lp_i2c_acc->roll * I2C_DEGRAD, lp_i2c_acc->heading * I2C_DEGRAD) ;
+        Trace1("%.0f\t%.0f\t%.0f\n", \
+          lp_Acc->acc_pitch * I2C_DEGRAD, \
+          lp_Acc->acc_roll * I2C_DEGRAD, \
+          lp_Acc->acc_heading * I2C_DEGRAD ) ;
       }	
       
       usleep( gp_Tpo->tpo_capteurs );
@@ -1021,8 +1015,8 @@ int main(int argc, char ** argv) {
   pthread_t p_thread_mot_azi ;
   
 /*
-  STRUCT_GPIO_PWM_MOTEUR *gp_Gpio_Pwm_Mot_Alt , g_mot_alt ; 
-  STRUCT_GPIO_PWM_MOTEUR *gp_Gpio_Pwm_Mot_Azi , g_mot_azi ;
+  STRUCT_GPIO_PWM_MOTEUR *gp_Alt_Mot , g_mot_alt ; 
+  STRUCT_GPIO_PWM_MOTEUR *gp_Azi_Mot , g_mot_azi ;
 */
   
   TraceArbo(__func__,0 , "") ;
@@ -1056,27 +1050,24 @@ int main(int argc, char ** argv) {
   /* LOG_INIT ouvre le fichier en ecriture pour pouvoir avoir les traces en mode ecriture sur disque
      et donc a besoin de lire au prealable le fichier de CONFIGURATION (config.txt) */
 
-  LOG_INIT        (gp_Log); 
-
-  TIME_INIT     ( gp_Tim, gp_Tpo ) ;
-  
-  /* GPIO_CLAVIER_MATRICIEL_CONFIG( gpio_key_l, gpio_key_c ) ; */
-  
-  CAT_INIT       ( gp_Cat ) ;
-  CALCULS_INIT   ( gp_Cal ) ;
+  LOG_INIT       ( gp_Log ); 
   VOUTE_INIT     ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
+  ASTRE_INIT     ( gp_Ast ) ;
   CODES_INIT     ( gp_Cod ) ;
   KEYS_INIT      ( gp_Key ) ;   
-  ASTRE_INIT     ( gp_Ast ) ;
   LIEU_INIT      ( gp_Lie ) ;
+  CAT_INIT       ( gp_Cat, gp_Ast ) ;
+  TIME_INIT      ( gp_Tim, gp_Tpo ) ;
   
-  TIME_CALCULS_TEMPS_SIDERAL  ( gp_Lie, gp_Tim) ;
+  TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
   
   DEVICES_INIT   ( gp_Dev ) ;
   SUIVI_INIT     ( gp_Sui ) ;
   LCD_INIT       ( gp_Lcd ) ;
-  PID_INIT       ( gp_Pid, gp_Pid_Par->par_pid_ech, gp_Pid_Par->par_pid_kp, gp_Pid_Par->par_pid_ki, gp_Pid_Par->par_pid_kd ) ;
+  PID_INIT       ( gp_Pid, gp_Pid_Par, gp_Con_Par) ;
 
+  CALCULS_INIT   ( gp_Cal, gp_Fre, gp_Sta, gp_Pas, gp_Ast, gp_Vou, gp_Lie, gp_Dev, gp_Mut, gp_Tim, gp_Sui) ;
+  
   DEVICES_AFFICHER_UTILISATION( gp_Dev) ;
 
   Trace1("pthread_self = %ld", pthread_self()) ;
@@ -1096,7 +1087,7 @@ int main(int argc, char ** argv) {
   Trace1("gi_gpio_alt         : %d %d %d %d", gi_gpio_alt[0], gi_gpio_alt[1], gi_gpio_alt[2], gi_gpio_alt[3] ) ;
   Trace1("gi_gpio_azi         : %d %d %d %d", gi_gpio_azi[0], gi_gpio_azi[1], gi_gpio_azi[2], gi_gpio_azi[3] ) ;
   Trace1("gi_gpio_mas         : %d %d %d %d", gi_gpio_mas[0], gi_gpio_mas[1], gi_gpio_mas[2], gi_gpio_mas[3] ) ;
-  Trace1("gp_Gpi_Par_Pwm->par_led_etat    : %d", gp_Gpi_Par_Pwm->par_led_etat );
+  Trace1("gp_Pwm_Par->par_led_etat    : %d", gp_Pwm_Par->par_led_etat );
   Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
   
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
@@ -1139,17 +1130,17 @@ int main(int argc, char ** argv) {
 
   // ouverture led etat ----------------------------------------------
 
-  if ( gp_Gpi_Par_Pwm->par_led_etat != 0 ) {
+  if ( gp_Pwm_Par->par_led_etat != 0 ) {
 
-    GPIO_CLOSE_BROCHE( gp_Gpi_Par_Pwm->par_led_etat) ;
-    GPIO_OPEN_BROCHE( gp_Gpi_Par_Pwm->par_led_etat, 1) ;
-    GPIO_SET( gp_Gpi_Par_Pwm->par_led_etat, 0 ) ;
+    GPIO_CLOSE_BROCHE( gp_Pwm_Par->par_led_etat) ;
+    GPIO_OPEN_BROCHE( gp_Pwm_Par->par_led_etat, 1) ;
+    GPIO_SET( gp_Pwm_Par->par_led_etat, 0 ) ;
   }
   
   // -----------------------------------------------------------------
   
   GPIO_INIT_PWM_MOTEUR(\
-    gp_Gpio_Pwm_Mot_Alt,\
+    gp_Alt_Mot,\
     gi_gpio_alt,\
     gi_gpio_mas,\
     gp_Cal_Par->cal_par_alt_red_4 ,\
@@ -1161,7 +1152,7 @@ int main(int argc, char ** argv) {
     GPIO_CURRENT_FONCTION_PARAM1 ) ;
 
   GPIO_INIT_PWM_MOTEUR(\
-    gp_Gpio_Pwm_Mot_Azi,\
+    gp_Azi_Mot,\
     gi_gpio_azi,\
     gi_gpio_mas,\
     gp_Cal_Par->cal_par_azi_red_4 ,\
@@ -1172,43 +1163,43 @@ int main(int argc, char ** argv) {
     GPIO_CURRENT_FONCTION_PARAM0,\
     GPIO_CURRENT_FONCTION_PARAM1 ) ;
   
-  Trace1("gp_Gpio_Pwm_Mot_Azi->Fm %f gp_Gpio_Pwm_Mot_Azi->periode_mot = %f", gp_Gpio_Pwm_Mot_Azi->Fm, gp_Gpio_Pwm_Mot_Azi->periode_mot ) ;
-  Trace1("gp_Gpio_Pwm_Mot_Alt->Fm %f gp_Gpio_Pwm_Mot_Alt->periode_mot = %f", gp_Gpio_Pwm_Mot_Alt->Fm, gp_Gpio_Pwm_Mot_Alt->periode_mot ) ;
+  Trace1("gp_Azi_Mot->mot_fm %f gp_Azi_Mot->mot_per_mot = %f", gp_Azi_Mot->mot_fm, gp_Azi_Mot->mot_per_mot ) ;
+  Trace1("gp_Alt_Mot->mot_fm %f gp_Alt_Mot->mot_per_mot = %f", gp_Alt_Mot->mot_fm, gp_Alt_Mot->mot_per_mot ) ;
 
   for( i=0 ; i< gp_Cal_Par->cal_par_alt_red_4 ; i++ ) {
     Trace1("%d\t%f\t%f\t%f\t%f",i,\
-      gp_Gpio_Pwm_Mot_Azi->mot_pha[0]->rap[i],\
-      gp_Gpio_Pwm_Mot_Azi->mot_pha[1]->rap[i],\
-      gp_Gpio_Pwm_Mot_Azi->mot_pha[2]->rap[i],\
-      gp_Gpio_Pwm_Mot_Azi->mot_pha[3]->rap[i]) ;
+      gp_Azi_Mot->mot_pha[0]->pha_rap[i],\
+      gp_Azi_Mot->mot_pha[1]->pha_rap[i],\
+      gp_Azi_Mot->mot_pha[2]->pha_rap[i],\
+      gp_Azi_Mot->mot_pha[3]->pha_rap[i]) ;
   }
 
   // ============================== gestion des threads  ===================================
 /*
-  pthread_create( &p_thread_pha_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[0] ) ;
-  pthread_create( &p_thread_pha_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[1] ) ;
-  pthread_create( &p_thread_pha_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[2] ) ;
-  pthread_create( &p_thread_pha_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[3] ) ;
+  pthread_create( &p_thread_pha_azi[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
+  pthread_create( &p_thread_pha_azi[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
+  pthread_create( &p_thread_pha_azi[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
+  pthread_create( &p_thread_pha_azi[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
 
-  pthread_create( &p_thread_pha_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[0] ) ;
-  pthread_create( &p_thread_pha_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[1] ) ;
-  pthread_create( &p_thread_pha_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[2] ) ;
-  pthread_create( &p_thread_pha_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[3] ) ;
+  pthread_create( &p_thread_pha_alt[0],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
+  pthread_create( &p_thread_pha_alt[1],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
+  pthread_create( &p_thread_pha_alt[2],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
+  pthread_create( &p_thread_pha_alt[3],        NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
 
-  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, gp_Gpio_Pwm_Mot_Azi ) ;
-  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, gp_Gpio_Pwm_Mot_Alt ) ;
+  pthread_create( &p_thread_mot_azi,           NULL, (void*)suivi_main_M, gp_Azi_Mot ) ;
+  pthread_create( &p_thread_mot_alt,           NULL, (void*)suivi_main_M, gp_Alt_Mot ) ;
 
 */
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[0] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[1] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[2] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Azi->mot_pha[3] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)suivi_main_M,         gp_Gpio_Pwm_Mot_Azi ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[0] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[1] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[2] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Gpio_Pwm_Mot_Alt->mot_pha[3] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)suivi_main_M,         gp_Gpio_Pwm_Mot_Alt ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)suivi_main_M,         gp_Azi_Mot ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)GPIO_SUIVI_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)suivi_main_M,         gp_Alt_Mot ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MENU],            NULL, (void*)SUIVI_MENU,           gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)SUIVI_VOUTE,          gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_INFRA],           NULL, (void*)SUIVI_INFRAROUGE,     gp_Sui ) ;

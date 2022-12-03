@@ -15,15 +15,22 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+// #define MUTEX_GLO_I2C_DEV_LOCK        pthread_mutex_lock(   & gp_I2c->i2c_dev_mutex ) ;
+// #define MUTEX_GLO_I2C_DEV_UNLOCK      pthread_mutex_unlock( & gp_I2c->i2c_dev_mutex ) ;
+// #define MUTEX_GLO_I2C_ACC_LOCK        pthread_mutex_lock(   & gp_Acc->acc_mutex ) ;
+// #define MUTEX_GLO_I2C_ACC_UNLOCK      pthread_mutex_unlock( & gp_Acc->acc_mutex ) ;
+
 unsigned short sym[16] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15} ;
 
+/*
 STRUCT_I2C_DEVICE  lsm303d,   *lsm ;
 STRUCT_I2C_DEVICE  mcp23008,  *mcp ;
 STRUCT_I2C_DEVICE  rtcds1307, *rtc ;
-STRUCT_I2C_DEVICE  exemple,   *ex ;
-STRUCT_I2C_ACC_MAG accmag,    *lp_i2c_acc ;
+*/
+STRUCT_I2C_DEVICE  exemple,   *lp_I2c ;
+STRUCT_I2C_ACC_MAG accmag,    *lp_Acc ;
 
-void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *lp_i2c_acc) {
+void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *lp_Acc) {
   
   float norme_acc, norme_mag  ;
   // float phi, psi , the ;
@@ -32,65 +39,73 @@ void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *lp_i2c_acc) {
   // Normalisation des mesures de l'accelerometre
   //---------------------------------------------
   
-  lp_i2c_acc->Ax = (float)((int16_t)((lp_i2c_acc->axh << 8 ) | lp_i2c_acc->axl ))  ;
-  lp_i2c_acc->Ay = (float)((int16_t)((lp_i2c_acc->ayh << 8 ) | lp_i2c_acc->ayl ))  ;
-  lp_i2c_acc->Az = (float)((int16_t)((lp_i2c_acc->azh << 8 ) | lp_i2c_acc->azl ))  ;
+  lp_Acc->acc_acc_x = (float)((int16_t)((lp_Acc->acc_axh << 8 ) | lp_Acc->acc_axl ))  ;
+  lp_Acc->acc_acc_y = (float)((int16_t)((lp_Acc->acc_ayh << 8 ) | lp_Acc->acc_ayl ))  ;
+  lp_Acc->acc_acc_z = (float)((int16_t)((lp_Acc->acc_azh << 8 ) | lp_Acc->acc_azl ))  ;
   
-  norme_acc = sqrt((lp_i2c_acc->Ax*lp_i2c_acc->Ax)+(lp_i2c_acc->Ay*lp_i2c_acc->Ay)+(lp_i2c_acc->Az*lp_i2c_acc->Az) ) ;
+  norme_acc = sqrt( \
+      (lp_Acc->acc_acc_x*lp_Acc->acc_acc_x) \
+    + (lp_Acc->acc_acc_y*lp_Acc->acc_acc_y) \
+    + (lp_Acc->acc_acc_z*lp_Acc->acc_acc_z) ) ;
   
-  if ( norme_acc > lp_i2c_acc->A_norme_max ) lp_i2c_acc->A_norme_max = norme_acc ; 
-  
-  lp_i2c_acc->Xa = lp_i2c_acc->Ax / norme_acc ;
-  lp_i2c_acc->Ya = lp_i2c_acc->Ay / norme_acc ;
-  lp_i2c_acc->Za = lp_i2c_acc->Az / norme_acc ;
+  if ( norme_acc > lp_Acc->acc_acc_norme_max ) {
+     lp_Acc->acc_acc_norme_max = norme_acc ; 
+  }
+  lp_Acc->acc_acc_norm_x = lp_Acc->acc_acc_x / norme_acc ;
+  lp_Acc->acc_acc_norm_y = lp_Acc->acc_acc_y / norme_acc ;
+  lp_Acc->acc_acc_norm_z = lp_Acc->acc_acc_z / norme_acc ;
   
   //---------------------------------------------
   // Normalisation des mesures de la boussole
   //---------------------------------------------
   
-  lp_i2c_acc->Mx = (float)((int16_t)((lp_i2c_acc->mxh << 8 ) | lp_i2c_acc->mxl ))  ;
-  lp_i2c_acc->My = (float)((int16_t)((lp_i2c_acc->myh << 8 ) | lp_i2c_acc->myl ))  ;
-  lp_i2c_acc->Mz = (float)((int16_t)((lp_i2c_acc->mzh << 8 ) | lp_i2c_acc->mzl ))  ;
+  lp_Acc->acc_mag_x = (float)((int16_t)((lp_Acc->acc_mxh << 8 ) | lp_Acc->acc_mxl ))  ;
+  lp_Acc->acc_mag_y = (float)((int16_t)((lp_Acc->acc_myh << 8 ) | lp_Acc->acc_myl ))  ;
+  lp_Acc->acc_mag_z = (float)((int16_t)((lp_Acc->acc_mzh << 8 ) | lp_Acc->acc_mzl ))  ;
   
-  norme_mag = sqrt((lp_i2c_acc->Mx*lp_i2c_acc->Mx)+(lp_i2c_acc->My*lp_i2c_acc->My)+(lp_i2c_acc->Mz*lp_i2c_acc->Mz) ) ;
+  norme_mag = sqrt( \
+     (lp_Acc->acc_mag_x*lp_Acc->acc_mag_x) \
+   + (lp_Acc->acc_mag_y*lp_Acc->acc_mag_y) \
+   + (lp_Acc->acc_mag_z*lp_Acc->acc_mag_z) ) ;
   
-  if ( norme_mag > lp_i2c_acc->M_norme_max ) lp_i2c_acc->M_norme_max = norme_mag ; 
-  
-  lp_i2c_acc->Xm = lp_i2c_acc->Mx / norme_mag ;
-  lp_i2c_acc->Ym = lp_i2c_acc->My / norme_mag ;
-  lp_i2c_acc->Zm = lp_i2c_acc->Mz / norme_mag ;
+  if ( norme_mag > lp_Acc->acc_mag_norme_max ) {
+    lp_Acc->acc_mag_norme_max = norme_mag ; 
+  }
+  lp_Acc->acc_mag_norm_x = lp_Acc->acc_mag_x / norme_mag ;
+  lp_Acc->acc_mag_norm_y = lp_Acc->acc_mag_y / norme_mag ;
+  lp_Acc->acc_mag_norm_z = lp_Acc->acc_mag_z / norme_mag ;
   
   //---------------------------------------------
   // Calcul pitch and roll
   //---------------------------------------------
   
-  lp_i2c_acc->pitch = asin (-1.0 * lp_i2c_acc->Xa ) ;
-  lp_i2c_acc->roll  = asin ( lp_i2c_acc->Ya / cos ( lp_i2c_acc->pitch) ) ;
+  lp_Acc->acc_pitch = asin (-1.0 * lp_Acc->acc_acc_norm_x ) ;
+  lp_Acc->acc_roll  = asin ( lp_Acc->acc_acc_norm_y / cos ( lp_Acc->acc_pitch) ) ;
   
   //---------------------------------------------
   // Calcul heading
   //---------------------------------------------
   
-  // phi = atan2f(lp_i2c_acc->Mx,lp_i2c_acc->My) * 360 / ( 2 * M_PI ) ;  
-  // psi = atan2f(lp_i2c_acc->My,lp_i2c_acc->Mz) * 360 / ( 2 * M_PI ) ;   
-  // the = atan2f(lp_i2c_acc->Mz,lp_i2c_acc->Mx) * 360 / ( 2 * M_PI )  ;  
+  // phi = atan2f(lp_Acc->acc_mag_x,lp_Acc->acc_mag_y) * 360 / ( 2 * M_PI ) ;  
+  // psi = atan2f(lp_Acc->acc_mag_y,lp_Acc->acc_mag_z) * 360 / ( 2 * M_PI ) ;   
+  // the = atan2f(lp_Acc->acc_mag_z,lp_Acc->acc_mag_x) * 360 / ( 2 * M_PI )  ;  
   
-  lp_i2c_acc->Xh = lp_i2c_acc->Xm * cos ( lp_i2c_acc->pitch ) + lp_i2c_acc->Zm * sin (lp_i2c_acc->pitch ) ;
-  lp_i2c_acc->Yh = lp_i2c_acc->Xm * sin(lp_i2c_acc->roll) * sin(lp_i2c_acc->pitch) + lp_i2c_acc->Ym - lp_i2c_acc->Zm * sin(lp_i2c_acc->roll)*cos( lp_i2c_acc->pitch) ;
+  lp_Acc->acc_gauss_field_x = lp_Acc->acc_mag_norm_x * cos ( lp_Acc->acc_pitch ) + lp_Acc->acc_mag_norm_z * sin (lp_Acc->acc_pitch ) ;
+  lp_Acc->acc_gauss_field_y = lp_Acc->acc_mag_norm_x * sin(lp_Acc->acc_roll) * sin(lp_Acc->acc_pitch) + lp_Acc->acc_mag_norm_y - lp_Acc->acc_mag_norm_z * sin(lp_Acc->acc_roll)*cos( lp_Acc->acc_pitch) ;
   
-  if ( lp_i2c_acc->Xh > 0 && lp_i2c_acc->Yh >= 0 ) lp_i2c_acc->heading = atan( lp_i2c_acc->Yh / lp_i2c_acc->Xh ) ;
-  if ( lp_i2c_acc->Xh > 0 && lp_i2c_acc->Yh < 0 )  lp_i2c_acc->heading = 2 * M_PI + atan( lp_i2c_acc->Yh / lp_i2c_acc->Xh ) ;
-  if ( lp_i2c_acc->Xh < 0 )                lp_i2c_acc->heading = M_PI + atan( lp_i2c_acc->Yh / lp_i2c_acc->Xh ) ;
-  if ( lp_i2c_acc->Xh == 0 && lp_i2c_acc->Yh < 0 ) lp_i2c_acc->heading = M_PI / 2.0 ;
-  if ( lp_i2c_acc->Xh == 0 && lp_i2c_acc->Yh > 0 ) lp_i2c_acc->heading = M_PI * 1.5  ;
+  if ( lp_Acc->acc_gauss_field_x > 0 && lp_Acc->acc_gauss_field_y >= 0 ) lp_Acc->acc_heading = atan( lp_Acc->acc_gauss_field_y / lp_Acc->acc_gauss_field_x ) ;
+  if ( lp_Acc->acc_gauss_field_x > 0 && lp_Acc->acc_gauss_field_y < 0 )  lp_Acc->acc_heading = 2 * M_PI + atan( lp_Acc->acc_gauss_field_y / lp_Acc->acc_gauss_field_x ) ;
+  if ( lp_Acc->acc_gauss_field_x < 0 )                lp_Acc->acc_heading = M_PI + atan( lp_Acc->acc_gauss_field_y / lp_Acc->acc_gauss_field_x ) ;
+  if ( lp_Acc->acc_gauss_field_x == 0 && lp_Acc->acc_gauss_field_y < 0 ) lp_Acc->acc_heading = M_PI / 2.0 ;
+  if ( lp_Acc->acc_gauss_field_x == 0 && lp_Acc->acc_gauss_field_y > 0 ) lp_Acc->acc_heading = M_PI * 1.5  ;
   
-  // printf("%.0f\t%.0f\t%.0f\t%.0f\n", lp_i2c_acc->Ax , lp_i2c_acc->Ay , lp_i2c_acc->Az, norme_acc) ;
-  // printf("%.0f\t%.0f\t%.0f\t%.0f\n", lp_i2c_acc->Mx , lp_i2c_acc->My , lp_i2c_acc->Mz, norme_mag) ;
-  // printf("%.2f\t%.2f\t%.2f\t%.2f\n", lp_i2c_acc->Xm , lp_i2c_acc->Ym , lp_i2c_acc->Zm, sqrt( (lp_i2c_acc->Xm * lp_i2c_acc->Xm) + (lp_i2c_acc->Ym * lp_i2c_acc->Ym) + ( lp_i2c_acc->Zm * lp_i2c_acc->Zm) ) ) ;
+  // printf("%.0f\t%.0f\t%.0f\t%.0f\n", lp_Acc->acc_acc_x , lp_Acc->acc_acc_y , lp_Acc->acc_acc_z, norme_acc) ;
+  // printf("%.0f\t%.0f\t%.0f\t%.0f\n", lp_Acc->acc_mag_x , lp_Acc->acc_mag_y , lp_Acc->acc_mag_z, norme_mag) ;
+  // printf("%.2f\t%.2f\t%.2f\t%.2f\n", lp_Acc->acc_mag_norm_x , lp_Acc->acc_mag_norm_y , lp_Acc->acc_mag_norm_z, sqrt( (lp_Acc->acc_mag_norm_x * lp_Acc->acc_mag_norm_x) + (lp_Acc->acc_mag_norm_y * lp_Acc->acc_mag_norm_y) + ( lp_Acc->acc_mag_norm_z * lp_Acc->acc_mag_norm_z) ) ) ;
   
-  //printf("%.0f\t%.0f\t%.0f\n", lp_i2c_acc->pitch * I2C_DEGRAD, lp_i2c_acc->roll * I2C_DEGRAD, lp_i2c_acc->heading * I2C_DEGRAD) ;
+  //printf("%.0f\t%.0f\t%.0f\n", lp_Acc->acc_pitch * I2C_DEGRAD, lp_Acc->acc_roll * I2C_DEGRAD, lp_Acc->acc_heading * I2C_DEGRAD) ;
   //printf("%.0f\t%.0f\t%.0f\n", phi, psi, the) ;
-  //printf("%.0f\t%.0f\t%.0f\n",lp_i2c_acc->Mx * 90 / 16384 , lp_i2c_acc->My * 90 / 16384, lp_i2c_acc->Mz * 90 / 16384 );
+  //printf("%.0f\t%.0f\t%.0f\n",lp_Acc->acc_mag_x * 90 / 16384 , lp_Acc->acc_mag_y * 90 / 16384, lp_Acc->acc_mag_z * 90 / 16384 );
   //printf("---------\n") ;
 }
 //===========================================================
@@ -220,20 +235,20 @@ void I2C_GET_6( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre) {
 }
 //===========================================================
 
-void I2C_GET_ACC( STRUCT_I2C_DEVICE *ex, STRUCT_I2C_ACC_MAG *lp_i2c_acc ) {
+void I2C_GET_ACC( STRUCT_I2C_DEVICE *lp_I2c, STRUCT_I2C_ACC_MAG *lp_Acc ) {
 
-      lp_i2c_acc->axl = I2C_GET( ex, REG_OUT_ACC_X_L ) ;
-      lp_i2c_acc->axh = I2C_GET( ex, REG_OUT_ACC_X_H ) ; 
-      lp_i2c_acc->ayl = I2C_GET( ex, REG_OUT_ACC_Y_L ) ;
-      lp_i2c_acc->ayh = I2C_GET( ex, REG_OUT_ACC_Y_H ) ;
-      lp_i2c_acc->azl = I2C_GET( ex, REG_OUT_ACC_Z_L ) ;
-      lp_i2c_acc->azh = I2C_GET( ex, REG_OUT_ACC_Z_H ) ;
+      lp_Acc->acc_axl = I2C_GET( lp_I2c, REG_OUT_ACC_X_L ) ;
+      lp_Acc->acc_axh = I2C_GET( lp_I2c, REG_OUT_ACC_X_H ) ; 
+      lp_Acc->acc_ayl = I2C_GET( lp_I2c, REG_OUT_ACC_Y_L ) ;
+      lp_Acc->acc_ayh = I2C_GET( lp_I2c, REG_OUT_ACC_Y_H ) ;
+      lp_Acc->acc_azl = I2C_GET( lp_I2c, REG_OUT_ACC_Z_L ) ;
+      lp_Acc->acc_azh = I2C_GET( lp_I2c, REG_OUT_ACC_Z_H ) ;
              
-      lp_i2c_acc->mxl = I2C_GET( ex, REG_OUT_MAG_X_L ) ;
-      lp_i2c_acc->mxh = I2C_GET( ex, REG_OUT_MAG_X_H ) ; 
-      lp_i2c_acc->myl = I2C_GET( ex, REG_OUT_MAG_Y_L ) ;
-      lp_i2c_acc->myh = I2C_GET( ex, REG_OUT_MAG_Y_H ) ;
-      lp_i2c_acc->mzl = I2C_GET( ex, REG_OUT_MAG_Z_L ) ;
-      lp_i2c_acc->mzh = I2C_GET( ex, REG_OUT_MAG_Z_H ) ;
+      lp_Acc->acc_mxl = I2C_GET( lp_I2c, REG_OUT_MAG_X_L ) ;
+      lp_Acc->acc_mxh = I2C_GET( lp_I2c, REG_OUT_MAG_X_H ) ; 
+      lp_Acc->acc_myl = I2C_GET( lp_I2c, REG_OUT_MAG_Y_L ) ;
+      lp_Acc->acc_myh = I2C_GET( lp_I2c, REG_OUT_MAG_Y_H ) ;
+      lp_Acc->acc_mzl = I2C_GET( lp_I2c, REG_OUT_MAG_Z_L ) ;
+      lp_Acc->acc_mzh = I2C_GET( lp_I2c, REG_OUT_MAG_Z_H ) ;
 }
 //===========================================================

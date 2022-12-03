@@ -153,6 +153,24 @@ while (0)
   perror("pthread_mutex_init"); \
   exit(EXIT_FAILURE); }}
 
+#define HANDLE_ERROR_PTHREAD_MUTEX_LOCK(string) { \
+ int i_error=0 ; \
+ int i_errno=0 ; \
+ if ( ( i_error = pthread_mutex_lock( string )) != 0 ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pthread_mutex_lock"); \
+  exit(EXIT_FAILURE); }}
+
+#define HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(string) { \
+ int i_error=0 ; \
+ int i_errno=0 ; \
+ if ( ( i_error = pthread_mutex_unlock( string )) != 0 ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pthread_mutex_lock"); \
+  exit(EXIT_FAILURE); }}
+
 // ------------------------------------------------------------------------
 // ASTRO_LOG_DEBUG : fin macros
 // ------------------------------------------------------------------------

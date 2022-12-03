@@ -1,0 +1,1 @@
+cmd_/home/stef/git/astrokit/drv/embetronicx/Module.symvers := sed 's/\.ko$$/\.o/' /home/stef/git/astrokit/drv/embetronicx/modules.order | scripts/mod/modpost -m -a  -o /home/stef/git/astrokit/drv/embetronicx/Module.symvers -e -i Module.symvers   -T -

@@ -23,22 +23,22 @@ int  gi_pid_trace_azi ;
 * @fn     : PID_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure lcd *l
-* @param  : STRUCT_PID *gp_Pid
+* @param  : STRUCT_PID *lp_Pid
 * @date   : 2022-06 creation
 *****************************************************************************************/
 
-void PID_INIT(STRUCT_PID * lp_pid, double d_ech, double d_kp, double d_ki, double d_kd ) {
+void PID_INIT(STRUCT_PID * lp_Pid, STRUCT_PID_PARAMS * lp_Pid_Par, STRUCT_CONFIG_PARAMS * lp_Con_Par ) {
 
-  char c_path_file_out[ CONFIG_TAILLE_BUFFER_64] ; 
+  char c_path_file_out[ CONFIG_TAILLE_BUFFER_256] ; 
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Initialisation fichier */
 
   memset(c_path_file_out, 0, sizeof(c_path_file_out)) ;
-  sprintf( c_path_file_out, "%s/%s" , gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_pid) ;
+  sprintf( c_path_file_out, "%s/%s" , lp_Con_Par->par_rep_log, lp_Con_Par->par_fic_pid) ;
 
-  if ( ( lp_pid->pid_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
+  if ( ( lp_Pid->pid_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
     Trace("ouverture %s (KO)",c_path_file_out );
   }
   else {
@@ -46,47 +46,41 @@ void PID_INIT(STRUCT_PID * lp_pid, double d_ech, double d_kp, double d_ki, doubl
   }
   /* Initialisation mutex */
 
-  pthread_mutex_init( & lp_pid->pid_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pid->pid_mutex ) ;
   
   /* Parametres de reglages du PID proportionnel integral derive*/
 
-  lp_pid->ech = d_ech ;
-  lp_pid->Kp  = d_kp ;
-  lp_pid->Ki  = d_ki ;
-  lp_pid->Kd  = d_kd ;
+  lp_Pid->pid_ech = lp_Pid_Par->par_pid_ech ;
+  lp_Pid->pid_kp  = lp_Pid_Par->par_pid_kp ;
+  lp_Pid->pid_ki  = lp_Pid_Par->par_pid_ki ;
+  lp_Pid->pid_kd  = lp_Pid_Par->par_pid_kd ;
 
   /* Initialisation autres champs */
 
-  lp_pid->incr = 0 ;
-  lp_pid->inp = 0 ;  /* consigne */ 
-  lp_pid->out = 0;   /* sortie */ 
-  lp_pid->err = 0;   /* erreur  = out - inp */ 
-
-  lp_pid->err_sum = 0 ; /* calcul de la somme des erreurs */ 
-  lp_pid->err_int_Ki = 0 ; /* calcul de la partie integrale */  
-  lp_pid->err_der_Kd = 0 ; /* calcul de la partie derivee */
-  lp_pid->err_pre = 0 ;
-  
-  /* Reglages des coefficients Kp, Ki, Kd */
-
-  /* Mettre les accelerations a 1 */
-
-  lp_pid->pid_acc_azi   = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
-  lp_pid->pid_acc_alt   = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+  lp_Pid->pid_long_incr      = 0 ;
+  lp_Pid->pid_input_consigne = 0 ;  /* consigne */ 
+  lp_Pid->pid_output         = 0;   /* sortie */ 
+  lp_Pid->pid_err            = 0;   /* erreur  = out - inp */ 
+  lp_Pid->pid_err_sum        = 0 ; /* calcul de la somme des erreurs */ 
+  lp_Pid->pid_err_ki         = 0 ; /* calcul de la partie integrale */  
+  lp_Pid->pid_err_kd         = 0 ; /* calcul de la partie derivee */
+  lp_Pid->pid_err_pre        = 0 ;
+  lp_Pid->pid_acc_azi        = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+  lp_Pid->pid_acc_alt        = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
 
   /* Initialisation pointeurs de fonctions */
   
-  /* lp_pid->pid_init */ 
-  lp_pid->pid_reset = PID_RESET ;
-  lp_pid->pid_run   = PID_CALCULATE ;
-  lp_pid->pid_test  = PID_TEST ;
+  /* lp_Pid->pid_init */ 
+  lp_Pid->pid_reset = PID_RESET ;
+  lp_Pid->pid_run   = PID_RUN ;
+  lp_Pid->pid_test  = PID_TEST ;
 
   return ;
 }
 
 
 /*****************************************************************************************
-* @fn     : PID_CALCULATE
+* @fn     : PID_RUN
 * @author : s.gravois
 * @brief  : Cette fonction calcule a partir de Ki, Kp, Kd, Ech, et de E(t) depuis 0->t
 * @brief  : les valeurs des termes proportionnel , integral, et derivee
@@ -95,7 +89,7 @@ void PID_INIT(STRUCT_PID * lp_pid, double d_ech, double d_kp, double d_ki, doubl
 * @date   : 2022-06 creation
 *****************************************************************************************/
 
-void   PID_CALCULATE (double d_inp, double d_out) {
+void   PID_RUN (double d_input, double d_output) {
 
   double d_err_delta ; 
 
@@ -109,54 +103,56 @@ else {
   Trace("division par zero") ;
 }
 */
-  pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pid->pid_mutex ) ;
 
-  gp_Pid->err  = d_out - d_inp ;
+  gp_Pid->pid_err  = d_output - d_input ;
 
   /* calcul terme proportionnel */
 
-  gp_Pid->err_pro_Kp = gp_Pid->Kp * gp_Pid->err ;
+  gp_Pid->pid_err_kp = gp_Pid->pid_kp * gp_Pid->pid_err ;
 
   /* Si on a atteint au moins la deuxieme boucle */
   /* on calcule tout de qui est relatif a ID de PID : 
     * integral 
-    * proportionnel 
+    * derivate 
   */
 
-  if ( gp_Pid->incr > 0 ) {
+  if ( gp_Pid->pid_long_incr > 0 ) {
 
     /* calcul terme derivee */
+
     /* la division par deltat est ponderee par le parametre Kd */
     /* Etant donne que l'echantillonage est constant */
 
-    d_err_delta  = gp_Pid->err - gp_Pid->err_pre ;
-    gp_Pid->err_der_Kd = gp_Pid->Kd * d_err_delta ;
+    d_err_delta  = gp_Pid->pid_err - gp_Pid->pid_err_pre ;
+    gp_Pid->pid_err_kd = gp_Pid->pid_kd * d_err_delta ;
 
     /* calcul terme integral */
+
     /* Le calcul du terme INTEGRAL est la somme des rectangles depuis t=0 */
     /* TODO : methofde alternative methode des trapezes */
     /* la multiplication par deltat est ponderee par le parametre Ki */
     /* Etant donne que l'echantillonage est constant */
 
-    gp_Pid->err_sum   += gp_Pid->err ;
-    gp_Pid->err_int_Ki = gp_Pid->Ki * gp_Pid->err_sum ;
+    gp_Pid->pid_err_sum   += gp_Pid->pid_err ;
+    gp_Pid->pid_err_ki     = gp_Pid->pid_ki * gp_Pid->pid_err_sum ;
   }
 
   /* calcul complet comande PID et mise a edchelle pour consigne et output */
 
-  gp_Pid->pid = gp_Pid->err_pro_Kp + gp_Pid->err_int_Ki + gp_Pid->err_der_Kd ;
+  gp_Pid->pid_result = gp_Pid->pid_err_kp + gp_Pid->pid_err_ki + gp_Pid->pid_err_kd ;
 
   /* mise en conformite pour COmmande Sortie */
   /* TODO : voir si une addition avec 1 suffit */
   
-  gp_Pid->pid   = ( (gp_Pid->pid-1.0) / 2.0 )+ 1.0 ;
+  gp_Pid->pid_result   = ( (gp_Pid->pid_result-1.0) / 2.0 )+ 1.0 ;
 
   /* sauvegarde de erreur dans erreur precedente pour calcul suivant */
 
-  gp_Pid->err_pre = gp_Pid->err ;
-  gp_Pid->incr++ ;
+  gp_Pid->pid_err_pre = gp_Pid->pid_err ;
+  gp_Pid->pid_long_incr++ ;
 
-  pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pid->pid_mutex ) ;
 
   return ;
 }
@@ -167,10 +163,26 @@ else {
 * @author : s.gravois
 * @brief  : Cette fonction reset le calcul de la algorithme PID 
 * @param  : void
-* @date   : 2022-06 creation
+* @date   : 2022-06    creation
+* @date   : 2022-12-02 
 *****************************************************************************************/
 
-void   PID_RESET         ( void) {
+void PID_RESET (void) {
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pid->pid_mutex ) ;
+
+  gp_Pid->pid_long_incr      = 0 ;
+  gp_Pid->pid_input_consigne = 0 ;  /* consigne */ 
+  gp_Pid->pid_output         = 0;   /* sortie */ 
+  gp_Pid->pid_err            = 0;   /* erreur  = out - inp */ 
+  gp_Pid->pid_err_sum        = 0 ; /* calcul de la somme des erreurs */ 
+  gp_Pid->pid_err_ki         = 0 ; /* calcul de la partie integrale */  
+  gp_Pid->pid_err_kd         = 0 ; /* calcul de la partie derivee */
+  gp_Pid->pid_err_pre        = 0 ;
+  gp_Pid->pid_acc_azi        = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+  gp_Pid->pid_acc_alt        = 1.0 ; // acceleration PID par retour boucle des vitesses brutes
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pid->pid_mutex ) ;
 
   return ;
 }
