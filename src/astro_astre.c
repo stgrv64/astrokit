@@ -220,17 +220,17 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(void) {
   /* traitement des donnees en degres / minutes / secondes */
   /* est inclus dans l affichage le signe */
 
-  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Ast->ast_agh_a.ang_sig, gp_Ast->ast_agh_a.ang_DD, gp_Ast->ast_agh_a.ang_MM ) ;
-  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Ast->ast_asc_a.ang_sig, gp_Ast->ast_asc_a.ang_DD, gp_Ast->ast_asc_a.ang_MM ) ;
-  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Ast->ast_azi_a.ang_sig, gp_Ast->ast_azi_a.ang_DD, gp_Ast->ast_azi_a.ang_MM ) ;
-  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Ast->ast_alt_a.ang_sig, gp_Ast->ast_alt_a.ang_DD, gp_Ast->ast_alt_a.ang_MM ) ;
-  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Ast->ast_dec_a.ang_sig, gp_Ast->ast_dec_a.ang_DD, gp_Ast->ast_dec_a.ang_MM ) ;
+  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Ast->ast_agh_a.ang_sig, gp_Ast->ast_agh_a.ang_dd, gp_Ast->ast_agh_a.ang_mm ) ;
+  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Ast->ast_asc_a.ang_sig, gp_Ast->ast_asc_a.ang_dd, gp_Ast->ast_asc_a.ang_mm ) ;
+  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Ast->ast_azi_a.ang_sig, gp_Ast->ast_azi_a.ang_dd, gp_Ast->ast_azi_a.ang_mm ) ;
+  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Ast->ast_alt_a.ang_sig, gp_Ast->ast_alt_a.ang_dd, gp_Ast->ast_alt_a.ang_mm ) ;
+  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Ast->ast_dec_a.ang_sig, gp_Ast->ast_dec_a.ang_dd, gp_Ast->ast_dec_a.ang_mm ) ;
 
-  sprintf( c_dd_agh,   "%c %-3d deg",   gp_Ast->ast_agh_a.ang_sig, gp_Ast->ast_agh_a.ang_DD ) ;
-  sprintf( c_dd_asc,   "%c %-3d deg",   gp_Ast->ast_asc_a.ang_sig, gp_Ast->ast_asc_a.ang_DD ) ;
-  sprintf( c_dd_azi,   "%c %-3d deg",   gp_Ast->ast_azi_a.ang_sig, gp_Ast->ast_azi_a.ang_DD ) ;
-  sprintf( c_dd_alt,   "%c %-3d deg",   gp_Ast->ast_alt_a.ang_sig, gp_Ast->ast_alt_a.ang_DD ) ;
-  sprintf( c_dd_dec,   "%c %-3d deg",   gp_Ast->ast_dec_a.ang_sig, gp_Ast->ast_dec_a.ang_DD ) ;
+  sprintf( c_dd_agh,   "%c %-3d deg",   gp_Ast->ast_agh_a.ang_sig, gp_Ast->ast_agh_a.ang_dd ) ;
+  sprintf( c_dd_asc,   "%c %-3d deg",   gp_Ast->ast_asc_a.ang_sig, gp_Ast->ast_asc_a.ang_dd ) ;
+  sprintf( c_dd_azi,   "%c %-3d deg",   gp_Ast->ast_azi_a.ang_sig, gp_Ast->ast_azi_a.ang_dd ) ;
+  sprintf( c_dd_alt,   "%c %-3d deg",   gp_Ast->ast_alt_a.ang_sig, gp_Ast->ast_alt_a.ang_dd ) ;
+  sprintf( c_dd_dec,   "%c %-3d deg",   gp_Ast->ast_dec_a.ang_sig, gp_Ast->ast_dec_a.ang_dd ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   

@@ -30,9 +30,9 @@ struct STR_ANGLE {
   int             ang_si ;      /* signe sous forme entiere '-1' ou '+1' */
   double          ang_dec_rad ; 
   double          ang_dec_deg ; 
-  int             ang_DD ;      
-  int             ang_MM ;      
-  int             ang_SS ; 
+  int             ang_dd ;      
+  int             ang_mm ;      
+  int             ang_ss ; 
 } ;
 typedef struct STR_ANGLE STRUCT_ANGLE ;
 
@@ -198,7 +198,7 @@ void CALCULS_INIT ( \
  STRUCT_SUIVI            * ) ;
 
 void   CALCULS_VOUTE                   (void) ;
-void   CALCULS_COORD_R3                 (void) ;
+void   CALCULS_COORD_R3                (void) ;
 void   CALCULS_AZIMUT                  (void) ;
 void   CALCULS_EQUATEUR                (void) ;
 void   CALCULS_VITESSES_EQUATORIAL     (void) ;

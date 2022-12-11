@@ -664,13 +664,13 @@ void CALCULS_ANGLE_VERS_DMS(STRUCT_ANGLE *angle) {
     angle->ang_sig = '-' ;
   }
 
-  angle->ang_DD = (int)fabs(       angle->ang_dec_deg ) ;
-  angle->ang_MM = (int)fabs( (fabs(angle->ang_dec_deg) - angle->ang_DD ) * 60.0 ) ;
-  angle->ang_SS = (int)fabs(((fabs(angle->ang_dec_deg) - angle->ang_DD ) * 60.0 - angle->ang_MM ) * 60.0 ) ;
+  angle->ang_dd = (int)fabs(       angle->ang_dec_deg ) ;
+  angle->ang_mm = (int)fabs( (fabs(angle->ang_dec_deg) - angle->ang_dd ) * 60.0 ) ;
+  angle->ang_ss = (int)fabs(((fabs(angle->ang_dec_deg) - angle->ang_dd ) * 60.0 - angle->ang_mm ) * 60.0 ) ;
 
-  Trace2("minutes  decimale = %d" , angle->ang_MM) ;
-  Trace2("heure    decimale = %d" , angle->ang_DD) ;
-  Trace2("secondes decimale = %d" , angle->ang_SS) ;
+  Trace2("minutes  decimale = %d" , angle->ang_mm) ;
+  Trace2("heure    decimale = %d" , angle->ang_dd) ;
+  Trace2("secondes decimale = %d" , angle->ang_ss) ;
 }
 
 /*****************************************************************************************

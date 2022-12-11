@@ -31,7 +31,7 @@ int TIME_CALCULS_LOCAL_DATE(STRUCT_TIME * lp_Tim) {
 
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
   lp_Tim->tim_HH = 0 ;
   lp_Tim->tim_MM = 0 ;
@@ -40,14 +40,14 @@ int TIME_CALCULS_LOCAL_DATE(STRUCT_TIME * lp_Tim) {
   lp_Tim->tim_dd = 0 ;
   lp_Tim->tim_mm = 0 ;
   
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
 
   time(&t) ;
   // tzset() ;
   // tm=localtime(&t) ; // pour le temps local (UTC+1 en hiver et UTC+2 en ete)
   tm=gmtime(&t);   // pour UTC
   
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
   lp_Tim->tim_HH = tm->tm_hour ;
   lp_Tim->tim_MM = tm->tm_min ;
@@ -56,7 +56,7 @@ int TIME_CALCULS_LOCAL_DATE(STRUCT_TIME * lp_Tim) {
   lp_Tim->tim_dd = tm->tm_mday ;
   lp_Tim->tim_mm = tm->tm_mon + 1 ;
   
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
 
   TIME_CALCULS_HMS_VERS_DEC (lp_Tim ) ;
   
@@ -92,13 +92,13 @@ int TIME_CALCULS_JULIAN_DAY(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie) {
 
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
   memcpy( &l_Tim , lp_Tim, sizeof( STRUCT_TIME) ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
   Y  = lp_Tim->tim_yy ;
   M  = lp_Tim->tim_mm ;
@@ -106,11 +106,13 @@ int TIME_CALCULS_JULIAN_DAY(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie) {
   yy = lp_Tim->tim_yy ;
   mm = lp_Tim->tim_mm ;
   
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ;
 
   lp_Lie->lie_jj = 0 ;
   
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ;
   
   JJ=0 ;
   
@@ -134,11 +136,11 @@ int TIME_CALCULS_JULIAN_DAY(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie) {
   
   Trace1("Date Julienne = %7.9f",JJ) ;
   
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ;
 
   lp_Lie->lie_jj = JJ ;
   
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ;
 
   return 0 ;
 }
@@ -200,7 +202,7 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
   Trace1("jour sideral : %f", jour_sideral_decimal) ;
   
   TIME_CALCULS_LOCAL_DATE( lp_Tim ) ;   
-  TIME_CALCULS_JULIAN_DAY( lp_Lie, lp_Tim ) ;
+  TIME_CALCULS_JULIAN_DAY( lp_Tim, lp_Lie ) ;
   
   if ( lp_Lie->lie_jj == 0 ) return 1 ;
   
@@ -241,9 +243,9 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
  
   TIME_CALCULS_DEC_VERS_HMS( & TSR2 ) ;
   
-  TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
-  TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
-  TIME_AFFICHER_MSG_HHMMSS("1ere methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR2) ;
+  TIME_AFFICHER_MSG_HHMMSS(&TSMG3,"1ere methode - Temps sideral Greenwich 0hTU") ;
+  TIME_AFFICHER_MSG_HHMMSS(&TSMGH3,"1ere methode - Temps sideral Greenwich tps local (TU)") ;
+  TIME_AFFICHER_MSG_HHMMSS(&TSR2,"1ere methode - Temps sideral Lieu Local + Heure Locale (TU)") ;
   
   // =======================  Deuxieme methode ==========================
   /* cette methode ne tient pas compte du terme 36525 */
@@ -269,9 +271,9 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
   TIME_CALCULS_DEC_VERS_HMS( & TSMGH3 ) ;
   TIME_CALCULS_DEC_VERS_HMS( & TSR3) ;
   
-  TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich 0hTU",& TSMG3) ;
-  TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Greenwich tps local (TU)",& TSMGH3) ;
-  TIME_AFFICHER_MSG_HHMMSS("2eme methode - Temps sideral Lieu Local + Heure Locale (TU)",& TSR3) ;
+  TIME_AFFICHER_MSG_HHMMSS(&TSMG3,"2eme methode - Temps sideral Greenwich 0hTU") ;
+  TIME_AFFICHER_MSG_HHMMSS(&TSMGH3,"2eme methode - Temps sideral Greenwich tps local (TU)") ;
+  TIME_AFFICHER_MSG_HHMMSS(&TSR3,"2eme methode - Temps sideral Lieu Local + Heure Locale (TU)") ;
   
   // =======================  Troisieme methode ==========================
   /* unite = la seconde */ 
@@ -286,13 +288,13 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
 
   // =======================   ==========================
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ;
 
   lp_Lie->lie_ts  = TSR2.tim_hd ;
   // lp_Lie->lie_tsr = (TSR3.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
   lp_Lie->lie_tsr = (TSR2.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ;
 
   Trace1("JJ %f lp_Lie->lie_tsr = %f",lp_Lie->lie_jj, lp_Lie->lie_tsr ) ;
 
@@ -332,7 +334,7 @@ void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
 
   Trace2("TEMPS    decimal  = %.4f" , lp_Tim->tim_hd) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
   if ( lp_Tim->tim_hd >=0 ) { 
     lp_Tim->tim_si   =  1 ;
@@ -347,7 +349,7 @@ void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
   lp_Tim->tim_MM = (int)fabs( (fabs(lp_Tim->tim_hd) - lp_Tim->tim_HH ) * 60.0 ) ;
   lp_Tim->tim_SS = (int)fabs(((fabs(lp_Tim->tim_hd) - lp_Tim->tim_HH ) * 60.0 - lp_Tim->tim_MM ) * 60.0 ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
 
   Trace2("heure    decimale = %d" , lp_Tim->tim_HH) ;
   Trace2("minutes  decimale = %d" , lp_Tim->tim_MM) ;
@@ -360,7 +362,7 @@ void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
 // TODO  : * supprimer ? non utilise actuellement
 //========================================================================================
 
-long TIME_TEMPORISATION_MICROSEC(double microsecondes, double percent, struct timeval t00) {
+long TIME_TEMPORISATION_MICROSEC(struct timeval t00, double microsecondes, double percent) {
   
   struct timeval t01 ;
   unsigned long  t_diff ;
@@ -505,11 +507,11 @@ void TIME_CALCULS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
   lp_Tim->tim_hd = lp_Tim->tim_HH + (lp_Tim->tim_MM / 60.0) + (lp_Tim->tim_SS / 3600.0)  ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
 }
 
 /*****************************************************************************************
@@ -522,7 +524,7 @@ void TIME_CALCULS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
 * @todo   : ras
 *****************************************************************************************/
 
-void TIME_AFFICHER_MSG_HHMMSS( char * mesg, STRUCT_TIME * lp_Tim ) {
+void TIME_AFFICHER_MSG_HHMMSS( STRUCT_TIME * lp_Tim, char * mesg ) {
 
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
