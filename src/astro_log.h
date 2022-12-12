@@ -147,6 +147,11 @@ while (0)
 #define HANDLE_ERROR_PTHREAD_MUTEX_INIT(string) { \
  int i_error=0 ; \
  int i_errno=0 ; \
+ if ( string == NULL ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pointer null"); \
+  exit(EXIT_FAILURE); } \
  if ( ( i_error = pthread_mutex_init( string, NULL )) != 0 ) { \
   i_errno=errno; \
   Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
@@ -156,6 +161,11 @@ while (0)
 #define HANDLE_ERROR_PTHREAD_MUTEX_LOCK(string) { \
  int i_error=0 ; \
  int i_errno=0 ; \
+ if ( string == NULL ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pointer null"); \
+  exit(EXIT_FAILURE); } \
  if ( ( i_error = pthread_mutex_lock( string )) != 0 ) { \
   i_errno=errno; \
   Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
@@ -165,11 +175,30 @@ while (0)
 #define HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(string) { \
  int i_error=0 ; \
  int i_errno=0 ; \
+ if ( string == NULL ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pointer null"); \
+  exit(EXIT_FAILURE); } \
  if ( ( i_error = pthread_mutex_unlock( string )) != 0 ) { \
   i_errno=errno; \
   Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
-  perror("pthread_mutex_lock"); \
+  perror("pthread_mutex_unlock"); \
   exit(EXIT_FAILURE); }}
+
+#define HANDLE_ERROR_PTHREAD_MUTEX_DESTROY(string) { \
+ int i_error=0 ; \
+ int i_errno=0 ; \
+ if ( string == NULL ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pointer null"); \
+  exit(EXIT_FAILURE); } \
+ if ( ( i_error = pthread_mutex_destroy( string )) != 0 ) { \
+  i_errno=errno; \
+  Trace("i_error : %d i_errno : %d", i_error, i_errno ) ; \
+  perror("pthread_mutex_destroy"); \
+  exit(EXIT_FAILURE); }}                                     
 
 // ------------------------------------------------------------------------
 // ASTRO_LOG_DEBUG : fin macros

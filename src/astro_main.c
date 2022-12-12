@@ -218,7 +218,7 @@ void * SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
   void * (*ptr_fct)(STRUCT_SUIVI *)  = SUIVI_MENU ;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
  
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_MENU ) ;
    
@@ -496,7 +496,7 @@ void * SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
   struct timeval t00 ;
   struct sched_param param;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
 
@@ -609,7 +609,7 @@ void * SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
   int i_ret=0 ; 
   struct sched_param param;
     
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_INFRARED ) ;
   
@@ -651,7 +651,7 @@ void * SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
   char c_l0[16] ={0};
   char c_l1[16] ={0};
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_LCD ) ;
 
@@ -728,7 +728,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
   
   u_sleep_termios_demi_periode = (unsigned long)((double)gp_Tpo->tpo_termios / 2.0) ;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
@@ -777,7 +777,7 @@ void * SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
         // il va etre lu par les threads du programme principal
 
         Trace1("datas = %s", gp_Dat->dat_act ) ;
-        Trace1("gp_Tpo->tpo_termios = %ld", gp_Tpo->tpo_termios ) ;
+        Trace("gp_Tpo->tpo_termios = %ld", gp_Tpo->tpo_termios ) ;
         Trace1("usleep tempo_termios") ;
         
         usleep( gp_Tpo->tpo_termios ) ;
@@ -809,7 +809,7 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
   int c_char = 0 ;
   struct sched_param param;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
@@ -854,7 +854,7 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
   unsigned long l_incr=0 ;
   struct sched_param param;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
@@ -924,7 +924,7 @@ void * SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   STRUCT_I2C_DEVICE   l_I2c, *lp_I2c ;
   STRUCT_I2C_ACC_MAG  l_Acc, *lp_Acc ;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CAPTEURS ) ;
 
@@ -1008,12 +1008,12 @@ int main(int argc, char ** argv) {
   int i ;
   int devFD, board;
   struct sched_param param;
-
+/*
   pthread_t p_thread_pha_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_pha_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
   pthread_t p_thread_mot_alt ;
   pthread_t p_thread_mot_azi ;
-  
+*/  
 /*
   STRUCT_GPIO_PWM_MOTEUR *gp_Alt_Mot , g_mot_alt ; 
   STRUCT_GPIO_PWM_MOTEUR *gp_Azi_Mot , g_mot_azi ;
@@ -1027,12 +1027,9 @@ int main(int argc, char ** argv) {
   /* car Trace1 utilise ce fichier */
   /* Alternative : Trace1 */ 
 
-  ASTRO_GLOBAL_INIT() ;
-
-  ARGUMENTS_GERER_REP_HOME(argc, argv) ;
-  /* Pour permettre acces a STRUCT_SUIVI* via struct STRUCT_GPIO_PWM_MOTEUR* */
-
-  CONFIG_PATH_FIND( gc_config_path_cmd_stty, "stty") ;
+  ASTRO_GLOBAL_INIT          () ;
+  ARGUMENTS_GERER_REP_HOME   ( argc, argv) ;
+  CONFIG_PATH_FIND           ( gc_config_path_cmd_stty, "stty") ;
   
   // -----------------------------------------------------------------
   // Initialisations diverses et variees
@@ -1050,6 +1047,10 @@ int main(int argc, char ** argv) {
   /* LOG_INIT ouvre le fichier en ecriture pour pouvoir avoir les traces en mode ecriture sur disque
      et donc a besoin de lire au prealable le fichier de CONFIGURATION (config.txt) */
 
+  TIME_INIT         ( gp_Tim ) ;
+  TIME_INIT_PARAMS  ( gp_Tim_Par) ;
+  TIME_INIT_TEMPOS  ( gp_Tpo ) ;
+
   LOG_INIT       ( gp_Log ); 
   VOUTE_INIT     ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
   ASTRE_INIT     ( gp_Ast ) ;
@@ -1057,7 +1058,6 @@ int main(int argc, char ** argv) {
   KEYS_INIT      ( gp_Key ) ;   
   LIEU_INIT      ( gp_Lie ) ;
   CAT_INIT       ( gp_Cat, gp_Ast ) ;
-  TIME_INIT      ( gp_Tim, gp_Tpo ) ;
   
   TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
   
@@ -1066,7 +1066,7 @@ int main(int argc, char ** argv) {
   LCD_INIT       ( gp_Lcd ) ;
   PID_INIT       ( gp_Pid, gp_Pid_Par, gp_Con_Par) ;
 
-  CALCULS_INIT   ( gp_Cal, gp_Fre, gp_Sta, gp_Pas, gp_Ast, gp_Vou, gp_Lie, gp_Dev, gp_Mut, gp_Tim, gp_Sui) ;
+  CALCULS_INIT   ( gp_Cal ) ;
   
   DEVICES_AFFICHER_UTILISATION( gp_Dev) ;
 
@@ -1084,9 +1084,12 @@ int main(int argc, char ** argv) {
   signal(SIGINT,ASTRO_TRAP_MAIN) ;
   signal(SIGALRM,ASTRO_TRAP_MAIN) ;
 
-  Trace1("gi_gpio_alt         : %d %d %d %d", gi_gpio_alt[0], gi_gpio_alt[1], gi_gpio_alt[2], gi_gpio_alt[3] ) ;
-  Trace1("gi_gpio_azi         : %d %d %d %d", gi_gpio_azi[0], gi_gpio_azi[1], gi_gpio_azi[2], gi_gpio_azi[3] ) ;
-  Trace1("gi_gpio_mas         : %d %d %d %d", gi_gpio_mas[0], gi_gpio_mas[1], gi_gpio_mas[2], gi_gpio_mas[3] ) ;
+  Trace1("gi_alt_gpios         : %d %d %d %d", gi_alt_gpios[0], gi_alt_gpios[1], gi_alt_gpios[2], gi_alt_gpios[3] ) ;
+  Trace1("gi_azi_gpios         : %d %d %d %d", gi_azi_gpios[0], gi_azi_gpios[1], gi_azi_gpios[2], gi_azi_gpios[3] ) ;
+  
+  Trace1("gi_alt_masque         : %d %d %d %d", gi_alt_masque[0], gi_alt_masque[1], gi_alt_masque[2], gi_alt_masque[3] ) ;
+  Trace1("gi_azi_masque         : %d %d %d %d", gi_azi_masque[0], gi_azi_masque[1], gi_azi_masque[2], gi_azi_masque[3] ) ;
+  
   Trace1("gp_Pwm_Par->par_led_etat    : %d", gp_Pwm_Par->par_led_etat );
   Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
   
@@ -1141,11 +1144,11 @@ int main(int argc, char ** argv) {
   
   GPIO_INIT_PWM_MOTEUR(\
     gp_Alt_Mot,\
-    gi_gpio_alt,\
-    gi_gpio_mas,\
+    gi_alt_gpios,\
+    gi_alt_masque,\
     gp_Cal_Par->cal_par_alt_red_4 ,\
     100,\
-    gd_gpio_frequence_pwm, \
+    gd_alt_fpwm, \
     0, \
     GPIO_CURRENT_FONCTION,\
     GPIO_CURRENT_FONCTION_PARAM0,\
@@ -1153,11 +1156,11 @@ int main(int argc, char ** argv) {
 
   GPIO_INIT_PWM_MOTEUR(\
     gp_Azi_Mot,\
-    gi_gpio_azi,\
-    gi_gpio_mas,\
+    gi_azi_gpios,\
+    gi_azi_masque,\
     gp_Cal_Par->cal_par_azi_red_4 ,\
     100,\
-    gd_gpio_frequence_pwm, \
+    gd_azi_fpwm, \
     1, \
     GPIO_CURRENT_FONCTION,\
     GPIO_CURRENT_FONCTION_PARAM0,\

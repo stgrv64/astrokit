@@ -42,11 +42,17 @@ int             gi_gpio_out    [ GPIO_SIZE] ;
 
 /* Numeros de broches specifiques pour les sorties PWM */ 
 
-int             gi_gpio_alt    [ GPIO_NB_PHASES_PAR_MOTEUR ]  ;  // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
-int             gi_gpio_azi    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
-int             gi_gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // masque de redefinition des gpios des phases : evite soucis de branchement
+int             gi_alt_gpios    [ GPIO_NB_PHASES_PAR_MOTEUR ]  ;  // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
+int             gi_azi_gpios    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // phases du moteur (utilise si CONTROLEUR vaut 0 dans config.txt)
 
-double          gd_gpio_frequence_pwm ;
+/* masque de redefinition des gpios des phases : 
+  evite soucis de branchement */
+
+int             gi_alt_masque    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   
+int             gi_azi_masque    [ GPIO_NB_PHASES_PAR_MOTEUR ] ;   // masque de redefinition des gpios des phases : evite soucis de branchement
+
+double          gd_alt_fpwm ;
+double          gd_azi_fpwm ;
 int             gi_gpio_timeout ;
 int             gi_gpio_max_nb_pas ;
 int             gi_gpio_max_nb_upas ;
@@ -204,8 +210,8 @@ void GPIO_TAB_TOKEN(int tab[4],char * buffer, char * separator) {
 * @fn     : GPIO_CONFIG_FIC_READ
 * @author : s.gravois
 * @brief  : Cette fonction lit les parametres GPIO dans le fichier de configuration
-*           (gp_Pwm_Par->par_alt / gp_Pwm_Par->par_azi / GPIO_MASQUE )
-*           Initilise la frequence PWM a 1000 si aucune entree gd_gpio_frequence_pwm
+*           (gp_Pwm_Par->par_alt / gp_Pwm_Par->par_azi / ALT_MASQUE )
+*           Initilise la frequence PWM a 1000 si aucune entree gd_alt_fpwm
 * @param  : lp_Con->con_params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_LIGNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : 
@@ -219,80 +225,140 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
   for(l=0;l<CONFIG_DATAS_NB_LIGNES;l++) {
 
-   if(!strcmp("GPIO_ALT",lp_Con->con_params[l][0])) {
+    /*-------------------------------------------------------*/
+    /* Lecture du parametre des GPIOS utilises pour altitude */
+    /*-------------------------------------------------------*/
 
-    // FIXME ajout stephane 2021
-    memset( gp_Pwm_Par->par_alt,0,sizeof(gp_Pwm_Par->par_alt)) ;
-    strcpy( gp_Pwm_Par->par_alt, lp_Con->con_params[l][1] ) ;
+    if(!strcmp("ALT_GPIOS",lp_Con->con_params[l][0])) {
 
-    Trace1("GPIO_ALT trouve ligne %d = (%s)", l,gp_Pwm_Par->par_alt) ;
+      // FIXME ajout stephane 2021
+      memset( gp_Pwm_Par->par_alt,0,sizeof(gp_Pwm_Par->par_alt)) ;
+      strcpy( gp_Pwm_Par->par_alt, lp_Con->con_params[l][1] ) ;
 
-    for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gi_gpio_in[j]=-1 ;
+      Trace1("ALT_GPIOS trouve ligne %d = (%s)", l,gp_Pwm_Par->par_alt) ;
 
-    for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
-      token = strtok_r(str1, ",", &sptr);
-      if (token == NULL) break ;
-      gi_gpio_alt[j]=atoi(token);
+      for(j=0;j<GPIO_NB_PHASES_PAR_MOTEUR;j++) gi_gpio_in[j]=-1 ;
+
+      for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
+        token = strtok_r(str1, ",", &sptr);
+        if (token == NULL) break ;
+        gi_alt_gpios[j]=atoi(token);
+      }
     }
-   }
-   
-   if(!strcmp("GPIO_AZI",lp_Con->con_params[l][0])) {
 
-    // FIXME ajout stephane 2021
-    memset( gp_Pwm_Par->par_azi,0,sizeof(gp_Pwm_Par->par_azi)) ;
-    strcpy( gp_Pwm_Par->par_azi, lp_Con->con_params[l][1] ) ;
+    /*-------------------------------------------------------*/
+    /* Lecture du parametre des GPIOS utilises pour azimut */
+    /*-------------------------------------------------------*/
 
-    Trace1("GPIO_AZI trouve ligne %d = (%s)", l,gp_Pwm_Par->par_azi) ;
+    if(!strcmp("AZI_GPIOS",lp_Con->con_params[l][0])) {
 
-    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_out[i]=-1 ;
+      // FIXME ajout stephane 2021
+      memset( gp_Pwm_Par->par_azi,0,sizeof(gp_Pwm_Par->par_azi)) ;
+      strcpy( gp_Pwm_Par->par_azi, lp_Con->con_params[l][1] ) ;
 
-    for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
-      token = strtok_r(str1, ",", &sptr);
-      if (token == NULL) break ;
-      gi_gpio_azi[j]=atoi(token);
+      Trace1("AZI_GPIOS trouve ligne %d = (%s)", l,gp_Pwm_Par->par_azi) ;
+
+      for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_out[i]=-1 ;
+
+      for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
+        token = strtok_r(str1, ",", &sptr);
+        if (token == NULL) break ;
+        gi_azi_gpios[j]=atoi(token);
+      }
     }
-   }
-   
 
-   if(!strcmp("GPIO_MASQUE",lp_Con->con_params[l][0])) {
+    /*-------------------------------------------------------*/
+    /* Lecture du parametre MASQUE en altitude   */
+    /*-------------------------------------------------------*/
 
-    // FIXME ajout stephane 2021
-    memset( gp_Pwm_Par->par_mas,0,sizeof(gp_Pwm_Par->par_mas)) ;
-    strcpy( gp_Pwm_Par->par_mas, lp_Con->con_params[l][1] ) ;
+    if(!strcmp("ALT_MASQUE",lp_Con->con_params[l][0])) {
 
-    Trace1("GPIO_MASQUE trouve ligne %d = (%s)", l,gp_Pwm_Par->par_mas) ;
+      // FIXME ajout stephane 2021
+      memset( gp_Pwm_Par->par_alt_mas,0,sizeof(gp_Pwm_Par->par_alt_mas)) ;
+      strcpy( gp_Pwm_Par->par_alt_mas, lp_Con->con_params[l][1] ) ;
 
-    for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_gpio_mas[i]=-1 ;
+      Trace1("ALT_MASQUE trouve ligne %d = (%s)", l,gp_Pwm_Par->par_alt_mas) ;
 
-    for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
-      token = strtok_r(str1, ",", &sptr);
-      if (token == NULL) break ;
-      gi_gpio_mas[j]=atoi(token);
+      for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_alt_masque[i]=-1 ;
+
+      for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
+        token = strtok_r(str1, ",", &sptr);
+        if (token == NULL) break ;
+        gi_alt_masque[j]=atoi(token);
+      }
     }
-   }
 
-   if(!strcmp("GPIO_FREQUENCE_PWM",lp_Con->con_params[l][0])) {
+    /*-------------------------------------------------------*/
+    /* Lecture du parametre MASQUE en azimut   */
+    /*-------------------------------------------------------*/
 
-    // FIXME ajout stephane 2021
-    memset( gp_Pwm_Par->par_fre_pwm,0,sizeof(gp_Pwm_Par->par_fre_pwm)) ;
-    strcpy( gp_Pwm_Par->par_fre_pwm, lp_Con->con_params[l][1] ) ;
+    if(!strcmp("AZI_MASQUE",lp_Con->con_params[l][0])) {
 
-    gd_gpio_frequence_pwm = 1000 ;
+      // FIXME ajout stephane 2021
+      memset( gp_Pwm_Par->par_azi_mas,0,sizeof(gp_Pwm_Par->par_azi_mas)) ;
+      strcpy( gp_Pwm_Par->par_azi_mas, lp_Con->con_params[l][1] ) ;
 
-    Trace1("gp_Pwm_Par->par_fre_pwm trouve ligne %d = (%s)", l,gp_Pwm_Par->par_fre_pwm) ;
+      Trace1("AZI_MASQUE trouve ligne %d = (%s)", l,gp_Pwm_Par->par_azi_mas) ;
 
-    for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
-      token = strtok_r(str1, ",", &sptr);
-      if (token == NULL) break ;
-      gd_gpio_frequence_pwm=(double)atoi(token);
+      for(i=0; i < GPIO_NB_PHASES_PAR_MOTEUR ; i++) gi_azi_masque[i]=-1 ;
+
+      for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
+        token = strtok_r(str1, ",", &sptr);
+        if (token == NULL) break ;
+        gi_azi_masque[j]=atoi(token);
+      }
     }
-   }
+
+    /*-------------------------------------------------------*/
+    /* Lecture du parametre FREQUENCE PWM en altitude   */
+    /*-------------------------------------------------------*/
+
+    if(!strcmp("ALT_FPWM",lp_Con->con_params[l][0])) {
+
+      // FIXME ajout stephane 2021
+      memset( gp_Pwm_Par->par_alt_fpwm,0,sizeof(gp_Pwm_Par->par_alt_fpwm)) ;
+      strcpy( gp_Pwm_Par->par_alt_fpwm, lp_Con->con_params[l][1] ) ;
+
+      gd_alt_fpwm = 1000 ;
+
+      Trace1("gp_Pwm_Par->par_alt_fpwm trouve ligne %d = (%s)", l,gp_Pwm_Par->par_alt_fpwm) ;
+
+      for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
+        token = strtok_r(str1, ",", &sptr);
+        if (token == NULL) break ;
+        gd_alt_fpwm=(double)atoi(token);
+      }
+    }
+
+    /*-------------------------------------------------------*/
+    /* Lecture du parametre FREQUENCE PWM en azimut   */
+    /*-------------------------------------------------------*/
+
+    if(!strcmp("AZI_FPWM",lp_Con->con_params[l][0])) {
+
+      // FIXME ajout stephane 2021
+      memset( gp_Pwm_Par->par_alt_fpwm,0,sizeof(gp_Pwm_Par->par_alt_fpwm)) ;
+      strcpy( gp_Pwm_Par->par_alt_fpwm, lp_Con->con_params[l][1] ) ;
+
+      gd_azi_fpwm = 1000 ;
+
+      Trace1("gp_Pwm_Par->par_alt_fpwm trouve ligne %d = (%s)", l,gp_Pwm_Par->par_alt_fpwm) ;
+
+      for (j = 0, str1 = lp_Con->con_params[l][1]; ; j++, str1 = NULL) {
+        token = strtok_r(str1, ",", &sptr);
+        if (token == NULL) break ;
+        gd_azi_fpwm=(double)atoi(token);
+      }
+    }
   }
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_gpio_azi[%d]=%d",i,gi_gpio_azi[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_gpio_alt[%d]=%d",i,gi_gpio_alt[i]);
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_gpio_mas[%d]=%d",i,gi_gpio_mas[i]);
-   
-  Trace("gp_Pwm_Par->par_fre_pwm=%f", gd_gpio_frequence_pwm ) ;
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_azi_gpios[%d]=%d",i,gi_azi_gpios[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_alt_gpios[%d]=%d",i,gi_alt_gpios[i]);
+  
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_alt_masque[%d]=%d",i,gi_alt_masque[i]);
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_azi_masque[%d]=%d",i,gi_azi_masque[i]);
+
+  Trace("gd_alt_fpwm = %f", gd_alt_fpwm ) ;
+  Trace("gd_azi_fpwm = %f", gd_azi_fpwm ) ;
 }
 /*****************************************************************************************
 * @fn     : GPIO_READ2
@@ -1165,7 +1231,7 @@ void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_PHASE ) ;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   sleep(1) ;
 
@@ -1250,7 +1316,7 @@ void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_PWM_MOTOR  ) ;
 
-  TraceArbo(__func__,0,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   periode_mic = 0 ;
   periode_mot = 0 ;

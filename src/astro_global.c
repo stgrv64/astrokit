@@ -77,14 +77,13 @@ void ASTRO_GLOBAL_INIT(void) {
 
   Trace("%d processors dispo", gi_pthread_nb_cpu ) ;
 
-  gi_pid_trace = 0 ;
-  gi_pid_trace_alt = 0 ;
-  gi_pid_trace_azi = 0 ;
-
-  gi_gpio_timeout = 0 ;
-  gi_gpio_max_nb_pas = 0 ;
+  gi_pid_trace        = 0 ;
+  gi_pid_trace_alt    = 0 ;
+  gi_pid_trace_azi    = 0 ;
+  gi_gpio_timeout     = 0 ;
+  gi_gpio_max_nb_pas  = 0 ;
   gi_gpio_max_nb_upas = 0 ;
-  gi_pth_numero = 0 ;
+  gi_pth_numero       = 0 ;
   
   // -----------------------------------------------------------------
   // Initialisations des structures et pointeurs sur structure
@@ -147,4 +146,5 @@ void ASTRO_GLOBAL_INIT(void) {
   gp_Alt_Mot->p_pth = (STRUCT_PTHREADS*)  gp_Pth_Alt ;
   gp_Azi_Mot->p_pth = (STRUCT_PTHREADS*)  gp_Pth_Azi ; 
   */
+ return ;
 }

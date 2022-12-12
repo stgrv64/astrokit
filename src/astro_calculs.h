@@ -184,18 +184,10 @@ double DEG  (int degres, int minutes )                  ;
 // en profitant d'un sleep parametrable (eviter une consommation CPU
 // avant de rentrer en boucle active d'attente
 
-void CALCULS_INIT ( \
- STRUCT_CALCULS          * , \
- STRUCT_SUIVI_FREQUENCES * , \
- STRUCT_SUIVI_STATS      * , \
- STRUCT_SUIVI_PAS        * , \
- STRUCT_ASTRE            * , \
- STRUCT_VOUTE            * , \
- STRUCT_LIEU             * , \
- STRUCT_DEVICES          * , \
- STRUCT_MUTEXS           * , \
- STRUCT_TIME             * , \
- STRUCT_SUIVI            * ) ;
+void   CALCULS_INIT            ( STRUCT_CALCULS * ) ;
+void   CALCULS_INIT_PARAMS     ( STRUCT_CALCULS_PARAMS * ) ;
+void   CALCULS_INIT_PTR        ( STRUCT_CALCULS * )  ;
+void   CALCULS_INIT_ANGLE      ( STRUCT_ANGLE * ) ;
 
 void   CALCULS_VOUTE                   (void) ;
 void   CALCULS_COORD_R3                (void) ;
@@ -210,7 +202,8 @@ void   CALCULS_ASCENSION_DROITE        (void) ;
 void   CALCULS_DIVISEUR_FREQUENCE      (void) ;   
 void   CALCULS_CONVERSIONS_ANGLES      (void) ;
 void   CALCULS_TOUT                    (void) ;
-void   CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
+void   CALCULS_RECUP_MODE_ET_ASTRE_TYPE(void) ;
+
 void   CALCULS_ANGLE_VERS_DMS          (STRUCT_ANGLE *) ;
 /* TODO : decommenter
 void   SET_ASTRE ( STRUCT_ASTRE *gp_Ast,char *parametre, double valeur) ;

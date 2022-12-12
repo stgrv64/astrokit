@@ -130,11 +130,12 @@ void INFRARED_READ(void) {
     // il va etre lu par les threads du programme principal
     
     Trace1("gp_Dat->dat_act = %s", gp_Dat->dat_act ) ;
-    Trace1("gp_Tpo->tpo_ir = %ld", gp_Tpo->tpo_ir ) ;
+    Trace("gp_Tpo->tpo_ir = %ld", gp_Tpo->tpo_ir ) ;
     
+  
     usleep( gp_Tpo->tpo_ir ) ;
     
-    free(code);
+    
 
     DATAS_ACTION_RESET( gp_Dat ) ;
   }

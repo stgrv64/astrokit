@@ -15,16 +15,31 @@
 
 #include <pthread.h>
 
+#define TIME_DEFAULT_TEMPO_NEMU     50000
+#define TIME_DEFAULT_TEMPO_RAQ      51000
+#define TIME_DEFAULT_TEMPO_IR       52000
+#define TIME_DEFAULT_TEMPO_TERMIOS  53000
+#define TIME_DEFAULT_TEMPO_CAPTEURS 54000
+#define TIME_DEFAULT_TEMPO_LCD_LOOP 250000
+#define TIME_DEFAULT_TEMPO_LCD_DISP 100000
+
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_NEMU     1.0
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_RAQ      0.25
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_IR       1.1
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_TERMIOS  1.1
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_CAPTEURS 1.1
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_LCD_LOOP 10.0
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_LCD_DISP 2.5
+
 /* Definition de la structure associeee au fichier avant inclusion astro_global.h */
 /* Ceci est permis par le pre processeur */
 
 struct STR_TIME_TEMPOS {
   pthread_mutex_t tpo_mutex ;
-  
+  unsigned long   tpo_ir        ; 
   unsigned long   tpo_menu      ;
   unsigned long   tpo_voute     ;
   unsigned long   tpo_raq       ;
-  unsigned long   tpo_ir        ; 
   unsigned long   tpo_termios   ; 
   unsigned long   tpo_capteurs  ; 
   unsigned long   tpo_lcd_loop  ;
@@ -40,16 +55,15 @@ typedef struct STR_TIME_TEMPOS STRUCT_TIME_TEMPOS ;
 struct STR_TIME {
   
   pthread_mutex_t tim_mutex ;
-
-  double tim_hd ;      // heure decimale
-  char   tim_sig ;    /* signe */ 
-  int    tim_si ;      // signe
-  int    tim_mm ;      // month
-  int    tim_yy ;      // year
-  int    tim_dd ;      // day
-  int    tim_HH ;      // hour
-  int    tim_MM ;      // minutes
-  int    tim_SS ;      // secondes
+  double          tim_hd ;      // heure decimale
+  char            tim_sig ;    /* signe */ 
+  int             tim_si ;      // signe
+  int             tim_mm ;      // month
+  int             tim_yy ;      // year
+  int             tim_dd ;      // day
+  int             tim_HH ;      // hour
+  int             tim_MM ;      // minutes
+  int             tim_SS ;      // secondes
 
 } ;
 typedef struct STR_TIME STRUCT_TIME ;
@@ -58,9 +72,11 @@ typedef struct STR_TIME STRUCT_TIME ;
 
 struct STR_TIME_PARAMS {
   pthread_mutex_t tim_par_mutex ;
+
+  unsigned long   tim_par_tpo ;
+  unsigned long   tim_par_tpo_ir ;
   unsigned long   tim_par_tpo_menu ;
   unsigned long   tim_par_tpo_raq ;
-  unsigned long   tim_par_tpo_ir ;
   unsigned long   tim_par_tpo_termios ;
   unsigned long   tim_par_tpo_capteurs ;
   unsigned long   tim_par_tpo_lcd_loop ;
@@ -70,7 +86,14 @@ typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
 // ------ TEMPORISATIONS DES BOUCLES ------------
 
-void   TIME_INIT                      ( STRUCT_TIME * , STRUCT_TIME_TEMPOS *) ;
+void   TIME_INIT                      ( STRUCT_TIME * ) ;
+void   TIME_RELEASE                   ( STRUCT_TIME * ) ;
+
+void   TIME_INIT_TEMPOS               ( STRUCT_TIME_TEMPOS * ) ;
+void   TIME_INIT_PARAMS               ( STRUCT_TIME_PARAMS * ) ;
+
+void   TIME_CONFIG_TEMPOS             ( STRUCT_TIME_TEMPOS * ) ;
+
 int    TIME_CALCULS_SIDERAL_TIME      ( STRUCT_TIME * , STRUCT_LIEU * ) ;
 int    TIME_CALCULS_JULIAN_DAY        ( STRUCT_TIME * , STRUCT_LIEU * ) ;
 int    TIME_CALCULS_LOCAL_DATE        ( STRUCT_TIME *  ) ;

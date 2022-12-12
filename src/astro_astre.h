@@ -65,26 +65,25 @@ struct STR_ASTRE {
   STRUCT_TIME  ast_alt_t ;
   STRUCT_TIME  ast_dec_t ;
   STRUCT_TIME  ast_asc_t ;   
-  STRUCT_TIME  ast_agh_t ;   
-  STRUCT_ANGLE ast_azi_a ; 
-  STRUCT_ANGLE ast_alt_a ;
-  STRUCT_ANGLE ast_dec_a ; 
-  STRUCT_ANGLE ast_asc_a ;
-  STRUCT_ANGLE ast_agh_a ;
+  STRUCT_TIME  ast_agh_t ;
   STRUCT_TIME  ast_agh0_t ;  
   STRUCT_TIME  ast_agh1_t ; 
   STRUCT_TIME  ast_agh2_t ;  
   STRUCT_TIME  ast_azi0_t ;
   STRUCT_TIME  ast_azi1_t ;
   STRUCT_TIME  ast_azi2_t ;
+  STRUCT_ANGLE ast_azi_a ; 
+  STRUCT_ANGLE ast_alt_a ;
+  STRUCT_ANGLE ast_dec_a ; 
+  STRUCT_ANGLE ast_asc_a ;
+  STRUCT_ANGLE ast_agh_a ;
+  
   /* Numero de l objet dans un catalogue */
   
   int    ast_num ; 
   int    ast_new ; /* ajout 2022-11 */
   /* les 2 structures sont placees ici en attendant une structure dediee */
   int    ast_typ ;
-
-
 
   char   nom         [ ASTRE_TAILLE_BUFFER ] ;
   char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
@@ -184,7 +183,8 @@ typedef struct STR_ASTRE STRUCT_ASTRE ;
 /* Le contenu de cette variable permet le hachage avec 
  les valeurs de l enum t_en_Astre_Type defini dans astre.h */
  
-void ASTRE_INIT ( STRUCT_ASTRE * ) ;
+void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
+void ASTRE_INIT_PARAMS               ( STRUCT_ASTRE_PARAMS * ) ;
 
 void ASTRE_RESET                     (void) ;
 void ASTRE_FORMATE_DONNEES_AFFICHAGE (void) ;

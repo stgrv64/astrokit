@@ -37,8 +37,6 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast->ast_mutex ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ; ;
-
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
     memset( lp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
     strcpy( lp_Ast->plus_proche[C], "") ;
@@ -47,40 +45,77 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   memset( lp_Ast->infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   memset( lp_Ast->plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   
-  lp_Ast->a   = 0  ;
-  lp_Ast->h   = 0  ;
-  lp_Ast->a0  = 0 ;
-  lp_Ast->h0  = 0 ;
-  lp_Ast->AGH   = 0  ; 
-  lp_Ast->ASC   = 0  ;
-  lp_Ast->DEC   = 0   ;
-  lp_Ast->A0  = 0 ;
-  lp_Ast->H0  = 0 ;
-  lp_Ast->da  = 0 ;
-  lp_Ast->dh  = 0 ;
-  lp_Ast->dA  = 0 ;
-  lp_Ast->dH  = 0 ;
-  lp_Ast->Va  = 0 ;
-  lp_Ast->Vh  = 0 ;
-  lp_Ast->dVa = 0 ;
-  lp_Ast->dVh = 0 ;
-  lp_Ast->dVam= 0 ;
-  lp_Ast->dVhm= 0 ;
+  lp_Ast->a    = 0 ;
+  lp_Ast->h    = 0 ;
+  lp_Ast->a0   = 0 ;
+  lp_Ast->h0   = 0 ;
+  lp_Ast->AGH  = 0 ; 
+  lp_Ast->ASC  = 0 ;
+  lp_Ast->DEC  = 0 ;
+  lp_Ast->A0   = 0 ;
+  lp_Ast->H0   = 0 ;
+  lp_Ast->da   = 0 ;
+  lp_Ast->dh   = 0 ;
+  lp_Ast->dA   = 0 ;
+  lp_Ast->dH   = 0 ;
+  lp_Ast->Va   = 0 ;
+  lp_Ast->Vh   = 0 ;
+  lp_Ast->dVa  = 0 ;
+  lp_Ast->dVh  = 0 ;
+  lp_Ast->dVam = 0 ;
+  lp_Ast->dVhm = 0 ;
 
-  lp_Ast->x = 0 ;
-  lp_Ast->xx = 0 ;
-  lp_Ast->y  = 0 ;
-  lp_Ast->yy =0;
-  lp_Ast->z =0;
-  lp_Ast->zz =0;
+  lp_Ast->x    = 0 ;
+  lp_Ast->xx   = 0 ;
+  lp_Ast->y    = 0 ;
+  lp_Ast->yy   = 0 ;
+  lp_Ast->z    = 0 ;
+  lp_Ast->zz   = 0 ;
   
   lp_Ast->ast_typ = ASTRE_INDETERMINE ;
   lp_Ast->ast_num  = 0 ;
   lp_Ast->ast_new = TRUE ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ; ;
+  TIME_INIT( & lp_Ast->ast_at     ) ;
+  TIME_INIT( & lp_Ast->ast_ht     ) ;
+  TIME_INIT( & lp_Ast->ast_azi_t  ) ;
+  TIME_INIT( & lp_Ast->ast_alt_t  ) ;
+  TIME_INIT( & lp_Ast->ast_dec_t  ) ;
+  TIME_INIT( & lp_Ast->ast_asc_t  ) ;   
+  TIME_INIT( & lp_Ast->ast_agh_t  ) ;
+  TIME_INIT( & lp_Ast->ast_agh0_t ) ;  
+  TIME_INIT( & lp_Ast->ast_agh1_t ) ; 
+  TIME_INIT( & lp_Ast->ast_agh2_t ) ;  
+  TIME_INIT( & lp_Ast->ast_azi0_t ) ;
+  TIME_INIT( & lp_Ast->ast_azi1_t ) ;
+  TIME_INIT( & lp_Ast->ast_azi2_t ) ;
+
+  CALCULS_INIT_ANGLE ( & lp_Ast->ast_azi_a ) ; 
+  CALCULS_INIT_ANGLE ( & lp_Ast->ast_alt_a ) ;
+  CALCULS_INIT_ANGLE ( & lp_Ast->ast_dec_a ) ; 
+  CALCULS_INIT_ANGLE ( & lp_Ast->ast_asc_a ) ;
+  CALCULS_INIT_ANGLE ( & lp_Ast->ast_agh_a ) ;
 }
 
+/*****************************************************************************************
+* @fn     : ASTRE_INIT_PARAMS
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_ASTRE_PARAMS *
+* @param  : void
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void ASTRE_INIT_PARAMS(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
+  
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast_Par->ast_par_mutex ) ;
+
+  memset( lp_Ast_Par->ast_par_default_object, CALCULS_ZERO_CHAR, sizeof( lp_Ast_Par->ast_par_default_object ) ) ;
+  
+  /* TODO : finalize */
+}
 /*****************************************************************************************
 * @fn     : ASTRE_RESET
 * @author : s.gravois

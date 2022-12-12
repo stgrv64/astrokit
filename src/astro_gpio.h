@@ -6,7 +6,7 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 01/05/2021  | ajout entete
-# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Pwm_Par->par_fre_pwm 
+# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Pwm_Par->par_alt_fpwm 
 #   suite a ajout de la variable du meme nom dans types.h
 # mai 2022    | ajout / modifications sur les threads  
 #               ajout / renommage membres champs struct PMW phases et moteurs
@@ -84,19 +84,22 @@ struct STR_GPIO_PARAMS_MATRICIEL {
 } ;
 
 /* 
-  les params suivants servent pour utilisation d'une modulation PWM
+  Les params suivants servent pour utilisation d'une modulation PWM
   sur les sorties representees par altitude (4 broches) et azimut
   un masque d 'attaque est utilise
+
+  Ces parametres sont bufferisés dans cette structure , mais lus directement
+  dans les variables globales gi_* du fichier gpio.h / global.h
 */
 
 struct STR_GPIO_PARAMS_PWM {
 
   pthread_mutex_t par_mutex ;
   int             par_led_etat ;
-  char            par_fre_pwm [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_alt_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            par_azi     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_alt_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/

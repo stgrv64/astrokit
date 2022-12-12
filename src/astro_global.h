@@ -277,14 +277,15 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS \
-  extern double gd_gpio_frequence_pwm ; \
   extern int    gi_gpio_fd     [ GPIO_SIZE ] ; \
   extern int    gi_gpio_in   	 [ GPIO_SIZE ] ; \
   extern int    gi_gpio_out    [ GPIO_SIZE ] ; \
-  extern int    gi_gpio_alt    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
-  extern int    gi_gpio_azi    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
-  extern int    gi_gpio_mas    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
-  extern double gd_gpio_frequence_pwm ; \
+  extern int    gi_alt_gpios    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
+  extern int    gi_azi_gpios    [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
+  extern int    gi_alt_masque   [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
+  extern int    gi_azi_masque   [ GPIO_NB_PHASES_PAR_MOTEUR ] ; \
+  extern double gd_alt_fpwm ; \
+  extern double gd_azi_fpwm ; \
   extern int    gi_gpio_timeout ; \
   extern int    gi_gpio_max_nb_pas ; \
   extern int    gi_gpio_max_nb_upas ; \

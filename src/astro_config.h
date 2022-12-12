@@ -96,24 +96,24 @@ ALTITUDE   100
 //  et moteurs en metal NEMA 11 (pas ceux qui sont sur la monture vixen gp) 
 // -------------------------------------------------------------------------- 
 
-GPIO_LED_ETAT   4
-GPIO_ALT        21,26,19,13
-GPIO_AZI        6,5,7,11
-//  GPIO_MASQUE     0,1,2,3 
+LED_ETAT_GPIOS   4
+ALT_GPIOS        21,26,19,13
+AZI_GPIOS        6,5,7,11
+//  ALT_MASQUE     0,1,2,3 
 
 // -------------------------------------------------------------------------- 
 //  Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus) 
 // -------------------------------------------------------------------------- 
 
-//  GPIO_LED_ETAT   4 
-//  GPIO_ALT        21,26,19,13 
-//  GPIO_AZI        6,5,7,11 
+//  LED_ETAT_GPIOS   4 
+//  ALT_GPIOS        21,26,19,13 
+//  AZI_GPIOS        6,5,7,11 
 
-GPIO_MASQUE     3,1,0,2
+ALT_MASQUE     3,1,0,2
 
 //  ----------------------- parametres pwm 
 
-GPIO_FREQUENCE_PWM  250 
+ALT_FPWM  250 
 
 //  ----------------------- parametres reductions altitude 
 //  Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760  
@@ -186,11 +186,13 @@ typedef enum {
   LATITUDE,
   LONGITUDE,
   ALTITUDE,
-  GPIO_LED_ETAT,
-  GPIO_ALT,
-  GPIO_AZI,
-  GPIO_MASQUE,
-  GPIO_FREQUENCE_PWM,
+  LED_ETAT_GPIOS,
+  ALT_GPIOS,
+  AZI_GPIOS,
+  ALT_MASQUE,
+  AZI_MASQUE,
+  ALT_FPWM,
+  AZI_FPWM,
   ALT_R1,
   ALT_R2,
   ALT_R3,
@@ -308,11 +310,13 @@ static const char * gc_Config_Params_Obligatoires[] = {
   "LATITUDE",
   "LONGITUDE",
   "ALTITUDE",
-  "GPIO_LED_ETAT",
-  "GPIO_ALT",
-  "GPIO_AZI",
-  "GPIO_MASQUE",
-  "GPIO_FREQUENCE_PWM",
+  "LED_ETAT_GPIOS",
+  "ALT_GPIOS",
+  "AZI_GPIOS",
+  "ALT_MASQUE",
+  "AZI_MASQUE",
+  "ALT_FPWM",
+  "AZI_FPWM",
   "ALT_R1",
   "ALT_R2",
   "ALT_R3",
@@ -373,11 +377,13 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
   CONFIG_TYPE_INT, // "LATITUDE",
   CONFIG_TYPE_INT, // "LONGITUDE",
   CONFIG_TYPE_INT, // "ALTITUDE",
-  CONFIG_TYPE_INT, // "GPIO_LED_ETAT",
-  CONFIG_TYPE_INT, // "GPIO_ALT",
-  CONFIG_TYPE_INT, // "GPIO_AZI",
-  CONFIG_TYPE_INT, // "GPIO_MASQUE",
-  CONFIG_TYPE_INT, // "GPIO_FREQUENCE_PWM",
+  CONFIG_TYPE_INT, // "LED_ETAT_GPIOS",
+  CONFIG_TYPE_INT, // "ALT_GPIOS",
+  CONFIG_TYPE_INT, // "AZI_GPIOS",
+  CONFIG_TYPE_INT, // "ALT_MASQUE",
+  CONFIG_TYPE_INT, // "AZI_MASQUE",
+  CONFIG_TYPE_INT, // "ALT_FPWM",
+  CONFIG_TYPE_INT, // "AZI_FPWM",
   CONFIG_TYPE_INT, // "ALT_R1",
   CONFIG_TYPE_INT, // "ALT_R2",
   CONFIG_TYPE_INT, // "ALT_R3",
@@ -402,13 +408,14 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
   CONFIG_TYPE_INT, // "ALTAZ_REWIND_FAST"
 } ;
 
-void   CONFIG_INIT                  (STRUCT_CONFIG * ) ;
+void   CONFIG_INIT                  ( STRUCT_CONFIG * ) ;
+void   CONFIG_INIT_PARAMS           ( STRUCT_CONFIG_PARAMS * ) ;
 
-void   CONFIG_PARAMETRES_CONFIG     (STRUCT_CONFIG * ) ;
-void   CONFIG_FIC_DISPLAY           (STRUCT_CONFIG * ) ;
-int    CONFIG_FIC_READ              (STRUCT_CONFIG * ) ;
+void   CONFIG_PARAMETRES_CONFIG     ( STRUCT_CONFIG * ) ;
+void   CONFIG_FIC_DISPLAY           ( STRUCT_CONFIG * ) ;
+int    CONFIG_FIC_READ              ( STRUCT_CONFIG * ) ;
 
-void   CONFIG_AFFICHER_MODE_LONG    (STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_CALCULS *) ;
+void   CONFIG_AFFICHER_MODE_LONG    ( STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_CALCULS *) ;
 
 void   CONFIG_PARAMETRES_AFFICHER   (void) ;
 void   CONFIG_AFFICHER_TOUT         (void) ;  /* FIXME ajout 20191228 */

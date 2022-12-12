@@ -118,37 +118,106 @@ double CALCULS_REDUCTION_TOTALE(void) {
 * @date   : 2022-12-17 ajout structures necessaires pour init pointeurs
 *****************************************************************************************/
 
-void   CALCULS_INIT ( \
-
-  STRUCT_CALCULS          * gp_Cal , \
-  STRUCT_SUIVI_FREQUENCES * gp_Fre , \
-  STRUCT_SUIVI_STATS      * gp_Sta , \
-  STRUCT_SUIVI_PAS        * gp_Pas , \
-  STRUCT_ASTRE            * gp_Ast , \
-  STRUCT_VOUTE            * gp_Vou , \
-  STRUCT_LIEU             * gp_Lie , \
-  STRUCT_DEVICES          * gp_Dev , \
-  STRUCT_MUTEXS           * gp_Mut , \
-  STRUCT_TIME             * gp_Tim , \
-  STRUCT_SUIVI            * gp_Sui ) {
+void   CALCULS_INIT( STRUCT_CALCULS * lp_Cal ) {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Cal->cal_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal->cal_mutex ) ;
  
-  gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+  lp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
 
-  gp_Cal->cal_p_Fre = gp_Fre ;
-  gp_Cal->cal_p_Sta = gp_Sta ;
-  gp_Cal->cal_p_Pas = gp_Pas ;
-  gp_Cal->cal_p_Ast = gp_Ast ;
-  gp_Cal->cal_p_Cal = gp_Cal ;
-  gp_Cal->cal_p_Vou = gp_Vou ;
-  gp_Cal->cal_p_Lie = gp_Lie ;
-  gp_Cal->cal_p_Dev = gp_Dev ;
-  gp_Cal->cal_p_Mut = gp_Mut ;
-  gp_Cal->cal_p_Tim = gp_Tim ;
-  gp_Cal->cal_p_Sui = gp_Sui ;
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CALCULS_INIT_PARAMS
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_CALCULS_PARAMS *
+* @param  : void
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void CALCULS_INIT_PARAMS(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
+  
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal_Par->cal_par_mutex ) ;
+
+   lp_Cal_Par->cal_par_alt_red_tot = 0 ;
+   lp_Cal_Par->cal_par_azi_red_tot = 0 ;
+   
+   /* Les coefficients de reduction sont egaux a 1 par defaut */ 
+   /* car leur presence n est pas obligatoires dans le fichier config.txt */
+
+   lp_Cal_Par->cal_par_alt_red_1 = 1.0 ;  // reduction liee a la monture ()
+   lp_Cal_Par->cal_par_alt_red_2 = 1.0;   // reducteur du moteur (nombre de pas)
+   lp_Cal_Par->cal_par_alt_red_3 = 1.0;   // reducteur du moteur (gearbox)
+   lp_Cal_Par->cal_par_alt_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
+   lp_Cal_Par->cal_par_alt_red_5 = 1.0;   // reduction liee a la poulie
+   lp_Cal_Par->cal_par_alt_red_6 = 1.0;   // reduction liee au cpu
+   lp_Cal_Par->cal_par_alt_red_7 = 1.0;   // reduction non decrite plus haut
+
+   lp_Cal_Par->cal_par_azi_red_1 = 1.0 ;  // reduction liee a la monture
+   lp_Cal_Par->cal_par_azi_red_2 = 1.0;   // reducteur du moteur
+   lp_Cal_Par->cal_par_azi_red_3 = 1.0;   // nombre de pas du moteur en azimut
+   lp_Cal_Par->cal_par_azi_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
+   lp_Cal_Par->cal_par_azi_red_5 = 1.0;   // reduction liee a la poulie
+   lp_Cal_Par->cal_par_azi_red_6 = 1.0;   // reduction liee au cpu
+   lp_Cal_Par->cal_par_azi_red_7 = 1.0;   // reduction non decrite plus haut
+
+  /* TODO : finalize */
+}
+/*****************************************************************************************
+* @fn     : CALCULS_INIT_ANGLE
+* @author : s.gravois
+* @brief  : Initialise la structure calculs STRUCT_ANGLE
+* @param  : STRUCT_ANGLE * gp_Cal
+* @date   : 2022-12-11 creation
+* @todo   : 
+*****************************************************************************************/
+
+void   CALCULS_INIT_ANGLE( STRUCT_ANGLE * lp_Ang ) {
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ang->ang_mutex ) ;
+
+  lp_Ang->ang_sig     = '+' ; /* signe sous forme charactere '+' ou '-' */
+  lp_Ang->ang_tempo   = 0 ;
+  lp_Ang->ang_si      = 0 ; /* signe sous forme entiere '-1' ou '+1' */
+  lp_Ang->ang_dec_rad = 0 ; 
+  lp_Ang->ang_dec_deg = 0 ; 
+  lp_Ang->ang_dd      = 0 ;      
+  lp_Ang->ang_mm      = 0 ;      
+  lp_Ang->ang_ss      = 0 ; 
+} ;
+typedef struct STR_ANGLE STRUCT_ANGLE ;
+
+/*****************************************************************************************
+* @fn     : CALCULS_INIT_PTR
+* @author : s.gravois
+* @brief  : Initialise la structure calculs STRUCT_CALCULS
+* @brief  :  en supposant la voute de rayon 1
+* @param  : STRUCT_CALCULS * lp_Cal
+* @date   : 2022-11-17 creation entete doxygen
+* @date   : 2022-12-17 renmmage CALCULS_INIT_PTR
+* @todo   : voir si utile (but : simplification lecture du code)
+*****************************************************************************************/
+
+void   CALCULS_INIT_PTR( STRUCT_CALCULS * lp_Cal ) {
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  lp_Cal->cal_p_Fre = gp_Fre ;
+  lp_Cal->cal_p_Sta = gp_Sta ;
+  lp_Cal->cal_p_Pas = gp_Pas ;
+  lp_Cal->cal_p_Ast = gp_Ast ;
+  lp_Cal->cal_p_Vou = gp_Vou ;
+  lp_Cal->cal_p_Lie = gp_Lie ;
+  lp_Cal->cal_p_Dev = gp_Dev ;
+  lp_Cal->cal_p_Mut = gp_Mut ;
+  lp_Cal->cal_p_Tim = gp_Tim ;
+  lp_Cal->cal_p_Sui = gp_Sui ;
 
   return ;
 }

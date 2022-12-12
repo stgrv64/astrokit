@@ -769,8 +769,8 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(Masq) %s", gp_Pwm_Par->par_mas ) ;
-    sprintf( c_l1, "(Fpwm) %s", gp_Pwm_Par->par_fre_pwm );
+    sprintf( c_l0, "(Masq) %s", gp_Pwm_Par->par_alt_mas ) ;
+    sprintf( c_l1, "(Fpwm) %s", gp_Pwm_Par->par_alt_fpwm );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;

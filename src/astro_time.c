@@ -189,11 +189,15 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
   const double P_2000 = 2451545.5 ; 
   const double P_1900 = 2415020.0 ;
 
-  STRUCT_TIME Temps0 ;
-  STRUCT_TIME TSMG3 ;
-  STRUCT_TIME TSMGH3 ;
-  STRUCT_TIME TSR2 ;
-  STRUCT_TIME TSR3 ;
+  STRUCT_TIME st_TSMG3 ;
+  STRUCT_TIME st_TSMGH3 ;
+  STRUCT_TIME st_TSR2 ;
+  STRUCT_TIME st_TSR3 ;
+
+  TIME_INIT ( & st_TSMG3 ) ;
+  TIME_INIT ( & st_TSMGH3 ) ;
+  TIME_INIT ( & st_TSR2 ) ;
+  TIME_INIT ( & st_TSR3 ) ;
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -222,30 +226,30 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
   /* These functions compute the floating-point remainder of dividing x by y */ 
 
   TSMG2 = fmod(TSMG,360.0) ;
-  TSMG3.tim_hd = TSMG2 * jour_sideral_decimal / 360 ; /* pour ramener en heures */
+  st_TSMG3.tim_hd = TSMG2 * jour_sideral_decimal / 360 ; /* pour ramener en heures */
   
-  TIME_CALCULS_DEC_VERS_HMS( & TSMG3 ) ;
+  TIME_CALCULS_DEC_VERS_HMS( & st_TSMG3 ) ;
   /* *15 = pour ramener en degres */
   TSH       = lp_Tim->tim_hd * 1.00273790935 * 15 ;
   TSMGH     = TSMG + TSH ;
   TSMGH2    = fmod(TSMGH, 360.0) ;
-  TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360 ;
+  st_TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360 ;
 
-  TIME_CALCULS_DEC_VERS_HMS( & TSMGH3) ;
+  TIME_CALCULS_DEC_VERS_HMS( & st_TSMGH3) ;
 
   TSMH  = TSMGH + ( lp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES )  ;
   /*
-  Trace("TSMGH  TSMGH2  TSMGH3.tim_hd    : %0.5f   %0.5f   %0.5f", TSMGH, TSMGH2, TSMGH3.tim_hd) ;
+  Trace("TSMGH  TSMGH2  st_TSMGH3.tim_hd    : %0.5f   %0.5f   %0.5f", TSMGH, TSMGH2, st_TSMGH3.tim_hd) ;
   Trace("TSMH = TSMGH - lp_Lie->lie_lon : %0.5f = %0.5f - %0.5f ", TSMH, TSMGH, lp_Lie->lie_lon) ; 
   */
   TSMH2 = fmod(TSMH, 360.0) ;
-  TSR2.tim_hd = TSMH2 * jour_sideral_decimal / 360 ;
+  st_TSR2.tim_hd = TSMH2 * jour_sideral_decimal / 360 ;
  
-  TIME_CALCULS_DEC_VERS_HMS( & TSR2 ) ;
+  TIME_CALCULS_DEC_VERS_HMS( & st_TSR2 ) ;
   
-  TIME_AFFICHER_MSG_HHMMSS(&TSMG3,"1ere methode - Temps sideral Greenwich 0hTU") ;
-  TIME_AFFICHER_MSG_HHMMSS(&TSMGH3,"1ere methode - Temps sideral Greenwich tps local (TU)") ;
-  TIME_AFFICHER_MSG_HHMMSS(&TSR2,"1ere methode - Temps sideral Lieu Local + Heure Locale (TU)") ;
+  TIME_AFFICHER_MSG_HHMMSS( &st_TSMG3,  "1ere methode - Temps sideral Greenwich 0hTU") ;
+  TIME_AFFICHER_MSG_HHMMSS( &st_TSMGH3, "1ere methode - Temps sideral Greenwich tps local (TU)") ;
+  TIME_AFFICHER_MSG_HHMMSS( &st_TSR2,   "1ere methode - Temps sideral Lieu Local + Heure Locale (TU)") ;
   
   // =======================  Deuxieme methode ==========================
   /* cette methode ne tient pas compte du terme 36525 */
@@ -263,17 +267,17 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
   TSMGH2 = fmod(GMST,  360.0) ;
   TSMH2  = fmod(LMST,  360.0) ;
   
-  TSMG3.tim_hd  = TSMG2  * jour_sideral_decimal / 360.0 ;
-  TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360.0 ;
-  TSR3.tim_hd  = TSMH2  * jour_sideral_decimal / 360.0 ;
+  st_TSMG3.tim_hd  = TSMG2  * jour_sideral_decimal / 360.0 ;
+  st_TSMGH3.tim_hd = TSMGH2 * jour_sideral_decimal / 360.0 ;
+  st_TSR3.tim_hd  = TSMH2  * jour_sideral_decimal / 360.0 ;
   
-  TIME_CALCULS_DEC_VERS_HMS( & TSMG3) ;
-  TIME_CALCULS_DEC_VERS_HMS( & TSMGH3 ) ;
-  TIME_CALCULS_DEC_VERS_HMS( & TSR3) ;
+  TIME_CALCULS_DEC_VERS_HMS( & st_TSMG3) ;
+  TIME_CALCULS_DEC_VERS_HMS( & st_TSMGH3 ) ;
+  TIME_CALCULS_DEC_VERS_HMS( & st_TSR3) ;
   
-  TIME_AFFICHER_MSG_HHMMSS(&TSMG3,"2eme methode - Temps sideral Greenwich 0hTU") ;
-  TIME_AFFICHER_MSG_HHMMSS(&TSMGH3,"2eme methode - Temps sideral Greenwich tps local (TU)") ;
-  TIME_AFFICHER_MSG_HHMMSS(&TSR3,"2eme methode - Temps sideral Lieu Local + Heure Locale (TU)") ;
+  TIME_AFFICHER_MSG_HHMMSS( &st_TSMG3,  "2eme methode - Temps sideral Greenwich 0hTU") ;
+  TIME_AFFICHER_MSG_HHMMSS( &st_TSMGH3, "2eme methode - Temps sideral Greenwich tps local (TU)") ;
+  TIME_AFFICHER_MSG_HHMMSS( &st_TSR3,   "2eme methode - Temps sideral Lieu Local + Heure Locale (TU)") ;
   
   // =======================  Troisieme methode ==========================
   /* unite = la seconde */ 
@@ -290,13 +294,18 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Lie->lie_mutex ) ;
 
-  lp_Lie->lie_ts  = TSR2.tim_hd ;
-  // lp_Lie->lie_tsr = (TSR3.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
-  lp_Lie->lie_tsr = (TSR2.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
+  lp_Lie->lie_ts  = st_TSR2.tim_hd ;
+  // lp_Lie->lie_tsr = (st_TSR3.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
+  lp_Lie->lie_tsr = (st_TSR2.tim_hd / jour_sideral_decimal) * CALCULS_PI_FOIS_DEUX ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Lie->lie_mutex ) ;
 
   Trace1("JJ %f lp_Lie->lie_tsr = %f",lp_Lie->lie_jj, lp_Lie->lie_tsr ) ;
+
+  TIME_RELEASE ( & st_TSMG3 ) ;
+  TIME_RELEASE ( & st_TSMGH3 ) ;
+  TIME_RELEASE ( & st_TSR2 ) ;
+  TIME_RELEASE ( & st_TSR3 ) ;
 
   return 0 ;
 }
@@ -637,20 +646,29 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
   Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 }
+
+/*
+
+void   TIME_INIT                      ( STRUCT_TIME * ) ;
+void   TIME_INIT_TPO                  ( STRUCT_TIME_TEMPOS * ) ;
+void   TIME_INIT_PARAMS               ( STRUCT_TIME_PARAMS * ) ;
+
+*/
+
 /*****************************************************************************************
 * @fn     : TIME_INIT
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure STRUCT_TIME * lp_Tim
+* @brief  : Cette fonction initialise la structure STRUCT_TIME * 
 * @param  : STRUCT_TIME * lp_Tim
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-12- 
 * @todo   : configurer directement heure locale (?)
 *****************************************************************************************/
 
-void TIME_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
+void TIME_INIT( STRUCT_TIME * lp_Tim) {
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tpo->tpo_mutex ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tim->tim_mutex ) ;
 
   lp_Tim->tim_sig = '+' ; // signe 
@@ -662,15 +680,120 @@ void TIME_INIT( STRUCT_TIME * lp_Tim, STRUCT_TIME_TEMPOS * lp_Tpo) {
   lp_Tim->tim_SS  = 0 ;  // secondes
   lp_Tim->tim_hd  = 0 ;  // heure decimale (double)
 
+}
+/*****************************************************************************************
+* @fn     : TIME_RELEASE
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_TIME * 
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-12-11 creation
+* @todo   : 
+*****************************************************************************************/
+
+void TIME_RELEASE( STRUCT_TIME * lp_Tim) {
+  
+  TraceArbo(__func__,3,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_DESTROY( & lp_Tim->tim_mutex ) ;
+}
+/*****************************************************************************************
+* @fn     : TIME_INIT_PARAMS
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_TIME * 
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-12-11 creation
+* @todo   : 
+*****************************************************************************************/
+
+void TIME_INIT_PARAMS( STRUCT_TIME_PARAMS * lp_Tim_Par) {
+  
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tim_Par->tim_par_mutex ) ;
+
+  lp_Tim_Par->tim_par_tpo_menu = 0 ;
+  lp_Tim_Par->tim_par_tpo_raq = 0 ;
+  lp_Tim_Par->tim_par_tpo_ir = 0 ;
+  lp_Tim_Par->tim_par_tpo_termios = 0 ;
+  lp_Tim_Par->tim_par_tpo_capteurs = 0 ;
+  lp_Tim_Par->tim_par_tpo_lcd_loop = 0 ;
+  lp_Tim_Par->tim_par_tpo_lcd_disp = 0 ;
+}
+
+/*****************************************************************************************
+* @fn     : TIME_INIT_TEMPOS
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure TIME_INIT_TEMPOS *
+* @brief  : !! suppose  que TIME_INIT_PARAMS deja traitee & les parametres sont lues !!
+* @param  : STRUCT_TIME * lp_Tpo
+* @date   : 2022-12-11
+* @todo   : 
+*****************************************************************************************/
+
+void TIME_INIT_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
+  
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tpo->tpo_mutex ) ;
+
   /* Suppose que la lecture du fichier de config a ete faite */
   /* cf fonction CONFIG_PARAMETRES_CONFIG */
 
-  lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo_menu ;
-  lp_Tpo->tpo_raq      = gp_Tim_Par->tim_par_tpo_raq ;
-  lp_Tpo->tpo_ir       = gp_Tim_Par->tim_par_tpo_ir ;  
-  lp_Tpo->tpo_termios  = gp_Tim_Par->tim_par_tpo_termios ;
-  lp_Tpo->tpo_capteurs = gp_Tim_Par->tim_par_tpo_capteurs ;
-  lp_Tpo->tpo_lcd_loop = gp_Tim_Par->tim_par_tpo_lcd_loop ;
-  lp_Tpo->tpo_lcd_disp = gp_Tim_Par->tim_par_tpo_lcd_disp ;
+  lp_Tpo->tpo_menu     = 0 ;
+  lp_Tpo->tpo_raq      = 0 ;
+  lp_Tpo->tpo_ir       = 0 ;  
+  lp_Tpo->tpo_termios  = 0 ;
+  lp_Tpo->tpo_capteurs = 0 ;
+  lp_Tpo->tpo_lcd_loop = 0 ;
+  lp_Tpo->tpo_lcd_disp = 0 ;
+
+}
+
+/*****************************************************************************************
+* @fn     : TIME_CONFIG_TEMPOS
+* @author : s.gravois
+* @brief  : Cette fonction configure la structure STRUCT_TIME_TEMPOS en fct des parametres 
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-12-11 creation
+* @todo   : 
+*****************************************************************************************/
+
+void TIME_CONFIG_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
+  
+  TraceArbo(__func__,1,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  /* Donne des valeurs par defaut avant de se baser sur la lecture */
+
+  lp_Tpo->tpo_menu     = TIME_DEFAULT_TEMPO_NEMU ;
+  lp_Tpo->tpo_raq      = TIME_DEFAULT_TEMPO_RAQ ;
+  lp_Tpo->tpo_ir       = TIME_DEFAULT_TEMPO_IR ;  
+  lp_Tpo->tpo_termios  = TIME_DEFAULT_TEMPO_TERMIOS ;
+  lp_Tpo->tpo_capteurs = TIME_DEFAULT_TEMPO_CAPTEURS ;
+  lp_Tpo->tpo_lcd_loop = TIME_DEFAULT_TEMPO_LCD_LOOP ;
+  lp_Tpo->tpo_lcd_disp = TIME_DEFAULT_TEMPO_LCD_DISP ;
+
+  /* Si la valeur de TEMPO est > 0 , on utlilse juste TEMPO et les coefficients multiplicatifs 
+     pour ajuster les temporisations du programme */
+
+  if ( gp_Tim_Par->tim_par_tpo > 0 )  {
+
+    lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_NEMU ;
+    lp_Tpo->tpo_raq      = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_RAQ ; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
+    lp_Tpo->tpo_ir       = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_IR ;
+    lp_Tpo->tpo_termios  = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_TERMIOS ;
+    lp_Tpo->tpo_capteurs = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_CAPTEURS ;
+    lp_Tpo->tpo_lcd_loop = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_LCD_LOOP ; 
+    lp_Tpo->tpo_lcd_disp = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_LCD_DISP ; 
+  }
+  else {
+    lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo_menu     ;
+    lp_Tpo->tpo_raq      = gp_Tim_Par->tim_par_tpo_raq      ; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
+    lp_Tpo->tpo_ir       = gp_Tim_Par->tim_par_tpo_ir       ;
+    lp_Tpo->tpo_termios  = gp_Tim_Par->tim_par_tpo_termios  ;
+    lp_Tpo->tpo_capteurs = gp_Tim_Par->tim_par_tpo_capteurs ;
+    lp_Tpo->tpo_lcd_loop = gp_Tim_Par->tim_par_tpo_lcd_loop ; 
+    lp_Tpo->tpo_lcd_disp = gp_Tim_Par->tim_par_tpo_lcd_disp ; 
+  }
+
 
 }

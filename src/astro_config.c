@@ -94,7 +94,48 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
   }
   return ;
 }
+/*****************************************************************************************
+* @fn     : CONFIG_INIT_PARAMS
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_CONFIG_PARAMS *
+* @param  : void
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
 
+void CONFIG_INIT_PARAMS(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
+  
+  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con_Par->con_par_mutex ) ;
+
+  memset( lp_Con_Par->par_rep_cat, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_rep_cat ) ) ;
+  memset( lp_Con_Par->par_rep_cfg, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_rep_cfg ) ) ;
+  memset( lp_Con_Par->par_rep_log, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_rep_log ) ) ;
+  memset( lp_Con_Par->par_rep_in,  CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_rep_in ) ) ;
+  memset( lp_Con_Par->par_rep_out, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_rep_out ) ) ;
+  memset( lp_Con_Par->par_rep_scr, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_rep_scr ) ) ;
+  memset( lp_Con_Par->par_fic_led, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_fic_led ) ) ;
+  memset( lp_Con_Par->par_fic_log, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_fic_log ) ) ;
+  memset( lp_Con_Par->par_fic_pid, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_fic_pid ) ) ;
+  memset( lp_Con_Par->par_fic_dat, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_fic_dat ) ) ;
+  memset( lp_Con_Par->par_fic_hhm, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_fic_hhm ) ) ;
+  memset( lp_Con_Par->par_src_ker, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->par_src_ker ) ) ;
+
+  strcpy( lp_Con_Par->par_rep_cat , "" ) ;
+  strcpy( lp_Con_Par->par_rep_cfg , "" ) ;
+  strcpy( lp_Con_Par->par_rep_log , "" ) ;
+  strcpy( lp_Con_Par->par_rep_in  , "" ) ;
+  strcpy( lp_Con_Par->par_rep_out , "" ) ;
+  strcpy( lp_Con_Par->par_rep_scr , "" ) ;
+  strcpy( lp_Con_Par->par_fic_led , "" ) ;
+  strcpy( lp_Con_Par->par_fic_log , "" ) ;
+  strcpy( lp_Con_Par->par_fic_pid , "" ) ;
+  strcpy( lp_Con_Par->par_fic_dat , "" ) ;
+  strcpy( lp_Con_Par->par_fic_hhm , "" ) ;
+  strcpy( lp_Con_Par->par_src_ker , "" ) ;
+  /* TODO : finalize */
+}
 /*****************************************************************************************
 * @fn     : CONFIG_FORMAT_ADMIS
 * @author : s.gravois
@@ -210,6 +251,7 @@ int CONFIG_FIN_FICHIER(char c) {
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : juin 2022 : ajout parametres STRUCT_PID
 * @date   : nov 2022 : suite a refonte complete du code, passage par enum / g_char* / hachage ..
+* @date   : dec 2022 : suppression argument : passage par var globale
 * @todo   : 
 *****************************************************************************************/
 
@@ -223,27 +265,6 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
    // Variables susceptibles de ne pas etre lues (doivent etre mise a zero)
    //----------------------------------------------------------------------
    
-   gp_Cal_Par->cal_par_alt_red_tot = 0 ;
-   gp_Cal_Par->cal_par_azi_red_tot = 0 ;
-   
-   /* Les coefficients de reduction sont egaux a 1 par defaut */ 
-   /* car leur presence n est pas obligatoires dans le fichier config.txt */
-
-   gp_Cal_Par->cal_par_alt_red_1 = 1.0 ;  // reduction liee a la monture ()
-   gp_Cal_Par->cal_par_alt_red_2 = 1.0;   // reducteur du moteur (nombre de pas)
-   gp_Cal_Par->cal_par_alt_red_3 = 1.0;   // reducteur du moteur (gearbox)
-   gp_Cal_Par->cal_par_alt_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
-   gp_Cal_Par->cal_par_alt_red_5 = 1.0;   // reduction liee a la poulie
-   gp_Cal_Par->cal_par_alt_red_6 = 1.0;   // reduction liee au cpu
-   gp_Cal_Par->cal_par_alt_red_7 = 1.0;   // reduction non decrite plus haut
-
-   gp_Cal_Par->cal_par_azi_red_1 = 1.0 ;  // reduction liee a la monture
-   gp_Cal_Par->cal_par_azi_red_2 = 1.0;   // reducteur du moteur
-   gp_Cal_Par->cal_par_azi_red_3 = 1.0;   // nombre de pas du moteur en azimut
-   gp_Cal_Par->cal_par_azi_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
-   gp_Cal_Par->cal_par_azi_red_5 = 1.0;   // reduction liee a la poulie
-   gp_Cal_Par->cal_par_azi_red_6 = 1.0;   // reduction liee au cpu
-   gp_Cal_Par->cal_par_azi_red_7 = 1.0;   // reduction non decrite plus haut
 
    gp_Dev_Par->dev_par_use_capteurs = 0    ;
    gp_Dev_Par->dev_par_use_raquette = 0    ;
@@ -257,35 +278,11 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 
    /* Definition de valeurs par defauts pour les TEMPO */ 
 
-  gp_Tim_Par->tim_par_tpo_menu     = 50000;
-  gp_Tim_Par->tim_par_tpo_raq      = 51000; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
-  gp_Tim_Par->tim_par_tpo_ir       = 52000;
-  gp_Tim_Par->tim_par_tpo_termios  = 53000;
-  gp_Tim_Par->tim_par_tpo_capteurs = 50000;
-  gp_Tim_Par->tim_par_tpo_lcd_loop = 250000 ; 
-  gp_Tim_Par->tim_par_tpo_lcd_disp = 100000 ; 
+  TIME_CONFIG_PARAMS( gp_Tim_Par ) ;
+  
 
   gp_Pid_Par->par_pid_ech = 3 ;
 
-   //----------------------------------------------------------------------
-   // Lecture des variables dans la config lue dans le fichier de config
-   //-----------gp_Ast_Par->ast_par_default_object-------------------------------------------
-
-  memset( gp_Ast_Par->ast_par_default_object, CALCULS_ZERO_CHAR, sizeof( gp_Ast_Par->ast_par_default_object ) ) ;
-
-  memset( gp_Con_Par->par_rep_cat, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_cat ) ) ;
-  memset( gp_Con_Par->par_rep_cfg, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_cfg ) ) ;
-  memset( gp_Con_Par->par_rep_log, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_log ) ) ;
-  memset( gp_Con_Par->par_rep_in,  CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_in ) ) ;
-  memset( gp_Con_Par->par_rep_out, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_out ) ) ;
-  memset( gp_Con_Par->par_rep_scr, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_rep_scr ) ) ;
-
-  memset( gp_Con_Par->par_fic_led, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_led ) ) ;
-  memset( gp_Con_Par->par_fic_log, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_log ) ) ;
-  memset( gp_Con_Par->par_fic_pid, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_pid ) ) ;
-  memset( gp_Con_Par->par_fic_dat, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_dat ) ) ;
-  memset( gp_Con_Par->par_fic_hhm, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_fic_hhm ) ) ;
-  memset( gp_Con_Par->par_src_ker, CALCULS_ZERO_CHAR, sizeof( gp_Con_Par->par_src_ker ) ) ;
 
   for(l=0;l<CONFIG_DATAS_NB_LIGNES;l++) {
 
@@ -309,13 +306,14 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
     } 
     /* Definition de valeurs par defauts pour les TEMPO */ 
     
-    if(!strcmp("TEMPO_RAQ",        lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_raq=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_MENU",       lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_menu=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_IR",         lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_ir=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_TERMIOS",    lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_termios=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_CAPTEURS",   lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_capteurs=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_LCD_LOOP",   lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_lcd_loop=atol(lp_Con->con_params[l][1]);
-    if(!strcmp("TEMPO_LCD_DISP",   lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_lcd_disp=atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO",            lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo          = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_IR",         lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_ir       = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_RAQ",        lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_raq      = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_MENU",       lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_menu     = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_TERMIOS",    lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_termios  = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_CAPTEURS",   lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_capteurs = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_LCD_LOOP",   lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_lcd_loop = atol(lp_Con->con_params[l][1]);
+    if(!strcmp("TEMPO_LCD_DISP",   lp_Con->con_params[l][0])) gp_Tim_Par->tim_par_tpo_lcd_disp = atol(lp_Con->con_params[l][1]);
 
     // chemins des repertoires et fichiers (2021)
 
@@ -337,7 +335,7 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
     if(!strcmp("PID_KI",        lp_Con->con_params[l][0])) gp_Pid_Par->par_pid_kp =atof(lp_Con->con_params[l][1]);
     if(!strcmp("PID_KD",        lp_Con->con_params[l][0])) gp_Pid_Par->par_pid_kd =atof(lp_Con->con_params[l][1]);
 
-    if(!strcmp("LED_ETAT",      lp_Con->con_params[l][0]))     gp_Pwm_Par->par_led_etat=atoi(lp_Con->con_params[l][1]);
+    if(!strcmp("LED_ETAT_GPIOS",      lp_Con->con_params[l][0]))     gp_Pwm_Par->par_led_etat=atoi(lp_Con->con_params[l][1]);
 
     if(!strcmp("DEVICE_USE_CONTROLER", lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_controler=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_CAPTEURS",  lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_capteurs=atoi(lp_Con->con_params[l][1]);
@@ -470,18 +468,19 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
 
   Trace1("gp_Con_Par->par_default_menu = %s",   gc_hach_suivi_menus[ gp_Con_Par->par_default_menu ] ) ;
   
-  Trace1("gp_Tim_Par->tim_par_tpo_raq = %ld",  gp_Tim_Par->tim_par_tpo_raq);
-  Trace1("gp_Tim_Par->tim_par_tpo_menu = %ld",  gp_Tim_Par->tim_par_tpo_menu);
-  Trace1("gp_Tim_Par->tim_par_tpo_ir = %ld",  gp_Tim_Par->tim_par_tpo_ir);
-  Trace1("gp_Tim_Par->tim_par_tpo_termios = %ld",  gp_Tim_Par->tim_par_tpo_termios);
+  Trace1("gp_Tim_Par->tim_par_tpo          = %ld",  gp_Tim_Par->tim_par_tpo);
+  Trace1("gp_Tim_Par->tim_par_tpo_raq      = %ld",  gp_Tim_Par->tim_par_tpo_raq);
+  Trace1("gp_Tim_Par->tim_par_tpo_menu     = %ld",  gp_Tim_Par->tim_par_tpo_menu);
+  Trace1("gp_Tim_Par->tim_par_tpo_ir       = %ld",  gp_Tim_Par->tim_par_tpo_ir);
+  Trace1("gp_Tim_Par->tim_par_tpo_termios  = %ld",  gp_Tim_Par->tim_par_tpo_termios);
   Trace1("gp_Tim_Par->tim_par_tpo_capteurs = %ld",  gp_Tim_Par->tim_par_tpo_capteurs);
   Trace1("gp_Tim_Par->tim_par_tpo_lcd_loop = %ld",  gp_Tim_Par->tim_par_tpo_lcd_loop);
   Trace1("gp_Tim_Par->tim_par_tpo_lcd_disp = %ld",  gp_Tim_Par->tim_par_tpo_lcd_disp);
 
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
-  Trace1("gp_Pid_Par->par_pid_ki = %f",  gp_Pid_Par->par_pid_ki);
-  Trace1("gp_Pid_Par->par_pid_kp = %f",  gp_Pid_Par->par_pid_kp);
-  Trace1("gp_Pid_Par->par_pid_kd = %f",  gp_Pid_Par->par_pid_kd);
+  Trace1("gp_Pid_Par->par_pid_ki  = %f",  gp_Pid_Par->par_pid_ki);
+  Trace1("gp_Pid_Par->par_pid_kp  = %f",  gp_Pid_Par->par_pid_kp);
+  Trace1("gp_Pid_Par->par_pid_kd  = %f",  gp_Pid_Par->par_pid_kd);
 
   Trace("gp_Dev_Par->dev_par_use_controler = %d",  gp_Dev_Par->dev_par_use_controler);
   Trace("gp_Dev_Par->dev_par_use_capteurs = %d",  gp_Dev_Par->dev_par_use_capteurs);
@@ -529,8 +528,11 @@ void   CONFIG_PARAMETRES_AFFICHER(void) {
 
   Trace1("gp_Pwm_Par->par_alt = %s", gp_Pwm_Par->par_alt)  ;  
   Trace1("gp_Pwm_Par->par_azi = %s", gp_Pwm_Par->par_azi)  ;  
-  Trace1("gp_Pwm_Par->par_mas = %s", gp_Pwm_Par->par_mas)  ;  
-  Trace1("gp_Pwm_Par->par_fre_pwm = %s", gp_Pwm_Par->par_fre_pwm)  ;  
+
+  Trace1("gp_Pwm_Par->par_alt_mas = %s", gp_Pwm_Par->par_alt_mas)  ;
+  Trace1("gp_Pwm_Par->par_azi_mas = %s", gp_Pwm_Par->par_azi_mas)  ;
+
+  Trace1("gp_Pwm_Par->par_alt_fpwm = %s", gp_Pwm_Par->par_alt_fpwm)  ;  
 
   Trace2("anciennes variables\n");
   Trace2("gp_Raq_Par->par_raq_ouest   = %d",  gp_Raq_Par->par_raq_ouest);

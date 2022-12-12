@@ -37,6 +37,7 @@
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
 ASTRE_PAR_DEFAUT NGC6756
+LED_ETAT_GPIOS   4
 
 # ----------------------- parametres repertoires et fichiers
 
@@ -56,12 +57,13 @@ CONFIG_SCR_KERNEL    script_kernel.sh
 # tempo_menu     doit etre legerement inferieur aux autres tempo
 # tempo_raq      doit etre etre deux fois inferieur aux autres tempos
 
-TEMPO_MENU      23000
-TEMPO_RAQ       10000
-TEMPO_IR        25001
-TEMPO_TERMIOS   25002 
-TEMPO_CLAVIER   25003
-TEMPO_CAPTEURS  25004
+TEMPO           50000
+TEMPO_MENU      250000
+TEMPO_RAQ       100000
+TEMPO_IR        250010
+TEMPO_TERMIOS   250020
+TEMPO_CLAVIER   250030 
+TEMPO_CAPTEURS  250040
 TEMPO_LCD_LOOP  1000000
 TEMPO_LCD_DISP  25006
 TEMPO_PID_LOOP  5
@@ -104,7 +106,7 @@ ALTITUDE   100
 # et moteurs en metal NEMA 11 (pas ceux qui sont sur la monture vixen gp)
 #--------------------------------------------------------------------------
 
-GPIO_LED_ETAT   4
+
 GPIO_ALT        21,26,19,13
 GPIO_AZI        6,5,7,11
 # GPIO_MASQUE     0,1,2,3
@@ -113,7 +115,7 @@ GPIO_AZI        6,5,7,11
 # Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus)
 #--------------------------------------------------------------------------
 
-# GPIO_LED_ETAT   4
+# LED_ETAT_GPIOS   4
 # GPIO_ALT        21,26,19,13
 # GPIO_AZI        6,5,7,11
 GPIO_MASQUE     3,1,0,2
@@ -126,6 +128,7 @@ GPIO_FREQUENCE_PWM  250
 # Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760 
 # mesure precisemebnt sur 5 tours en 28800 pas avec le binaire /usr/local/bin/gpio23 
 
+ALT_GPIOS        
 ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
 ALT_R2  100       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
 ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)

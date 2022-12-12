@@ -218,6 +218,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
 
   TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   /* ---------------------------------------------------------------
   * Gestion d un chemin externe (option -p <path>) si getcwd KO
   * ---------------------------------------------------------------*/
