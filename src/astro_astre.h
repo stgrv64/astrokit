@@ -183,11 +183,12 @@ typedef struct STR_ASTRE STRUCT_ASTRE ;
 /* Le contenu de cette variable permet le hachage avec 
  les valeurs de l enum t_en_Astre_Type defini dans astre.h */
  
-void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
-void ASTRE_INIT_PARAMS               ( STRUCT_ASTRE_PARAMS * ) ;
+void ASTRE_PARAMS_INIT               ( STRUCT_ASTRE_PARAMS * ) ;
+void ASTRE_PARAMS_DISPLAY            ( STRUCT_ASTRE_PARAMS * ) ;
 
-void ASTRE_RESET                     (void) ;
-void ASTRE_FORMATE_DONNEES_AFFICHAGE (void) ;
-void ASTRE_AFFICHER_MODE_STELLARIUM  (void) ;
+void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
+void ASTRE_RESET                     ( STRUCT_ASTRE *) ;
+void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE *) ;
+void ASTRE_DISPLAY_MODE_STELLARIUM   ( STRUCT_ASTRE *) ;
 
 #endif

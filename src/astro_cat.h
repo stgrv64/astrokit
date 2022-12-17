@@ -24,6 +24,10 @@
 
 #define   CAT_NGC_TXT        "ngc.csv"
 #define   CAT_ETO_TXT        "eto.csv"
+
+#define   CAT_NGC_DEC_TXT    "ngc.csv.dec"
+#define   CAT_ETO_DEC_TXT    "eto.csv.dec"
+
 #define   CAT_NB_LIGNES      10000
 #define   CAT_NB_COLONNES    6
 #define   CAT_TAILLE_BUFFER  100
@@ -32,12 +36,10 @@
 
 struct STR_CAT {
  pthread_mutex_t cat_mutex ;
- STRUCT_ASTRE  * cat_p_ast ;
- char            c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
- char            c_cat_dec     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
- char            c_cat_eto     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
- char            c_cat_eto_dec [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
+ char            cat_dat [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER] ;
+ char            cat_dec [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER] ;
 } ;
+typedef struct STR_CAT STRUCT_CAT ;
 
 char g_c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
 char g_c_cat_dec     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
@@ -46,17 +48,16 @@ char g_c_cat_eto_dec [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
 
 /* TODO : creer une structure de catalogues STRUCT_CAT */ 
 
-void      CAT_INIT          (STRUCT_CAT *, STRUCT_ASTRE * ) ;
+void      CAT_INIT          ( STRUCT_CAT * ) ;
+void      CAT_READ          ( STRUCT_CAT * , char * ) ;
+void      CAT_FIND          ( STRUCT_CAT * , STRUCT_ASTRE *) ;
+void      CAT_ZONE          ( STRUCT_CAT * , STRUCT_ASTRE *, double ) ;
+void      CAT_DISPLAY_DAT  ( STRUCT_CAT * ) ;
+void      CAT_DISPLAY_DEC  ( STRUCT_CAT * ) ;
 
-int       CAT_FIN_MOT       ( char c) ;
-void      CAT_AFFICHER      ( char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
-void      CAT_READ          ( char * , char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
-void      CAT_FIND          ( STRUCT_ASTRE *, char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
+void      CAT_FORMAT_DECIMAL_NGC ( STRUCT_CAT *, char * ) ;
+void      CAT_FORMAT_DECIMAL_ETO ( STRUCT_CAT *, char * ) ;
 
-void      CAT_FORMAT_DECIMAL_NGC( char * , char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
-                           char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
-void      CAT_FORMAT_DECIMAL_ETO( char * , char     [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
-                           char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
-void      CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) ;
+int       CAT_FIN_MOT      ( char ) ;
 
 #endif

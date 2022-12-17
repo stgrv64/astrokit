@@ -34,21 +34,9 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  memset(c_mot, 0, sizeof(c_mot)) ;     
+  DATAS_ACTION_PUT  ( gp_Dat, lp_Key ) ;
+  DATAS_ACTION_RESET( gp_Dat );
 
-  pthread_mutex_lock(& gp_Mut->mut_dat );
-  strcpy( c_mot, gp_Dat->dat_act ) ;
-  pthread_mutex_unlock(& gp_Mut->mut_dat );
-  
-  if ( strcmp( c_mot, "") ) {
-    
-    //printf("c_mot = %s\n", c_mot ) ;
-    strcpy( lp_Key->key_mot, c_mot ) ; 
-    lp_Key->key_appui_en_cours = 1 ;
-    lp_Key->key_mot_en_cours = 1 ;    
-  }
-  else lp_Key->key_appui_en_cours = 0 ; 
-  
   // =======================================================================
   // Quand la touche est relacheee, on traite
   // ensuite appui en cours est remis a ZERO pour qu'on ne passe qu'une fois
@@ -162,7 +150,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 
   int i ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init keys") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("") ;
 
@@ -207,7 +195,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 } 
 
 /*****************************************************************************************
-* @fn     : KEYS_AFFICHER
+* @fn     : KEYS_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations d entrees input ("lp_Key")
 * @param  : STRUCT_KEYS *lp_Key
@@ -215,7 +203,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
 * @todo   : 
 *****************************************************************************************/
 
-void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
+void KEYS_DISPLAY(STRUCT_KEYS *lp_Key) {
   
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
@@ -242,4 +230,26 @@ void KEYS_AFFICHER(STRUCT_KEYS *lp_Key) {
 
   TraceArbo(__func__,1,c_cmd) ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }
+/*****************************************************************************************
+* @fn     : KEYS_RESET_MOT
+* @author : s.gravois
+* @brief  : Cette fonction reset proprement le mot en cours et le mot retenu
+* @param  : STRUCT_KEYS *lp_Key
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
 
+void KEYS_RESET_MOT(STRUCT_KEYS *lp_Key) {
+  
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
+  lp_Key->key_mot_en_cours = 0 ;
+  strcpy( lp_Key->key_mot, "" ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+
+  return ;
+
+}

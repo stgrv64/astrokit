@@ -20,12 +20,12 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 /*****************************************************************************************
 * @fn     : ASTRE_INIT
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure STRUCT_ASTRE * gp_Ast
+* @brief  : Cette fonction initialise la structure STRUCT_ASTRE * lp_Ast
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 ajout membres de la structure dans la fonction
 * @date   : 2022-10-07 deplacement depuis config.c dans ce fichier
-* @todo   : supprimer STRUCT_ASTRE *gp_Ast (var blog) et remplacer par void
+* @todo   : supprimer STRUCT_ASTRE *lp_Ast (var blog) et remplacer par void
 *           passer par des pointeurs de fonctions dans un structure
 *****************************************************************************************/
 
@@ -33,7 +33,7 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 
   int C ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast->ast_mutex ) ;
 
@@ -98,7 +98,7 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 }
 
 /*****************************************************************************************
-* @fn     : ASTRE_INIT_PARAMS
+* @fn     : ASTRE_PARAMS_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure STRUCT_ASTRE_PARAMS *
 * @param  : void
@@ -106,9 +106,9 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 * @todo   : 
 *****************************************************************************************/
 
-void ASTRE_INIT_PARAMS(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
+void ASTRE_PARAMS_INIT(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"init astre params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast_Par->ast_par_mutex ) ;
 
@@ -117,68 +117,86 @@ void ASTRE_INIT_PARAMS(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   /* TODO : finalize */
 }
 /*****************************************************************************************
+* @fn     : ASTRE_PARAMS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_ASTRE_PARAMS *
+* @param  : void
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void ASTRE_PARAMS_DISPLAY(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
+  
+  TraceArbo(__func__,1,"display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("%-50s = %s","lp_Ast_Par->ast_par_default_object", lp_Ast_Par->ast_par_default_object );  
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : ASTRE_RESET
 * @author : s.gravois
-* @brief  : Cette fonction reset la structure STRUCT_ASTRE * gp_Ast
-* @param  : void
+* @brief  : Cette fonction reset la structure STRUCT_ASTRE * lp_Ast
+* @param  : STRUCT_ASTRE *
 * @date   : 2022-12-01 creation (a l identique de ASTRE_INIT)
 * @todo   : 
 *****************************************************************************************/
 
-void ASTRE_RESET(void) {
+void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
 
   int C ;
   
-  TraceArbo(__func__,0,"reset ") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"reset") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ; ;
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
-    memset( gp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-    strcpy( gp_Ast->plus_proche[C], "") ;
+    memset( lp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+    strcpy( lp_Ast->plus_proche[C], "") ;
   }
-  memset( gp_Ast->nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( gp_Ast->infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( gp_Ast->plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( lp_Ast->nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( lp_Ast->infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( lp_Ast->plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
 
-  gp_Ast->ast_typ = ASTRE_INDETERMINE ;
-  gp_Ast->ast_num = 0 ;
-  gp_Ast->ast_new = TRUE ;
+  lp_Ast->ast_typ = ASTRE_INDETERMINE ;
+  lp_Ast->ast_num = 0 ;
+  lp_Ast->ast_new = TRUE ;
 
-  gp_Ast->a       = 0  ;
-  gp_Ast->h       = 0  ;
-  gp_Ast->a0      = 0 ;
-  gp_Ast->h0      = 0 ;
-  gp_Ast->AGH     = 0 ; 
-  gp_Ast->ASC     = 0 ;
-  gp_Ast->DEC     = 0 ;
-  gp_Ast->A0      = 0 ;
-  gp_Ast->H0      = 0 ;
-  gp_Ast->da      = 0 ;
-  gp_Ast->dh      = 0 ;
-  gp_Ast->dA      = 0 ;
-  gp_Ast->dH      = 0 ;
-  gp_Ast->Va      = 0 ;
-  gp_Ast->Vh      = 0 ;
-  gp_Ast->dVa     = 0 ;
-  gp_Ast->dVh     = 0 ;
-  gp_Ast->dVam    = 0 ;
-  gp_Ast->dVhm    = 0 ;
-  gp_Ast->x       = 0 ;
-  gp_Ast->xx      = 0 ;
-  gp_Ast->y       = 0 ;
-  gp_Ast->yy      = 0 ;
-  gp_Ast->z       = 0 ;
-  gp_Ast->zz      = 0 ;
+  lp_Ast->a       = 0  ;
+  lp_Ast->h       = 0  ;
+  lp_Ast->a0      = 0 ;
+  lp_Ast->h0      = 0 ;
+  lp_Ast->AGH     = 0 ; 
+  lp_Ast->ASC     = 0 ;
+  lp_Ast->DEC     = 0 ;
+  lp_Ast->A0      = 0 ;
+  lp_Ast->H0      = 0 ;
+  lp_Ast->da      = 0 ;
+  lp_Ast->dh      = 0 ;
+  lp_Ast->dA      = 0 ;
+  lp_Ast->dH      = 0 ;
+  lp_Ast->Va      = 0 ;
+  lp_Ast->Vh      = 0 ;
+  lp_Ast->dVa     = 0 ;
+  lp_Ast->dVh     = 0 ;
+  lp_Ast->dVam    = 0 ;
+  lp_Ast->dVhm    = 0 ;
+  lp_Ast->x       = 0 ;
+  lp_Ast->xx      = 0 ;
+  lp_Ast->y       = 0 ;
+  lp_Ast->yy      = 0 ;
+  lp_Ast->z       = 0 ;
+  lp_Ast->zz      = 0 ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ; ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ; ;
 }
 
 /*****************************************************************************************
 * @fn     : ASTRE_FORMATE_DONNEES_AFFICHAGE
 * @author : s.gravois
 * @brief  : Cette fonction formate divers string en vue d un affichage pertinent
-* @param  : STRUCT_ASTRE *gp_Ast
+* @param  : STRUCT_ASTRE *lp_Ast
 * @date   : 2022-04-12 creation
 * @date   : 2022-04-21 remplacement ° par o (affichage LCD ° impossible)
 * @date   : 2022-04-21 ajout de 2 resolutions plus simple (affichage contraint par LCD) :
@@ -186,7 +204,7 @@ void ASTRE_RESET(void) {
 * @date   : 2022-04-21 - c_dd_*  
 *****************************************************************************************/
 
-void ASTRE_FORMATE_DONNEES_AFFICHAGE(void) {
+void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
 
   char  c_hhmmss_agh[ 16] ;
   char  c_hhmmss_asc[ 16] ;
@@ -212,7 +230,7 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(void) {
   char  c_dd_alt[ 16] ;
   char  c_dd_dec[ 16] ;
 
-  TraceArbo(__func__,1,"") ;
+  TraceArbo(__func__,2,"format astre display datas") ;
 
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
@@ -240,68 +258,68 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(void) {
 
   /* traitement des donnees en heures / minutes / secondes */
 
-  sprintf( c_hhmmss_agh, " %3dh%2dm%2ds",  gp_Ast->ast_agh_t.tim_HH, gp_Ast->ast_agh_t.tim_MM, gp_Ast->ast_agh_t.tim_SS  ) ;
-  sprintf( c_hhmmss_asc, " %3dh%2dm%2ds",  gp_Ast->ast_asc_t.tim_HH, gp_Ast->ast_asc_t.tim_MM, gp_Ast->ast_asc_t.tim_SS  ) ;
-  sprintf( c_hhmmss_azi, " %3dh%2dm%2ds",  gp_Ast->ast_azi_t.tim_HH, gp_Ast->ast_azi_t.tim_MM, gp_Ast->ast_azi_t.tim_SS  ) ;
-  sprintf( c_hhmmss_alt, " %3dh%2dm%2ds",  gp_Ast->ast_alt_t.tim_HH, gp_Ast->ast_alt_t.tim_MM, gp_Ast->ast_alt_t.tim_SS  ) ;
-  sprintf( c_hhmmss_dec, " %3dh%2dm%2ds",  gp_Ast->ast_dec_t.tim_HH, gp_Ast->ast_dec_t.tim_MM, gp_Ast->ast_dec_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh, " %3dh%2dm%2ds",  lp_Ast->ast_agh_t.tim_HH, lp_Ast->ast_agh_t.tim_MM, lp_Ast->ast_agh_t.tim_SS  ) ;
+  sprintf( c_hhmmss_asc, " %3dh%2dm%2ds",  lp_Ast->ast_asc_t.tim_HH, lp_Ast->ast_asc_t.tim_MM, lp_Ast->ast_asc_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi, " %3dh%2dm%2ds",  lp_Ast->ast_azi_t.tim_HH, lp_Ast->ast_azi_t.tim_MM, lp_Ast->ast_azi_t.tim_SS  ) ;
+  sprintf( c_hhmmss_alt, " %3dh%2dm%2ds",  lp_Ast->ast_alt_t.tim_HH, lp_Ast->ast_alt_t.tim_MM, lp_Ast->ast_alt_t.tim_SS  ) ;
+  sprintf( c_hhmmss_dec, " %3dh%2dm%2ds",  lp_Ast->ast_dec_t.tim_HH, lp_Ast->ast_dec_t.tim_MM, lp_Ast->ast_dec_t.tim_SS  ) ;
 
-  sprintf( c_hhmm_agh,   " %3d h %2d m",   gp_Ast->ast_agh_t.tim_HH, gp_Ast->ast_agh_t.tim_MM ) ;
-  sprintf( c_hhmm_asc,   " %3d h %2d m",   gp_Ast->ast_asc_t.tim_HH, gp_Ast->ast_asc_t.tim_MM ) ;
-  sprintf( c_hhmm_azi,   " %3d h %2d m",   gp_Ast->ast_azi_t.tim_HH, gp_Ast->ast_azi_t.tim_MM ) ;
-  sprintf( c_hhmm_alt,   " %3d h %2d m",   gp_Ast->ast_alt_t.tim_HH, gp_Ast->ast_alt_t.tim_MM ) ;
-  sprintf( c_hhmm_dec,   " %3d h %2d m",   gp_Ast->ast_dec_t.tim_HH, gp_Ast->ast_dec_t.tim_MM ) ;
+  sprintf( c_hhmm_agh,   " %3d h %2d m",   lp_Ast->ast_agh_t.tim_HH, lp_Ast->ast_agh_t.tim_MM ) ;
+  sprintf( c_hhmm_asc,   " %3d h %2d m",   lp_Ast->ast_asc_t.tim_HH, lp_Ast->ast_asc_t.tim_MM ) ;
+  sprintf( c_hhmm_azi,   " %3d h %2d m",   lp_Ast->ast_azi_t.tim_HH, lp_Ast->ast_azi_t.tim_MM ) ;
+  sprintf( c_hhmm_alt,   " %3d h %2d m",   lp_Ast->ast_alt_t.tim_HH, lp_Ast->ast_alt_t.tim_MM ) ;
+  sprintf( c_hhmm_dec,   " %3d h %2d m",   lp_Ast->ast_dec_t.tim_HH, lp_Ast->ast_dec_t.tim_MM ) ;
 
   /* traitement des donnees en degres / minutes / secondes */
   /* est inclus dans l affichage le signe */
 
-  sprintf( c_ddmm_agh, "%c %-3d d %d'", gp_Ast->ast_agh_a.ang_sig, gp_Ast->ast_agh_a.ang_dd, gp_Ast->ast_agh_a.ang_mm ) ;
-  sprintf( c_ddmm_asc, "%c %-3d d %d'", gp_Ast->ast_asc_a.ang_sig, gp_Ast->ast_asc_a.ang_dd, gp_Ast->ast_asc_a.ang_mm ) ;
-  sprintf( c_ddmm_azi, "%c %-3d d %d'", gp_Ast->ast_azi_a.ang_sig, gp_Ast->ast_azi_a.ang_dd, gp_Ast->ast_azi_a.ang_mm ) ;
-  sprintf( c_ddmm_alt, "%c %-3d d %d'", gp_Ast->ast_alt_a.ang_sig, gp_Ast->ast_alt_a.ang_dd, gp_Ast->ast_alt_a.ang_mm ) ;
-  sprintf( c_ddmm_dec, "%c %-3d d %d'", gp_Ast->ast_dec_a.ang_sig, gp_Ast->ast_dec_a.ang_dd, gp_Ast->ast_dec_a.ang_mm ) ;
+  sprintf( c_ddmm_agh, "%c %-3d d %d'", lp_Ast->ast_agh_a.ang_sig, lp_Ast->ast_agh_a.ang_dd, lp_Ast->ast_agh_a.ang_mm ) ;
+  sprintf( c_ddmm_asc, "%c %-3d d %d'", lp_Ast->ast_asc_a.ang_sig, lp_Ast->ast_asc_a.ang_dd, lp_Ast->ast_asc_a.ang_mm ) ;
+  sprintf( c_ddmm_azi, "%c %-3d d %d'", lp_Ast->ast_azi_a.ang_sig, lp_Ast->ast_azi_a.ang_dd, lp_Ast->ast_azi_a.ang_mm ) ;
+  sprintf( c_ddmm_alt, "%c %-3d d %d'", lp_Ast->ast_alt_a.ang_sig, lp_Ast->ast_alt_a.ang_dd, lp_Ast->ast_alt_a.ang_mm ) ;
+  sprintf( c_ddmm_dec, "%c %-3d d %d'", lp_Ast->ast_dec_a.ang_sig, lp_Ast->ast_dec_a.ang_dd, lp_Ast->ast_dec_a.ang_mm ) ;
 
-  sprintf( c_dd_agh,   "%c %-3d deg",   gp_Ast->ast_agh_a.ang_sig, gp_Ast->ast_agh_a.ang_dd ) ;
-  sprintf( c_dd_asc,   "%c %-3d deg",   gp_Ast->ast_asc_a.ang_sig, gp_Ast->ast_asc_a.ang_dd ) ;
-  sprintf( c_dd_azi,   "%c %-3d deg",   gp_Ast->ast_azi_a.ang_sig, gp_Ast->ast_azi_a.ang_dd ) ;
-  sprintf( c_dd_alt,   "%c %-3d deg",   gp_Ast->ast_alt_a.ang_sig, gp_Ast->ast_alt_a.ang_dd ) ;
-  sprintf( c_dd_dec,   "%c %-3d deg",   gp_Ast->ast_dec_a.ang_sig, gp_Ast->ast_dec_a.ang_dd ) ;
+  sprintf( c_dd_agh,   "%c %-3d deg",   lp_Ast->ast_agh_a.ang_sig, lp_Ast->ast_agh_a.ang_dd ) ;
+  sprintf( c_dd_asc,   "%c %-3d deg",   lp_Ast->ast_asc_a.ang_sig, lp_Ast->ast_asc_a.ang_dd ) ;
+  sprintf( c_dd_azi,   "%c %-3d deg",   lp_Ast->ast_azi_a.ang_sig, lp_Ast->ast_azi_a.ang_dd ) ;
+  sprintf( c_dd_alt,   "%c %-3d deg",   lp_Ast->ast_alt_a.ang_sig, lp_Ast->ast_alt_a.ang_dd ) ;
+  sprintf( c_dd_dec,   "%c %-3d deg",   lp_Ast->ast_dec_a.ang_sig, lp_Ast->ast_dec_a.ang_dd ) ;
 
   /* Sauvegarde des donnees formatees dans la structure astre */
   
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ;
 
-  strcpy( gp_Ast->c_hhmmss_agh, c_hhmmss_agh)  ;
-  strcpy( gp_Ast->c_hhmmss_asc, c_hhmmss_asc)  ;
-  strcpy( gp_Ast->c_hhmmss_azi, c_hhmmss_azi)  ;
-  strcpy( gp_Ast->c_hhmmss_alt, c_hhmmss_alt)  ;
-  strcpy( gp_Ast->c_hhmmss_dec, c_hhmmss_dec)  ;
+  strcpy( lp_Ast->c_hhmmss_agh, c_hhmmss_agh)  ;
+  strcpy( lp_Ast->c_hhmmss_asc, c_hhmmss_asc)  ;
+  strcpy( lp_Ast->c_hhmmss_azi, c_hhmmss_azi)  ;
+  strcpy( lp_Ast->c_hhmmss_alt, c_hhmmss_alt)  ;
+  strcpy( lp_Ast->c_hhmmss_dec, c_hhmmss_dec)  ;
 
-  strcpy( gp_Ast->c_hhmm_agh, c_hhmm_agh)  ;
-  strcpy( gp_Ast->c_hhmm_asc, c_hhmm_asc)  ;
-  strcpy( gp_Ast->c_hhmm_azi, c_hhmm_azi)  ;
-  strcpy( gp_Ast->c_hhmm_alt, c_hhmm_alt)  ;
-  strcpy( gp_Ast->c_hhmm_dec, c_hhmm_dec)  ;
+  strcpy( lp_Ast->c_hhmm_agh, c_hhmm_agh)  ;
+  strcpy( lp_Ast->c_hhmm_asc, c_hhmm_asc)  ;
+  strcpy( lp_Ast->c_hhmm_azi, c_hhmm_azi)  ;
+  strcpy( lp_Ast->c_hhmm_alt, c_hhmm_alt)  ;
+  strcpy( lp_Ast->c_hhmm_dec, c_hhmm_dec)  ;
 
-  strcpy( gp_Ast->c_ddmm_agh, c_ddmm_agh)  ;
-  strcpy( gp_Ast->c_ddmm_asc, c_ddmm_asc)  ;
-  strcpy( gp_Ast->c_ddmm_azi, c_ddmm_azi)  ;
-  strcpy( gp_Ast->c_ddmm_alt, c_ddmm_alt)  ;
-  strcpy( gp_Ast->c_ddmm_dec, c_ddmm_dec)  ;
+  strcpy( lp_Ast->c_ddmm_agh, c_ddmm_agh)  ;
+  strcpy( lp_Ast->c_ddmm_asc, c_ddmm_asc)  ;
+  strcpy( lp_Ast->c_ddmm_azi, c_ddmm_azi)  ;
+  strcpy( lp_Ast->c_ddmm_alt, c_ddmm_alt)  ;
+  strcpy( lp_Ast->c_ddmm_dec, c_ddmm_dec)  ;
 
-  strcpy( gp_Ast->c_dd_agh, c_dd_agh)  ;
-  strcpy( gp_Ast->c_dd_asc, c_dd_asc)  ;
-  strcpy( gp_Ast->c_dd_azi, c_dd_azi)  ;
-  strcpy( gp_Ast->c_dd_alt, c_dd_alt)  ;
-  strcpy( gp_Ast->c_dd_dec, c_dd_dec)  ;
+  strcpy( lp_Ast->c_dd_agh, c_dd_agh)  ;
+  strcpy( lp_Ast->c_dd_asc, c_dd_asc)  ;
+  strcpy( lp_Ast->c_dd_azi, c_dd_azi)  ;
+  strcpy( lp_Ast->c_dd_alt, c_dd_alt)  ;
+  strcpy( lp_Ast->c_dd_dec, c_dd_dec)  ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ;
 
   return ;
 }
 
 /*****************************************************************************************
-* @fn     : ASTRE_AFFICHER_MODE_STELLARIUM
+* @fn     : ASTRE_DISPLAY_MODE_STELLARIUM
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations a la sauce stellarium
 * @param  : 
@@ -309,13 +327,13 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(void) {
 * @date   : 2022-03-28 simplification
 *****************************************************************************************/
 
-void ASTRE_AFFICHER_MODE_STELLARIUM(void) {
+void ASTRE_DISPLAY_MODE_STELLARIUM(STRUCT_ASTRE *lp_Ast) {
 
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"display mode stellarium") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->Va           , gp_Ast->Vh ) ;
-  Trace("AD / Dec   : %s / %s"       , gp_Ast->c_hhmmss_asc , gp_Ast->c_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s"       , gp_Ast->c_hhmmss_agh , gp_Ast->c_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s"       , gp_Ast->c_ddmm_azi   , gp_Ast->c_ddmm_alt ) ;
+  Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->Va           , lp_Ast->Vh ) ;
+  Trace("AD / Dec   : %s / %s"       , lp_Ast->c_hhmmss_asc , lp_Ast->c_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s"       , lp_Ast->c_hhmmss_agh , lp_Ast->c_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->c_ddmm_azi   , lp_Ast->c_ddmm_alt ) ;
 }
 

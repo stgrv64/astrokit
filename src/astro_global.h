@@ -82,6 +82,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <syslog.h>
 #include <time.h>
 #include <unistd.h>
 #include <semaphore.h>
@@ -91,9 +92,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <linux/i2c-dev.h>
-
-#include "lirc_client.h"
-#include "libfahw.h"
 
 /*------------------------------------------------------------------------------*/
 /* Definition des constantes globales                                           */ 
@@ -237,7 +235,8 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_ANGLE            g_Angle,              *gp_Ang ; \
   extern STRUCT_ASTRE            g_Astre,              *gp_Ast ; \
   extern STRUCT_CALCULS          g_Calculs,            *gp_Cal ; \
-  extern STRUCT_CAT              g_Catalogue,          *gp_Cat ; \
+  extern STRUCT_CAT              g_Cat_Ngc,            *gp_Ngc ; \
+  extern STRUCT_CAT              g_Cat_Eto,            *gp_Eto ; \
   extern STRUCT_CODES            g_Codes,              *gp_Cod ; \
   extern STRUCT_CONFIG           g_Config,             *gp_Con ; \
   extern STRUCT_DATAS            g_Datas,              *gp_Dat ; \

@@ -109,11 +109,9 @@ void INFRARED_READ(void) {
     }  
     Trace1("i_indice_code j k = %d %d %d", i_indice_code,j,k); 
 
-    DATAS_ACTION_RESET( gp_Dat ) ;
-
     if ( k == 0 && i_indice_code < CODES_CODE_NB_CODES ) {
       
-      DATAS_ACTION_COPY( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
+      DATAS_ACTION_SET( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
     }
 
     if ( k > 0 && \
@@ -121,7 +119,7 @@ void INFRARED_READ(void) {
          i_indice_code <= IR_CODE_REPETE_AUTORISE_MAX && \
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
-      DATAS_ACTION_COPY( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
+      DATAS_ACTION_SET( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
     }
     
     // tres important !!
@@ -131,19 +129,16 @@ void INFRARED_READ(void) {
     
     Trace1("gp_Dat->dat_act = %s", gp_Dat->dat_act ) ;
     Trace("gp_Tpo->tpo_ir = %ld", gp_Tpo->tpo_ir ) ;
-    
   
     usleep( gp_Tpo->tpo_ir ) ;
     
-    
-
     DATAS_ACTION_RESET( gp_Dat ) ;
   }
 }
 
 //====================================================================================
 /* 
- TODO : modifier pour avoir le meme comportement que appel thread SUIVI_INFRAROUGE
+ TODO : modifier pour avoir le meme comportement que appel thread _SUIVI_INFRAROUGE
 */
 void mainIr(int argc, char *argv[])  // void main(int argc, char *argv[]) 
 {	

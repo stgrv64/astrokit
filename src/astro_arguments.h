@@ -7,7 +7,7 @@
 # --------------------------------------------------------------
 # 19/01/2022  | * ajout entete
 #               * ajouts fonctions utilisant getopt
-# 11/03/2022  | * ajout fonction ARGUMENTS_GERER_REP_HOME
+# 11/03/2022  | * ajout fonction ARGUMENTS_MANAGE_REP_HOME
 # 07/10/2022  | * refonte complete du code : deplacement code GPIO_TEST_CONTROLER
 #  dans gpio.c
 # -------------------------------------------------------------- 
@@ -34,11 +34,11 @@ int incrlog ;
 /* TODO : creer une structure d arguments */
 
 void  ARGUMENTS_HELP                   (int , char** ) ;
-void  ARGUMENTS_GERER_FACON_CLASSIQUE  (int , char** )  ;
-void  ARGUMENTS_GERER_GETOPT           (int , char** )  ;
-void  ARGUMENTS_GERER_REP_HOME         (int , char** ) ;
+void  ARGUMENTS_MANAGE_FACON_CLASSIQUE  (int , char** )  ;
+void  ARGUMENTS_MANAGE_GETOPT           (int , char** )  ;
+void  ARGUMENTS_MANAGE_REP_HOME         (int , char** ) ;
 
-void  ARGUMENTS_VOUTE (void) ;
+void  ARGUMENTS_CREATE_VOUTE (void) ;
 
 #endif
 

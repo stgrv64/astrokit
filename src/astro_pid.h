@@ -75,11 +75,13 @@ struct STR_PID {
 typedef struct STR_PID STRUCT_PID ;
 typedef struct STR_PID_PARAMS STRUCT_PID_PARAMS ;
 
-void   PID_INIT             (STRUCT_PID * , STRUCT_PID_PARAMS * , STRUCT_CONFIG_PARAMS * ) ;
-void   PID_RUN              (double, double ) ;
-void   PID_RESET            (void) ;
-void   PID_TEST             (void) ;
-void   PID_ACTIVATE         (void) ;
-int    PID_IS_IN_CONDITION  (void) ;
+void PID_INIT           ( STRUCT_PID * ) ;
+void PID_PARAMS_INIT    ( STRUCT_PID_PARAMS * ) ;
+void PID_PARAMS_DISPLAY ( STRUCT_PID_PARAMS * ) ;
+void PID_RUN              (double, double ) ;
+void PID_RESET            (void) ;
+void PID_TEST             (void) ;
+void PID_ACTIVATE         (void) ;
+int  PID_IS_IN_CONDITION  (void) ;
 
 #endif

@@ -15,6 +15,7 @@
 
 #include <pthread.h>
 
+#define TIME_DEFAULT_TEMPO_VOUTE    1000000
 #define TIME_DEFAULT_TEMPO_NEMU     50000
 #define TIME_DEFAULT_TEMPO_RAQ      51000
 #define TIME_DEFAULT_TEMPO_IR       52000
@@ -22,6 +23,7 @@
 #define TIME_DEFAULT_TEMPO_CAPTEURS 54000
 #define TIME_DEFAULT_TEMPO_LCD_LOOP 250000
 #define TIME_DEFAULT_TEMPO_LCD_DISP 100000
+#define TIME_DEFAULT_TEMPO_PID_LOOP 100000
 
 #define TIME_DEFAULT_TEMPO_COEFF_MULT_NEMU     1.0
 #define TIME_DEFAULT_TEMPO_COEFF_MULT_RAQ      0.25
@@ -30,6 +32,7 @@
 #define TIME_DEFAULT_TEMPO_COEFF_MULT_CAPTEURS 1.1
 #define TIME_DEFAULT_TEMPO_COEFF_MULT_LCD_LOOP 10.0
 #define TIME_DEFAULT_TEMPO_COEFF_MULT_LCD_DISP 2.5
+#define TIME_DEFAULT_TEMPO_COEFF_MULT_PID_LOOP 10.0
 
 /* Definition de la structure associeee au fichier avant inclusion astro_global.h */
 /* Ceci est permis par le pre processeur */
@@ -38,7 +41,7 @@ struct STR_TIME_TEMPOS {
   pthread_mutex_t tpo_mutex ;
   unsigned long   tpo_ir        ; 
   unsigned long   tpo_menu      ;
-  unsigned long   tpo_voute     ;
+  unsigned long   tpo_voute     ; /* non utilise pour l instant (vou_tempo a la place )*/
   unsigned long   tpo_raq       ;
   unsigned long   tpo_termios   ; 
   unsigned long   tpo_capteurs  ; 
@@ -71,8 +74,8 @@ typedef struct STR_TIME STRUCT_TIME ;
 #include "astro_global.h"
 
 struct STR_TIME_PARAMS {
-  pthread_mutex_t tim_par_mutex ;
 
+  pthread_mutex_t tim_par_mutex ;
   unsigned long   tim_par_tpo ;
   unsigned long   tim_par_tpo_ir ;
   unsigned long   tim_par_tpo_menu ;
@@ -81,6 +84,7 @@ struct STR_TIME_PARAMS {
   unsigned long   tim_par_tpo_capteurs ;
   unsigned long   tim_par_tpo_lcd_loop ;
   unsigned long   tim_par_tpo_lcd_disp ;
+  unsigned long   tim_par_tpo_pid_loop ;
 } ;
 typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
@@ -90,8 +94,8 @@ void   TIME_INIT                      ( STRUCT_TIME * ) ;
 void   TIME_RELEASE                   ( STRUCT_TIME * ) ;
 
 void   TIME_INIT_TEMPOS               ( STRUCT_TIME_TEMPOS * ) ;
-void   TIME_INIT_PARAMS               ( STRUCT_TIME_PARAMS * ) ;
-
+void   TIME_PARAMS_INIT               ( STRUCT_TIME_PARAMS * ) ;
+void   TIME_PARAMS_DISPLAY            ( STRUCT_TIME_PARAMS * ) ;
 void   TIME_CONFIG_TEMPOS             ( STRUCT_TIME_TEMPOS * ) ;
 
 int    TIME_CALCULS_SIDERAL_TIME      ( STRUCT_TIME * , STRUCT_LIEU * ) ;
@@ -99,8 +103,8 @@ int    TIME_CALCULS_JULIAN_DAY        ( STRUCT_TIME * , STRUCT_LIEU * ) ;
 int    TIME_CALCULS_LOCAL_DATE        ( STRUCT_TIME *  ) ;
 void   TIME_CALCULS_HMS_VERS_DEC      ( STRUCT_TIME *  ) ;
 void   TIME_CALCULS_DEC_VERS_HMS      ( STRUCT_TIME *  ) ;
-void   TIME_AFFICHER                  ( STRUCT_TIME *  ) ; 
-void   TIME_AFFICHER_MSG_HHMMSS       ( STRUCT_TIME * , char * ) ;
+void   TIME_DISPLAY                  ( STRUCT_TIME *  ) ; 
+void   TIME_DISPLAY_MSG_HHMMSS       ( STRUCT_TIME * , char * ) ;
 
 void   TIME_CALCULS_HMS_VERS_DEC_DIR  ( double *, double, double, double) ;
 

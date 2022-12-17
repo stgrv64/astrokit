@@ -50,7 +50,10 @@ struct STR_LIEU {
  double          lie_jd ;   // jour decimal
 } ;
 
-void   LIEU_INIT    ( STRUCT_LIEU    * ) ;
-void   LIEU_AFFICHER( STRUCT_LIEU *gp_Lie) ;
+void LIEU_INIT           ( STRUCT_LIEU    * ) ;
+void LIEU_PARAMS_INIT    ( STRUCT_LIEU_PARAMS * ) ;
+void LIEU_PARAMS_DISPLAY ( STRUCT_LIEU_PARAMS * ) ;
+
+void LIEU_DISPLAY    ( STRUCT_LIEU * ) ;
 
 #endif

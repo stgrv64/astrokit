@@ -21,8 +21,7 @@ typedef struct   STR_VOUTE STRUCT_VOUTE ;
 
 struct STR_VOUTE {
    pthread_mutex_t vou_mutex ;
-   unsigned long   vou_tempo ;
-   unsigned long   vou_dt_us ; 
+   unsigned long   vou_tempo ; 
    long long       vou_num ; 
    double          vou_tempo_percent ;
    double          vou_calibration_delta_t ;
@@ -38,6 +37,6 @@ struct STR_VOUTE {
 void  VOUTE_INIT            ( STRUCT_VOUTE * ) ;
 void  VOUTE_CONFIG          ( STRUCT_VOUTE *, double , double , double  ) ;
 long  VOUTE_TEMPORISATION   ( STRUCT_VOUTE *, struct timeval ) ;
-void  VOUTE_AFFICHER        ( STRUCT_VOUTE * ) ;
+void  VOUTE_DISPLAY        ( STRUCT_VOUTE * ) ;
 
 #endif

@@ -62,7 +62,7 @@ void CODES_INIT(STRUCT_CODES *lp_Cod) {
 
   int i_pos ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init codes") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cod->cod_mutex ) ;
 

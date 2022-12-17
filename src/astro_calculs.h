@@ -96,7 +96,7 @@ struct STR_CALCULS_PARAMS {
   double        cal_par_alt_red_5 ;    // reduction liee a la poulie
   double        cal_par_alt_red_6 ;    // reduction liee au cpu
   double        cal_par_alt_red_7 ;    // reduction non decrite plus haut
-  int           cal_par_alt_rev ;      // Flag de reversibilitee du sens de rotation (en cas d'erreur)
+  int           cal_par_alt_inv ;      // Flag de inversione du sens de rotation (en cas d'erreur)
   double        cal_par_alt_acc ;      // Facteur de multiplication en mo
 
   // ------ PARAMETRES DE azimut   ------------
@@ -112,7 +112,7 @@ struct STR_CALCULS_PARAMS {
   double        cal_par_azi_red_5 ;   // reduction liee a la poulie
   double        cal_par_azi_red_6 ;   // reduction liee au cpu
   double        cal_par_azi_red_7 ;   // reduction non decrite plus haut
-  int           cal_par_azi_rev ;  // Flag de reversibilitee du sens de rotation (en cas d'erreur)
+  int           cal_par_azi_inv ;  // Flag de inversione du sens de rotation (en cas d'erreur)
   double        cal_par_azi_acc ;  // Facteur de multiplication en mode MANUEL_0
 
   // ------ PARAMETRES DE ALT et AZI   ------------
@@ -184,27 +184,26 @@ double DEG  (int degres, int minutes )                  ;
 // en profitant d'un sleep parametrable (eviter une consommation CPU
 // avant de rentrer en boucle active d'attente
 
-void   CALCULS_INIT            ( STRUCT_CALCULS * ) ;
-void   CALCULS_INIT_PARAMS     ( STRUCT_CALCULS_PARAMS * ) ;
-void   CALCULS_INIT_PTR        ( STRUCT_CALCULS * )  ;
-void   CALCULS_INIT_ANGLE      ( STRUCT_ANGLE * ) ;
-
-void   CALCULS_VOUTE                   (void) ;
-void   CALCULS_COORD_R3                (void) ;
-void   CALCULS_AZIMUT                  (void) ;
-void   CALCULS_EQUATEUR                (void) ;
-void   CALCULS_VITESSES_EQUATORIAL     (void) ;
-void   CALCULS_PERIODE                 (void) ;
-void   CALCULS_PERIODES_SUIVI_MANUEL   (void) ;
-void   CALCULS_VITESSES                (void) ;
-void   CALCULS_ANGLE_HORAIRE           (void) ;
-void   CALCULS_ASCENSION_DROITE        (void) ; 
-void   CALCULS_DIVISEUR_FREQUENCE      (void) ;   
-void   CALCULS_CONVERSIONS_ANGLES      (void) ;
-void   CALCULS_TOUT                    (void) ;
-void   CALCULS_RECUP_MODE_ET_ASTRE_TYPE(void) ;
-
-void   CALCULS_ANGLE_VERS_DMS          (STRUCT_ANGLE *) ;
+void CALCULS_INIT            ( STRUCT_CALCULS * ) ;
+void CALCULS_PARAMS_INIT     ( STRUCT_CALCULS_PARAMS * ) ;
+void CALCULS_PARAMS_DISPLAY  ( STRUCT_CALCULS_PARAMS * ) ;
+void CALCULS_INIT_PTR        ( STRUCT_CALCULS * )  ;
+void CALCULS_INIT_ANGLE      ( STRUCT_ANGLE * ) ;
+void CALCULS_VOUTE                   (void) ;
+void CALCULS_COORD_R3                (void) ;
+void CALCULS_AZIMUT                  (void) ;
+void CALCULS_EQUATEUR                (void) ;
+void CALCULS_VITESSES_EQUATORIAL     (void) ;
+void CALCULS_PERIODE                 (void) ;
+void CALCULS_PERIODES_SUIVI_MANUEL   (void) ;
+void CALCULS_VITESSES                (void) ;
+void CALCULS_ANGLE_HORAIRE           (void) ;
+void CALCULS_ASCENSION_DROITE        (void) ; 
+void CALCULS_DIVISEUR_FREQUENCE      (void) ;   
+void CALCULS_CONVERSIONS_ANGLES      (void) ;
+void CALCULS_TOUT                    (void) ;
+void CALCULS_RECUP_MODE_ET_ASTRE_TYPE(void) ;
+void CALCULS_ANGLE_VERS_DMS          (STRUCT_ANGLE *) ;
 /* TODO : decommenter
 void   SET_ASTRE ( STRUCT_ASTRE *gp_Ast,char *parametre, double valeur) ;
 void   SET_LIEU  ( STRUCT_LIEU *gp_Lie,char *parametre, double valeur) ;

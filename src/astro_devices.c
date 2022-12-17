@@ -37,7 +37,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init devices") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   pthread_mutex_init( & lp_Dev->dev_mutex, NULL ) ;
 
@@ -49,10 +49,61 @@ void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
   lp_Dev->dev_use_keyboard    = gp_Dev_Par->dev_par_use_keyboard ;
   lp_Dev->dev_use_lcd         = gp_Dev_Par->dev_par_use_lcd ; 
   lp_Dev->dev_init_capteurs = 0 ; 
+
+  return ;
 }
 
 /*****************************************************************************************
-* @fn     : DEVICES_AFFICHER_UTILISATION
+* @fn     : CONFIG_PARAMS_INIT
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_CONFIG_PARAMS *
+* @param  : STRUCT_DEVICES_PARAMS *lp_Dev_Par
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void DEVICES_PARAMS_INIT(STRUCT_DEVICES_PARAMS *lp_Dev_Par ) {
+  
+  TraceArbo(__func__,1,"init devicdes params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Dev_Par->dev_par_mutex ) ;
+
+  lp_Dev_Par->dev_par_use_capteurs  = 0 ;
+  lp_Dev_Par->dev_par_use_raquette  = 0 ;
+  lp_Dev_Par->dev_par_use_bluetooth = 0 ;
+  lp_Dev_Par->dev_par_use_infrared  = 0 ;
+  lp_Dev_Par->dev_par_use_controler = 0 ;
+  lp_Dev_Par->dev_par_use_keyboard  = 0 ;
+  lp_Dev_Par->dev_par_use_lcd       = 0 ; 
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : DEVICES_PARAMS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche la structure STRUCT_DEVICES_PARAMS *
+* @param  : STRUCT_DEVICES_PARAMS *lp_Dev_Par
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void DEVICES_PARAMS_DISPLAY(STRUCT_DEVICES_PARAMS *lp_Dev_Par ) {
+  
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_controler", lp_Dev_Par->dev_par_use_controler);
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_capteurs ", lp_Dev_Par->dev_par_use_capteurs);
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_bluetooth", lp_Dev_Par->dev_par_use_bluetooth);
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_infrared ", lp_Dev_Par->dev_par_use_infrared);
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_raquette ", lp_Dev_Par->dev_par_use_raquette);
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_keyboard ", lp_Dev_Par->dev_par_use_keyboard);
+  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_lcd      ", lp_Dev_Par->dev_par_use_lcd);
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : DEVICES_DISPLAY_UTILISATION
 * @author : s.gravois
 * @brief  : Cette fonction affiche le parametrage utilisation des devices 
 * @param  : void
@@ -60,9 +111,9 @@ void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
 * @date   : 2022-10-08 rapatriement et changement de nom depuis config.c
 *****************************************************************************************/
 
-void DEVICES_AFFICHER_UTILISATION (STRUCT_DEVICES *lp_Dev) {
+void DEVICES_DISPLAY_UTILISATION (STRUCT_DEVICES *lp_Dev) {
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("lp_Dev->dev_use_infrarouge = %d",lp_Dev->dev_use_infrarouge) ;
   Trace1("lp_Dev->dev_use_capteurs   = %d",lp_Dev->dev_use_capteurs) ;

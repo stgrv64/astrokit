@@ -118,9 +118,9 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
 
   int i_error=0 ; 
   int i_errno=0 ;
-  char buf[255] ;
+  char buf[CONFIG_TAILLE_BUFFER_256] ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Log->log_mutex )
 

@@ -13,7 +13,8 @@ octobre 2022 :  * creation
 STRUCT_ANGLE            g_Angle,              *gp_Ang ;
 STRUCT_ASTRE            g_Astre,              *gp_Ast ;
 STRUCT_CALCULS          g_Calculs,            *gp_Cal ; 
-STRUCT_CAT              g_Catalogue,          *gp_Cat ;
+STRUCT_CAT              g_Cat_Ngc,            *gp_Ngc ;
+STRUCT_CAT              g_Cat_Eto,            *gp_Eto ;
 STRUCT_CODES            g_Codes,              *gp_Cod ;
 STRUCT_CONFIG           g_Config,             *gp_Con ;
 STRUCT_DATAS            g_Datas,              *gp_Dat ;
@@ -71,7 +72,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_CONFIG ;
 
 void ASTRO_GLOBAL_INIT(void) {
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init global variables") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   gi_pthread_nb_cpu = sysconf(_SC_NPROCESSORS_ONLN);
 
@@ -92,7 +93,8 @@ void ASTRO_GLOBAL_INIT(void) {
   gp_Ang      = & g_Angle ;
   gp_Ast      = & g_Astre ;
   gp_Cal      = & g_Calculs ;
-  gp_Cat      = & g_Catalogue ;
+  gp_Ngc      = & g_Cat_Ngc ;
+  gp_Eto      = & g_Cat_Eto ;
   gp_Cod      = & g_Codes ;
   gp_Con      = & g_Config ; 
   gp_Dat      = & g_Datas ;

@@ -20,7 +20,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 * @fn     : SUIVI_TEMPORISATION_AZIMUT
 * @author : s.gravois
 * @brief  : Cette fonction permet de faire une temporisation dans le thread SUIVI_AZIMUT de astro.c
-* @param  : STRUCT_SUIVI * gp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
 * @param  : struct timeval * pt00
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
@@ -28,17 +28,17 @@ MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 * @todo   : TODO : supprimer (obsolete) 
 *****************************************************************************************/
 
-void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) {
+void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * lp_Sui, struct timeval * pt00) {
   
   struct timeval t01 ;
   double t_diff ;
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  usleep ( (long)(gp_Sui->DTa * gp_Sui->sui_tempo_percent) ) ;
+  usleep ( (long)(lp_Sui->DTa * lp_Sui->sui_tempo_percent) ) ;
   
   t_diff=0;
-  while( t_diff < gp_Sui->DTa ) {
+  while( t_diff < lp_Sui->DTa ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (( t01.tv_sec - pt00->tv_sec)  * TIME_MICRO_SEC ) + t01.tv_usec - pt00->tv_usec;
@@ -50,7 +50,7 @@ void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) {
 * @fn     : SUIVI_TEMPORISATION_AZIMUT
 * @author : s.gravois
 * @brief  : Cette fonction permet de faire une temporisation dans le thread SUIVI_ALTITUDE de astro.c
-* @param  : STRUCT_SUIVI * gp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
 * @param  : struct timeval * pt00
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
@@ -58,17 +58,17 @@ void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) {
 * @todo   : TODO : supprimer (obsolete) 
 *****************************************************************************************/
 
-void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) {
+void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * lp_Sui, struct timeval * pt00) {
   
   struct timeval t01 ;
   double  t_diff ;
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  usleep ( (long)(gp_Sui->DTh * gp_Sui->sui_tempo_percent) ) ;
+  usleep ( (long)(lp_Sui->DTh * lp_Sui->sui_tempo_percent) ) ;
   
   t_diff=0;
-  while( t_diff < gp_Sui->DTh ) {
+  while( t_diff < lp_Sui->DTh ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (( t01.tv_sec - pt00->tv_sec)  * TIME_MICRO_SEC ) + t01.tv_usec - pt00->tv_usec;
@@ -79,70 +79,84 @@ void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * gp_Sui, struct timeval * pt00) 
 /*****************************************************************************************
 * @fn     : SUIVI_MAJ_PAS
 * @author : s.gravois
-* @brief  : Cette fonction met a jour les valeurs de gp_Sui->pas* en fonction
+* @brief  : Cette fonction met a jour les valeurs de lp_Sui->pas* en fonction
 * @brief  : du contenu de gp_Dat->dat_act
-* @param  : STRUCT_SUIVI * gp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-03-22 renommage (ancien IR_xxx) et deplacment dans config.c /.h
 *****************************************************************************************/
 
-void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
+void SUIVI_MAJ_PAS( STRUCT_SUIVI_PAS * lp_Pas ) {
 
-  int c_act = 0 ;
+  int i = 0 ;
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_lock(& gp_Mut->mut_dat );
-
   /* TODO : supprimer : obsolete ----------
   if ( ! strcmp( gp_Dat->dat_act, "plus" ) )  {
-    gp_Fre->fre_ta_mic *=  gp_Sui->sui_plus  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
-    gp_Fre->fre_th_mic *=  gp_Sui->sui_plus  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
+    gp_Fre->fre_ta_mic *=  lp_Sui->sui_plus  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
+    gp_Fre->fre_th_mic *=  lp_Sui->sui_plus  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
   }
   if ( ! strcmp( gp_Dat->dat_act, "moins" ) ) {
-    gp_Fre->fre_ta_mic *=  gp_Sui->sui_moins  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
-    gp_Fre->fre_th_mic *=  gp_Sui->sui_moins  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
+    gp_Fre->fre_ta_mic *=  lp_Sui->sui_moins  ; gp_Fre->fre_fa_mic = 1 / gp_Fre->fre_ta_mic ;
+    gp_Fre->fre_th_mic *=  lp_Sui->sui_moins  ; gp_Fre->fre_fh_mic = 1 / gp_Fre->fre_th_mic ;
   }
   */
   /* TODO : supprimer : obsolete ----------
     touche + et - utilise pour PLA et ETO sur le clavier 
   */
  /*
-  if ( ! strcmp( gp_Dat->dat_act, "plus" ) )         { c_act++; gp_Pas->pas_acc_plus  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "moins" ) )        { c_act++; gp_Pas->pas_acc_moins = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "plus" ) )         { i++; gp_Pas->pas_acc_plus  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "moins" ) )        { i++; gp_Pas->pas_acc_moins = 1 ; }
 */
-  if ( ! strcmp( gp_Dat->dat_act, "forward" ) )      { c_act++; gp_Pas->pas_forward  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "rewind" ) )       { c_act++; gp_Pas->pas_rewind = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "forwardfast" ) )  { c_act++; gp_Pas->pas_forward_fast  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "rewindfast" ) )   { c_act++; gp_Pas->pas_rewind_fast = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "ne" ) )           { c_act++; gp_Pas->pas_nord=1 ; gp_Pas->pas_est=1   ; }
-  if ( ! strcmp( gp_Dat->dat_act, "no" ) )           { c_act++; gp_Pas->pas_nord=1 ; gp_Pas->pas_ouest=1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "se" ) )           { c_act++; gp_Pas->pas_sud=1  ; gp_Pas->pas_est=1   ; }
-  if ( ! strcmp( gp_Dat->dat_act, "so" ) )           { c_act++; gp_Pas->pas_sud=1  ; gp_Pas->pas_ouest=1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "n" ) )            { c_act++; gp_Pas->pas_nord  = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "o" ) )            { c_act++; gp_Pas->pas_ouest = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "e" ) )            { c_act++; gp_Pas->pas_est   = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "s" ) )            { c_act++; gp_Pas->pas_sud   = 1 ; }
-  if ( ! strcmp( gp_Dat->dat_act, "reset" ) )        { c_act++; gp_Sui->reset   = 1 ; }
+/*
+  if ( ! strcmp( gp_Dat->dat_act, "forward" ) )      { i++; gp_Pas->pas_forward  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "rewind" ) )       { i++; gp_Pas->pas_rewind = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "forwardfast" ) )  { i++; gp_Pas->pas_forward_fast  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "rewindfast" ) )   { i++; gp_Pas->pas_rewind_fast = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "ne" ) )           { i++; gp_Pas->pas_nord=1 ; gp_Pas->pas_est=1   ; }
+  if ( ! strcmp( gp_Dat->dat_act, "no" ) )           { i++; gp_Pas->pas_nord=1 ; gp_Pas->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "se" ) )           { i++; gp_Pas->pas_sud=1  ; gp_Pas->pas_est=1   ; }
+  if ( ! strcmp( gp_Dat->dat_act, "so" ) )           { i++; gp_Pas->pas_sud=1  ; gp_Pas->pas_ouest=1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "n" ) )            { i++; gp_Pas->pas_nord  = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "o" ) )            { i++; gp_Pas->pas_ouest = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "e" ) )            { i++; gp_Pas->pas_est   = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "s" ) )            { i++; gp_Pas->pas_sud   = 1 ; }
+  if ( ! strcmp( gp_Dat->dat_act, "reset" ) )        { i++; gp_Pas->pas_rst   = 1 ; }
+*/
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->pas_mutex ) ;
+
+  KEYS_IF_MOT_IS("n" )             { i++ ; lp_Pas->pas_nord          = 1 ; }
+  KEYS_IF_MOT_IS("o" )             { i++ ; lp_Pas->pas_ouest         = 1 ; }
+  KEYS_IF_MOT_IS("e" )             { i++ ; lp_Pas->pas_est           = 1 ; }
+  KEYS_IF_MOT_IS("s" )             { i++ ; lp_Pas->pas_sud           = 1 ; }
+  KEYS_IF_MOT_IS("forward" )       { i++ ; lp_Pas->pas_forward       = 1 ; }
+  KEYS_IF_MOT_IS("rewind" )        { i++ ; lp_Pas->pas_rewind        = 1 ; }
+  KEYS_IF_MOT_IS("forwardfast" )   { i++ ; lp_Pas->pas_forward_fast  = 1 ; }
+  KEYS_IF_MOT_IS("rewindfast" )    { i++ ; lp_Pas->pas_rewind_fast   = 1 ; }
+  KEYS_IF_MOT_IS("ne" )            { i++ ; lp_Pas->pas_nord          = 1 ; lp_Pas->pas_est   = 1 ; }
+  KEYS_IF_MOT_IS("no" )            { i++ ; lp_Pas->pas_nord          = 1 ; lp_Pas->pas_ouest = 1 ; }
+  KEYS_IF_MOT_IS("se" )            { i++ ; lp_Pas->pas_sud           = 1 ; lp_Pas->pas_est   = 1 ; }
+  KEYS_IF_MOT_IS("so" )            { i++ ; lp_Pas->pas_sud           = 1 ; lp_Pas->pas_ouest = 1 ; }
+  KEYS_IF_MOT_IS("reset" )         { i++ ; lp_Pas->pas_rst             = 1 ; }
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pas->pas_mutex ) ;
   /* Si gp_Dat->dat_act a ete utilise, il peut etre remis a zero */
 
-  if ( c_act > 0 ) {
-    
-    memset( gp_Dat->dat_act, 0, strlen( gp_Dat->dat_act ) ) ;
-    strcpy( gp_Dat->dat_act, "") ;
+  if (i>0) { 
+    KEYS_RESET_MOT(gp_Key) ; 
   }
-  pthread_mutex_unlock(& gp_Mut->mut_dat );
 
-  Trace2("raz de gp_Dat->dat_act") ;
+  /* TODO : remplacer par SUIVI_PAS_DISPLAY */
 
   Trace2("%ld %ld %ld %ld %d %d\n", \
-    gp_Pas->pas_ouest, \
-    gp_Pas->pas_est, \
-    gp_Pas->pas_nord, \
-    gp_Pas->pas_sud, \
-    gp_Pas->pas_acc_plus, \
-    gp_Pas->pas_acc_moins );
+    lp_Pas->pas_ouest, \
+    lp_Pas->pas_est, \
+    lp_Pas->pas_nord, \
+    lp_Pas->pas_sud, \
+    lp_Pas->pas_acc_plus, \
+    lp_Pas->pas_acc_moins );
   
   TraceArbo(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }
@@ -151,7 +165,7 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 * @fn     : SUIVI_OLD_0
 * @author : s.gravois
 * @brief  : realise certaines actions particulieres apres appui sur une touche
-* @param  : STRUCT_SUIVI   *gp_Sui
+* @param  : STRUCT_SUIVI   *lp_Sui
 * @param  : STRUCT_KEYS *clavier 
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-05-30 amelioration et visibilite du contenu fct 
@@ -159,7 +173,7 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI * gp_Sui) {
 * @todo   : analyser pour simplification <=> avec suivi menu etc..
 *****************************************************************************************/
 
-void SUIVI_OLD_0( STRUCT_SUIVI * gp_Sui) {
+void SUIVI_OLD_0( STRUCT_SUIVI * lp_Sui) {
     
 
 }
@@ -168,7 +182,7 @@ void SUIVI_OLD_0( STRUCT_SUIVI * gp_Sui) {
 * @fn     : SUIVI_MENU_BEFORE_WHILE
 * @author : s.gravois
 * @brief  : fonction qui initialise des attributs 
-* @param  : STRUCT_SUIVI * gp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-10-07 deplacement code depuis astro.c 
 * @date   : 2022-11-03 renommage SUIVI_MENU_PREALABLE -> SUIVI_MENU_BEFORE_WHILE
@@ -176,11 +190,11 @@ void SUIVI_OLD_0( STRUCT_SUIVI * gp_Sui) {
 * @todo   : (obsolete) 
 *****************************************************************************************/
 
-void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * gp_Sui) {
+void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  switch ( gp_Sui->sui_menu ) {
+  switch ( lp_Sui->sui_menu ) {
     case MENU_AZIMUTAL            : break ;
     case MENU_EQUATORIAL          : break ;
     case MENU_MANUEL_BRUT         : break ;
@@ -199,7 +213,7 @@ void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * gp_Sui) {
 * @fn     : SUIVI_TRAITEMENT_MOT
 * @author : s.gravois
 * @brief  : realise certaines actions particulieres apres appui sur une touche
-* @param  : STRUCT_SUIVI   *gp_Sui
+* @param  : STRUCT_SUIVI   *lp_Sui
 * @param  : STRUCT_KEYS *clavier 
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-05-30 amelioration et visibilite du contenu fct 
@@ -207,7 +221,8 @@ void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * gp_Sui) {
 * @todo   : analyser pour simplification <=> avec suivi menu etc..
 *****************************************************************************************/
 
-void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
+void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
+
   int i=0;
   char cmd[256]={0} ;
   char s_buffer4[ CONFIG_TAILLE_BUFFER_32 * 4 ]={0} ;
@@ -230,7 +245,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
   // On change de MENU si on appuie sur EST OUEST NORD ou SUD => 
   // on passe en MENU 0 
 
-  gp_Sui->sui_menu_old = gp_Sui->sui_menu ;
+  lp_Sui->sui_menu_old = lp_Sui->sui_menu ;
 
   /*  touche OUEST */
 
@@ -239,39 +254,51 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     Trace("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
 
-    ASTRE_FORMATE_DONNEES_AFFICHAGE();
+    ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
 
-    KEYS_If_Mot_Is("o")     { gp_Sui->sui_menu = MENU_MANUEL_BRUT ;i=1; }
-    KEYS_If_Mot_Is("e" )    { gp_Sui->sui_menu = MENU_MANUEL_BRUT ; i=1;}
-    KEYS_If_Mot_Is("s")     { gp_Sui->sui_menu = MENU_MANUEL_BRUT ; i=1;}
-    KEYS_If_Mot_Is("n")     { gp_Sui->sui_menu = MENU_MANUEL_BRUT ;i=1; }
-    KEYS_If_Mot_Is("reset") { gp_Sui->sui_menu = MENU_MANUEL_BRUT ;i=1; }
+    /* Renvoi sur MANUEL_BRUT */
 
-    KEYS_If_Mot_Is("stop")  { gp_Vou->vou_run = 0 ; i=1;}
-    KEYS_If_Mot_Is("play")  { gp_Vou->vou_run = 1 ; i=1;}
+    KEYS_IF_MOT_IS("n" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("o" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("e" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("s" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("forward" )       { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("rewind" )        { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("forwardfast" )   { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("rewindfast" )    { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("ne" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("no" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("se" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("so" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("reset" )         { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+
+    /* Fin Renvoi sur MANUEL_BRUT */
+
+    KEYS_IF_MOT_IS("stop")  { gp_Vou->vou_run = 0 ; i=1;}
+    KEYS_IF_MOT_IS("play")  { gp_Vou->vou_run = 1 ; i=1;}
     
     /* Quelques actions d 'affichage a l'ecran  */
 
-    KEYS_If_Mot_Is("aff_variables")       { CONFIG_PARAMETRES_AFFICHER() ; i=1 ; } ;
+    KEYS_IF_MOT_IS("aff_variables")       { CONFIG_PARAMETRES_DISPLAY() ; i=1 ; } ;
 
     /* Quelques actions d 'affichage a l'ecran LCD */
 
-    KEYS_If_Mot_Is("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
-    KEYS_If_Mot_Is("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
-    KEYS_If_Mot_Is("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
-    KEYS_If_Mot_Is("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
-    KEYS_If_Mot_Is("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
-    KEYS_If_Mot_Is("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
-    KEYS_If_Mot_Is("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
-    KEYS_If_Mot_Is("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
-    KEYS_If_Mot_Is("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
-    KEYS_If_Mot_Is("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
-    KEYS_If_Mot_Is("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
-    KEYS_If_Mot_Is("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
+    KEYS_IF_MOT_IS("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
+    KEYS_IF_MOT_IS("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
+    KEYS_IF_MOT_IS("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
+    KEYS_IF_MOT_IS("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
+    KEYS_IF_MOT_IS("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
+    KEYS_IF_MOT_IS("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
+    KEYS_IF_MOT_IS("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
+    KEYS_IF_MOT_IS("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
+    KEYS_IF_MOT_IS("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
+    KEYS_IF_MOT_IS("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
+    KEYS_IF_MOT_IS("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
+    KEYS_IF_MOT_IS("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
 
     /* Activation algorithme PID de regulation des periodes / frequences moteurs */
 
-    KEYS_If_Mot_Is("cfg_log_tps_reel_up") { 
+    KEYS_IF_MOT_IS("cfg_log_tps_reel_up") { 
       i=1 ; 
       if ( gi_pid_trace == 0 ){
         gi_pid_trace = gp_Tpo->tpo_pid_loop ; 
@@ -291,7 +318,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     /* Activation traces PID pour le moteur ALT */
 
-    KEYS_If_Mot_Is("cfg_log_tps_reel_trace_alt") { 
+    KEYS_IF_MOT_IS("cfg_log_tps_reel_trace_alt") { 
       i=1 ; 
       if ( gi_pid_trace_alt == 0 ) {
         gi_pid_trace_alt=1;      
@@ -311,7 +338,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     /* Activation traces PID pour le moteur AZI */
 
-    KEYS_If_Mot_Is("cfg_log_tps_reel_trace_azi") { 
+    KEYS_IF_MOT_IS("cfg_log_tps_reel_trace_azi") { 
       i=1 ;
       if ( gi_pid_trace_azi == 0 ) {
         gi_pid_trace_azi=1 ; 
@@ -329,16 +356,16 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
       }
     }
 
-    KEYS_If_Mot_Is("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
+    KEYS_IF_MOT_IS("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
 
-    KEYS_If_Mot_Is("aff_infos") { 
+    KEYS_IF_MOT_IS("aff_infos") { 
 
       Trace1("Mot_Is aff_infos") ;
       
-      CONFIG_AFFICHER_TOUT() ; 
+      CONFIG_DISPLAY_TOUT() ; 
       
       /*gp_Lcd->display_informations ( 2000000 ) ;*/
-      gp_Sui->sui_menu = MENU_INFO ; 
+      lp_Sui->sui_menu = MENU_INFO ; 
       
       i=1;
       
@@ -346,58 +373,53 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
     /*  touche mode equatorial */
     
-    KEYS_If_Mot_Is("key_equ")      { 
+    KEYS_IF_MOT_IS("key_equ")      { 
       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
-      gp_Sui->sui_menu = MENU_EQUATORIAL ; 
+      lp_Sui->sui_menu = MENU_EQUATORIAL ; 
       i=1;
     }    
 
     /*  touche mode azimutal */
 
-    KEYS_If_Mot_Is("key_azi")      { 
+    KEYS_IF_MOT_IS("key_azi")      { 
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
-      gp_Sui->sui_menu = MENU_AZIMUTAL ; 
+      lp_Sui->sui_menu = MENU_AZIMUTAL ; 
       i=1;
     }       // mode azimutal
 
     /* touche POWER : arret su systeme */
 
-    KEYS_If_Mot_Is("key_power")     { 
+    KEYS_IF_MOT_IS("key_power")     { 
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
-      gp_Sui->sui_menu = MENU_DOWN ; 
+      lp_Sui->sui_menu = MENU_DOWN ; 
       i=1;
     } 
 
     /* touche EXIT : arret su programme */
 
-    KEYS_If_Mot_Is("key_exit")      { 
-      gp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; 
+    KEYS_IF_MOT_IS("key_exit")      { 
+      lp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; 
       i=1;
     } 
 
     /* touche reseau : arret du reseau */
     /* TODO : non implemente : a definir et coder */
 
-    KEYS_If_Mot_Is("key_reseau_up") { 
+    KEYS_IF_MOT_IS("key_reseau_up") { 
       
-      gp_Sui->sui_menu = MENU_RESEAU_UP ; 
+      lp_Sui->sui_menu = MENU_RESEAU_UP ; 
       /* TODO : a terminer */
       i=1;
       
     }     
     /* remise a jour du mot a vide */ 
 
-    KEYS_If_Mot_Is("aff_thread_infos") {
+    KEYS_IF_MOT_IS("aff_thread_infos") {
       i=1;
       PTHREADS_INFOS(gp_Pth) ;
     }
-    if (i) { 
-      strcpy(gp_Key->key_mot,"") ; 
-      Trace1("raz de gp_Dat->dat_act") ;
-      pthread_mutex_lock(& gp_Mut->mut_dat );
-      memset( gp_Dat->dat_act, 0, strlen( gp_Dat->dat_act ) ) ;
-      strcpy( gp_Dat->dat_act, "") ;
-      pthread_mutex_unlock(& gp_Mut->mut_dat );
+    if (i>0) { 
+      KEYS_RESET_MOT(gp_Key) ; 
     }
   }
   else {
@@ -426,8 +448,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
     //--------------------------------------------------------------------
     
     if ( ! strcmp( gp_Key->key_symbole, gp_Key->key_menu )) {
-      gp_Sui->sui_menu_old = gp_Sui->sui_menu ;
-      gp_Sui->sui_menu     = atoi( gp_Key->key_nombre ) ; 
+      lp_Sui->sui_menu_old = lp_Sui->sui_menu ;
+      lp_Sui->sui_menu     = atoi( gp_Key->key_nombre ) ; 
     }
     
     //---------------------------------------------------------------------------------------------------------
@@ -447,14 +469,14 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 
       /* Recherche de l'as dans les catalgues */
       
-      if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-      if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-      if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
+      if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+      if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+      if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
       
       /* Pour les planetes, le calcul est fait dans SOLAR_SYSTEM dans CALCULS_TOUT */
 
       gp_Ast->ast_new = TRUE ;
-      //gp_Sui->sui_menu = MENU_AZIMUTAL ;
+      //lp_Sui->sui_menu = MENU_AZIMUTAL ;
 
       GPIO_LED_ETAT_CLIGNOTE(1, 10) ; 
     }
@@ -511,19 +533,20 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
           if ( gp_Dev->dev_use_capteurs ) { 
             /* TODO : FIXME :  use global var for pitch & heading as member of STR_I2C_xx */
             /*
-            gp_Ast->a = gp_Sui->_pitch ;
-            gp_Ast->h = gp_Sui->_heading ; 
+            gp_Ast->a = lp_Sui->_pitch ;
+            gp_Ast->h = lp_Sui->_heading ; 
             */
           }
           CALCULS_EQUATEUR () ;
 
-          gp_Sui->sui_menu_old = gp_Sui->sui_menu ;
-          gp_Sui->sui_menu = MENU_AZIMUTAL ;
+          lp_Sui->sui_menu_old = lp_Sui->sui_menu ;
+          lp_Sui->sui_menu = MENU_AZIMUTAL ;
           break ;
       }
       //---------------------------------------------------------------------------------------------------------
     }
     gp_Key->key_phrase_lue=0 ;
+
     strcpy( gp_Key->key_mot, "" ) ;
     strcpy( gp_Key->key_nombre, "" ) ;
   }
@@ -532,7 +555,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 * @fn     : SUIVI_MANUEL_BRUT
 * @author : s.gravois
 * @brief  : Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
-* @param  : STRUCT_SUIVI   *gp_Sui
+* @param  : STRUCT_SUIVI   *lp_Sui
 * @param  : STRUCT_KEYS *gp_Key 
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-05-31 correction code dans flag_nord_sud_est_ouest : les accelrations sont les pas
@@ -540,13 +563,13 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key ) {
 *****************************************************************************************/
 /* FIXME :
   SUIVI_MANUEL_BRUT : 
-    le suivi etant effectue sur un as (calcul des vitesses et periodes par suivi_voute)
+    le suivi etant effectue sur un axe (calcul des vitesses et periodes par suivi_voute)
     l'appui sur les touches N-S-E-O provoque une suspension de suivi_voute jusqua touche OK
     avec une multiplication des vitesses N-S-E-O par un facteur gp_Cal_Par->cal_par_alt_acc
     Ce mode permet le centrage / recentrage de l'objet tout en ayant le suivi.
 */
 
-void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
+void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
   
   int  flag_nord_sud_est_ouest = 0 ;
   int  flag_calcul = 0 ;
@@ -554,9 +577,9 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, gp_Sui) ; */
+  /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, lp_Sui) ; */
 
-  SUIVI_MAJ_PAS( gp_Sui) ;
+  SUIVI_MAJ_PAS(gp_Pas) ;
 
   if( strcmp( gp_Dat->dat_act, "") != 0 ) {
     Trace1("0 gp_Dat->dat_act = %s", gp_Dat->dat_act ) ;
@@ -568,11 +591,11 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   // reset = remise a zero des compteurs
   //------------------------------------------------------------
   
-  if ( gp_Sui->reset ) {
+  if ( gp_Pas->pas_rst ) {
 
     strcpy(c_action,"reset") ;
 
-    Trace1("prise en compte : gp_Sui->reset" ) ;
+    Trace1("prise en compte : gp_Pas->pas_rst" ) ;
 
     // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
     // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
@@ -582,10 +605,10 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 
     gp_Pas->pas_acc_azi = 1 ;
 
-    if ( gp_Sui->sui_mode_equatorial )  gp_Pas->pas_acc_alt = 0.0 ;
+    if ( lp_Sui->sui_mode_equatorial )  gp_Pas->pas_acc_alt = 0.0 ;
     else                             gp_Pas->pas_acc_alt = 1.0 ;
 
-    gp_Sui->reset = 0 ;
+    gp_Pas->pas_rst = 0 ;
            
     // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
     // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -637,7 +660,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     gp_Pas->pas_ouest   = 0 ; 
     gp_Pas->pas_nord    = 0 ;
     gp_Pas->pas_sud     = 0 ;
-    gp_Sui->reset = 0 ;
+    gp_Pas->pas_rst     = 0 ;
 
     // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
     // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
@@ -753,7 +776,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 // MODE MANUEL : le suivi d'effectue directement en appuyant sur les touches 
 //==========================================================
 
-void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
+void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * lp_Sui) {
+
   double  t_appui_raq_azi ;
   double  t_appui_raq_alt ;
   double  tempo_raq_alt ;
@@ -765,7 +789,7 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   long    t_diff =0;
   double  t_diff_sec=0 ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   gp_Pas->pas_azi_old = gp_Pas->pas_azi ;
   gp_Pas->pas_alt_old = gp_Pas->pas_alt ;
@@ -775,8 +799,8 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   azi = 0 ;
   alt = 0 ;
   
-  /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, gp_Sui) ; */
-  SUIVI_MAJ_PAS  ( gp_Sui) ;
+  /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, lp_Sui) ; */
+  SUIVI_MAJ_PAS(gp_Pas) ;
   
   // La determination de tempo_raq est tres importante
   // Elle varie suivant la reduction total du moteur
@@ -788,10 +812,11 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
   // reset = remise a zero des compteurs
   //------------------------------------------------------------
   
-  if ( gp_Sui->reset ) {
+  if ( gp_Pas->pas_rst ) {
 
     gp_Pas->pas_alt = 0 ;
     gp_Pas->pas_azi = 0 ;
+    gp_Pas->pas_rst = 0 ;
 
     t_appui_raq_azi = 0 ;
     t_appui_raq_alt = 0 ; 
@@ -800,7 +825,7 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     gp_Fre->fre_th_mic = SUIVI_MAIN_TH_RESET ;
     gp_Fre->fre_fa_mic = SUIVI_MAIN_FA_RESET ;
     gp_Fre->fre_fh_mic = SUIVI_MAIN_FH_RESET ;
-    gp_Sui->reset = 0 ;
+    
   }
   // -----------------------------------------------------------
   // TANT QUE J'APPUIE SUR UN BOUTON DE LA RAQUETTE ===>
@@ -862,12 +887,12 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
     gp_Pas->pas_ouest = 0 ; 
     gp_Pas->pas_nord  = 0 ;
     gp_Pas->pas_sud   = 0 ;
-    gp_Sui->reset = 0 ;
+    gp_Pas->pas_rst = 0 ;
     
     // on relit sur les claviers en mode manuel 
 
-    /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, gp_Sui) ; */
-    SUIVI_MAJ_PAS( gp_Sui) ;
+    /* GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS( gpio_key_l, gpio_key_c, lp_Sui) ; */
+    SUIVI_MAJ_PAS(gp_Pas) ;
   }
   // =================================================================
   // FIN DE LA BOUCLE : TANT QUE J'APPUIE SUR UN BOUTON DE LA RAQUETTE
@@ -902,8 +927,8 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 /*****************************************************************************************
 * @fn     : SUIVI_INIT
 * @author : s.gravois
-* @brief  : Cette fonction configure la structure STRUCT_SUIVI * gp_Sui
-* @param  : STRUCT_SUIVI * gp_Sui
+* @brief  : Cette fonction configure la structure STRUCT_SUIVI * lp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @date   : 2022-01-20 passage d une partie de code dans DEVICES_INIT
 * @date   : 2022-05-24 ajout mutex_thread suivi pour proteger section crotique threads
@@ -911,21 +936,20 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * gp_Sui, STRUCT_KEYS *gp_Key) {
 * @todo   : voir si les mutex peuvent etre dispatches / eclates dans les autres struct
 *****************************************************************************************/
 
-void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
+void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
   
   int i ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init suivi") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Vou->vou_run      = 1 ;
-  gp_Sui->sui_mode_equatorial = 0 ;
+  lp_Sui->sui_mode_equatorial = 0 ;
 
   // a modifier  : instancier ces variables a l aide du fichier de config
 
-  gp_Sui->reset = 0 ;
-  
+  gp_Pas->pas_rst           = 1 ;
   gp_Pas->pas_azi           = 1 ;
   gp_Pas->pas_alt           = 1 ;
+
   gp_Pas->pas_acc_plus      = 0 ;
   gp_Pas->pas_acc_moins     = 0 ;
   gp_Pas->pas_azi_old       = 0 ;
@@ -938,18 +962,20 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
   gp_Pas->pas_rewind        = 0 ;
   gp_Pas->pas_forward_fast  = 0 ;
   gp_Pas->pas_rewind_fast   = 0 ;
-
-  /* Initialisation des accelerations */
-
   gp_Pas->pas_acc_azi       = 1.0 ; // acceleration volontaire des vitesses brutes
   gp_Pas->pas_acc_alt       = 1.0 ; // acceleration volontaire des vitesses brutes
+  gp_Pas->pas_asc           = 0 ;
+  gp_Pas->pas_dec           = 0  ;
 
   gp_Fre->fre_fa_mic        = 30 ;
   gp_Fre->fre_fh_mic        = 30 ;
-
+  gp_Fre->fre_sa            = 0 ; // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_ALT
+  gp_Fre->fre_sh            = 0 ; // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_AZI
+  gp_Fre->fre_sa_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
+  gp_Fre->fre_sh_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
   gp_Fre->fre_ta_mic        = 1 / gp_Fre->fre_fa_mic ;
   gp_Fre->fre_th_mic        = 1 / gp_Fre->fre_fh_mic ;
-  
+
   gp_Sta->sta_Tac        = 1.0 ;
   gp_Sta->sta_Thc        = 1.0 ;
   
@@ -967,30 +993,15 @@ void SUIVI_INIT(STRUCT_SUIVI * gp_Sui) {
   
   for(i=0;i<STATS_ASS;i++) gp_Sta->sta_Iat[i] = 0 ;
   for(i=0;i<STATS_ASS;i++) gp_Sta->sta_Iht[i] = 0 ;
-     
-  gp_Pas->pas_asc = 0 ;
-  gp_Pas->pas_dec = 0  ;
-    
-  gp_Fre->fre_sa = 0 ;       // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_ALT
-  gp_Fre->fre_sh = 0 ;       // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_AZI
-  gp_Fre->fre_sa_old = 0 ;   // flag de comparaison pour raffraichir ou non les ecritures
-  gp_Fre->fre_sh_old = 0 ;   // flag de comparaison pour raffraichir ou non les ecritures
-  
-  gp_Sui->sui_Da = 0  ;      // nombre a injecter dans les diviseurs de frequence
-  gp_Sui->sui_Dh = 0 ;       // nombre a injecter dans les diviseurs de frequence
-  
-  gp_Sui->sui_menu = gp_Con_Par->par_default_menu  ;    // menu par defaut
-  gp_Sui->sui_menu_old = gp_Con_Par->par_default_menu  ;
+           
+  lp_Sui->sui_Da            = 0  ;      // nombre a injecter dans les diviseurs de frequence
+  lp_Sui->sui_Dh            = 0 ;       // nombre a injecter dans les diviseurs de frequence
+  lp_Sui->alarme            = 0 ;
+  lp_Sui->sui_tempo_percent = 0.99 ; 
+  lp_Sui->DTh               = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
+  lp_Sui->DTa               = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
+  lp_Sui->sui_menu          = gp_Con_Par->par_default_menu  ;    // menu par defaut
+  lp_Sui->sui_menu_old      = gp_Con_Par->par_default_menu  ;
 
-  gp_Sui->alarme = 0 ;
-  
-  gp_Sui->sui_tempo_percent = 0.99 ; 
-  
-  gp_Tpo->tpo_pid_loop = gp_Pid_Par->par_pid_ech ;
-  gp_Tpo->tpo_voute    = gp_Vou->vou_dt_us ;
-
-  gp_Sui->DTh = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
-  gp_Sui->DTa = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
-
-  gettimeofday(&gp_Sui->sui_tval,NULL) ;
+  gettimeofday(&lp_Sui->sui_tval,NULL) ;
 }

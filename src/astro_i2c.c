@@ -114,7 +114,9 @@ int I2C_INIT( STRUCT_I2C_DEVICE * lp_i2c_dev, char * c_i2c_device_name, char * a
   int ret ;
   ret =0 ;
   
-  pthread_mutex_init(&lp_i2c_dev->i2c_dev_mutex,NULL) ;
+  TraceArbo(__func__,1,"init i2c") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT(&lp_i2c_dev->i2c_dev_mutex) ;
   
   if ( ( lp_i2c_dev->i2c_dev_fd = open(c_i2c_device_name, O_RDWR)) < 0)  ret = -1 ;
   else if ( ioctl( lp_i2c_dev->i2c_dev_fd, I2C_SLAVE, strtoul(adress,NULL,16) ) < 0) ret = -2 ;

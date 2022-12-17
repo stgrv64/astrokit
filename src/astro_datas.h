@@ -27,9 +27,11 @@ struct STR_DATAS {
 } ;
 typedef struct STR_DATAS STRUCT_DATAS ;
 
-void DATAS_INIT         ( STRUCT_DATAS * ) ;
-void DATAS_RESET        ( STRUCT_DATAS * )  ;
-void DATAS_ACTION_RESET ( STRUCT_DATAS * )  ;
-void DATAS_ACTION_COPY  ( STRUCT_DATAS * , const char * ) ;
+void DATAS_INIT            ( STRUCT_DATAS * ) ;
+void DATAS_RESET           ( STRUCT_DATAS * )  ;
+void DATAS_ACTION_RESET    ( STRUCT_DATAS * )  ;
+
+void DATAS_ACTION_SET      ( STRUCT_DATAS * , const char * ) ;
+void DATAS_ACTION_PUT      ( STRUCT_DATAS * , STRUCT_KEYS * );
 
 #endif

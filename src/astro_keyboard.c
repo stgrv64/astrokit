@@ -110,12 +110,12 @@ int KEYBOARD_TERMIOS_KBHIT() {
 * @todo   : eviter les traces a l interieur de cette fonction
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
+int KEYBOARD_TERMIOS_KBHIT_NEW(char * plc_buffer, int * pli_sum_ascii) {
   char chaine[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
-  *i_sum_ascii=0 ;
+  *pli_sum_ascii=0 ;
   memset(chaine, 0, sizeof(chaine)) ;
 
   if ( peek_char[0] != -1 ) {
@@ -134,14 +134,14 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
 
   if ( nread >0  ) {
 
-    Trace("nread positif = %d", nread) ;
+    Trace1("nread positif = %d", nread) ;
     
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       peek_char[i] = (int)chaine[i] ;
-      Trace("peek_chars[%d] = %c %d i_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *i_sum_ascii) ;
-      *i_sum_ascii+=(int)peek_char[i] ;
+      Trace1("peek_chars[%d] = %c %d pli_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *pli_sum_ascii) ;
+      *pli_sum_ascii+=(int)peek_char[i] ;
     }
-    strcpy( ch_chaine , chaine) ;  
+    strcpy( plc_buffer , chaine) ;  
 
     memset(peek_char, 0, sizeof(peek_char)) ;
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
@@ -149,7 +149,7 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * ch_chaine, int * i_sum_ascii) {
     }
     memset(chaine, 0, sizeof(chaine)) ;
 
-    Trace("nread %-3d i_sum_ascii %-5d ch_chaine %-10s", nread, *i_sum_ascii, ch_chaine ) ;
+    Trace1("nread %-3d pli_sum_ascii %-5d plc_buffer %-10s", nread, *pli_sum_ascii, plc_buffer ) ;
     // usleep(10000) ;
     return -1 ;
   }

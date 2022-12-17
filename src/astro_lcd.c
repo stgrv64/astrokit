@@ -76,7 +76,7 @@ extern STRUCT_LCD     *gp_Lcd ;
 
 void LCD_INIT(STRUCT_LCD * lp_Lcd) {
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init lcd") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace("") ;
 
@@ -664,7 +664,7 @@ void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
 /*****************************************************************************************
 * @fn     : LCD_DISPLAY_MODE_STELLARIUM
 * @author : s.gravois
-* @brief  : Cette fonction s inspire de ASTRE_AFFICHER_MODE_STELLARIUM pour le LCD
+* @brief  : Cette fonction s inspire de ASTRE_DISPLAY_MODE_STELLARIUM pour le LCD
 * @param  : 
 * @date   : 2022-03-18 creation
 * @date   : 2022-03-28 simplification
@@ -742,8 +742,8 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(h) %s", gp_Pwm_Par->par_alt ) ;
-    sprintf( c_l1, "(a) %s", gp_Pwm_Par->par_azi );
+    sprintf( c_l0, "(h) %s", gp_Pwm_Par->par_alt_gpio ) ;
+    sprintf( c_l1, "(a) %s", gp_Pwm_Par->par_azi_gpio );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->display_current() ;
@@ -757,6 +757,7 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
 * @param  : LCD * gp_Lcd
 * @param  : int i_duree_us
 * @date   : 2022-05-30 creation 
+* @todo   : TODO : prendre en compte nouveaux parametres en double (par_alt_gpio/par_azi_gpio ..)
 *****************************************************************************************/
 
 void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
@@ -769,7 +770,7 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(Masq) %s", gp_Pwm_Par->par_alt_mas ) ;
+    sprintf( c_l0, "(Masq) %s", gp_Pwm_Par->par_alt_mask ) ;
     sprintf( c_l1, "(Fpwm) %s", gp_Pwm_Par->par_alt_fpwm );
 
     gp_Lcd->change_current( i_duree_us, c_l0, c_l1) ;

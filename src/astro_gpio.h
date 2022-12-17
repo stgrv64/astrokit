@@ -95,11 +95,14 @@ struct STR_GPIO_PARAMS_MATRICIEL {
 struct STR_GPIO_PARAMS_PWM {
 
   pthread_mutex_t par_mutex ;
-  int             par_led_etat ;
+
+  int             par_led_etat ; /* TODO : mettre ailleurs */
   char            par_alt_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_alt     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_azi     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_alt_mas     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_alt_gpio     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_alt_mask     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_azi_gpio     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_azi_mask     [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_azi_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/
@@ -177,7 +180,7 @@ struct STR_GPIO_PWM_MOTEUR {
   double                  param0 ;
   double                  param1 ;
 
-  // FIXME : la difference entre temps et  tps_ree : voir fonction *suivi_main_M
+  // FIXME : la difference entre temps et  tps_ree : voir fonction *_GPIO_PWM_MOT
   //         *  temps      : on utilise periode , qui sert pour le usleep 
   //         *  tps_ree : on utilise gettimeofday , qui sert a calculer la duree de la boucle while(en entier)
 
@@ -270,12 +273,15 @@ long   GPIO_ACCELERATION_1(int gpio, double f_deb,double f_fin, double delai,lon
 long   GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double delai,long nano_moins) ;
 
 // PWM
+void   GPIO_PWM_PARAMS_INIT    ( STRUCT_GPIO_PARAMS_PWM * ) ;
+void   GPIO_PWM_PARAMS_DISPLAY ( STRUCT_GPIO_PARAMS_PWM * ) ;
+
 void   GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
 void   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
 
 // Fonction de threads
 
-void * GPIO_SUIVI_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) ;
-void * suivi_main_M(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
+void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) ;
+void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
 
 #endif

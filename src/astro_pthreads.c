@@ -84,7 +84,7 @@ void PTHREADS_INIT_MUTEXS(void) {
   int i_error=0 ;
   int i_errno=0 ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_glo_alt, NULL )) != 0 ) {
     i_errno=errno;        
@@ -136,7 +136,7 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
   struct sched_param param; 
   char c_rlogin[ 16] = {0} ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init pthreads") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   lp_Pth->pth_i_nb = 0 ;
   
@@ -375,7 +375,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
     param.sched_priority = PTHREAD_POLICY_1 ;
 
     if (pthread_setschedparam( pthread_self(), PTHREAD_SCHED_PARAM_SUIVI_VOUTE, & param) != 0) {
-      perror("setschedparam SUIVI_VOUTE"); 
+      perror("setschedparam _SUIVI_VOUTE"); 
       exit(EXIT_FAILURE);
     }
   }
@@ -384,13 +384,13 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
   }
 
   pthread_mutex_lock( & gp_Mut->mut_pth) ;
-  pthread_setname_np( pthread_self(), "SUIVI_VOUTE" ) ;
+  pthread_setname_np( pthread_self(), "_SUIVI_VOUTE" ) ;
   gp_Sui->p_pthpth_att->att_pid[ gi_pth_numero++ ] = pthread_self() ;
   pthread_mutex_unlock( & gp_Mut->mut_pth) ;
   */
 
  /*****************************************************************************************
-* @fn     : PTHREADS_AFFICHER_ETAT
+* @fn     : PTHREADS_DISPLAY_ETAT
 * @author : s.gravois
 * @brief  : Cette fonction affiche l etat des threads en cours 
 * @param  : void
@@ -398,7 +398,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
 * @todo   : a finir
 *****************************************************************************************/
 
-void   PTHREADS_AFFICHER_ETAT(STRUCT_PTHREADS* lp_pth) {
+void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_pth) {
 
   int i_num_thread=0 ;
   char c_thread_name [ 16 ] ; 

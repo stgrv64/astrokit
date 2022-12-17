@@ -20,6 +20,50 @@ int  gi_pid_trace_alt ;
 int  gi_pid_trace_azi ;
 
 /*****************************************************************************************
+* @fn     : PID_PARAMS_INIT
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_PID_PARAMS *
+* @param  : STRUCT_PID_PARAMS * lp_Pid_Par
+* @date   : 2022-12-12 creation
+*****************************************************************************************/
+
+void PID_PARAMS_INIT(STRUCT_PID_PARAMS * lp_Pid_Par ) {
+
+  char c_path_file_out[ CONFIG_TAILLE_BUFFER_256] ; 
+
+  TraceArbo(__func__,1,"init pid arams") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pid_Par->pid_par_mutex ) ;
+
+  lp_Pid_Par->par_pid_ech = 0 ;
+  lp_Pid_Par->par_pid_kd = 0 ;
+  lp_Pid_Par->par_pid_ki = 0 ;
+  lp_Pid_Par->par_pid_kp = 0 ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : PID_PARAMS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche la structure STRUCT_PID_PARAMS *
+* @param  : STRUCT_PID_PARAMS * lp_Pid_Par
+* @date   : 2022-12-12 creation
+*****************************************************************************************/
+
+void PID_PARAMS_DISPLAY(STRUCT_PID_PARAMS * lp_Pid_Par ) {
+
+  char c_path_file_out[ CONFIG_TAILLE_BUFFER_256] ; 
+
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("%-50s = %f", "lp_Pid_Par->par_pid_ech" , lp_Pid_Par->par_pid_ech);
+  Trace("%-50s = %f", "lp_Pid_Par->par_pid_ki " , lp_Pid_Par->par_pid_ki);
+  Trace("%-50s = %f", "lp_Pid_Par->par_pid_kp " , lp_Pid_Par->par_pid_kp);
+  Trace("%-50s = %f", "lp_Pid_Par->par_pid_kd " , lp_Pid_Par->par_pid_kd);
+
+  return ;
+}
+/*****************************************************************************************
 * @fn     : PID_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure lcd *l
@@ -27,16 +71,19 @@ int  gi_pid_trace_azi ;
 * @date   : 2022-06 creation
 *****************************************************************************************/
 
-void PID_INIT(STRUCT_PID * lp_Pid, STRUCT_PID_PARAMS * lp_Pid_Par, STRUCT_CONFIG_PARAMS * lp_Con_Par ) {
+void PID_INIT(STRUCT_PID * lp_Pid ) {
 
   char c_path_file_out[ CONFIG_TAILLE_BUFFER_256] ; 
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init pid") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Initialisation fichier */
 
   memset(c_path_file_out, 0, sizeof(c_path_file_out)) ;
-  sprintf( c_path_file_out, "%s/%s" , lp_Con_Par->par_rep_log, lp_Con_Par->par_fic_pid) ;
+
+  sprintf( c_path_file_out, "%s/%s" , \
+    gp_Con_Par->par_rep_log, \
+    gp_Con_Par->par_fic_pid) ;
 
   if ( ( lp_Pid->pid_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
     Trace("ouverture %s (KO)",c_path_file_out );
@@ -50,10 +97,10 @@ void PID_INIT(STRUCT_PID * lp_Pid, STRUCT_PID_PARAMS * lp_Pid_Par, STRUCT_CONFIG
   
   /* Parametres de reglages du PID proportionnel integral derive*/
 
-  lp_Pid->pid_ech = lp_Pid_Par->par_pid_ech ;
-  lp_Pid->pid_kp  = lp_Pid_Par->par_pid_kp ;
-  lp_Pid->pid_ki  = lp_Pid_Par->par_pid_ki ;
-  lp_Pid->pid_kd  = lp_Pid_Par->par_pid_kd ;
+  lp_Pid->pid_ech = gp_Pid_Par->par_pid_ech ;
+  lp_Pid->pid_kp  = gp_Pid_Par->par_pid_kp ;
+  lp_Pid->pid_ki  = gp_Pid_Par->par_pid_ki ;
+  lp_Pid->pid_kd  = gp_Pid_Par->par_pid_kd ;
 
   /* Initialisation autres champs */
 

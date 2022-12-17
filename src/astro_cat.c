@@ -39,56 +39,97 @@ int CAT_FIN_MOT(char c) {
 * @brief  : Cette fonction initialise la structure de catalogues
 * @param  : char c
 * @date   : 2022-11-21 creation
-* @todo   : ras
+* @todo   : inclure le path du cataogue dans la structure pour fct lecture +loin
 *****************************************************************************************/
 
-void CAT_INIT (STRUCT_CAT * gp_Cat, STRUCT_ASTRE * gp_Ast) {
+void CAT_INIT (STRUCT_CAT * lp_Cat ) {
  
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init catalogues") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Cat->cat_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cat->cat_mutex ) ;
 
   for(int L=0;L<CAT_NB_LIGNES;L++) {
     for(int C=0;C<CAT_NB_COLONNES;C++) {
-      memset(gp_Cat->c_cat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+      memset(lp_Cat->cat_dat[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+      memset(lp_Cat->cat_dec[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
     }
   }
-  gp_Cat->cat_p_ast = gp_Ast ;
-
   return ;
 }
 /*****************************************************************************************
-* @fn     : CAT_AFFICHER
+* @fn     : CAT_DISPLAY_DAT
 * @author : s.gravois
-* @brief  : Cette fonction affiche le catalogue passe en parametre
-* @param  : char c
+* @brief  : Cette fonction affiche le catalogue "datas" passe en parametre
+* @param  : STRUCT_CAT * lp_Cat 
 * @date   : 2022-10-14 creation
-* @todo   : ras
+* @date   : 2022-22-13 modification suite a passage struct STR_CAT
+* @todo   : fusionner les fcts CAT_DISPLAY_DAT & CAT_DISPLAY_DEC
 *****************************************************************************************/
 
-void CAT_AFFICHER(char catalogue[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+void CAT_DISPLAY_DAT(STRUCT_CAT * lp_Cat ) {
+
   int l, c ;
   char buffer[ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
   /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
   char buffer_recopie [ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   l=0 ;
-  while( strcmp( catalogue[l][3], "_" ) ) {
+  while( strcmp( lp_Cat->cat_dat[l][3], "_" ) ) {
    memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
    for(c=0;c<CAT_NB_COLONNES;c++) {
     /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
     memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
     strcpy( buffer_recopie, buffer ) ;
-    /* sprintf( buffer, "%-10s %-10s", buffer, catalogue[l][c] ) ; */
-    sprintf( buffer, "%-10s %-10s", buffer_recopie, catalogue[l][c] ) ; 
+    /* sprintf( buffer, "%-10s %-10s", buffer, lp_Cat->cat_dat[l][c] ) ; */
+    sprintf( buffer, "%-10s %-10s", buffer_recopie, lp_Cat->cat_dat[l][c] ) ; 
    }
    Trace1("%5d = %s ",l,buffer) ;
    l++;
    if( l>=CAT_NB_LIGNES) break ;
   }
 }
-//============================================================================
-void CAT_READ(char * catalogue_txt, char l_char_Datas[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+/*****************************************************************************************
+* @fn     : CAT_DISPLAY_DEC
+* @author : s.gravois
+* @brief  : Cette fonction affiche le catalogue "decimal" passe en parametre
+* @param  : STRUCT_CAT * lp_Cat 
+* @date   : 2022-22-13 creation
+* @todo   : fusionner les fcts CAT_DISPLAY_DAT & CAT_DISPLAY_DEC
+*****************************************************************************************/
+
+void CAT_DISPLAY_DEC(STRUCT_CAT * lp_Cat ) {
+
+  int l, c ;
+  char buffer[ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
+  /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+  char buffer_recopie [ CAT_TAILLE_BUFFER * CAT_NB_COLONNES ] ;
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  l=0 ;
+  while( strcmp( lp_Cat->cat_dec[l][3], "_" ) ) {
+   memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
+   for(c=0;c<CAT_NB_COLONNES;c++) {
+    /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+    memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+    strcpy( buffer_recopie, buffer ) ;
+    /* sprintf( buffer, "%-10s %-10s", buffer, lp_Cat->cat_dac[l][c] ) ; */
+    sprintf( buffer, "%-10s %-10s", buffer_recopie, lp_Cat->cat_dec[l][c] ) ; 
+   }
+   Trace1("%5d = %s ",l,buffer) ;
+   l++;
+   if( l>=CAT_NB_LIGNES) break ;
+  }
+}
+
+/*****************************************************************************************
+* @fn     : CAT_READ
+* @author : s.gravois
+* @brief  : Cette fonction lit le catalogue "datas" passe en parametre
+* @param  : STRUCT_CAT * lp_Cat 
+* @date   : 2022-22-13 creation entete doxygen
+* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+*****************************************************************************************/
+
+void CAT_READ(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
 
   FILE * fin ;
   char buf[CAT_TAILLE_BUFFER * CAT_NB_COLONNES] ;
@@ -99,12 +140,16 @@ void CAT_READ(char * catalogue_txt, char l_char_Datas[CAT_NB_LIGNES][CAT_NB_COLO
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++) {
-      memset(l_char_Datas[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
-      strcpy(l_char_Datas[L][C],"_") ;
+      memset(lp_Cat->cat_dat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+      strcpy(lp_Cat->cat_dat[L][C],"_") ;
     }
   
   memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
-  sprintf(buf,"%s/%s/%s",gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_cat,catalogue_txt) ;
+
+  sprintf(buf,"%s/%s/%s", \
+    gp_Con_Par->par_rep_home, \
+    gp_Con_Par->par_rep_cat, \
+    catalogue_txt) ;
   
   if ( (fin=fopen(buf,"r")) == NULL)  {
     // completer et modifier
@@ -119,18 +164,26 @@ void CAT_READ(char * catalogue_txt, char l_char_Datas[CAT_NB_LIGNES][CAT_NB_COLO
     for (C = 0, str1 = buf ; ; C++, str1 = NULL) {
       token = strtok_r(str1, ";", &sptr);
       if (token == NULL) break ;
-      strcpy( l_char_Datas[L][C],token);
+      strcpy( lp_Cat->cat_dat[L][C],token);
     }
     L++;
     if( L>=CAT_NB_LIGNES) break ;
   }
   fclose(fin);
-}
-//============================================================================
-// retourne tous les objets dans une zone de deg degres autour de STRUCT_ASTRE
-//============================================================================
 
-void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CAT_READ
+* @author : s.gravois
+* @brief  : Cette fonction recherche les objets dans un cercle autour de l astre en parametre
+* @param  : STRUCT_CAT * lp_Cat 
+* @param  : STRUCT_ASTRE * gp_Ast 
+* @date   : 2022-22-13 creation entete doxygen
+* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+*****************************************************************************************/
+
+void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
   
   int    L,C ;
   double asc, asc_b  ;
@@ -140,43 +193,51 @@ void CAT_ZONE(STRUCT_ASTRE *gp_Ast, double deg, char lc_Cat[CAT_NB_LIGNES][CAT_N
   
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  asc = gp_Ast->AGH0 ;
-  dec = gp_Ast->DEC ;
+  asc = lp_Ast->AGH0 ;
+  dec = lp_Ast->DEC ;
   L=0 ;
   d_min=deg ;
 
   Trace1("Recherche dans la zone de %s : ASC=%f DEC=%f",\
-    gp_Ast->nom, \
-    gp_Ast->AGH0, \
-    gp_Ast->DEC) ;
+    lp_Ast->nom, \
+    lp_Ast->AGH0, \
+    lp_Ast->DEC) ;
   
-  while( strcmp( lc_Cat[L][3],"_") \
-      && strcmp( gp_Ast->nom,lc_Cat[L][0]) \
-      && strcmp( gp_Ast->nom,lc_Cat[L][1])) {
+  while( strcmp( lp_Cat->cat_dec[L][3],"_") \
+      && strcmp( lp_Ast->nom,lp_Cat->cat_dec[L][0]) \
+      && strcmp( lp_Ast->nom,lp_Cat->cat_dec[L][1])) {
    
-    asc_b = atof( lc_Cat[L][2] ) ;
-    dec_b = atof( lc_Cat[L][3] ) ;
+    asc_b = atof( lp_Cat->cat_dec[L][2] ) ;
+    dec_b = atof( lp_Cat->cat_dec[L][3] ) ;
     
     d_angulaire = sqrt(sqr( asc_b - asc ) + sqr ( dec_b -dec )) ;
     
     if (  d_angulaire < d_min )     // si objet dans le cercle recherche
     if ( deg > d_angulaire )  {
-      // Trace1("dans la zone => %s=%s : ASC=%s DEC=%s DIST=%f",lc_Cat[L][0],lc_Cat[L][1],lc_Cat[L][2],lc_Cat[L][3], d_angulaire) ;
+      // Trace1("dans la zone => %s=%s : ASC=%s DEC=%s DIST=%f",lp_Cat->cat_dec[L][0],lp_Cat->cat_dec[L][1],lp_Cat->cat_dec[L][2],lp_Cat->cat_dec[L][3], d_angulaire) ;
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
-          memset( gp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
-          strcpy( gp_Ast->plus_proche[C], lc_Cat[L][C]) ;
+          memset( lp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
+          strcpy( lp_Ast->plus_proche[C], lp_Cat->cat_dec[L][C]) ;
         }
       }
     }
     L++;
   }
   Trace1("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f",\
-  gp_Ast->plus_proche[0], gp_Ast->plus_proche[1], gp_Ast->plus_proche[2], gp_Ast->plus_proche[3], d_min) ;
+  lp_Ast->plus_proche[0], lp_Ast->plus_proche[1], lp_Ast->plus_proche[2], lp_Ast->plus_proche[3], d_min) ;
 }
-//============================================================================
-void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+/*****************************************************************************************
+* @fn     : CAT_FIND
+* @author : s.gravois
+* @brief  : Cette fonction recherche l astre en parametre dans le catalogue 'decimal'
+* @param  : STRUCT_CAT * lp_Cat 
+* @date   : 2022-22-13 creation entete doxygen
+* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+*****************************************************************************************/
+
+void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   
   int    L=0 ;
   int    i_ligne=0 ;
@@ -191,38 +252,43 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
   
   L=0 ;
   
-  memset( gp_Ast->infos, 0 , sizeof( gp_Ast->infos) ) ;
+  memset( lp_Ast->infos, 0 , sizeof( lp_Ast->infos) ) ;
 
-  gp_Ast->ASC=0;
-  gp_Ast->DEC=0 ;
+  lp_Ast->ASC=0;
+  lp_Ast->DEC=0 ;
   
   i_ligne = L ;
 
-  while( strcmp(lc_Cat[L][3],"_") && L < CAT_NB_LIGNES ) {
+  while( strcmp(lp_Cat->cat_dec[L][3],"_") && L < CAT_NB_LIGNES ) {
     //usleep(10000) ;
-    Trace2("L=%d %s %s %s %s" , L , lc_Cat[L][0], lc_Cat[L][1] , lc_Cat[L][2] , lc_Cat[L][3] );
+    Trace2("L=%d %s %s %s %s" , \
+      L , \
+      lp_Cat->cat_dec[L][0], \
+      lp_Cat->cat_dec[L][1] , \
+      lp_Cat->cat_dec[L][2] , \
+      lp_Cat->cat_dec[L][3] );
 
-    if(!strcmp(lc_Cat[L][0],gp_Ast->nom)) {
+    if(!strcmp(lp_Cat->cat_dec[L][0],lp_Ast->nom)) {
 
       /* -----------------------------------------------
        * Sauvegarde des coordonnees equatoriales du catalogue 
        * dans la structure STRUCT_ASTRE 
        **************************************************/
 
-      gp_Ast->ASC = atof( lc_Cat[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      gp_Ast->DEC = atof( lc_Cat[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      strcpy( gp_Ast->infos, lc_Cat[L][0] ) ;
+      lp_Ast->ASC = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      lp_Ast->DEC = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      strcpy( lp_Ast->infos, lp_Cat->cat_dec[L][0] ) ;
 
       i_ligne = L ;
       i_trouve = TRUE ;
       break  ;
     }
 
-    if(!strcmp(lc_Cat[L][1],gp_Ast->nom)) {
+    if(!strcmp(lp_Cat->cat_dec[L][1],lp_Ast->nom)) {
 
-      gp_Ast->ASC = atof( lc_Cat[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      gp_Ast->DEC = atof( lc_Cat[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      strcpy( gp_Ast->infos, lc_Cat[L][1] ) ;
+      lp_Ast->ASC = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      lp_Ast->DEC = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      strcpy( lp_Ast->infos, lp_Cat->cat_dec[L][1] ) ;
 
       i_ligne = L ; 
       i_trouve = TRUE ;
@@ -231,41 +297,59 @@ void  CAT_FIND(STRUCT_ASTRE *gp_Ast, char lc_Cat[CAT_NB_LIGNES][CAT_NB_COLONNES]
     L++;
   }
   if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
-    Trace1("(trouve) : (nom) %s (infos) %s: ",gp_Ast->nom , gp_Ast->infos ) ;
+    Trace1("(trouve) : (nom) %s (infos) %s: ",lp_Ast->nom , lp_Ast->infos ) ;
   }
   else {
     
-    gp_Ast->ASC = 0.0 ;
-    gp_Ast->DEC = 0.0 ;
-    Trace1(" %s : non trouve dans catalogue",gp_Ast->nom) ;
-    strcpy( gp_Ast->nom, "undefined" ) ;
-    strcpy( gp_Ast->infos, "undefined" ) ;
+    lp_Ast->ASC = 0.0 ;
+    lp_Ast->DEC = 0.0 ;
+    Trace1(" %s : non trouve dans catalogue",lp_Ast->nom) ;
+    strcpy( lp_Ast->nom, "undefined" ) ;
+    strcpy( lp_Ast->infos, "undefined" ) ;
   }
 
   CALCULS_CONVERSIONS_ANGLES() ;
 
   Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
-    gp_Ast->nom , \
-    gp_Ast->ast_asc_t.tim_HH, \
-    gp_Ast->ast_asc_t.tim_MM, \
-    gp_Ast->ast_asc_t.tim_SS, \
-    gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES
+    lp_Ast->nom , \
+    lp_Ast->ast_asc_t.tim_HH, \
+    lp_Ast->ast_asc_t.tim_MM, \
+    lp_Ast->ast_asc_t.tim_SS, \
+    lp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES
   ) ; 
 
   return ; 
 }
-//============================================================================
-// Genere a la fois un catalogue avec des angles uniquement et au format decimal
+/*****************************************************************************************
+ * // Genere a la fois un catalogue avec des angles uniquement et au format decimal
 // et aussi un fichier dans le repertoire des catalogues
-//   format entree : NGC ; MESSIER (si existe sinon 0) ; ASC (HH) ; ASC(MM) ; DEC(DEG) ; DEG(MIN)
-//   format sortie : NGC ; MESSIER (si existe sinon 0) ; ASC (degres decimaux) ; DEC(degres decimaux); ASC (heures decimales) ; DEC(heures decimales);     
-//============================================================================
+//   format entree : 
+      NGC ; 
+      MESSIER (si existe sinon 0) ; 
+      ASC (HH) ; 
+      ASC (MM) ; 
+      DEC (DEG) ; 
+      DEG (MIN)
+//   format sortie : 
+      NGC ; 
+      MESSIER (si existe sinon 0) ; 
+      ASC (degres decimaux) ; 
+      DEC (degres decimaux); 
+      ASC (heures decimales) ; 
+      DEC (heures decimales);     
+*****************************************************************************************/
 
-void CAT_FORMAT_DECIMAL_NGC( \
+/*****************************************************************************************
+* @fn     : CAT_FORMAT_DECIMAL_NGC
+* @author : s.gravois
+* @brief  : Genere un catalogue avec des angles uniquement et au format decimal
+            pour le catalogue de type "ngc.txt"
+* @param  : STRUCT_CAT * lp_Cat 
+* @date   : 2022-22-13 creation entete doxygen
+* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+*****************************************************************************************/
 
-  char * catalogue_txt, \
-  char l_char_Datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
-  char l_char_DatasDec[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
   
   FILE * fout ;
   char   buf[CAT_TAILLE_BUFFER] ;
@@ -278,8 +362,8 @@ void CAT_FORMAT_DECIMAL_NGC( \
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
-      memset(l_char_DatasDec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-      strcpy(l_char_DatasDec[L][C],"_") ;
+      memset(lp_Cat->cat_dec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+      strcpy(lp_Cat->cat_dec[L][C],"_") ;
   } 
   
   memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
@@ -291,52 +375,59 @@ void CAT_FORMAT_DECIMAL_NGC( \
     exit(2) ;
   }
   L=0 ;
-  while( strcmp(l_char_Datas[L][0],"_") ) {
+  while( strcmp(lp_Cat->cat_dat[L][0],"_") ) {
    
-   strcpy( l_char_DatasDec[L][0], l_char_Datas[L][0]) ;
-   strcpy( l_char_DatasDec[L][1], l_char_Datas[L][1]) ;
+   strcpy( lp_Cat->cat_dec[L][0], lp_Cat->cat_dat[L][0]) ;
+   strcpy( lp_Cat->cat_dec[L][1], lp_Cat->cat_dat[L][1]) ;
    
-   ASC_HH  = atoi( l_char_Datas[L][2] ) ;
-   ASC_MM  = atoi( l_char_Datas[L][3] ) ;
+   ASC_HH  = atoi( lp_Cat->cat_dat[L][2] ) ;
+   ASC_MM  = atoi( lp_Cat->cat_dat[L][3] ) ;
    
-   DEC_DEG = atoi( l_char_Datas[L][4] ) ;
-   DEG_MIN = atoi( l_char_Datas[L][5] ) ;
+   DEC_DEG = atoi( lp_Cat->cat_dat[L][4] ) ;
+   DEG_MIN = atoi( lp_Cat->cat_dat[L][5] ) ;
    
    asc = ( (double)ASC_HH + SGN(ASC_HH) *(double)ASC_MM  / 60.0) * 15.0 ; // conversion en degres decimaux de type double
    dec =  (double)DEC_DEG + SGN(DEC_DEG)*(double)DEG_MIN / 60.0 ;
    
-   sprintf(l_char_DatasDec[L][2],"%f",asc) ;
-   sprintf(l_char_DatasDec[L][3],"%f",dec) ;
+   sprintf(lp_Cat->cat_dec[L][2],"%f",asc) ;
+   sprintf(lp_Cat->cat_dec[L][3],"%f",dec) ;
    
    asc = asc / 15 ;
    dec = dec / 15 ;
    
-   sprintf(l_char_DatasDec[L][4],"%f",asc) ;
-   sprintf(l_char_DatasDec[L][5],"%f",dec) ;
+   sprintf(lp_Cat->cat_dec[L][4],"%f",asc) ;
+   sprintf(lp_Cat->cat_dec[L][5],"%f",dec) ;
    
    fprintf(fout,"%s;%s;%s;%s;%s;%s\n",\
-     l_char_DatasDec[L][0], \
-     l_char_DatasDec[L][1], \
-     l_char_DatasDec[L][2], \
-     l_char_DatasDec[L][3], \
-     l_char_DatasDec[L][4], \
-     l_char_DatasDec[L][5]) ;   
+     lp_Cat->cat_dec[L][0], \
+     lp_Cat->cat_dec[L][1], \
+     lp_Cat->cat_dec[L][2], \
+     lp_Cat->cat_dec[L][3], \
+     lp_Cat->cat_dec[L][4], \
+     lp_Cat->cat_dec[L][5]) ;   
    L++ ;
    if( L>=CAT_NB_LIGNES) break ;
   }
   fclose(fout) ;
 }
-//============================================================================
-// Genere a la fois un catalogue avec des angles uniquement et au format decimal
-// et aussi un fichier dans le repertoire des catalogues
-//   format entree : NOM (etoile) ; ASC (HH) ; ASC(MM) ; DEC(degres decimaux); 
-//   format sortie : NUMERO ; NOM (etoile) ; ASC (degres decimaux) ; DEC(degres decimaux);     
-//============================================================================
+/*****************************************************************************************
+Genere a la fois un catalogue avec des angles uniquement et au format decimal
+et aussi un fichier dans le repertoire des catalogues
+   format entree : NOM (etoile) ; ASC (HH) ; ASC(MM) ; DEC(degres decimaux); 
+   format sortie : NUMERO ; NOM (etoile) ; ASC (degres decimaux) ; DEC(degres decimaux);     
+*****************************************************************************************/
 
-void CAT_FORMAT_DECIMAL_ETO( \
-  char * catalogue_txt, \
-  char l_char_Datas    [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER], \
-  char l_char_DatasDec[CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER]) {
+/*****************************************************************************************
+* @fn     : CAT_FORMAT_DECIMAL_NGC
+* @author : s.gravois
+* @brief  : Genere un catalogue avec des angles uniquement et au format decimal
+            pour le catalogue de type "ngc.txt"
+* @param  : STRUCT_CAT * lp_Cat 
+* @date   : 2022-22-13 creation entete doxygen
+* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+*****************************************************************************************/
+
+void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * catalogue_txt ) {
   
   FILE * fout ;
   char   buf[CAT_TAILLE_BUFFER] ;
@@ -348,8 +439,8 @@ void CAT_FORMAT_DECIMAL_ETO( \
   
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
-      memset(l_char_DatasDec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-      strcpy(l_char_DatasDec[L][C],"_") ;
+      memset(lp_Cat->cat_dec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+      strcpy(lp_Cat->cat_dec[L][C],"_") ;
   } 
   
   memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
@@ -361,16 +452,16 @@ void CAT_FORMAT_DECIMAL_ETO( \
     exit(2) ;
   }
   L=0 ;
-  while( strcmp(l_char_Datas[L][0],"_") ) {
+  while( strcmp(lp_Cat->cat_dat[L][0],"_") ) {
    
-   strcpy(  l_char_DatasDec[L][0], l_char_Datas[L][0]) ;
-   strcpy(  l_char_DatasDec[L][1], l_char_Datas[L][1]) ;
+   strcpy(  lp_Cat->cat_dec[L][0], lp_Cat->cat_dat[L][0]) ;
+   strcpy(  lp_Cat->cat_dec[L][1], lp_Cat->cat_dat[L][1]) ;
    
-   ASC_HH  = atoi( l_char_Datas[L][2] ) ;
-   ASC_MM  = atoi( l_char_Datas[L][3] ) ;
+   ASC_HH  = atoi( lp_Cat->cat_dat[L][2] ) ;
+   ASC_MM  = atoi( lp_Cat->cat_dat[L][3] ) ;
    
-   dec = atof( l_char_Datas[L][4] ) ;
-   //DEG_MIN = atoi( l_char_Datas[L][5] ) ;
+   dec = atof( lp_Cat->cat_dat[L][4] ) ;
+   //DEG_MIN = atoi( lp_Cat->cat_dat[L][5] ) ;
    
    asc = ( ASC_HH + ( ASC_MM / 60.0 ) )   * 15.0 ; // conversion en degres decimaux de type double
    
@@ -378,22 +469,22 @@ void CAT_FORMAT_DECIMAL_ETO( \
    
    //dec =  (double)DEC_DEG + SGN(DEC_DEG)*(double)DEG_MIN / 60.0 ;
    
-   sprintf(l_char_DatasDec[L][2],"%f",asc) ;
-   sprintf(l_char_DatasDec[L][3],"%f",dec) ;
+   sprintf(lp_Cat->cat_dec[L][2],"%f",asc) ;
+   sprintf(lp_Cat->cat_dec[L][3],"%f",dec) ;
    
    asc = asc / 15 ;
    dec = dec / 15 ;
    
-   sprintf(l_char_DatasDec[L][4],"%f",asc) ;
-   sprintf(l_char_DatasDec[L][5],"%f",dec) ;
+   sprintf(lp_Cat->cat_dec[L][4],"%f",asc) ;
+   sprintf(lp_Cat->cat_dec[L][5],"%f",dec) ;
    
    fprintf(fout,"%s;%s;%s;%s;%s;%s\n",\
-     l_char_DatasDec[L][0], \
-     l_char_DatasDec[L][1], \
-     l_char_DatasDec[L][2], \
-     l_char_DatasDec[L][3], \
-     l_char_DatasDec[L][4], \
-     l_char_DatasDec[L][5]) ;   
+     lp_Cat->cat_dec[L][0], \
+     lp_Cat->cat_dec[L][1], \
+     lp_Cat->cat_dec[L][2], \
+     lp_Cat->cat_dec[L][3], \
+     lp_Cat->cat_dec[L][4], \
+     lp_Cat->cat_dec[L][5]) ;   
    L++ ;
    if( L>=CAT_NB_LIGNES) break ;
   }

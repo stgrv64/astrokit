@@ -14,7 +14,7 @@
 # 2022-04-28  | - c_hhmm_*
 # 2022-04-28  | - c_dd_*  
 # 2022-05-02  | ajout fonction CONFIG_PATH_FIND
-# 2022-05-24  | ajout fonction PTHREADS_AFFICHER_ETAT
+# 2022-05-24  | ajout fonction PTHREADS_DISPLAY_ETAT
 # -------------------------------------------------------------- 
 */
 
@@ -97,19 +97,19 @@ ALTITUDE   100
 // -------------------------------------------------------------------------- 
 
 LED_ETAT_GPIOS   4
-ALT_GPIOS        21,26,19,13
-AZI_GPIOS        6,5,7,11
-//  ALT_MASQUE     0,1,2,3 
+ALT_GPIO        21,26,19,13
+AZI_GPIO        6,5,7,11
+//  ALT_MASK     0,1,2,3 
 
 // -------------------------------------------------------------------------- 
 //  Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus) 
 // -------------------------------------------------------------------------- 
 
 //  LED_ETAT_GPIOS   4 
-//  ALT_GPIOS        21,26,19,13 
-//  AZI_GPIOS        6,5,7,11 
+//  ALT_GPIO        21,26,19,13 
+//  AZI_GPIO        6,5,7,11 
 
-ALT_MASQUE     3,1,0,2
+ALT_MASK     3,1,0,2
 
 //  ----------------------- parametres pwm 
 
@@ -126,7 +126,7 @@ ALT_R4  8       //  mode micro pas utilise (1/x)
 ALT_R5  1        //  reduction liee a la poulie 
 ALT_R6  1        //  reduction liee au cpu 
 ALT_R7  1        //  reduction non decrite plus haut .... 
-ALT_ROT 0        //  Flag de reversibilite du sens de rotation 
+ALT_INV 0        //  Flag de inversion du sens de rotation 
 ALT_ACC 2        //  Facteur de multiplication en mode MANUEL 
 
 //  ----------------------- parametres reductions azimut 
@@ -138,7 +138,7 @@ AZI_R4  8       //  mode micro pas utilise (1/x)
 AZI_R5  1        //  reduction liee a la poulie 
 AZI_R6  1        //  reduction liee au cpu 
 AZI_R7  1        //  reduction non decrite plus haut .... 
-AZI_ROT 1        //  Flag de reversibilite du sens de rotation 
+AZI_INV 1        //  Flag de inversion du sens de rotation 
 AZI_ACC 2        //  Facteur de multiplication en mode MANUEL 
 
 //  ----------------------- parametres reductions altaz 
@@ -163,6 +163,7 @@ typedef enum {
   CONFIG_FIC_LOG,
   CONFIG_FIC_DATE,
   CONFIG_FIC_HHMM,
+  CONFIG_FIC_PID,
   CONFIG_SCR_KERNEL,
   TEMPO_MENU,
   TEMPO_RAQ,
@@ -187,10 +188,10 @@ typedef enum {
   LONGITUDE,
   ALTITUDE,
   LED_ETAT_GPIOS,
-  ALT_GPIOS,
-  AZI_GPIOS,
-  ALT_MASQUE,
-  AZI_MASQUE,
+  ALT_GPIO,
+  AZI_GPIO,
+  ALT_MASK,
+  AZI_MASK,
   ALT_FPWM,
   AZI_FPWM,
   ALT_R1,
@@ -200,7 +201,7 @@ typedef enum {
   ALT_R5,
   ALT_R6,
   ALT_R7,
-  ALT_ROT,
+  ALT_INV,
   ALT_ACC,
   AZI_R1,
   AZI_R2,
@@ -209,7 +210,7 @@ typedef enum {
   AZI_R5,
   AZI_R6,
   AZI_R7,
-  AZI_ROT,
+  AZI_INV,
   AZI_ACC,
   ALTAZ_FORWARD,
   ALTAZ_REWIND,
@@ -240,6 +241,7 @@ struct STR_CONFIG_PARAMS {
 
   pthread_mutex_t con_par_mutex ;
   int             par_default_menu ;
+
   char            par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
@@ -247,11 +249,14 @@ struct STR_CONFIG_PARAMS {
   char            par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
   char            par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
   char            par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+
   char            par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            par_fic_vou    [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
   char            par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
   char            par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
   char            par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+
   char            par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
@@ -287,6 +292,7 @@ static const char * gc_Config_Params_Obligatoires[] = {
   "CONFIG_FIC_LOG",
   "CONFIG_FIC_DATE",
   "CONFIG_FIC_HHMM",
+  "CONFIG_FIC_PID",
   "CONFIG_SCR_KERNEL",
   "TEMPO_MENU",
   "TEMPO_RAQ",
@@ -311,10 +317,10 @@ static const char * gc_Config_Params_Obligatoires[] = {
   "LONGITUDE",
   "ALTITUDE",
   "LED_ETAT_GPIOS",
-  "ALT_GPIOS",
-  "AZI_GPIOS",
-  "ALT_MASQUE",
-  "AZI_MASQUE",
+  "ALT_GPIO",
+  "AZI_GPIO",
+  "ALT_MASK",
+  "AZI_MASK",
   "ALT_FPWM",
   "AZI_FPWM",
   "ALT_R1",
@@ -324,7 +330,7 @@ static const char * gc_Config_Params_Obligatoires[] = {
   "ALT_R5",
   "ALT_R6",
   "ALT_R7",
-  "ALT_ROT",
+  "ALT_INV",
   "ALT_ACC",
   "AZI_R1",
   "AZI_R2",
@@ -333,7 +339,7 @@ static const char * gc_Config_Params_Obligatoires[] = {
   "AZI_R5",
   "AZI_R6",
   "AZI_R7",
-  "AZI_ROT",
+  "AZI_INV",
   "AZI_ACC",
   "ALTAZ_FORWARD",
   "ALTAZ_REWIND",
@@ -378,10 +384,10 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
   CONFIG_TYPE_INT, // "LONGITUDE",
   CONFIG_TYPE_INT, // "ALTITUDE",
   CONFIG_TYPE_INT, // "LED_ETAT_GPIOS",
-  CONFIG_TYPE_INT, // "ALT_GPIOS",
-  CONFIG_TYPE_INT, // "AZI_GPIOS",
-  CONFIG_TYPE_INT, // "ALT_MASQUE",
-  CONFIG_TYPE_INT, // "AZI_MASQUE",
+  CONFIG_TYPE_INT, // "ALT_GPIO",
+  CONFIG_TYPE_INT, // "AZI_GPIO",
+  CONFIG_TYPE_INT, // "ALT_MASK",
+  CONFIG_TYPE_INT, // "AZI_MASK",
   CONFIG_TYPE_INT, // "ALT_FPWM",
   CONFIG_TYPE_INT, // "AZI_FPWM",
   CONFIG_TYPE_INT, // "ALT_R1",
@@ -391,7 +397,7 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
   CONFIG_TYPE_INT, // "ALT_R5",
   CONFIG_TYPE_INT, // "ALT_R6",
   CONFIG_TYPE_INT, // "ALT_R7",
-  CONFIG_TYPE_INT, // "ALT_ROT",
+  CONFIG_TYPE_INT, // "ALT_INV",
   CONFIG_TYPE_INT, // "ALT_ACC",
   CONFIG_TYPE_INT, // "AZI_R1",
   CONFIG_TYPE_INT, // "AZI_R2",
@@ -400,7 +406,7 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
   CONFIG_TYPE_INT, // "AZI_R5",
   CONFIG_TYPE_INT, // "AZI_R6",
   CONFIG_TYPE_INT, // "AZI_R7",
-  CONFIG_TYPE_INT, // "AZI_ROT",
+  CONFIG_TYPE_INT, // "AZI_INV",
   CONFIG_TYPE_INT, // "AZI_ACC",
   CONFIG_TYPE_INT, // "ALTAZ_FORWARD",
   CONFIG_TYPE_INT, // "ALTAZ_REWIND",
@@ -409,16 +415,16 @@ static const int gi_Config_Params_Obligatoires_Type[] = {
 } ;
 
 void   CONFIG_INIT                  ( STRUCT_CONFIG * ) ;
-void   CONFIG_INIT_PARAMS           ( STRUCT_CONFIG_PARAMS * ) ;
+void   CONFIG_PARAMS_INIT           ( STRUCT_CONFIG_PARAMS * ) ;
 
 void   CONFIG_PARAMETRES_CONFIG     ( STRUCT_CONFIG * ) ;
 void   CONFIG_FIC_DISPLAY           ( STRUCT_CONFIG * ) ;
 int    CONFIG_FIC_READ              ( STRUCT_CONFIG * ) ;
 
-void   CONFIG_AFFICHER_MODE_LONG    ( STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_CALCULS *) ;
+void   CONFIG_DISPLAY_MODE_LONG    ( STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_CALCULS *) ;
 
-void   CONFIG_PARAMETRES_AFFICHER   (void) ;
-void   CONFIG_AFFICHER_TOUT         (void) ;  /* FIXME ajout 20191228 */
+void   CONFIG_PARAMETRES_DISPLAY   (void) ;
+void   CONFIG_DISPLAY_TOUT         (void) ;  /* FIXME ajout 20191228 */
 void   CONFIG_MENU_CHANGE_DETECT    (void) ;  /* FIXME ajout 20200102 */
 
 int    CONFIG_FORMAT_ADMIS          (char c) ;

@@ -16,6 +16,49 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
+* @fn     : LIEU_PARAMS_INIT
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_LIEU_PARAMS *
+* @param  : STRUCT_LIEU_PARAMS * lp_Lie_Par
+* @date   : 2022-12-12 creation
+*****************************************************************************************/
+
+void LIEU_PARAMS_INIT(STRUCT_LIEU_PARAMS * lp_Lie_Par ) {
+
+  char c_path_file_out[ CONFIG_TAILLE_BUFFER_256] ; 
+
+  TraceArbo(__func__,1,"init lieu params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Lie_Par->lie_par_mutex ) ;
+
+  lp_Lie_Par->par_altitude = 0 ;
+  lp_Lie_Par->par_latitude = 0 ;
+  lp_Lie_Par->par_longitude = 0 ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : LIEU_PARAMS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette affiche la structure STRUCT_LIEU_PARAMS *
+* @param  : STRUCT_LIEU_PARAMS *lp_Lie_Par
+* @date   : 2022-12-15 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void LIEU_PARAMS_DISPLAY(STRUCT_LIEU_PARAMS *lp_Lie_Par ) {
+  
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("%-50s = %.2f" , "lp_Lie_Par->par_altitude ", lp_Lie_Par->par_altitude); 
+  Trace("%-50s = %.2f" , "lp_Lie_Par->par_latitude ", lp_Lie_Par->par_latitude); 
+  Trace("%-50s = %.2f" , "lp_Lie_Par->par_longitude", lp_Lie_Par->par_longitude); 
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : LIEU_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure STRUCT_LIEU *lp_Lie
@@ -27,7 +70,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
  
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init lieu") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   pthread_mutex_init( & lp_Lie->lie_mutex, NULL ) ;
 
@@ -42,7 +85,7 @@ void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
 }
 
 /*****************************************************************************************
-* @fn     : LIEU_AFFICHER
+* @fn     : LIEU_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations du lieu d observation
 * @param  : STRUCT_LIEU *lp_Lie
@@ -50,7 +93,7 @@ void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
 * @todo   : 
 *****************************************************************************************/
 
-void LIEU_AFFICHER(STRUCT_LIEU *lp_Lie) {
+void LIEU_DISPLAY(STRUCT_LIEU *lp_Lie) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 

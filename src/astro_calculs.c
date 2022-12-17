@@ -103,7 +103,7 @@ double DEG  (int degres, int minutes )                  { return (double)degres 
 
 double CALCULS_REDUCTION_TOTALE(void) {
 
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calcul red totale") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   return 0.0 ;
 }
@@ -120,7 +120,7 @@ double CALCULS_REDUCTION_TOTALE(void) {
 
 void   CALCULS_INIT( STRUCT_CALCULS * lp_Cal ) {
 
-  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init calculs") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal->cal_mutex ) ;
  
@@ -129,7 +129,7 @@ void   CALCULS_INIT( STRUCT_CALCULS * lp_Cal ) {
   return ;
 }
 /*****************************************************************************************
-* @fn     : CALCULS_INIT_PARAMS
+* @fn     : CALCULS_PARAMS_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure STRUCT_CALCULS_PARAMS *
 * @param  : void
@@ -137,35 +137,96 @@ void   CALCULS_INIT( STRUCT_CALCULS * lp_Cal ) {
 * @todo   : 
 *****************************************************************************************/
 
-void CALCULS_INIT_PARAMS(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
+void CALCULS_PARAMS_INIT(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"init calculs params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal_Par->cal_par_mutex ) ;
 
-   lp_Cal_Par->cal_par_alt_red_tot = 0 ;
-   lp_Cal_Par->cal_par_azi_red_tot = 0 ;
-   
-   /* Les coefficients de reduction sont egaux a 1 par defaut */ 
-   /* car leur presence n est pas obligatoires dans le fichier config.txt */
+  /* Les deux parametres suivants servent a calculer la reduction
+     totale. 
+     S ils sont positifs, leur valeur est prise en compte via config.txt
+     S ils sont egaus a zero, ils sont affectes par la somme 
+     des reductions lues dans config.txt
+  */
 
-   lp_Cal_Par->cal_par_alt_red_1 = 1.0 ;  // reduction liee a la monture ()
-   lp_Cal_Par->cal_par_alt_red_2 = 1.0;   // reducteur du moteur (nombre de pas)
-   lp_Cal_Par->cal_par_alt_red_3 = 1.0;   // reducteur du moteur (gearbox)
-   lp_Cal_Par->cal_par_alt_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
-   lp_Cal_Par->cal_par_alt_red_5 = 1.0;   // reduction liee a la poulie
-   lp_Cal_Par->cal_par_alt_red_6 = 1.0;   // reduction liee au cpu
-   lp_Cal_Par->cal_par_alt_red_7 = 1.0;   // reduction non decrite plus haut
+  lp_Cal_Par->cal_par_alt_red_tot = 0.0 ;
+  lp_Cal_Par->cal_par_azi_red_tot = 0.0 ;
 
-   lp_Cal_Par->cal_par_azi_red_1 = 1.0 ;  // reduction liee a la monture
-   lp_Cal_Par->cal_par_azi_red_2 = 1.0;   // reducteur du moteur
-   lp_Cal_Par->cal_par_azi_red_3 = 1.0;   // nombre de pas du moteur en azimut
-   lp_Cal_Par->cal_par_azi_red_4 = 1.0;   // mode micro pas utilisee (1/R4)
-   lp_Cal_Par->cal_par_azi_red_5 = 1.0;   // reduction liee a la poulie
-   lp_Cal_Par->cal_par_azi_red_6 = 1.0;   // reduction liee au cpu
-   lp_Cal_Par->cal_par_azi_red_7 = 1.0;   // reduction non decrite plus haut
+  /* Les coefficients de reduction sont egaux a 1 par defaut */ 
+  /* car leur presence n est pas obligatoires dans le fichier config.txt */
+
+  lp_Cal_Par->cal_par_alt_red_1   = 1.0 ;  // reduction liee a la monture ()
+  lp_Cal_Par->cal_par_alt_red_2   = 1.0;   // reducteur du moteur (nombre de pas)
+  lp_Cal_Par->cal_par_alt_red_3   = 1.0;   // reducteur du moteur (gearbox)
+  lp_Cal_Par->cal_par_alt_red_4   = 1.0;   // mode micro pas utilisee (1/R4)
+  lp_Cal_Par->cal_par_alt_red_5   = 1.0;   // reduction liee a la poulie
+  lp_Cal_Par->cal_par_alt_red_6   = 1.0;   // reduction liee au cpu
+  lp_Cal_Par->cal_par_alt_red_7   = 1.0;   // reduction non decrite plus haut
+  lp_Cal_Par->cal_par_alt_acc     = 1.0 ; 
+  lp_Cal_Par->cal_par_alt_f       = 1.0 ; /* frequence du diviseur de frequence eventuel */
+  lp_Cal_Par->cal_par_azi_f       = 1.0 ; /* frequence du diviseur de frequence eventuel */
+
+  lp_Cal_Par->cal_par_azi_red_1   = 1.0 ;  // reduction liee a la monture
+  lp_Cal_Par->cal_par_azi_red_2   = 1.0;   // reducteur du moteur
+  lp_Cal_Par->cal_par_azi_red_3   = 1.0;   // nombre de pas du moteur en azimut
+  lp_Cal_Par->cal_par_azi_red_4   = 1.0;   // mode micro pas utilisee (1/R4)
+  lp_Cal_Par->cal_par_azi_red_5   = 1.0;   // reduction liee a la poulie
+  lp_Cal_Par->cal_par_azi_red_6   = 1.0;   // reduction liee au cpu
+  lp_Cal_Par->cal_par_azi_red_7   = 1.0;   // reduction non decrite plus haut
+  lp_Cal_Par->cal_par_azi_acc     = 1.0 ; 
+  lp_Cal_Par->cal_par_alt_n       = 1.0 ; /* frequence du diviseur de frequence eventuel */
+  lp_Cal_Par->cal_par_azi_n       = 1.0 ; /* frequence du diviseur de frequence eventuel */ 
+  
+  lp_Cal_Par->cal_par_altaz_fast_forward = 1.0 ; 
+  lp_Cal_Par->cal_par_altaz_fast_rewind  = 1.0 ; 
+  lp_Cal_Par->cal_par_altaz_slow_forward = 1.0 ; 
+  lp_Cal_Par->cal_par_altaz_slow_rewind  = 1.0 ; 
 
   /* TODO : finalize */
+
+  return ; 
+}
+/*****************************************************************************************
+* @fn     : CALCULS_PARAMS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche la structure STRUCT_CALCULS_PARAMS *
+* @param  : void
+* @date   : 2022-12-11 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void CALCULS_PARAMS_DISPLAY(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
+
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1", lp_Cal_Par->cal_par_alt_red_1);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2", lp_Cal_Par->cal_par_alt_red_2);
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_3", lp_Cal_Par->cal_par_alt_red_3);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_4", lp_Cal_Par->cal_par_alt_red_4);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_5", lp_Cal_Par->cal_par_alt_red_5);
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_6", lp_Cal_Par->cal_par_alt_red_6);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_7", lp_Cal_Par->cal_par_alt_red_7);
+  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_alt_inv  ", lp_Cal_Par->cal_par_alt_inv  );   
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_acc  ", lp_Cal_Par->cal_par_alt_acc ) ;
+  Trace("%-50s = %ld", "lp_Cal_Par->cal_par_alt_f    ", lp_Cal_Par->cal_par_alt_f ) ;
+  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_alt_n    ", lp_Cal_Par->cal_par_alt_n ) ;
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_1", lp_Cal_Par->cal_par_azi_red_1);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_2", lp_Cal_Par->cal_par_azi_red_2);
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_3", lp_Cal_Par->cal_par_azi_red_3);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_4", lp_Cal_Par->cal_par_azi_red_4);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_5", lp_Cal_Par->cal_par_azi_red_5);
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_6", lp_Cal_Par->cal_par_azi_red_6);         
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_7", lp_Cal_Par->cal_par_azi_red_7);
+  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_azi_inv  ", lp_Cal_Par->cal_par_azi_inv  );   
+  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_acc  ", lp_Cal_Par->cal_par_azi_acc ) ;
+  Trace("%-50s = %ld", "lp_Cal_Par->cal_par_azi_f    ", lp_Cal_Par->cal_par_azi_f ) ;
+  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_azi_n    ", lp_Cal_Par->cal_par_azi_n ) ;
+  
+  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_slow_forward", lp_Cal_Par->cal_par_altaz_slow_forward ) ;  
+  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_slow_rewind ", lp_Cal_Par->cal_par_altaz_slow_rewind ) ;   
+  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_fast_forward", lp_Cal_Par->cal_par_altaz_fast_forward ) ;  
+  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_fast_rewind ", lp_Cal_Par->cal_par_altaz_fast_rewind ) ;  
+
+  return ;
 }
 /*****************************************************************************************
 * @fn     : CALCULS_INIT_ANGLE
@@ -178,7 +239,7 @@ void CALCULS_INIT_PARAMS(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
 void   CALCULS_INIT_ANGLE( STRUCT_ANGLE * lp_Ang ) {
 
-  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init calculs : struct angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ang->ang_mutex ) ;
 
@@ -206,7 +267,7 @@ typedef struct STR_ANGLE STRUCT_ANGLE ;
 
 void   CALCULS_INIT_PTR( STRUCT_CALCULS * lp_Cal ) {
 
-  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init pointeurs") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   lp_Cal->cal_p_Fre = gp_Fre ;
   lp_Cal->cal_p_Sta = gp_Sta ;
@@ -233,7 +294,7 @@ void   CALCULS_INIT_PTR( STRUCT_CALCULS * lp_Cal ) {
 
 void CALCULS_COORD_R3(void) {
 
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate r3 coords") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // on deduit de l'azimut et de l'altitude
   // les coordonnees x y et z dans la geode d'observation
@@ -278,7 +339,7 @@ void CALCULS_AZIMUT(void) {
   
   double lat,A,H,a0,h,a1,a2,af ;
   
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   lat= gp_Lie->lie_lat ;
   A  = gp_Ast->AGH ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
@@ -368,7 +429,7 @@ void CALCULS_EQUATEUR(void) {
   
   double A0,A2,A1,a,h,lat,Af,agh,H ;
 
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"calculate equatorial coords") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
     (gp_Ast->a)   * CALCULS_UN_RADIAN_EN_DEGRES,\
@@ -456,7 +517,7 @@ void CALCULS_EQUATEUR(void) {
 
 void CALCULS_VITESSES_EQUATORIAL(void) {
 
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate equatorial speeds") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
@@ -486,7 +547,7 @@ void CALCULS_VITESSES(void) {
  
   double G, Va, Vh, angle ;
   
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate speeds") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Sui->sui_mode_equatorial == 1 ) {
     gp_Ast->Va = -15.0 ;
@@ -507,6 +568,7 @@ void CALCULS_VITESSES(void) {
 * @fn     : CALCULS_DIVISEUR_FREQUENCE
 * @author : s.gravois
 * @brief  : calcule les nombres a injecter dans des diviseurs de frequence 
+* @brief  : (frequence de oscillateur a quartz par exemple de reference avant division)
 * @param  : STRUCT_SUIVI * gp_Sui
 * @param  : STRUCT_ASTRE * gp_Ast
 * @date   : 2022-10-11 creation entete doxygen 
@@ -515,7 +577,7 @@ void CALCULS_VITESSES(void) {
 
 void CALCULS_DIVISEUR_FREQUENCE(void) {
   
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate divide params of divide controler frequency") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   gp_Sui->sui_Da = gp_Cal_Par->cal_par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_azi_red_tot * pow(2.0, gp_Cal_Par->cal_par_azi_n) * ( gp_Ast->Va / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
   gp_Sui->sui_Dh = gp_Cal_Par->cal_par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_alt_red_tot * pow(2.0, gp_Cal_Par->cal_par_alt_n) * ( gp_Ast->Vh / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
@@ -541,7 +603,7 @@ void CALCULS_PERIODE(void) {
   double freq_alt_bru, freq_azi_bru ;
   double azi_rot,   alt_rot ;
   
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"calculate periods") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // Calcul de la periode necessaire si pas de terme D ni 2 puissance N
   // ceci dans le cas ou on genere directement la frequence de reference
@@ -549,10 +611,10 @@ void CALCULS_PERIODE(void) {
   // qui correspondent au diviseur 2^N et diviseur programmable
   // Ou bien ces periodes / frequences servent pour la generation des signaux PWM
   
-  // Les flags de reversibilite *_ROT permettent de ne pas etre dependant du sens de branchement des moteurs !
+  // Les flags de inversion *_ROT permettent de ne pas etre dependant du sens de branchement des moteurs !
 
-  if ( gp_Cal_Par->cal_par_azi_rev == 0 )       azi_rot = -1.0 ; else azi_rot = 1.0 ;
-  if ( gp_Cal_Par->cal_par_alt_rev == 0 )       alt_rot = -1.0 ; else alt_rot = 1.0 ;
+  if ( gp_Cal_Par->cal_par_azi_inv == 0 )       azi_rot = -1.0 ; else azi_rot = 1.0 ;
+  if ( gp_Cal_Par->cal_par_alt_inv == 0 )       alt_rot = -1.0 ; else alt_rot = 1.0 ;
 
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
@@ -611,7 +673,6 @@ void CALCULS_PERIODE(void) {
 
   pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
   
-  TraceArbo(__func__,2,"2eme lock") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   pthread_mutex_lock(& gp_Mut->mut_glo_alt );
 
@@ -628,8 +689,7 @@ void CALCULS_PERIODE(void) {
 
   pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
-  TraceArbo(__func__,2,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
+  return ;
 }
 
 /*****************************************************************************************
@@ -652,7 +712,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
   double frequence ;
   double azi_rot, alt_rot ;
   
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate periods with manual controls") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // calcul de la periode en fonction des informations de suivi
   // renvoyer par les boutons de la raquette
@@ -660,7 +720,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
   
   if ( gp_Pas->pas_azi !=  gp_Pas->pas_azi_old ) {
     if ( gp_Pas->pas_azi !=0 ) {
-      if ( gp_Cal_Par->cal_par_azi_rev == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
+      if ( gp_Cal_Par->cal_par_azi_inv == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
     
       //frequence = azi_rot * (double)gp_Pas->pas_azi / t_appui_raq_azi ;
       frequence = azi_rot * (double)gp_Pas->pas_azi ;
@@ -684,7 +744,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
   }
   if ( gp_Pas->pas_alt !=  gp_Pas->pas_alt_old ) {
     if ( gp_Pas->pas_alt !=0 ) {
-      if ( gp_Cal_Par->cal_par_alt_rev == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
+      if ( gp_Cal_Par->cal_par_alt_inv == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
     
       //frequence = alt_rot * (double)gp_Pas->pas_alt / t_appui_raq_alt ;
       frequence = alt_rot * (double)gp_Pas->pas_alt ;
@@ -719,7 +779,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
 
 void CALCULS_ANGLE_VERS_DMS(STRUCT_ANGLE *angle) {
   
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate angle to dms") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace2("angle decimal (radian)  = %.4f" , angle->ang_dec_rad) ;
   Trace2("angle decimal (degres)  = %.4f" , angle->ang_dec_deg) ;
@@ -754,7 +814,7 @@ void CALCULS_ANGLE_VERS_DMS(STRUCT_ANGLE *angle) {
 
 void CALCULS_CONVERSIONS_ANGLES(void) {
   
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate astre angles converrsions") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* ----------------------------*/
   /* azimut et altitude          */
@@ -837,7 +897,7 @@ void CALCULS_CONVERSIONS_ANGLES(void) {
 
 void CALCULS_ANGLE_HORAIRE(void) {
   
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"calculate horaire angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // en radians 
 
@@ -864,7 +924,7 @@ void CALCULS_ANGLE_HORAIRE(void) {
   Trace1("angle horaire (deg)      = %.2f", gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
-    ASTRE_AFFICHER_MODE_STELLARIUM() ;
+    ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
   */
 }
 
@@ -880,7 +940,7 @@ void CALCULS_ANGLE_HORAIRE(void) {
 
 void CALCULS_ASCENSION_DROITE(void) {
   
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"calculate ascension droite") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // en radians 
   
@@ -907,7 +967,7 @@ void CALCULS_ASCENSION_DROITE(void) {
   Trace1("angle horaire (deg)      = %.2f", gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
-    ASTRE_AFFICHER_MODE_STELLARIUM() ;
+    ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
   */
 }
 /*****************************************************************************************
@@ -924,7 +984,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
   int len=0 ;
   char c_sub[32];
 
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"get astre type and calcultation mode") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /*---------------- evolution 19/01/2022 ----------------
   * prise en compte du fait que la as peut avoir plusieurs
@@ -1040,7 +1100,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
 void CALCULS_TOUT(void) {
 
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"calculate all") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   switch (gp_Ast->ast_typ) {
 
@@ -1181,7 +1241,7 @@ void CALCULS_VOUTE(void) {
   // double A, H ;
   double a, h ;
 
-  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,3,"calculate a 3d voute") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 /*
   TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
   CALCULS_EQUATEUR         ( gp_Lie, gp_Ast ) ;

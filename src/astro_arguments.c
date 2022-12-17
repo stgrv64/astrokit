@@ -9,7 +9,7 @@
 #               * ajouts fonctions utilisant getopt
 # 11/03/2022  | * prise en compte option -p (facon classique)
 #               * renseignement gp_Con_Par->par_rep_home par -p <path>
-# 11/03/2022  | * ajout fonction ARGUMENTS_GERER_REP_HOME
+# 11/03/2022  | * ajout fonction ARGUMENTS_MANAGE_REP_HOME
 # -------------------------------------------------------------- 
 */
 
@@ -22,7 +22,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 // extern ASTRO_TRAP_MAIN();
 
 /*****************************************************************************************
-* @fn     : ARGUMENTS_VOUTE
+* @fn     : ARGUMENTS_CREATE_VOUTE
 * @author : s.gravois
 * @brief  : 
 * @param  : const char *fmt
@@ -33,13 +33,13 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @todo   : (obsolete) la bonne pratique est de passer par getopt 
 *****************************************************************************************/
 
-void ARGUMENTS_VOUTE( void) {
+void ARGUMENTS_CREATE_VOUTE( void) {
   
   char cmd[64]={0} ;
   int i_retour=0 ;
   FILE   *fout ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"ceate a 3d voute") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   double a, h ;
   
@@ -108,7 +108,7 @@ void ARGUMENTS_VOUTE( void) {
 }
 
 /*****************************************************************************************
-* @fn     : ARGUMENTS_VARIABLES
+* @fn     : ARGUMENTS_MANAGE_VA_ARGS
 * @author : s.gravois
 * @brief  : point entree su programme
 * @param  : const char *fmt
@@ -119,13 +119,13 @@ void ARGUMENTS_VOUTE( void) {
 * @todo   : (obsolete) la bonne pratique est de passer par getopt 
 *****************************************************************************************/
 
-void ARGUMENTS_VARIABLES(const char *fmt, ... ) {
+void ARGUMENTS_MANAGE_VA_ARGS(const char *fmt, ... ) {
     int d;
     char c, *s; 
     va_list ap;
     va_start(ap, fmt);
 
-    TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+    TraceArbo(__func__,0,"manage va_args") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
     
     while(*fmt) { 
        switch ((int)*fmt ++) {
@@ -160,7 +160,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 
   char binaire[255] ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"help") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   memset(binaire, CALCULS_ZERO_CHAR,sizeof(binaire)) ;
   strcpy(binaire,argv[0]) ;
@@ -206,18 +206,18 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 }
 
 /*****************************************************************************************
-* @fn     : ARGUMENTS_GERER_REP_HOME
+* @fn     : ARGUMENTS_MANAGE_REP_HOME
 * @author : s.gravois
 * @brief  : Gere le passage des arguments de facon classique
 * @param  : int     argc
 * @param  : char ** argv
 * @date   : 2022-03-11 creation
-* @todo   : fusioner avec ARGUMENTS_GERER_FACON_CLASSIQUE
+* @todo   : fusioner avec ARGUMENTS_MANAGE_FACON_CLASSIQUE
 *****************************************************************************************/
 
-void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
+void ARGUMENTS_MANAGE_REP_HOME(int argc, char** argv) {
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"manage rep home") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   /* ---------------------------------------------------------------
   * Gestion d un chemin externe (option -p <path>) si getcwd KO
@@ -243,7 +243,7 @@ void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
   Trace("gp_Con_Par->par_rep_home = %s",gp_Con_Par->par_rep_home);
 }
 /*****************************************************************************************
-* @fn     : ARGUMENTS_GERER
+* @fn     : ARGUMENTS_MANAGE
 * @author : s.gravois
 * @brief  : Gere le passage des arguments de facon classique
 * @param  : int     argc
@@ -252,14 +252,14 @@ void ARGUMENTS_GERER_REP_HOME(int argc, char** argv) {
 * @todo   : 
 *****************************************************************************************/
 
-void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
+void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   
   long c_ir_0 = 0 , c_ir_1 = 0 ;
   int  ir_old, ir ;
   double periode ;
   double nbpulse ;
   
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"manage argc/argv") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   incrlog=30 ;
 
@@ -286,14 +286,14 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     
     /* Recherche de l'as dans les catalogues */
     
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
+    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ; */   
+    /* CONFIG_DISPLAY_TOUT() ; */   
 
     exit(0) ;
   }
@@ -311,12 +311,12 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     /* Recherche de l'as dans les catalogues */
     
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
+    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
     
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ; */
+    /* CONFIG_DISPLAY_TOUT() ; */
   }
   /* ---------------------------------------------------------------
   * Gestion du calcul de l azimut en fonction 
@@ -337,7 +337,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ;  */
+    /* CONFIG_DISPLAY_TOUT() ;  */
 	   
     exit(0) ;
   }
@@ -360,7 +360,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ;  */
+    /* CONFIG_DISPLAY_TOUT() ;  */
 	   
     exit(0) ;
   }
@@ -380,13 +380,13 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_dec) ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Ast, g_c_cat_eto_dec) ;
+    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
     
     CALCULS_TOUT() ;
 
-    /* CONFIG_AFFICHER_TOUT() ; */   
+    /* CONFIG_DISPLAY_TOUT() ; */   
 
     /* mode equateur */
 
@@ -396,7 +396,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ; */ 
+    /* CONFIG_DISPLAY_TOUT() ; */ 
 
     exit(0) ;
   }
@@ -412,7 +412,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ; */    
+    /* CONFIG_DISPLAY_TOUT() ; */    
 
     exit(0) ;
   }
@@ -434,7 +434,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
-    /* CONFIG_AFFICHER_TOUT() ; */   
+    /* CONFIG_DISPLAY_TOUT() ; */   
   }
   // -----------------------------------------------------------------
   if ( ( argc == 4  ) &&  ! strcmp("vou",argv[1]) ) {
@@ -456,7 +456,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
     gp_Vou->vou_pas = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
     gp_Lie->lie_lat  = atof(argv[3]) / CALCULS_UN_RADIAN_EN_DEGRES ; 
     
-    ARGUMENTS_VOUTE( ) ;
+    ARGUMENTS_CREATE_VOUTE( ) ;
     exit(0) ;
   }
   /* -----------------------------------------------------------------
@@ -481,7 +481,7 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 2 ) &&  ! strcmp("sta",argv[1]) ) {
     
-    printf("ARGUMENTS_GERER : GPIO_STATUT demander\n") ;
+    printf("ARGUMENTS_MANAGE : GPIO_STATUT demander\n") ;
     GPIO_STATUT() ;
     exit(0) ;
   }
@@ -600,11 +600,11 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
   */
   // -----------------------------------------------------------------
   Trace1("as %s pris en compte",argv[1]);
-  printf("fin %s\n","ARGUMENTS_GERER") ;
+  printf("fin %s\n","ARGUMENTS_MANAGE") ;
 }
 
 /*****************************************************************************************
-* @fn     : ARGUMENTS_GERER
+* @fn     : ARGUMENTS_MANAGE
 * @author : s.gravois
 * @brief  : Gere le passage des arguments de facon classique
 * @param  : int     argc
@@ -613,18 +613,18 @@ void ARGUMENTS_GERER_FACON_CLASSIQUE(int argc, char** argv) {
 * @todo   : 
 *****************************************************************************************/
 
-void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
+void ARGUMENTS_MANAGE_GETOPT(int argc, char** argv) {
 
   char c=0 ;
 
-  TraceArbo(__func__,0,"--------------") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"manage via getopt") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   while ((c = getopt (argc, argv, "a:A:Lq:f:l:")) != -1) {
       switch (c) {
      
         case 'L':
           gp_Sui->alarme=atoi(argv[2]) ;
-          Trace("ARGUMENTS_GERER : ala = %d\n",gp_Sui->alarme) ;
+          Trace("ARGUMENTS_MANAGE : ala = %d\n",gp_Sui->alarme) ;
         break ;
         
         case 'a' :
@@ -635,7 +635,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
           CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
           
           CALCULS_TOUT() ;
-          /* CONFIG_AFFICHER_TOUT() ; */   
+          /* CONFIG_DISPLAY_TOUT() ; */   
 
           exit(0) ;
         break ;
@@ -648,7 +648,7 @@ void ARGUMENTS_GERER_GETOPT(int argc, char** argv) {
 
           CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
           CALCULS_TOUT() ;
-          /* CONFIG_AFFICHER_TOUT() ; */   
+          /* CONFIG_DISPLAY_TOUT() ; */   
 
           exit(0) ;
 
