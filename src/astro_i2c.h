@@ -112,13 +112,14 @@ struct STR_I2C_MCP23017 {
 struct STR_I2C_DEVICE {
 
   pthread_mutex_t i2c_dev_mutex ;
-
-  unsigned char i2c_dev_buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
-  unsigned long i2c_dev_usleep ;         // sleep entre chaque lecture (microseconde)
-  int           i2c_dev_statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
-  int           i2c_dev_fd ;                     // file descriptor pour le device utilise
-  int           i2c_dev_registre ;               // registre
-  int           i2c_dev_adress ;                 // adress du device (en hexa)
+  void          (*i2c_dev_lock)   (void) ;
+  void          (*i2c_dev_unlock) (void) ;  
+  unsigned char   i2c_dev_buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
+  unsigned long   i2c_dev_usleep ;         // sleep entre chaque lecture (microseconde)
+  int             i2c_dev_statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
+  int             i2c_dev_fd ;                     // file descriptor pour le device utilise
+  int             i2c_dev_registre ;               // registre
+  int             i2c_dev_adress ;                 // adress du device (en hexa)
 } ;
 
 //---------------------------------------------------
@@ -126,7 +127,8 @@ struct STR_I2C_DEVICE {
 struct STR_I2C_ACC_MAG {
   
   pthread_mutex_t acc_mutex ;
-
+  void          (*acc_lock)   (void) ;
+  void          (*acc_unlock) (void) ;  
   float acc_acc_norme_max ; 
   float acc_mag_norme_max ;
   float acc_roll ;
@@ -183,15 +185,15 @@ struct STR_I2C_ACC_MAG {
   
 } ;
 
-typedef struct STR_I2C_DEVICE  STRUCT_I2C_DEVICE ;
+typedef struct STR_I2C_DEVICE  STRUCT_I2C ;
 typedef struct STR_I2C_ACC_MAG STRUCT_I2C_ACC_MAG ;
 
-int 	   I2C_INIT           ( STRUCT_I2C_DEVICE *, char * , char * ) ;
-void     I2C_CALCULS_ACCMAG ( STRUCT_I2C_ACC_MAG * ) ;
-uint16_t I2C_GET            ( STRUCT_I2C_DEVICE *, char * ) ;
-void     I2C_GET_6          ( STRUCT_I2C_DEVICE *, char * ) ;
-int      I2C_SET_3          ( STRUCT_I2C_DEVICE *, unsigned long ) ;
-int      I2C_SET            ( STRUCT_I2C_DEVICE *, char * , char * ) ;
-void     I2C_GET_ACC        ( STRUCT_I2C_DEVICE *, STRUCT_I2C_ACC_MAG * )  ;
+int 	   I2C_INIT               ( STRUCT_I2C *, char * , char * ) ;
+void     I2C_CALCULS_ACCMAG     ( STRUCT_I2C_ACC_MAG * ) ;
+uint16_t I2C_READ_1_BYTES       ( STRUCT_I2C *, char * ) ;
+void     I2C_READ_6_BYTES       ( STRUCT_I2C *, char * ) ;
+int      I2C_WRITE                ( STRUCT_I2C *, char * , char * ) ;
+void     I2C_ACC_READ            ( STRUCT_I2C *, STRUCT_I2C_ACC_MAG * )  ;
+int      I2C_WRITE_DAC_MCP4726  ( STRUCT_I2C *, unsigned long ) ;
 
 #endif

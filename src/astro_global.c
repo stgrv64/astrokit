@@ -19,7 +19,7 @@ STRUCT_CODES            g_Codes,              *gp_Cod ;
 STRUCT_CONFIG           g_Config,             *gp_Con ;
 STRUCT_DATAS            g_Datas,              *gp_Dat ;
 STRUCT_DEVICES          g_Devices,            *gp_Dev ;
-STRUCT_I2C_DEVICE       g_I2cDev,             *gp_I2c ;
+STRUCT_I2C              g_I2cDev,             *gp_I2c ;
 STRUCT_I2C_ACC_MAG      g_I2cAcc,             *gp_Acc ;
 STRUCT_I2C_MCP23017     g_I2cMcp,             *gp_Mcp ;
 STRUCT_KEYS             g_Keys,               *gp_Key ;
@@ -33,6 +33,7 @@ STRUCT_SUIVI            g_Suivi,              *gp_Sui ;
 STRUCT_SUIVI_PAS        g_Suivi_Pas,          *gp_Pas ;
 STRUCT_SUIVI_FREQUENCES g_Suivi_Frequences,   *gp_Fre ;
 STRUCT_SUIVI_STATS      g_Suivi_Statistiques, *gp_Sta ;
+STRUCT_TERMIOS          g_Termios,            *gp_Ter ;
 STRUCT_TIME             g_Time,               *gp_Tim ;
 STRUCT_TIME_TEMPOS      g_Time_Tempos,        *gp_Tpo ;
 STRUCT_VOUTE            g_Voute,              *gp_Vou ;
@@ -52,7 +53,7 @@ STRUCT_GPIO_PARAMS_MAT  g_Gpio_Params_Mat,    *gp_Mat_Par ;
 STRUCT_GPIO_PARAMS_RAQ  g_Gpio_Params_Raq,    *gp_Raq_Par ;
 STRUCT_GPIO_PARAMS_CON  g_Gpio_Params_Ctl,    *gp_Ctl_Par ;
 
-INFRARED_LIRC_CONFIG    *gp_LircConfig;
+STR_EXT_LIRC_CONFIG    *gp_LircConfig;
 
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
@@ -109,10 +110,12 @@ void ASTRO_GLOBAL_INIT(void) {
   gp_Pid      = & g_Pid ;     
   gp_Pth      = & g_Pthreads ;
   gp_Mut      = & g_Mutexs ;
-  gp_Vou      = & g_Voute ;
+  gp_Sui      = & g_Suivi ;  
+  gp_Ter      = & g_Termios ;
   gp_Tim      = & g_Time ;
   gp_Tpo      = & g_Time_Tempos ;
-  gp_Sui      = & g_Suivi ;  
+  gp_Vou      = & g_Voute ;
+
   gp_Pas      = & g_Suivi_Pas ;
   gp_Fre      = & g_Suivi_Frequences ;
   gp_Sta      = & g_Suivi_Statistiques ;

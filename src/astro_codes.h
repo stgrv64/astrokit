@@ -25,6 +25,9 @@ t_en_Codes_Pos ;
 
 struct STR_CODES {
   pthread_mutex_t cod_mutex ;
+  void          (*cod_lock)   (void) ;
+  void          (*cod_unlock) (void) ; 
+  FILE           *cod_file ;  
   char            cod_in_term [ CODES_CODE_NB_CODES][CODES_CODE_BUFFER_SIZE] ;
   char            cod_in_lirc [ CODES_CODE_NB_CODES][CODES_CODE_BUFFER_SIZE] ;
   char            cod_out_act [ CODES_CODE_NB_CODES][CODES_CODE_BUFFER_SIZE] ;

@@ -19,7 +19,7 @@
 # (issue)         cela est justifie par le fait que les variables sont globales
 # 
 # 11/03/2022  | * prise en compte option -p (facon classique)
-#               * renseignement gp_Con_Par->par_rep_home par -p <path>
+#               * renseignement gp_Con_Par->con_par_rep_home par -p <path>
 # 11/03/2022  | * ajout appel fonction ARGUMENTS_MANAGE_REP_HOME
 #
 # 21/03/2022  | * ajout appel CODES_INIT dasn main 
@@ -29,7 +29,7 @@
 #               * correction BUG ( repetition if ( i_indice_code < CODES_CODE_NB_CODES ))
 # mai 2022      * petites corrections mineures
 #               * reprise intégralité code pour utilisation pointeur fct (gp_Lcd->display_xxx)
-#               -> display / display_default pour affichage par defaut
+#               -> display / default_display pour affichage par defaut
 #               -> display_xxx pour affichage autre que default
 #               => affichage par default parametrable
 #
@@ -123,7 +123,7 @@ void ASTRO_TRAP_MAIN(int sig) {
       exit(2) ;
     } 
   }
-  GPIO_SET( gp_Pwm_Par->par_led_etat, 0 ) ;
+  GPIO_SET( gp_Pwm_Par->gpi_pwm_par_led_etat, 0 ) ;
 
   closelog();
 /*
@@ -547,7 +547,7 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
         ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
         
         gp_Lcd->display_ast_vit(2000000) ;
-        gp_Lcd->refresh_default() ;
+        gp_Lcd->default_refresh() ;
         
         gp_Ast->ast_new = FALSE ;
       }
@@ -660,9 +660,12 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
   
   if ( gp_Dev->dev_use_lcd ) {
 
-    gp_Lcd->display_default() ;
+    gp_Lcd->default_display() ;
 
+    /*-------------------------*/
     /* Debut boucle _SUIVI_LCD */
+    /*-------------------------*/
+
     while(TRUE) {
 
       /* Creee un point d 'annulation pour la fonction pthread_cancel */
@@ -674,21 +677,21 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
       
       /* Si un changement de lignes a ete effectue dans une partie du programme */
 
-      if ( gp_Lcd->i_change_current == TRUE ) {
+      if ( gp_Lcd->lcd_change_current == TRUE ) {
        
-        Trace1("gp_Lcd->i_change_current == TRUE");
+        Trace1("gp_Lcd->lcd_change_current == TRUE");
         /* on additionne la duree affichage de base et
            la duree d'affichage i_duree_us envoyee par les fcts  */
         
-        usleep( gp_Lcd->i_duree_us );
+        usleep( gp_Lcd->lcd_change_display_us );
 
-        gp_Lcd->display_default() ;
+        gp_Lcd->default_display() ;
 
-        gp_Lcd->i_change_current = FALSE ;
+        gp_Lcd->lcd_change_current = FALSE ;
       }
       else {
-        Trace1("gp_Lcd->i_change_current == TRUE");
-        gp_Lcd->refresh_default() ;
+        Trace1("gp_Lcd->lcd_change_current == TRUE");
+        gp_Lcd->default_refresh() ;
       }
       gp_Ast->ast_new = FALSE ;
       
@@ -712,7 +715,7 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
-void * _SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
+void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
 
   unsigned long u_sleep_termios_demi_periode = 0 ; 
   long long ll_inrc=0 ;
@@ -733,8 +736,6 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
     
   if ( gp_Dev->dev_use_keyboard ) {
-  
-    KEYBOARD_TERMIOS_INIT() ;
 
     /* Debut boucle _SUIVI_CLAVIER_TERMIOS */
     while( c_char != 'q' ) {
@@ -745,7 +746,10 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
       memset(&c_char,0,sizeof(c_char)) ;
       memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
-      if ( KEYBOARD_TERMIOS_KBHIT_NEW(ch_chaine, &i_sum_ascii)) {
+      if ( KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(lp_ter)) {
+
+        strcpy( ch_chaine, lp_ter->ter_buffer ) ;
+        i_sum_ascii      = * lp_ter->ter_sum_ascii ;
 
         c_char=ch_chaine[0] ;
 
@@ -783,7 +787,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI * gp_Sui ) {
         DATAS_ACTION_RESET(gp_Dat) ;        
       }
     }
-    KEYBOARD_TERMIOS_EXIT() ;
+    KEYBOARD_TERMIOS_EXIT(lp_ter) ;
   }
   Trace("Stop") ;
 
@@ -919,7 +923,7 @@ void * _SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   struct sched_param param;
   int ret ;
   
-  STRUCT_I2C_DEVICE   l_I2c, *lp_I2c ;
+  STRUCT_I2C   l_I2c, *lp_I2c ;
   STRUCT_I2C_ACC_MAG  l_Acc, *lp_Acc ;
 
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
@@ -956,18 +960,18 @@ void * _SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
           break ;
         }
         else {
-          I2C_SET( lp_I2c, REG_CTRL1, "0x57" ) ;
-          I2C_SET( lp_I2c, REG_CTRL2, "0x00" ) ;
-          I2C_SET( lp_I2c, REG_CTRL5, "0x64" ) ;
-          I2C_SET( lp_I2c, REG_CTRL6, "0x20" ) ;
-          I2C_SET( lp_I2c, REG_CTRL7, "0x00" ) ;
+          I2C_WRITE( lp_I2c, REG_CTRL1, "0x57" ) ;
+          I2C_WRITE( lp_I2c, REG_CTRL2, "0x00" ) ;
+          I2C_WRITE( lp_I2c, REG_CTRL5, "0x64" ) ;
+          I2C_WRITE( lp_I2c, REG_CTRL6, "0x20" ) ;
+          I2C_WRITE( lp_I2c, REG_CTRL7, "0x00" ) ;
     
           gp_Dev->dev_init_capteurs = 1 ;
         }
       }
       if ( gp_Dev->dev_init_capteurs ) {
       
-        I2C_GET_ACC( lp_I2c, lp_Acc )   ;
+        I2C_ACC_READ( lp_I2c, lp_Acc )   ;
         I2C_CALCULS_ACCMAG( lp_Acc ) ;
       /*
         gp_Sui->_roll    =  lp_Acc->acc_roll  ; 
@@ -1058,23 +1062,26 @@ int main(int argc, char ** argv) {
   /* LOG_INIT ouvre le fichier en ecriture pour pouvoir avoir les traces en mode ecriture sur disque
      et donc a besoin de lire au prealable le fichier de CONFIGURATION (config.txt) */
 
-  TIME_INIT          ( gp_Tim ) ;
-  TIME_INIT_TEMPOS   ( gp_Tpo ) ;
-  TIME_CONFIG_TEMPOS ( gp_Tpo ) ;
-  LOG_INIT           ( gp_Log ); 
-  CALCULS_INIT       ( gp_Cal ) ;
-  CAT_INIT           ( gp_Ngc ) ;
-  CAT_INIT           ( gp_Eto ) ;
-  CODES_INIT         ( gp_Cod ) ;
-  VOUTE_INIT         ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
-  ASTRE_INIT         ( gp_Ast ) ;
-  KEYS_INIT          ( gp_Key ) ;   
-  LIEU_INIT          ( gp_Lie ) ;
-  DEVICES_INIT       ( gp_Dev ) ;
-  SUIVI_INIT         ( gp_Sui ) ;
-  LCD_INIT           ( gp_Lcd ) ;
-  PID_INIT           ( gp_Pid ) ;
-  
+  TIME_INIT           ( gp_Tim ) ;
+  TIME_INIT_TEMPOS    ( gp_Tpo ) ;
+  TIME_TEMPOS_CONFIG  ( gp_Tpo ) ;
+  TIME_TEMPOS_DISPLAY ( gp_Tpo ) ;
+  LOG_INIT            ( gp_Log ); 
+  CALCULS_INIT        ( gp_Cal ) ;
+  CAT_INIT            ( gp_Ngc ) ;
+  CAT_INIT            ( gp_Eto ) ;
+  CODES_INIT          ( gp_Cod ) ;
+  VOUTE_INIT          ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
+  ASTRE_INIT          ( gp_Ast ) ;
+  KEYS_INIT           ( gp_Key ) ;   
+  LIEU_INIT           ( gp_Lie ) ;
+  DEVICES_INIT        ( gp_Dev ) ;
+  SUIVI_INIT          ( gp_Sui ) ;
+  LCD_INIT            ( gp_Lcd ) ;
+  PID_INIT            ( gp_Pid ) ;
+
+  KEYBOARD_TERMIOS_INIT(gp_Ter) ;
+
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
 
   TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
@@ -1099,7 +1106,7 @@ int main(int argc, char ** argv) {
   Trace1("gi_alt_masque         : %d %d %d %d", gi_alt_masque[0], gi_alt_masque[1], gi_alt_masque[2], gi_alt_masque[3] ) ;
   Trace1("gi_azi_masque         : %d %d %d %d", gi_azi_masque[0], gi_azi_masque[1], gi_azi_masque[2], gi_azi_masque[3] ) ;
   
-  Trace1("gp_Pwm_Par->par_led_etat    : %d", gp_Pwm_Par->par_led_etat );
+  Trace1("gp_Pwm_Par->gpi_pwm_par_led_etat    : %d", gp_Pwm_Par->gpi_pwm_par_led_etat );
   Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
   
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
@@ -1116,14 +1123,14 @@ int main(int argc, char ** argv) {
   
   if ( strcmp(gp_Ast_Par->ast_par_default_object,"") != 0 ) {
 
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, gp_Ast_Par->ast_par_default_object ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, gp_Ast_Par->ast_par_default_object ) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
 
     gp_Ast->ast_new = TRUE ;
   }
@@ -1139,11 +1146,11 @@ int main(int argc, char ** argv) {
 
   // ouverture led etat ----------------------------------------------
 
-  if ( gp_Pwm_Par->par_led_etat != 0 ) {
+  if ( gp_Pwm_Par->gpi_pwm_par_led_etat != 0 ) {
 
-    GPIO_CLOSE_BROCHE( gp_Pwm_Par->par_led_etat) ;
-    GPIO_OPEN_BROCHE( gp_Pwm_Par->par_led_etat, 1) ;
-    GPIO_SET( gp_Pwm_Par->par_led_etat, 0 ) ;
+    GPIO_CLOSE_BROCHE( gp_Pwm_Par->gpi_pwm_par_led_etat) ;
+    GPIO_OPEN_BROCHE( gp_Pwm_Par->gpi_pwm_par_led_etat, 1) ;
+    GPIO_SET( gp_Pwm_Par->gpi_pwm_par_led_etat, 0 ) ;
   }
   
   // -----------------------------------------------------------------
@@ -1213,7 +1220,7 @@ int main(int argc, char ** argv) {
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_INFRA],           NULL, (void*)_SUIVI_INFRAROUGE,     gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_CAPTEUR],         NULL, (void*)_SUIVI_CAPTEURS,       gp_Sui ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_CLAVIER],         NULL, (void*)_SUIVI_CLAVIER_TERMIOS,gp_Sui ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_CLAVIER],         NULL, (void*)_SUIVI_CLAVIER_TERMIOS,gp_Ter ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_LCD],             NULL, (void*)_SUIVI_LCD,            gp_Sui ) ;
 
   /* Affichage d'informations sur les threads lancés */

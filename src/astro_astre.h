@@ -58,45 +58,44 @@ typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;
 struct STR_ASTRE {
 
   pthread_mutex_t ast_mutex ;
+  void          (*ast_lock)   (void) ;
+  void          (*ast_unlock) (void) ;  
+  FILE           *ast_file ; 
 
-  STRUCT_TIME  ast_at ;
-  STRUCT_TIME  ast_ht ;
-  STRUCT_TIME  ast_azi_t ;
-  STRUCT_TIME  ast_alt_t ;
-  STRUCT_TIME  ast_dec_t ;
-  STRUCT_TIME  ast_asc_t ;   
-  STRUCT_TIME  ast_agh_t ;
-  STRUCT_TIME  ast_agh0_t ;  
-  STRUCT_TIME  ast_agh1_t ; 
-  STRUCT_TIME  ast_agh2_t ;  
-  STRUCT_TIME  ast_azi0_t ;
-  STRUCT_TIME  ast_azi1_t ;
-  STRUCT_TIME  ast_azi2_t ;
-  STRUCT_ANGLE ast_azi_a ; 
-  STRUCT_ANGLE ast_alt_a ;
-  STRUCT_ANGLE ast_dec_a ; 
-  STRUCT_ANGLE ast_asc_a ;
-  STRUCT_ANGLE ast_agh_a ;
+  STRUCT_TIME     ast_at ;
+  STRUCT_TIME     ast_ht ;
+  STRUCT_TIME     ast_azi_t ;
+  STRUCT_TIME     ast_alt_t ;
+  STRUCT_TIME     ast_dec_t ;
+  STRUCT_TIME     ast_asc_t ;   
+  STRUCT_TIME     ast_agh_t ;
+  STRUCT_TIME     ast_agh0_t ;  
+  STRUCT_TIME     ast_agh1_t ; 
+  STRUCT_TIME     ast_agh2_t ;  
+  STRUCT_TIME     ast_azi0_t ;
+  STRUCT_TIME     ast_azi1_t ;
+  STRUCT_TIME     ast_azi2_t ;
+  STRUCT_ANGLE    ast_azi_a ; 
+  STRUCT_ANGLE    ast_alt_a ;
+  STRUCT_ANGLE    ast_dec_a ; 
+  STRUCT_ANGLE    ast_asc_a ;
+  STRUCT_ANGLE    ast_agh_a ;
   
-  /* Numero de l objet dans un catalogue */
-  
-  int    ast_num ; 
-  int    ast_new ; /* ajout 2022-11 */
-  /* les 2 structures sont placees ici en attendant une structure dediee */
-  int    ast_typ ;
-
-  char   nom         [ ASTRE_TAILLE_BUFFER ] ;
-  char   infos       [ ASTRE_TAILLE_BUFFER ] ;  
-  char   plus_proche [ ASTRE_NB_COLONNES   ][ ASTRE_TAILLE_BUFFER ] ;
+  int             ast_num ; 
+  int             ast_new ; 
+  int             ast_typ ;
+  char            ast_nom         [ ASTRE_TAILLE_BUFFER ] ;
+  char            ast_infos       [ ASTRE_TAILLE_BUFFER ] ;  
+  char            ast_plus_proche [ ASTRE_NB_COLONNES   ][ ASTRE_TAILLE_BUFFER ] ;
   
   /* --------------------------------------------
   *  on deduit de l'azimut(h) et de l'altitude (a)
   *  les coordonnees x y et z dans la geode d'observation de rayon 1
   --------------------------------------------- */
 
-  double x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
-  double y ;    // cos(h)sin(a)  = ordonnee du point sur la sphere de rayon UN (voute celeste) 
-  double z ;    // sin(h)        = z        du point sur la sphere de rayon UN (voute celeste) 
+  double ast_r3_x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
+  double ast_r3_y ;    // cos(h)sin(a)  = ordonnee du point sur la sphere de rayon UN (voute celeste) 
+  double ast_r3_z ;    // sin(h)        = z        du point sur la sphere de rayon UN (voute celeste) 
 
   /* --------------------------------------------
   *  on deduit de l'azimut et de l'altitude
@@ -105,12 +104,12 @@ struct STR_ASTRE {
   * => permet de representer la norme d'un vecteur par rapport a (a,h)<=>(x,y,z)
   --------------------------------------------- */
 
-  double xx ;   // donneee permettant de representer une valeur par OM * val (sphere de unite UN multipliee par la valeur) _ abscisse
-  double yy ;   // idem - ordonnee
-  double zz ; 
+  double ast_r3_xx ;   // donneee permettant de representer une valeur par OM * val (sphere de unite UN multipliee par la valeur) _ abscisse
+  double ast_r3_yy ;   // idem - ordonnee
+  double ast_r3_zz ; 
   
-  double a ;    // azimut
-  double h ;    // altitude
+  double ast_azi ;    // azimut
+  double ast_alt ;    // altitude
 
   double a0 ;   // valeur precedente de l'azimut
   double h0 ;   // valeur precedente de l'altitude

@@ -27,13 +27,19 @@
 #define IR_CODE_REPETE_AUTORISE_MAX 24
 
 struct STR_INFRARED {
- 
+  pthread_mutex_t inf_mutex ;
+  void          (*inf_lock)   (void) ;
+  void          (*inf_unlock) (void) ;
 } ;
 
 typedef struct STR_INFRARED STRUCT_INFRARED ;
 
-int   INFRARED_OPEN  ( INFRARED_LIRC_CONFIG *gp_LircConfig) ;
-void  INFRARED_CLOSE ( INFRARED_LIRC_CONFIG *gp_LircConfig) ;
+void  INFRARED_INIT  ( STRUCT_INFRARED * ) ;
+
+/* TODO : inserer gp_LircConfig dans STR_INFRARED */
+
+int   INFRARED_OPEN  ( STR_EXT_LIRC_CONFIG *gp_LircConfig) ;
+void  INFRARED_CLOSE ( STR_EXT_LIRC_CONFIG *gp_LircConfig) ;
 void  INFRARED_READ  ( void) ;
 
 #endif

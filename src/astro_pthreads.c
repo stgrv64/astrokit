@@ -71,6 +71,40 @@ static const char * gc_hach_pth_sched_param[] = {
   "SCHED_RR"
 } ;
 
+
+/*****************************************************************************************
+* @fn     : ASTRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : ASTRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+
 /*****************************************************************************************
 * @fn     : PTHREADS_INIT_MUTEXS
 * @author : s.gravois

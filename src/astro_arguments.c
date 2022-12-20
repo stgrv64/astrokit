@@ -8,7 +8,7 @@
 # 19/01/2022  | * ajout entete
 #               * ajouts fonctions utilisant getopt
 # 11/03/2022  | * prise en compte option -p (facon classique)
-#               * renseignement gp_Con_Par->par_rep_home par -p <path>
+#               * renseignement gp_Con_Par->con_par_rep_home par -p <path>
 # 11/03/2022  | * ajout fonction ARGUMENTS_MANAGE_REP_HOME
 # -------------------------------------------------------------- 
 */
@@ -64,8 +64,8 @@ void ARGUMENTS_CREATE_VOUTE( void) {
 
     for(a=-M_PI +0.001 ;a<M_PI;a+=gp_Vou->vou_pas){
      
-     gp_Ast->a=a ;
-     gp_Ast->h=h ;
+     gp_Ast->ast_azi=a ;
+     gp_Ast->ast_alt=h ;
      
      CALCULS_EQUATEUR() ; // calcul coordonnees horaires en fait
      CALCULS_VITESSES() ; // TODO : verifier gp_Sui->sui_mode_equatorial avant
@@ -82,22 +82,22 @@ void ARGUMENTS_CREATE_VOUTE( void) {
      CALCULS_COORD_R3() ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
-       gp_Ast->a * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->h * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_alt * CALCULS_UN_RADIAN_EN_DEGRES, \
        gp_Ast->ASC * CALCULS_UN_RADIAN_EN_DEGRES, \
        gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->x , \
-       gp_Ast->y, \
-       gp_Ast->z, \
+       gp_Ast->ast_r3_x , \
+       gp_Ast->ast_r3_y, \
+       gp_Ast->ast_r3_z, \
        gp_Ast->Va, \
        gp_Ast->Vh, \
        gp_Ast->V, \
        gp_Ast->An ) ;
      
      Trace1("xx %.1f yy %.1f zz %.1f Va %.1f Vh %.1f V %.1f", \
-       gp_Ast->xx , \
-       gp_Ast->yy , \
-       gp_Ast->zz , \
+       gp_Ast->ast_r3_xx , \
+       gp_Ast->ast_r3_yy , \
+       gp_Ast->ast_r3_zz , \
        gp_Ast->Va, \
        gp_Ast->Vh, \
        gp_Ast->V ) ;
@@ -225,22 +225,22 @@ void ARGUMENTS_MANAGE_REP_HOME(int argc, char** argv) {
 
   if ( ( argc == 3 ) &&  ! strcmp( "-p" , argv[1]) ) {
   
-    Trace1("option -p = gp_Con_Par->par_rep_home %s pris en compte\n",argv[2]);
+    Trace1("option -p = gp_Con_Par->con_par_rep_home %s pris en compte\n",argv[2]);
 
-    memset( gp_Con_Par->par_rep_home, 0, sizeof(gp_Con_Par->par_rep_home)) ;
-    strcpy( gp_Con_Par->par_rep_home, argv[2] ) ;
+    memset( gp_Con_Par->con_par_rep_home, 0, sizeof(gp_Con_Par->con_par_rep_home)) ;
+    strcpy( gp_Con_Par->con_par_rep_home, argv[2] ) ;
   }
   else {
-    Trace1("pas de option -p => lecture gp_Con_Par->par_rep_home avec getcwd");
+    Trace1("pas de option -p => lecture gp_Con_Par->con_par_rep_home avec getcwd");
 
-    if ( getcwd(gp_Con_Par->par_rep_home, sizeof(gp_Con_Par->par_rep_home)) == NULL ) {
+    if ( getcwd(gp_Con_Par->con_par_rep_home, sizeof(gp_Con_Par->con_par_rep_home)) == NULL ) {
       SyslogEno("getcwd") ;
     }
     else {
-      Trace1("gp_Con_Par->par_rep_home lu par getcwd = %s",gp_Con_Par->par_rep_home);
+      Trace1("gp_Con_Par->con_par_rep_home lu par getcwd = %s",gp_Con_Par->con_par_rep_home);
     }
   }
-  Trace("gp_Con_Par->par_rep_home = %s",gp_Con_Par->par_rep_home);
+  Trace("gp_Con_Par->con_par_rep_home = %s",gp_Con_Par->con_par_rep_home);
 }
 /*****************************************************************************************
 * @fn     : ARGUMENTS_MANAGE
@@ -279,16 +279,16 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   if ( ( argc == 3 ) &&  ! strcmp("ast",argv[1]) ) {
   
     Trace("as %s pris en compte\n",argv[2]);
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, argv[2] ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, argv[2] ) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     
     /* Recherche de l'as dans les catalogues */
     
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
@@ -304,16 +304,16 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   if ( ( argc == 3  ) &&  ! strcmp("AST",argv[1]) ) {
   
     Trace("as %s pris en compte\n",argv[2]);
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, argv[2] ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, argv[2] ) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
     /* Recherche de l'as dans les catalogues */
     
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
     
     CALCULS_TOUT() ;
     /* CONFIG_DISPLAY_TOUT() ; */
@@ -326,11 +326,11 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   if ( ( argc == 4 ) &&  ! strcmp("azi",argv[1]) ) {
 
     Trace("as nom mis a la valeur AZI0");
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, "AZI0" ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, "AZI0" ) ;
 
-    memset( gp_Ast->infos, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->infos, "calcul volontaire : equatorial => azimutal" ) ;
+    memset( gp_Ast->ast_infos, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_infos, "calcul volontaire : equatorial => azimutal" ) ;
 
     gp_Ast->ASC = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
     gp_Ast->DEC = atof(argv[3]) / CALCULS_UN_RADIAN_EN_DEGRES ;
@@ -349,14 +349,14 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   if ( ( argc == 4 ) &&  ! strcmp("equ",argv[1]) ) {
 
     Trace("as nom mis a la valeur EQU0");
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, "EQU0" ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, "EQU0" ) ;
 
-    memset( gp_Ast->infos, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->infos, "calcul volontaire : azimutal => equatorial" ) ;
+    memset( gp_Ast->ast_infos, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_infos, "calcul volontaire : azimutal => equatorial" ) ;
 
-    gp_Ast->a = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
-    gp_Ast->h = atof(argv[3]) / CALCULS_UN_RADIAN_EN_DEGRES ;
+    gp_Ast->ast_azi = atof(argv[2]) / CALCULS_UN_RADIAN_EN_DEGRES ;
+    gp_Ast->ast_alt = atof(argv[3]) / CALCULS_UN_RADIAN_EN_DEGRES ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
@@ -375,14 +375,14 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
     /* mode ast */
 
     Trace("as %s pris en compte\n",argv[2]);
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, argv[2] ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, argv[2] ) ;
     
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
-    if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
     
     CALCULS_TOUT() ;
 
@@ -391,8 +391,8 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
     /* mode equateur */
 
     Trace("as nom mis a la valeur EQU0");
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, "EQU0" ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, "EQU0" ) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
@@ -407,8 +407,8 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
     gp_Sui->sui_mode_equatorial=0 ;
 
     Trace("as nom mis a la valeur TST0");
-    memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-    strcpy( gp_Ast->nom, "AZI0" ) ;
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    strcpy( gp_Ast->ast_nom, "AZI0" ) ;
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
     CALCULS_TOUT() ;
@@ -629,8 +629,8 @@ void ARGUMENTS_MANAGE_GETOPT(int argc, char** argv) {
         
         case 'a' :
           Trace("as %s pris en compte\n",optarg);
-          memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-          strcpy( gp_Ast->nom, optarg ) ;
+          memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+          strcpy( gp_Ast->ast_nom, optarg ) ;
 
           CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
           
@@ -643,8 +643,8 @@ void ARGUMENTS_MANAGE_GETOPT(int argc, char** argv) {
         case 'A' :
 
           Trace("as %s pris en compte\n",optarg);
-          memset( gp_Ast->nom, 0, sizeof(gp_Ast->nom)) ;
-          strcpy( gp_Ast->nom, optarg ) ;
+          memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+          strcpy( gp_Ast->ast_nom, optarg ) ;
 
           CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
           CALCULS_TOUT() ;

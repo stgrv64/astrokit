@@ -41,6 +41,8 @@ typedef struct STR_LIEU_PARAMS STRUCT_LIEU_PARAMS ;
 struct STR_LIEU {
  
  pthread_mutex_t lie_mutex ;
+ void          (*lie_lock)   (void) ;
+ void          (*lie_unlock) (void) ;  
  double          lie_lat ;  // latitude
  double          lie_lon ;  // longitude
  double          lie_alt ;

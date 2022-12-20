@@ -15,6 +15,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
+* @fn     : ASTRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : ASTRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : TIME_CALCULS_LOCAL_DATE
 * @author : s.gravois
 * @brief  : Calcule la date locale servant a tous les calculs ulterieurs
@@ -467,6 +500,34 @@ double TIME_CALCULS_DUREE_NANOSEC(struct timeval *t00) {
 
   return t_diff ;
 }
+
+/*****************************************************************************************
+* @fn     : TIME_TEMPOS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations de temps
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @date   : 2022-10-08 rapatriement depuis config.c
+* @todo   : ras
+*****************************************************************************************/
+
+void TIME_TEMPOS_DISPLAY(STRUCT_TIME_TEMPOS * lp_Tim_Tpo) {
+
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("tpo_ir        = %ld", lp_Tim_Tpo->tpo_ir       ); 
+  Trace("tpo_menu      = %ld", lp_Tim_Tpo->tpo_menu     );
+  Trace("tpo_voute     = %ld", lp_Tim_Tpo->tpo_voute    ); /* non utilise pour l instant (vou_tempo a la place ))*/
+  Trace("tpo_raq       = %ld", lp_Tim_Tpo->tpo_raq      );
+  Trace("tpo_termios   = %ld", lp_Tim_Tpo->tpo_termios  ); 
+  Trace("tpo_capteurs  = %ld", lp_Tim_Tpo->tpo_capteurs ); 
+  Trace("tpo_lcd_loop  = %ld", lp_Tim_Tpo->tpo_lcd_loop ) ;
+  Trace("tpo_lcd_disp  = %ld", lp_Tim_Tpo->tpo_lcd_disp ) ;
+  Trace("tpo_pid_loop  = %ld", lp_Tim_Tpo->tpo_pid_loop ) ;
+
+  return ;
+}
+
 /*****************************************************************************************
 * @fn     : TIME_DISPLAY
 * @author : s.gravois
@@ -610,9 +671,9 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
     year, \
     month, \
     day, \
-    gp_Con_Par->par_rep_home, \
-    gp_Con_Par->par_rep_cfg, \
-    gp_Con_Par->par_fic_dat ) ;
+    gp_Con_Par->con_par_rep_home, \
+    gp_Con_Par->con_par_rep_cfg, \
+    gp_Con_Par->con_par_fic_dat ) ;
 
   Trace("buf = %s", buf) ;
 
@@ -665,9 +726,9 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
   sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", \
     hou, \
     min, \
-    gp_Con_Par->par_rep_home, \
-    gp_Con_Par->par_rep_cfg, \
-    gp_Con_Par->par_fic_hhm ) ;
+    gp_Con_Par->con_par_rep_home, \
+    gp_Con_Par->con_par_rep_cfg, \
+    gp_Con_Par->con_par_fic_hhm ) ;
 
   Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
@@ -779,7 +840,7 @@ void TIME_INIT_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
 }
 
 /*****************************************************************************************
-* @fn     : TIME_CONFIG_TEMPOS
+* @fn     : TIME_TEMPOS_CONFIG
 * @author : s.gravois
 * @brief  : Cette fonction configure la structure STRUCT_TIME_TEMPOS en fct des parametres 
 * @param  : STRUCT_TIME * lp_Tim
@@ -787,7 +848,7 @@ void TIME_INIT_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
 * @todo   : 
 *****************************************************************************************/
 
-void TIME_CONFIG_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
+void TIME_TEMPOS_CONFIG( STRUCT_TIME_TEMPOS * lp_Tpo) {
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 

@@ -25,6 +25,8 @@
 struct STR_ANGLE {
 
   pthread_mutex_t ang_mutex ;
+  void          (*ang_lock)   (void) ;
+  void          (*ang_unlock) (void) ;  
   unsigned long   ang_tempo ;
   char            ang_sig ;     /* signe sous forme charactere '+' ou '-' */
   int             ang_si ;      /* signe sous forme entiere '-1' ou '+1' */
@@ -82,7 +84,9 @@ typedef enum t_en_Calculs_Mode ENUM_CALCULS_MODE ;
 struct STR_CALCULS_PARAMS {
 
   pthread_mutex_t cal_par_mutex ;
-
+  void          (*cal_lock)   (void) ;
+  void          (*cal_unlock) (void) ;  
+  FILE           *cal_file ; 
   // ------ PARAMETRES DE altitude   ------------
 
   unsigned long cal_par_alt_f ;        // frequence de reference (utile si on utilise CALCULS_DIVISEUR_FREQUENCE)
@@ -130,6 +134,8 @@ typedef struct STR_CALCULS_PARAMS STRUCT_CALCULS_PARAMS ;
 /*---------------------------------------------------*/
 
 struct STR_CALCULS {
+  void (*mut_lock)   (void) ;
+  void (*mut_unlock) (void) ;
   pthread_mutex_t           cal_mutex ;
   STRUCT_SUIVI_FREQUENCES * cal_p_Fre ;
   STRUCT_SUIVI_STATS      * cal_p_Sta ;
@@ -187,6 +193,10 @@ double DEG  (int degres, int minutes )                  ;
 void CALCULS_INIT            ( STRUCT_CALCULS * ) ;
 void CALCULS_PARAMS_INIT     ( STRUCT_CALCULS_PARAMS * ) ;
 void CALCULS_PARAMS_DISPLAY  ( STRUCT_CALCULS_PARAMS * ) ;
+
+void CALCULS_LOCK            ( STRUCT_CALCULS * ) ;
+void CALCULS_UNLOCK          ( STRUCT_CALCULS * ) ;
+
 void CALCULS_INIT_PTR        ( STRUCT_CALCULS * )  ;
 void CALCULS_INIT_ANGLE      ( STRUCT_ANGLE * ) ;
 void CALCULS_VOUTE                   (void) ;

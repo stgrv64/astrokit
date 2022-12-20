@@ -28,6 +28,55 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_INFRARED ;
 
 /*****************************************************************************************
+* @fn     : INFRARED_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_INFRARED *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void INFRARED_LOCK ( STRUCT_INFRARED * lp_Inf) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Inf->inf_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : INFRARED_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_INFRARED *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void INFRARED_UNLOCK ( STRUCT_INFRARED * lp_Inf) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Inf->inf_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : INFRARED_INIT
+* @author : s.gravois
+* @brief  : Initialise la structure STRUCT_INFRARED
+* @param  : STRUCT_INFRARED *
+* @date   : 2022-12-20 creation entete 
+* @todo   : (inserer dans STRUCT_INFRARED le contenu de STR_EXT_LIRC_CONFIG)
+*****************************************************************************************/
+
+void  INFRARED_INIT ( STRUCT_INFRARED * lp_Inf ) {
+
+  TraceArbo(__func__,0,"init infrared") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Inf->inf_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
 * @fn     : INFRARED_OPEN
 * @author : s.gravois
 * @brief  : Ouverture des flux IR a l aide du paquet LIRC
@@ -37,7 +86,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_INFRARED ;
 * @todo   : 
 *****************************************************************************************/
 
-int INFRARED_OPEN(INFRARED_LIRC_CONFIG *gp_LircConfig) {
+int INFRARED_OPEN(STR_EXT_LIRC_CONFIG *gp_LircConfig) {
 
   int retour = 0 ;
   
@@ -48,7 +97,7 @@ int INFRARED_OPEN(INFRARED_LIRC_CONFIG *gp_LircConfig) {
 }
 //====================================================================================
   
-void INFRARED_CLOSE(INFRARED_LIRC_CONFIG *gp_LircConfig) {
+void INFRARED_CLOSE(STR_EXT_LIRC_CONFIG *gp_LircConfig) {
   
   // Frees the data structures associated with config.
   lirc_freeconfig(gp_LircConfig);

@@ -12,15 +12,15 @@ void   ASTRO_TRAP_SUIVI_INFRAROUGE(int )  ;
 void   ASTRO_TRAP_SUIVI_CAPTEURS(int )  ;
 void   ASTRO_TRAP_SUIVI_CLAVIER(int )  ;
 
-void * _SUIVI_MENU(STRUCT_SUIVI * ) ;
-void * _SUIVI_VOUTE(STRUCT_SUIVI * ) ;
-void * _SUIVI_INFRAROUGE(STRUCT_SUIVI * ) ;
-void * _SUIVI_CLAVIER_getchar( STRUCT_SUIVI *  ) ;
-void * _SUIVI_CLAVIER_TERMIOS( STRUCT_SUIVI *  ) ;
-void * _SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI*  ) ;
-void * _SUIVI_CAPTEURS(STRUCT_SUIVI * ) ;
-void * _SUIVI_CLAVIER_1(STRUCT_SUIVI * ) ;
-void * _SUIVI_CLAVIER_0(STRUCT_SUIVI * ) ;
+void * _SUIVI_MENU            ( STRUCT_SUIVI * ) ;
+void * _SUIVI_VOUTE           ( STRUCT_SUIVI * ) ;
+void * _SUIVI_INFRAROUGE      ( STRUCT_SUIVI * ) ;
+void * _SUIVI_CLAVIER_getchar ( STRUCT_SUIVI * ) ;
+void * _SUIVI_CLAVIER_TERMIOS ( STRUCT_TERMIOS * ) ;
+void * _SUIVI_CLAVIER_NCURSES ( STRUCT_SUIVI * ) ;
+void * _SUIVI_CAPTEURS        ( STRUCT_SUIVI * ) ;
+void * _SUIVI_CLAVIER_1       ( STRUCT_SUIVI * ) ;
+void * _SUIVI_CLAVIER_0       ( STRUCT_SUIVI * ) ;
 
 extern void SOLAR_SYSTEM( \
  char   * nom, \

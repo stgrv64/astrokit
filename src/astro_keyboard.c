@@ -15,92 +15,136 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static struct termios config_initiale; 
-static struct termios config_finale ; 
+/*****************************************************************************************
+* @fn     : KEYBOARD_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_TERMIOS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
 
-static int peek_caractere = -1 ; 
-static int peek_char[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] = { -1 } ; 
+void KEYBOARD_LOCK ( void * lp_Void) {
+
+  STRUCT_TERMIOS * lp_Ter = (STRUCT_TERMIOS*) lp_Void ;
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ter->ter_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : KEYBOARD_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_TERMIOS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void KEYBOARD_UNLOCK ( void * lp_Void) {
+
+  STRUCT_TERMIOS * lp_Ter = (STRUCT_TERMIOS*) lp_Void ;
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ter->ter_mutex ) ;
+
+  return ;
+}
 
 /*****************************************************************************************
 * @fn     : KEYBOARD_TERMIOS_INIT
 * @author : s.gravois
 * @brief  : sauvegarde la structure termios initiale (ouverture)
-* @param  : 
+* @param  : STRUCT_TERMIOS *
 * @date   : 2022-01-18 creation
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-void KEYBOARD_TERMIOS_INIT() {
+void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
 
- tcgetattr(0,&config_initiale); 
- 
- config_finale = config_initiale ; 
- 
- config_finale.c_lflag &= ~ICANON ;
- config_finale.c_lflag &= ~ECHO ;
- config_finale.c_lflag &= ~ISIG ;
- config_finale.c_cc[VMIN]  = 1 ;
- config_finale.c_cc[VTIME] = 0 ;
- 
- tcsetattr(0,TCSANOW, &config_initiale) ;
+  TraceArbo(__func__,0,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ter->ter_mutex ) ;
+
+  tcgetattr(0,&lp_Ter->ter_config_initiale); 
+
+  lp_Ter->ter_config_finale = lp_Ter->ter_config_initiale ; 
+
+  lp_Ter->ter_config_finale.c_lflag     &= ~ICANON ;
+  lp_Ter->ter_config_finale.c_lflag     &= ~ECHO ;
+  lp_Ter->ter_config_finale.c_lflag     &= ~ISIG ;
+  lp_Ter->ter_config_finale.c_cc[VMIN]   = 1 ;
+  lp_Ter->ter_config_finale.c_cc[VTIME]  = 0 ;
+
+  tcsetattr(0,TCSANOW, &lp_Ter->ter_config_initiale) ;
+
+  lp_Ter->ter_lock   = KEYBOARD_LOCK ;
+  lp_Ter->ter_unlock = KEYBOARD_UNLOCK ;
+
+  return ;
 }
 
 /*****************************************************************************************
 * @fn     : KEYBOARD_TERMIOS_EXIT
 * @author : s.gravois
 * @brief  : retablit la structure termios initiale (fermeture)
-* @param  : 
+* @param  : STRUCT_TERMIOS * 
 * @date   : 2022-01-18 creation
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-void KEYBOARD_TERMIOS_EXIT() {
- tcsetattr(0, TCSANOW, &config_initiale ) ;
+void KEYBOARD_TERMIOS_EXIT(STRUCT_TERMIOS * lp_Ter) {
+
+ tcsetattr(0, TCSANOW, &lp_Ter->ter_config_initiale ) ;
+
+ return ;
 }
 
 /*****************************************************************************************
-* @fn     : KEYBOARD_TERMIOS_KBHIT
+* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR
 * @author : s.gravois
-* @brief  : detecte la frappe d'une touche sur le clavier via termios
+* @brief  : Lit un character depuis frappe d'une touche sur le clavier via termios
 * @param  : 
 * @date   : 2022-01-18 creation
 * @date   : passage du buffer de lecture de char a char[]
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_KBHIT() {
-  char chaine[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
+int KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR(STRUCT_TERMIOS * lp_Ter) {
+
+  char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
-  if ( peek_caractere != -1 ) {
-    // Trace("peek_caractere != -1") ;
+  if ( lp_Ter->ter_peek_char != -1 ) {
+    // Trace("lp_Ter->ter_peek_char != -1") ;
     return 1 ;
   }
-  config_finale.c_cc[VMIN] = 0 ;
-  tcsetattr( 0, TCSANOW, &config_finale ) ;
+  lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
+  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale ) ;
 
   /* Lecture dans le file descriptor 0 (stdin) */
 
-  nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+  nread = read(0, &lc_buf, TERMIOS_KBHIT_SIZE_BUFFER_READ );
 
-  ch = chaine[0] ;
-  config_finale.c_cc[VMIN] = 1 ;
-  tcsetattr( 0, TCSANOW, &config_finale )  ;
+  ch = lc_buf[0] ;
+  lp_Ter->ter_config_finale.c_cc[VMIN] = 1 ;
+  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale )  ;
 
   if ( nread >0  ) {
     // Trace1("nread = %d", nread) ;
   }
   if (nread == 1 ) {
-    peek_caractere = ch ; 
-    // Trace1("peek_caractere = ch = %c", ch) ;
+    lp_Ter->ter_peek_char = ch ; 
+    // Trace1("lp_Ter->ter_peek_char = ch = %c", ch) ;
     return -1 ;
   }
   return 0 ;
 }
 
 /*****************************************************************************************
-* @fn     : KEYBOARD_TERMIOS_KBHIT_NEW
+* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR
 * @author : s.gravois
 * @brief  : detecte la frappe d'une touche sur le clavier via termios
 * @param  : 
@@ -110,46 +154,58 @@ int KEYBOARD_TERMIOS_KBHIT() {
 * @todo   : eviter les traces a l interieur de cette fonction
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_KBHIT_NEW(char * plc_buffer, int * pli_sum_ascii) {
-  char chaine[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
+int KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(STRUCT_TERMIOS * lp_Ter) {
+
+  char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
-  *pli_sum_ascii=0 ;
-  memset(chaine, 0, sizeof(chaine)) ;
+  *lp_Ter->ter_sum_ascii=0 ;
+  memset(lc_buf, 0, sizeof(lc_buf)) ;
 
-  if ( peek_char[0] != -1 ) {
-    // Trace("peek_char[0] != -1") ;
+  if ( lp_Ter->ter_peek_chars[0] != -1 ) {
+    // Trace("lp_Ter->ter_peek_chars[0] != -1") ;
     return 1 ;
   }
-  config_finale.c_cc[VMIN] = 0 ;
-  tcsetattr( 0, TCSANOW, &config_finale ) ;
+  lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
+  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale ) ;
 
   /* Lecture dans le file descriptor 0 (stdin) */
 
-  nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+  nread = read(0, &lc_buf, TERMIOS_KBHIT_SIZE_BUFFER_READ );
 
-  config_finale.c_cc[VMIN] = 1 ;
-  tcsetattr( 0, TCSANOW, &config_finale )  ;
+  lp_Ter->ter_config_finale.c_cc[VMIN] = 1 ;
+  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale )  ;
 
   if ( nread >0  ) {
 
     Trace1("nread positif = %d", nread) ;
     
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
-      peek_char[i] = (int)chaine[i] ;
-      Trace1("peek_chars[%d] = %c %d pli_sum_ascii = %d", i, peek_char[i], (int) peek_char[i], *pli_sum_ascii) ;
-      *pli_sum_ascii+=(int)peek_char[i] ;
-    }
-    strcpy( plc_buffer , chaine) ;  
+      lp_Ter->ter_peek_chars[i] = (int)lc_buf[i] ;
+      Trace1("peek_chars[%d] = %c %d lp_Ter->ter_sum_ascii = %d", \
+       i, \
+       lp_Ter->ter_peek_chars[i], \
+       (int) lp_Ter->ter_peek_chars[i], \
+       *lp_Ter->ter_sum_ascii) ;
 
-    memset(peek_char, 0, sizeof(peek_char)) ;
+      *lp_Ter->ter_sum_ascii+=(int)lp_Ter->ter_peek_chars[i] ;
+    }
+    strcpy( lp_Ter->ter_buffer , lc_buf) ;  
+
+    memset(lp_Ter->ter_peek_chars, 0, sizeof(lp_Ter->ter_peek_chars)) ;
+    strncpy((char*)lp_Ter->ter_peek_chars, (const char*)-1, TERMIOS_KBHIT_SIZE_BUFFER_READ) ;
+    /*
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
-      peek_char[i]=-1;
-    }
-    memset(chaine, 0, sizeof(chaine)) ;
+      lp_Ter->ter_peek_chars[i]=-1;
+    }*/
+    memset(lc_buf, 0, sizeof(lc_buf)) ;
 
-    Trace1("nread %-3d pli_sum_ascii %-5d plc_buffer %-10s", nread, *pli_sum_ascii, plc_buffer ) ;
+    Trace1("nread %-3d lp_Ter->ter_sum_ascii %-5d lp_Ter->ter_buffer %-10s", \
+      nread, \
+    * lp_Ter->ter_sum_ascii, \
+      lp_Ter->ter_buffer ) ;
+
     // usleep(10000) ;
     return -1 ;
   }
@@ -167,18 +223,18 @@ int KEYBOARD_TERMIOS_KBHIT_NEW(char * plc_buffer, int * pli_sum_ascii) {
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_READCH() {
+int KEYBOARD_TERMIOS_READCH(STRUCT_TERMIOS * lp_Ter) {
   char ch ;
   int nread =0 ; 
 
-  if(peek_caractere != -1 ) {
-    ch = peek_caractere ;
-    peek_caractere = -1 ;
-    // Trace("ch = %c (peek_caractere != -1)", ch) ;
+  if(lp_Ter->ter_peek_char != -1 ) {
+    ch = lp_Ter->ter_peek_char ;
+    lp_Ter->ter_peek_char = -1 ;
+    // Trace("ch = %c (lp_Ter->ter_peek_char != -1)", ch) ;
     return ch ;
   }
 
-  // nread = read(0, &chaine, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+  // nread = read(0, &lc_buf, TERMIOS_KBHIT_SIZE_BUFFER_READ );
   nread = read( 0, &ch, 1)  ;
 
   // Trace("ch = %c nread = %d", ch, nread) ;
@@ -189,26 +245,26 @@ int KEYBOARD_TERMIOS_READCH() {
 * @fn     : main
 * @author : s.gravois
 * @brief  : point de depart du programme 
-* @param  : 
+* @param  : STRUCT_TERMIOS *
 * @date   : 2022-01-18 creation
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_READ(void) {
+int KEYBOARD_TERMIOS_READ(STRUCT_TERMIOS * lp_Ter) {
 
   int ch =0 ;
 
-  KEYBOARD_TERMIOS_INIT() ;
+  KEYBOARD_TERMIOS_INIT(lp_Ter) ;
 
   while(ch!='q') {
     // printf("boucle en cours\n") ;
     usleep(50000) ;
-    if ( KEYBOARD_TERMIOS_KBHIT()) {
-      ch= KEYBOARD_TERMIOS_READCH() ;
+    if ( KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR(lp_Ter)) {
+      ch= KEYBOARD_TERMIOS_READCH(lp_Ter) ;
       printf("keycode %c => %d\n", ch, ch) ;
     }
   }
-  KEYBOARD_TERMIOS_EXIT() ;
+  KEYBOARD_TERMIOS_EXIT(lp_Ter) ;
   exit(0) ;
 }
 

@@ -6,7 +6,7 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 01/05/2021  | ajout entete
-# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Pwm_Par->par_alt_fpwm 
+# 01/05/2021  | creation entete de la fonction au format doxygen #define gp_Pwm_Par->gpi_pwm_par_alt_fpwm 
 #   suite a ajout de la variable du meme nom dans types.h
 # mai 2022    | ajout / modifications sur les threads  
 #               ajout / renommage membres champs struct PMW phases et moteurs
@@ -57,12 +57,12 @@ struct STR_GPIO_PARAMS_CONTROLER {
 
 struct STR_GPIO_PARAMS_RAQUETTE {
 
-  pthread_mutex_t par_mutex ;
-  int par_raq_ouest  ; 
-  int par_raq_est  ;
-  int par_raq_sud  ;
-  int par_raq_nord  ;
-  int par_raq_v  ;
+  pthread_mutex_t gpi_raq_par_mutex ;
+  int             gpi_raq_par_ouest  ; 
+  int             gpi_raq_par_est  ;
+  int             gpi_raq_par_sud  ;
+  int             gpi_raq_par_nord  ;
+  int             gpi_raq_par_v  ;
 } ;
 
 /* 
@@ -72,15 +72,15 @@ struct STR_GPIO_PARAMS_RAQUETTE {
 
 struct STR_GPIO_PARAMS_MATRICIEL {
 
-  pthread_mutex_t par_mutex ;
-  int par_l1  ;
-  int par_l2  ;
-  int par_l3  ;
-  int par_l4  ;
-  int par_c1  ;
-  int par_c2  ;
-  int par_c3  ;
-  int par_c4  ;
+  pthread_mutex_t gpi_mat_par_mutex ;
+  int             gpi_mat_par_l1  ;
+  int             gpi_mat_par_l2  ;
+  int             gpi_mat_par_l3  ;
+  int             gpi_mat_par_l4  ;
+  int             gpi_mat_par_c1  ;
+  int             gpi_mat_par_c2  ;
+  int             gpi_mat_par_c3  ;
+  int             gpi_mat_par_c4  ;
 } ;
 
 /* 
@@ -96,13 +96,13 @@ struct STR_GPIO_PARAMS_PWM {
 
   pthread_mutex_t par_mutex ;
 
-  int             par_led_etat ; /* TODO : mettre ailleurs */
-  char            par_alt_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_alt_gpio     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_alt_mask     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_azi_gpio     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_azi_mask     [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_azi_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
+  int             gpi_pwm_par_led_etat ; /* TODO : mettre ailleurs */
+  char            gpi_pwm_par_alt_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            gpi_pwm_par_alt_gpio [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            gpi_pwm_par_alt_mask [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            gpi_pwm_par_azi_gpio [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            gpi_pwm_par_azi_mask [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            gpi_pwm_par_azi_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/
@@ -129,7 +129,8 @@ t_en_Gpio_Red_Type ;
 struct STR_GPIO_PWM_PHASE {
 
   pthread_mutex_t   pha_mutex ;    
-
+  void            (*pha_lock)   (void) ;
+  void            (*pha_unlock) (void) ;  
   /* STRUCT_SUIVI    * p_sui ; */
   /* STRUCT_PTHREADS * p_pth ; */
 
@@ -155,10 +156,10 @@ struct STR_GPIO_PWM_PHASE {
 /*---------------------------------------------------*/
 
 struct STR_GPIO_PWM_MOTEUR {
-
-  pthread_mutex_t         mot_mutex ; 
-
   STRUCT_GPIO_PWM_PHASE * mot_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
+  pthread_mutex_t         mot_mutex ; 
+  void                  (*mot_lock)   (void) ;
+  void                  (*mot_unlock) (void) ;  
 
   struct timeval          mot_timeval ;
   /* STRUCT_SUIVI          * p_sui ; */

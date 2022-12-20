@@ -17,6 +17,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
+* @fn     : CAT_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_CAT *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void CAT_LOCK ( STRUCT_CAT * lp_Cat) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cat->cat_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CAT_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_CAT *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void CAT_UNLOCK ( STRUCT_CAT * lp_Cat) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cat->cat_mutex ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : CAT_FIN_MOT
 * @author : s.gravois
 * @brief  : Cette fonction definit le caractere de fin d un mot 
@@ -147,8 +180,8 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
   memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
 
   sprintf(buf,"%s/%s/%s", \
-    gp_Con_Par->par_rep_home, \
-    gp_Con_Par->par_rep_cat, \
+    gp_Con_Par->con_par_rep_home, \
+    gp_Con_Par->con_par_rep_cat, \
     catalogue_txt) ;
   
   if ( (fin=fopen(buf,"r")) == NULL)  {
@@ -199,13 +232,13 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
   d_min=deg ;
 
   Trace1("Recherche dans la zone de %s : ASC=%f DEC=%f",\
-    lp_Ast->nom, \
+    lp_Ast->ast_nom, \
     lp_Ast->AGH0, \
     lp_Ast->DEC) ;
   
   while( strcmp( lp_Cat->cat_dec[L][3],"_") \
-      && strcmp( lp_Ast->nom,lp_Cat->cat_dec[L][0]) \
-      && strcmp( lp_Ast->nom,lp_Cat->cat_dec[L][1])) {
+      && strcmp( lp_Ast->ast_nom,lp_Cat->cat_dec[L][0]) \
+      && strcmp( lp_Ast->ast_nom,lp_Cat->cat_dec[L][1])) {
    
     asc_b = atof( lp_Cat->cat_dec[L][2] ) ;
     dec_b = atof( lp_Cat->cat_dec[L][3] ) ;
@@ -218,15 +251,15 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
-          memset( lp_Ast->plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
-          strcpy( lp_Ast->plus_proche[C], lp_Cat->cat_dec[L][C]) ;
+          memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
+          strcpy( lp_Ast->ast_plus_proche[C], lp_Cat->cat_dec[L][C]) ;
         }
       }
     }
     L++;
   }
   Trace1("Le plus proche => %s=%s : ASC=%s DEC=%s DIST=%f",\
-  lp_Ast->plus_proche[0], lp_Ast->plus_proche[1], lp_Ast->plus_proche[2], lp_Ast->plus_proche[3], d_min) ;
+  lp_Ast->ast_plus_proche[0], lp_Ast->ast_plus_proche[1], lp_Ast->ast_plus_proche[2], lp_Ast->ast_plus_proche[3], d_min) ;
 }
 /*****************************************************************************************
 * @fn     : CAT_FIND
@@ -252,7 +285,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   
   L=0 ;
   
-  memset( lp_Ast->infos, 0 , sizeof( lp_Ast->infos) ) ;
+  memset( lp_Ast->ast_infos, 0 , sizeof( lp_Ast->ast_infos) ) ;
 
   lp_Ast->ASC=0;
   lp_Ast->DEC=0 ;
@@ -268,7 +301,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
       lp_Cat->cat_dec[L][2] , \
       lp_Cat->cat_dec[L][3] );
 
-    if(!strcmp(lp_Cat->cat_dec[L][0],lp_Ast->nom)) {
+    if(!strcmp(lp_Cat->cat_dec[L][0],lp_Ast->ast_nom)) {
 
       /* -----------------------------------------------
        * Sauvegarde des coordonnees equatoriales du catalogue 
@@ -277,18 +310,18 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
 
       lp_Ast->ASC = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       lp_Ast->DEC = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      strcpy( lp_Ast->infos, lp_Cat->cat_dec[L][0] ) ;
+      strcpy( lp_Ast->ast_infos, lp_Cat->cat_dec[L][0] ) ;
 
       i_ligne = L ;
       i_trouve = TRUE ;
       break  ;
     }
 
-    if(!strcmp(lp_Cat->cat_dec[L][1],lp_Ast->nom)) {
+    if(!strcmp(lp_Cat->cat_dec[L][1],lp_Ast->ast_nom)) {
 
       lp_Ast->ASC = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       lp_Ast->DEC = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      strcpy( lp_Ast->infos, lp_Cat->cat_dec[L][1] ) ;
+      strcpy( lp_Ast->ast_infos, lp_Cat->cat_dec[L][1] ) ;
 
       i_ligne = L ; 
       i_trouve = TRUE ;
@@ -297,21 +330,21 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
     L++;
   }
   if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
-    Trace1("(trouve) : (nom) %s (infos) %s: ",lp_Ast->nom , lp_Ast->infos ) ;
+    Trace1("(trouve) : (nom) %s (infos) %s: ",lp_Ast->ast_nom , lp_Ast->ast_infos ) ;
   }
   else {
     
     lp_Ast->ASC = 0.0 ;
     lp_Ast->DEC = 0.0 ;
-    Trace1(" %s : non trouve dans catalogue",lp_Ast->nom) ;
-    strcpy( lp_Ast->nom, "undefined" ) ;
-    strcpy( lp_Ast->infos, "undefined" ) ;
+    Trace1(" %s : non trouve dans catalogue",lp_Ast->ast_nom) ;
+    strcpy( lp_Ast->ast_nom, "undefined" ) ;
+    strcpy( lp_Ast->ast_infos, "undefined" ) ;
   }
 
   CALCULS_CONVERSIONS_ANGLES() ;
 
   Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
-    lp_Ast->nom , \
+    lp_Ast->ast_nom , \
     lp_Ast->ast_asc_t.tim_HH, \
     lp_Ast->ast_asc_t.tim_MM, \
     lp_Ast->ast_asc_t.tim_SS, \
@@ -367,7 +400,7 @@ void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
   } 
   
   memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s/%s", gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_cat,catalogue_txt) ;
+  sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_cat,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier
@@ -444,7 +477,7 @@ void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * catalogue_txt ) {
   } 
   
   memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s/%s",gp_Con_Par->par_rep_home,gp_Con_Par->par_rep_cat,catalogue_txt) ;
+  sprintf(buf,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,catalogue_txt) ;
   
   if ( (fout=fopen(buf,"w")) == NULL) {
     // completer et modifier

@@ -16,6 +16,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
+* @fn     : ASTRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : ASTRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : VOUTE_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure STRUCT_VOUTE *lp_Vou
@@ -49,7 +82,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
   if ( ASTRO_LOG_DEBUG_VOUTE ) {
   
     memset( buf, CALCULS_ZERO_CHAR, sizeof(buf));
-    sprintf(buf,"%s/%s/%s", gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_vou) ;
+    sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_vou) ;
     
     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {
       // completer et modifier

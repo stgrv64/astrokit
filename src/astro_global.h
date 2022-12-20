@@ -15,8 +15,8 @@
 #               * modification ordre des menus (MENU_AZIMUTAL=0)
 # 17/01/2022  | * ajout gestion touches clavier (*_CLAVIER)
 #               * nouveaux fichiers astro_keyboard.h / .c
-# 18/01/2022  | * ajout parametre gp_Con_Par->par_rep_scr
-#               * ajout parametre gp_Con_Par->par_src_ker
+# 18/01/2022  | * ajout parametre gp_Con_Par->con_par_rep_scr
+#               * ajout parametre gp_Con_Par->con_par_src_ker
 #               * remplacement fonctions Trace1 par Trace 
 #               * refonte des macros de Trace
 # 19/01/2022  | * ajout ASTRE_INDETERMINE pour pouvoir calculer
@@ -31,7 +31,7 @@
 #                 pour avoir une representation char de l enum
 #               * ajout ASCx comme STRUCT_TIME dans STRUCT_ASTRE
 # 23/01/2022  | * suppression MODE_EQUATORIAL
-#               * changement type gp_Con_Par->par_default_menu
+#               * changement type gp_Con_Par->con_par_default_menu
 #               * ajout constantes char * en fonction gc_hach_suivi_menus
 # mars  2022  | * ajout signe a structure STRUCT_TIME
 #               * ajout c_si signe sous forme char
@@ -103,7 +103,7 @@
 #define CODES_NB_IN_OUT                      3
 
 #define CONFIG_ZERO_CHAR                     '\0'
-#define CONFIG_FIC_CFG                       "config.txt"
+#define CONFIG_FIC_CFG                       "astrokit.cfg"
 #define CONFIG_MES                           "MES"
 #define CONFIG_NGC                           "NGC"
 #define CONFIG_ETO                           "ETO"
@@ -160,7 +160,9 @@
 typedef enum    t_en_Reduction_Type         ENUM_CALCULS_REDUCTION_TYPE ;
 typedef enum    t_en_Calculs_Mode           ENUM_CALCULS_MODE ;
 
-typedef struct  lirc_config                 INFRARED_LIRC_CONFIG ;
+typedef struct  lirc_config                 STR_EXT_LIRC_CONFIG ;
+typedef struct  timeval                     STR_EXT_TIMEVAL ;
+typedef struct  termios                     STR_EXT_TERMIOS ;
 
 typedef struct  pthread_t                   STRUCT_PTHREAD_T ;
 typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
@@ -182,11 +184,12 @@ typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
 typedef struct  STR_SUIVI_PAS               STRUCT_SUIVI_PAS ;
 typedef struct  STR_SUIVI_FREQUENCES        STRUCT_SUIVI_FREQUENCES ;
 typedef struct  STR_SUIVI_STATS             STRUCT_SUIVI_STATS ;
+typedef struct  STR_TERMIOS                 STRUCT_TERMIOS ;
 typedef struct  STR_TIME                    STRUCT_TIME ;
 typedef struct  STR_TIME_TEMPOS             STRUCT_TIME_TEMPOS ;
 typedef struct  STR_VOUTE                   STRUCT_VOUTE ;
 
-typedef struct  STR_I2C_DEVICE              STRUCT_I2C_DEVICE ;
+typedef struct  STR_I2C_DEVICE              STRUCT_I2C ;
 typedef struct  STR_I2C_ACC_MAG             STRUCT_I2C_ACC_MAG ;
 typedef struct  STR_I2C_MCP23017            STRUCT_I2C_MCP23017 ;
 typedef struct  STR_GPIO_PWM_PHASE          STRUCT_GPIO_PWM_PHASE ;
@@ -228,8 +231,10 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 #include "astro_voute.h"
 #include "astro_astre.h"
 
+/* TODO : (inserer dans STRUCT_INFRARED le contenu de STR_EXT_LIRC_CONFIG) */
+
 #define MACRO_ASTRO_GLOBAL_EXTERN_INFRARED \
-  extern INFRARED_LIRC_CONFIG * gp_LircConfig ; \
+  extern STR_EXT_LIRC_CONFIG * gp_LircConfig ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_STRUCT \
   extern STRUCT_ANGLE            g_Angle,              *gp_Ang ; \
@@ -241,7 +246,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_CONFIG           g_Config,             *gp_Con ; \
   extern STRUCT_DATAS            g_Datas,              *gp_Dat ; \
   extern STRUCT_DEVICES          g_Devices,            *gp_Dev ; \
-  extern STRUCT_I2C_DEVICE       g_I2cDev,             *gp_I2c ; \
+  extern STRUCT_I2C              g_I2cDev,             *gp_I2c ; \
   extern STRUCT_I2C_ACC_MAG      g_I2cAcc,             *gp_Acc ; \
   extern STRUCT_I2C_MCP23017     g_I2cMcp,             *gp_Mcp ; \
   extern STRUCT_KEYS             g_Keys,               *gp_Key ; \
@@ -255,6 +260,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_SUIVI_PAS        g_Suivi_Pas,          *gp_Pas ; \
   extern STRUCT_SUIVI_FREQUENCES g_Suivi_Frequences,   *gp_Fre ; \
   extern STRUCT_SUIVI_STATS      g_Suivi_Statistiques, *gp_Sta ; \
+  extern STRUCT_TERMIOS          g_Termios,            *gp_Ter ; \
   extern STRUCT_TIME             g_Time,               *gp_Tim ; \
   extern STRUCT_TIME_TEMPOS      g_Time_Tempos,        *gp_Tpo ; \
   extern STRUCT_VOUTE            g_Voute,              *gp_Vou ; \
@@ -273,8 +279,10 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_GPIO_PARAMS_MAT  g_Gpio_Params_Mat,  *gp_Mat_Par ; \
   extern STRUCT_GPIO_PARAMS_RAQ  g_Gpio_Params_Raq,  *gp_Raq_Par ; \
   extern STRUCT_GPIO_PARAMS_CON  g_Gpio_Params_Ctl,  *gp_Ctl_Par ; \
-
-
+/*
+#define MACRO_ASTRO_GLOBAL_EXTERN_LOG \
+  extern FILE * gp_File_Flog ; \
+*/
 #define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS \
   extern int    gi_gpio_fd     [ GPIO_SIZE ] ; \
   extern int    gi_gpio_in   	 [ GPIO_SIZE ] ; \
@@ -301,6 +309,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_CONFIG \
   extern char   gc_config_path_cmd_stty[ CONFIG_TAILLE_BUFFER_32 ] ; \
+  extern FILE * gp_File_Flog ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_CONST \
   extern const char * gc_hach_suivi_menus[]  ; \

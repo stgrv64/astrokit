@@ -90,58 +90,46 @@ t_en_Lcd_Type_Affichage ;
 struct STR_LCD {
 
   pthread_mutex_t lcd_mutex ;
+  void          (*lcd_lock)   (void) ;
+  void          (*lcd_unlock) (void) ;  
 
-  int  i_type_affichage ; 
-  int  i_fd ; 
-  int  i_board ; 
-  int  i_i2c_num ; 
+  int  lcd_fd ; 
+  int  lcd_i2c_add ; 
+  char lcd_l0_cur[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char lcd_l1_cur[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char lcd_l0_def[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  char lcd_l1_def[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  int  lcd_change_current ;
+  int  lcd_change_default ;
+  int  lcd_change_display_us ; 
 
-  char c_l0cur[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_l1cur[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_l0def[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
-  char c_l1def[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ;
+  void (*default_set)  (char * ,char * )  ;
 
-  int  i_change_current ;
-  int  i_change_default ;
-
-  int  i_duree_us ; 
-
-  void (*display)(void);
-
-  void (*define_default)  (char * ,char * )  ;
-
-  void (*change_current)  (const int, const char*, const char*) ;
-  void (*change_default)  (const int, const char*, const char*) ;
-
-  /* void (*refresh_current)  (void) ; */
-  void (*refresh_default)  (void) ;
-
-  void (*display_default) (void) ;
-  void (*display_current) (void) ;
+  void (*current_change)  (const int, const char*, const char*) ;
+  void (*current_display) (void) ;
+  
+  void (*default_change)  (const int, const char*, const char*) ;
+  void (*default_refresh)  (void) ;
+  void (*default_display) (void) ;
 
   void (*display_str_str) ( const int , const char* , const char * );
   void (*display_str_int) ( const int , const char* , int );
   void (*display_int_int) ( const int , const int   , const int );
   void (*display_str_lng) ( const int , const char* , const long );
-
-  void (*display_tps_lie) ( const int ) ;
-  void (*display_ast_vit) ( const int ) ;
-  void (*display_azi_alt) ( const int ) ;
-  void (*display_agh_dec) ( const int ) ;
-  void (*display_asc_dec) ( const int ) ;
-  void (*display_mod_ste) ( const int ) ;
-
-  void (*display_ast_fre) ( const int ) ;
-  void (*display_ast_per) ( const int ) ;
-
+  void (*display_tps_lie)           ( const int ) ;
+  void (*display_ast_vit)           ( const int ) ;
+  void (*display_azi_alt)           ( const int ) ;
+  void (*display_agh_dec)           ( const int ) ;
+  void (*display_asc_dec)           ( const int ) ;
+  void (*display_mod_ste)           ( const int ) ;
+  void (*display_ast_fre)           ( const int ) ;
+  void (*display_ast_per)           ( const int ) ;
   void (*display_cfg_gpios_alt_azi) ( const int ) ;
   void (*display_cfg_gpios_mas_fre) ( const int ) ;
   void (*display_cfg_gpios_leds)    ( const int ) ;
   void (*display_cfg_reduction)     ( const int ) ;
-
-  void (*display_informations) ( const int ) ;
-  
-  void (*display_acc_alt_azi) ( const int ) ;
+  void (*display_informations)      ( const int ) ;
+  void (*display_acc_alt_azi)       ( const int ) ;
 }  ;
 
 void   LCD_INIT                      (STRUCT_LCD *) ;

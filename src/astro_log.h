@@ -18,12 +18,14 @@
 
 /* TODO : mettre ces define dans le fichier de paramatres config */
 
-#define ASTRO_LOG_DEBUG                  0 /* valeurs possibles => 0 : pas de traces  , > 0 : traces progressives*/
-#define ASTRO_LOG_DEBUG_PID              0 /* valeurs possibles => 0 : pas de traces  ,   1 : traces */
-#define ASTRO_LOG_DEBUG_PID              0 /* valeurs possibles => 0 : pas de traces  ,   1 : traces */
-#define ASTRO_LOG_DEBUG_WRITE_FS         0 /* valeurs possibles => 0 : pas d ecriture ,   1 : ecriture */
-#define ASTRO_LOG_DEBUG_VOUTE            0 /* valeurs possibles => 0 : fcontions de base , > 0 : suivantes */
+#define ASTRO_LOG_DEBUG                  0 /* valeurs possibles => 0/>0 : pas de traces  / traces progressives */
+#define ASTRO_LOG_DEBUG_WRITE_FS         0 /* valeurs possibles => 0/1  : pas d ecriture / ecriture sur disque */
+#define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  0 /* valeurs possibles => 0    : fonctions de base , > 0 : suivantes  */
 
+#define ASTRO_LOG_DEBUG_PID              0 /* valeurs possibles => 0/1  : pas d ecriture / ecriture sur disque */
+#define ASTRO_LOG_DEBUG_VOUTE            0 /* valeurs possibles => 0/1  : pas d ecriture / ecriture sur disque */
+
+FILE * gp_File_Flog ;
 /* gp_File_Flog */
 
 // ------------------------------------------------------------------------
@@ -218,6 +220,8 @@ while (0)
 
 struct STR_LOG {
  pthread_mutex_t log_mutex ;
+ void          (*log_lock)   (void) ;
+ void          (*log_unlock) (void) ;  
  int             log_level ;
 } ;
 typedef struct STR_LOG STRUCT_LOG ;

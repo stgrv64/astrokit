@@ -26,6 +26,40 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+
+/*****************************************************************************************
+* @fn     : DEVICES_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_DEVICES *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void DEVICES_LOCK ( STRUCT_DEVICES * lp_Dev) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dev->dev_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : DEVICES_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_DEVICES *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void DEVICES_UNLOCK ( STRUCT_DEVICES * lp_Dev) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Dev->dev_mutex ) ;
+
+  return ;
+}
+
 /*****************************************************************************************
 * @fn     : DEVICES_INIT
 * @author : s.gravois

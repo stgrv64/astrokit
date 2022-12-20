@@ -99,9 +99,7 @@ typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FREQUENCES ;
 
 struct STR_SUIVI {
 
-  STRUCT_SUIVI_PAS   * sui_pas ;
-  STRUCT_TIME_TEMPOS * sui_tpo ;
-  struct timeval       sui_tval ; 
+  STR_EXT_TIMEVAL      sui_tval ; 
   int                  sui_reset ; 
   int                  sui_mode_equatorial ;
   double               sui_plus ;    // multiplicateur ajustement des periodes si besoin

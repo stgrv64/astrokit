@@ -19,6 +19,40 @@ int  gi_pid_trace ;
 int  gi_pid_trace_alt ;
 int  gi_pid_trace_azi ;
 
+
+/*****************************************************************************************
+* @fn     : ASTRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : ASTRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+
 /*****************************************************************************************
 * @fn     : PID_PARAMS_INIT
 * @author : s.gravois
@@ -82,10 +116,10 @@ void PID_INIT(STRUCT_PID * lp_Pid ) {
   memset(c_path_file_out, 0, sizeof(c_path_file_out)) ;
 
   sprintf( c_path_file_out, "%s/%s" , \
-    gp_Con_Par->par_rep_log, \
-    gp_Con_Par->par_fic_pid) ;
+    gp_Con_Par->con_par_rep_log, \
+    gp_Con_Par->con_par_fic_pid) ;
 
-  if ( ( lp_Pid->pid_f_out = fopen( c_path_file_out, "w" ) ) == NULL ) {
+  if ( ( lp_Pid->pid_file = fopen( c_path_file_out, "w" ) ) == NULL ) {
     Trace("ouverture %s (KO)",c_path_file_out );
   }
   else {

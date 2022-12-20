@@ -19,21 +19,21 @@
 #define KEYS_VALIDATIONS_SIZE 10
 
 struct STR_KEYS {
-
   pthread_mutex_t key_mutex ;
-
-  char key_symbole     [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_nombre      [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_mot         [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_phrase      [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_premier     [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_valider     [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_menu        [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char key_actions     [ KEYS_ACTIONS_SIZE       ][ CONFIG_TAILLE_BUFFER_32 ]  ;
-  char key_validations [ KEYS_VALIDATIONS_SIZE   ][ CONFIG_TAILLE_BUFFER_32 ]  ;
-  int  key_appui_en_cours ;
-  int  key_mot_en_cours ;
-  int  key_phrase_lue ;
+  void          (*key_lock)   (void) ;
+  void          (*key_unlock) (void) ;  
+  char            key_symbole     [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_nombre      [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_mot         [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_phrase      [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_premier     [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_valider     [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_menu        [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            key_actions     [ KEYS_ACTIONS_SIZE       ][ CONFIG_TAILLE_BUFFER_32 ]  ;
+  char            key_validations [ KEYS_VALIDATIONS_SIZE   ][ CONFIG_TAILLE_BUFFER_32 ]  ;
+  int             key_appui_en_cours ;
+  int             key_mot_en_cours ;
+  int             key_phrase_lue ;
 } ;
 
 void   KEYS_INIT                  ( STRUCT_KEYS * )  ;

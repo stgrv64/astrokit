@@ -28,14 +28,17 @@ struct STR_DEVICES_PARAMS {
 
 struct STR_DEVICES {
   pthread_mutex_t dev_mutex ;
-  int dev_use_bluetooth ;
-  int dev_use_capteurs ;
-  int dev_use_infrarouge ;
-  int dev_use_raquette ;
-  int dev_use_controler ; 
-  int dev_use_keyboard ;
-  int dev_use_lcd ; 
-  int dev_init_capteurs ;
+  void          (*dev_lock)   (void) ;
+  void          (*dev_unlock) (void) ;  
+  FILE           *dev_file ;
+  int             dev_use_bluetooth ;
+  int             dev_use_capteurs ;
+  int             dev_use_infrarouge ;
+  int             dev_use_raquette ;
+  int             dev_use_controler ; 
+  int             dev_use_keyboard ;
+  int             dev_use_lcd ; 
+  int             dev_init_capteurs ;
 } ;
 
 typedef struct STR_DEVICES_PARAMS STRUCT_DEVICES_PARAMS ;

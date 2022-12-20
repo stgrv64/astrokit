@@ -21,6 +21,9 @@
 
 struct STR_DATAS {
   pthread_mutex_t dat_mutex ;
+  void          (*dat_lock)   (void) ;
+  void          (*dat_unlock) (void) ;  
+  FILE           *dat_file ;
   char dat_act [ CONFIG_TAILLE_BUFFER_256 ] ;
   char dat_acc [ CONFIG_TAILLE_BUFFER_256 ] ;
   char dat_bou [ CONFIG_TAILLE_BUFFER_256 ] ;

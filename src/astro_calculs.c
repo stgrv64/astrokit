@@ -94,6 +94,38 @@ double RAD  (int degres, int minutes )                  { return ((double)degres
 double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
 
 /*****************************************************************************************
+* @fn     : CALCULS_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_CALCULS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void CALCULS_LOCK ( STRUCT_CALCULS * lp_Cal) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cal->cal_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : CALCULS_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_CALCULS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void CALCULS_UNLOCK ( STRUCT_CALCULS * lp_Cal) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cal->cal_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
 * @fn     : CALCULS_REDUCTION_TOTALE
 * @author : s.gravois
 * @brief  : permet de calculer unela reduction totale de la vitesse 
@@ -301,18 +333,18 @@ void CALCULS_COORD_R3(void) {
   
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
-  gp_Ast->x = cos( gp_Ast->h ) * cos( gp_Ast->a )  ;
-  gp_Ast->y = cos( gp_Ast->h ) * sin( gp_Ast->a ) ;
-  gp_Ast->z = sin( gp_Ast->h ) ;
+  gp_Ast->ast_r3_x = cos( gp_Ast->ast_alt ) * cos( gp_Ast->ast_azi )  ;
+  gp_Ast->ast_r3_y = cos( gp_Ast->ast_alt ) * sin( gp_Ast->ast_azi ) ;
+  gp_Ast->ast_r3_z = sin( gp_Ast->ast_alt ) ;
   
   // On projette la sphere de rayon=1 sur une autre sphere de rayon la valeur qu'on veut
   // ce systeme permet de voir en 3D une valeur en fonction de 3 autres
   // Ici on veut representer la vitesse (norme du vecteur) 
   // en fonction de x y et z (x y z directions du vecteur sur la sphere unite)
   
-  gp_Ast->xx = gp_Ast->x * gp_Ast->V ;
-  gp_Ast->yy = gp_Ast->y * gp_Ast->V ;
-  gp_Ast->zz = gp_Ast->z * gp_Ast->V ;
+  gp_Ast->ast_r3_xx = gp_Ast->ast_r3_x * gp_Ast->V ;
+  gp_Ast->ast_r3_yy = gp_Ast->ast_r3_y * gp_Ast->V ;
+  gp_Ast->ast_r3_zz = gp_Ast->ast_r3_z * gp_Ast->V ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
@@ -354,13 +386,13 @@ void CALCULS_AZIMUT(void) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
-  gp_Ast->h = h ;
-  gp_Ast->a = SGN(a0)*a2 ;
+  gp_Ast->ast_alt = h ;
+  gp_Ast->ast_azi = SGN(a0)*a2 ;
 
   /* Si azimut negatif on ajoute 360 degres */  
   
-  if ( gp_Ast->a < 0 ) {
-    gp_Ast->a += 2*M_PI ;
+  if ( gp_Ast->ast_azi < 0 ) {
+    gp_Ast->ast_azi += 2*M_PI ;
   }
 
    // resultats de calculs : pour tests (a modifier : supprimer)
@@ -397,7 +429,7 @@ void CALCULS_AZIMUT(void) {
     gp_Ast->ast_agh_t.tim_SS, \
     gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES );
 
-  Trace1("alt = %f (deg)" , (gp_Ast->h)*CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("alt = %f (deg)" , (gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   return ;
 }
@@ -432,8 +464,8 @@ void CALCULS_EQUATEUR(void) {
   TraceArbo(__func__,2,"calculate equatorial coords") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
-    (gp_Ast->a)   * CALCULS_UN_RADIAN_EN_DEGRES,\
-    (gp_Ast->h)   * CALCULS_UN_RADIAN_EN_DEGRES,\
+    (gp_Ast->ast_azi)   * CALCULS_UN_RADIAN_EN_DEGRES,\
+    (gp_Ast->ast_alt)   * CALCULS_UN_RADIAN_EN_DEGRES,\
     (gp_Ast->AGH) * CALCULS_UN_RADIAN_EN_DEGRES,\
     (gp_Ast->DEC) * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
@@ -445,8 +477,8 @@ void CALCULS_EQUATEUR(void) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
-  a = gp_Ast->a ;
-  h = gp_Ast->h ;
+  a = gp_Ast->ast_azi ;
+  h = gp_Ast->ast_alt ;
   
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
@@ -475,7 +507,7 @@ void CALCULS_EQUATEUR(void) {
   CALCULS_CONVERSIONS_ANGLES() ;
   
   Trace1(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
-       gp_Ast->nom , \
+       gp_Ast->ast_nom , \
        gp_Ast->ast_asc_t.tim_HH, \
        gp_Ast->ast_asc_t.tim_MM, \
        gp_Ast->ast_asc_t.tim_SS, \
@@ -498,8 +530,8 @@ void CALCULS_EQUATEUR(void) {
   Trace1("DEC   (deg) = %f" , (gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   Trace1("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
-   (gp_Ast->a)*CALCULS_UN_RADIAN_EN_DEGRES,\
-   (gp_Ast->h)*CALCULS_UN_RADIAN_EN_DEGRES,\
+   (gp_Ast->ast_azi)*CALCULS_UN_RADIAN_EN_DEGRES,\
+   (gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES,\
    (gp_Ast->AGH)*CALCULS_UN_RADIAN_EN_DEGRES,\
    (gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
@@ -820,18 +852,18 @@ void CALCULS_CONVERSIONS_ANGLES(void) {
   /* azimut et altitude          */
   /* ----------------------------*/
 
-  (gp_Ast->ast_at).tim_hd = gp_Ast->a * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_at).tim_hd = gp_Ast->ast_azi * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_at) ;
 
-  (gp_Ast->ast_azi_a).ang_dec_rad = gp_Ast->a ;
-  (gp_Ast->ast_azi_a).ang_dec_deg = gp_Ast->a * CALCULS_UN_RADIAN_EN_DEGRES ;
+  (gp_Ast->ast_azi_a).ang_dec_rad = gp_Ast->ast_azi ;
+  (gp_Ast->ast_azi_a).ang_dec_deg = gp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES ;
   CALCULS_ANGLE_VERS_DMS(&gp_Ast->ast_azi_a) ;
   
-  (gp_Ast->ast_ht).tim_hd = gp_Ast->h * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_ht).tim_hd = gp_Ast->ast_alt * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_ht) ;
   
-  (gp_Ast->ast_alt_a).ang_dec_rad = gp_Ast->h ;
-  (gp_Ast->ast_alt_a).ang_dec_deg = gp_Ast->h * CALCULS_UN_RADIAN_EN_DEGRES ;
+  (gp_Ast->ast_alt_a).ang_dec_rad = gp_Ast->ast_alt ;
+  (gp_Ast->ast_alt_a).ang_dec_deg = gp_Ast->ast_alt * CALCULS_UN_RADIAN_EN_DEGRES ;
   CALCULS_ANGLE_VERS_DMS(&gp_Ast->ast_alt_a) ;
 
   /* -----------------------------*/
@@ -1005,26 +1037,26 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Cal->cal_mutex) ;
 
-  len = strlen(gp_Ast->nom)-i_len_prefixe ;
+  len = strlen(gp_Ast->ast_nom)-i_len_prefixe ;
 
-  Trace1("nom %s i_len_prefixe %d len %d", gp_Ast->nom, i_len_prefixe, len ) ;
-  Trace1("gp_Ast->nom %s CONFIG_MES %s", gp_Ast->nom, CONFIG_NGC ) ;
-  Trace1("strstr( gp_Ast->nom, CONFIG_MES ) = %s", strstr( gp_Ast->nom, CONFIG_NGC )) ;
+  Trace1("nom %s i_len_prefixe %d len %d", gp_Ast->ast_nom, i_len_prefixe, len ) ;
+  Trace1("gp_Ast->ast_nom %s CONFIG_MES %s", gp_Ast->ast_nom, CONFIG_NGC ) ;
+  Trace1("strstr( gp_Ast->ast_nom, CONFIG_MES ) = %s", strstr( gp_Ast->ast_nom, CONFIG_NGC )) ;
 
   /* La chaine doit etre superieure en longueur a i_len_prefixe */
 
-  if ( strlen(gp_Ast->nom) > i_len_prefixe ) {
+  if ( strlen(gp_Ast->ast_nom) > i_len_prefixe ) {
 
     Trace1("len>i_len_prefixe") ;
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK(&gp_Ast->ast_mutex) ;
 
-    if      ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
-    else if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
-    else if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
-    else if ( strstr( gp_Ast->nom, CONFIG_PLA ) != NULL ) gp_Ast->ast_typ = ASTRE_PLANETE ;
-    else if ( strstr( gp_Ast->nom, CONFIG_AZI ) != NULL ) gp_Ast->ast_typ = ASTRE_INDETERMINE ;
-    else if ( strstr( gp_Ast->nom, CONFIG_EQU ) != NULL ) gp_Ast->ast_typ = ASTRE_INDETERMINE ;
+    if      ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_PLA ) != NULL ) gp_Ast->ast_typ = ASTRE_PLANETE ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_AZI ) != NULL ) gp_Ast->ast_typ = ASTRE_INDETERMINE ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_EQU ) != NULL ) gp_Ast->ast_typ = ASTRE_INDETERMINE ;
     else                                                  gp_Ast->ast_typ = ASTRE_INDETERMINE ;
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Ast->ast_mutex) ;
@@ -1033,12 +1065,12 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK(&gp_Cal->cal_mutex) ;
 
-    if      ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->nom, CONFIG_PLA ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->nom, CONFIG_AZI ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->nom, CONFIG_EQU ) != NULL ) gp_Cal->cal_mode = CALCULS_AZIMUTAL_VERS_EQUATORIAL ;
+    if      ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_PLA ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_AZI ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_EQU ) != NULL ) gp_Cal->cal_mode = CALCULS_AZIMUTAL_VERS_EQUATORIAL ;
     else                                                  gp_Cal->cal_mode = CALCULS_AZIMUTAL_VERS_EQUATORIAL ; 
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Cal->cal_mutex) ;
@@ -1062,12 +1094,12 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   if ( gp_Ast->ast_typ != ASTRE_INDETERMINE ) {
 
-    if( strlen(gp_Ast->nom) > i_len_prefixe ) {
+    if( strlen(gp_Ast->ast_nom) > i_len_prefixe ) {
 
       if ( len > sizeof(c_sub) ) { Trace("erreur : %d >  %d", len,(int)sizeof(c_sub) ) ;}
       if ( len <= 0 )            { Trace("erreur : %d <= 0",   len) ;}
 
-      memcpy( c_sub, &gp_Ast->nom[i_len_prefixe], len );
+      memcpy( c_sub, &gp_Ast->ast_nom[i_len_prefixe], len );
 
       c_sub[len] = CONFIG_ZERO_CHAR ;
       gp_Ast->ast_num = atoi(c_sub) ;
@@ -1153,11 +1185,11 @@ void CALCULS_TOUT(void) {
         gp_Ast->ast_num = 0 ; 
       }
 
-      SOLAR_SYSTEM(     gp_Ast->infos, \
+      SOLAR_SYSTEM(     gp_Ast->ast_infos, \
                       & gp_Ast->ASC,  \
                       & gp_Ast->DEC, \
-                      & gp_Ast->a, \
-                      & gp_Ast->h , \
+                      & gp_Ast->ast_azi, \
+                      & gp_Ast->ast_alt , \
                         gp_Lie->lie_lat, \
                         gp_Lie->lie_lon, \
                         gp_Lie->lie_alt, \
@@ -1215,8 +1247,8 @@ void CALCULS_TOUT(void) {
         // TODO : modifier / completer / corriger ..
         
         if ( gp_Dev->dev_use_capteurs ) { 
-          gp_Ast->a = gp_Sui->pitch ;         // FIXME : donne azimut
-          gp_Ast->h = gp_Sui->acc_heading ;       // FIXME : donne altitude 
+          gp_Ast->ast_azi = gp_Sui->pitch ;         // FIXME : donne azimut
+          gp_Ast->ast_alt = gp_Sui->acc_heading ;       // FIXME : donne altitude 
           CALCULS_EQUATEUR ( gp_Lie, gp_Ast) ;  // FIXME : donnes ASC et DEC
         }
             
@@ -1259,8 +1291,8 @@ void CALCULS_VOUTE(void) {
     if (h>=0) 
     for(a=-M_PI +0.001 ;a<M_PI;a+=gp_Vou->vou_pas){
      
-     gp_Ast->a=a ;
-     gp_Ast->h=h ;
+     gp_Ast->ast_azi=a ;
+     gp_Ast->ast_alt=h ;
      
      CALCULS_EQUATEUR() ; 
      CALCULS_ASCENSION_DROITE() ;
@@ -1277,13 +1309,13 @@ void CALCULS_VOUTE(void) {
      CALCULS_COORD_R3() ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
-       gp_Ast->a * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->h * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_alt * CALCULS_UN_RADIAN_EN_DEGRES, \
        gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES, \
        gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->x , \
-       gp_Ast->y, \
-       gp_Ast->z, \
+       gp_Ast->ast_r3_x , \
+       gp_Ast->ast_r3_y, \
+       gp_Ast->ast_r3_z, \
        gp_Ast->Va, \
        gp_Ast->Vh, \
        gp_Ast->V, \
@@ -1291,15 +1323,15 @@ void CALCULS_VOUTE(void) {
      
      /*  	
      printf("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
-       gp_Ast->xx , \
-       gp_Ast->yy , \
-       gp_Ast->zz , \
+       gp_Ast->ast_r3_xx , \
+       gp_Ast->ast_r3_yy , \
+       gp_Ast->ast_r3_zz , \
        gp_Ast->V ) ;
      
      printf("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
-       gp_Ast->xx , \
-       gp_Ast->yy , \
-       gp_Ast->zz , \
+       gp_Ast->ast_r3_xx , \
+       gp_Ast->ast_r3_yy , \
+       gp_Ast->ast_r3_zz , \
        gp_Ast->Va, \
        gp_Ast->Vh, \
        gp_Ast->V ) ;
@@ -1318,9 +1350,9 @@ void CALCULS_VOUTE(void) {
       if ( gp_Ast->ast_new  ) {
 
         Trace1("%s : a %d h %d A %d H %d : Va %.2f Vh %.2f fre_ta_mic %.2f fre_th_mic %.2f fre_fa_mic=%.2f fre_fh_mic %.2f",\
-          gp_Ast->nom,\
-          (int)((gp_Ast->a)*CALCULS_UN_RADIAN_EN_DEGRES),\
-          (int)((gp_Ast->h)*CALCULS_UN_RADIAN_EN_DEGRES),\
+          gp_Ast->ast_nom,\
+          (int)((gp_Ast->ast_azi)*CALCULS_UN_RADIAN_EN_DEGRES),\
+          (int)((gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES),\
           (int)((gp_Ast->AGH)*CALCULS_UN_RADIAN_EN_DEGRES),\
           (int)((gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES),\
           gp_Ast->Va,\

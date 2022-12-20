@@ -15,7 +15,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-FILE * gp_File_Flog ; /* TODO : mettre ailleurs */
+
+/*****************************************************************************************
+* @fn     : ASTRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : ASTRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
 
 /*****************************************************************************************
 * @fn     : LOG_SYSTEM_LOG_0
@@ -40,9 +72,9 @@ void LOG_SYSTEM_LOG_0(int *incrlog) {
 
     sprintf(cmd,"echo %d >> %s/%s/%s", \
       *incrlog, \
-      gp_Con_Par->par_rep_home, \
-      gp_Con_Par->par_rep_log, \
-      gp_Con_Par->par_fic_log) ;
+      gp_Con_Par->con_par_rep_home, \
+      gp_Con_Par->con_par_rep_log, \
+      gp_Con_Par->con_par_fic_log) ;
 
     ret = system(cmd) ;
 
@@ -90,9 +122,9 @@ void LOG_SYSTEM_LOG_1(char *txt) {
 
     sprintf( cmd,"echo %s >> %s/%s/%s", \
       c_out, \
-      gp_Con_Par->par_rep_home, \
-      gp_Con_Par->par_rep_log, \
-      gp_Con_Par->par_fic_log ) ;
+      gp_Con_Par->con_par_rep_home, \
+      gp_Con_Par->con_par_rep_log, \
+      gp_Con_Par->con_par_fic_log ) ;
 
     ret =  system(cmd) ;
     
@@ -106,7 +138,7 @@ void LOG_SYSTEM_LOG_1(char *txt) {
 * @fn     : LOG_INIT
 * @author : s.gravois
 * @brief  : Cette fonction ouvre le fichier de log defini par 
-*           gp_Con_Par->par_rep_home / gp_Con_Par->par_rep_log / gp_Con_Par->par_fic_log
+*           gp_Con_Par->con_par_rep_home / gp_Con_Par->con_par_rep_log / gp_Con_Par->con_par_fic_log
 *           definis dans le fichier de configuration
 * @param  : void
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
@@ -129,7 +161,7 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     
     memset(buf, CALCULS_ZERO_CHAR, sizeof(buf));
-    sprintf(buf,"%s/%s/%s", gp_Con_Par->par_rep_home, gp_Con_Par->par_rep_log, gp_Con_Par->par_fic_log) ;
+    sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_log) ;
     
     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {
       // completer et modifier

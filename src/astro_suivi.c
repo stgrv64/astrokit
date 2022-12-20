@@ -17,6 +17,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
 /*****************************************************************************************
+* @fn     : ASTRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : ASTRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_ASTRE *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : SUIVI_TEMPORISATION_AZIMUT
 * @author : s.gravois
 * @brief  : Cette fonction permet de faire une temporisation dans le thread SUIVI_AZIMUT de astro.c
@@ -460,18 +493,18 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     if ( strstr( s_buffer4, gp_Key->key_symbole ) != NULL ) {
 
-      memset( gp_Ast->nom, CALCULS_ZERO_CHAR, sizeof(gp_Ast->nom)) ;
-      sprintf( gp_Ast->nom, "%s%s", gp_Key->key_symbole, gp_Key->key_nombre) ;
+      memset( gp_Ast->ast_nom, CALCULS_ZERO_CHAR, sizeof(gp_Ast->ast_nom)) ;
+      sprintf( gp_Ast->ast_nom, "%s%s", gp_Key->key_symbole, gp_Key->key_nombre) ;
     
-      Trace("== %s ==",gp_Ast->nom) ;
+      Trace("== %s ==",gp_Ast->ast_nom) ;
       
       CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
       /* Recherche de l'as dans les catalgues */
       
-      if ( strstr( gp_Ast->nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-      if ( strstr( gp_Ast->nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-      if ( strstr( gp_Ast->nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
+      if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+      if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
+      if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
       
       /* Pour les planetes, le calcul est fait dans SOLAR_SYSTEM dans CALCULS_TOUT */
 
@@ -533,8 +566,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
           if ( gp_Dev->dev_use_capteurs ) { 
             /* TODO : FIXME :  use global var for pitch & heading as member of STR_I2C_xx */
             /*
-            gp_Ast->a = lp_Sui->_pitch ;
-            gp_Ast->h = lp_Sui->_heading ; 
+            gp_Ast->ast_azi = lp_Sui->_pitch ;
+            gp_Ast->ast_alt = lp_Sui->_heading ; 
             */
           }
           CALCULS_EQUATEUR () ;
@@ -1000,8 +1033,10 @@ void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
   lp_Sui->sui_tempo_percent = 0.99 ; 
   lp_Sui->DTh               = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
   lp_Sui->DTa               = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
-  lp_Sui->sui_menu          = gp_Con_Par->par_default_menu  ;    // menu par defaut
-  lp_Sui->sui_menu_old      = gp_Con_Par->par_default_menu  ;
+  lp_Sui->sui_menu          = gp_Con_Par->con_par_default_menu  ;    // menu par defaut
+  lp_Sui->sui_menu_old      = gp_Con_Par->con_par_default_menu  ;
 
   gettimeofday(&lp_Sui->sui_tval,NULL) ;
+
+  return ;
 }

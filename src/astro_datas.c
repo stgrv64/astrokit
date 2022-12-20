@@ -16,6 +16,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
+* @fn     : DATAS_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_DATAS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void DATAS_LOCK ( STRUCT_DATAS * lp_Dat) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dat->dat_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : DATAS_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_DATAS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void DATAS_UNLOCK ( STRUCT_DATAS * lp_Dat) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Dat->dat_mutex ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : DATAS_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise les champs de la structure STRUCT_DATAS

@@ -240,24 +240,27 @@ t_en_Config_Parametres_Obligatoires_Types ;
 struct STR_CONFIG_PARAMS {
 
   pthread_mutex_t con_par_mutex ;
-  int             par_default_menu ;
+  void          (*con_par_lock)   (void) ;
+  void          (*con_par_unlock) (void) ;  
+  
+  int             con_par_default_menu ;
 
-  char            par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
-  char            par_rep_log    [ CONFIG_TAILLE_BUFFER_64 ] ;      
-  char            par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
-  char            par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
-  char            par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+  char            con_par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            con_par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            con_par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
+  char            con_par_rep_log    [ CONFIG_TAILLE_BUFFER_64 ] ;      
+  char            con_par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
+  char            con_par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
+  char            con_par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
 
-  char            par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_fic_vou    [ CONFIG_TAILLE_BUFFER_64 ] ;
-  char            par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
-  char            par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
-  char            par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
-  char            par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+  char            con_par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            con_par_fic_vou    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            con_par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
+  char            con_par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
+  char            con_par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
+  char            con_par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
 
-  char            par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
+  char            con_par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
 /*---------------------------------------------------*/
@@ -265,8 +268,13 @@ struct STR_CONFIG_PARAMS {
 /*---------------------------------------------------*/
 
 struct STR_CONFIG {
- pthread_mutex_t con_mutex ;
- char con_params  [CONFIG_DATAS_NB_LIGNES] [CONFIG_DATAS_NB_COLONNES] [CONFIG_TAILLE_BUFFER_256] ;
+  pthread_mutex_t con_mutex ;
+  FILE           *con_file ;
+  void          (*con_lock)   (void) ;
+  void          (*con_unlock) (void) ;  
+  char            con_params  [CONFIG_DATAS_NB_LIGNES] \
+                              [CONFIG_DATAS_NB_COLONNES] \
+                              [CONFIG_TAILLE_BUFFER_256] ;
 } ;
 typedef struct  STR_CONFIG STRUCT_CONFIG ;
 

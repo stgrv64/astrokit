@@ -23,12 +23,52 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 unsigned short sym[16] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15} ;
 
 /*
-STRUCT_I2C_DEVICE  lsm303d,   *lsm ;
-STRUCT_I2C_DEVICE  mcp23008,  *mcp ;
-STRUCT_I2C_DEVICE  rtcds1307, *rtc ;
+STRUCT_I2C  lsm303d,   *lsm ;
+STRUCT_I2C  mcp23008,  *mcp ;
+STRUCT_I2C  rtcds1307, *rtc ;
 */
-STRUCT_I2C_DEVICE  exemple,   *lp_I2c ;
+STRUCT_I2C         exemple,   *lp_I2c ;
 STRUCT_I2C_ACC_MAG accmag,    *lp_Acc ;
+
+/*****************************************************************************************
+* @fn     : I2C_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void I2C_LOCK ( STRUCT_I2C * lp_I2c) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_I2c->i2c_dev_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : I2C_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void I2C_UNLOCK ( STRUCT_I2C * lp_I2c) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_I2c->i2c_dev_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : I2C_CALCULS_ACCMAG
+* @author : s.gravois
+* @brief  : Calcul le pitch , roll et heading via accelerometre *lp_Acc
+* @param  : STRUCT_I2C_ACC_MAG *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
 
 void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *lp_Acc) {
   
@@ -107,9 +147,18 @@ void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *lp_Acc) {
   //printf("%.0f\t%.0f\t%.0f\n", phi, psi, the) ;
   //printf("%.0f\t%.0f\t%.0f\n",lp_Acc->acc_mag_x * 90 / 16384 , lp_Acc->acc_mag_y * 90 / 16384, lp_Acc->acc_mag_z * 90 / 16384 );
   //printf("---------\n") ;
+
+  return ;
 }
-//===========================================================
-int I2C_INIT( STRUCT_I2C_DEVICE * lp_i2c_dev, char * c_i2c_device_name, char * adress) {
+/*****************************************************************************************
+* @fn     : I2C_INIT
+* @author : s.gravois
+* @brief  : Tente d initialiser le device i2c avec open / ioctl / adressage direct
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
+
+int I2C_INIT( STRUCT_I2C * lp_i2c_dev, char * c_i2c_device_name, char * adress) {
    
   int ret ;
   ret =0 ;
@@ -118,9 +167,15 @@ int I2C_INIT( STRUCT_I2C_DEVICE * lp_i2c_dev, char * c_i2c_device_name, char * a
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT(&lp_i2c_dev->i2c_dev_mutex) ;
   
-  if ( ( lp_i2c_dev->i2c_dev_fd = open(c_i2c_device_name, O_RDWR)) < 0)  ret = -1 ;
-  else if ( ioctl( lp_i2c_dev->i2c_dev_fd, I2C_SLAVE, strtoul(adress,NULL,16) ) < 0) ret = -2 ;
-  else lp_i2c_dev->i2c_dev_adress = strtoul(adress,NULL,16) ;
+  if ( ( lp_i2c_dev->i2c_dev_fd = open(c_i2c_device_name, O_RDWR)) < 0) { 
+    ret = -1 ;
+  }
+  else if ( ioctl( lp_i2c_dev->i2c_dev_fd, I2C_SLAVE, strtoul(adress,NULL,16) ) < 0) { 
+    ret = -2 ;
+  }
+  else {
+    lp_i2c_dev->i2c_dev_adress = strtoul(adress,NULL,16) ;
+  }
   
   lp_i2c_dev->i2c_dev_statut = ret ;  
   lp_i2c_dev->i2c_dev_usleep  = I2C_SLEEP_MICRO ;
@@ -130,17 +185,24 @@ int I2C_INIT( STRUCT_I2C_DEVICE * lp_i2c_dev, char * c_i2c_device_name, char * a
   
   return ret ;
 }
-//===========================================================
-int I2C_SET_3( STRUCT_I2C_DEVICE * lp_i2c_dev, unsigned long output) {
+/*****************************************************************************************
+* @fn     : I2C_WRITE_DAC_MCP4726
+* @author : s.gravois
+* @brief  : Ecrit sur le slave i2c MCP4726 la valeur value
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
+
+int I2C_WRITE_DAC_MCP4726( STRUCT_I2C * lp_i2c_dev, unsigned long value) {
 
   int ret ;
-  unsigned long output1 ;
-  unsigned long output2 ;
+  unsigned long value1 ;
+  unsigned long value2 ;
   
-  output1 = (output / 16);
-  output2 = (output % 16) << 4;
-  //output1 =0 ;
-  //output2 =0;
+  value1 = (value / 16);
+  value2 = (value % 16) << 4;
+  //value1 =0 ;
+  //value2 =0;
   usleep( lp_i2c_dev->i2c_dev_usleep ) ;
   ret=0 ;
   memset( lp_i2c_dev->i2c_dev_buf, 0 , I2C_BUFFER_SIZE ) ;
@@ -148,8 +210,8 @@ int I2C_SET_3( STRUCT_I2C_DEVICE * lp_i2c_dev, unsigned long output) {
   //lp_i2c_dev->i2c_dev_buf[0] = lp_i2c_dev->i2c_dev_adress ;
   
   lp_i2c_dev->i2c_dev_buf[0] = (unsigned long)strtoul( MCP4726_CMD_WRITEDAC, NULL, 16 ) ;
-  lp_i2c_dev->i2c_dev_buf[1] = output1 ;
-  lp_i2c_dev->i2c_dev_buf[2] = output2 ;
+  lp_i2c_dev->i2c_dev_buf[1] = value1 ;
+  lp_i2c_dev->i2c_dev_buf[2] = value2 ;
   
   // if (writeEEPROM)                                      // command and config bits  (C2.C1.C0.x.x.PD1.PD0.x)
   // {
@@ -159,8 +221,8 @@ int I2C_SET_3( STRUCT_I2C_DEVICE * lp_i2c_dev, unsigned long output) {
   // {
   //  I2CMasterBuffer[1] = (MCP4726_CMD_WRITEDAC);
   // }
-  // I2CMasterBuffer[2] = (output / 16);                   // Upper data bits          (D11.D10.D9.D8.D7.D6.D5.D4)
-  // I2CMasterBuffer[3] = (output % 16) << 4;              // Lower data bits          (D3.D2.D1.D0.x.x.x.x)
+  // I2CMasterBuffer[2] = (value / 16);                   // Upper data bits          (D11.D10.D9.D8.D7.D6.D5.D4)
+  // I2CMasterBuffer[3] = (value % 16) << 4;              // Lower data bits          (D3.D2.D1.D0.x.x.x.x)
   
   if ((write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 3)) != 3 ) {
     printf("Error when writing to i2c slave\n");
@@ -170,8 +232,15 @@ int I2C_SET_3( STRUCT_I2C_DEVICE * lp_i2c_dev, unsigned long output) {
   
   return ret ;
 }
-//===========================================================
-int I2C_SET( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre, char * value) {
+/*****************************************************************************************
+* @fn     : I2C_WRITE
+* @author : s.gravois
+* @brief  : Set le slave i2c avec a valeur de registre et de valeur en parametes
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
+
+int I2C_WRITE( STRUCT_I2C * lp_i2c_dev, char * registre, char * value) {
 
   int ret ;
   
@@ -182,7 +251,8 @@ int I2C_SET( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre, char * value) {
   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
   lp_i2c_dev->i2c_dev_buf[1] = strtoul( value, NULL, 16 ) ;
   
-  if ((write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 2)) != 2 ) {
+  if (( write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 2)) != 2 ) {
+
     printf("Error writing to i2c slave\n");
     ret = -1 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
@@ -190,8 +260,15 @@ int I2C_SET( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre, char * value) {
   
   return ret ;
 }
-//===========================================================
-uint16_t I2C_GET( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre) {
+/*****************************************************************************************
+* @fn     : I2C_WRITE
+* @author : s.gravois
+* @brief  : Lit sur le slave i2c sur le registre passe en parametre
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
+
+uint16_t I2C_READ_1_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
   
   int ret ;
   
@@ -201,26 +278,44 @@ uint16_t I2C_GET( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre) {
   
   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
   
+  /*-------------------------*/
+  /* On ecrit avant de lire  */
+  /*-------------------------*/
+
   if ((write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 1)) != 1 ) {
     printf("Error writing to i2c slave register %s\n", registre);
     ret = -1 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
-  
+
   if ((read( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 1)) != 1 ) {
     printf("Error reading to i2c slave register\n");
     ret = -2 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
-  if ( ret == 0 )  return (uint16_t)lp_i2c_dev->i2c_dev_buf[0] ;
-  else            return (uint16_t)ret ;
+  if ( ret == 0 ) {
+    return (uint16_t)lp_i2c_dev->i2c_dev_buf[0] ;
+  }
+  else { 
+    return (uint16_t)ret ;
+  }
+
+  return ret ;
 }
-//===========================================================
-void I2C_GET_6( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre) {
+/*****************************************************************************************
+* @fn     : I2C_READ_6_BYTES
+* @author : s.gravois
+* @brief  : Lit 6 octets sur le slave i2c sur le registre passe en parametre
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
+
+void I2C_READ_6_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
   
   int ret ;
   
   ret=0 ;
+
   usleep( lp_i2c_dev->i2c_dev_usleep) ;
   memset( lp_i2c_dev->i2c_dev_buf, 0 , I2C_BUFFER_SIZE ) ;
   
@@ -230,27 +325,38 @@ void I2C_GET_6( STRUCT_I2C_DEVICE * lp_i2c_dev, char * registre) {
     printf("Error writing to i2c slave register %s\n", registre);
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
+
   if ((read( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 6)) != 6 ) {
     printf("Error reading to i2c slave register %s\n", registre);
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
+
+  return ;
 }
-//===========================================================
+/*****************************************************************************************
+* @fn     : I2C_ACC_READ
+* @author : s.gravois
+* @brief  : Lit sur l accelerometre les valeurs d acceleation et de magnetometre
+* @param  : STRUCT_I2C *
+* @date   : 2022-12-20 creation entete
+*****************************************************************************************/
 
-void I2C_GET_ACC( STRUCT_I2C_DEVICE *lp_I2c, STRUCT_I2C_ACC_MAG *lp_Acc ) {
+void I2C_ACC_READ( STRUCT_I2C *lp_I2c, STRUCT_I2C_ACC_MAG *lp_Acc ) {
 
-      lp_Acc->acc_axl = I2C_GET( lp_I2c, REG_OUT_ACC_X_L ) ;
-      lp_Acc->acc_axh = I2C_GET( lp_I2c, REG_OUT_ACC_X_H ) ; 
-      lp_Acc->acc_ayl = I2C_GET( lp_I2c, REG_OUT_ACC_Y_L ) ;
-      lp_Acc->acc_ayh = I2C_GET( lp_I2c, REG_OUT_ACC_Y_H ) ;
-      lp_Acc->acc_azl = I2C_GET( lp_I2c, REG_OUT_ACC_Z_L ) ;
-      lp_Acc->acc_azh = I2C_GET( lp_I2c, REG_OUT_ACC_Z_H ) ;
-             
-      lp_Acc->acc_mxl = I2C_GET( lp_I2c, REG_OUT_MAG_X_L ) ;
-      lp_Acc->acc_mxh = I2C_GET( lp_I2c, REG_OUT_MAG_X_H ) ; 
-      lp_Acc->acc_myl = I2C_GET( lp_I2c, REG_OUT_MAG_Y_L ) ;
-      lp_Acc->acc_myh = I2C_GET( lp_I2c, REG_OUT_MAG_Y_H ) ;
-      lp_Acc->acc_mzl = I2C_GET( lp_I2c, REG_OUT_MAG_Z_L ) ;
-      lp_Acc->acc_mzh = I2C_GET( lp_I2c, REG_OUT_MAG_Z_H ) ;
+  lp_Acc->acc_axl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_X_L ) ;
+  lp_Acc->acc_axh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_X_H ) ; 
+  lp_Acc->acc_ayl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Y_L ) ;
+  lp_Acc->acc_ayh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Y_H ) ;
+  lp_Acc->acc_azl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Z_L ) ;
+  lp_Acc->acc_azh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Z_H ) ;
+
+  lp_Acc->acc_mxl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_X_L ) ;
+  lp_Acc->acc_mxh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_X_H ) ; 
+  lp_Acc->acc_myl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Y_L ) ;
+  lp_Acc->acc_myh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Y_H ) ;
+  lp_Acc->acc_mzl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Z_L ) ;
+  lp_Acc->acc_mzh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Z_H ) ;
+
+  return ;
 }
 //===========================================================
