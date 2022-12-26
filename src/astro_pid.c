@@ -21,34 +21,34 @@ int  gi_pid_trace_azi ;
 
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : PID_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_PID *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void PID_LOCK ( STRUCT_PID * lp_Pid) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pid->pid_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : PID_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_PID *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void PID_UNLOCK ( STRUCT_PID * lp_Pid) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pid->pid_mutex ) ;
 
   return ;
 }
@@ -90,10 +90,10 @@ void PID_PARAMS_DISPLAY(STRUCT_PID_PARAMS * lp_Pid_Par ) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %f", "lp_Pid_Par->par_pid_ech" , lp_Pid_Par->par_pid_ech);
-  Trace("%-50s = %f", "lp_Pid_Par->par_pid_ki " , lp_Pid_Par->par_pid_ki);
-  Trace("%-50s = %f", "lp_Pid_Par->par_pid_kp " , lp_Pid_Par->par_pid_kp);
-  Trace("%-50s = %f", "lp_Pid_Par->par_pid_kd " , lp_Pid_Par->par_pid_kd);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Pid_Par->par_pid_ech" , lp_Pid_Par->par_pid_ech);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Pid_Par->par_pid_ki " , lp_Pid_Par->par_pid_ki);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Pid_Par->par_pid_kp " , lp_Pid_Par->par_pid_kp);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Pid_Par->par_pid_kd " , lp_Pid_Par->par_pid_kd);
 
   return ;
 }

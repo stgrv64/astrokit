@@ -73,7 +73,7 @@ void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
 
   TraceArbo(__func__,0,"init devices") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & lp_Dev->dev_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Dev->dev_mutex ) ;
 
   lp_Dev->dev_use_capteurs    = gp_Dev_Par->dev_par_use_capteurs ;
   lp_Dev->dev_use_raquette    = gp_Dev_Par->dev_par_use_raquette ;
@@ -125,13 +125,13 @@ void DEVICES_PARAMS_DISPLAY(STRUCT_DEVICES_PARAMS *lp_Dev_Par ) {
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_controler", lp_Dev_Par->dev_par_use_controler);
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_capteurs ", lp_Dev_Par->dev_par_use_capteurs);
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_bluetooth", lp_Dev_Par->dev_par_use_bluetooth);
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_infrared ", lp_Dev_Par->dev_par_use_infrared);
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_raquette ", lp_Dev_Par->dev_par_use_raquette);
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_keyboard ", lp_Dev_Par->dev_par_use_keyboard);
-  Trace("%-50s = %d", "lp_Dev_Par->dev_par_use_lcd      ", lp_Dev_Par->dev_par_use_lcd);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_controler", lp_Dev_Par->dev_par_use_controler);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_capteurs ", lp_Dev_Par->dev_par_use_capteurs);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_bluetooth", lp_Dev_Par->dev_par_use_bluetooth);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_infrared ", lp_Dev_Par->dev_par_use_infrared);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_raquette ", lp_Dev_Par->dev_par_use_raquette);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_keyboard ", lp_Dev_Par->dev_par_use_keyboard);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_lcd      ", lp_Dev_Par->dev_par_use_lcd);
 
   return ;
 }

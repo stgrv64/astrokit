@@ -73,34 +73,34 @@ static const char * gc_hach_pth_sched_param[] = {
 
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : PTHREADS_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_PTHREADS *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void PTHREADS_LOCK ( STRUCT_PTHREADS * lp_Pth) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : PTHREADS_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_PTHREADS *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
 
   return ;
 }
@@ -120,36 +120,13 @@ void PTHREADS_INIT_MUTEXS(void) {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_glo_alt, NULL )) != 0 ) {
-    i_errno=errno;        
-    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
-    perror("pthread_mutex_init mut_glo_alt");
-    exit(EXIT_FAILURE); 
-  }
-  if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_glo_azi, NULL )) != 0 ) {
-    i_errno=errno;        
-    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
-    perror("pthread_mutex_init mut_glo_azi");
-    exit(EXIT_FAILURE); 
-  }
-  if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_cal, NULL )) != 0 ) {
-    i_errno=errno;        
-    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
-    perror("pthread_mutex_init mut_cal");
-    exit(EXIT_FAILURE); 
-  }
-  if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_dat , NULL )) != 0 ) {
-    i_errno=errno;        
-    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
-    perror("pthread_mutex_init mut_dat");
-    exit(EXIT_FAILURE); 
-  }
-  if ( ( i_error = pthread_mutex_init( & gp_Mut->mut_pth , NULL )) != 0 ) {
-    i_errno=errno;        
-    Trace("i_error : %d i_errno : %d", i_error, i_errno ) ;
-    perror("pthread_mutex_init mut_pth");
-    exit(EXIT_FAILURE); 
-  }
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_glo_alt ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_glo_azi ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_cal ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_dat ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_dat ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_pth ) ;
+
 }
 /*****************************************************************************************
 * @fn     : PTHREADS_INIT

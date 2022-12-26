@@ -17,38 +17,101 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : SUIVI_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_SUIVI *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void SUIVI_LOCK ( STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : SUIVI_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_SUIVI *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void SUIVI_UNLOCK ( STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->sui_mutex ) ;
 
   return ;
 }
+/*****************************************************************************************
+* @fn     : SUIVI_PAS_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_SUIVI_PAS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
 
+void SUIVI_PAS_LOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->pas_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_PAS_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_SUIVI_PAS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void SUIVI_PAS_UNLOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pas->pas_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_FRE_LOCK
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_SUIVI_FREQUENCES *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FREQUENCES * lp_Fre) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->fre_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_FRE_UNLOCK
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_SUIVI_FREQUENCES *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+void SUIVI_FRE_UNLOCK ( STRUCT_SUIVI_FREQUENCES * lp_Fre) {
+
+  TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Fre->fre_mutex ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : SUIVI_TEMPORISATION_AZIMUT
 * @author : s.gravois
@@ -68,10 +131,10 @@ void SUIVI_TEMPORISATION_AZIMUT(STRUCT_SUIVI * lp_Sui, struct timeval * pt00) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  usleep ( (long)(lp_Sui->DTa * lp_Sui->sui_tempo_percent) ) ;
+  usleep ( (long)(lp_Sui->sui_dta * lp_Sui->sui_tempo_percent) ) ;
   
   t_diff=0;
-  while( t_diff < lp_Sui->DTa ) {
+  while( t_diff < lp_Sui->sui_dta ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (( t01.tv_sec - pt00->tv_sec)  * TIME_MICRO_SEC ) + t01.tv_usec - pt00->tv_usec;
@@ -98,10 +161,10 @@ void SUIVI_TEMPORISATION_ALTITUDE(STRUCT_SUIVI * lp_Sui, struct timeval * pt00) 
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  usleep ( (long)(lp_Sui->DTh * lp_Sui->sui_tempo_percent) ) ;
+  usleep ( (long)(lp_Sui->sui_dth * lp_Sui->sui_tempo_percent) ) ;
   
   t_diff=0;
-  while( t_diff < lp_Sui->DTh ) {
+  while( t_diff < lp_Sui->sui_dth ) {
      
    gettimeofday(&t01,NULL) ;
    t_diff = (( t01.tv_sec - pt00->tv_sec)  * TIME_MICRO_SEC ) + t01.tv_usec - pt00->tv_usec;
@@ -945,8 +1008,8 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * lp_Sui) {
   if ( gp_Pas->pas_azi_old != gp_Pas->pas_azi || gp_Pas->pas_alt_old != gp_Pas->pas_alt ) {
 
    Trace1(" : Va = %2.4f Vh = %2.4f fre_ta_mic = %2.4f fre_th_mic = %2.4f fre_fa_mic = %2.4f fre_fh_mic = %2.4f Fam = %ld Fhm = %ld",\
-    gp_Ast->Va, \
-    gp_Ast->Vh, \
+    gp_Ast->ast_azi_vit, \
+    gp_Ast->ast_alt_vit, \
     gp_Fre->fre_ta_mic, \
     gp_Fre->fre_th_mic, \
     gp_Fre->fre_fa_mic, \
@@ -1029,10 +1092,10 @@ void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
            
   lp_Sui->sui_Da            = 0  ;      // nombre a injecter dans les diviseurs de frequence
   lp_Sui->sui_Dh            = 0 ;       // nombre a injecter dans les diviseurs de frequence
-  lp_Sui->alarme            = 0 ;
+  lp_Sui->sui_alarme            = 0 ;
   lp_Sui->sui_tempo_percent = 0.99 ; 
-  lp_Sui->DTh               = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
-  lp_Sui->DTa               = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
+  lp_Sui->sui_dth               = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
+  lp_Sui->sui_dta               = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
   lp_Sui->sui_menu          = gp_Con_Par->con_par_default_menu  ;    // menu par defaut
   lp_Sui->sui_menu_old      = gp_Con_Par->con_par_default_menu  ;
 

@@ -148,9 +148,11 @@ struct STR_MUTEXS {
 typedef struct STR_MUTEXS STRUCT_MUTEXS ;
 
 struct STR_PTHREADS {
-  pthread_t                 pth_mutex ; /* protege les membres de la structure */
-  pthread_t                 pth_t   [ PTHREADS_MAX_THREADS ]  ;  
   STRUCT_PTHREADS_ATTRIBUTS pth_att [ PTHREADS_MAX_THREADS ]  ; 
+  pthread_mutex_t           pth_mutex ;
+  void                    (*pth_lock)   (void) ;
+  void                    (*pth_unlock) (void) ;  
+  pthread_t                 pth_t   [ PTHREADS_MAX_THREADS ]  ;  
   unsigned int              pth_i_nb ; 
 } ;
 typedef struct STR_PTHREADS STRUCT_PTHREADS ;

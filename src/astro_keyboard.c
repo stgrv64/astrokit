@@ -63,7 +63,7 @@ void KEYBOARD_UNLOCK ( void * lp_Void) {
 
 void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
 
-  TraceArbo(__func__,0,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init termios") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ter->ter_mutex ) ;
 

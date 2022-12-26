@@ -501,21 +501,22 @@ void   CONFIG_PARAMETRES_DISPLAY(void) {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat    ", gp_Pwm_Par->gpi_pwm_par_led_etat );  
-  Trace("%-50s = %s","gp_Con_Par->con_par_default_menu", gc_hach_suivi_menus[ gp_Con_Par->con_par_default_menu ] ) ;
-  Trace("%-50s = %s","gp_Con_Par->con_par_rep_cat     ", gp_Con_Par->con_par_rep_cat)  ;
-  Trace("%-50s = %s","gp_Con_Par->con_par_rep_cfg     ", gp_Con_Par->con_par_rep_cfg)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_rep_log     ", gp_Con_Par->con_par_rep_log)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_rep_in      ", gp_Con_Par->con_par_rep_in)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_rep_out     ", gp_Con_Par->con_par_rep_out)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_fic_log     ", gp_Con_Par->con_par_fic_log)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_fic_pid     ", gp_Con_Par->con_par_fic_pid)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_fic_vou     ", gp_Con_Par->con_par_fic_vou)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_fic_led     ", gp_Con_Par->con_par_fic_led)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_fic_dat     ", gp_Con_Par->con_par_fic_dat)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_fic_hhm     ", gp_Con_Par->con_par_fic_hhm)  ;  
-  Trace("%-50s = %s","gp_Con_Par->con_par_rep_scr     ", gp_Con_Par->con_par_rep_scr)  ; 
-  Trace("%-50s = %s","gp_Con_Par->con_par_src_ker     ", gp_Con_Par->con_par_src_ker)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat    ", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat    ", gp_Pwm_Par->gpi_pwm_par_led_etat );  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_default_menu", gc_hach_suivi_menus[ gp_Con_Par->con_par_default_menu ] ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cat     ", gp_Con_Par->con_par_rep_cat)  ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cfg     ", gp_Con_Par->con_par_rep_cfg)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_log     ", gp_Con_Par->con_par_rep_log)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_in      ", gp_Con_Par->con_par_rep_in)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_out     ", gp_Con_Par->con_par_rep_out)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_log     ", gp_Con_Par->con_par_fic_log)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_pid     ", gp_Con_Par->con_par_fic_pid)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_vou     ", gp_Con_Par->con_par_fic_vou)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_led     ", gp_Con_Par->con_par_fic_led)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_dat     ", gp_Con_Par->con_par_fic_dat)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_hhm     ", gp_Con_Par->con_par_fic_hhm)  ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_scr     ", gp_Con_Par->con_par_rep_scr)  ; 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_src_ker     ", gp_Con_Par->con_par_src_ker)  ; 
 
   TIME_PARAMS_DISPLAY     ( gp_Tim_Par ) ;
   PID_PARAMS_DISPLAY      ( gp_Pid_Par ) ;
@@ -820,20 +821,20 @@ void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *gp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_
   Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
   Trace(" %s : latitude      : %.2f (deg) ", c_nom, lp_Lie->lie_lat    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
   Trace(" %s : longitude     : %.2f (deg) ", c_nom, lp_Lie->lie_lon    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Ast->Va,  gp_Ast->Vh ) ; 
+  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Ast->ast_azi_vit,  gp_Ast->ast_alt_vit ) ; 
   Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Ast->ast_azi    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
   Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Ast->ast_alt    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Ast->DEC  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
-  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ASC    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
+  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Ast->ast_dec  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
+  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_asc    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
+  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
 
-  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
-  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
-  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AGH2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh2 ) ;
+  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
+  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
+  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh2 ) ;
 
-  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi0 ) ;
-  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
-  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->AZI2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
+  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_azi0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi0 ) ;
+  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_azi1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
+  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_azi2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
 
   Trace("----------------------------") ;
 }

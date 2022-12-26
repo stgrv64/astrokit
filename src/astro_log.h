@@ -98,6 +98,20 @@ while (0)
 #endif
 
 // ------------------------------------------------------------------------
+// ASTRO_LOG_DEBUG : NiveauX GENERIQUES DEPENDANT DE VARIABLES
+// ------------------------------------------------------------------------
+
+#define TraceLogLevel(loglevel,nb,fmt, args...) \
+do { \
+  if (loglevel>=nb) { \
+    fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+  } else  { \
+    fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+  } \
+} \
+while (0)
+
+// ------------------------------------------------------------------------
 // ASTRO_LOG_DEBUG : Niveau 0
 // ------------------------------------------------------------------------
 

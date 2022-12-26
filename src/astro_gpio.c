@@ -164,12 +164,12 @@ void   GPIO_PWM_PARAMS_DISPLAY (STRUCT_GPIO_PARAMS_PWM * lp_Pwm_Par) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_gpio", lp_Pwm_Par->gpi_pwm_par_alt_gpio)  ;  
-  Trace("%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_gpio", lp_Pwm_Par->gpi_pwm_par_azi_gpio)  ;  
-  Trace("%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_mask", lp_Pwm_Par->gpi_pwm_par_alt_mask)  ;
-  Trace("%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_mask", lp_Pwm_Par->gpi_pwm_par_azi_mask)  ;
-  Trace("%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_fpwm", lp_Pwm_Par->gpi_pwm_par_alt_fpwm)  ;  
-  Trace("%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_fpwm", lp_Pwm_Par->gpi_pwm_par_azi_fpwm)  ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_gpio", lp_Pwm_Par->gpi_pwm_par_alt_gpio)  ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_gpio", lp_Pwm_Par->gpi_pwm_par_azi_gpio)  ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_mask", lp_Pwm_Par->gpi_pwm_par_alt_mask)  ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_mask", lp_Pwm_Par->gpi_pwm_par_azi_mask)  ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_fpwm", lp_Pwm_Par->gpi_pwm_par_alt_fpwm)  ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_fpwm", lp_Pwm_Par->gpi_pwm_par_azi_fpwm)  ;  
 
   return ;
 
@@ -1675,7 +1675,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
   
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & lp_Mot->mot_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Mot->mot_mutex ) ;
   
   memset(cmd, CONFIG_ZERO_CHAR ,sizeof(cmd)) ;
 
@@ -1706,7 +1706,7 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
     
     lp_Mot->mot_pha[i]=(STRUCT_GPIO_PWM_PHASE *)malloc(sizeof(STRUCT_GPIO_PWM_PHASE)) ;
     
-    pthread_mutex_init( & lp_Mot->mot_pha[i]->pha_mutex, NULL ) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Mot->mot_pha[i]->pha_mutex ) ;
 
     /* 2022-11-01 : p_pth > non utilise pour l'instant (preparation portage) */    
     /* les threads sont utilises et initialises via  pthread_t [] dans main */

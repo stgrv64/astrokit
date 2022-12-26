@@ -17,34 +17,34 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : LIEU_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LIEU *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void LIEU_LOCK ( STRUCT_LIEU * lp_Lie) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lie->lie_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : LIEU_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LIEU *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void LIEU_UNLOCK ( STRUCT_LIEU * lp_Lie) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lie->lie_mutex ) ;
 
   return ;
 }
@@ -85,9 +85,9 @@ void LIEU_PARAMS_DISPLAY(STRUCT_LIEU_PARAMS *lp_Lie_Par ) {
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %.2f" , "lp_Lie_Par->par_altitude ", lp_Lie_Par->par_altitude); 
-  Trace("%-50s = %.2f" , "lp_Lie_Par->par_latitude ", lp_Lie_Par->par_latitude); 
-  Trace("%-50s = %.2f" , "lp_Lie_Par->par_longitude", lp_Lie_Par->par_longitude); 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_altitude ", lp_Lie_Par->par_altitude); 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_latitude ", lp_Lie_Par->par_latitude); 
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_longitude", lp_Lie_Par->par_longitude); 
 
   return ;
 }
@@ -106,7 +106,7 @@ void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
  
   TraceArbo(__func__,0,"init lieu") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  pthread_mutex_init( & lp_Lie->lie_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Lie->lie_mutex ) ;
 
   lp_Lie->lie_jj  = 0 ; // jour julien
   lp_Lie->lie_ts  = 0 ;  // temps sideral

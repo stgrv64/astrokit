@@ -230,33 +230,32 @@ void CALCULS_PARAMS_INIT(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
 void CALCULS_PARAMS_DISPLAY(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1", lp_Cal_Par->cal_par_alt_red_1);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2", lp_Cal_Par->cal_par_alt_red_2);
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_3", lp_Cal_Par->cal_par_alt_red_3);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_4", lp_Cal_Par->cal_par_alt_red_4);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_5", lp_Cal_Par->cal_par_alt_red_5);
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_6", lp_Cal_Par->cal_par_alt_red_6);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_7", lp_Cal_Par->cal_par_alt_red_7);
-  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_alt_inv  ", lp_Cal_Par->cal_par_alt_inv  );   
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_alt_acc  ", lp_Cal_Par->cal_par_alt_acc ) ;
-  Trace("%-50s = %ld", "lp_Cal_Par->cal_par_alt_f    ", lp_Cal_Par->cal_par_alt_f ) ;
-  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_alt_n    ", lp_Cal_Par->cal_par_alt_n ) ;
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_1", lp_Cal_Par->cal_par_azi_red_1);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_2", lp_Cal_Par->cal_par_azi_red_2);
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_3", lp_Cal_Par->cal_par_azi_red_3);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_4", lp_Cal_Par->cal_par_azi_red_4);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_5", lp_Cal_Par->cal_par_azi_red_5);
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_6", lp_Cal_Par->cal_par_azi_red_6);         
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_7", lp_Cal_Par->cal_par_azi_red_7);
-  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_azi_inv  ", lp_Cal_Par->cal_par_azi_inv  );   
-  Trace("%-50s = %f",  "lp_Cal_Par->cal_par_azi_acc  ", lp_Cal_Par->cal_par_azi_acc ) ;
-  Trace("%-50s = %ld", "lp_Cal_Par->cal_par_azi_f    ", lp_Cal_Par->cal_par_azi_f ) ;
-  Trace("%-50s = %d",  "lp_Cal_Par->cal_par_azi_n    ", lp_Cal_Par->cal_par_azi_n ) ;
-  
-  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_slow_forward", lp_Cal_Par->cal_par_altaz_slow_forward ) ;  
-  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_slow_rewind ", lp_Cal_Par->cal_par_altaz_slow_rewind ) ;   
-  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_fast_forward", lp_Cal_Par->cal_par_altaz_fast_forward ) ;  
-  Trace("%-50s = %f", "lp_Cal_Par->cal_par_altaz_fast_rewind ", lp_Cal_Par->cal_par_altaz_fast_rewind ) ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1",         lp_Cal_Par->cal_par_alt_red_1);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2",         lp_Cal_Par->cal_par_alt_red_2);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_3",         lp_Cal_Par->cal_par_alt_red_3);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_4",         lp_Cal_Par->cal_par_alt_red_4);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_5",         lp_Cal_Par->cal_par_alt_red_5);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_6",         lp_Cal_Par->cal_par_alt_red_6);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_7",         lp_Cal_Par->cal_par_alt_red_7);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_alt_inv  ",         lp_Cal_Par->cal_par_alt_inv  );   
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_acc  ",         lp_Cal_Par->cal_par_alt_acc ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Cal_Par->cal_par_alt_f    ",         lp_Cal_Par->cal_par_alt_f ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_alt_n    ",         lp_Cal_Par->cal_par_alt_n ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_1",         lp_Cal_Par->cal_par_azi_red_1);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_2",         lp_Cal_Par->cal_par_azi_red_2);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_3",         lp_Cal_Par->cal_par_azi_red_3);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_4",         lp_Cal_Par->cal_par_azi_red_4);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_5",         lp_Cal_Par->cal_par_azi_red_5);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_6",         lp_Cal_Par->cal_par_azi_red_6);         
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_7",         lp_Cal_Par->cal_par_azi_red_7);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_azi_inv  ",         lp_Cal_Par->cal_par_azi_inv  );   
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_acc  ",         lp_Cal_Par->cal_par_azi_acc ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Cal_Par->cal_par_azi_f    ",         lp_Cal_Par->cal_par_azi_f ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_azi_n    ",         lp_Cal_Par->cal_par_azi_n ) ;
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Cal_Par->cal_par_altaz_slow_forward", lp_Cal_Par->cal_par_altaz_slow_forward ) ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Cal_Par->cal_par_altaz_slow_rewind ", lp_Cal_Par->cal_par_altaz_slow_rewind ) ;   
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Cal_Par->cal_par_altaz_fast_forward", lp_Cal_Par->cal_par_altaz_fast_forward ) ;  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f", "lp_Cal_Par->cal_par_altaz_fast_rewind ", lp_Cal_Par->cal_par_altaz_fast_rewind ) ;  
 
   return ;
 }
@@ -284,7 +283,6 @@ void   CALCULS_INIT_ANGLE( STRUCT_ANGLE * lp_Ang ) {
   lp_Ang->ang_mm      = 0 ;      
   lp_Ang->ang_ss      = 0 ; 
 } ;
-typedef struct STR_ANGLE STRUCT_ANGLE ;
 
 /*****************************************************************************************
 * @fn     : CALCULS_INIT_PTR
@@ -342,9 +340,9 @@ void CALCULS_COORD_R3(void) {
   // Ici on veut representer la vitesse (norme du vecteur) 
   // en fonction de x y et z (x y z directions du vecteur sur la sphere unite)
   
-  gp_Ast->ast_r3_xx = gp_Ast->ast_r3_x * gp_Ast->V ;
-  gp_Ast->ast_r3_yy = gp_Ast->ast_r3_y * gp_Ast->V ;
-  gp_Ast->ast_r3_zz = gp_Ast->ast_r3_z * gp_Ast->V ;
+  gp_Ast->ast_r3_xx = gp_Ast->ast_r3_x * gp_Ast->ast_vit ;
+  gp_Ast->ast_r3_yy = gp_Ast->ast_r3_y * gp_Ast->ast_vit ;
+  gp_Ast->ast_r3_zz = gp_Ast->ast_r3_z * gp_Ast->ast_vit ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
@@ -366,18 +364,22 @@ void CALCULS_AZIMUT(void) {
   // par rapport au m�ridien (SUD) et la declinaison
   // ATTENTION !! angle horaire = ascension droite sid�rale corrig�e
   // avec le temps sid�ral : une conversion doit etre faite pour trouver
-  // gp_Ast->AGH  = TS - (asc droite absolue)
+  // gp_Ast->ast_agh  = TS - (asc droite absolue)
   // Une fonction de calcul du temps sid�ral doit etre faite ult�rieurement 
   
   double lat,A,H,a0,h,a1,a2,af ;
   
   TraceArbo(__func__,2,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
+
   lat= gp_Lie->lie_lat ;
-  A  = gp_Ast->AGH ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
-  H  = gp_Ast->DEC ; // FIXME : declinaison - seule valeur qui ne change pas 
+  A  = gp_Ast->ast_agh ; // FIXME : angle horaire calcule prealablement dans astro.c en theorie
+  H  = gp_Ast->ast_dec ; // FIXME : declinaison - seule valeur qui ne change pas 
   
-  Trace2("agh = %2.3f\tH = %2.3f\t",(gp_Ast->AGH)*CALCULS_UN_RADIAN_EN_DEGRES,(gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
+
+  Trace2("agh = %2.3f\tH = %2.3f\t",(gp_Ast->ast_agh)*CALCULS_UN_RADIAN_EN_DEGRES,(gp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   h  = ALT(lat,A,H) ;
   a0 = AZI0(A,H,h) ;
@@ -397,9 +399,9 @@ void CALCULS_AZIMUT(void) {
 
    // resultats de calculs : pour tests (a modifier : supprimer)
   
-  gp_Ast->AZI0 = a0 ;
-  gp_Ast->AZI1 = a1 ;
-  gp_Ast->AZI2 = a2 ;
+  gp_Ast->ast_azi0 = a0 ;
+  gp_Ast->ast_azi1 = a1 ;
+  gp_Ast->ast_azi2 = a2 ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
@@ -409,25 +411,25 @@ void CALCULS_AZIMUT(void) {
     gp_Ast->ast_azi0_t.tim_HH, \
     gp_Ast->ast_azi0_t.tim_MM , \
     gp_Ast->ast_azi0_t.tim_SS, \
-    gp_Ast->AZI0 * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_azi0 * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace2("AZI1 = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->ast_azi1_t.tim_HH, \
     gp_Ast->ast_azi1_t.tim_MM , \
     gp_Ast->ast_azi1_t.tim_SS, \
-    gp_Ast->AZI1 * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_azi1 * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace2("AZI2 = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->ast_azi2_t.tim_HH, \
     gp_Ast->ast_azi2_t.tim_MM , \
     gp_Ast->ast_azi2_t.tim_SS, \
-    gp_Ast->AZI2 * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_azi2 * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace1("azi = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->ast_agh_t.tim_HH, \
     gp_Ast->ast_agh_t.tim_MM, \
     gp_Ast->ast_agh_t.tim_SS, \
-    gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace1("alt = %f (deg)" , (gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
@@ -466,8 +468,8 @@ void CALCULS_EQUATEUR(void) {
   Trace1("avant calcul => a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
     (gp_Ast->ast_azi)   * CALCULS_UN_RADIAN_EN_DEGRES,\
     (gp_Ast->ast_alt)   * CALCULS_UN_RADIAN_EN_DEGRES,\
-    (gp_Ast->AGH) * CALCULS_UN_RADIAN_EN_DEGRES,\
-    (gp_Ast->DEC) * CALCULS_UN_RADIAN_EN_DEGRES) ;
+    (gp_Ast->ast_agh) * CALCULS_UN_RADIAN_EN_DEGRES,\
+    (gp_Ast->ast_dec) * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Lie->lie_mutex ) ;
 
@@ -492,15 +494,15 @@ void CALCULS_EQUATEUR(void) {
   if ( A0 < 0 ) {
     A0 += 2 * M_PI ;
   }
-  // gp_Ast->AGH = SGN(A0)*A1  ;
+  // gp_Ast->ast_agh = SGN(A0)*A1  ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
-  gp_Ast->DEC  = H ;
-  gp_Ast->AGH = A0 ;
-  gp_Ast->AGH0 = A0 ;
-  gp_Ast->AGH1 = A1 ;
-  gp_Ast->AGH2 = A2 ;
+  gp_Ast->ast_dec  = H ;
+  gp_Ast->ast_agh = A0 ;
+  gp_Ast->ast_agh0 = A0 ;
+  gp_Ast->ast_agh1 = A1 ;
+  gp_Ast->ast_agh2 = A2 ;
   
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
@@ -511,29 +513,29 @@ void CALCULS_EQUATEUR(void) {
        gp_Ast->ast_asc_t.tim_HH, \
        gp_Ast->ast_asc_t.tim_MM, \
        gp_Ast->ast_asc_t.tim_SS, \
-       gp_Ast->ASC * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->ASC \
+       gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_asc \
   ) ; 
 
   Trace1("AH0   (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    gp_Ast->ast_agh0_t.tim_HH, gp_Ast->ast_agh0_t.tim_MM , gp_Ast->ast_agh0_t.tim_SS, gp_Ast->AGH0 * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_agh0_t.tim_HH, gp_Ast->ast_agh0_t.tim_MM , gp_Ast->ast_agh0_t.tim_SS, gp_Ast->ast_agh0 * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace1("AH1   (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    gp_Ast->ast_agh1_t.tim_HH, gp_Ast->ast_agh1_t.tim_MM , gp_Ast->ast_agh1_t.tim_SS, gp_Ast->AGH1 * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_agh1_t.tim_HH, gp_Ast->ast_agh1_t.tim_MM , gp_Ast->ast_agh1_t.tim_SS, gp_Ast->ast_agh1 * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace1("AH2   (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    gp_Ast->ast_agh2_t.tim_HH, gp_Ast->ast_agh2_t.tim_MM , gp_Ast->ast_agh2_t.tim_SS, gp_Ast->AGH2 * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_agh2_t.tim_HH, gp_Ast->ast_agh2_t.tim_MM , gp_Ast->ast_agh2_t.tim_SS, gp_Ast->ast_agh2 * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace1("AH    (deg) = %d.%d.%d (hms) %.2f (deg)", \
-    gp_Ast->ast_agh_t.tim_HH, gp_Ast->ast_agh_t.tim_MM , gp_Ast->ast_agh_t.tim_SS, gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES );
+    gp_Ast->ast_agh_t.tim_HH, gp_Ast->ast_agh_t.tim_MM , gp_Ast->ast_agh_t.tim_SS, gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES );
 
-  Trace1("DEC   (deg) = %f" , (gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("DEC   (deg) = %f" , (gp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   Trace1("apres calcul =>a = %2.3f\th = %2.3f\t=>agh = %2.3f\tH=%2.3f",\
    (gp_Ast->ast_azi)*CALCULS_UN_RADIAN_EN_DEGRES,\
    (gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES,\
-   (gp_Ast->AGH)*CALCULS_UN_RADIAN_EN_DEGRES,\
-   (gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES) ;
+   (gp_Ast->ast_agh)*CALCULS_UN_RADIAN_EN_DEGRES,\
+   (gp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES) ;
 
    return ;
 } 
@@ -553,8 +555,8 @@ void CALCULS_VITESSES_EQUATORIAL(void) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
-  gp_Ast->Va = -15.0 ;
-  gp_Ast->Vh = -15.0 ;
+  gp_Ast->ast_azi_vit = -15.0 ;
+  gp_Ast->ast_alt_vit = -15.0 ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
@@ -582,18 +584,18 @@ void CALCULS_VITESSES(void) {
   TraceArbo(__func__,3,"calculate speeds") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Sui->sui_mode_equatorial == 1 ) {
-    gp_Ast->Va = -15.0 ;
-    gp_Ast->Vh = -15.0 ;
+    gp_Ast->ast_azi_vit = -15.0 ;
+    gp_Ast->ast_alt_vit = -15.0 ;
   }
   else {
     angle=CALCULS_NB_SECARC_PAR_S_EQU ;
-    G  = sqr(sin(gp_Ast->AGH))*sqr(cos(gp_Ast->DEC))+sqr(sin(gp_Lie->lie_lat)*cos(gp_Ast->DEC)*cos(gp_Ast->AGH)-cos(gp_Lie->lie_lat)*sin(gp_Ast->DEC)) ;
-    Va = angle*(cos(gp_Ast->DEC)*(cos(gp_Lie->lie_lat)*cos(gp_Ast->AGH)*sin(gp_Ast->DEC)-sin(gp_Lie->lie_lat)*cos(gp_Ast->DEC)))/G ;
-    Vh = angle*sin(gp_Ast->AGH)*cos(gp_Ast->DEC)*cos(gp_Lie->lie_lat)/sqrt(G) ;
-    gp_Ast->Va=Va ;
-    gp_Ast->Vh=Vh ;
+    G  = sqr(sin(gp_Ast->ast_agh))*sqr(cos(gp_Ast->ast_dec))+sqr(sin(gp_Lie->lie_lat)*cos(gp_Ast->ast_dec)*cos(gp_Ast->ast_agh)-cos(gp_Lie->lie_lat)*sin(gp_Ast->ast_dec)) ;
+    Va = angle*(cos(gp_Ast->ast_dec)*(cos(gp_Lie->lie_lat)*cos(gp_Ast->ast_agh)*sin(gp_Ast->ast_dec)-sin(gp_Lie->lie_lat)*cos(gp_Ast->ast_dec)))/G ;
+    Vh = angle*sin(gp_Ast->ast_agh)*cos(gp_Ast->ast_dec)*cos(gp_Lie->lie_lat)/sqrt(G) ;
+    gp_Ast->ast_azi_vit=Va ;
+    gp_Ast->ast_alt_vit=Vh ;
   }
-  Trace2("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n",(gp_Lie->lie_lat)*CALCULS_UN_RADIAN_EN_DEGRES,(gp_Ast->AGH)*CALCULS_UN_RADIAN_EN_DEGRES,(gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES,Va,Vh) ;
+  Trace2("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n",(gp_Lie->lie_lat)*CALCULS_UN_RADIAN_EN_DEGRES,(gp_Ast->ast_agh)*CALCULS_UN_RADIAN_EN_DEGRES,(gp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES,Va,Vh) ;
 }
 
 /*****************************************************************************************
@@ -611,8 +613,8 @@ void CALCULS_DIVISEUR_FREQUENCE(void) {
   
   TraceArbo(__func__,3,"calculate divide params of divide controler frequency") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  gp_Sui->sui_Da = gp_Cal_Par->cal_par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_azi_red_tot * pow(2.0, gp_Cal_Par->cal_par_azi_n) * ( gp_Ast->Va / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
-  gp_Sui->sui_Dh = gp_Cal_Par->cal_par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_alt_red_tot * pow(2.0, gp_Cal_Par->cal_par_alt_n) * ( gp_Ast->Vh / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
+  gp_Sui->sui_Da = gp_Cal_Par->cal_par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_azi_red_tot * pow(2.0, gp_Cal_Par->cal_par_azi_n) * ( gp_Ast->ast_azi_vit / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
+  gp_Sui->sui_Dh = gp_Cal_Par->cal_par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_alt_red_tot * pow(2.0, gp_Cal_Par->cal_par_alt_n) * ( gp_Ast->ast_alt_vit / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
 }
 
 /*****************************************************************************************
@@ -651,8 +653,8 @@ void CALCULS_PERIODE(void) {
   // La periode de base en mode controleur est directement geree par ce controleur
   // La periode de base en mode PWM est le quart d'une sinusoide
   
-  Trace2("%f %f %f %f %f",gp_Pas->pas_acc_azi, gp_Vou->vou_acc, gp_Cal_Par->cal_par_azi_red_tot, gp_Ast->Va, azi_rot);
-  Trace2("%f %f %f %f %f",gp_Pas->pas_acc_alt, gp_Vou->vou_acc, gp_Cal_Par->cal_par_alt_red_tot, gp_Ast->Vh, alt_rot);
+  Trace2("%f %f %f %f %f",gp_Pas->pas_acc_azi, gp_Vou->vou_acc, gp_Cal_Par->cal_par_azi_red_tot, gp_Ast->ast_azi_vit, azi_rot);
+  Trace2("%f %f %f %f %f",gp_Pas->pas_acc_alt, gp_Vou->vou_acc, gp_Cal_Par->cal_par_alt_red_tot, gp_Ast->ast_alt_vit, alt_rot);
 
   /*------------------------*/
   /* Calculs des frequences */
@@ -661,8 +663,8 @@ void CALCULS_PERIODE(void) {
   /* calcul des frequences brutes non corrigees = brutes */
   /* ces frequences ne sont pas corrigees par les accelerations diverses */
 
-  freq_azi_bru = gp_Cal_Par->cal_par_azi_red_tot * gp_Ast->Va * azi_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
-  freq_alt_bru = gp_Cal_Par->cal_par_alt_red_tot * gp_Ast->Vh * alt_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
+  freq_azi_bru = gp_Cal_Par->cal_par_azi_red_tot * gp_Ast->ast_azi_vit * azi_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
+  freq_alt_bru = gp_Cal_Par->cal_par_alt_red_tot * gp_Ast->ast_alt_vit * alt_rot / CALCULS_DIVISEUR_SEPCIFIQUE / CALCULS_PI_FOIS_DEUX / 4  ;
 
   /* calcul des frequences corrigees avant prise en compte micro pas */
   /* ces frequences sont corrigees par les accelerations diverses */
@@ -759,7 +761,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
     
       pthread_mutex_lock(& gp_Mut->mut_glo_azi );
   
-        gp_Ast->Va = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_azi_red_tot ) ;
+        gp_Ast->ast_azi_vit = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_azi_red_tot ) ;
         gp_Fre->fre_sa_old = gp_Fre->fre_sa ; 
         gp_Fre->fre_sa     = (int)SGN(frequence)  ;
         gp_Fre->fre_fa_mic = fabs(frequence) ;
@@ -783,7 +785,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
     
       pthread_mutex_lock( & gp_Mut->mut_glo_alt );
     
-        gp_Ast->Vh     = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_alt_red_tot ) ;
+        gp_Ast->ast_alt_vit     = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_alt_red_tot ) ;
         gp_Fre->fre_sh_old = gp_Fre->fre_sh ; 
         gp_Fre->fre_sh         = (int)SGN(frequence)  ;
         gp_Fre->fre_fh_mic = fabs(frequence) ;
@@ -871,49 +873,49 @@ void CALCULS_CONVERSIONS_ANGLES(void) {
   /* ascension droite             */
   /* -----------------------------*/
 
-  (gp_Ast->ast_agh_t).tim_hd = gp_Ast->AGH * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_agh_t).tim_hd = gp_Ast->ast_agh * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_agh_t) ;
   
-  (gp_Ast->ast_dec_t).tim_hd = gp_Ast->DEC * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_dec_t).tim_hd = gp_Ast->ast_dec * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_dec_t) ;
 
-  (gp_Ast->ast_asc_t).tim_hd  = gp_Ast->ASC * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_asc_t).tim_hd  = gp_Ast->ast_asc * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_asc_t) ;
 
   /* -------------------------------*/
 
-  (gp_Ast->ast_agh_a).ang_dec_rad = gp_Ast->AGH ;
-  (gp_Ast->ast_agh_a).ang_dec_deg = gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES ;
+  (gp_Ast->ast_agh_a).ang_dec_rad = gp_Ast->ast_agh ;
+  (gp_Ast->ast_agh_a).ang_dec_deg = gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES ;
   CALCULS_ANGLE_VERS_DMS(&gp_Ast->ast_agh_a) ;
 
-  (gp_Ast->ast_asc_a).ang_dec_rad = gp_Ast->ASC ;
-  (gp_Ast->ast_asc_a).ang_dec_deg = gp_Ast->ASC * CALCULS_UN_RADIAN_EN_DEGRES ;
+  (gp_Ast->ast_asc_a).ang_dec_rad = gp_Ast->ast_asc ;
+  (gp_Ast->ast_asc_a).ang_dec_deg = gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES ;
   CALCULS_ANGLE_VERS_DMS(&gp_Ast->ast_asc_a) ;
 
-  (gp_Ast->ast_dec_a).ang_dec_rad = gp_Ast->DEC ;
-  (gp_Ast->ast_dec_a).ang_dec_deg = gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES ;
+  (gp_Ast->ast_dec_a).ang_dec_rad = gp_Ast->ast_dec ;
+  (gp_Ast->ast_dec_a).ang_dec_deg = gp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES ;
   CALCULS_ANGLE_VERS_DMS(&gp_Ast->ast_dec_a) ;
 
   /* -------------------------------*/
   /* les calculs intermediaires     */
   /* -------------------------------*/
 
-  (gp_Ast->ast_agh0_t).tim_hd = gp_Ast->AGH0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_agh0_t).tim_hd = gp_Ast->ast_agh0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_agh0_t) ;
 
-  (gp_Ast->ast_agh1_t).tim_hd = gp_Ast->AGH1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_agh1_t).tim_hd = gp_Ast->ast_agh1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_agh1_t) ;
 
-  (gp_Ast->ast_agh2_t).tim_hd = gp_Ast->AGH2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_agh2_t).tim_hd = gp_Ast->ast_agh2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_agh2_t) ;
 
-  (gp_Ast->ast_azi0_t).tim_hd = gp_Ast->AZI0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_azi0_t).tim_hd = gp_Ast->ast_azi0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_azi0_t) ;
 
-  (gp_Ast->ast_azi1_t).tim_hd = gp_Ast->AZI1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_azi1_t).tim_hd = gp_Ast->ast_azi1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_azi1_t) ;
 
-  (gp_Ast->ast_azi2_t).tim_hd = gp_Ast->AZI2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  (gp_Ast->ast_azi2_t).tim_hd = gp_Ast->ast_azi2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   TIME_CALCULS_DEC_VERS_HMS(&gp_Ast->ast_azi2_t) ;
 }
 
@@ -935,25 +937,25 @@ void CALCULS_ANGLE_HORAIRE(void) {
 
   /* correction ascension droite si negatif (on ajoute 360 degres) */
 
-  if ( gp_Ast->ASC < 0 ) {
-    gp_Ast->ASC += 2*M_PI ;
+  if ( gp_Ast->ast_asc < 0 ) {
+    gp_Ast->ast_asc += 2*M_PI ;
   }
 
   /* calcul */ 
 
-  gp_Ast->AGH = gp_Lie->lie_tsr - gp_Ast->ASC ;
+  gp_Ast->ast_agh = gp_Lie->lie_tsr - gp_Ast->ast_asc ;
   
   /* correction angle horaire si negatif (on ajoute 360 degres) */
 
-  if ( gp_Ast->AGH < 0 ) {
-    gp_Ast->AGH += 2*M_PI ;
+  if ( gp_Ast->ast_agh < 0 ) {
+    gp_Ast->ast_agh += 2*M_PI ;
   }
 
   CALCULS_CONVERSIONS_ANGLES() ;
   
-  Trace1("ascension droite (deg)   = %.2f", gp_Ast->ASC * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ;
-  Trace1("angle horaire (deg)      = %.2f", gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("angle horaire (deg)      = %.2f", gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
     ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
@@ -978,25 +980,25 @@ void CALCULS_ASCENSION_DROITE(void) {
   
   /* correction angle horaire si negatif (on ajoute 360 degres) */
 
-  if ( gp_Ast->AGH < 0 ) {
-    gp_Ast->AGH += 2*M_PI ;
+  if ( gp_Ast->ast_agh < 0 ) {
+    gp_Ast->ast_agh += 2*M_PI ;
   }
 
   /* calcul */ 
 
-  gp_Ast->ASC = gp_Lie->lie_tsr - gp_Ast->AGH ;
+  gp_Ast->ast_asc = gp_Lie->lie_tsr - gp_Ast->ast_agh ;
   
   /* correction ascension droite si negatif (on ajoute 360 degres) */
 
-  if ( gp_Ast->ASC < 0 ) {
-    gp_Ast->ASC += 2*M_PI ;
+  if ( gp_Ast->ast_asc < 0 ) {
+    gp_Ast->ast_asc += 2*M_PI ;
   }
 
   CALCULS_CONVERSIONS_ANGLES() ;
   
-  Trace1("ascension droite (deg)   = %.2f", gp_Ast->ASC * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ;
-  Trace1("angle horaire (deg)      = %.2f", gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("angle horaire (deg)      = %.2f", gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
     ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
@@ -1186,8 +1188,8 @@ void CALCULS_TOUT(void) {
       }
 
       SOLAR_SYSTEM(     gp_Ast->ast_infos, \
-                      & gp_Ast->ASC,  \
-                      & gp_Ast->DEC, \
+                      & gp_Ast->ast_asc,  \
+                      & gp_Ast->ast_dec, \
                       & gp_Ast->ast_azi, \
                       & gp_Ast->ast_alt , \
                         gp_Lie->lie_lat, \
@@ -1299,42 +1301,42 @@ void CALCULS_VOUTE(void) {
      CALCULS_VITESSES() ;
      CALCULS_PERIODE() ;
 
-     gp_Ast->V  = sqrt( sqr( gp_Ast->Va ) + sqr( gp_Ast->Vh )) ;
+     gp_Ast->ast_vit  = sqrt( sqr( gp_Ast->ast_azi_vit ) + sqr( gp_Ast->ast_alt_vit )) ;
      
-     if ( gp_Ast->Va != 0) 
-       gp_Ast->An = atan( gp_Ast->Vh / gp_Ast->Va ) ;
+     if ( gp_Ast->ast_azi_vit != 0) 
+       gp_Ast->ast_ah = atan( gp_Ast->ast_alt_vit / gp_Ast->ast_azi_vit ) ;
      else
-       gp_Ast->An = M_PI/2 ;
+       gp_Ast->ast_ah = M_PI/2 ;
      
      CALCULS_COORD_R3() ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
        gp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES, \
        gp_Ast->ast_alt * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->AGH * CALCULS_UN_RADIAN_EN_DEGRES, \
-       gp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES, \
+       gp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES, \
        gp_Ast->ast_r3_x , \
        gp_Ast->ast_r3_y, \
        gp_Ast->ast_r3_z, \
-       gp_Ast->Va, \
-       gp_Ast->Vh, \
-       gp_Ast->V, \
-       gp_Ast->An ) ;
+       gp_Ast->ast_azi_vit, \
+       gp_Ast->ast_alt_vit, \
+       gp_Ast->ast_vit, \
+       gp_Ast->ast_ah ) ;
      
      /*  	
      printf("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
        gp_Ast->ast_r3_xx , \
        gp_Ast->ast_r3_yy , \
        gp_Ast->ast_r3_zz , \
-       gp_Ast->V ) ;
+       gp_Ast->ast_vit ) ;
      
      printf("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
        gp_Ast->ast_r3_xx , \
        gp_Ast->ast_r3_yy , \
        gp_Ast->ast_r3_zz , \
-       gp_Ast->Va, \
-       gp_Ast->Vh, \
-       gp_Ast->V ) ;
+       gp_Ast->ast_azi_vit, \
+       gp_Ast->ast_alt_vit, \
+       gp_Ast->ast_vit ) ;
      */
    }
   
@@ -1353,18 +1355,18 @@ void CALCULS_VOUTE(void) {
           gp_Ast->ast_nom,\
           (int)((gp_Ast->ast_azi)*CALCULS_UN_RADIAN_EN_DEGRES),\
           (int)((gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES),\
-          (int)((gp_Ast->AGH)*CALCULS_UN_RADIAN_EN_DEGRES),\
-          (int)((gp_Ast->DEC)*CALCULS_UN_RADIAN_EN_DEGRES),\
-          gp_Ast->Va,\
-          gp_Ast->Vh,\
+          (int)((gp_Ast->ast_agh)*CALCULS_UN_RADIAN_EN_DEGRES),\
+          (int)((gp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES),\
+          gp_Ast->ast_azi_vit,\
+          gp_Ast->ast_alt_vit,\
           gp_Fre->fre_ta_mic,\
           gp_Fre->fre_th_mic,\
           gp_Fre->fre_fa_mic,\
           gp_Fre->fre_fh_mic ) ;
 
         Trace1("Va=%2.4f Vh=%2.4f fre_ta_mic=%2.4f fre_th_mic=%2.4f fre_fa_mic=%2.4f fre_fh_mic=%2.4f Fam = %ld Fhm = %ld sta_Tac = %f sta_Thc = %f\n",\
-              gp_Ast->Va,\
-              gp_Ast->Vh,\
+              gp_Ast->ast_azi_vit,\
+              gp_Ast->ast_alt_vit,\
               gp_Fre->fre_ta_mic,\
               gp_Fre->fre_th_mic,\
               gp_Fre->fre_fa_mic,\

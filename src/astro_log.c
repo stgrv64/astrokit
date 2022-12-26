@@ -17,34 +17,34 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : LOG_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LOG *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void LOG_LOCK ( STRUCT_LOG * lp_Log) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Log->log_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : LOG_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LOG *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void LOG_UNLOCK ( STRUCT_LOG * lp_Log) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Log->log_mutex ) ;
 
   return ;
 }
@@ -155,8 +155,6 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
   TraceArbo(__func__,0,"init log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Log->log_mutex )
-
-  Trace("") ;
   
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     

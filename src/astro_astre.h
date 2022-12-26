@@ -58,8 +58,8 @@ typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;
 struct STR_ASTRE {
 
   pthread_mutex_t ast_mutex ;
-  void          (*ast_lock)   (void) ;
-  void          (*ast_unlock) (void) ;  
+  void          (*ast_lock)   (struct STR_ASTRE *) ;
+  void          (*ast_unlock) (struct STR_ASTRE *) ;  
   FILE           *ast_file ; 
 
   STRUCT_TIME     ast_at ;
@@ -93,9 +93,9 @@ struct STR_ASTRE {
   *  les coordonnees x y et z dans la geode d'observation de rayon 1
   --------------------------------------------- */
 
-  double ast_r3_x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
-  double ast_r3_y ;    // cos(h)sin(a)  = ordonnee du point sur la sphere de rayon UN (voute celeste) 
-  double ast_r3_z ;    // sin(h)        = z        du point sur la sphere de rayon UN (voute celeste) 
+  double          ast_r3_x ;    // cos(h)cos(a)  = abscisse du point sur la sphere de rayon UN (voute celeste) 
+  double          ast_r3_y ;    // cos(h)sin(a)  = ordonnee du point sur la sphere de rayon UN (voute celeste) 
+  double          ast_r3_z ;    // sin(h)        = z        du point sur la sphere de rayon UN (voute celeste) 
 
   /* --------------------------------------------
   *  on deduit de l'azimut et de l'altitude
@@ -104,77 +104,48 @@ struct STR_ASTRE {
   * => permet de representer la norme d'un vecteur par rapport a (a,h)<=>(x,y,z)
   --------------------------------------------- */
 
-  double ast_r3_xx ;   // donneee permettant de representer une valeur par OM * val (sphere de unite UN multipliee par la valeur) _ abscisse
-  double ast_r3_yy ;   // idem - ordonnee
-  double ast_r3_zz ; 
+  double          ast_r3_xx ;   // donneee permettant de representer une valeur par OM * val (sphere de unite UN multipliee par la valeur) _ abscisse
+  double          ast_r3_yy ;   // idem - ordonnee
+  double          ast_r3_zz ; 
   
-  double ast_azi ;    // azimut
-  double ast_alt ;    // altitude
-
-  double a0 ;   // valeur precedente de l'azimut
-  double h0 ;   // valeur precedente de l'altitude
+  double          ast_azi ;     // azimut
+  double          ast_alt ;     // altitude
+  double          ast_agh ;     // angle horaire  ( = gp_Lie->tps_mic sideral - ASC)
+  double          ast_dec  ;    // un resultat de calcul de declinaison
+  double          ast_asc  ;    // un resultat de calcul de asc
+  double          ast_agh0 ;    // un autre resultat de calcul de asc
+  double          ast_agh1 ;    // un autre resultat de calcul de asc
+  double          ast_agh2 ;    // un autre resultat de calcul de asc
+  double          ast_azi0 ;    // un resultat de calcul de AZI
+  double          ast_azi1 ;    // un autre resultat de calcul de AZI
+  double          ast_azi2 ;    // un autre resultat de calcul de AZI
+  double          ast_vit  ;    // norme du vecteur vitesse
+  double          ast_ah  ;     // angle du vecteur vitesse par rapport a horizontal droite
+  double          ast_azi_vit ; // vitesse de l'azimut   en rad par seconde calculee par une methode
+  double          ast_alt_vit ; // vitesse de l'altitude en rad par seconde calculee par une methode
   
-  double AGH ;    // angle horaire  ( = gp_Lie->tps_mic sideral - ASC)
-  double H    ;    // declinaison
-  
-  double DEC  ;  // un resultat de calcul de declinaison
-  double ASC  ;   // un resultat de calcul de asc
-
-  double AGH0 ;  // un autre resultat de calcul de asc
-  double AGH1 ;  // un autre resultat de calcul de asc
-  double AGH2 ;  // un autre resultat de calcul de asc
-
-  double ALT ;   // un resultat de calcul de ALT
-
-  double AZI0 ;   // un resultat de calcul de AZI
-  double AZI1 ;  // un autre resultat de calcul de AZI
-  double AZI2 ;  // un autre resultat de calcul de AZI
-
-  double A0 ;   // valeur precedente de l'angle horaire
-  double H0 ;   // valeur precedente de la declinaison
-  
-  double V  ;   // norme du vecteur vitesse
-  double An  ;  // angle du vecteur vitesse par rapport a horizontal droite
-  double Va ;   // vitesse de l'azimut   en rad par seconde calculee par une methode
-  double Vh ;   // vitesse de l'altitude en rad par seconde calculee par une methode
-  
-  // ceci sert pour les tests 
-  // a modifier et effacer en fin de developpement
-  
-  double da ;   // differentiel azimut           en rad par seconde (a - a0 )
-  double dh ;   // differentiel altitude         en rad par seconde (h - h0 )
-  double dA ;   // differentiel ascension droite en rad par seconde (A - A0 )
-  double dH ;   // differentiel declinaison      en rad par seconde (H - H0 )
-  double dVa ;  // differentiel de la vitesse en azimut utile pour calcul    (acceleration en azimut)
-  double dVh ;  // differentiel de la vitesse en altitude utilde pour calcul (acceleratnio en altitude)
-  double dVam ; // maximum du differentiel pour tests et calcul
-  double dVhm ; // maximum du differentiel pour tests et calcul
-
   /* formatage des informations de coordonnnes sur l astre */
 
-  char  c_hhmmss_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmmss_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmmss_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmmss_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmmss_dec[ CONFIG_TAILLE_BUFFER_16] ;
-
-  char  c_hhmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_hhmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
-
-  char  c_ddmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_ddmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_ddmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_ddmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_ddmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
-
-  char  c_dd_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_dd_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_dd_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_dd_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char  c_dd_dec[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmmss_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmmss_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmmss_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmmss_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmmss_dec[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_ddmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_ddmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_ddmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_ddmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_ddmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_dd_agh[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_dd_asc[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_dd_azi[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_dd_alt[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_dd_dec[ CONFIG_TAILLE_BUFFER_16] ;
 
 } ;
 typedef struct STR_ASTRE STRUCT_ASTRE ;

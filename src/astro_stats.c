@@ -7,34 +7,34 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : STATS_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_STATS *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void STATS_LOCK ( STRUCT_STATS * lp_Sta) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sta->sta_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : STATS_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_STATS *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void STATS_UNLOCK ( STRUCT_STATS * lp_Sta) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sta->sta_mutex ) ;
 
   return ;
 }
@@ -43,11 +43,11 @@ void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
 * @fn     : STAT_MESURE_PULSATIONS_INJECTEES
 * @author : s.gravois
 * @brief  : Effectue les calculs statistiques sur les mesures
-* @param  : STRUCT_SUIVI_STATS *
+* @param  : STRUCT_STATS *
 * @date   : 2022-12-20 creation entete
 *****************************************************************************************/
 
-void STAT_MESURE_PULSATIONS_INJECTEES(STRUCT_SUIVI_STATS * gp_Sta) {
+void STAT_MESURE_PULSATIONS_INJECTEES(STRUCT_STATS * gp_Sta) {
 
   int i,incr=0 ;
   // calcul de la valeur moyenne du tableau des valeurs mesurees

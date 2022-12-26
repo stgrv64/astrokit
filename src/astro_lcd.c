@@ -67,34 +67,34 @@ extern STRUCT_LCD     *gp_Lcd ;
 
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : LCD_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LCD *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void LCD_LOCK ( STRUCT_LCD * lp_Lcd) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lcd->lcd_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : LCD_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LCD *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void LCD_UNLOCK ( STRUCT_LCD * lp_Lcd) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lcd->lcd_mutex ) ;
 
   return ;
 }
@@ -113,11 +113,9 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
 
   TraceArbo(__func__,0,"init lcd") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("") ;
-
   /* Initialisation mutex */
 
-  pthread_mutex_init( & lp_Lcd->lcd_mutex, NULL ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Lcd->lcd_mutex ) ;
   
   /* Initialisation pointeurs de fonctions */
 
@@ -600,7 +598,7 @@ void LCD_DISPLAY_ASTRE_VITESSES( const int i_duree_us ) {
     memset( c_l1, 0, sizeof(c_l1)) ;
 
     strcpy(  c_l0, gp_Ast->ast_nom ) ;
-    sprintf( c_l1,"%.2f %.2f", gp_Ast->Va, gp_Ast->Vh);
+    sprintf( c_l1,"%.2f %.2f", gp_Ast->ast_azi_vit, gp_Ast->ast_alt_vit);
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -628,8 +626,8 @@ void LCD_DISPLAY_AZI_ALT( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "AZI %s", gp_Ast->c_ddmm_azi ) ;
-    sprintf( c_l1, "ALT %s", gp_Ast->c_ddmm_alt );
+    sprintf( c_l0, "AZI %s", gp_Ast->ast_ddmm_azi ) ;
+    sprintf( c_l1, "ALT %s", gp_Ast->ast_ddmm_alt );
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -657,8 +655,8 @@ void LCD_DISPLAY_AGH_DEC( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "AGH %s", gp_Ast->c_hhmm_agh ) ;
-    sprintf( c_l1, "DEC %s", gp_Ast->c_ddmm_dec ) ;
+    sprintf( c_l0, "AGH %s", gp_Ast->ast_hhmm_agh ) ;
+    sprintf( c_l1, "DEC %s", gp_Ast->ast_ddmm_dec ) ;
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -686,8 +684,8 @@ void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "ASC %s", gp_Ast->c_hhmm_asc ) ;
-    sprintf( c_l1, "DEC %s", gp_Ast->c_ddmm_dec ) ;
+    sprintf( c_l0, "ASC %s", gp_Ast->ast_hhmm_asc ) ;
+    sprintf( c_l1, "DEC %s", gp_Ast->ast_ddmm_dec ) ;
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -714,16 +712,16 @@ void LCD_DISPLAY_MODE_STELLARIUM( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(AZI) %s", gp_Ast->c_ddmm_azi ) ;
-    sprintf( c_l1, "(ALT) %s", gp_Ast->c_ddmm_alt );
+    sprintf( c_l0, "(AZI) %s", gp_Ast->ast_ddmm_azi ) ;
+    sprintf( c_l1, "(ALT) %s", gp_Ast->ast_ddmm_alt );
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
     /*
-    Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->Va           , gp_Ast->Vh ) ;
-    Trace("AD / Dec   : %s / %s"       , gp_Ast->c_hhmmss_asc , gp_Ast->c_ddmm_dec ) ;
-    Trace("AH / Dec   : %s / %s"       , gp_Ast->c_hhmmss_agh , gp_Ast->c_ddmm_dec ) ;
-    Trace("AZ./ Haut. : %s / %s"       , gp_Ast->c_ddmm_azi   , gp_Ast->c_ddmm_alt ) ;
+    Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->ast_azi_vit           , gp_Ast->ast_alt_vit ) ;
+    Trace("AD / Dec   : %s / %s"       , gp_Ast->ast_hhmmss_asc , gp_Ast->ast_ddmm_dec ) ;
+    Trace("AH / Dec   : %s / %s"       , gp_Ast->ast_hhmmss_agh , gp_Ast->ast_ddmm_dec ) ;
+    Trace("AZ./ Haut. : %s / %s"       , gp_Ast->ast_ddmm_azi   , gp_Ast->ast_ddmm_alt ) ;
     */
   }
   return ;

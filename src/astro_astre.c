@@ -69,6 +69,9 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast->ast_mutex ) ;
 
+  lp_Ast->ast_lock   = ASTRE_LOCK ;
+  lp_Ast->ast_unlock = ASTRE_UNLOCK ;
+
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
     memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
     strcpy( lp_Ast->ast_plus_proche[C], "") ;
@@ -79,24 +82,11 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   
   lp_Ast->ast_azi    = 0 ;
   lp_Ast->ast_alt    = 0 ;
-  lp_Ast->a0   = 0 ;
-  lp_Ast->h0   = 0 ;
-  lp_Ast->AGH  = 0 ; 
-  lp_Ast->ASC  = 0 ;
-  lp_Ast->DEC  = 0 ;
-  lp_Ast->A0   = 0 ;
-  lp_Ast->H0   = 0 ;
-  lp_Ast->da   = 0 ;
-  lp_Ast->dh   = 0 ;
-  lp_Ast->dA   = 0 ;
-  lp_Ast->dH   = 0 ;
-  lp_Ast->Va   = 0 ;
-  lp_Ast->Vh   = 0 ;
-  lp_Ast->dVa  = 0 ;
-  lp_Ast->dVh  = 0 ;
-  lp_Ast->dVam = 0 ;
-  lp_Ast->dVhm = 0 ;
-
+  lp_Ast->ast_agh  = 0 ; 
+  lp_Ast->ast_asc  = 0 ;
+  lp_Ast->ast_dec  = 0 ;
+  lp_Ast->ast_azi_vit   = 0 ;
+  lp_Ast->ast_alt_vit   = 0 ;
   lp_Ast->ast_r3_x    = 0 ;
   lp_Ast->ast_r3_xx   = 0 ;
   lp_Ast->ast_r3_y    = 0 ;
@@ -161,7 +151,7 @@ void ASTRE_PARAMS_DISPLAY(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   
   TraceArbo(__func__,1,"astre params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %s","lp_Ast_Par->ast_par_default_object", lp_Ast_Par->ast_par_default_object );  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","lp_Ast_Par->ast_par_default_object", lp_Ast_Par->ast_par_default_object );  
 
   return ;
 }
@@ -181,7 +171,8 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
   
   TraceArbo(__func__,0,"reset") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ; ;
+  lp_Ast->ast_lock(lp_Ast) ;
+  // HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ; ;
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
     memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
@@ -194,26 +185,13 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
   lp_Ast->ast_typ = ASTRE_INDETERMINE ;
   lp_Ast->ast_num = 0 ;
   lp_Ast->ast_new = TRUE ;
-
   lp_Ast->ast_azi       = 0  ;
   lp_Ast->ast_alt       = 0  ;
-  lp_Ast->a0      = 0 ;
-  lp_Ast->h0      = 0 ;
-  lp_Ast->AGH     = 0 ; 
-  lp_Ast->ASC     = 0 ;
-  lp_Ast->DEC     = 0 ;
-  lp_Ast->A0      = 0 ;
-  lp_Ast->H0      = 0 ;
-  lp_Ast->da      = 0 ;
-  lp_Ast->dh      = 0 ;
-  lp_Ast->dA      = 0 ;
-  lp_Ast->dH      = 0 ;
-  lp_Ast->Va      = 0 ;
-  lp_Ast->Vh      = 0 ;
-  lp_Ast->dVa     = 0 ;
-  lp_Ast->dVh     = 0 ;
-  lp_Ast->dVam    = 0 ;
-  lp_Ast->dVhm    = 0 ;
+  lp_Ast->ast_agh       = 0 ; 
+  lp_Ast->ast_asc     = 0 ;
+  lp_Ast->ast_dec     = 0 ;
+  lp_Ast->ast_azi_vit      = 0 ;
+  lp_Ast->ast_alt_vit      = 0 ;
   lp_Ast->ast_r3_x       = 0 ;
   lp_Ast->ast_r3_xx      = 0 ;
   lp_Ast->ast_r3_y       = 0 ;
@@ -221,7 +199,7 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
   lp_Ast->ast_r3_z       = 0 ;
   lp_Ast->ast_r3_zz      = 0 ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ; ;
+  lp_Ast->ast_unlock( lp_Ast ) ;
 }
 
 /*****************************************************************************************
@@ -321,29 +299,29 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
   
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ;
 
-  strcpy( lp_Ast->c_hhmmss_agh, c_hhmmss_agh)  ;
-  strcpy( lp_Ast->c_hhmmss_asc, c_hhmmss_asc)  ;
-  strcpy( lp_Ast->c_hhmmss_azi, c_hhmmss_azi)  ;
-  strcpy( lp_Ast->c_hhmmss_alt, c_hhmmss_alt)  ;
-  strcpy( lp_Ast->c_hhmmss_dec, c_hhmmss_dec)  ;
+  strcpy( lp_Ast->ast_hhmmss_agh, c_hhmmss_agh)  ;
+  strcpy( lp_Ast->ast_hhmmss_asc, c_hhmmss_asc)  ;
+  strcpy( lp_Ast->ast_hhmmss_azi, c_hhmmss_azi)  ;
+  strcpy( lp_Ast->ast_hhmmss_alt, c_hhmmss_alt)  ;
+  strcpy( lp_Ast->ast_hhmmss_dec, c_hhmmss_dec)  ;
 
-  strcpy( lp_Ast->c_hhmm_agh, c_hhmm_agh)  ;
-  strcpy( lp_Ast->c_hhmm_asc, c_hhmm_asc)  ;
-  strcpy( lp_Ast->c_hhmm_azi, c_hhmm_azi)  ;
-  strcpy( lp_Ast->c_hhmm_alt, c_hhmm_alt)  ;
-  strcpy( lp_Ast->c_hhmm_dec, c_hhmm_dec)  ;
+  strcpy( lp_Ast->ast_hhmm_agh, c_hhmm_agh)  ;
+  strcpy( lp_Ast->ast_hhmm_asc, c_hhmm_asc)  ;
+  strcpy( lp_Ast->ast_hhmm_azi, c_hhmm_azi)  ;
+  strcpy( lp_Ast->ast_hhmm_alt, c_hhmm_alt)  ;
+  strcpy( lp_Ast->ast_hhmm_dec, c_hhmm_dec)  ;
 
-  strcpy( lp_Ast->c_ddmm_agh, c_ddmm_agh)  ;
-  strcpy( lp_Ast->c_ddmm_asc, c_ddmm_asc)  ;
-  strcpy( lp_Ast->c_ddmm_azi, c_ddmm_azi)  ;
-  strcpy( lp_Ast->c_ddmm_alt, c_ddmm_alt)  ;
-  strcpy( lp_Ast->c_ddmm_dec, c_ddmm_dec)  ;
+  strcpy( lp_Ast->ast_ddmm_agh, c_ddmm_agh)  ;
+  strcpy( lp_Ast->ast_ddmm_asc, c_ddmm_asc)  ;
+  strcpy( lp_Ast->ast_ddmm_azi, c_ddmm_azi)  ;
+  strcpy( lp_Ast->ast_ddmm_alt, c_ddmm_alt)  ;
+  strcpy( lp_Ast->ast_ddmm_dec, c_ddmm_dec)  ;
 
-  strcpy( lp_Ast->c_dd_agh, c_dd_agh)  ;
-  strcpy( lp_Ast->c_dd_asc, c_dd_asc)  ;
-  strcpy( lp_Ast->c_dd_azi, c_dd_azi)  ;
-  strcpy( lp_Ast->c_dd_alt, c_dd_alt)  ;
-  strcpy( lp_Ast->c_dd_dec, c_dd_dec)  ;
+  strcpy( lp_Ast->ast_dd_agh, c_dd_agh)  ;
+  strcpy( lp_Ast->ast_dd_asc, c_dd_asc)  ;
+  strcpy( lp_Ast->ast_dd_azi, c_dd_azi)  ;
+  strcpy( lp_Ast->ast_dd_alt, c_dd_alt)  ;
+  strcpy( lp_Ast->ast_dd_dec, c_dd_dec)  ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ;
 
@@ -363,9 +341,11 @@ void ASTRE_DISPLAY_MODE_STELLARIUM(STRUCT_ASTRE *lp_Ast) {
 
   TraceArbo(__func__,1,"display mode stellarium") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->Va           , lp_Ast->Vh ) ;
-  Trace("AD / Dec   : %s / %s"       , lp_Ast->c_hhmmss_asc , lp_Ast->c_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s"       , lp_Ast->c_hhmmss_agh , lp_Ast->c_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->c_ddmm_azi   , lp_Ast->c_ddmm_alt ) ;
+  Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;
+  Trace("AD / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_asc , lp_Ast->ast_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_agh , lp_Ast->ast_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->ast_ddmm_azi   , lp_Ast->ast_ddmm_alt ) ;
+
+  return ;
 }
 

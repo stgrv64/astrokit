@@ -50,6 +50,8 @@ t_en_Menus ;
 struct STR_SUIVI_PAS {
 
   pthread_mutex_t   pas_mutex ;
+  void            (*pas_lock)   (void) ;
+  void            (*pas_unlock) (void) ;  
   int               pas_rst ; 
   double            pas_acc_azi ;   // acceleration volontaire en azimut   
   double            pas_acc_alt ;   // acceleration volontaire en altitude 
@@ -76,6 +78,8 @@ typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
 struct STR_SUIVI_FREQUENCES {
 
   pthread_mutex_t   fre_mutex ;
+  void            (*fre_lock)   (void) ;
+  void            (*fre_unlock) (void) ;  
   double            fre_ta_mic ; // periode de la frequence a injecter directement
   double            fre_th_mic ; // periode de la frequence a injecter directement
   double            fre_fa_mic ; // frequence a injecter directement (tient compte des micro pas)
@@ -98,20 +102,22 @@ struct STR_SUIVI_FREQUENCES {
 typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FREQUENCES ;
 
 struct STR_SUIVI {
-
-  STR_EXT_TIMEVAL      sui_tval ; 
-  int                  sui_reset ; 
-  int                  sui_mode_equatorial ;
-  double               sui_plus ;    // multiplicateur ajustement des periodes si besoin
-  double               sui_moins ;   // multiplicateur ajustement des periodes si besoin
-  double               sui_Da ;  // nombre a injecter dans les diviseurs de frequence
-  double               sui_Dh ;  // nombre a injecter dans les diviseurs de frequence
-  t_en_Menus           sui_menu;      // valeur du menu courant 
-  t_en_Menus           sui_menu_old ; // sauvegarde du menu precedent
-  int                  alarme ; // si different de 0 provoque une alarm(alarme) au debut de main
-  double               sui_tempo_percent ;
-  double               DTh ;
-  double               DTa ;
+  pthread_mutex_t  sui_mutex ;
+  void           (*sui_lock)   (void) ;
+  void           (*sui_unlock) (void) ;  
+  STR_EXT_TIMEVAL  sui_tval ; 
+  int              sui_reset ; 
+  int              sui_mode_equatorial ;
+  double           sui_plus ;    // multiplicateur ajustement des periodes si besoin
+  double           sui_moins ;   // multiplicateur ajustement des periodes si besoin
+  double           sui_Da ;  // nombre a injecter dans les diviseurs de frequence
+  double           sui_Dh ;  // nombre a injecter dans les diviseurs de frequence
+  t_en_Menus       sui_menu;      // valeur du menu courant 
+  t_en_Menus       sui_menu_old ; // sauvegarde du menu precedent
+  int              sui_alarme ; // si different de 0 provoque une alarm(sui_alarme) au debut de main
+  double           sui_tempo_percent ;
+  double           sui_dth ;
+  double           sui_dta ;
     
 }  ;
 

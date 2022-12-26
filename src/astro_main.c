@@ -556,7 +556,7 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
         CONFIG_DISPLAY_TOUT() ;
       }
 */
-      gp_Ast->AGH += gp_Vou->vou_pas ;
+      gp_Ast->ast_agh += gp_Vou->vou_pas ;
       gp_Vou->vou_begin += gp_Vou->vou_pas ;
 
       Trace1("voute : temporisation") ;
@@ -1140,8 +1140,8 @@ int main(int argc, char ** argv) {
   ARGUMENTS_HELP                  ( argc, argv ) ;
   ARGUMENTS_MANAGE_FACON_CLASSIQUE ( argc, argv  ) ;
   
-  if ( gp_Sui->alarme != 0 ) {
-    alarm( gp_Sui->alarme) ;
+  if ( gp_Sui->sui_alarme != 0 ) {
+    alarm( gp_Sui->sui_alarme) ;
   }  
 
   // ouverture led etat ----------------------------------------------

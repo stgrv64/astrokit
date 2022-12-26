@@ -15,34 +15,34 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
-* @fn     : ASTRE_LOCK
+* @fn     : TIME_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_TIME *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+void TIME_LOCK ( STRUCT_TIME * lp_Tim) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Tim->tim_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : ASTRE_UNLOCK
+* @fn     : TIME_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_TIME *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_UNLOCK ( STRUCT_ASTRE * lp_Ast) {
+void TIME_UNLOCK ( STRUCT_TIME * lp_Tim) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Tim->tim_mutex ) ;
 
   return ;
 }
@@ -576,15 +576,15 @@ void TIME_PARAMS_DISPLAY(STRUCT_TIME_PARAMS * lp_Tim_Par) {
   
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo         ", lp_Tim_Par->tim_par_tpo);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_raq     ", lp_Tim_Par->tim_par_tpo_raq);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_menu    ", lp_Tim_Par->tim_par_tpo_menu);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_ir      ", lp_Tim_Par->tim_par_tpo_ir);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_termios ", lp_Tim_Par->tim_par_tpo_termios);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_capteurs", lp_Tim_Par->tim_par_tpo_capteurs);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_loop", lp_Tim_Par->tim_par_tpo_lcd_loop);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_disp", lp_Tim_Par->tim_par_tpo_lcd_disp);
-  Trace("%-50s = %ld", "lp_Tim_Par->tim_par_tpo_pid_loop", lp_Tim_Par->tim_par_tpo_pid_loop);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo         ", lp_Tim_Par->tim_par_tpo);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_raq     ", lp_Tim_Par->tim_par_tpo_raq);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_menu    ", lp_Tim_Par->tim_par_tpo_menu);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_ir      ", lp_Tim_Par->tim_par_tpo_ir);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_termios ", lp_Tim_Par->tim_par_tpo_termios);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_capteurs", lp_Tim_Par->tim_par_tpo_capteurs);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_loop", lp_Tim_Par->tim_par_tpo_lcd_loop);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_disp", lp_Tim_Par->tim_par_tpo_lcd_disp);
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_pid_loop", lp_Tim_Par->tim_par_tpo_pid_loop);
 
   return ;
 }
@@ -820,7 +820,7 @@ void TIME_PARAMS_INIT( STRUCT_TIME_PARAMS * lp_Tim_Par) {
 
 void TIME_INIT_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
   
-  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init time tempos") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tpo->tpo_mutex ) ;
 

@@ -226,15 +226,15 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
   
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  asc = lp_Ast->AGH0 ;
-  dec = lp_Ast->DEC ;
+  asc = lp_Ast->ast_agh0 ;
+  dec = lp_Ast->ast_dec ;
   L=0 ;
   d_min=deg ;
 
   Trace1("Recherche dans la zone de %s : ASC=%f DEC=%f",\
     lp_Ast->ast_nom, \
-    lp_Ast->AGH0, \
-    lp_Ast->DEC) ;
+    lp_Ast->ast_agh0, \
+    lp_Ast->ast_dec) ;
   
   while( strcmp( lp_Cat->cat_dec[L][3],"_") \
       && strcmp( lp_Ast->ast_nom,lp_Cat->cat_dec[L][0]) \
@@ -287,8 +287,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   
   memset( lp_Ast->ast_infos, 0 , sizeof( lp_Ast->ast_infos) ) ;
 
-  lp_Ast->ASC=0;
-  lp_Ast->DEC=0 ;
+  lp_Ast->ast_asc=0;
+  lp_Ast->ast_dec=0 ;
   
   i_ligne = L ;
 
@@ -308,8 +308,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
        * dans la structure STRUCT_ASTRE 
        **************************************************/
 
-      lp_Ast->ASC = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      lp_Ast->DEC = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      lp_Ast->ast_asc = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      lp_Ast->ast_dec = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       strcpy( lp_Ast->ast_infos, lp_Cat->cat_dec[L][0] ) ;
 
       i_ligne = L ;
@@ -319,8 +319,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
 
     if(!strcmp(lp_Cat->cat_dec[L][1],lp_Ast->ast_nom)) {
 
-      lp_Ast->ASC = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
-      lp_Ast->DEC = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      lp_Ast->ast_asc = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      lp_Ast->ast_dec = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       strcpy( lp_Ast->ast_infos, lp_Cat->cat_dec[L][1] ) ;
 
       i_ligne = L ; 
@@ -334,8 +334,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   }
   else {
     
-    lp_Ast->ASC = 0.0 ;
-    lp_Ast->DEC = 0.0 ;
+    lp_Ast->ast_asc = 0.0 ;
+    lp_Ast->ast_dec = 0.0 ;
     Trace1(" %s : non trouve dans catalogue",lp_Ast->ast_nom) ;
     strcpy( lp_Ast->ast_nom, "undefined" ) ;
     strcpy( lp_Ast->ast_infos, "undefined" ) ;
@@ -348,7 +348,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
     lp_Ast->ast_asc_t.tim_HH, \
     lp_Ast->ast_asc_t.tim_MM, \
     lp_Ast->ast_asc_t.tim_SS, \
-    lp_Ast->DEC * CALCULS_UN_RADIAN_EN_DEGRES
+    lp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES
   ) ; 
 
   return ; 

@@ -138,7 +138,7 @@ struct STR_CALCULS {
   void (*mut_unlock) (void) ;
   pthread_mutex_t           cal_mutex ;
   STRUCT_SUIVI_FREQUENCES * cal_p_Fre ;
-  STRUCT_SUIVI_STATS      * cal_p_Sta ;
+  STRUCT_STATS      * cal_p_Sta ;
   STRUCT_SUIVI_PAS        * cal_p_Pas ;
   STRUCT_ASTRE            * cal_p_Ast ;
   STRUCT_CALCULS          * cal_p_Cal ;
