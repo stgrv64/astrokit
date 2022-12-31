@@ -160,7 +160,8 @@ int KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(STRUCT_TERMIOS * lp_Ter) {
   char ch ;
   int nread ; 
 
-  *lp_Ter->ter_sum_ascii=0 ;
+  lp_Ter->ter_sum_ascii=0 ;
+
   memset(lc_buf, 0, sizeof(lc_buf)) ;
 
   if ( lp_Ter->ter_peek_chars[0] != -1 ) {
@@ -179,17 +180,17 @@ int KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(STRUCT_TERMIOS * lp_Ter) {
 
   if ( nread >0  ) {
 
-    Trace1("nread positif = %d", nread) ;
+    Trace("nread positif = %d", nread) ;
     
     for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
       lp_Ter->ter_peek_chars[i] = (int)lc_buf[i] ;
       Trace1("peek_chars[%d] = %c %d lp_Ter->ter_sum_ascii = %d", \
-       i, \
-       lp_Ter->ter_peek_chars[i], \
-       (int) lp_Ter->ter_peek_chars[i], \
-       *lp_Ter->ter_sum_ascii) ;
+        i, \
+        lp_Ter->ter_peek_chars[i], \
+        (int) lp_Ter->ter_peek_chars[i], \
+        lp_Ter->ter_sum_ascii) ;
 
-      *lp_Ter->ter_sum_ascii+=(int)lp_Ter->ter_peek_chars[i] ;
+      lp_Ter->ter_sum_ascii+=(int)lp_Ter->ter_peek_chars[i] ;
     }
     strcpy( lp_Ter->ter_buffer , lc_buf) ;  
 
@@ -203,7 +204,7 @@ int KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(STRUCT_TERMIOS * lp_Ter) {
 
     Trace1("nread %-3d lp_Ter->ter_sum_ascii %-5d lp_Ter->ter_buffer %-10s", \
       nread, \
-    * lp_Ter->ter_sum_ascii, \
+      lp_Ter->ter_sum_ascii, \
       lp_Ter->ter_buffer ) ;
 
     // usleep(10000) ;

@@ -633,7 +633,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
             gp_Ast->ast_alt = lp_Sui->_heading ; 
             */
           }
-          CALCULS_EQUATEUR () ;
+          CALCULS_EQUATEUR (gp_Ast) ;
 
           lp_Sui->sui_menu_old = lp_Sui->sui_menu ;
           lp_Sui->sui_menu = MENU_AZIMUTAL ;
@@ -861,8 +861,8 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     /* pthread_mutex_lock( & gp_Mut->mut_cal ); */
     
-    CALCULS_VITESSES() ;
-    CALCULS_PERIODE() ;
+    CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+    CALCULS_PERIODE(gp_Ast) ;
     
     /* pthread_mutex_unlock( & gp_Mut->mut_cal ); */
   }

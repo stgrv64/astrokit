@@ -199,15 +199,15 @@ void CALCULS_UNLOCK          ( STRUCT_CALCULS * ) ;
 
 void CALCULS_INIT_PTR        ( STRUCT_CALCULS * )  ;
 void CALCULS_INIT_ANGLE      ( STRUCT_ANGLE * ) ;
+
 void CALCULS_VOUTE                   (void) ;
-void CALCULS_COORD_R3                (void) ;
-void CALCULS_AZIMUT                  (void) ;
-void CALCULS_EQUATEUR                (void) ;
-void CALCULS_VITESSES_EQUATORIAL     (void) ;
-void CALCULS_PERIODE                 (void) ;
-void CALCULS_PERIODES_SUIVI_MANUEL   (void) ;
-void CALCULS_VITESSES                (void) ;
-void CALCULS_ANGLE_HORAIRE           (void) ;
+void CALCULS_COORD_R3                (STRUCT_ASTRE *) ;
+void CALCULS_AZIMUT                  (STRUCT_ASTRE *) ;
+void CALCULS_EQUATEUR                (STRUCT_ASTRE *) ;
+void CALCULS_PERIODE                 (STRUCT_ASTRE *) ;
+void CALCULS_PERIODES_SUIVI_MANUEL   (STRUCT_ASTRE *, STRUCT_SUIVI_PAS *, STRUCT_SUIVI_FREQUENCES *) ;
+void CALCULS_VITESSES                (STRUCT_ASTRE *, STRUCT_LIEU * , STRUCT_SUIVI * ) ;
+void CALCULS_ANGLE_HORAIRE           (STRUCT_ASTRE *) ;
 void CALCULS_ASCENSION_DROITE        (STRUCT_ASTRE *) ; 
 void CALCULS_DIVISEUR_FREQUENCE      (void) ;   
 void CALCULS_CONVERSIONS_ANGLES      (STRUCT_ASTRE *) ;

@@ -341,7 +341,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
     strcpy( lp_Ast->ast_infos, "undefined" ) ;
   }
 
-  CALCULS_CONVERSIONS_ANGLES() ;
+  CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
 
   Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
     lp_Ast->ast_nom , \

@@ -63,8 +63,8 @@ struct STR_TERMIOS {
   pthread_mutex_t  ter_mutex ;
   void          (* ter_lock)   (void*) ;
   void          (* ter_unlock) (void*) ;
-  char           * ter_buffer ; 
-  int            * ter_sum_ascii ;
+  char             ter_buffer [ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
+  int              ter_sum_ascii ;
   int              ter_peek_char  ; 
   int              ter_peek_chars[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
 };

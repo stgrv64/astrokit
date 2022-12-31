@@ -381,7 +381,7 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         // TODO : les periodes / frequences en azimut et altitude
 
         SUIVI_MANUEL_ASSERVI(gp_Sui) ; 
-        CALCULS_PERIODES_SUIVI_MANUEL()  ;
+        CALCULS_PERIODES_SUIVI_MANUEL(gp_Ast,gp_Pas,gp_Fre)  ;
 
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_ASSERVI ; 
@@ -749,7 +749,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
       if ( KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(lp_ter)) {
 
         strcpy( ch_chaine, lp_ter->ter_buffer ) ;
-        i_sum_ascii      = * lp_ter->ter_sum_ascii ;
+        i_sum_ascii      = lp_ter->ter_sum_ascii ;
 
         c_char=ch_chaine[0] ;
 

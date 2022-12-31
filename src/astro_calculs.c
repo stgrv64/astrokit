@@ -282,7 +282,9 @@ void   CALCULS_INIT_ANGLE( STRUCT_ANGLE * lp_Ang ) {
   lp_Ang->ang_dd      = 0 ;      
   lp_Ang->ang_mm      = 0 ;      
   lp_Ang->ang_ss      = 0 ; 
-} ;
+
+  return ;
+}
 
 /*****************************************************************************************
 * @fn     : CALCULS_INIT_PTR
@@ -418,7 +420,7 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
-  CALCULS_CONVERSIONS_ANGLES() ;
+  CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
 
   Trace2("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
     gp_Ast->ast_azi0_t.tim_HH, \
@@ -566,29 +568,6 @@ void CALCULS_EQUATEUR(STRUCT_ASTRE * lp_Ast) {
 } 
 
 /*****************************************************************************************
-* @fn     : CALCULS_VITESSES_EQUATORIAL
-* @author : s.gravois
-* @brief  : MAJ de Va et Vh (vitesses sur les moteurs azimut et altitude) en vit equatoriales
-* @param  : STRUCT_ASTRE * gp_Ast
-* @date   : 2022-10-11 creation entete doxygen 
-* @todo   : (obsolete : est inclus dans CALCULS_VITESSES)
-*****************************************************************************************/
-
-void CALCULS_VITESSES_EQUATORIAL(void) {
-
-  TraceArbo(__func__,3,"calculate equatorial speeds") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
-
-  gp_Ast->ast_azi_vit = -15.0 ;
-  gp_Ast->ast_alt_vit = -15.0 ;
-
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
-
-  return ;
-}
-
-/*****************************************************************************************
 * @fn     : CALCULS_VITESSES
 * @author : s.gravois
 * @brief  : MAJ de Va et Vh (vitesses sur les moteurs azimut et altitude) en vit equatoriales
@@ -599,7 +578,7 @@ void CALCULS_VITESSES_EQUATORIAL(void) {
 * @todo   : 
 *****************************************************************************************/
 
-void CALCULS_VITESSES(STRUCT_ASTRE * lp_ast, STRUCT_LIEU * lp_Lie, STRUCT_SUIVI * lp_Sui) {
+void CALCULS_VITESSES(STRUCT_ASTRE * lp_Ast, STRUCT_LIEU * lp_Lie, STRUCT_SUIVI * lp_Sui) {
 
   // le calcul des vitesses est fait avec
   // l'angle horaire et la declinaison (azimut et altitude inutiles)
@@ -609,16 +588,26 @@ void CALCULS_VITESSES(STRUCT_ASTRE * lp_ast, STRUCT_LIEU * lp_Lie, STRUCT_SUIVI 
   TraceArbo(__func__,3,"calculate speeds") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( lp_Sui->sui_mode_equatorial == 1 ) {
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ;
+
     lp_Ast->ast_azi_vit = -15.0 ;
     lp_Ast->ast_alt_vit = -15.0 ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ;
   }
   else {
     angle=CALCULS_NB_SECARC_PAR_S_EQU ;
     G  = sqr(sin(lp_Ast->ast_agh))*sqr(cos(lp_Ast->ast_dec))+sqr(sin(lp_Lie->lie_lat)*cos(lp_Ast->ast_dec)*cos(lp_Ast->ast_agh)-cos(lp_Lie->lie_lat)*sin(lp_Ast->ast_dec)) ;
     Va = angle*(cos(lp_Ast->ast_dec)*(cos(lp_Lie->lie_lat)*cos(lp_Ast->ast_agh)*sin(lp_Ast->ast_dec)-sin(lp_Lie->lie_lat)*cos(lp_Ast->ast_dec)))/G ;
     Vh = angle*sin(lp_Ast->ast_agh)*cos(lp_Ast->ast_dec)*cos(lp_Lie->lie_lat)/sqrt(G) ;
-    lp_Ast->ast_azi_vit=Va ;
-    lp_Ast->ast_alt_vit=Vh ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ;
+
+    lp_Ast->ast_azi_vit = Va ;
+    lp_Ast->ast_alt_vit = Vh ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ;
   }
   
   Trace2("%2.0f\t%2.8f\t%2.4f\t=>\t%2.8f\t%2.8f\n", \
@@ -627,8 +616,9 @@ void CALCULS_VITESSES(STRUCT_ASTRE * lp_ast, STRUCT_LIEU * lp_Lie, STRUCT_SUIVI 
      (lp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES, \
      Va, \
      Vh ) ;
-}
 
+  return ;
+}
 /*****************************************************************************************
 * @fn     : CALCULS_DIVISEUR_FREQUENCE
 * @author : s.gravois
@@ -644,8 +634,14 @@ void CALCULS_DIVISEUR_FREQUENCE(void) {
   
   TraceArbo(__func__,3,"calculate divide params of divide controler frequency") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Sui->sui_mutex ) ;
+
   gp_Sui->sui_Da = gp_Cal_Par->cal_par_azi_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_azi_red_tot * pow(2.0, gp_Cal_Par->cal_par_azi_n) * ( gp_Ast->ast_azi_vit / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
   gp_Sui->sui_Dh = gp_Cal_Par->cal_par_alt_f * 2.0 * M_PI / ( gp_Cal_Par->cal_par_alt_red_tot * pow(2.0, gp_Cal_Par->cal_par_alt_n) * ( gp_Ast->ast_alt_vit / ( 60 * 60 * CALCULS_UN_RADIAN_EN_DEGRES ) )) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Sui->sui_mutex ) ;
+
+  return ;
 }
 
 /*****************************************************************************************
@@ -661,12 +657,12 @@ void CALCULS_DIVISEUR_FREQUENCE(void) {
 * @date   : 2022-06 ajout champs xxx_bru freq /periode avant multiplication par acceleration
 *****************************************************************************************/
 
-void CALCULS_PERIODE(void) {
+void CALCULS_PERIODE(STRUCT_ASTRE * lp_Ast) {
 
   double freq_alt_mic, freq_azi_mic ;
   double freq_alt_mot, freq_azi_mot ;
   double freq_alt_bru, freq_azi_bru ;
-  double azi_rot,   alt_rot ;
+  double azi_rot,      alt_rot ;
   
   TraceArbo(__func__,2,"calculate periods") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -772,7 +768,7 @@ void CALCULS_PERIODE(void) {
 * @todo   : les periodes / frequences en azimut et altitude
 *****************************************************************************************/
 
-void CALCULS_PERIODES_SUIVI_MANUEL(void) {
+void CALCULS_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE * lp_Ast, STRUCT_SUIVI_PAS * lp_Pas, STRUCT_SUIVI_FREQUENCES * lp_Fre) {
 
   double frequence ;
   double azi_rot, alt_rot ;
@@ -783,54 +779,63 @@ void CALCULS_PERIODES_SUIVI_MANUEL(void) {
   // renvoyer par les boutons de la raquette
   // on deduit la frequence du nombre de pas comptes et de la periode ecoulee
   
-  if ( gp_Pas->pas_azi !=  gp_Pas->pas_azi_old ) {
-    if ( gp_Pas->pas_azi !=0 ) {
+  if ( lp_Pas->pas_azi !=  lp_Pas->pas_azi_old ) {
+
+    if ( lp_Pas->pas_azi !=0 ) {
+
       if ( gp_Cal_Par->cal_par_azi_inv == 0 ) azi_rot = -1 ; else azi_rot = 1 ;
     
-      //frequence = azi_rot * (double)gp_Pas->pas_azi / t_appui_raq_azi ;
-      frequence = azi_rot * (double)gp_Pas->pas_azi ;
-    
-      HANDLE_ERROR_PTHREAD_MUTEX_LOCK(& gp_Mut->mut_glo_azi );
+      //frequence = azi_rot * (double)lp_Pas->pas_azi / t_appui_raq_azi ;
+      frequence = azi_rot * (double)lp_Pas->pas_azi ;
   
-        gp_Ast->ast_azi_vit = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_azi_red_tot ) ;
-        gp_Fre->fre_sa_old = gp_Fre->fre_sa ; 
-        gp_Fre->fre_sa     = (int)SGN(frequence)  ;
-        gp_Fre->fre_fa_mic = fabs(frequence) ;
-        gp_Fre->fre_ta_mic = 1 / gp_Fre->fre_fa_mic ;
+      gp_Ast->ast_azi_vit = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_azi_red_tot ) ;
+
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->fre_mutex );
+
+      lp_Fre->fre_sa_old = lp_Fre->fre_sa ; 
+      lp_Fre->fre_sa     = (int)SGN(frequence)  ;
+      lp_Fre->fre_fa_mic = fabs(frequence) ;
+      lp_Fre->fre_ta_mic = 1 / lp_Fre->fre_fa_mic ;
     
-      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(& gp_Mut->mut_glo_azi );
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Fre->fre_mutex );
     
       Trace1("fre_ta_mic = %2.4f fre_th_mic = %2.4f fre_fa_mic = %2.4f fre_fh_mic = %2.4f\n", \
-        gp_Fre->fre_ta_mic, \
-        gp_Fre->fre_th_mic, \
-        gp_Fre->fre_fa_mic, \
-        gp_Fre->fre_fh_mic) ;
+        lp_Fre->fre_ta_mic, \
+        lp_Fre->fre_th_mic, \
+        lp_Fre->fre_fa_mic, \
+        lp_Fre->fre_fh_mic) ;
     }
   }
-  if ( gp_Pas->pas_alt !=  gp_Pas->pas_alt_old ) {
-    if ( gp_Pas->pas_alt !=0 ) {
+
+  if ( lp_Pas->pas_alt !=  lp_Pas->pas_alt_old ) {
+
+    if ( lp_Pas->pas_alt !=0 ) {
+
       if ( gp_Cal_Par->cal_par_alt_inv == 0 ) alt_rot = -1 ; else alt_rot = 1 ;
     
-      //frequence = alt_rot * (double)gp_Pas->pas_alt / t_appui_raq_alt ;
-      frequence = alt_rot * (double)gp_Pas->pas_alt ;
-    
-      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_glo_alt );
-    
-        gp_Ast->ast_alt_vit     = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_alt_red_tot ) ;
-        gp_Fre->fre_sh_old = gp_Fre->fre_sh ; 
-        gp_Fre->fre_sh         = (int)SGN(frequence)  ;
-        gp_Fre->fre_fh_mic = fabs(frequence) ;
-        gp_Fre->fre_th_mic = 1 / gp_Fre->fre_fh_mic ;
+      //frequence = alt_rot * (double)lp_Pas->pas_alt / t_appui_raq_alt ;
+      frequence = alt_rot * (double)lp_Pas->pas_alt ;
+        
+      gp_Ast->ast_alt_vit = frequence * CALCULS_DIVISEUR_SEPCIFIQUE * CALCULS_PI_FOIS_DEUX / ( gp_Vou->vou_acc * gp_Cal_Par->cal_par_alt_red_tot ) ;
+
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->fre_mutex );
+
+      lp_Fre->fre_sh_old = lp_Fre->fre_sh ; 
+      lp_Fre->fre_sh         = (int)SGN(frequence)  ;
+      lp_Fre->fre_fh_mic = fabs(frequence) ;
+      lp_Fre->fre_th_mic = 1 / lp_Fre->fre_fh_mic ;
   
-      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_glo_alt );
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Fre->fre_mutex );
     
       Trace1("fre_ta_mic = %2.4f fre_th_mic = %2.4f fre_fa_mic = %2.4f fre_fh_mic = %2.4f\n", \
-        gp_Fre->fre_ta_mic, \
-        gp_Fre->fre_th_mic, \
-        gp_Fre->fre_fa_mic, \
-        gp_Fre->fre_fh_mic) ;
+        lp_Fre->fre_ta_mic, \
+        lp_Fre->fre_th_mic, \
+        lp_Fre->fre_fa_mic, \
+        lp_Fre->fre_fh_mic) ;
     }
   }
+
+  return ;
 }
 
 /*****************************************************************************************
@@ -966,7 +971,7 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCULS_ANGLE_HORAIRE(void) {
+void CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
   
   TraceArbo(__func__,2,"calculate horaire angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -974,25 +979,29 @@ void CALCULS_ANGLE_HORAIRE(void) {
 
   /* correction ascension droite si negatif (on ajoute 360 degres) */
 
-  if ( gp_Ast->ast_asc < 0 ) {
-    gp_Ast->ast_asc += 2*M_PI ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex );
+
+  if ( lp_Ast->ast_asc < 0 ) {
+    lp_Ast->ast_asc += 2*M_PI ;
   }
 
   /* calcul */ 
 
-  gp_Ast->ast_agh = gp_Lie->lie_tsr - gp_Ast->ast_asc ;
+  lp_Ast->ast_agh = gp_Lie->lie_tsr - lp_Ast->ast_asc ;
   
   /* correction angle horaire si negatif (on ajoute 360 degres) */
 
-  if ( gp_Ast->ast_agh < 0 ) {
-    gp_Ast->ast_agh += 2*M_PI ;
+  if ( lp_Ast->ast_agh < 0 ) {
+    lp_Ast->ast_agh += 2*M_PI ;
   }
 
-  CALCULS_CONVERSIONS_ANGLES() ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex );
+
+  CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
   
-  Trace1("ascension droite (deg)   = %.2f", gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
-  Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ;
-  Trace1("angle horaire (deg)      = %.2f", gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
+  Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
     ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
@@ -1013,8 +1022,9 @@ void CALCULS_ASCENSION_DROITE(STRUCT_ASTRE * lp_Ast) {
   
   TraceArbo(__func__,2,"calculate ascension droite") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex );
+
   // en radians 
-  
   /* correction angle horaire si negatif (on ajoute 360 degres) */
 
   if ( lp_Ast->ast_agh < 0 ) {
@@ -1031,7 +1041,9 @@ void CALCULS_ASCENSION_DROITE(STRUCT_ASTRE * lp_Ast) {
     lp_Ast->ast_asc += 2*M_PI ;
   }
 
-  CALCULS_CONVERSIONS_ANGLES() ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex );
+
+  CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
   
   Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
@@ -1040,6 +1052,8 @@ void CALCULS_ASCENSION_DROITE(STRUCT_ASTRE * lp_Ast) {
   /*
     ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
   */
+
+  return ;
 }
 /*****************************************************************************************
 * @fn     : CALCULS_RECUP_MODE_ET_ASTRE_TYPE()
@@ -1187,15 +1201,15 @@ void CALCULS_TOUT(void) {
 
       if ( gp_Cal->cal_mode == CALCULS_AZIMUTAL_VERS_EQUATORIAL ) {
         
-        CALCULS_EQUATEUR() ;
-        CALCULS_ASCENSION_DROITE() ;
+        CALCULS_EQUATEUR(gp_Ast) ;
+        CALCULS_ASCENSION_DROITE(gp_Ast) ;
       }
       else {
-        CALCULS_ANGLE_HORAIRE() ;
-        CALCULS_AZIMUT() ;
+        CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+        CALCULS_AZIMUT(gp_Ast) ;
       }
-      CALCULS_VITESSES() ;
-      CALCULS_PERIODE() ;
+      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+      CALCULS_PERIODE(gp_Ast) ;
             
       break ;
     /* ----------------------------------------------------------------- */
@@ -1203,18 +1217,16 @@ void CALCULS_TOUT(void) {
     case ASTRE_CIEL_PROFOND :
     
       TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
-      CALCULS_ANGLE_HORAIRE() ;
-      CALCULS_AZIMUT() ;
-      CALCULS_VITESSES() ;
-      CALCULS_PERIODE() ;
+      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+      CALCULS_AZIMUT(gp_Ast) ;
+      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+      CALCULS_PERIODE(gp_Ast) ;
       
       break ;
     /* ----------------------------------------------------------------- */
     
     case ASTRE_PLANETE :
-      
-      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_cal );
-            
+                  
       TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
       
       if ( gp_Ast->ast_num > 9 ) {
@@ -1240,7 +1252,7 @@ void CALCULS_TOUT(void) {
                         gp_Tim->tim_SS,\
                         gp_Ast->ast_num ) ;
       
-      CALCULS_ANGLE_HORAIRE() ;
+      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 
       // FIXME : ainsi que coordonnees equatoriales / declinaison
@@ -1250,8 +1262,8 @@ void CALCULS_TOUT(void) {
       
       // CALCULS_AZIMUT  ( gp_Lie, gp_Ast) ;
       
-      CALCULS_VITESSES() ;
-      CALCULS_PERIODE() ;
+      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+      CALCULS_PERIODE(gp_Ast) ;
 
       break ;
 
@@ -1335,8 +1347,8 @@ void CALCULS_VOUTE(void) {
      
      CALCULS_EQUATEUR(gp_Ast) ; 
      CALCULS_ASCENSION_DROITE(gp_Ast) ;
-     CALCULS_VITESSES() ;
-     CALCULS_PERIODE() ;
+     CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+     CALCULS_PERIODE(gp_Ast) ;
 
      gp_Ast->ast_vit  = sqrt( sqr( gp_Ast->ast_azi_vit ) + sqr( gp_Ast->ast_alt_vit )) ;
      
@@ -1345,7 +1357,7 @@ void CALCULS_VOUTE(void) {
      else
        gp_Ast->ast_ah = M_PI/2 ;
      
-     CALCULS_COORD_R3() ;
+     CALCULS_COORD_R3(gp_Ast) ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f\n", \
        gp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES, \

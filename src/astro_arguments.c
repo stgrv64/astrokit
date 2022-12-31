@@ -72,8 +72,8 @@ void ARGUMENTS_CREATE_VOUTE( void) {
      lp_Ast->ast_azi=a ;
      lp_Ast->ast_alt=h ;
      
-     CALCULS_EQUATEUR() ; // calcul coordonnees horaires en fait
-     CALCULS_VITESSES() ; // TODO : verifier lp_Sui->sui_mode_equatorial avant
+     CALCULS_EQUATEUR(lp_Ast) ; // calcul coordonnees horaires en fait
+     CALCULS_VITESSES(lp_Ast,lp_Lie,lp_Sui) ; // TODO : verifier lp_Sui->sui_mode_equatorial avant
      
      /* Calcul de la norme de la vitesse */
 
@@ -84,7 +84,7 @@ void ARGUMENTS_CREATE_VOUTE( void) {
      else
        lp_Ast->ast_ah = M_PI/2 ;
      
-     CALCULS_COORD_R3() ;
+     CALCULS_COORD_R3(lp_Ast) ;
      
      Trace1("%3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f %3.1f", \
        lp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES, \
