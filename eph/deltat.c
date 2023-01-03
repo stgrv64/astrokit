@@ -339,19 +339,19 @@ T = 2000.0 + (JD - J2000)/365.25;
 
 switch( jdflag ) {
 	case 0:
-	  TRACE1("case 0");
+	  Trace1("case 0");
 		TDT = JD;
 		UT = JD;
 		break;
 	case 1:
-	  TRACE1("case 1");
+	  Trace1("case 1");
 		TDT = JD;
     deltat_value = periode(T);
 		UT = TDT - deltat_value/86400.0;
 		jtocal(UT); /* display the other date */
 		break;
 	case 2:
-	  TRACE1("case 2");
+	  Trace1("case 2");
 		UT = JD;
     deltat_value = periode(T);
 		TDT = UT + deltat_value/86400.0;

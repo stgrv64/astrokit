@@ -17,24 +17,24 @@ int main(void) {
   memset( cmd, 0, sizeof(cmd)) ;
 
   if((child_pid = fork()) < 0 ){perror("fork failure");exit(1);}
-  if(child_pid == 0) {  TRACE1("\nChild: I am a new-born process!\n\n");
+  if(child_pid == 0) {  Trace1("\nChild: I am a new-born process!\n\n");
     my_pid = getpid();    parent_pid = getppid();
-    TRACE1("Child: my pid is: %d\n\n", my_pid);
-    TRACE1("Child: my parent's pid is: %d\n\n", parent_pid);
+    Trace1("Child: my pid is: %d\n\n", my_pid);
+    Trace1("Child: my parent's pid is: %d\n\n", parent_pid);
     sprintf(cmd, "%s %f %f %f %f %f",ephe, -0.39, 43.3, 200.0, 2477343.7, 1.0 ) ;
-    TRACE1("cmd=%s\n",cmd);
+    Trace1("cmd=%s\n",cmd);
     execl(ephe, cmd,"-0.39", "43.3", "200", "2477343.7", "1", (char*)0);
     perror("execl() failure!\n\n");
-    TRACE1("This print is after execl() and should not have been executed if execl were successful! \n\n");
+    Trace1("This print is after execl() and should not have been executed if execl were successful! \n\n");
     exit(2);
   }
   else
   {
-    TRACE1("\nParent: I created a child process.\n\n");
-    TRACE1("Parent: my child's pid is: %d\n\n", child_pid);
-    system("ps -acefl | egrep \"angie|aa_moi\" ");  TRACE1("\n \n");
+    Trace1("\nParent: I created a child process.\n\n");
+    Trace1("Parent: my child's pid is: %d\n\n", child_pid);
+    system("ps -acefl | egrep \"angie|aa_moi\" ");  Trace1("\n \n");
     wait(&status); /* can use wait(NULL) since exit status from child is not used. */
-    TRACE1("\n Parent: my child is dead. I am going to leave.\n \n ");
+    Trace1("\n Parent: my child is dead. I am going to leave.\n \n ");
   }
 }
 // =========================================================================================================

@@ -128,60 +128,63 @@ void DATAS_ACTION_RESET( STRUCT_DATAS * lp_Dat ) {
 }
 
 /*****************************************************************************************
-* @fn     : DATAS_ACTION_SET
+* @fn     : DATAS_ACTION_BUF_TO_DAT
 * @author : s.gravois
 * @brief  : Cette fonction copie dans le champs dat_act de STRUCT_DATAS la valeur en arg
 * @param  : STRUCT_DATAS *lp_Dat
 * @date   : 2022-12-01 creation 
-* @todo   : 
+* @todo   : (voir si on garde GPIO_LED_ETAT_CLIGNOTE )
 *****************************************************************************************/
 
-void DATAS_ACTION_SET( STRUCT_DATAS * lp_Dat, const char * c_char ) {
+void DATAS_ACTION_BUF_TO_DAT( STRUCT_DATAS * lp_Dat, const char * c_char ) {
 
   TraceArbo(__func__,2,"copy action field") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
+  Trace1("cp datas %s on gp_Dat->dat_act", c_char ) ;
+
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
 
   strcpy( lp_Dat->dat_act, c_char) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Dat->dat_mutex ) ; ;
 
-  GPIO_LED_ETAT_CLIGNOTE(1,10) ;
+  // GPIO_LED_ETAT_CLIGNOTE(1,10) ;
   
   return ;
 }
 
-
 /*****************************************************************************************
-* @fn     : DATAS_ACTION_PUT
+* @fn     : DATAS_ACTION_DAT_TO_KEY
 * @author : s.gravois
 * @brief  : Cette fonction copie dans la valeur en arg , le champs dat_act de STRUCT_DATAS
 * @param  : STRUCT_DATAS *lp_Dat
 * @date   : 2022-12-01 creation 
-* @todo   : 
+* @todo   : (voir si on garde GPIO_LED_ETAT_CLIGNOTE )
 *****************************************************************************************/
 
-void DATAS_ACTION_PUT( STRUCT_DATAS * lp_Dat, STRUCT_KEYS * lp_Key ) {
+void DATAS_ACTION_DAT_TO_KEY( STRUCT_DATAS * lp_Dat, STRUCT_KEYS * lp_Key ) {
 
   TraceArbo(__func__,2,"copy action field") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Key->key_mutex ) ; ;
+  /* Si la chaine n'est pas vide , on traite */
 
-  memset( lp_Key->key_mot, 0, sizeof(lp_Key->key_mot)) ;   
-  strcpy( lp_Key->key_mot, lp_Dat->dat_act) ;
-    
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Key->key_mutex ) ; ;
+  if ( strcmp(lp_Dat->dat_act,DATAS_ZERO_CHAR) != 0 ) {
 
-  if ( strcmp( lp_Key->key_mot, "") ) {
-    
-    lp_Key->key_appui_en_cours = 1 ;
-    lp_Key->key_mot_en_cours = 1 ;    
+    Trace1("cp %s to lp_Key->key_mot", lp_Dat->dat_act) ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Key->key_mutex ) ;
+
+    memset( lp_Key->key_mot, 0, sizeof(lp_Key->key_mot)) ;   
+    strcpy( lp_Key->key_mot, lp_Dat->dat_act) ;
+      
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Key->key_mutex ) ;
+
+    lp_Key->key_mot_en_cours = 1 ;
   }
-  else { 
-    lp_Key->key_appui_en_cours = 0 ; 
+  else {
+    Trace1("lp_Dat->dat_act vide") ;
   }
-
-  GPIO_LED_ETAT_CLIGNOTE(1,10) ;
+  // GPIO_LED_ETAT_CLIGNOTE(1,10) ;
   
   return ;
 }

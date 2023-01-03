@@ -45,7 +45,7 @@ for( k=0; k<2; k++ )
 	}
 
 if( prtflg )
-	printf( "light time %.4fm,  ", 1440.0*t );
+	Trace1( "light time %.4fm,  ", 1440.0*t );
 
 /* Final object-earth vector and the amount by which it changed.
  */

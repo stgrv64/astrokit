@@ -68,8 +68,8 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
 
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  DATAS_ACTION_PUT  ( gp_Dat, lp_Key ) ;
-  DATAS_ACTION_RESET( gp_Dat );
+  DATAS_ACTION_DAT_TO_KEY  ( gp_Dat, lp_Key ) ;
+  DATAS_ACTION_RESET       ( gp_Dat );
 
   // =======================================================================
   // Quand la touche est relacheee, on traite
@@ -100,7 +100,11 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
         memset( s_buffer, CONFIG_ZERO_CHAR, sizeof( s_buffer )) ;
         strcpy( s_buffer, lp_Key->key_phrase ) ;
 
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
         sprintf(lp_Key->key_phrase,"%s%s",s_buffer, lp_Key->key_mot);
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
       }
       Trace1("resultat => phrase = %s \n",lp_Key->key_phrase ) ;
       
@@ -116,7 +120,11 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
           memset( s_buffer, CONFIG_ZERO_CHAR, sizeof( s_buffer )) ;
           strcpy( s_buffer, lp_Key->key_nombre ) ;
 
+          HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
           sprintf(lp_Key->key_nombre,"%s%s", s_buffer, lp_Key->key_mot);
+
+          HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
         }
       }
       Trace1("resultat => nombre = %s \n",lp_Key->key_nombre ) ;
@@ -126,8 +134,14 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
     //------------------------------------------------------------
     
     if ( ! strcmp( lp_Key->key_premier, "")){ 
-      if ( strlen(lp_Key->key_mot) < CONFIG_TAILLE_BUFFER_32)
-      strcpy( lp_Key->key_premier, lp_Key->key_mot);
+      if ( strlen(lp_Key->key_mot) < CONFIG_TAILLE_BUFFER_32) {
+
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
+        strcpy( lp_Key->key_premier, lp_Key->key_mot);
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+      }
     }
     //------------------------------------------------------------
     // Si le mot en cours est une VALIDATION 
@@ -137,14 +151,21 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
     // on efface tout sauf SYMBOLE et NOMBRE qui sont determiner plus tot
     //------------------------------------------------------------
 
-    for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )
-    if ( ! strcmp( lp_Key->key_mot,    lp_Key->key_valider )  ) {
-      Trace1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
+    for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ ) {
 
-      strcpy(lp_Key->key_premier,"") ;
-      strcpy(lp_Key->key_phrase,"")  ;
-      strcpy(lp_Key->key_mot,"") ;
-      lp_Key->key_phrase_lue=1 ;
+      if ( ! strcmp( lp_Key->key_mot,    lp_Key->key_valider )  ) {
+
+        Trace1("Appui sur valider => on met premier dans symbole, phrase dans nombre, et NULL dans phrase et mot, phrase_lue a 1" ) ; 
+
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
+        strcpy(lp_Key->key_premier,"") ;
+        strcpy(lp_Key->key_phrase,"")  ;
+        strcpy(lp_Key->key_mot,"") ;
+        lp_Key->key_phrase_lue=1 ;
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+      }
     }
     //------------------------------------------------------------
     // Si le mot est une ACTION, on efface la phrase en cours    
@@ -152,20 +173,31 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
     // on met le mot dans SYMBOLE (symbole utilise dans prog main) 
     //------------------------------------------------------------
     
-    for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ )
-    if ( ! strcmp( lp_Key->key_mot, lp_Key->key_actions[i] )) {
-        Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
-        strcpy(lp_Key->key_premier,lp_Key->key_mot) ;
-        strcpy(lp_Key->key_symbole,lp_Key->key_mot)  ;
+    for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
 
-        strcpy(lp_Key->key_nombre,"")  ;
-        strcpy(lp_Key->key_phrase,"")  ;
-        strcpy(lp_Key->key_mot,"") ;
-        lp_Key->key_phrase_lue=0 ;
+      if ( ! strcmp( lp_Key->key_mot, lp_Key->key_actions[i] )) {
+
+          Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
+
+          HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
+          strcpy(lp_Key->key_premier,lp_Key->key_mot) ;
+          strcpy(lp_Key->key_symbole,lp_Key->key_mot)  ;
+          strcpy(lp_Key->key_nombre,"")  ;
+          strcpy(lp_Key->key_phrase,"")  ;
+          strcpy(lp_Key->key_mot,"") ;
+          lp_Key->key_phrase_lue=0 ;
+
+          HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+      }
     }
     
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
     lp_Key->key_mot_en_cours = 0 ;
-    lp_Key->key_appui_en_cours = 0 ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+    // lp_Key->key_appui_en_cours = 0 ;
   }
 }
 
@@ -186,7 +218,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   
   TraceArbo(__func__,0,"init keys") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("") ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Key->key_mutex ) ;
 
   memset( lp_Key->key_phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
   memset( lp_Key->key_valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
@@ -225,7 +257,13 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   strcpy( lp_Key->key_actions[4], "ETO" ) ;
   strcpy( lp_Key->key_actions[5], "PLA" ) ;
   strcpy( lp_Key->key_actions[6], "TIME" ) ;
-   
+  
+  /* Pointeurs de fonctions */
+
+  lp_Key->key_lock   = KEYS_LOCK ;
+  lp_Key->key_unlock = KEYS_UNLOCK ;
+
+  return ;
 } 
 
 /*****************************************************************************************
@@ -243,18 +281,18 @@ void KEYS_DISPLAY(STRUCT_KEYS *lp_Key) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mot) %-5s (menu) %-10s",\
+  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mot) %-5s (menu) %-10s (motencours) %-2d",\
     lp_Key->key_phrase,\
     lp_Key->key_mot,\
     lp_Key->key_symbole,\
     lp_Key->key_nombre,\
     lp_Key->key_premier,\
     lp_Key->key_valider,\
-    lp_Key->key_menu) ;
+    lp_Key->key_menu, \
+    lp_Key->key_mot_en_cours) ;
 
+  Trace( "%s", c_cmd) ;
   
-  Trace1( "%s", c_cmd) ;
-
   Trace2("lp_Key->key_mot         = %s",lp_Key->key_mot) ;
   Trace2("lp_Key->key_premier     = %s",lp_Key->key_premier) ;
   Trace2("lp_Key->key_phrase      = %s",lp_Key->key_phrase) ;
@@ -263,6 +301,8 @@ void KEYS_DISPLAY(STRUCT_KEYS *lp_Key) {
   Trace2("lp_Key->key_phrase_lue  = %d",lp_Key->key_phrase_lue) ;
 
   TraceArbo(__func__,1,c_cmd) ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  return ;
 }
 /*****************************************************************************************
 * @fn     : KEYS_RESET_MOT
@@ -285,5 +325,4 @@ void KEYS_RESET_MOT(STRUCT_KEYS *lp_Key) {
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
 
   return ;
-
 }

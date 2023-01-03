@@ -42,11 +42,11 @@ int showrd( msg, p, pol ) char *msg; double p[], pol[]; {
 
   if (prtflg != 0) {
     
-    TRACE1( "%s  R.A. ", msg );
+    Trace1( "%s  R.A. ", msg );
     
     hms( x );
     
-    TRACE1( "Dec. " );
+    Trace1( "Dec. " );
     
     dms( y );
   }
@@ -67,7 +67,7 @@ int showcor( strng, p, dp ) char *strng; double p[], dp[]; {
   for( i=0; i<3; i++ ) p1[i] = p[i] + dp[i];
 
   deltap( p, p1, &dr, &dd );
-  TRACE1( "%s dRA %.3fs dDec %.2f\"", strng, RTS*dr/15.0, RTS*dd );
+  Trace1( "%s dRA %.3fs dDec %.2f\"", strng, RTS*dr/15.0, RTS*dd );
   
 return(0);
 }
@@ -91,7 +91,7 @@ int dms( x ) double x; {
   m = (int) s;
   s -= m;
   s *= 60;
-  TRACE1( "%d %d %.2f", d, m, s );
+  Trace1( "%d %d %.2f", d, m, s );
   return(0);
 }
 // ================================================================================
@@ -132,7 +132,7 @@ int hms( x ) double x; {
  sint = sfrac / 1000;
  sfrac -= sint * 1000;
  
- TRACE1( "%3dh %02dm %02ld.%03lds  ", h, m, sint, sfrac );
+ Trace1( "%3dh %02dm %02ld.%03lds  ", h, m, sint, sfrac );
  
 return(0);
 }
@@ -356,16 +356,18 @@ int jtocal( J ) double J; {
 	if( prtflg )
 		printf( "%ld B.C. ", year );
 	}
- else
-	{
-	if( prtflg )
-		printf( "%ld ", year );
-	}
+ else {
+	if( prtflg ) {
+    /* (mise en commentaire 2023) */
+		// printf( "%ld ", year );
+  }
+ }
  day = (int) dd;
 
- if( prtflg )
-	printf( "%s %d %s", months[month-1], day, days[(int) a] );
-
+ if( prtflg ) {
+ /* (mise en commentaire 2023) */
+	/* printf( "%s %d %s", months[month-1], day, days[(int) a] ); */
+ }
  /* Flag last or first day of year */
  if( ((month == 1) && (day == 1))
 	|| ((month == 12) && (day == 31)) )
@@ -379,13 +381,21 @@ int jtocal( J ) double J; {
  a = (long) dd;
  dd = dd - a;
  if( prtflg ) {
-  hms( 2.0*PI*dd );
-  if( J == TDT ) printf( "TDT\n" ); /* Indicate Terrestrial Dynamical Time */
-  else if( J == UT )
-   printf( "UT\n" ); /* Universal Time */
-  else
-   printf( "\n" );
-  }
+    hms( 2.0*PI*dd );
+
+    /* (mise en commentaire 2023) */
+    /*
+    if( J == TDT ) {
+      printf( "TDT\n" ); // Indicate Terrestrial Dynamical Time
+    }
+    else if( J == UT ) {
+      printf( "UT\n" ); // Universal Time
+    }
+    else {
+      printf( "\n" );
+    }
+    */
+ }
  return(0);
 }
 

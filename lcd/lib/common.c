@@ -180,9 +180,9 @@ static char FAHWLastError[255];
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 EXPORT void clearLastError() 
 {
-    Trace(""); pthread_mutex_lock(&mutex);
+   pthread_mutex_lock(&mutex);
     memset(FAHWLastError, 0, sizeof(FAHWLastError));
-    Trace(""); pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&mutex);
 }
 
 EXPORT void setLastError(const char *fmt, ...) 
@@ -192,9 +192,9 @@ EXPORT void setLastError(const char *fmt, ...)
     char* errMsg;
     if (vasprintf(&errMsg, fmt, vl) > 0) {
         LCD_DEBUG("%s\n", errMsg);
-        Trace(""); pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex);
         strncpy(FAHWLastError, errMsg, (sizeof(FAHWLastError)-1));
-        Trace(""); pthread_mutex_unlock(&mutex);
+         pthread_mutex_unlock(&mutex);
         free(errMsg);
     }
     va_end(vl);
@@ -205,10 +205,10 @@ EXPORT int getLastError(char* dest, int maxlen)
     if (dest == NULL || maxlen<=0) {
         return -1;
     }
-    Trace(""); pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutex);
     int ret = strlen(FAHWLastError);
     strncpy(dest, FAHWLastError, maxlen);
-    Trace(""); pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&mutex);
 
     return ret;
 }

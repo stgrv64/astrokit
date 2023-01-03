@@ -49,10 +49,10 @@ polar[2] = r;
 if( prtflg == 0 )
 	return(0);
 
-TRACE1( "ecliptic long" );
+Trace1( "ecliptic long" );
 dms( yy );
-TRACE1( " lat" );
+Trace1( " lat" );
 dms( zz );
-TRACE1( " rad %.6E\n", r );
+Trace1( " rad %.6E\n", r );
 return(0);
 }

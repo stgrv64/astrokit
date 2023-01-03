@@ -232,8 +232,6 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   
   /* Debut boucle _SUIVI_MENU */
   
-  sleep(1 );
-
   while(TRUE) {
 
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
@@ -257,29 +255,27 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
       case MENU_AZIMUTAL :
         
         Trace1("MENU_AZIMUTAL") ;
-        
-        // a modifier / completer : TIME_CALCULS_SIDERAL_TIME et CALCULS_ANGLE_HORAIRE
-        // sont a supprimer car deja calculer dans SUIVI_
 
-        Trace1("appel : %d : MENU_AZIMUTAL" , gp_Sui->sui_menu) ;
-
-        pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
         gp_Pas->pas_acc_alt          = 1 ;
         gp_Pas->pas_acc_azi          = 1 ;
-        gp_Sui->sui_mode_equatorial  = 0 ;
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
+        
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Vou->vou_mutex ) ;
+
         gp_Vou->vou_run              = 1 ; 
 
-        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Vou->vou_mutex ) ;
 
-/*
-        CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
-				CALCULS_TOUT() ;
-*/
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Sui->sui_mutex ) ;
+
+        gp_Sui->sui_mode_equatorial  = 0 ;
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_BRUT ; 
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Sui->sui_mutex ) ;
 
       break ;
 
@@ -289,53 +285,42 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         
         Trace1("MENU_EQUATORIAL") ;
         
-        pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
         gp_Pas->pas_acc_alt          = 0 ;
         gp_Pas->pas_acc_azi          = 1 ;
 
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
+
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Sui->sui_mutex ) ;
+
         gp_Sui->sui_mode_equatorial = 1 ;
-        gp_Vou->vou_run      = 0 ; 
-
-        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
-
-/*
-        CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
-				CALCULS_TOUT() ;
-*/
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_BRUT ;
 
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Sui->sui_mutex ) ;
+
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Vou->vou_mutex ) ;
+
+        gp_Vou->vou_run      = 0 ; 
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Vou->vou_mutex ) ;
+
       break ;
 
-      // -------------------------- STRUCT_SUIVI MANUEL PAR DEFAUT ------------------
-      
+      /* -------------------------- SUIVI MANUEL PAR DEFAUT -------------------------- */
+      /* 
+        Le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
+        simplement une acceleration / ralentissement / changement de direction
+        sur le N-S-E-O (pas de recalcul des periodes) 
+        FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial    
+      */
       case MENU_MANUEL_BRUT :
         
         Trace1("MENU_MANUEL_BRUT") ;
-        
-        // le but de ce suivi est de deduire des actions N-S-O-E de l'utilisateur 
-        // simplement une acceleration / ralentissement / changement de direction
-        // sur le N-S-E-O (pas de recalcul des periodes) 
-        // FIXME : les periodes sont conservees , ainsi que le mode azimutal ou equatorial
-
-        if( strcmp( gp_Dat->dat_act, "") != 0 ) {
-          Trace1("1 gp_Dat->dat_act = %s", gp_Dat->dat_act ) ;
-        }
-
+      
         SUIVI_MANUEL_BRUT(gp_Sui) ;
   
-        pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_lock(& gp_Mut->mut_glo_alt );
-
-        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
-        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ; 
-
-        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
-
       break ;
 
       /* -------------------------- MENU_MANUEL_NON_ASSERVI : LE PLUS SIMPLE ------------------
@@ -348,43 +333,34 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
         
         Trace1("MENU_MANUEL_NON_ASSERVI") ;
         
-        // Suivi le plus simple : seules les touches est nord sud ouest et reset sont prises en compte
-        // TODO : verifier
-
-        Trace1("appel : %d : MENU_MANUEL_NON_ASSERVI" , gp_Sui->sui_menu) ;
-
-        pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
         gp_Pas->pas_acc_alt          = 0 ;
         gp_Pas->pas_acc_azi          = 0 ;
 
-        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
-        gp_Sui->sui_menu             = MENU_MANUEL_NON_ASSERVI ; 
-
-        pthread_mutex_unlock(& gp_Mut->mut_glo_azi );   
-        pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
-/*
-        CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
-				CALCULS_TOUT() ;
-*/
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
 
       break ;
 
-      // -------------------------- STRUCT_SUIVI MANUEL AVEC RE-CALCUL DES PERIODES  -----------------
+      /* -------------------------- Suivi MANUEL AVEC RE-CALCUL DES PERIODES  ----------------- */
+      /*
+        TODO : a modifier car cela marche pas tres bien (interraction avec le thread _SUIVI_VOUTE)
+        TODO : le but de ce gp_Sui est de deduire des actions N-S-O-E de l'utilisateur 
+        TODO : les periodes / frequences en azimut et altitude
+      */
       case MENU_MANUEL_ASSERVI :
 
         Trace1("MENU_MANUEL_ASSERVI") ;       
 
-        // TODO : a modifier car cela marche pas tres bien (interraction avec le thread _SUIVI_VOUTE)
-        // TODO : le but de ce gp_Sui est de deduire des actions N-S-O-E de l'utilisateur 
-        // TODO : les periodes / frequences en azimut et altitude
-
         SUIVI_MANUEL_ASSERVI(gp_Sui) ; 
         CALCULS_PERIODES_SUIVI_MANUEL(gp_Ast,gp_Pas,gp_Fre)  ;
 
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Sui->sui_mutex ) ;
+
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_ASSERVI ; 
+
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Sui->sui_mutex ) ;
 
       break ;
 
@@ -721,9 +697,10 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
   long long ll_inrc=0 ;
   int i_indice_code=0 ;
   int c_char =0 ;
+  int i_nread = 0 ;
   int i_sum_ascii =0 ; 
   char c_sum_ascii[8] ;
-  char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ] ;
+  char ch_chaine[TERMIOS_KBHIT_SIZE_BUFFER_READ+1] ;
   struct sched_param param;
   struct timeval t00,t01  ;
   
@@ -738,26 +715,31 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
   if ( gp_Dev->dev_use_keyboard ) {
 
     /* Debut boucle _SUIVI_CLAVIER_TERMIOS */
+    /* !!! 
+       Eviter les traces dans la boucle TERMIOS 
+       pour eviter interraction avec 
+    */
     while( c_char != 'q' ) {
 
       /* Creee un point d 'annulation pour la fonction pthread_cancel */
       pthread_testcancel() ;
 
+      usleep( gp_Tpo->tpo_termios ) ;
+
       memset(&c_char,0,sizeof(c_char)) ;
       memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
-      if ( KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(lp_ter)) {
+      if ( ( i_nread = KEYBOARD_TERMIOS_KBHIT_READ_CHARS(lp_ter)) > 0) {
+
+        lp_ter->ter_lock(lp_ter) ;
 
         strcpy( ch_chaine, lp_ter->ter_buffer ) ;
         i_sum_ascii      = lp_ter->ter_sum_ascii ;
 
+        lp_ter->ter_unlock(lp_ter) ;
+
         c_char=ch_chaine[0] ;
 
-        Trace("chaine %s (ascii %d)", ch_chaine, i_sum_ascii) ;
-
-        if ( i_sum_ascii == 27 ) {
-          Trace1("exit detecte %d", i_sum_ascii) ;
-        }
         memset(c_sum_ascii,0, sizeof(c_sum_ascii));
         sprintf(c_sum_ascii,"%d",i_sum_ascii);
         i_indice_code=0 ;
@@ -767,28 +749,30 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
            Trace2("%s = %s ?", c_sum_ascii, gp_Cod->cod_in_term[i_indice_code]) ;  
            i_indice_code++ ; 
         }
-        DATAS_ACTION_RESET(gp_Dat) ;
         
         if ( i_indice_code < CODES_CODE_NB_CODES ) {
-          
-          DATAS_ACTION_SET( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;          
-        }
-        // tres important !!
-        // le usleep suivant permet de garder l information !!!!!!
-        // gp_Dat->dat_act fonctionne comme un TAMPON
-        // il va etre lu par les threads du programme principal
 
-        Trace1("datas = %s", gp_Dat->dat_act ) ;
-        Trace("gp_Tpo->tpo_termios = %ld", gp_Tpo->tpo_termios ) ;
-        Trace1("usleep tempo_termios") ;
-        
-        usleep( gp_Tpo->tpo_termios ) ;
-        
-        DATAS_ACTION_RESET(gp_Dat) ;        
-      }
+          Trace("chaine %s ascii %d indice code %d code %s", \
+            ch_chaine, \
+            i_sum_ascii, \
+            i_indice_code, \
+            gp_Cod->cod_out_act[i_indice_code] ) ;
+
+          DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;          
+        }
+        else {
+          Trace("chaine %s ascii %d indice code %d >= CODES_CODE_NB_CODES (%d) : aucune correspondance trouvee", \
+            ch_chaine, \
+            i_sum_ascii, \
+            i_indice_code, \
+            CODES_CODE_NB_CODES ) ;          
+        }        
+      }    
     }
-    KEYBOARD_TERMIOS_EXIT(lp_ter) ;
   }
+
+  KEYBOARD_TERMIOS_EXIT(lp_ter) ;
+  
   Trace("Stop") ;
 
   return NULL ;
@@ -1037,14 +1021,14 @@ int main(int argc, char ** argv) {
   // Initialisations des valeurs de parametres (a zero, "", ou null)
   // -----------------------------------------------------------------
 
-  ASTRE_PARAMS_INIT    ( gp_Ast_Par ) ;
-  CALCULS_PARAMS_INIT  ( gp_Cal_Par ) ;
-  CONFIG_PARAMS_INIT   ( gp_Con_Par ) ;
-  DEVICES_PARAMS_INIT  ( gp_Dev_Par ) ;
-  LIEU_PARAMS_INIT     ( gp_Lie_Par ) ;
-  PID_PARAMS_INIT      ( gp_Pid_Par ) ;
-  TIME_PARAMS_INIT     ( gp_Tim_Par ) ;
-  GPIO_PWM_PARAMS_INIT ( gp_Pwm_Par ) ;
+  ASTRE_PARAMS_INIT          ( gp_Ast_Par ) ;
+  CALCULS_PARAMS_INIT        ( gp_Cal_Par ) ;
+  CONFIG_PARAMS_INIT         ( gp_Con_Par ) ;
+  DEVICES_PARAMS_INIT        ( gp_Dev_Par ) ;
+  LIEU_PARAMS_INIT           ( gp_Lie_Par ) ;
+  PID_PARAMS_INIT            ( gp_Pid_Par ) ;
+  TIME_PARAMS_INIT           ( gp_Tim_Par ) ;
+  GPIO_PWM_PARAMS_INIT       ( gp_Pwm_Par ) ;
   
   // -----------------------------------------------------------------
   // Initialisations diverses et variees
@@ -1054,9 +1038,11 @@ int main(int argc, char ** argv) {
   CONFIG_FIC_READ            ( gp_Con ) ;
   GPIO_CONFIG_FIC_READ       ( gp_Con ) ; 
   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
-  CONFIG_FIC_VERIFY          ( gp_Con);
+  CONFIG_FIC_VERIFY          ( gp_Con ) ;
   CONFIG_PARAMETRES_CONFIG   ( gp_Con ) ;
+
   CONFIG_PARAMETRES_DISPLAY  () ;
+
 
   // CONFIG_PARAMETRES_DISPLAY() ;   
   /* LOG_INIT ouvre le fichier en ecriture pour pouvoir avoir les traces en mode ecriture sur disque
@@ -1077,10 +1063,13 @@ int main(int argc, char ** argv) {
   LIEU_INIT           ( gp_Lie ) ;
   DEVICES_INIT        ( gp_Dev ) ;
   SUIVI_INIT          ( gp_Sui ) ;
+  SUIVI_PAS_INIT      ( gp_Pas ) ;
+  SUIVI_FRE_INIT      ( gp_Fre ) ;
   LCD_INIT            ( gp_Lcd ) ;
   PID_INIT            ( gp_Pid ) ;
-
+  STATS_INIT          ( gp_Sta ) ;
   KEYBOARD_TERMIOS_INIT(gp_Ter) ;
+  
 
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
 

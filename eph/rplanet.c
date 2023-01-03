@@ -47,8 +47,8 @@ if( prtflg )
 		a += b * b;
 		}
 	a = sqrt(a);
-	TRACE1( "true geocentric distance %.7f au    ", a ); /* was EO */
-	TRACE1( "equatorial diameter %.2f\"\n", 2.0*elemnt->sdiam/EO );
+	Trace1( "true geocentric distance %.7f au    ", a ); /* was EO */
+	Trace1( "equatorial diameter %.2f\"\n", 2.0*elemnt->sdiam/EO );
 
 
 /* Calculate visual magnitude.
@@ -67,7 +67,7 @@ if( prtflg )
  */
 	b = 0.5 * (1.01 + 0.99*pq);
 	s = elemnt->mag + 2.1715 * log( EO*SO ) - 1.085*log(b);
-	TRACE1( "approx. visual magnitude %.1f, phase %.3f\n", s, a );
+	Trace1( "approx. visual magnitude %.1f, phase %.3f\n", s, a );
 	}
 
 /* Find unit vector from earth in direction of object
@@ -112,7 +112,7 @@ nutate( TDT, p );
 /* Display the final apparent R.A. and Dec.
  * for equinox of date.
  */
-if( prtflg ) TRACE1 ("%s.", whatconstel (p, TDT));
+if( prtflg ) Trace1 ("%s.", whatconstel (p, TDT));
 
 showrd( "  Apparent:", p, polar );
 

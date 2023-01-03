@@ -47,11 +47,13 @@ typedef enum {
 }
 t_en_Menus ;
 
+typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
+
 struct STR_SUIVI_PAS {
 
   pthread_mutex_t   pas_mutex ;
-  void            (*pas_lock)   (void) ;
-  void            (*pas_unlock) (void) ;  
+  void            (*pas_lock)   (STRUCT_SUIVI_PAS*) ;
+  void            (*pas_unlock) (STRUCT_SUIVI_PAS*) ;  
   int               pas_rst ; 
   double            pas_acc_azi ;   // acceleration volontaire en azimut   
   double            pas_acc_alt ;   // acceleration volontaire en altitude 
@@ -73,13 +75,13 @@ struct STR_SUIVI_PAS {
   int               pas_rewind_fast ;
 } ;
 
-typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
+typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FRE ;
 
 struct STR_SUIVI_FREQUENCES {
 
   pthread_mutex_t   fre_mutex ;
-  void            (*fre_lock)   (void) ;
-  void            (*fre_unlock) (void) ;  
+  void            (*fre_lock)   (STRUCT_SUIVI_FRE*) ;
+  void            (*fre_unlock) (STRUCT_SUIVI_FRE*) ;  
   double            fre_ta_mic ; // periode de la frequence a injecter directement
   double            fre_th_mic ; // periode de la frequence a injecter directement
   double            fre_fa_mic ; // frequence a injecter directement (tient compte des micro pas)
@@ -99,12 +101,12 @@ struct STR_SUIVI_FREQUENCES {
 
 } ;
 
-typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FREQUENCES ;
+typedef struct STR_SUIVI STRUCT_SUIVI ;
 
 struct STR_SUIVI {
   pthread_mutex_t  sui_mutex ;
-  void           (*sui_lock)   (void) ;
-  void           (*sui_unlock) (void) ;  
+  void           (*sui_lock)   (STRUCT_SUIVI*) ;
+  void           (*sui_unlock) (STRUCT_SUIVI*) ;  
   STR_EXT_TIMEVAL  sui_tval ; 
   int              sui_reset ; 
   int              sui_mode_equatorial ;
@@ -121,8 +123,6 @@ struct STR_SUIVI {
     
 }  ;
 
-typedef struct STR_SUIVI STRUCT_SUIVI ;
-
 static const char * gc_hach_suivi_menus[] = {
   "MENU_AZIMUTAL",
   "MENU_EQUATORIAL",
@@ -137,13 +137,15 @@ static const char * gc_hach_suivi_menus[] = {
   "MENU_DOWN"
 } ;
 
-void   SUIVI_INIT                    ( STRUCT_SUIVI * ) ;
+void SUIVI_INIT                    ( STRUCT_SUIVI * ) ;
+void SUIVI_PAS_INIT                ( STRUCT_SUIVI_PAS * ) ;
+void SUIVI_FRE_INIT                ( STRUCT_SUIVI_FRE * ) ;
 
-void   SUIVI_TRAITEMENT_MOT          ( STRUCT_SUIVI * ) ;
-void   SUIVI_MANUEL_BRUT             ( STRUCT_SUIVI * ) ;
-void   SUIVI_MANUEL_ASSERVI          ( STRUCT_SUIVI * ) ;
-void   SUIVI_OLD_0                   ( STRUCT_SUIVI * ) ;
-void   SUIVI_MENU_BEFORE_WHILE       ( STRUCT_SUIVI * ) ;
+void SUIVI_TRAITEMENT_MOT          ( STRUCT_SUIVI * ) ;
+void SUIVI_MANUEL_BRUT             ( STRUCT_SUIVI * ) ;
+void SUIVI_MANUEL_ASSERVI          ( STRUCT_SUIVI * ) ;
+void SUIVI_OLD_0                   ( STRUCT_SUIVI * ) ;
+void SUIVI_MENU_BEFORE_WHILE       ( STRUCT_SUIVI * ) ;
 /* old */
 void   SUIVI_TEMPORISATION_ALTITUDE  ( STRUCT_SUIVI * , struct timeval * )  ;
 void   SUIVI_TEMPORISATION_AZIMUT    ( STRUCT_SUIVI * , struct timeval * ) ;

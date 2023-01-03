@@ -283,19 +283,28 @@ void GPIO_TRAP_SIG(int sig) {
 * @param  : int duree_clignotement
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 * @todo   : effectuer la meme fonction mais avec variation continue PWM
-*           (necessite utiliser les threads rapports cycliques)
+* @todo   : (necessite utiliser les threads rapports cycliques)
+* @todo   : ATTENTION : participe aux temporisations avec usleep !
+* @todo   : devrait etre place dans un thread dedie
+* @todo   : (remettre le usleep en fin de test)
 *****************************************************************************************/
 
 void GPIO_LED_ETAT_CLIGNOTE(int nombre_clignotement, int duree_clignotement) {
+  
  int i ;
  i=-1; 
  
  TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
  while(++i<nombre_clignotement) {
-  GPIO_SET( gp_Pwm_Par->gpi_pwm_par_led_etat, 1 ) ; usleep(duree_clignotement*10000);
-  GPIO_SET( gp_Pwm_Par->gpi_pwm_par_led_etat, 0 ) ; usleep(duree_clignotement*10000);
+  GPIO_SET( gp_Pwm_Par->gpi_pwm_par_led_etat, 1 ) ; 
+  /* usleep(duree_clignotement*10000); */  
+  
+  GPIO_SET( gp_Pwm_Par->gpi_pwm_par_led_etat, 0 ) ; 
+  /* usleep(duree_clignotement*10000); */
  }
+
+ return;
 }
 /*****************************************************************************************
 * @fn     : GPIO_TAB_TOKEN

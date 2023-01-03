@@ -160,7 +160,7 @@ void INFRARED_READ(void) {
 
     if ( k == 0 && i_indice_code < CODES_CODE_NB_CODES ) {
       
-      DATAS_ACTION_SET( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
+      DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
     }
 
     if ( k > 0 && \
@@ -168,7 +168,7 @@ void INFRARED_READ(void) {
          i_indice_code <= IR_CODE_REPETE_AUTORISE_MAX && \
          i_indice_code >= IR_CODE_REPETE_AUTORISE_MIN ) {
 
-      DATAS_ACTION_SET( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
+      DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
     }
     
     // tres important !!

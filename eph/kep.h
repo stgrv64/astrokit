@@ -6,25 +6,27 @@
 #define DEBUG 0
 
 #ifndef DEBUG
-#define TRACE(fmt, args...)  while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define TRACE1(fmt, args...) while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace(fmt, args...)  while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #endif
 
 #if defined(DEBUG) && DEBUG == 0 
-#define Trace(fmt, args...)   fprintf(stderr, "\n%s : " fmt, __func__, ##args)
-#define TRACE(fmt, args...)   while(0) { fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; }
-#define TRACE1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace(fmt, args...)              fprintf(stderr, "\n%s : " fmt, __func__, ##args)
+#define Trace1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #endif
 
 #if defined(DEBUG) && DEBUG == 1
-#define Trace(fmt, args...)   fprintf(stderr, "\n%s : " fmt, __func__, ##args)
-#define TRACE(fmt, args...)   fprintf(stderr, "\n%s : " fmt, __func__, ##args)
-#define TRACE1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace(fmt, args...)              fprintf(stderr, "\n%s : " fmt, __func__, ##args)
+#define Trace1(fmt, args...){            fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
+#define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #endif
 
 #if defined(DEBUG) && DEBUG == 2
-#define TRACE(fmt, args...)  fprintf(stderr, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args)
-#define TRACE1(fmt, args...) fprintf(stderr, "\n%s : " fmt, __func__, ##args) 
+#define Trace(fmt, args...)              fprintf(stderr, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args)
+#define Trace1(fmt, args...)             fprintf(stderr, "\n%s : " fmt, __func__, ##args) 
+#define Trace2(fmt, args...)             fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; 
 #endif
 
 typedef struct   {

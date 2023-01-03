@@ -160,7 +160,7 @@ int main()
       t = search( t0, 0.5*PI, 27.0 );
 #endif
       TDT = t;
-      TRACE1("%.4f ", t);
+      Trace1("%.4f ", t);
       prtflg = 1;
       jtocal(t);
       t0 = t;

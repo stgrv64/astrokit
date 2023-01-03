@@ -217,13 +217,13 @@ while( *p )
 *q++ = '\0';
 /* convert all '_' characters to spaces */
 q = ans;
-while( *q != '\0' )
-	{
+while( *q != '\0' ) {
 	if( *q == '_' )
 		*q = ' ';
 	++q;
-	}
-printf( "\n              %s\n", ans );
+}
+/* (mise en commentaire 2023) */
+// printf( "\n              %s\n", ans );
 return(0);
 }
 

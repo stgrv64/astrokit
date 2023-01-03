@@ -50,7 +50,7 @@ int dosun(TOPOCENTRIC *infos) { // declaration fonction
   }
 
   if( prtflg ) {
-    TRACE1( "light time %.4fm,  ", 1440.0*t );
+    Trace1( "light time %.4fm,  ", 1440.0*t );
     showcor( "aberration", ecr, pol );  // appel fonction
   }
 
@@ -96,7 +96,7 @@ infos->dec=ecr[2] ;
     y  = coseps * rec[1]  +  sineps * rec[2];
     y  = zatan2( rec[0], y ) + nutl;
     
-    TRACE1( "Apparent longitude %.3f deg\n", RTD*y );
+    Trace1( "Apparent longitude %.3f deg\n", RTD*y );
   }
 
   /* Report altitude and azimuth */

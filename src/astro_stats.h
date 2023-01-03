@@ -25,6 +25,8 @@ struct STR_STATS {
 
 typedef struct STR_STATS STRUCT_STATS ;
 
+void STATS_INIT (STRUCT_STATS * ) ;
+
 void STAT_MESURE_PULSATIONS_INJECTEES(STRUCT_STATS *) ;
 
 #endif

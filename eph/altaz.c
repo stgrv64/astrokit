@@ -143,12 +143,12 @@ int altaz(infos,  pol, J )
     infos->asc = ra ;
     infos->dec = dec ;
   
-  	TRACE1( "AD  (hms) =\t" );
+  	Trace1( "AD  (hms) =\t" );
   	hms( ra );
-  	TRACE1( "DEC (hms) =\t" );
+  	Trace1( "DEC (hms) =\t" );
   	dms( dec );
   
-  	TRACE1( "=========" );
+  	Trace1( "=========" );
   	}
   return(0);
 }

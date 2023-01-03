@@ -84,11 +84,11 @@ void SUIVI_PAS_UNLOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
 * @fn     : SUIVI_FRE_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
-* @param  : STRUCT_SUIVI_FREQUENCES *
+* @param  : STRUCT_SUIVI_FRE *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FREQUENCES * lp_Fre) {
+void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -100,11 +100,11 @@ void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FREQUENCES * lp_Fre) {
 * @fn     : SUIVI_FRE_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
-* @param  : STRUCT_SUIVI_FREQUENCES *
+* @param  : STRUCT_SUIVI_FRE *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_FRE_UNLOCK ( STRUCT_SUIVI_FREQUENCES * lp_Fre) {
+void SUIVI_FRE_UNLOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -271,7 +271,7 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI_PAS * lp_Pas ) {
 
 void SUIVI_OLD_0( STRUCT_SUIVI * lp_Sui) {
     
-
+  return ;
 }
 
 /*****************************************************************************************
@@ -303,6 +303,8 @@ void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * lp_Sui) {
     case MENU_PROGRAMME_DOWN      : break ; 
     case MENU_DOWN                : break ; 
   }
+
+  return ;
 }
 
 /*****************************************************************************************
@@ -341,38 +343,53 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
   // On change de MENU si on appuie sur EST OUEST NORD ou SUD => 
   // on passe en MENU 0 
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
+
   lp_Sui->sui_menu_old = lp_Sui->sui_menu ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->sui_mutex ) ;
 
   /*  touche OUEST */
 
-  /* Si on a un mot non vide */
+  /*==============================================*/
+  /* Si on a un mot non vide                      */
+  /*==============================================*/
+
   if ( strcmp( gp_Key->key_mot, "" ) != 0 ) {
 
-    Trace("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
+    Trace1("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
 
     ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
 
     /* Renvoi sur MANUEL_BRUT */
 
-    KEYS_IF_MOT_IS("n" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("o" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("e" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("s" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("forward" )       { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("rewind" )        { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("forwardfast" )   { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("rewindfast" )    { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("ne" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("no" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("se" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("so" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("reset" )         { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
+
+    KEYS_IF_MOT_IS("n" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("o" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("e" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("s" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("forward" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("rewind" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("forwardfast" )        { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("rewindfast" )         { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("ne" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("no" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("se" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("so" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    KEYS_IF_MOT_IS("reset" )              { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->sui_mutex ) ;
 
     /* Fin Renvoi sur MANUEL_BRUT */
 
-    KEYS_IF_MOT_IS("stop")  { gp_Vou->vou_run = 0 ; i=1;}
-    KEYS_IF_MOT_IS("play")  { gp_Vou->vou_run = 1 ; i=1;}
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Vou->vou_mutex ) ;
+
+    KEYS_IF_MOT_IS("stop")                { gp_Vou->vou_run = 0 ; i=1;}
+    KEYS_IF_MOT_IS("play")                { gp_Vou->vou_run = 1 ; i=1;}
     
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Vou->vou_mutex ) ;
+
     /* Quelques actions d 'affichage a l'ecran  */
 
     KEYS_IF_MOT_IS("aff_variables")       { CONFIG_PARAMETRES_DISPLAY() ; i=1 ; } ;
@@ -866,6 +883,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
     
     /* pthread_mutex_unlock( & gp_Mut->mut_cal ); */
   }
+  return ;
 }
 
 //==========================================================
@@ -1038,57 +1056,11 @@ void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
   
   TraceArbo(__func__,0,"init suivi") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Sui->sui_mutex) ;
+
   lp_Sui->sui_mode_equatorial = 0 ;
 
   // a modifier  : instancier ces variables a l aide du fichier de config
-
-  gp_Pas->pas_rst           = 1 ;
-  gp_Pas->pas_azi           = 1 ;
-  gp_Pas->pas_alt           = 1 ;
-
-  gp_Pas->pas_acc_plus      = 0 ;
-  gp_Pas->pas_acc_moins     = 0 ;
-  gp_Pas->pas_azi_old       = 0 ;
-  gp_Pas->pas_alt_old       = 0 ;
-  gp_Pas->pas_est           = 0 ;
-  gp_Pas->pas_ouest         = 0 ; 
-  gp_Pas->pas_nord          = 0 ;
-  gp_Pas->pas_sud           = 0 ;
-  gp_Pas->pas_forward       = 0 ;
-  gp_Pas->pas_rewind        = 0 ;
-  gp_Pas->pas_forward_fast  = 0 ;
-  gp_Pas->pas_rewind_fast   = 0 ;
-  gp_Pas->pas_acc_azi       = 1.0 ; // acceleration volontaire des vitesses brutes
-  gp_Pas->pas_acc_alt       = 1.0 ; // acceleration volontaire des vitesses brutes
-  gp_Pas->pas_asc           = 0 ;
-  gp_Pas->pas_dec           = 0  ;
-
-  gp_Fre->fre_fa_mic        = 30 ;
-  gp_Fre->fre_fh_mic        = 30 ;
-  gp_Fre->fre_sa            = 0 ; // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_ALT
-  gp_Fre->fre_sh            = 0 ; // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_AZI
-  gp_Fre->fre_sa_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
-  gp_Fre->fre_sh_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
-  gp_Fre->fre_ta_mic        = 1 / gp_Fre->fre_fa_mic ;
-  gp_Fre->fre_th_mic        = 1 / gp_Fre->fre_fh_mic ;
-
-  gp_Sta->sta_Tac        = 1.0 ;
-  gp_Sta->sta_Thc        = 1.0 ;
-  
-  gp_Sta->sta_Tacc = 0.97 ;
-  gp_Sta->sta_Thcc = 0.97 ;
-  
-  gp_Sta->sta_Ia = 0 ;
-  gp_Sta->sta_Ih = 0 ;
-  
-  gp_Sta->sta_Ias = 0 ;
-  gp_Sta->sta_Ihs = 0 ;
-  
-  gp_Sta->sta_Ia_prec = 0 ;
-  gp_Sta->sta_Ih_prec = 0 ;
-  
-  for(i=0;i<STATS_ASS;i++) gp_Sta->sta_Iat[i] = 0 ;
-  for(i=0;i<STATS_ASS;i++) gp_Sta->sta_Iht[i] = 0 ;
            
   lp_Sui->sui_Da            = 0  ;      // nombre a injecter dans les diviseurs de frequence
   lp_Sui->sui_Dh            = 0 ;       // nombre a injecter dans les diviseurs de frequence
@@ -1102,4 +1074,81 @@ void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
   gettimeofday(&lp_Sui->sui_tval,NULL) ;
 
   return ;
+}
+
+/*****************************************************************************************
+* @fn     : SUIVI_PAS_INIT
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_SUIVI * lp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
+* @date   : 2023-01-02 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void SUIVI_PAS_INIT(STRUCT_SUIVI_PAS * lp_Pas) {
+
+  int i ;
+  
+  TraceArbo(__func__,0,"init pas") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pas->pas_mutex) ;
+
+  lp_Pas->pas_rst           = 1 ;
+  lp_Pas->pas_azi           = 1 ;
+  lp_Pas->pas_azi_old       = 1 ;
+  lp_Pas->pas_alt_old       = 1 ;
+  lp_Pas->pas_alt           = 1 ;
+  lp_Pas->pas_acc_plus      = 0 ;
+  lp_Pas->pas_acc_moins     = 0 ;
+  lp_Pas->pas_est           = 0 ;
+  lp_Pas->pas_ouest         = 0 ; 
+  lp_Pas->pas_nord          = 0 ;
+  lp_Pas->pas_sud           = 0 ;
+  lp_Pas->pas_forward       = 0 ;
+  lp_Pas->pas_rewind        = 0 ;
+  lp_Pas->pas_forward_fast  = 0 ;
+  lp_Pas->pas_rewind_fast   = 0 ;
+  lp_Pas->pas_acc_azi       = 1.0 ; // acceleration volontaire des vitesses brutes
+  lp_Pas->pas_acc_alt       = 1.0 ; // acceleration volontaire des vitesses brutes
+  lp_Pas->pas_asc           = 0 ;
+  lp_Pas->pas_dec           = 0  ;
+
+  lp_Pas->pas_lock   = SUIVI_PAS_LOCK ;
+  lp_Pas->pas_unlock = SUIVI_PAS_UNLOCK ;
+
+  return ;
+
+}
+
+/*****************************************************************************************
+* @fn     : SUIVI_FRE_INIT
+* @author : s.gravois
+* @brief  : Cette fonction initialise la structure STRUCT_SUIVI * lp_Sui
+* @param  : STRUCT_SUIVI * lp_Sui
+* @date   : 2023-01-02 creation 
+* @todo   : 
+*****************************************************************************************/
+
+void SUIVI_FRE_INIT(STRUCT_SUIVI_FRE * lp_Fre) {
+
+  int i ;
+  
+  TraceArbo(__func__,0,"init frequences") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Fre->fre_mutex) ;
+
+  lp_Fre->fre_fa_mic        = 30 ;
+  lp_Fre->fre_fh_mic        = 30 ;
+  lp_Fre->fre_sa            = 0 ; // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_ALT
+  lp_Fre->fre_sh            = 0 ; // signe de la vitesse (direction), tenir compte du flag FLAG_SENS_AZI
+  lp_Fre->fre_sa_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
+  lp_Fre->fre_sh_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
+  lp_Fre->fre_ta_mic        = 1 / lp_Fre->fre_fa_mic ;
+  lp_Fre->fre_th_mic        = 1 / lp_Fre->fre_fh_mic ;
+
+  lp_Fre->fre_lock   = SUIVI_FRE_LOCK ;
+  lp_Fre->fre_unlock = SUIVI_FRE_UNLOCK ;
+
+  return ;
+
 }

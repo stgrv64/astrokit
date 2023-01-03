@@ -25,8 +25,10 @@ for( i=0; i<3; i++ )
 	p[i] += dp[i];
 	}
 if( prtflg )
-	printf( "elongation from sun %.2f degrees, ", acos( -ep )/DTR );
-showcor( "light defl.", p, dp );
+	/* (mise en commentaire 2023) 
+	printf( "elongation from sun %.2f degrees, ", acos( -ep )/DTR ); 
+	*/
+	showcor( "light defl.", p, dp );
 return(0);
 }
 

@@ -104,9 +104,9 @@ while (0)
 #define TraceLogLevel(loglevel,nb,fmt, args...) \
 do { \
   if (loglevel>=nb) { \
-    fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
   } else  { \
-    fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
   } \
 } \
 while (0)

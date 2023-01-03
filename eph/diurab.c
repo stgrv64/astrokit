@@ -36,7 +36,7 @@ D = 1.5472e-6*trho*coslat*sinlha*sindec;
 *dec += D;
 
 if( prtflg ) {
- TRACE1( "diurnal aberration dRA %.3fs dDec %.2f\"\n", RTS*N/15.0, RTS*D );
+ Trace1( "diurnal aberration dRA %.3fs dDec %.2f\"\n", RTS*N/15.0, RTS*D );
 }
 return(0);
 }

@@ -15,6 +15,8 @@
 
 #include "astro_global.h"
 
+#define DATAS_ZERO_CHAR ""
+
 #ifndef CONFIG_TAILLE_BUFFER_256
 #define CONFIG_TAILLE_BUFFER_256 256
 #endif
@@ -32,9 +34,10 @@ typedef struct STR_DATAS STRUCT_DATAS ;
 
 void DATAS_INIT            ( STRUCT_DATAS * ) ;
 void DATAS_RESET           ( STRUCT_DATAS * )  ;
+
 void DATAS_ACTION_RESET    ( STRUCT_DATAS * )  ;
 
-void DATAS_ACTION_SET      ( STRUCT_DATAS * , const char * ) ;
-void DATAS_ACTION_PUT      ( STRUCT_DATAS * , STRUCT_KEYS * );
+void DATAS_ACTION_BUF_TO_DAT      ( STRUCT_DATAS * , const char * ) ;
+void DATAS_ACTION_DAT_TO_KEY      ( STRUCT_DATAS * , STRUCT_KEYS * );
 
 #endif

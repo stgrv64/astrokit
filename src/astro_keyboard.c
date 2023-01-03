@@ -23,9 +23,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYBOARD_LOCK ( void * lp_Void) {
-
-  STRUCT_TERMIOS * lp_Ter = (STRUCT_TERMIOS*) lp_Void ;
+void KEYBOARD_LOCK ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -41,9 +39,7 @@ void KEYBOARD_LOCK ( void * lp_Void) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYBOARD_UNLOCK ( void * lp_Void) {
-
-  STRUCT_TERMIOS * lp_Ter = (STRUCT_TERMIOS*) lp_Void ;
+void KEYBOARD_UNLOCK ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -79,6 +75,13 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
 
   tcsetattr(0,TCSANOW, &lp_Ter->ter_config_initiale) ;
 
+  memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
+  memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
+/*
+  for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
+    lp_Ter->ter_buffer[i]=-1;
+  }
+*/
   lp_Ter->ter_lock   = KEYBOARD_LOCK ;
   lp_Ter->ter_unlock = KEYBOARD_UNLOCK ;
 
@@ -102,23 +105,23 @@ void KEYBOARD_TERMIOS_EXIT(STRUCT_TERMIOS * lp_Ter) {
 }
 
 /*****************************************************************************************
-* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR
+* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_CHAR
 * @author : s.gravois
 * @brief  : Lit un character depuis frappe d'une touche sur le clavier via termios
-* @param  : 
+* @param  : STRUCT_TERMIOS * lp_Ter
 * @date   : 2022-01-18 creation
 * @date   : passage du buffer de lecture de char a char[]
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR(STRUCT_TERMIOS * lp_Ter) {
+int KEYBOARD_TERMIOS_KBHIT_READ_CHAR(STRUCT_TERMIOS * lp_Ter) {
 
   char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
   if ( lp_Ter->ter_peek_char != -1 ) {
-    // Trace("lp_Ter->ter_peek_char != -1") ;
+    Trace("lp_Ter->ter_peek_char != -1") ;
     return 1 ;
   }
   lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
@@ -144,74 +147,58 @@ int KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR(STRUCT_TERMIOS * lp_Ter) {
 }
 
 /*****************************************************************************************
-* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR
+* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_CHARS
 * @author : s.gravois
 * @brief  : detecte la frappe d'une touche sur le clavier via termios
-* @param  : 
+* @param  : STRUCT_TERMIOS * lp_Ter
 * @date   : 2022-01-18 creation
 * @date   : passage du buffer de lecture de char a char[]
 * @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
 * @todo   : eviter les traces a l interieur de cette fonction
 *****************************************************************************************/
 
-int KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR(STRUCT_TERMIOS * lp_Ter) {
+int KEYBOARD_TERMIOS_KBHIT_READ_CHARS(STRUCT_TERMIOS * lp_Ter) {
 
-  char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
+  // char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
   int nread ; 
 
+  lp_Ter->ter_lock(lp_Ter) ;
+
   lp_Ter->ter_sum_ascii=0 ;
-
-  memset(lc_buf, 0, sizeof(lc_buf)) ;
-
-  if ( lp_Ter->ter_peek_chars[0] != -1 ) {
-    // Trace("lp_Ter->ter_peek_chars[0] != -1") ;
-    return 1 ;
-  }
   lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
+  memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
   tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale ) ;
 
-  /* Lecture dans le file descriptor 0 (stdin) */
+  lp_Ter->ter_unlock(lp_Ter) ;
 
-  nread = read(0, &lc_buf, TERMIOS_KBHIT_SIZE_BUFFER_READ );
+  // Trace1("--------------------- before read ----------------------------") ;
+
+  nread = read(0,&(lp_Ter->ter_buffer),TERMIOS_KBHIT_SIZE_BUFFER_READ);
+
+  lp_Ter->ter_lock(lp_Ter) ;
 
   lp_Ter->ter_config_finale.c_cc[VMIN] = 1 ;
   tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale )  ;
 
-  if ( nread >0  ) {
+  lp_Ter->ter_unlock(lp_Ter) ;
 
-    Trace("nread positif = %d", nread) ;
+  if ( nread > 0  ) {
+
+    // Trace("nread positif = %d", nread) ;
     
-    for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
-      lp_Ter->ter_peek_chars[i] = (int)lc_buf[i] ;
-      Trace1("peek_chars[%d] = %c %d lp_Ter->ter_sum_ascii = %d", \
-        i, \
-        lp_Ter->ter_peek_chars[i], \
-        (int) lp_Ter->ter_peek_chars[i], \
-        lp_Ter->ter_sum_ascii) ;
+    lp_Ter->ter_lock(lp_Ter) ;
 
-      lp_Ter->ter_sum_ascii+=(int)lp_Ter->ter_peek_chars[i] ;
+    for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
+      lp_Ter->ter_sum_ascii+=(int)lp_Ter->ter_buffer[i] ;
     }
-    strcpy( lp_Ter->ter_buffer , lc_buf) ;  
+    
+    lp_Ter->ter_unlock(lp_Ter) ;
 
-    memset(lp_Ter->ter_peek_chars, 0, sizeof(lp_Ter->ter_peek_chars)) ;
-    strncpy((char*)lp_Ter->ter_peek_chars, (const char*)-1, TERMIOS_KBHIT_SIZE_BUFFER_READ) ;
-    /*
-    for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
-      lp_Ter->ter_peek_chars[i]=-1;
-    }*/
-    memset(lc_buf, 0, sizeof(lc_buf)) ;
-
-    Trace1("nread %-3d lp_Ter->ter_sum_ascii %-5d lp_Ter->ter_buffer %-10s", \
-      nread, \
-      lp_Ter->ter_sum_ascii, \
-      lp_Ter->ter_buffer ) ;
-
-    // usleep(10000) ;
-    return -1 ;
+    return nread ;
   }
   else {
-    // Trace2("nread = %d", nread) ;
+    return -1 ;
   }
   return 0 ;
 }
@@ -260,7 +247,7 @@ int KEYBOARD_TERMIOS_READ(STRUCT_TERMIOS * lp_Ter) {
   while(ch!='q') {
     // printf("boucle en cours\n") ;
     usleep(50000) ;
-    if ( KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR(lp_Ter)) {
+    if ( KEYBOARD_TERMIOS_KBHIT_READ_CHAR(lp_Ter)) {
       ch= KEYBOARD_TERMIOS_READCH(lp_Ter) ;
       printf("keycode %c => %d\n", ch, ch) ;
     }
@@ -381,6 +368,7 @@ void KEYBOARD_NCURSES_READ(void) {
     struct timeval current;
 
     gettimeofday(&current, 0);
+
     secs = (int) (current.tv_sec - previous.tv_sec);
     msecs = (int) ((current.tv_usec - previous.tv_usec) / 1000);
     if (msecs < 0) {

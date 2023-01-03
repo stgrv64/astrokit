@@ -768,7 +768,7 @@ void CALCULS_PERIODE(STRUCT_ASTRE * lp_Ast) {
 * @todo   : les periodes / frequences en azimut et altitude
 *****************************************************************************************/
 
-void CALCULS_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE * lp_Ast, STRUCT_SUIVI_PAS * lp_Pas, STRUCT_SUIVI_FREQUENCES * lp_Fre) {
+void CALCULS_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE * lp_Ast, STRUCT_SUIVI_PAS * lp_Pas, STRUCT_SUIVI_FRE * lp_Fre) {
 
   double frequence ;
   double azi_rot, alt_rot ;
@@ -1187,6 +1187,8 @@ void CALCULS_TOUT(void) {
 
   TraceArbo(__func__,1,"calculate all") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
+
   switch (gp_Ast->ast_typ) {
 
     /* ----------------------------------------------------------------- */
@@ -1197,8 +1199,6 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
-      TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
-
       if ( gp_Cal->cal_mode == CALCULS_AZIMUTAL_VERS_EQUATORIAL ) {
         
         CALCULS_EQUATEUR(gp_Ast) ;
@@ -1216,7 +1216,6 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_CIEL_PROFOND :
     
-      TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
       CALCULS_ANGLE_HORAIRE(gp_Ast) ;
       CALCULS_AZIMUT(gp_Ast) ;
       CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
@@ -1226,9 +1225,7 @@ void CALCULS_TOUT(void) {
     /* ----------------------------------------------------------------- */
     
     case ASTRE_PLANETE :
-                  
-      TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
-      
+
       if ( gp_Ast->ast_num > 9 ) {
         Trace("numero de planete interdit = %d", gp_Ast->ast_num ) ;
         Trace("=> forçage a zero (soleil)"
@@ -1252,6 +1249,13 @@ void CALCULS_TOUT(void) {
                         gp_Tim->tim_SS,\
                         gp_Ast->ast_num ) ;
       
+      Trace("(infos) %s (asc) %.2f (dec) %.2f (azi) %.2f (alt) %.2f", \
+        gp_Ast->ast_infos, \
+        gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES, \
+        gp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES, \
+        gp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES, \
+        gp_Ast->ast_alt * CALCULS_UN_RADIAN_EN_DEGRES )  ;
+
       CALCULS_ANGLE_HORAIRE(gp_Ast) ;
       
       // FIXME : pour les planetes , le calcul de l'azimut / altitude 

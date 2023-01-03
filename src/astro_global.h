@@ -182,7 +182,7 @@ typedef struct  STR_MUTEXS                  STRUCT_MUTEXS ;
 typedef struct  STR_PTHREADS                STRUCT_PTHREADS ;
 typedef struct  STR_SUIVI                   STRUCT_SUIVI ;
 typedef struct  STR_SUIVI_PAS               STRUCT_SUIVI_PAS ;
-typedef struct  STR_SUIVI_FREQUENCES        STRUCT_SUIVI_FREQUENCES ;
+typedef struct  STR_SUIVI_FREQUENCES        STRUCT_SUIVI_FRE ;
 typedef struct  STR_STATS             STRUCT_STATS ;
 typedef struct  STR_TERMIOS                 STRUCT_TERMIOS ;
 typedef struct  STR_TIME                    STRUCT_TIME ;
@@ -258,7 +258,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_PTHREADS         g_Pthreads,           *gp_Pth ; \
   extern STRUCT_SUIVI            g_Suivi,              *gp_Sui ; \
   extern STRUCT_SUIVI_PAS        g_Suivi_Pas,          *gp_Pas ; \
-  extern STRUCT_SUIVI_FREQUENCES g_Suivi_Frequences,   *gp_Fre ; \
+  extern STRUCT_SUIVI_FRE g_Suivi_Frequences,   *gp_Fre ; \
   extern STRUCT_STATS      g_Suivi_Statistiques, *gp_Sta ; \
   extern STRUCT_TERMIOS          g_Termios,            *gp_Ter ; \
   extern STRUCT_TIME             g_Time,               *gp_Tim ; \

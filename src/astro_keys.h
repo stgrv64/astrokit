@@ -18,10 +18,12 @@
 #define KEYS_ACTIONS_SIZE     7
 #define KEYS_VALIDATIONS_SIZE 10
 
+typedef struct STR_KEYS STRUCT_KEYS ;
+
 struct STR_KEYS {
   pthread_mutex_t key_mutex ;
-  void          (*key_lock)   (void) ;
-  void          (*key_unlock) (void) ;  
+  void          (*key_lock)   (STRUCT_KEYS*) ;
+  void          (*key_unlock) (STRUCT_KEYS*) ;  
   char            key_symbole     [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_nombre      [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_mot         [ CONFIG_TAILLE_BUFFER_32 ] ;

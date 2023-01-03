@@ -57,19 +57,18 @@
 #endif
 #endif
 
+typedef struct STR_TERMIOS STRUCT_TERMIOS ;
+
 struct STR_TERMIOS {
+  pthread_mutex_t  ter_mutex ;
+  void          (* ter_lock)   (STRUCT_TERMIOS *) ;
+  void          (* ter_unlock) (STRUCT_TERMIOS *) ;
   STR_EXT_TERMIOS  ter_config_initiale; 
   STR_EXT_TERMIOS  ter_config_finale ;   
-  pthread_mutex_t  ter_mutex ;
-  void          (* ter_lock)   (void*) ;
-  void          (* ter_unlock) (void*) ;
-  char             ter_buffer [ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
+  char             ter_buffer    [ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
   int              ter_sum_ascii ;
   int              ter_peek_char  ; 
-  int              ter_peek_chars[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
 };
-
-typedef struct STR_TERMIOS STRUCT_TERMIOS ;
 
 void KEYBOARD_INIT             (STRUCT_TERMIOS *) ;
 void KEYBOARD_READ             (STRUCT_TERMIOS *) ;
@@ -78,8 +77,8 @@ void KEYBOARD_TERMIOS_EXIT     (STRUCT_TERMIOS *) ;
 int  KEYBOARD_TERMIOS_READCH   (STRUCT_TERMIOS *) ;
 int  KEYBOARD_TERMIOS_READ     (STRUCT_TERMIOS *) ;
 
-int  KEYBOARD_TERMIOS_KBHIT_READ_1_CHAR ( STRUCT_TERMIOS *) ; 
-int  KEYBOARD_TERMIOS_KBHIT_READ_x_CHAR ( STRUCT_TERMIOS * ) ;
+int  KEYBOARD_TERMIOS_KBHIT_READ_CHAR ( STRUCT_TERMIOS *) ; 
+int  KEYBOARD_TERMIOS_KBHIT_READ_CHARS ( STRUCT_TERMIOS * ) ;
 
 void KEYBOARD_NCURSES_READ     (void) ;
 void KEYBOARD_NCURSES_INIT     (void) ;
