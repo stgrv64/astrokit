@@ -1,3 +1,6 @@
+
+#include "log.h"
+
 /* Precession of the equinox and ecliptic
  * from epoch Julian date J to or from J2000.0
  *
@@ -155,6 +158,15 @@ static DOUBLE inclcof[] = {
  * to go from J2000 to J2.
  */
 
+/*****************************************************************************************
+* @fn     : precess
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int precess( R, J, direction )
 DOUBLE R[], J;
 int direction;
@@ -166,6 +178,8 @@ int i;
 #if IAU
 DOUBLE sinth, costh, sinZ, cosZ, sinz, cosz, Z, TH;
 #endif
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 if( J == J2000 )
 	return(0);

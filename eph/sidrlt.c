@@ -11,19 +11,46 @@
  * to approximately 24 microseconds.
  */
 
+/* Temps sidéral apparent local avec équation des équinoxes
+  *AA page B6
+  *
+  * Les coefficients de temps sidéraux proviennent de Williams (1994), mis à jour
+  * à DE403.
+  *
+  * Prudence. A l'époque J2000.0, la précision à 16 décimales
+  * de nombres double précision IEEE
+  * limite la résolution temporelle mesurée par la date julienne
+  * à environ 24 microsecondes.
+  */
+
+#include "log.h"
 
 extern double J2000, TDT, RTD, nutl, coseps;
+
 #if __STDC__
+
 double floor (double);
 int nutlo (double);
 int epsiln (double);
+
 #else
 double floor();
 int nutlo(), epsiln();
 #endif
 
 /* program returns sidereal seconds since sidereal midnight */
+
+/*****************************************************************************************
+* @fn     : sidrlt
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double sidrlt( j, tlong )
+
 double j;	/* Julian date and fraction */
 double tlong;	/* East longitude of observer, degrees */
 {
@@ -31,6 +58,8 @@ double jd0;     /* Julian day at midnight Universal Time */
 double secs;   /* Time of day, UT seconds since UT midnight */
 double eqeq, gmst, jd, T0, msday;
 /*long il;*/
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Julian day at given UT */
 jd = j;

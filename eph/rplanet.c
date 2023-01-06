@@ -5,9 +5,25 @@
  * right ascension and declination.
  */
 
+/* Le programme suivant réduit l'équatoriale héliocentrique
+  * coordonnées rectangulaires de la terre et de l'objet qui
+  * ont été calculés par kepler() et produit des géocentriques apparents
+  * ascension droite et déclinaison.
+  */
+
 #include "kep.h"
 
+/*****************************************************************************************
+* @fn     : reduce
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int reduce( infos, elemnt, q, e )
+
 TOPOCENTRIC *infos ;
 struct orbit *elemnt;	/* orbital elements of q */
 double q[], e[];	/* heliocentric coordinates */
@@ -16,6 +32,8 @@ double p[3], temp[3], polar[3];
 double a, b, s;
 int i;
 double sqrt(), asin(), log();
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* Save the geometric coordinates at TDT
  */
@@ -112,14 +130,18 @@ nutate( TDT, p );
 /* Display the final apparent R.A. and Dec.
  * for equinox of date.
  */
-if( prtflg ) Trace1 ("%s.", whatconstel (p, TDT));
+/* (mise en commentaire 2023) */
+if( prtflg ) { 
+  Trace1 ("%s.", whatconstel (p, TDT));
+}
 
 showrd( "  Apparent:", p, polar );
 
 /* Geocentric ecliptic longitude and latitude.  */
-if( prtflg )
-  {
-    printf ("Apparent geocentric ");
+if( prtflg ) 
+{
+	/* (mise en commentaire 2023) */
+    Trace1 ("Apparent geocentric ");
     for( i=0; i<3; i++ )
 	p[i] *= EO;
     lonlat( p, TDT, temp, 0 );
@@ -131,18 +153,29 @@ altaz( infos, polar, UT );
 return(0);
 }
 
-
 extern struct orbit *elobject;
 extern double robject[];
 
+/*****************************************************************************************
+* @fn     : doplanet
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int doplanet(TOPOCENTRIC *infos)
 {
-  /* calculate heliocentric position of the object */
-  
-  kepler( TDT, elobject, robject, obpolar );
-  
-  /* apply correction factors and print apparent place */
-  
-  reduce( infos, elobject, robject, rearth );
-  return 0;
+
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+	/* calculate heliocentric position of the object */
+
+	kepler( TDT, elobject, robject, obpolar );
+
+	/* apply correction factors and print apparent place */
+
+	reduce( infos, elobject, robject, rearth );
+
+	return 0;
 }

@@ -95,8 +95,7 @@ struct STR_GPIO_PARAMS_MATRICIEL {
 struct STR_GPIO_PARAMS_PWM {
 
   pthread_mutex_t par_mutex ;
-
-  int             gpi_pwm_par_led_etat ; /* TODO : mettre ailleurs */
+  int             gpi_pwm_par_led_etat ; 
   char            gpi_pwm_par_alt_fpwm [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            gpi_pwm_par_alt_gpio [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            gpi_pwm_par_alt_mask [ CONFIG_TAILLE_BUFFER_64 ] ;
@@ -128,13 +127,12 @@ t_en_Gpio_Red_Type ;
 
 struct STR_GPIO_PWM_PHASE {
 
+  STR_EXT_TIMEVAL    pha_tval ;
   pthread_mutex_t   pha_mutex ;    
   void            (*pha_lock)   (void) ;
   void            (*pha_unlock) (void) ;  
   /* STRUCT_SUIVI    * p_sui ; */
   /* STRUCT_PTHREADS * p_pth ; */
-
-  struct timeval    pha_tval ;
 
   double            pha_rap[ GPIO_MICROPAS_MAX ] ; 
   double            pha_per_pwm ;  

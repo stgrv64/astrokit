@@ -4,6 +4,15 @@
 #include "kep.h"
 extern double Clightaud;
 
+/*****************************************************************************************
+* @fn     : annuab
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int annuab( p )
 double p[]; /* unit vector pointing from earth to object */
 {
@@ -11,6 +20,8 @@ double A, B, C;
 double betai, pV;
 double x[3], V[3];
 int i;
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* Calculate the velocity of the earth (see vearth.c).
  */

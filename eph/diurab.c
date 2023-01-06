@@ -11,32 +11,44 @@ extern double trho;
 /* geocentric latitude of observer, degrees: */
 extern double tlat;
 
+/*****************************************************************************************
+* @fn     : diurab
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int diurab( last, ra, dec )
 double last;	/* local apparent sidereal time, radians */
 double *ra;	/* right ascension, radians */
 double *dec;	/* declination, radians */
 {
-double lha, coslha, sinlha, cosdec, sindec;
-double coslat, N, D;
+	double lha, coslha, sinlha, cosdec, sindec;
+	double coslat, N, D;
 
-lha = last - *ra;
-coslha = cos(lha);
-sinlha = sin(lha);
-cosdec = cos(*dec);
-sindec = sin(*dec);
-coslat = cos( DTR*tlat );
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-if( cosdec != 0.0 )
-	N = 1.5472e-6*trho*coslat*coslha/cosdec;
-else
-	N = 0.0;
-*ra += N;
+	lha    = last - *ra;
+	
+	coslha = cos(lha);
+	sinlha = sin(lha);
+	cosdec = cos(*dec);
+	sindec = sin(*dec);
+	coslat = cos( DTR*tlat );
 
-D = 1.5472e-6*trho*coslat*sinlha*sindec;
-*dec += D;
+	if( cosdec != 0.0 )
+		N = 1.5472e-6*trho*coslat*coslha/cosdec;
+	else
+		N = 0.0;
+	*ra += N;
 
-if( prtflg ) {
- Trace1( "diurnal aberration dRA %.3fs dDec %.2f\"\n", RTS*N/15.0, RTS*D );
-}
-return(0);
+	D = 1.5472e-6*trho*coslat*sinlha*sindec;
+	*dec += D;
+
+	if( prtflg ) {
+	Trace1( "diurnal aberration dRA %.3fs dDec %.2f\"\n", RTS*N/15.0, RTS*D );
+	}
+	return(0);
 }

@@ -69,8 +69,11 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast->ast_mutex ) ;
 
-  lp_Ast->ast_lock   = ASTRE_LOCK ;
-  lp_Ast->ast_unlock = ASTRE_UNLOCK ;
+  lp_Ast->ast_lock     = ASTRE_LOCK ;
+  lp_Ast->ast_unlock   = ASTRE_UNLOCK ;
+  lp_Ast->ast_log      = ASTRE_LOG ;
+
+  lp_Ast->ast_loglevel = 0 ;
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
     memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
@@ -117,6 +120,8 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   CALCULS_INIT_ANGLE ( & lp_Ast->ast_dec_a ) ; 
   CALCULS_INIT_ANGLE ( & lp_Ast->ast_asc_a ) ;
   CALCULS_INIT_ANGLE ( & lp_Ast->ast_agh_a ) ;
+
+  return ;
 }
 
 /*****************************************************************************************
@@ -185,19 +190,19 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
   lp_Ast->ast_typ = ASTRE_INDETERMINE ;
   lp_Ast->ast_num = 0 ;
   lp_Ast->ast_new = TRUE ;
-  lp_Ast->ast_azi       = 0  ;
-  lp_Ast->ast_alt       = 0  ;
-  lp_Ast->ast_agh       = 0 ; 
+  lp_Ast->ast_azi     = 0  ;
+  lp_Ast->ast_alt     = 0  ;
+  lp_Ast->ast_agh     = 0 ; 
   lp_Ast->ast_asc     = 0 ;
   lp_Ast->ast_dec     = 0 ;
-  lp_Ast->ast_azi_vit      = 0 ;
-  lp_Ast->ast_alt_vit      = 0 ;
-  lp_Ast->ast_r3_x       = 0 ;
-  lp_Ast->ast_r3_xx      = 0 ;
-  lp_Ast->ast_r3_y       = 0 ;
-  lp_Ast->ast_r3_yy      = 0 ;
-  lp_Ast->ast_r3_z       = 0 ;
-  lp_Ast->ast_r3_zz      = 0 ;
+  lp_Ast->ast_azi_vit = 0 ;
+  lp_Ast->ast_alt_vit = 0 ;
+  lp_Ast->ast_r3_x    = 0 ;
+  lp_Ast->ast_r3_xx   = 0 ;
+  lp_Ast->ast_r3_y    = 0 ;
+  lp_Ast->ast_r3_yy   = 0 ;
+  lp_Ast->ast_r3_z    = 0 ;
+  lp_Ast->ast_r3_zz   = 0 ;
 
   lp_Ast->ast_unlock( lp_Ast ) ;
 }

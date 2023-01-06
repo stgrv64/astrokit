@@ -119,7 +119,7 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
   
   /* Initialisation pointeurs de fonctions */
 
-  lp_Lcd->default_set  = LCD_DEFINE_DEFAULT ;
+  lp_Lcd->default_set     = LCD_DEFINE_DEFAULT ;
   lp_Lcd->default_refresh = LCD_REFRESH_DEFAULT ;
 
   lp_Lcd->default_display = LCD_DISPLAY_DEFAULT ;
@@ -330,8 +330,6 @@ void LCD_REFRESH_DEFAULT(void) {
 
   char c_l0[16] ={0};
   char c_l1[16] ={0};
-
-  Trace("") ;
   
   memset( c_l0, 0, sizeof( c_l0) ) ;
   memset( c_l1, 0, sizeof( c_l1) ) ;

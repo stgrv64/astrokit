@@ -4,7 +4,22 @@
  * - S. L. Moshier, November, 1987
  */
 
+/* Ce programme réduit les coordonnées catalogue d'une étoile
+  * au lieu apparent.
+  *
+  * - S. L. Moshier, novembre 1987
+  */
+
 #include "kep.h"
+
+/*****************************************************************************************
+* @fn     : rstar
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int rstar( infos, el )
 TOPOCENTRIC *infos ;
@@ -16,6 +31,7 @@ double cosdec, sindec, cosra, sinra;
 int i;
 double log();
 
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* Convert from RA and Dec to equatorial rectangular direction
  */
@@ -87,7 +103,7 @@ for( i=0; i<3; i++ )
 
 if( prtflg )
 	{
-	printf( "approx. visual magnitude %.1f\n", el->mag );
+	Trace1( "approx. visual magnitude %.1f\n", el->mag );
 /* Report astrometric position
  */
 	showrd( "Astrometric J2000.0:", p, polar );
@@ -141,13 +157,23 @@ altaz( infos, polar, UT );
 return(0);
 }
 
-
 /* Compute stellar ephemeris for ELOBJECT at time TDT.  */
  
 extern struct orbit *elobject;
 
+/*****************************************************************************************
+* @fn     : dostar
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int dostar ( TOPOCENTRIC *infos )
 {
-  rstar( infos, (struct star *) elobject );
-  return 0;
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+	rstar( infos, (struct star *) elobject );
+	return 0;
 }

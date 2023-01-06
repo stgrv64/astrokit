@@ -25,7 +25,6 @@
  *                 tested against JPL DE403 ephemeris file.
  */
 
-
 #if __STDC__
 int sscc(int, double, int);
 extern int epsiln(double);
@@ -38,6 +37,7 @@ double sin(), cos(), floor(), fabs();
 #endif
 
 #include "plantbl.h"
+#include "log.h"
 
 /* The answers are posted here by nutlo():
  */
@@ -192,126 +192,137 @@ double FAR cc[5][8];
 
 #define mod3600(x) ((x) - 1296000. * floor ((x)/1296000.))
 
+/*****************************************************************************************
+* @fn     : nutlo
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int nutlo(J)
 double J;
 {
-double f, g, T, T2, T10;
-double MM, MS, FF, DD, OM;
-double cu, su, cv, sv, sw;
-double C, D;
-int i, j, k, k1, m;
-short *p;
+	double f, g, T, T2, T10;
+	double MM, MS, FF, DD, OM;
+	double cu, su, cv, sv, sw;
+	double C, D;
+	int i, j, k, k1, m;
+	short *p;
 
-if( jdnut == J )
-	return(0);
-jdnut = J;
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-/* Julian centuries from 2000 January 1.5,
- * barycentric dynamical time
- */
-T = (J-2451545.0)/36525.0;
-T2 = T * T;
-T10 = T / 10.0;
+	if( jdnut == J )
+		return(0);
+	jdnut = J;
 
-/* Fundamental arguments in the FK5 reference system.  */
+	/* Julian centuries from 2000 January 1.5,
+	* barycentric dynamical time
+	*/
+	T = (J-2451545.0)/36525.0;
+	T2 = T * T;
+	T10 = T / 10.0;
 
-/* longitude of the mean ascending node of the lunar orbit
- * on the ecliptic, measured from the mean equinox of date
- */
-OM = (mod3600 (-6962890.539 * T + 450160.280) + (0.008 * T + 7.455) * T2)
-    * STR;
+	/* Fundamental arguments in the FK5 reference system.  */
 
-/* mean longitude of the Sun minus the
- * mean longitude of the Sun's perigee
- */
-MS = (mod3600 (129596581.224 * T + 1287099.804) - (0.012 * T + 0.577) * T2)
-    * STR;
+	/* longitude of the mean ascending node of the lunar orbit
+	* on the ecliptic, measured from the mean equinox of date
+	*/
+	OM = (mod3600 (-6962890.539 * T + 450160.280) + (0.008 * T + 7.455) * T2)
+		* STR;
 
-/* mean longitude of the Moon minus the
- * mean longitude of the Moon's perigee
- */
-MM = (mod3600 (1717915922.633 * T + 485866.733) + (0.064 * T + 31.310) * T2)
-    * STR;
+	/* mean longitude of the Sun minus the
+	* mean longitude of the Sun's perigee
+	*/
+	MS = (mod3600 (129596581.224 * T + 1287099.804) - (0.012 * T + 0.577) * T2)
+		* STR;
 
-/* mean longitude of the Moon minus the
- * mean longitude of the Moon's node
- */
-FF = (mod3600 (1739527263.137 * T + 335778.877) + (0.011 * T - 13.257) * T2)
-    * STR;
+	/* mean longitude of the Moon minus the
+	* mean longitude of the Moon's perigee
+	*/
+	MM = (mod3600 (1717915922.633 * T + 485866.733) + (0.064 * T + 31.310) * T2)
+		* STR;
 
-/* mean elongation of the Moon from the Sun.
- */
-DD = (mod3600 (1602961601.328 * T + 1072261.307) + (0.019 * T - 6.891) * T2)
-    * STR;
+	/* mean longitude of the Moon minus the
+	* mean longitude of the Moon's node
+	*/
+	FF = (mod3600 (1739527263.137 * T + 335778.877) + (0.011 * T - 13.257) * T2)
+		* STR;
 
-/* Calculate sin( i*MM ), etc. for needed multiple angles
- */
-sscc( 0, MM, 3 );
-sscc( 1, MS, 2 );
-sscc( 2, FF, 4 );
-sscc( 3, DD, 4 );
-sscc( 4, OM, 2 );
+	/* mean elongation of the Moon from the Sun.
+	*/
+	DD = (mod3600 (1602961601.328 * T + 1072261.307) + (0.019 * T - 6.891) * T2)
+		* STR;
 
-C = 0.0;
-D = 0.0;
-p = &nt[0]; /* point to start of table */
+	/* Calculate sin( i*MM ), etc. for needed multiple angles
+	*/
+	sscc( 0, MM, 3 );
+	sscc( 1, MS, 2 );
+	sscc( 2, FF, 4 );
+	sscc( 3, DD, 4 );
+	sscc( 4, OM, 2 );
 
-for( i=0; i<105; i++ )
-	{
-/* argument of sine and cosine */
-	k1 = 0;
-	cv = 0.0;
-	sv = 0.0;
-	for( m=0; m<5; m++ )
+	C = 0.0;
+	D = 0.0;
+	p = &nt[0]; /* point to start of table */
+
+	for( i=0; i<105; i++ )
 		{
-		j = *p++;
-		if( j )
+	/* argument of sine and cosine */
+		k1 = 0;
+		cv = 0.0;
+		sv = 0.0;
+		for( m=0; m<5; m++ )
 			{
-			k = j;
-			if( j < 0 )
-				k = -k;
-			su = ss[m][k-1]; /* sin(k*angle) */
-			if( j < 0 )
-				su = -su;
-			cu = cc[m][k-1];
-			if( k1 == 0 )
-				{ /* set first angle */
-				sv = su;
-				cv = cu;
-				k1 = 1;
-				}
-			else
-				{ /* combine angles */
-				sw = su*cv + cu*sv;
-				cv = cu*cv - su*sv;
-				sv = sw;
+			j = *p++;
+			if( j )
+				{
+				k = j;
+				if( j < 0 )
+					k = -k;
+				su = ss[m][k-1]; /* sin(k*angle) */
+				if( j < 0 )
+					su = -su;
+				cu = cc[m][k-1];
+				if( k1 == 0 )
+					{ /* set first angle */
+					sv = su;
+					cv = cu;
+					k1 = 1;
+					}
+				else
+					{ /* combine angles */
+					sw = su*cv + cu*sv;
+					cv = cu*cv - su*sv;
+					sv = sw;
+					}
 				}
 			}
+	/* longitude coefficient */
+		f  = *p++;
+		if( (k = *p++) != 0 )
+			f += T10 * k;
+
+	/* obliquity coefficient */
+		g = *p++;
+		if( (k = *p++) != 0 )
+			g += T10 * k;
+
+	/* accumulate the terms */
+		C += f * sv;
+		D += g * cv;
 		}
-/* longitude coefficient */
-	f  = *p++;
-	if( (k = *p++) != 0 )
-		f += T10 * k;
-
-/* obliquity coefficient */
-	g = *p++;
-	if( (k = *p++) != 0 )
-		g += T10 * k;
-
-/* accumulate the terms */
-	C += f * sv;
-	D += g * cv;
-	}
-/* first terms, not in table: */
-C += (-1742.*T10 - 171996.)*ss[4][0];	/* sin(OM) */
-D += (   89.*T10 +  92025.)*cc[4][0];	/* cos(OM) */
-/*
-printf( "nutation: in longitude %.3f\", in obliquity %.3f\"\n", C, D );
-*/
-/* Save answers, expressed in radians */
-nutl = 0.0001 * STR * C;
-nuto = 0.0001 * STR * D;
-return(0);
+	/* first terms, not in table: */
+	C += (-1742.*T10 - 171996.)*ss[4][0];	/* sin(OM) */
+	D += (   89.*T10 +  92025.)*cc[4][0];	/* cos(OM) */
+	/*
+	Trace1( "nutation: in longitude %.3f\", in obliquity %.3f\"\n", C, D );
+	*/
+	/* Save answers, expressed in radians */
+	nutl = 0.0001 * STR * C;
+	nuto = 0.0001 * STR * D;
+	return(0);
 }
 
 
@@ -324,82 +335,106 @@ return(0);
  * p[] = equatorial rectangular position vector of object for
  * mean ecliptic and equinox of date.
  */
+
+/*****************************************************************************************
+* @fn     : nutate
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int nutate( J, p )
 double J;
 double p[];
 {
-double ce, se, cl, sl, sino, f;
-double dp[3], p1[3];
-int i;
+	double ce, se, cl, sl, sino, f;
+	double dp[3], p1[3];
+	int i;
 
-nutlo(J); /* be sure we calculated nutl and nuto */
-epsiln(J); /* and also the obliquity of date */
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-f = eps + nuto;
-ce = cos( f );
-se = sin( f );
-sino = sin(nuto);
-cl = cos( nutl );
-sl = sin( nutl );
+	nutlo(J); /* be sure we calculated nutl and nuto */
+	epsiln(J); /* and also the obliquity of date */
 
-/* Apply adjustment
- * to equatorial rectangular coordinates of object.
- *
- * This is a composite of three rotations: rotate about x axis
- * to ecliptic of date; rotate about new z axis by the nutation
- * in longitude; rotate about new x axis back to equator of date
- * plus nutation in obliquity.
- */
-p1[0] =   cl*p[0]
-        - sl*coseps*p[1]
-        - sl*sineps*p[2];
+	f = eps + nuto;
+	ce = cos( f );
+	se = sin( f );
+	sino = sin(nuto);
+	cl = cos( nutl );
+	sl = sin( nutl );
 
-p1[1] =   sl*ce*p[0]
-        + ( cl*coseps*ce + sineps*se )*p[1]
-        - ( sino + (1.0-cl)*sineps*ce )*p[2];
+	/* Apply adjustment
+	* to equatorial rectangular coordinates of object.
+	*
+	* This is a composite of three rotations: rotate about x axis
+	* to ecliptic of date; rotate about new z axis by the nutation
+	* in longitude; rotate about new x axis back to equator of date
+	* plus nutation in obliquity.
+	*/
+	p1[0] =   cl*p[0]
+			- sl*coseps*p[1]
+			- sl*sineps*p[2];
 
-p1[2] =   sl*se*p[0]
-        + ( sino + (cl-1.0)*se*coseps )*p[1]
-        + ( cl*sineps*se + coseps*ce )*p[2];
+	p1[1] =   sl*ce*p[0]
+			+ ( cl*coseps*ce + sineps*se )*p[1]
+			- ( sino + (1.0-cl)*sineps*ce )*p[2];
 
-for( i=0; i<3; i++ )
-	dp[i] = p1[i] - p[i];
-showcor( "nutation", p, dp );
+	p1[2] =   sl*se*p[0]
+			+ ( sino + (cl-1.0)*se*coseps )*p[1]
+			+ ( cl*sineps*se + coseps*ce )*p[2];
 
-for( i=0; i<3; i++ )
-	p[i] = p1[i];
-return(0);
+	for( i=0; i<3; i++ )
+		dp[i] = p1[i] - p[i];
+	showcor( "nutation", p, dp );
+
+	for( i=0; i<3; i++ )
+		p[i] = p1[i];
+	return(0);
 }
 
 
 /* Prepare lookup table of sin and cos ( i*Lj )
  * for required multiple angles
  */
+
+/*****************************************************************************************
+* @fn     : sscc
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int sscc( k, arg, n )
 int k;
 double arg;
 int n;
 {
-double cu, su, cv, sv, s;
-int i;
+	double cu, su, cv, sv, s;
+	int i;
 
-su = sin(arg);
-cu = cos(arg);
-ss[k][0] = su;			/* sin(L) */
-cc[k][0] = cu;			/* cos(L) */
-sv = 2.0*su*cu;
-cv = cu*cu - su*su;
-ss[k][1] = sv;			/* sin(2L) */
-cc[k][1] = cv;
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+	
+	su = sin(arg);
+	cu = cos(arg);
+	ss[k][0] = su;			/* sin(L) */
+	cc[k][0] = cu;			/* cos(L) */
+	sv = 2.0*su*cu;
+	cv = cu*cu - su*su;
+	ss[k][1] = sv;			/* sin(2L) */
+	cc[k][1] = cv;
 
-for( i=2; i<n; i++ )
-	{
-	s =  su*cv + cu*sv;
-	cv = cu*cv - su*sv;
-	sv = s;
-	ss[k][i] = sv;		/* sin( i+1 L ) */
-	cc[k][i] = cv;
-	}
-return(0);
+	for( i=2; i<n; i++ )
+		{
+		s =  su*cv + cu*sv;
+		cv = cu*cv - su*sv;
+		sv = s;
+		ss[k][i] = sv;		/* sin( i+1 L ) */
+		cc[k][i] = cv;
+		}
+	return(0);
 }
 

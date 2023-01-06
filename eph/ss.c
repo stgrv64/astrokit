@@ -286,7 +286,7 @@ int jdflag = 2 ;
 /* correction vector, saved for display  */
 double dp[3];
 
-/* display formats for printf()
+/* display formats for Trace1()
  */
 extern char *intfmt, *dblfmt;
 
@@ -315,6 +315,16 @@ TOPOCENTRIC inf, *infos ;
 // ajout 2022 avril : verification numero planete (<10)
 //===========================================================================================
 
+/*****************************************************************************************
+* @fn     : SOLAR_SYSTEM
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-05 creation entete doxygen
+* @date   : 2023-01-05 revue de code
+* @todo   : ras
+*****************************************************************************************/
+
 void SOLAR_SYSTEM( \
   char   * nom, \
   double * ASC, \
@@ -337,6 +347,8 @@ void SOLAR_SYSTEM( \
   double tlongg, glatt, heightt;
   int    yearr, monthh, dayy, hourr, minn, secc ;
   
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   Trace1("numero planete = %d", num) ;
   
   if ( num > 9 ) return ;
@@ -371,7 +383,10 @@ void SOLAR_SYSTEM( \
   memset( infos->nom, 0, sizeof( infos->nom) ) ;
   
   Trace1("%f %f %f %d %d %d %d %d %d : %d : %f", glatt, tlongg, heightt, yearr, monthh, dayy, hourr, minn, secc, objnum,  JD ) ;
-  
+
+  Trace1("sizeof orbit    = %ld", sizeof(struct orbit )) ;
+  Trace1("sizeof star     = %ld", sizeof(struct star )) ;
+
   switch(objnum) {
     case -1: exit(0);
     case 0:  elobject = 0;        strcpy( infos->nom, "soleil" ) ;  break;
@@ -385,7 +400,8 @@ void SOLAR_SYSTEM( \
     case 8:  elobject = &neptune; strcpy( infos->nom, "neptune" ) ; break;
     case 9:  elobject = &pluto;   strcpy( infos->nom, "pluton" ) ;  break;
     case 10: elobject = &test;    strcpy( infos->nom, "test" ) ;    break;
-    case 88: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); // fonction
+    case 88: elobject = (struct orbit *)&fstar; 
+         i = getstar( (struct star *) elobject ); // fonction
     case 99: elobject = &forbit;
          i = getorbit( elobject ); // fonction
          //if( i == 1 ) goto loop1;
@@ -425,9 +441,15 @@ void SOLAR_SYSTEM( \
   *a = infos->azi ;
   *h = infos->alt ;
 }
-//===========================================================================================
-// Main program starts here.
-//===========================================================================================
+/*****************************************************************************************
+* @fn     : mainSS
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-05 creation entete doxygen
+* @date   : 2023-01-05 revue de code
+* @todo   : ras
+*****************************************************************************************/
 
 int mainSS(int argc , char ** argv) {
 
@@ -441,6 +463,8 @@ int mainSS(int argc , char ** argv) {
   double tlongg, glatt, heightt;
   int  yearr, monthh, dayy, hourr, minn, secc ;
   
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   asc = &aa ;
   h = &hh ;
 
@@ -452,12 +476,12 @@ int mainSS(int argc , char ** argv) {
   
   djd= 0 ;
   ntab=1 ;
-  //printf("coucou\n") ;
-  //for(i=0;i<argc;i++) printf("argument %d= %s",i, argv[i]) ;
+  //Trace1("coucou\n") ;
+  //for(i=0;i<argc;i++) Trace1("argument %d= %s",i, argv[i]) ;
 
   if ( argc == 2 && ( ! strcmp( argv[1],"--help" ) || ! strcmp( argv[1],"-h" ))) {
-    printf("Usage : %s <longitude> <latitude> <altitude> <jour julien> <numero objet>\n", argv[0]) ;
-    printf("Usage : %s <longitude> <latitude> <altitude> <annee> <mois> <jour> <heure> <min> <sec> <numero objet>\n", argv[0]) ;
+    Trace1("Usage : %s <longitude> <latitude> <altitude> <jour julien> <numero objet>\n", argv[0]) ;
+    Trace1("Usage : %s <longitude> <latitude> <altitude> <annee> <mois> <jour> <heure> <min> <sec> <numero objet>\n", argv[0]) ;
     exit(1) ;
   }
   else if ( argc == 6 ) {
@@ -506,7 +530,7 @@ int mainSS(int argc , char ** argv) {
     kinit();  // fonction
     prtflg = 1;
     
-    // printf( "Enter starting date of tabulation\n" );
+    // Trace1( "Enter starting date of tabulation\n" );
   
     JD = zgetdate(); /* date */           // appel fonction
     JD += gethms();  /* time of day */    // appel fonction
@@ -648,9 +672,9 @@ void SOLAR_SYSTEM_old(char * nom,double * a, double * h,double lat, double lon, 
       case 88:  dostar(    infos);  break;
       default:  doplanet(  infos);  break;
     }
-    printf( "infos->nom = %s\n" , infos->nom );
-    printf( "infos->azi = %f\n" , infos->azi );
-    printf( "infos->alt = %f\n" , infos->alt );
+    Trace1( "infos->nom = %s\n" , infos->nom );
+    Trace1( "infos->azi = %f\n" , infos->azi );
+    Trace1( "infos->alt = %f\n" , infos->alt );
     JD += djd;
   }
   strcpy( nom, infos->nom ) ;

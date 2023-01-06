@@ -21,14 +21,21 @@ double r_trnsit;
 double r_rise;
 double r_set;
 double elevation_threshold, semidiameter;
-int f_trnsit, southern_hemisphere;
-int no_rise_set (double, int (*)());
+int    f_trnsit, southern_hemisphere;
 
-double search_halve (double tl, double yl, double th, double yh, int (* func)());
-int iter_trnsit( int (* func)() );
+int         no_rise_set (double, int (*)());
+double      search_halve (double tl, double yl, double th, double yh, int (* func)());
+int         iter_trnsit( int (* func)() );
 static void iter_func( double t, int (* func)() );
 
-
+/*****************************************************************************************
+* @fn     : trnsit
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int trnsit(J, lha, dec)
 double J; /* Julian date */
@@ -37,6 +44,8 @@ double dec; /* declination, radians */
 {
 double x, y, z, N, D, TPI;
 double lhay, cosdec, sindec, coslat, sinlat;
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 f_trnsit = 0;
 TPI = 2.0*PI;
@@ -62,7 +71,7 @@ if (sinlat < 0)
  x = (J - x) * TPI;
 /* adjust local hour angle */
 y = lha;
-/* printf ("%.7f,", lha); */
+/* Trace1 ("%.7f,", lha); */
 while( y < -PI )
 	y += TPI;
 while( y > PI )
@@ -70,13 +79,12 @@ while( y > PI )
 lhay = y;
 y =  y/( -dradt/TPI + 1.00273790934);
 r_trnsit = x - y;
-/* printf ("rt %.7f ", r_trnsit); */
+/* Trace1 ("rt %.7f ", r_trnsit); */
 /* Ordinarily never print here.  */
-if( prtflg > 1 )
-	{
-	printf( "approx local meridian transit" );
+if( prtflg > 1 ) {
+	Trace1( "approx local meridian transit" );
 	hms( r_trnsit );
-	printf( "UT  (date + %.5f)\n", r_trnsit/TPI );
+	Trace1( "UT  (date + %.5f)\n", r_trnsit/TPI );
 	}
 if( (coslat == 0.0) || (cosdec == 0.0) )
 	goto norise; 
@@ -132,20 +140,16 @@ if( (y < 1.0) && (y > -1.0) )
 	/* Ordinarily never print here.  */
 		if( prtflg > 1 )
 		{
-		printf( "rises approx " );
+		Trace1( "rises approx " );
 		hms(r_rise);
-		printf( "UT,  sets approx " );
+		Trace1( "UT,  sets approx " );
 		hms(r_set);
-		printf( "UT\n" );
+		Trace1( "UT\n" );
 		}
 	}
 norise:		;
 return(0);
 }
-
-
-
-
 
 extern struct orbit earth;
 
@@ -156,9 +160,20 @@ double elevation_trnsit;
 double t_set;
 /* Compute estimate of lunar rise and set times for iterative solution.  */
 
+/*****************************************************************************************
+* @fn     : iter_func
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 static void iter_func(t, func) double t; int (* func)();
 {
   int prtsave;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   prtsave = prtflg;
   prtflg = 0;
@@ -172,8 +187,16 @@ static void iter_func(t, func) double t; int (* func)();
 
 /* Iterative computation of rise, transit, and set times.  */
 
-int
-iter_trnsit( func )
+/*****************************************************************************************
+* @fn     : iter_trnsit
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
+int iter_trnsit( func )
 int (* func)();
 {
   double JDsave, TDTsave, UTsave;
@@ -182,6 +205,8 @@ int (* func)();
   double TPI;
   int prtsave;
   
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   loopctr = 0;
   prtsave = prtflg;
   TPI = PI + PI;
@@ -197,11 +222,13 @@ int (* func)();
     {
       t0 = t1;
       date = floor(t0 - 0.5) + 0.5;
+
       iter_func(t0, func);
+
       t1 = date + r_trnsit / TPI;
       if (++loopctr > 10)
 	{
-	  printf ("? Transit time did not converge.\n");
+	  Trace1 ("? Transit time did not converge.\n");
 	  goto no_trnsit;
 	}
     }
@@ -250,7 +277,7 @@ int (* func)();
 	}
       if (++loopctr > 10)
 	{
-	  printf ("? Rise time did not converge.\n");
+	  Trace1 ("? Rise time did not converge.\n");
 	  f_trnsit = 0;
 	  goto prtrnsit;
 	}
@@ -290,7 +317,7 @@ int (* func)();
 	}
       if (++loopctr > 10)
 	{
-	  printf ("? Set time did not converge.\n");
+	  Trace1 ("? Set time did not converge.\n");
 	  f_trnsit = 0;
 	  goto prtrnsit;
 	}
@@ -309,31 +336,31 @@ int (* func)();
 
 prtrnsit:
   prtflg = 1;
-  printf( "local meridian transit " );
+  Trace1( "local meridian transit " );
   UT = t_trnsit;
   jtocal (t_trnsit);
   if (t_rise != -1.0)
     {
-      printf( "rises " );
+      Trace1( "rises " );
       UT = t_rise;
       jtocal (t_rise);
     }
   if (t_set != -1.0)
     {
-      printf( "sets " );
+      Trace1( "sets " );
       UT = t_set;
       jtocal (t_set);
       if (t_rise != -1.0)
 	{
 	  t0 = t_set - t_rise;
 	  if ((t0 > 0.0) && (t0 < 1.0))
-	    printf("Visible hours %.4f\n", 24.0 * t0);
+	    Trace1("Visible hours %.4f\n", 24.0 * t0);
 	}
     }
 
   if ((fabs(JDsave - t_rise) > 0.5) && (fabs(JDsave - t_trnsit) > 0.5)
       && (fabs(JDsave - t_set) > 0.5))
-    printf("? wrong event date.\n");
+    Trace1("? wrong event date.\n");
 
 no_trnsit:
   JD = JDsave;
@@ -352,7 +379,20 @@ no_trnsit:
    this function steps between the transit time and the previous
    or next inferior transits to find an event more reliably.  */
 
+/* Si l'approximation initiale ne parvient pas à localiser un temps de montée ou de réglage,
+    cette fonction passe entre le temps de transit et le précédent
+    ou les prochains transits inférieurs pour trouver un événement de manière plus fiable. */
+
 #define STEP_SCALE 0.5
+
+/*****************************************************************************************
+* @fn     : no_rise_set
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int no_rise_set (t0, func) double t0; int (* func)();
 {
@@ -360,6 +400,8 @@ int no_rise_set (t0, func) double t0; int (* func)();
   double el_trnsit0 = elevation_trnsit;
   double t, e;
   double t_above, el_above, t_below, el_below;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Step time toward previous inferior transit to find
      whether a rise event was missed.  The step size is a function
@@ -410,14 +452,15 @@ int no_rise_set (t0, func) double t0; int (* func)();
 
   if (elevation > elevation_threshold)
     {
-      /* printf ("Previous inferior transit is above horizon.\n"); */
+      /* Trace1 ("Previous inferior transit is above horizon.\n"); */
       t_rise = -1.0;
       goto next_midnight;
     }
   /* Find missed rise time. */
+
 search_rise:
-  t_rise = search_halve (t_below, el_below,
-			 t_above, el_above, func);
+
+  t_rise = search_halve (t_below, el_below, t_above, el_above, func);
   f_trnsit = 1;
 
 next_midnight:
@@ -467,14 +510,13 @@ next_midnight:
 
   if (elevation > elevation_threshold)
     {
-      /* printf ("Next inferior transit is above horizon.\n"); */
+      /* Trace1 ("Next inferior transit is above horizon.\n"); */
       t_set = -1.0;
       return 0;
     }
   /* Find missed set time. */
 search_set:
-  t_set = search_halve (t, elevation,
-			t_trnsit, elevation_trnsit, func);
+  t_set = search_halve (t, elevation,t_trnsit, elevation_trnsit, func);
   f_trnsit = 1;
   return 0;
 }
@@ -483,8 +525,17 @@ search_set:
 /* Search rise or set time by simple interval halving
    after the event has been bracketed in time.  */
 
-double
-search_halve (t1, y1, t2, y2, func)
+
+/*****************************************************************************************
+* @fn     : no_rise_set
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
+double search_halve (t1, y1, t2, y2, func)
      double t1;
      double y1;
      double t2;
@@ -495,6 +546,8 @@ search_halve (t1, y1, t2, y2, func)
   // double e1 ;
   // e1 = 0 ;
   
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   // e1 = y1 - elevation_threshold;
   e2 = y2 - elevation_threshold;
   
@@ -503,8 +556,11 @@ search_halve (t1, y1, t2, y2, func)
 while( fabs(t2 - t1) > .00001 )
   {
     /* Evaluate at middle of current interval.  */
+
     tm = 0.5 * (t1 + t2);
+    
     iter_func(tm, func);
+    
     ym = elevation;
     em = ym - elevation_threshold;
     /* Replace the interval boundary whose error has the same sign as em.  */

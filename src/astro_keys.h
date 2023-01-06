@@ -15,15 +15,28 @@
 
 #include "astro_global.h"
 
-#define KEYS_ACTIONS_SIZE     7
+#define KEYS_IF_MOT_IS(s)  if(!strcmp(gp_Key->key_mot,s))
+
+#define ASTRO_KEYS_LOG(loglevel,nb,fmt, args...) \
+do { \
+  if (loglevel>=nb) { \
+    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
+  } \
+} \
+while (0)
+
+#define KEYS_ACTIONS_SIZE     8
 #define KEYS_VALIDATIONS_SIZE 10
 
 typedef struct STR_KEYS STRUCT_KEYS ;
+
 
 struct STR_KEYS {
   pthread_mutex_t key_mutex ;
   void          (*key_lock)   (STRUCT_KEYS*) ;
   void          (*key_unlock) (STRUCT_KEYS*) ;  
+  void          (*key_log)    (STRUCT_KEYS*) ;
+  char            key_loglevel ;
   char            key_symbole     [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_nombre      [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_mot         [ CONFIG_TAILLE_BUFFER_32 ] ;

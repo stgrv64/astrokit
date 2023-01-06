@@ -375,19 +375,6 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
       break ; 
 
-      // ------------------------------  MODE INFO --------------------------------------
-
-      case MENU_INFO :
-
-        Trace1("appel : %d : MENU_INFO" , gp_Sui->sui_menu) ;
-
-        CONFIG_DISPLAY_TOUT() ;
-
-        gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
-        gp_Sui->sui_menu             = MENU_MANUEL_BRUT ;
-
-      break ; 
-
       // ------------------------------ MODE ACTIVATION DU RESEAU ----------------------------------
      
       case MENU_RESEAU_UP :
@@ -460,7 +447,7 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
    tous les calculs relatifs a la vitesse de l'as suivi
 */
 
-void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
+void * _SUIVI_VOUTE(STRUCT_SUIVI * lp_Vou) {
   
   long long ll_inrc=0 ;
   char c_l0[16] ={0};
@@ -476,7 +463,7 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
 
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
 
-  sleep(1) ;
+  
   
   memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
   memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
@@ -485,7 +472,7 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
   
   gettimeofday(&t00,NULL) ;
   
-  VOUTE_CONFIG( gp_Vou, 1, 1, 0.985 ) ;
+  VOUTE_CONFIG( lp_Vou, 1, 1, 0.985 ) ;
   
   // FIXME : 
   // en mode equatorial, pas besoin de _SUIVI_VOUTE, en effet la vitesse ne change pas
@@ -505,9 +492,9 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
 
     Trace1("while") ;
 
-    if ( gp_Vou->vou_run ) {
+    if ( lp_Vou->vou_run ) {
       
-      Trace1("gp_Vou->vou_run == true") ;
+      Trace1("lp_Vou->vou_run == true") ;
 
       /* FIXME : modification 20121225 : tous les calculs generiques dans CALCULS_TOUT */
       
@@ -532,15 +519,15 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
         CONFIG_DISPLAY_TOUT() ;
       }
 */
-      gp_Ast->ast_agh += gp_Vou->vou_pas ;
-      gp_Vou->vou_begin += gp_Vou->vou_pas ;
+      gp_Ast->ast_agh += lp_Vou->vou_pas ;
+      lp_Vou->vou_begin += lp_Vou->vou_pas ;
 
       Trace1("voute : temporisation") ;
 
-      gp_Vou->vou_temps_ecoule += VOUTE_TEMPORISATION( gp_Vou, t00 ) ; 
+      lp_Vou->vou_temps_ecoule += VOUTE_TEMPORISATION( lp_Vou, t00 ) ; 
       gettimeofday(&t00,NULL) ;
 
-			gp_Vou->vou_num ++ ;
+			lp_Vou->vou_num ++ ;
       ul_vou_while_incr++ ;
       // attention cet appel systeme genere une interuption
       // uniquement utiliser pour les tests
@@ -557,9 +544,9 @@ void * _SUIVI_VOUTE(STRUCT_SUIVI * gp_Sui) {
       // system("/bin/date >> /root/astrokit.begin.log") ;
       //Trace1("La voute ne tourne pas") ;
 
-      Trace("usleep %ld", gp_Vou->vou_tempo ) ;
+      Trace("usleep %ld", lp_Vou->vou_tempo ) ;
 
-      usleep( gp_Vou->vou_tempo );
+      usleep( lp_Vou->vou_tempo );
     }
   }
   Trace1("Stop") ;
@@ -850,7 +837,7 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
 
     // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
     
-    sleep(1) ;
+    
 
     initscr() ;
     if (newterm(0, stdout, stdin) == 0) {
@@ -881,7 +868,7 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
     }
 
     sleep(2) ;
-    printw("appel endwin") ; sleep(1) ;
+    printw("appel endwin") ; 
     endwin();
     ASTRO_TRAP_MAIN(1) ;
   }
@@ -994,33 +981,17 @@ int main(int argc, char ** argv) {
   int i ;
   int devFD, board;
   struct sched_param param;
-/*
-  pthread_t p_thread_pha_alt[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_t p_thread_pha_azi[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_t p_thread_mot_alt ;
-  pthread_t p_thread_mot_azi ;
-*/  
-/*
-  STRUCT_GPIO_PWM_MOTEUR *gp_Alt_Mot , g_mot_alt ; 
-  STRUCT_GPIO_PWM_MOTEUR *gp_Azi_Mot , g_mot_azi ;
-*/
   
   TraceArbo(__func__,0 , "") ;
-
-  int i2cDev = 1;
 
   /* Attention, pas de Trace1 avant d avoir ouvert le fichier de log */ 
   /* car Trace1 utilise ce fichier */
   /* Alternative : Trace1 */ 
 
   ASTRO_GLOBAL_INIT          () ;
-  ARGUMENTS_MANAGE_REP_HOME   ( argc, argv) ;
+  ARGUMENTS_MANAGE_REP_HOME  ( argc, argv) ;
   CONFIG_PATH_FIND           ( gc_config_path_cmd_stty, "stty") ;
   
-  // -----------------------------------------------------------------
-  // Initialisations des valeurs de parametres (a zero, "", ou null)
-  // -----------------------------------------------------------------
-
   ASTRE_PARAMS_INIT          ( gp_Ast_Par ) ;
   CALCULS_PARAMS_INIT        ( gp_Cal_Par ) ;
   CONFIG_PARAMS_INIT         ( gp_Con_Par ) ;
@@ -1030,52 +1001,43 @@ int main(int argc, char ** argv) {
   TIME_PARAMS_INIT           ( gp_Tim_Par ) ;
   GPIO_PWM_PARAMS_INIT       ( gp_Pwm_Par ) ;
   
-  // -----------------------------------------------------------------
-  // Initialisations diverses et variees
-  // -----------------------------------------------------------------
-
   CONFIG_INIT                ( gp_Con ) ;
   CONFIG_FIC_READ            ( gp_Con ) ;
   GPIO_CONFIG_FIC_READ       ( gp_Con ) ; 
   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
   CONFIG_FIC_VERIFY          ( gp_Con ) ;
   CONFIG_PARAMETRES_CONFIG   ( gp_Con ) ;
-
-  CONFIG_PARAMETRES_DISPLAY  () ;
-
-
-  // CONFIG_PARAMETRES_DISPLAY() ;   
-  /* LOG_INIT ouvre le fichier en ecriture pour pouvoir avoir les traces en mode ecriture sur disque
-     et donc a besoin de lire au prealable le fichier de CONFIGURATION (config.txt) */
-
-  TIME_INIT           ( gp_Tim ) ;
-  TIME_INIT_TEMPOS    ( gp_Tpo ) ;
-  TIME_TEMPOS_CONFIG  ( gp_Tpo ) ;
-  TIME_TEMPOS_DISPLAY ( gp_Tpo ) ;
-  LOG_INIT            ( gp_Log ); 
-  CALCULS_INIT        ( gp_Cal ) ;
-  CAT_INIT            ( gp_Ngc ) ;
-  CAT_INIT            ( gp_Eto ) ;
-  CODES_INIT          ( gp_Cod ) ;
-  VOUTE_INIT          ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
-  ASTRE_INIT          ( gp_Ast ) ;
-  KEYS_INIT           ( gp_Key ) ;   
-  LIEU_INIT           ( gp_Lie ) ;
-  DEVICES_INIT        ( gp_Dev ) ;
-  SUIVI_INIT          ( gp_Sui ) ;
-  SUIVI_PAS_INIT      ( gp_Pas ) ;
-  SUIVI_FRE_INIT      ( gp_Fre ) ;
-  LCD_INIT            ( gp_Lcd ) ;
-  PID_INIT            ( gp_Pid ) ;
-  STATS_INIT          ( gp_Sta ) ;
-  KEYBOARD_TERMIOS_INIT(gp_Ter) ;
+  CONFIG_PARAMS_DISPLAY  () ;  
+  TIME_INIT                  ( gp_Tim ) ;
+  TIME_INIT_TEMPOS           ( gp_Tpo ) ;
+  TIME_TEMPOS_CONFIG         ( gp_Tpo ) ;
+  TIME_TEMPOS_DISPLAY        ( gp_Tpo ) ;
+  LOG_INIT                   ( gp_Log ); 
+  CALCULS_INIT               ( gp_Cal ) ;
+  CAT_INIT                   ( gp_Ngc ) ;
+  CAT_INIT                   ( gp_Eto ) ;
+  CAT_READ                   ( gp_Ngc, CAT_NGC_TXT ) ;    
+  CAT_READ                   ( gp_Eto, CAT_ETO_TXT ) ;                  
+  CAT_FORMAT_DECIMAL_NGC     ( gp_Ngc, CAT_NGC_DEC_TXT ) ;         
+  CAT_FORMAT_DECIMAL_ETO     ( gp_Eto, CAT_ETO_DEC_TXT ) ; 
+  CODES_INIT                 ( gp_Cod ) ;
+  VOUTE_INIT                 ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
+  ASTRE_INIT                 ( gp_Ast ) ;
+  KEYS_INIT                  ( gp_Key ) ;
+  LIEU_INIT                  ( gp_Lie ) ;
+  DEVICES_INIT               ( gp_Dev ) ;
+  SUIVI_INIT                 ( gp_Sui ) ;
+  SUIVI_PAS_INIT             ( gp_Pas ) ;
+  SUIVI_FRE_INIT             ( gp_Fre ) ;
+  LCD_INIT                   ( gp_Lcd ) ;
+  PID_INIT                   ( gp_Pid ) ;
+  STATS_INIT                 ( gp_Sta ) ;
+  KEYBOARD_TERMIOS_INIT      (gp_Ter) ;
   
-
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
 
   TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
 
-  Trace1("pthread_self = %ld", pthread_self()) ;
 
   /* ---------------------------------------------------------------------------- */
   /* Initialisation des strcutures necessaires aux attributs de tread             */
@@ -1083,19 +1045,25 @@ int main(int argc, char ** argv) {
   /* ---------------------------------------------------------------------------- */
 
   PTHREADS_INIT_MUTEXS () ;
+  
   PTHREADS_INIT        ( gp_Pth, pthread_self()) ;
+  
   PTHREADS_CONFIG      ( gp_Pth, pthread_self(), PTHREAD_TYPE_MAIN  ) ; 
-
+  
   signal(SIGINT,ASTRO_TRAP_MAIN) ;
+  
   signal(SIGALRM,ASTRO_TRAP_MAIN) ;
 
-  Trace1("gi_alt_gpios         : %d %d %d %d", gi_alt_gpios[0], gi_alt_gpios[1], gi_alt_gpios[2], gi_alt_gpios[3] ) ;
-  Trace1("gi_azi_gpios         : %d %d %d %d", gi_azi_gpios[0], gi_azi_gpios[1], gi_azi_gpios[2], gi_azi_gpios[3] ) ;
+  Trace("gi_alt_gpios   : %d %d %d %d", gi_alt_gpios[0], gi_alt_gpios[1], gi_alt_gpios[2], gi_alt_gpios[3] ) ;
+  Trace("gi_azi_gpios   : %d %d %d %d", gi_azi_gpios[0], gi_azi_gpios[1], gi_azi_gpios[2], gi_azi_gpios[3] ) ;
+  Trace("gi_alt_masque  : %d %d %d %d", gi_alt_masque[0], gi_alt_masque[1], gi_alt_masque[2], gi_alt_masque[3] ) ;
+  Trace("gi_azi_masque  : %d %d %d %d", gi_azi_masque[0], gi_azi_masque[1], gi_azi_masque[2], gi_azi_masque[3] ) ;
   
-  Trace1("gi_alt_masque         : %d %d %d %d", gi_alt_masque[0], gi_alt_masque[1], gi_alt_masque[2], gi_alt_masque[3] ) ;
-  Trace1("gi_azi_masque         : %d %d %d %d", gi_azi_masque[0], gi_azi_masque[1], gi_azi_masque[2], gi_azi_masque[3] ) ;
   
-  Trace1("gp_Pwm_Par->gpi_pwm_par_led_etat    : %d", gp_Pwm_Par->gpi_pwm_par_led_etat );
+  gp_Pwm_Par->gpi_pwm_par_led_etat=0;
+  printf( "LED : %d\n", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;
+  Trace("led_etat    : %d", gp_Pwm_Par->gpi_pwm_par_led_etat );
+  
   Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
   
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
@@ -1104,10 +1072,7 @@ int main(int argc, char ** argv) {
   // reglages variables particulieres
   // ----------------------------------------------------------------- 
   /* TODO : fusionner g_c_cat et g_c_cat_eto */
-  CAT_READ               ( gp_Ngc, CAT_NGC_TXT ) ;    
-  CAT_READ               ( gp_Eto, CAT_ETO_TXT ) ;                  
-  CAT_FORMAT_DECIMAL_NGC ( gp_Ngc, CAT_NGC_DEC_TXT ) ;         
-  CAT_FORMAT_DECIMAL_ETO ( gp_Eto, CAT_ETO_DEC_TXT ) ; 
+
   // -----------------------------------------------------------------
   
   if ( strcmp(gp_Ast_Par->ast_par_default_object,"") != 0 ) {
@@ -1179,22 +1144,7 @@ int main(int argc, char ** argv) {
       gp_Azi_Mot->mot_pha[3]->pha_rap[i]) ;
   }
 
-  // ============================== gestion des threads  ===================================
-/*
-  pthread_create( &p_thread_pha_azi[0],        NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
-  pthread_create( &p_thread_pha_azi[1],        NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
-  pthread_create( &p_thread_pha_azi[2],        NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
-  pthread_create( &p_thread_pha_azi[3],        NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
 
-  pthread_create( &p_thread_pha_alt[0],        NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
-  pthread_create( &p_thread_pha_alt[1],        NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
-  pthread_create( &p_thread_pha_alt[2],        NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
-  pthread_create( &p_thread_pha_alt[3],        NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
-
-  pthread_create( &p_thread_mot_azi,           NULL, (void*)_GPIO_PWM_MOT, gp_Azi_Mot ) ;
-  pthread_create( &p_thread_mot_alt,           NULL, (void*)_GPIO_PWM_MOT, gp_Alt_Mot ) ;
-
-*/
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;

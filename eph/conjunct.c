@@ -132,15 +132,27 @@ struct orbit *elobject;
 double robject[3] = {0.0, 0.0, 0.0};
 static int first_search;
 
+/*****************************************************************************************
+* @fn     : main
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int main()
 {
   double t, t0;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   kinit();
+
   objnum = 0;
   t0 = STARTDATE;
   first_search = 0;
+
   while( t0 <= ENDDATE )
     {
       prtflg = 0;
@@ -177,10 +189,21 @@ exit(0);
    Then, in both cases, reduce the error by interval halving
    until the function equals Y with the desired precision.  */
 
+/*****************************************************************************************
+* @fn     : search
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double search(t, y, delta)
 double t, y, delta;
 {
   double tl, tm, th, yl, ym, yh, el, eh, em, dt;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if (first_search == 0)
     {
@@ -250,6 +273,16 @@ return (tm);
 
 /* Compute desired relation of apperent ecliptic longitude
    as a function of the ephemeris date.  */
+
+/*****************************************************************************************
+* @fn     : func
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double func(t)
 double t;
 {
@@ -258,6 +291,8 @@ double t;
 #if NEWMOON || FULLMOON || FIRST_QUARTER_MOON || THIRD_QUARTER_MOON
   double m;
 #endif
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   TDT = t;
   /* Longitude of the sun.  */
@@ -285,13 +320,23 @@ double t;
    Both outputs are in equatorial rectangular coordinates
    and are referred to the equinox and ecliptic of date.  */
 
+/*****************************************************************************************
+* @fn     : apparent
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int apparent( p, q )
-double p[], q[];
-{
+double p[], q[]; {
+
 double polar[3];
 int i;
 static double TDTearth = -1.0e38;
 
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* Calculate heliocentric position of the earth */
 if(TDTearth != TDT)

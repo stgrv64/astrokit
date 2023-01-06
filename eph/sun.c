@@ -8,6 +8,16 @@
 
 extern struct orbit earth;
 
+/*****************************************************************************************
+* @fn     : dosun
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-05 creation entete doxygen
+* @date   : 2023-01-05 revue de code
+* @todo   : ras
+*****************************************************************************************/
+
 int dosun(TOPOCENTRIC *infos) { // declaration fonction
  
   double r, x, y, t;
@@ -15,10 +25,12 @@ int dosun(TOPOCENTRIC *infos) { // declaration fonction
   int    i;
   double asin(), modtp(), sqrt(), cos(), sin();
 
-
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   // Display ecliptic longitude and latitude.
  
   for( i=0; i<3; i++ ) ecr[i] = -rearth[i];
+
   r = eapolar[2]; 
 
   if( prtflg )lonlat( ecr, TDT, pol, 1 ); // appel fonction
@@ -82,12 +94,14 @@ int dosun(TOPOCENTRIC *infos) { // declaration fonction
    * for equinox of date.
    */
 
-  if( prtflg ) printf ("%s.", whatconstel (ecr, TDT));   // appel fonction
-
+  if( prtflg ) {
+    /* (mise en commentaire 2023) */
+    Trace1 ("%s.", whatconstel (ecr, TDT));   // appel fonction
+  }
   showrd( "    Apparent:", ecr, pol );
 
-infos->asc=ecr[1] ;
-infos->dec=ecr[2] ;
+  infos->asc=ecr[1] ;
+  infos->dec=ecr[2] ;
 
   /* Show it in ecliptic coordinates */
   

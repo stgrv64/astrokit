@@ -230,6 +230,10 @@ void CALCULS_PARAMS_INIT(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
 void CALCULS_PARAMS_DISPLAY(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
+  TraceArbo(__func__,1,"params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("gp_Log->log_level = %d", gp_Log->log_level) ;
+
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1",          lp_Cal_Par->cal_par_alt_red_1);         
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2",          lp_Cal_Par->cal_par_alt_red_2);
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_3",          lp_Cal_Par->cal_par_alt_red_3);         
@@ -295,6 +299,7 @@ void   CALCULS_INIT_ANGLE( STRUCT_ANGLE * lp_Ang ) {
 * @date   : 2022-11-17 creation entete doxygen
 * @date   : 2022-12-17 renmmage CALCULS_INIT_PTR
 * @todo   : voir si utile (but : simplification lecture du code)
+* @todo   : (non utilisé actuellement , IE Jan 2023)
 *****************************************************************************************/
 
 void   CALCULS_INIT_PTR( STRUCT_CALCULS * lp_Cal ) {
@@ -1249,7 +1254,7 @@ void CALCULS_TOUT(void) {
                         gp_Tim->tim_SS,\
                         gp_Ast->ast_num ) ;
       
-      Trace("(infos) %s (asc) %.2f (dec) %.2f (azi) %.2f (alt) %.2f", \
+      Trace2("(infos) %s (asc) %.2f (dec) %.2f (azi) %.2f (alt) %.2f", \
         gp_Ast->ast_infos, \
         gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES, \
         gp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES, \

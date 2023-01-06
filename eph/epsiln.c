@@ -1,5 +1,8 @@
 /* Obliquity of the ecliptic at Julian date J  */
 
+/* 2023 : ajout include kep.h */
+#include "kep.h"
+
 #define WILLIAMS 1
 #define SIMON 0
 /* J. L. Simon, P. Bretagnon, J. Chapront, M. Chapront-Touze', G. Francou,
@@ -39,10 +42,21 @@ double coseps = 0.0; /* Cosine of the obliquity */
 double sineps = 0.0; /* Sine of the obliquity */
 extern double eps, coseps, sineps, STR;
 
+/*****************************************************************************************
+* @fn     : epsiln
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int epsiln(J)
 double J; /* Julian date input */
 {
 double T;
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 if( J == jdeps )
 	return(0);

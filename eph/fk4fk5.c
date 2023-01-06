@@ -29,6 +29,14 @@ static double Mat[36] = {
 	4.85767e-3, -2.714e-5, 1.00000956
 };
 
+/*****************************************************************************************
+* @fn     : fk4fk5
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int fk4fk5( p, m, el )
 double p[], m[];
@@ -39,7 +47,9 @@ double *u, *v;
 double R[6];
 int i, j;
 
-printf( "Converting to FK5 system\n" );
+Trace1( "Converting to FK5 system\n" );
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* Note the direction vector and motion vector
  * are already supplied by rstar.c.
@@ -113,8 +123,8 @@ dms( el->dec );
 
 u = (double *)&el->px;
 for( i=0; i<3; i++ )
-	printf( " %.4f ", *u++ * RTS );
-printf( "\n" );
+	Trace1( " %.4f ", *u++ * RTS );
+Trace1( "\n" );
 #endif
 return(0);
 }

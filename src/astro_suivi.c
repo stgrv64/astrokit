@@ -297,7 +297,6 @@ void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * lp_Sui) {
     case MENU_MANUEL_NON_ASSERVI  : break ;
     case MENU_MANUEL_ASSERVI      : break ;
     case MENU_GOTO                : break ;
-    case MENU_INFO                : break ;
     case MENU_RESEAU_UP           : break ;
     case MENU_RESEAU_DOWN         : break ; 
     case MENU_PROGRAMME_DOWN      : break ; 
@@ -361,6 +360,19 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
 
+    /* Lettres en Majuscules : affichages ponctuels */
+
+    KEYS_IF_MOT_IS("K" )                  { gp_Key->key_log(gp_Key) ; }
+    KEYS_IF_MOT_IS("P" )                  { gp_Pth->pth_log(gp_Pth) ; }
+    KEYS_IF_MOT_IS("I")                   { gp_Con−>con_log(gp_Con) ; }
+
+      // Trace1("Mot_Is aff_infos") ;
+      // CONFIG_DISPLAY_TOUT() ; 
+      /*gp_Lcd->display_informations ( 2000000 ) ;*/
+      
+
+    /* Lettres en Minuscules : affichages continus */
+
     /* Renvoi sur MANUEL_BRUT */
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
@@ -392,7 +404,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Quelques actions d 'affichage a l'ecran  */
 
-    KEYS_IF_MOT_IS("aff_variables")       { CONFIG_PARAMETRES_DISPLAY() ; i=1 ; } ;
+    KEYS_IF_MOT_IS("v")       { CONFIG_PARAMS_DISPLAY() ; i=1 ; } ;
 
     /* Quelques actions d 'affichage a l'ecran LCD */
 
@@ -411,7 +423,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation algorithme PID de regulation des periodes / frequences moteurs */
 
-    KEYS_IF_MOT_IS("cfg_log_tps_reel_up") { 
+    KEYS_IF_MOT_IS("l") { 
       i=1 ; 
       if ( gi_pid_trace == 0 ){
         gi_pid_trace = gp_Tpo->tpo_pid_loop ; 
@@ -431,7 +443,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation traces PID pour le moteur ALT */
 
-    KEYS_IF_MOT_IS("cfg_log_tps_reel_trace_alt") { 
+    KEYS_IF_MOT_IS("j") { 
       i=1 ; 
       if ( gi_pid_trace_alt == 0 ) {
         gi_pid_trace_alt=1;      
@@ -451,7 +463,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation traces PID pour le moteur AZI */
 
-    KEYS_IF_MOT_IS("cfg_log_tps_reel_trace_azi") { 
+    KEYS_IF_MOT_IS("k") { 
       i=1 ;
       if ( gi_pid_trace_azi == 0 ) {
         gi_pid_trace_azi=1 ; 
@@ -471,22 +483,9 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     KEYS_IF_MOT_IS("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
 
-    KEYS_IF_MOT_IS("aff_infos") { 
-
-      Trace1("Mot_Is aff_infos") ;
-      
-      CONFIG_DISPLAY_TOUT() ; 
-      
-      /*gp_Lcd->display_informations ( 2000000 ) ;*/
-      lp_Sui->sui_menu = MENU_INFO ; 
-      
-      i=1;
-      
-    }     // mode info
-
     /*  touche mode equatorial */
     
-    KEYS_IF_MOT_IS("key_equ")      { 
+    KEYS_IF_MOT_IS("MODE_EQUATORIAL")      { 
       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
       lp_Sui->sui_menu = MENU_EQUATORIAL ; 
       i=1;
@@ -494,7 +493,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /*  touche mode azimutal */
 
-    KEYS_IF_MOT_IS("key_azi")      { 
+    KEYS_IF_MOT_IS("MODE_AZIMUTAL")      { 
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_AZIMUTAL ; 
       i=1;
@@ -508,7 +507,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       i=1;
     } 
 
-    /* touche EXIT : arret su programme */
+    /* touche key_exit : arret su programme */
 
     KEYS_IF_MOT_IS("key_exit")      { 
       lp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; 
@@ -518,7 +517,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* touche reseau : arret du reseau */
     /* TODO : non implemente : a definir et coder */
 
-    KEYS_IF_MOT_IS("key_reseau_up") { 
+    KEYS_IF_MOT_IS("KEY_R") { 
       
       lp_Sui->sui_menu = MENU_RESEAU_UP ; 
       /* TODO : a terminer */
@@ -527,10 +526,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     }     
     /* remise a jour du mot a vide */ 
 
-    KEYS_IF_MOT_IS("aff_thread_infos") {
-      i=1;
-      PTHREADS_INFOS(gp_Pth) ;
-    }
+
     if (i>0) { 
       KEYS_RESET_MOT(gp_Key) ; 
     }

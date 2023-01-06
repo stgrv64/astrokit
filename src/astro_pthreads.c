@@ -80,7 +80,7 @@ static const char * gc_hach_pth_sched_param[] = {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void PTHREADS_LOCK ( STRUCT_PTHREADS * lp_Pth) {
+static void PTHREADS_LOCK ( STRUCT_PTHREADS * lp_Pth) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -96,7 +96,7 @@ void PTHREADS_LOCK ( STRUCT_PTHREADS * lp_Pth) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
+static void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -105,6 +105,81 @@ void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
   return ;
 }
 
+/*****************************************************************************************
+* @fn     : PTHREADS_LOG
+* @author : s.gravois
+* @brief  : Fonction qui gere les logs de la structure STRUCT_PTHREADS
+* @param  : STRUCT_PTHREADS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+ void PTHREADS_LOG ( STRUCT_PTHREADS * lp_Pth) {
+
+  pthread_t i_id=0 ;
+  pthread_t i_id_pth=0 ;
+  int       i=0;
+  int       l_nb_threads = 0 ;
+  int       i_num_thread = 0 ;
+  int       i_ord =0 ;
+  int       i_pri=0 ;
+  int       i_sta=0 ;
+  char      c_nam[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
+  char      c_ord[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
+  char      c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
+  char      c_cmd[ CONFIG_TAILLE_BUFFER_256] = {0} ;
+
+  TraceArbo(__func__,2,"pthreads log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+
+  l_nb_threads = gi_pth_numero ; 
+
+  switch ( lp_Pth->pth_loglevel )
+  {
+    case 0 :
+      lp_Pth->pth_loglevel = 1 ;
+      break;
+    case 1 :
+      lp_Pth->pth_loglevel = 0 ;
+      break;
+    default:
+      lp_Pth->pth_loglevel = 0 ;
+      break;
+  }
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex) ;
+
+  for( i_num_thread = 0 ; i_num_thread <= l_nb_threads ; i_num_thread++ ) {
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+
+    strcpy( c_nam, lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
+    strcpy( c_ord, lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
+    strcpy( c_sta, lp_Pth->pth_att[ i_num_thread ].att_c_sta ) ;
+           i_id  = lp_Pth->pth_att[ i_num_thread ].att_pid  ;
+           i_pri = lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
+           i_ord = lp_Pth->pth_att[ i_num_thread ].att_ord  ; 
+           i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
+        i_id_pth = lp_Pth->pth_t[ i_num_thread ] ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
+
+    memset( c_cmd, 0, sizeof(c_cmd)) ;
+
+    sprintf( c_cmd , "(pth) %-16s (id) %ld (id2) %ld (ord) %s (prio) %d (sta) %s (num) %d", \
+      c_nam, \
+      i_id, \
+      i_id_pth, \
+      c_ord, \
+      i_pri, \
+      c_sta, \
+      i_num_thread ) ;
+
+      TraceLogLevel(lp_Pth->pth_loglevel,1,"%s", c_cmd) ;
+  }
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : PTHREADS_INIT_MUTEXS
 * @author : s.gravois
@@ -149,6 +224,8 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
 
   TraceArbo(__func__,0,"init pthreads") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pth->pth_mutex ) ;
+
   lp_Pth->pth_i_nb = 0 ;
   
   getlogin_r( c_rlogin, strlen(c_rlogin));
@@ -177,6 +254,16 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
     perror("Execute with root privilege (because of threads -> sched_priority used)") ;
     exit(EXIT_FAILURE) ;
   }
+
+  /* Pointeurs de fonctions */
+
+  lp_Pth->pth_lock   = PTHREADS_LOCK ;
+  lp_Pth->pth_unlock = PTHREADS_UNLOCK ;
+  lp_Pth->pth_log    = PTHREADS_LOG ;
+
+  lp_Pth->pth_loglevel = 0 ;
+  
+  return ;
 }
 
 /*****************************************************************************************
@@ -187,7 +274,7 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
 * @date   : 2022-06-01 creation
 *****************************************************************************************/
 
-void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_thread ) {
+void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_thread ) {
 
   int   i_num_thread = 0 ;
   int   i_error=0 ;
@@ -219,6 +306,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_th
   strcpy( c_ord, gc_hach_pth_sched_param[(int)l_en_thread]) ;
 
   param.sched_priority = i_pri ;
+
 
   /*----------------------------------------------------------*/
   /* Configuration et attribution des CPUs pour chaque thread */
@@ -300,24 +388,32 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_th
   }
 
   if ( i_error == 0 ) {
-    pthread_mutex_lock( & gp_Mut->mut_pth) ;
+    
 
     i_num_thread = gi_pth_numero ;
     gi_pth_numero++ ;
     
-    strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , "PTHREAD_RUNNING" ) ;
-    strcpy( lp_pth->pth_att[ i_num_thread ].att_c_nam , c_name ) ;
-    strcpy( lp_pth->pth_att[ i_num_thread ].att_c_ord , c_ord ) ;
-            lp_pth->pth_att[ i_num_thread ].att_pid                = i_pth_self ;
-            lp_pth->pth_att[ i_num_thread ].att_pri.sched_priority = i_pri ;
-            lp_pth->pth_att[ i_num_thread ].att_ord                = i_ord ; 
-            lp_pth->pth_att[ i_num_thread ].att_nbc                = gi_pthread_nb_cpu ; 
-            lp_pth->pth_att[ i_num_thread ].att_sta                = (int) PTHREAD_RUNNING ;
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+
+    strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_sta , "PTHREAD_RUNNING" ) ;
+    strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_nam , c_name ) ;
+    strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_ord , c_ord ) ;
+            lp_Pth->pth_att[ i_num_thread ].att_pid                = i_pth_self ;
+            lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority = i_pri ;
+            lp_Pth->pth_att[ i_num_thread ].att_ord                = i_ord ; 
+            lp_Pth->pth_att[ i_num_thread ].att_nbc                = gi_pthread_nb_cpu ; 
+            lp_Pth->pth_att[ i_num_thread ].att_sta                = (int) PTHREAD_RUNNING ;
     
-    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
   }
   if ( i_error == 0 ) {
-    Trace("thread %-16s : id %ld ord %s prio %d sta %s num %d", c_name, i_pth_self, c_ord, i_pri, "PTHREAD_RUNNING", i_num_thread ) ;
+    Trace("%-16s : id %lx ord %s prio %d sta %s num %d", \
+      c_name, \
+      i_pth_self, \
+      c_ord, \
+      i_pri, \
+      "PTHREAD_RUNNING", \
+      i_num_thread ) ;
   }
 
   /*-------------------------------------------------------------*/
@@ -342,7 +438,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_pth, pthread_t i_pth_self, int l_en_th
 * @date   : 2022-10-03 creation
 *****************************************************************************************/
 
-void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
+void PTHREADS_INFOS(STRUCT_PTHREADS* lp_Pth) {
 
   int i=0;
   int l_nb_threads = 0 ;
@@ -364,14 +460,14 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
 
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-    strcpy( c_nam, lp_pth->pth_att[ i_num_thread ].att_c_nam ) ;
-    strcpy( c_ord, lp_pth->pth_att[ i_num_thread ].att_c_ord ) ;
-    strcpy( c_sta, lp_pth->pth_att[ i_num_thread ].att_c_sta ) ;
-           i_id  = lp_pth->pth_att[ i_num_thread ].att_pid  ;
-           i_pri = lp_pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
-           i_ord = lp_pth->pth_att[ i_num_thread ].att_ord  ; 
-           i_sta = lp_pth->pth_att[ i_num_thread ].att_sta ;
-           i_id_pth = lp_pth->pth_t[ i_num_thread ] ;
+    strcpy( c_nam, lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
+    strcpy( c_ord, lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
+    strcpy( c_sta, lp_Pth->pth_att[ i_num_thread ].att_c_sta ) ;
+           i_id  = lp_Pth->pth_att[ i_num_thread ].att_pid  ;
+           i_pri = lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
+           i_ord = lp_Pth->pth_att[ i_num_thread ].att_ord  ; 
+           i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
+           i_id_pth = lp_Pth->pth_t[ i_num_thread ] ;
     pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
     Trace("thread %-16s : id %ld id2 %ld ord %s prio %d sta %s num %d", c_nam, i_id, i_id_pth,  c_ord, i_pri, c_sta, i_num_thread ) ;
@@ -409,7 +505,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_pth) {
 * @todo   : a finir
 *****************************************************************************************/
 
-void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_pth) {
+void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_Pth) {
 
   int i_num_thread=0 ;
   char c_thread_name [ 16 ] ; 
@@ -429,16 +525,16 @@ void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_pth) {
 
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-    strcpy( c_nam,  lp_pth->pth_att[ i_num_thread ].att_c_nam ) ;
-    strcpy( c_ord,  lp_pth->pth_att[ i_num_thread ].att_c_ord ) ;
-    strcpy( c_sta,  lp_pth->pth_att[ i_num_thread ].att_c_sta ) ;
-            i_id  = lp_pth->pth_att[ i_num_thread ].att_pid  ;
-            i_pri = lp_pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
-            i_sta = lp_pth->pth_att[ i_num_thread ].att_sta ;
+    strcpy( c_nam,  lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
+    strcpy( c_ord,  lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
+    strcpy( c_sta,  lp_Pth->pth_att[ i_num_thread ].att_c_sta ) ;
+            i_id  = lp_Pth->pth_att[ i_num_thread ].att_pid  ;
+            i_pri = lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
+            i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
 
     pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
-    Trace("thread %-16s : id %ld ord %s prio %d sta %s", c_nam, i_id, c_ord, i_pri, c_sta ) ;
+    Trace("PTHREAD %-16s : id %lx ord %s prio %d sta %s", c_nam, i_id, c_ord, i_pri, c_sta ) ;
 
   }
   return ;
@@ -454,7 +550,7 @@ void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_pth) {
 * @todo   : 
 *****************************************************************************************/
 
-void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
+void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_Pth) {
 
   int i_num_thread=0 ;
   char c_thread_name [ 16 ] ; 
@@ -470,22 +566,22 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
   char c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
   pthread_t i_id = 0 ;
 
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_LCD] ) != 0 )             {  Trace("pthread_cancel error PTHREAD_T_LCD") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_CLAVIER] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_CLAVIER") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_CAPTEUR] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_CAPTEUR") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_INFRA] ) != 0 )           {  Trace("pthread_cancel error PTHREAD_T_INFRA") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_VOUTE] ) != 0 )           {  Trace("pthread_cancel error PTHREAD_T_VOUTE") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MENU] ) != 0 )            {  Trace("pthread_cancel error PTHREAD_T_MENU") ; } 
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI") ; }              
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_0") ; }  
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_1") ; }  
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_2") ; }  
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_3") ; }
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_0") ; }  
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_1") ; }  
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_2") ; }  
-  if ( pthread_cancel ( lp_pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_3") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_LCD] ) != 0 )             {  Trace("pthread_cancel error PTHREAD_T_LCD") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_CLAVIER] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_CLAVIER") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_CAPTEUR] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_CAPTEUR") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_INFRA] ) != 0 )           {  Trace("pthread_cancel error PTHREAD_T_INFRA") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_VOUTE] ) != 0 )           {  Trace("pthread_cancel error PTHREAD_T_VOUTE") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MENU] ) != 0 )            {  Trace("pthread_cancel error PTHREAD_T_MENU") ; } 
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_ALT] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_AZI] ) != 0 )         {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI") ; }              
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_0") ; }  
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_1") ; }  
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_2") ; }  
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_AZI_PHASE_3") ; }
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_0") ; }  
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_1") ; }  
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_2") ; }  
+  if ( pthread_cancel ( lp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3] ) != 0 ) {  Trace("pthread_cancel error PTHREAD_T_MOT_ALT_PHASE_3") ; }
 
   for( i_num_thread = PTHREADS_MAX_THREADS ; i_num_thread >=0  ; i_num_thread-- )   {
 
@@ -493,12 +589,12 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
 
     pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-    strcpy( c_nam,  lp_pth->pth_att[ i_num_thread ].att_c_nam ) ;
-    strcpy( c_ord,  lp_pth->pth_att[ i_num_thread ].att_c_ord ) ;
-    strcpy( c_sta,  lp_pth->pth_att[ i_num_thread ].att_c_sta ) ;
-            i_id  = lp_pth->pth_att[ i_num_thread ].att_pid  ;
-            i_pri = lp_pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
-            i_sta = lp_pth->pth_att[ i_num_thread ].att_sta ;
+    strcpy( c_nam,  lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
+    strcpy( c_ord,  lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
+    strcpy( c_sta,  lp_Pth->pth_att[ i_num_thread ].att_c_sta ) ;
+            i_id  = lp_Pth->pth_att[ i_num_thread ].att_pid  ;
+            i_pri = lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
+            i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
 
     pthread_mutex_unlock( & gp_Mut->mut_pth) ;
 
@@ -525,8 +621,8 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
 
           pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-          lp_pth->pth_att[ i_num_thread ].att_sta = (int) i_sta ;    
-          strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
+          lp_Pth->pth_att[ i_num_thread ].att_sta = (int) i_sta ;    
+          strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
           
           pthread_mutex_unlock( & gp_Mut->mut_pth) ;
         }
@@ -540,8 +636,8 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_pth) {
 
           pthread_mutex_lock( & gp_Mut->mut_pth) ;
 
-          lp_pth->pth_att[ i_num_thread ].att_sta = i_sta ;    
-          strcpy( lp_pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
+          lp_Pth->pth_att[ i_num_thread ].att_sta = i_sta ;    
+          strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
           
           pthread_mutex_unlock( & gp_Mut->mut_pth) ;
       }

@@ -1,7 +1,12 @@
 /* gplan.c
    Routines to chew through tables of perturbations.  */
 
+#include <stdio.h>
+#include <string.h>
+
 #include "plantbl.h"
+#include "log.h"
+
 #if __STDC__
 extern int epsiln ( double J );
 double cos (double);
@@ -61,6 +66,14 @@ static double phases[] =
 static double ss[NARGS][31];
 static double cc[NARGS][31];
 
+/*****************************************************************************************
+* @fn     : gplan
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int 
 gplan (J, plan, pobj)
@@ -71,6 +84,8 @@ gplan (J, plan, pobj)
   register double su, cu, sv, cv, T;
   double t, sl, sb, sr;
   int i, j, k, m, n, k1, ip, np, nt;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /*------------------------*/
 /* Linux is not  _MSC_VER */
@@ -241,6 +256,16 @@ double *pl, *pb, *pr;
 /* Prepare lookup table of sin and cos ( i*Lj )
  * for required multiple angles
  */
+
+/*****************************************************************************************
+* @fn     : sscc
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 static int 
 sscc (k, arg, n)
      int k;
@@ -249,6 +274,8 @@ sscc (k, arg, n)
 {
   double cu, su, cv, sv, s;
   int i;
+
+  TraceArbo(__func__,2,"toto") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   su = sin (arg);
   cu = cos (arg);
@@ -276,11 +303,22 @@ static double NF_arcsec;
 static double Ea_arcsec;
 static double pA_precession;
 
+/*****************************************************************************************
+* @fn     : mean_elements
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 void
 mean_elements (J)
      double J;
 {
   double x, T, T2;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Time variables.  T is in Julian centuries.  */
   T = (J - 2451545.0) / 36525.0;
@@ -436,6 +474,15 @@ mean_elements (J)
    in three variables (e.g., longitude, latitude, radius)
    of the same list of arguments.  */
 
+/*****************************************************************************************
+* @fn     : g3plan
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int
 g3plan (J, plan, pobj, objnum)
      double J;
@@ -444,6 +491,9 @@ g3plan (J, plan, pobj, objnum)
      int objnum;
 {
   int i, j, k, m, n, k1, ip, np, nt;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
 #ifdef _MSC_VER
   char FAR *p;
   long FAR *pl;
@@ -619,6 +669,16 @@ g3plan (J, plan, pobj, objnum)
 /* Generic program to accumulate sum of trigonometric series
    in two variables (e.g., longitude, radius)
    of the same list of arguments.  */
+
+/*****************************************************************************************
+* @fn     : g2plan
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int 
 g2plan (J, plan, pobj)
      double J;
@@ -626,6 +686,9 @@ g2plan (J, plan, pobj)
      double pobj[];
 {
   int i, j, k, m, n, k1, ip, np, nt;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
 #if _MSC_VER
   char FAR *p;
   long FAR *pl;
@@ -776,10 +839,17 @@ g2plan (J, plan, pobj)
   return (0);
 }
 
-
-
 /* Generic program to accumulate sum of trigonometric series
    in one variable.  */
+
+/*****************************************************************************************
+* @fn     : g1plan
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 double
 g1plan (J, plan)
@@ -787,6 +857,9 @@ g1plan (J, plan)
      struct plantbl *plan;
 {
   int i, j, k, m, k1, ip, np, nt;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
 #ifdef _MSC_VER
   char FAR *p;
   long FAR *pl;
@@ -913,6 +986,15 @@ g1plan (J, plan)
 extern struct plantbl moonlr, moonlat;
 extern double coseps, sineps;
 
+/*****************************************************************************************
+* @fn     : gmoon
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int 
 gmoon (J, rect, pol)
      double J;
@@ -920,7 +1002,10 @@ gmoon (J, rect, pol)
 {
   double x, cosB, sinB, cosL, sinL;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   g2plan (J, &moonlr, pol);
+
   x = pol[0];
   x += LP_equinox;
   if (x < -6.48e5)
@@ -928,18 +1013,24 @@ gmoon (J, rect, pol)
   if (x > 6.48e5)
     x -= 1.296e6;
   pol[0] = STR * x;
+  
   x = g1plan (J, &moonlat);
+  
   pol[1] = STR * x;
   x = (1.0 + STR * pol[2]) * moonlr.distance;
   pol[2] = x;
   /* Convert ecliptic polar to equatorial rectangular coordinates.  */
+  
   epsiln(J);
+  
   cosB = cos(pol[1]);
   sinB = sin(pol[1]);
   cosL = cos(pol[0]);
   sinL = sin(pol[0]);
+
   rect[0] = cosB * cosL * x;
   rect[1] = (coseps * cosB * sinL - sineps * sinB) * x;
   rect[2] = (sineps * cosB * sinL + coseps * sinB) * x;
+  
   return 0;
 }

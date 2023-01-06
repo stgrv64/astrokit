@@ -24,6 +24,15 @@
 extern double tlong, tlat, glat;
 double azimuth, elevation, refracted_elevation;
 
+/*****************************************************************************************
+* @fn     : altaz
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int altaz(infos,  pol, J )
  TOPOCENTRIC *infos ;
  double pol[3];
@@ -32,6 +41,8 @@ int altaz(infos,  pol, J )
   double dec, cosdec, sindec, lha, coslha, sinlha;
   double ra, dist, last, alt, az, coslat, sinlat;
   double N, D, x, y, z, TPI;
+  
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   /* TODO : FIXME : 2022 novembre */ 
   /* C'est ici que les coordonnees equatoriales sont recuperees */
@@ -48,9 +59,9 @@ int altaz(infos,  pol, J )
   lha = last - ra; /* local hour angle, radians */
   if( prtflg )
   	{
-  	// printf( "Local apparent sidereal time " );
+  	// Trace1( "Local apparent sidereal time " );
   	hms( last );
-  	// printf( "\n" );
+  	// Trace1( "\n" );
   	}
   /* Display rate at which ra and dec are changing
    */
@@ -61,7 +72,7 @@ int altaz(infos,  pol, J )
    *	N = x*dradt;
    *	D = x*ddecdt;
    *	if( N != 0.0 )
-   *		printf( "dRA/dt %.2f\"/h, dDec/dt %.2f\"/h\n", N, D );
+   *		Trace1( "dRA/dt %.2f\"/h, dDec/dt %.2f\"/h\n", N, D );
    *	}
    */
   
@@ -134,9 +145,9 @@ int altaz(infos,  pol, J )
   z = RTS*(dec - z);
   if( prtflg )
   	{
-  	//printf( "atmospheric refraction %.3f deg  dRA %.3fs dDec %.2f\"\n", D, y, z );
-  	//printf( "Topocentric:  Altitude %.3f deg, ", alt );
-  	//printf( "Azimuth %.3f deg\n", az );
+  	//Trace1( "atmospheric refraction %.3f deg  dRA %.3fs dDec %.2f\"\n", D, y, z );
+  	//Trace1( "Topocentric:  Altitude %.3f deg, ", alt );
+  	//Trace1( "Azimuth %.3f deg\n", az );
     
     infos->alt = alt / RTD ;
     infos->azi = az / RTD ;

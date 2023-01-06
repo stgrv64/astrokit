@@ -8,6 +8,7 @@
    See mlr404.c for test summary. */
 
 #include "plantbl.h"
+
 static long FAR tabr[] = {-1};
 static long FAR tabb[] = {-1};
 static long FAR tabl[] = {

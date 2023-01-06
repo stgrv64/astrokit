@@ -268,16 +268,19 @@ struct STR_CONFIG_PARAMS {
 /* Fin parametres de fichier config                  */ 
 /*---------------------------------------------------*/
 
+typedef struct  STR_CONFIG STRUCT_CONFIG ;
+
 struct STR_CONFIG {
   pthread_mutex_t con_mutex ;
   FILE           *con_file ;
-  void          (*con_lock)   (void) ;
-  void          (*con_unlock) (void) ;  
+  int             con_loglevel ;
+  void          (*con_log)    (STRUCT_CONFIG*) ;
+  void          (*con_lock)   (STRUCT_CONFIG*) ;
+  void          (*con_unlock) (STRUCT_CONFIG*) ;  
   char            con_params  [CONFIG_DATAS_NB_LIGNES] \
                               [CONFIG_DATAS_NB_COLONNES] \
                               [CONFIG_TAILLE_BUFFER_256] ;
 } ;
-typedef struct  STR_CONFIG STRUCT_CONFIG ;
 
 static const char * c_Bin_Possible_Paths[] = {
   "/bin",
@@ -433,7 +436,7 @@ int    CONFIG_FIC_READ              ( STRUCT_CONFIG * ) ;
 
 void   CONFIG_DISPLAY_MODE_LONG    ( STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_CALCULS *) ;
 
-void   CONFIG_PARAMETRES_DISPLAY   (void) ;
+void   CONFIG_PARAMS_DISPLAY   (void) ;
 void   CONFIG_DISPLAY_TOUT         (void) ;  /* FIXME ajout 20191228 */
 void   CONFIG_MENU_CHANGE_DETECT    (void) ;  /* FIXME ajout 20200102 */
 

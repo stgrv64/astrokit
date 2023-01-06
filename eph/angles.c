@@ -14,12 +14,22 @@ double FAR pq;	/* cosine of sun-object-earth angle */
 double FAR ep;	/* -cosine of sun-earth-object angle */
 double FAR qe;	/* cosine of earth-sun-object angle */
 
+/*****************************************************************************************
+* @fn     : angles
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int angles( p, q, e )
 double p[], q[], e[];
 {
 double a, b, s;
 int i;
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 EO = 0.0;
 SE = 0.0;

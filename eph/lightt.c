@@ -5,6 +5,15 @@
 
 #include "kep.h"
 
+/*****************************************************************************************
+* @fn     : lightt
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int lightt( elemnt, q, e )
 double e[], q[];	/* rectangular position vectors */
 struct orbit *elemnt;	/* orbital elements of object q */
@@ -13,6 +22,7 @@ double p[3], p0[3], ptemp[3];
 double P, Q, E, t, x, y;
 int i, k;
 
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* save initial q-e vector for display */
 for( i=0; i<3; i++ )

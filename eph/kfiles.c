@@ -51,13 +51,24 @@ double Clightaud; /* C in au/day  */
 extern double Rearth;
 extern double height,  tlong, tlat, glat, trho, attemp, atpress, dtgiven;
 
+/*****************************************************************************************
+* @fn     : kinit
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int kinit() // declaration fonction
 {
   double a, b, fl, co, si, u;
   FILE *f, *fopen();
   char s[84];
 
-  printf( "Planetary and lunar positions approximate DE404.\n" );
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace1( "Planetary and lunar positions approximate DE404.\n" );
 
   f = fopen( "aa.ini", "r" );
   
@@ -93,29 +104,29 @@ int kinit() // declaration fonction
     trho = 0.998327073 + 0.001676438 * cos(2.0*u) - 0.000003519 * cos(4.0*u) + 0.000000008 * cos(6.0*u);
     trho += height/6378160.;
    */
-    printf( "Terrestrial east longitude %.4f deg\n", tlong );
-    printf( "geocentric latitude %.4f deg\n", tlat );
-    printf( "Earth radius %.5f\n", trho );
+    Trace1( "Terrestrial east longitude %.4f deg\n", tlong );
+    Trace1( "geocentric latitude %.4f deg\n", tlat );
+    Trace1( "Earth radius %.5f\n", trho );
 
     fgets( s, 80, f );
     sscanf( s, "%lf", &attemp );
-    printf( "temperature %.1f C\n", attemp );
+    Trace1( "temperature %.1f C\n", attemp );
     fgets( s, 80, f );
     sscanf( s, "%lf", &atpress );
-    printf( "pressure %.0f mb\n", atpress );
+    Trace1( "pressure %.0f mb\n", atpress );
     fgets( s, 80, f );
     sscanf( s, "%d", &jdflag );
    
     switch( jdflag ) {
-      case 0: printf("TDT and UT assumed equal.\n"); break;
-      case 1: printf("Input time is TDT.\n" );       break;
-      case 2: printf("Input time is UT.\n" );        break;
-      default: printf("Illegal jdflag\n" ); exit(0);
+      case 0: Trace1("TDT and UT assumed equal.\n"); break;
+      case 1: Trace1("Input time is TDT.\n" );       break;
+      case 2: Trace1("Input time is UT.\n" );        break;
+      default: Trace1("Illegal jdflag\n" ); exit(0);
     }
     fgets( s, 80, f );
     sscanf( s, "%lf", &dtgiven );
     
-    if( dtgiven != 0.0 ) printf( "Using deltaT = %.2fs.\n", dtgiven );
+    if( dtgiven != 0.0 ) Trace1( "Using deltaT = %.2fs.\n", dtgiven );
     fclose(f);
   }
   
@@ -129,14 +140,21 @@ int kinit() // declaration fonction
   
   return(0);
 }
-//=============================================================================
-/* Program to read in a file containing orbital parameters */
-//=============================================================================
+/*****************************************************************************************
+* @fn     : KINIT_ASTROKIT
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int KINIT_ASTROKIT(double tlongg, double glatt, double heightt,double attempp, double atpresss, double jdflagg, double dtgivenn ) // declaration fonction
 {
   double a, b, fl, co, si, u;
   //char s[84];
+
+    TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
     tlong = tlongg ;
     glat  = glatt ;
@@ -203,19 +221,31 @@ int KINIT_ASTROKIT(double tlongg, double glatt, double heightt,double attempp, d
 
 extern struct orbit earth;
 
+/*****************************************************************************************
+* @fn     : getorbit
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int getorbit(el) struct orbit *el; {
   FILE *f;
   char s1[128], s2[128], *u, *v;
   int i;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   getnum( "Name of orbit catalogue file: ", orbnam, strfmt );
+
   f = fincat( orbnam, 2, s1, s2 );
+
   if( f == 0 ) return(-1); /* failure flag */
 
 
-  printf( "%s\n", s1 );
-  printf( "%s\n", s2 );
+  Trace1( "%s\n", s1 );
+  Trace1( "%s\n", s2 );
 
   /* Read in ASCII floating point numbers */
   
@@ -236,12 +266,19 @@ int getorbit(el) struct orbit *el; {
     u = (char *)&earth;
     v = (char *)el;
     for( i=0; i < (int) sizeof(struct orbit); i++ ) *u++ = *v++;
-    printf( "Read in earth orbit\n" );
+    Trace1( "Read in earth orbit\n" );
     return(1);
   }
 }
 
-//=============================================================================
+/*****************************************************************************************
+* @fn     : getstar
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int getstar(el) struct star *el; {
   int sign;
@@ -252,13 +289,15 @@ int getstar(el) struct star *el; {
   char *p;
   int i;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   getnum( "Name of star catalogue file: ", starnam, strfmt );
   
   f = fincat( starnam, 1, s, (char *)0 );
   
   if( f == 0 ) return(-1); /* failure flag */
 
-  printf( "%s\n", s ); /* Read in the ASCII string data and name of the object */
+  Trace1( "%s\n", s ); /* Read in the ASCII string data and name of the object */
   
   sscanf( s, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %s",
     &el->epoch, &rh, &rm, &rs, &dd, &dm, &ds,
@@ -305,12 +344,12 @@ int getstar(el) struct star *el; {
   el->dec = z;
 
   #if DEBUG
-   printf( "%.2f\n", el->epoch );
-   printf( "%.0f %.0f %.3f\n", rh, rm, rs );
-   printf( "%.8f\n", el->ra );
-   printf( "%.0f %.0f %.3f\n", dd, dm, ds );
-   printf( "%.8f\n", el->dec );
-   printf( "d %.3f mua %.3f mud %.3f v %.3f\n", el->px, el->mura, el->mudec, el->v );
+   Trace1( "%.2f\n", el->epoch );
+   Trace1( "%.0f %.0f %.3f\n", rh, rm, rs );
+   Trace1( "%.8f\n", el->ra );
+   Trace1( "%.0f %.0f %.3f\n", dd, dm, ds );
+   Trace1( "%.8f\n", el->dec );
+   Trace1( "d %.3f mua %.3f mud %.3f v %.3f\n", el->px, el->mura, el->mudec, el->v );
   #endif
 
   el->mura *= 15.0/RTS;	/* s/century -> "/century -> rad/century */
@@ -329,16 +368,26 @@ int getstar(el) struct star *el; {
 /* Open catalogue and find line number
  */
 // number of lines per catalogue entry = n
-//=============================================================================
+
+/*****************************************************************************************
+* @fn     : fincat
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 FILE *fincat( name, n, str1, str2 ) char *name; int n; char *str1, *str2;
 {
  int i;
  FILE *f, *fopen();
  
+ TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
  f = fopen( name, "r" );
  
- if( f == 0 ) { printf( "Can't find file %s\n", name ); return(0); /* failure flag */ }
+ if( f == 0 ) { Trace1( "Can't find file %s\n", name ); return(0); /* failure flag */ }
  
  getnum( "Line number", &linenum, intfmt );
  
@@ -357,7 +406,7 @@ FILE *fincat( name, n, str1, str2 ) char *name; int n; char *str1, *str2;
  fclose(f);
  return( f );
  endf:
-   printf( "End of file reached.\n" );
+   Trace1( "End of file reached.\n" );
    failure:
    fclose(f);
    return(0);

@@ -3,7 +3,7 @@
 
 /*double PI = 3.14159265358979323846;*/
 #include "kep.h"
-#include <string.h>
+
 #if __STDC__
 double caltoj (long, int, double);
 #else
@@ -21,10 +21,21 @@ char *strfmt = "%s";
  * Output vector pol[] contains R.A., Dec., and radius. */
 // ================================================================================
 
+/*****************************************************************************************
+* @fn     : showrd
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int showrd( msg, p, pol ) char *msg; double p[], pol[]; {
 
   double x, y, r;
   int i;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   r = 0.0;
   
@@ -59,9 +70,20 @@ int showrd( msg, p, pol ) char *msg; double p[], pol[]; {
  */
 // ================================================================================
 
+/*****************************************************************************************
+* @fn     : showcor
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int showcor( strng, p, dp ) char *strng; double p[], dp[]; {
   double p1[3], dr, dd;
   int i;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if( prtflg == 0 ) return(0);
   for( i=0; i<3; i++ ) p1[i] = p[i] + dp[i];
@@ -76,11 +98,23 @@ return(0);
  */
 // ================================================================================
 
+/*****************************************************************************************
+* @fn     : dms
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int dms( x ) double x; {
   double s;
   int d, m;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   s = x * RTD;
+
   if( s < 0.0 ) {
     s = -s;
   }
@@ -91,7 +125,9 @@ int dms( x ) double x; {
   m = (int) s;
   s -= m;
   s *= 60;
+
   Trace1( "%d %d %.2f", d, m, s );
+
   return(0);
 }
 // ================================================================================
@@ -101,10 +137,21 @@ int dms( x ) double x; {
 
 #define RTOH (12.0/PI)
 
+/*****************************************************************************************
+* @fn     : hms
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int hms( x ) double x; {
  int h, m;
  long sint, sfrac;
  double s;
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
  s = x * RTOH;
  if( s < 0.0 ) s += 24.0;
@@ -198,11 +245,22 @@ static double day = 1.0;
 short yerend = 0;
 extern short yerend;
 
+/*****************************************************************************************
+* @fn     : zgetdate_moi
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double zgetdate_moi(int yearr, int monthh, int dayy) {
 
   double J;
   char cmd[16] ;
   
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   memset    ( cmd, 0,sizeof(cmd)) ;
   sprintf   ( cmd, "%d",yearr);
   getnum_moi( cmd, &cyear, lngfmt );
@@ -216,13 +274,25 @@ double zgetdate_moi(int yearr, int monthh, int dayy) {
   getnum_moi( cmd, &day, dblfmt );
   
   J = caltoj(cyear,month,day);
+
   return(J);
 }
 
 
+/*****************************************************************************************
+* @fn     : zgetdate
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double zgetdate() {
 
   double J;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Get operator to type in a date. */
 
@@ -244,10 +314,18 @@ double zgetdate() {
   return(J);
 }
 
-
-
 /*     Calculate Julian day from Gregorian calendar date
  */
+
+/*****************************************************************************************
+* @fn     : caltoj
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double caltoj( year, month, day ) long year; int month; double day; {
  long y, a, b, c, e, m;
  double J;
@@ -278,7 +356,8 @@ double caltoj( year, month, day ) long year; int month; double day; {
   if( year == 1582L ) { if( month < 10 ) goto julius; if( month > 10) goto gregor;if( day >= 15 ) goto gregor; }
 
   julius:
-   printf( " Julian Calendar assumed.\n" );
+   /* (mise en commentaire 2023) */
+   /* printf( " Julian Calendar assumed.\n" ); */
    b = -38;
  }
  else { /* -number of century years that are not leap years */
@@ -353,8 +432,10 @@ int jtocal( J ) double J; {
 	{
 	year = -year + 1;
 	cyear = -year;
-	if( prtflg )
-		printf( "%ld B.C. ", year );
+	if( prtflg ) {
+    /* (mise en commentaire 2023) */
+		/* printf( "%ld B.C. ", year ); */
+  }
 	}
  else {
 	if( prtflg ) {
@@ -402,39 +483,62 @@ int jtocal( J ) double J; {
 
 /* Reduce x modulo 360 degrees
  */
+
+
+/*****************************************************************************************
+* @fn     : mod360
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double mod360(x)
 double x;
 {
-long k;
-double y;
+  long k;
+  double y;
 
-k = (long) (x/360.0);
-y = x  -  k * 360.0;
-while( y < 0.0 )
-	y += 360.0;
-while( y > 360.0 )
-	y -= 360.0;
-return(y);
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  k = (long) (x/360.0);
+  y = x  -  k * 360.0;
+  while( y < 0.0 )
+    y += 360.0;
+  while( y > 360.0 )
+    y -= 360.0;
+  return(y);
 }
-
-
 
 
 /* Reduce x modulo 2 pi
  */
 #define TPI (2.0*PI)
+
+/*****************************************************************************************
+* @fn     : modtp
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double modtp(x)
 double x;
 {
-double y;
+  double y;
 
-y = floor( x/TPI );
-y = x - y * TPI;
-while( y < 0.0 )
-	y += TPI;
-while( y >= TPI )
-	y -= TPI;
-return(y);
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  y = floor( x/TPI );
+  y = x - y * TPI;
+  while( y < 0.0 )
+    y += TPI;
+  while( y >= TPI )
+    y -= TPI;
+  return(y);
 }
 
 
@@ -443,66 +547,113 @@ return(y);
 static int hours = 0;
 static int minutes = 0;
 static double seconds = 0.0;
-//=======================================================================
+
+/*****************************************************************************************
+* @fn     : gethms_moi
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double gethms_moi(int hourr,int minn, int secc) {
  double t;
  char cmd[64] ;
 
- memset(cmd,0,sizeof(cmd)) ;
- sprintf(cmd,"%d",hourr);
- getnum_moi( cmd, &hours, intfmt );
- 
- memset(cmd,0,sizeof(cmd)) ;
- sprintf(cmd,"%d",minn); 
- getnum_moi( cmd, &minutes, intfmt );
- 
- memset(cmd,0,sizeof(cmd)) ;
- sprintf(cmd,"%d",secc);
- getnum_moi( cmd, &seconds, dblfmt );
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
- t = (3600.0*hours + 60.0*minutes + seconds)/86400.0;
- return(t);
+  memset(cmd,0,sizeof(cmd)) ;
+  sprintf(cmd,"%d",hourr);
+  getnum_moi( cmd, &hours, intfmt );
+  
+  memset(cmd,0,sizeof(cmd)) ;
+  sprintf(cmd,"%d",minn); 
+  getnum_moi( cmd, &minutes, intfmt );
+  
+  memset(cmd,0,sizeof(cmd)) ;
+  sprintf(cmd,"%d",secc);
+  getnum_moi( cmd, &seconds, dblfmt );
+
+  t = (3600.0*hours + 60.0*minutes + seconds)/86400.0 ;
+
+  return(t);
 }
-//=======================================================================
+/*****************************************************************************************
+* @fn     : gethms
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double gethms() {
  double t;
 
- getnum( "Time: Hours", &hours, intfmt );
- getnum( "Minutes", &minutes, intfmt );
- getnum( "Seconds", &seconds, dblfmt );
- t = (3600.0*hours + 60.0*minutes + seconds)/86400.0;
- return(t);
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  getnum( "Time: Hours", &hours, intfmt );
+  getnum( "Minutes", &minutes, intfmt );
+  getnum( "Seconds", &seconds, dblfmt );
+  t = (3600.0*hours + 60.0*minutes + seconds)/86400.0;
+
+  return(t);
 }
-//=======================================================================
+/*****************************************************************************************
+* @fn     : getnum_moi
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int getnum_moi( char s[40], void *num, char *format) {
 
-  if     ( format == strfmt ) printf( format, (char *)   num );
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  /*
+  if     ( format == strfmt ) printf( format,  (char *)  num );
   else if( format == dblfmt ) printf( format, *(double *)num );
   else if( format == intfmt ) printf( format, *(int *)   num );
   else if( format == lngfmt ) printf( format, *(long *)  num );
   else                        printf( "Illegal input format\n"  );
+  */
   if( s[0] != '\0' ) sscanf( s, format, num );
+
   return(0);
 }
-//=======================================================================
+/*****************************************************************************************
+* @fn     : getnum
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int getnum( msg, num, format ) char *msg; void *num; char *format; {
   char s[40];
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   printf( "%s (", msg );
+  /*
   if     ( format == strfmt ) printf( format, (char *) num );
   else if( format == dblfmt ) printf( format, *(double *)num );
   else if( format == intfmt ) printf( format, *(int *)num );
   else if( format == lngfmt ) printf( format, *(long *)num );
   else                        printf( "Illegal input format\n"  );
+
   printf( ") ? ");
+  */
   // gets(s);
   memset(s,0, sizeof(s));
   fgets(s,40,stdin ) ;
+
   if( s[0] != '\0' ) sscanf( s, format, num );
   return(0);
 }
-//=======================================================================
-
 
 /*
  * Convert change in rectangular coordinatates to change
@@ -525,63 +676,75 @@ int getnum( msg, num, format ) char *msg; void *num; char *format; {
  * p1 is the vector after motion or aberration.
  *
  */
+/*****************************************************************************************
+* @fn     : deltap
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int deltap( p0, p1, dr, dd )
 double p0[], p1[];
 double *dr, *dd;
 {
-double dp[3], A, B, P, Q, x, y, z;
-int i;
+  double dp[3], A, B, P, Q, x, y, z;
+  int i;
 
-P = 0.0;
-Q = 0.0;
-z = 0.0;
-for( i=0; i<3; i++ )
-	{
-	x = p0[i];
-	y = p1[i];
-	P += x * x;
-	Q += y * y;
-	y = y - x;
-	dp[i] = y;
-	z += y*y;
-	}
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-A = sqrt(P);
-B = sqrt(Q);
+  P = 0.0;
+  Q = 0.0;
+  z = 0.0;
+  for( i=0; i<3; i++ )
+    {
+    x = p0[i];
+    y = p1[i];
+    P += x * x;
+    Q += y * y;
+    y = y - x;
+    dp[i] = y;
+    z += y*y;
+    }
 
-if( (A < 1.e-7) || (B < 1.e-7) || (z/(P+Q)) > 5.e-7 )
-	{
-	P = zatan2( p0[0], p0[1] );
-	Q = zatan2( p1[0], p1[1] );
-	Q = Q - P;
-	while( Q < -PI )
-		Q += 2.0*PI;
-	while( Q > PI )
-		Q -= 2.0*PI;
-	*dr = Q;
-	P = asin( p0[2]/A );
-	Q = asin( p1[2]/B );
-	*dd = Q - P;
-	return(0);
-	}
+  A = sqrt(P);
+  B = sqrt(Q);
+
+  if( (A < 1.e-7) || (B < 1.e-7) || (z/(P+Q)) > 5.e-7 )
+    {
+    P = zatan2( p0[0], p0[1] );
+    Q = zatan2( p1[0], p1[1] );
+    Q = Q - P;
+    while( Q < -PI )
+      Q += 2.0*PI;
+    while( Q > PI )
+      Q -= 2.0*PI;
+    *dr = Q;
+    P = asin( p0[2]/A );
+    Q = asin( p1[2]/B );
+    *dd = Q - P;
+    return(0);
+    }
 
 
-x = p0[0];
-y = p0[1];
-if( x == 0.0 )
-	{
-	*dr = 1.0e38;
-	}
-else
-	{
-	Q = y/x;
-	Q = (dp[1]  -  dp[0]*y/x)/(x * (1.0 + Q*Q));
-	*dr = Q;
-	}
+  x = p0[0];
+  y = p0[1];
 
-x = p0[2]/A;
-P = sqrt( 1.0 - x*x );
-*dd = (p1[2]/B - x)/P;
-return(0);
+  if( x == 0.0 )
+    {
+    *dr = 1.0e38;
+    }
+  else
+    {
+    Q = y/x;
+    Q = (dp[1]  -  dp[0]*y/x)/(x * (1.0 + Q*Q));
+    *dr = Q;
+    }
+
+  x = p0[2]/A;
+  P = sqrt( 1.0 - x*x );
+  *dd = (p1[2]/B - x)/P;
+  
+  return(0);
 }

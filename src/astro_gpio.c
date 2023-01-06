@@ -1396,7 +1396,7 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
     }
     usleep( d_TUpwm_haut ) ;  
 
-    pwrite( i_gpio_fd, c_buf0,strlen(c_buf0),0) ;
+    pwr ite( i_gpio_fd, c_buf0,strlen(c_buf0),0) ;
     
     usleep( d_TUpwm_bas ) ;
   }
@@ -1429,7 +1429,11 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   double periode_ree=0 ; /* periode effective reelle consommee pour la temporisation */
   double periode_mic=0 ; /* periode de referefence (micro pas) pour la temporisation */
   double periode_mot=0 ; /* periode de referrence (sans micro pas ) du moteur */
-  double  per_tpwm = 0; 
+  double per_tpwm = 0; 
+
+  double ld_par_alt_red_4 = 0 ;
+  double ld_par_azi_red_4 = 0 ;
+
   double rc=0 ;
   //double tdiff=0 ;
   long long   i_incr=0 ; 
@@ -1444,7 +1448,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   periode_mot = 0 ;
   periode_bru = 0 ;
 
-  pthread_mutex_lock( & lp_Mot->mot_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_mutex ) ;
 
   lp_Mot->mot_upas = 0 ;
   lp_Mot->mot_pas = 0 ;
@@ -1452,14 +1456,19 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
   gettimeofday(&lp_Mot->mot_timeval,NULL) ; 
 
-  pthread_mutex_unlock( & lp_Mot->mot_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex ) ;
   
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Cal_Par->cal_par_mutex ) ;
+
+  ld_par_alt_red_4 = gp_Cal_Par->cal_par_alt_red_4 ;
+  ld_par_azi_red_4 = gp_Cal_Par->cal_par_azi_red_4 ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Cal_Par->cal_par_mutex ) ;
+
   while (1) {
 
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
     pthread_testcancel() ;
-
-    pthread_mutex_lock( & lp_Mot->mot_mutex ) ;
 
     /* -----------------------------------------------------
        Recopie des donnees de suivi dans les variables locales 
@@ -1470,43 +1479,52 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
     switch ( lp_Mot->mot_id ) {
 
       case 0 : 
-        pthread_mutex_lock( & gp_Mut->mut_glo_alt ) ;
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Fre->fre_mutex ) ;
 
           periode_mic         = gp_Fre->fre_th_mic ;
-          periode_mot         = gp_Fre->fre_th_mot / gp_Cal_Par->cal_par_alt_red_4;
-          periode_bru         = gp_Fre->fre_th_bru / gp_Cal_Par->cal_par_alt_red_4 ;
+          periode_mot         = gp_Fre->fre_th_mot / ld_par_alt_red_4;
+          periode_bru         = gp_Fre->fre_th_bru / ld_par_alt_red_4 ;
           sens                = gp_Fre->fre_sh ;
 
-        pthread_mutex_unlock( & gp_Mut->mut_glo_alt ) ;
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Fre->fre_mutex ) ;
         break ;
 
       case 1 :
-        pthread_mutex_lock( & gp_Mut->mut_glo_azi ) ;
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Fre->fre_mutex ) ;
 
           periode_mic         = gp_Fre->fre_ta_mic ; 
-          periode_mot         = gp_Fre->fre_ta_mot / gp_Cal_Par->cal_par_azi_red_4 ;
-          periode_bru         = gp_Fre->fre_ta_bru / gp_Cal_Par->cal_par_azi_red_4 ;
+          periode_mot         = gp_Fre->fre_ta_mot / ld_par_azi_red_4 ;
+          periode_bru         = gp_Fre->fre_ta_bru / ld_par_azi_red_4 ;
           sens                = gp_Fre->fre_sa ;
 
-        pthread_mutex_unlock( & gp_Mut->mut_glo_azi ) ;
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Fre->fre_mutex ) ;
+
         break ;
     }
 
     i_pas_change=0;
 
     if ( sens > 0 ) {
+
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_mutex) ;
+
       if ( lp_Mot->mot_upas == lp_Mot->mot_nb_upas - 1 ) { 
         lp_Mot->mot_upas = 0 ; 
         /* Si lp_Mot->mot_upas = 0 , cela veut dire que tout le cycle de micro pas a ete ecoule */
         lp_Mot->mot_pas ++ ;
         i_pas_change=1;        
+
+        /* TODO : vois si mettre ailleurs (thread dédié) */
         if ( gi_gpio_max_nb_pas >0 && lp_Mot->mot_pas > gi_gpio_max_nb_pas ) {
+
           GPIO_TRAP_SIG(0);
         }
       }
       else { 
         lp_Mot->mot_upas++ ; 
       }
+
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex) ;
     }
     else {
       if ( lp_Mot->mot_upas == 0 ) { 
@@ -1514,7 +1532,11 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
         /* Si lp_Mot->mot_upas = lp_Mot->mot_nb_upas-1 , cela veut dire que tout le cycle de micro pas a ete ecoule */
         lp_Mot->mot_pas -- ;
         i_pas_change=1;
+
+        /* TODO : vois si mettre ailleurs (thread dédié) */
+
         if ( gi_gpio_max_nb_pas >0 && lp_Mot->mot_pas > gi_gpio_max_nb_pas ) {
+          
           GPIO_TRAP_SIG(0);
         }
       } 
@@ -1522,7 +1544,8 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
         lp_Mot->mot_upas-- ; 
       }
     }
-    
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK() ;
+
     micropas  =  lp_Mot->mot_upas ;
     per_tpwm =  lp_Mot->mot_per_pwm ;
 

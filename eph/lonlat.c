@@ -6,12 +6,23 @@
 
 #include "kep.h"
 
+/*****************************************************************************************
+* @fn     : lonlat
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int lonlat( pp, J, polar, ofdate )
 double pp[], J, polar[];
 int ofdate; /* 1 means precess from J2000 to date J.  */
 {
 double s[3], x, y, z, yy, zz, r;
 int i;
+
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 /* Make local copy of position vector
  * and calculate radius.
@@ -33,6 +44,7 @@ if( ofdate )
 /* Convert from equatorial to ecliptic coordinates
  */
 epsiln(J);
+
 yy = s[1];
 zz = s[2];
 x  = s[0];

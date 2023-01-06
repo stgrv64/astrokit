@@ -132,196 +132,206 @@ short dt[TABSIZ] = {
  6607, 6632,
 };
 
-
+/*****************************************************************************************
+* @fn     : periode
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 double periode(Y)
 double Y;
 {
-double ans, p, B;
-int d[6];
-int i, iy, k;
+  double ans, p, B;
+  int d[6];
+  int i, iy, k;
 
-if( dtgiven != 0.0 )
-{
-    deltat_value = dtgiven;
-	return dtgiven;
-}
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-if( Y > TABEND )
-{
-    /* Extrapolate future values beyond the lookup table.  */
-    if (Y > (TABEND + 100.0))
+  if( dtgiven != 0.0 )
+  {
+      deltat_value = dtgiven;
+    return dtgiven;
+  }
+
+  if( Y > TABEND )
+  {
+      /* Extrapolate future values beyond the lookup table.  */
+      if (Y > (TABEND + 100.0))
+      {
+          /* Morrison & Stephenson (2004) long-term curve fit.  */
+          B = 0.01 * (Y - 1820.0);
+          ans = 32.0 * B * B - 20.0;
+      }
+      else
+      {
+          double a, b, c, d, m0, m1;
+
+          /* Cubic interpolation between last tabulated value
+            and long-term curve evaluated at 100 years later.  */
+
+          /* Last tabulated delta T value. */
+          a = 0.01 * dt[TABSIZ-1];
+          /* Approximate slope in past 10 years. */
+          b = 0.001 * (dt[TABSIZ-1] - dt[TABSIZ - 11]);
+
+          /* Long-term curve 100 years hence. */
+          B = 0.01 * (TABEND + 100.0 - 1820.0);
+          m0 = 32.0 * B*B - 20.0;
+          /* Its slope. */
+          m1 = 0.64 * B;
+
+          /* Solve for remaining coefficients of an interpolation polynomial
+            that agrees in value and slope at both ends of the 100-year
+            interval. */
+          d = 2.0e-6 * (50.0 * (m1 + b) - m0 + a);
+          c = 1.0e-4 * (m0 - a - 100.0 * b - 1.0e6 * d);
+
+          /* Note, the polynomial coefficients do not depend on Y.
+            A given tabulation and long-term formula
+            determine the polynomial.
+            Thus, for the IERS table ending at 2011.0, the coefficients are
+            a = 66.32
+            b = 0.223
+            c = 0.03231376
+            d = -0.0001607784
+          */
+
+          /* Compute polynomial value at desired time. */
+          p = Y - TABEND;
+          ans = a + p * (b  + p * (c + p * d));
+      }
+      return ans;
+  }
+
+
+  /* Use Morrison and Stephenson (2004) prior to the year 1700.  */
+  if( Y < 1700.0 )
+  {
+      if (Y <= -1000.0)
+      {
+          /* Morrison and Stephenson long-term fit.  */
+          B = 0.01 * (Y - 1820.0);
+          ans = 32.0 * B * B - 20.0;
+      }
+      else
+      {
+          /* Morrison and Stephenson recommend linear interpolation
+            between tabulations. */
+          iy = Y;
+          iy = (iy + 1000) / 100;  /* Integer index into the table. */
+          B = -1000 + 100 * iy;    /* Starting year of tabulated interval.  */
+          p = m_s[iy];
+          ans = p + 0.01 * (Y - B) * (m_s[iy + 1] - p);
+      }
+    return(ans);
+  }
+
+  /* Besselian interpolation between tabulated values
+  * in the telescopic era.
+  * See AA page K11.
+  */
+
+  /* Index into the table.
+  */
+  p = floor(Y);
+  iy = (int) (p - TABSTART);
+  /* Zeroth order estimate is value at start of year
+  */
+  ans = dt[iy];
+  k = iy + 1;
+  if( k >= TABSIZ )
+    goto done; /* No data, can't go on. */
+
+  /* The fraction of tabulation interval
+  */
+  p = Y - p;
+
+  /* First order interpolated value
+  */
+  ans += p*(dt[k] - dt[iy]);
+  if( (iy-1 < 0) || (iy+2 >= TABSIZ) )
+    goto done; /* can't do second differences */
+
+  /* Make table of first differences
+  */
+  k = iy - 2;
+  for( i=0; i<5; i++ )
     {
-        /* Morrison & Stephenson (2004) long-term curve fit.  */
-        B = 0.01 * (Y - 1820.0);
-        ans = 32.0 * B * B - 20.0;
-    }
+    if( (k < 0) || (k+1 >= TABSIZ) )
+      {
+      d[i] = 0;
+      }
     else
-    {
-        double a, b, c, d, m0, m1;
-
-        /* Cubic interpolation between last tabulated value
-           and long-term curve evaluated at 100 years later.  */
-
-        /* Last tabulated delta T value. */
-        a = 0.01 * dt[TABSIZ-1];
-        /* Approximate slope in past 10 years. */
-        b = 0.001 * (dt[TABSIZ-1] - dt[TABSIZ - 11]);
-
-        /* Long-term curve 100 years hence. */
-        B = 0.01 * (TABEND + 100.0 - 1820.0);
-        m0 = 32.0 * B*B - 20.0;
-        /* Its slope. */
-        m1 = 0.64 * B;
-
-        /* Solve for remaining coefficients of an interpolation polynomial
-           that agrees in value and slope at both ends of the 100-year
-           interval. */
-        d = 2.0e-6 * (50.0 * (m1 + b) - m0 + a);
-        c = 1.0e-4 * (m0 - a - 100.0 * b - 1.0e6 * d);
-
-        /* Note, the polynomial coefficients do not depend on Y.
-           A given tabulation and long-term formula
-           determine the polynomial.
-           Thus, for the IERS table ending at 2011.0, the coefficients are
-           a = 66.32
-           b = 0.223
-           c = 0.03231376
-           d = -0.0001607784
-        */
-
-        /* Compute polynomial value at desired time. */
-        p = Y - TABEND;
-        ans = a + p * (b  + p * (c + p * d));
+      d[i] = dt[k+1] - dt[k];
+    k += 1;
     }
-    return ans;
-}
+
+  /* Compute second differences
+  */
+  for( i=0; i<4; i++ )
+    d[i] = d[i+1] - d[i];
+  B = 0.25*p*(p-1.0);
+  ans += B*(d[1] + d[2]);
+  #if DEMO
+  /* (mise en commentaire 2023) */
+  /* printf( "B %.4lf, ans %.4lf\n", B, ans ); */
+  #endif
+  if( iy+2 >= TABSIZ )
+    goto done;
+
+  /* Compute third differences
+  */
+  for( i=0; i<3; i++ )
+    d[i] = d[i+1] - d[i];
+  B = 2.0*B/3.0;
+  ans += (p-0.5)*B*d[1];
+  #if DEMO
+  printf( "B %.4lf, ans %.4lf\n", B*(p-0.5), ans );
+  #endif
+  if( (iy-2 < 0) || (iy+3 > TABSIZ) )
+    goto done;
+
+  /* Compute fourth differences
+  */
+  for( i=0; i<2; i++ )
+    d[i] = d[i+1] - d[i];
+  B = 0.125*B*(p+1.0)*(p-2.0);
+  ans += B*(d[0] + d[1]);
+  #if DEMO
+  printf( "B %.4lf, ans %.4lf\n", B, ans );
+  #endif
+
+  done:
+
+  ans *= 0.01;
 
 
-/* Use Morrison and Stephenson (2004) prior to the year 1700.  */
-if( Y < 1700.0 )
-{
-    if (Y <= -1000.0)
+  #if 0 /* ndot = -26.0 assumed; no correction. */
+
+  /* Astronomical Almanac table is corrected by adding the expression
+  *     -0.000091 (ndot + 26)(year-1955)^2  seconds
+  * to entries prior to 1955 (AA page K8), where ndot is the secular
+  * tidal term in the mean motion of the Moon.
+  *
+  * Entries after 1955 are referred to atomic time standards and
+  * are not affected by errors in Lunar or planetary theory.
+  */
+  if( Y < 1955.0 )
     {
-        /* Morrison and Stephenson long-term fit.  */
-        B = 0.01 * (Y - 1820.0);
-        ans = 32.0 * B * B - 20.0;
+    B = (Y - 1955.0);
+  #if 1
+    ans += -0.000091 * (-25.8 + 26.0) * B * B;
+  #else
+    ans += -0.000091 * (-23.8946 + 26.0) * B * B;
+  #endif
     }
-    else
-    {
-        /* Morrison and Stephenson recommend linear interpolation
-           between tabulations. */
-        iy = Y;
-        iy = (iy + 1000) / 100;  /* Integer index into the table. */
-        B = -1000 + 100 * iy;    /* Starting year of tabulated interval.  */
-        p = m_s[iy];
-        ans = p + 0.01 * (Y - B) * (m_s[iy + 1] - p);
-    }
-	return(ans);
-}
 
-/* Besselian interpolation between tabulated values
- * in the telescopic era.
- * See AA page K11.
- */
+  #endif /* 0 */
 
-/* Index into the table.
- */
-p = floor(Y);
-iy = (int) (p - TABSTART);
-/* Zeroth order estimate is value at start of year
- */
-ans = dt[iy];
-k = iy + 1;
-if( k >= TABSIZ )
-	goto done; /* No data, can't go on. */
-
-/* The fraction of tabulation interval
- */
-p = Y - p;
-
-/* First order interpolated value
- */
-ans += p*(dt[k] - dt[iy]);
-if( (iy-1 < 0) || (iy+2 >= TABSIZ) )
-	goto done; /* can't do second differences */
-
-/* Make table of first differences
- */
-k = iy - 2;
-for( i=0; i<5; i++ )
-	{
-	if( (k < 0) || (k+1 >= TABSIZ) )
-		{
-		d[i] = 0;
-		}
-	else
-		d[i] = dt[k+1] - dt[k];
-	k += 1;
-	}
-
-/* Compute second differences
- */
-for( i=0; i<4; i++ )
-	d[i] = d[i+1] - d[i];
-B = 0.25*p*(p-1.0);
-ans += B*(d[1] + d[2]);
-#if DEMO
-printf( "B %.4lf, ans %.4lf\n", B, ans );
-#endif
-if( iy+2 >= TABSIZ )
-	goto done;
-
-/* Compute third differences
- */
-for( i=0; i<3; i++ )
-	d[i] = d[i+1] - d[i];
-B = 2.0*B/3.0;
-ans += (p-0.5)*B*d[1];
-#if DEMO
-printf( "B %.4lf, ans %.4lf\n", B*(p-0.5), ans );
-#endif
-if( (iy-2 < 0) || (iy+3 > TABSIZ) )
-	goto done;
-
-/* Compute fourth differences
- */
-for( i=0; i<2; i++ )
-	d[i] = d[i+1] - d[i];
-B = 0.125*B*(p+1.0)*(p-2.0);
-ans += B*(d[0] + d[1]);
-#if DEMO
-printf( "B %.4lf, ans %.4lf\n", B, ans );
-#endif
-
-done:
-
-ans *= 0.01;
-
-
-#if 0 /* ndot = -26.0 assumed; no correction. */
-
-/* Astronomical Almanac table is corrected by adding the expression
- *     -0.000091 (ndot + 26)(year-1955)^2  seconds
- * to entries prior to 1955 (AA page K8), where ndot is the secular
- * tidal term in the mean motion of the Moon.
- *
- * Entries after 1955 are referred to atomic time standards and
- * are not affected by errors in Lunar or planetary theory.
- */
-if( Y < 1955.0 )
-	{
-	B = (Y - 1955.0);
-#if 1
-	ans += -0.000091 * (-25.8 + 26.0) * B * B;
-#else
-	ans += -0.000091 * (-23.8946 + 26.0) * B * B;
-#endif
-	}
-
-#endif /* 0 */
-
-return( ans );
+  return( ans );
 }
 
 /* Routine to fill in time values for TDT and UT.
@@ -329,46 +339,68 @@ return( ans );
  * jdflag is set up on reading the initialization file aa.ini.
  */
 
+/*****************************************************************************************
+* @fn     : update
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int update()
 {
-double T;
+  double T;
 
-/* Convert Julian date to Julian years re J2000.0.
- */
-T = 2000.0 + (JD - J2000)/365.25;
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-switch( jdflag ) {
-	case 0:
-	  Trace1("case 0");
-		TDT = JD;
-		UT = JD;
-		break;
-	case 1:
-	  Trace1("case 1");
-		TDT = JD;
-    deltat_value = periode(T);
-		UT = TDT - deltat_value/86400.0;
-		jtocal(UT); /* display the other date */
-		break;
-	case 2:
-	  Trace1("case 2");
-		UT = JD;
-    deltat_value = periode(T);
-		TDT = UT + deltat_value/86400.0;
-		jtocal(TDT);
-		break;
-	}
-jtocal(JD);
-return(0);
+  /* Convert Julian date to Julian years re J2000.0.
+  */
+  T = 2000.0 + (JD - J2000)/365.25;
+
+  switch( jdflag ) {
+
+    case 0:
+      Trace1("case 0");
+      TDT = JD;
+      UT = JD;
+      break;
+
+    case 1:
+      Trace1("case 1");
+      TDT = JD;
+      deltat_value = periode(T);
+      UT = TDT - deltat_value/86400.0;
+      jtocal(UT); /* display the other date */
+      break;
+
+    case 2:
+      Trace1("case 2");
+      UT = JD;
+      deltat_value = periode(T);
+      TDT = UT + deltat_value/86400.0;
+      jtocal(TDT);
+      break;
+    }
+
+  jtocal(JD);
+
+  return(0);
 }
-
-
-
-
 
 /* Exercise program.
  */
 #if DEMO
+
+/*****************************************************************************************
+* @fn     : main
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 main()
 {
 char s[20];

@@ -58,8 +58,10 @@ typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;
 struct STR_ASTRE {
 
   pthread_mutex_t ast_mutex ;
+  void          (*ast_log)    (struct STR_ASTRE *) ;
   void          (*ast_lock)   (struct STR_ASTRE *) ;
   void          (*ast_unlock) (struct STR_ASTRE *) ;  
+  int             ast_loglevel ;
   FILE           *ast_file ; 
 
   STRUCT_TIME     ast_at ;

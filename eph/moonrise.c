@@ -15,10 +15,11 @@
 */
 #define USE_ITER_TRNSIT 1
 
-
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "kep.h"
+
 /* Conversion factors between degrees and radians */
 double DTR = 1.7453292519943295769e-2;
 double RTD = 5.7295779513082320877e1;
@@ -119,7 +120,7 @@ int jdflag = 0;
 /* correction vector, saved for display  */
 double dp[3];
 
-/* display formats for printf() */
+/* display formats for Trace1() */
 extern char *intfmt, *dblfmt;
 
 /* display enable flag */
@@ -150,10 +151,21 @@ extern double tlong, glat, tlat, flat, height, trho, aearth;
 
 /* Callable kinit function */
 
+/*****************************************************************************************
+* @fn     : set_geographic_position
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 void
 set_geographic_position ()
 {
   double u, co, si, fl, a, b;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 	u = glat * DTR;
 /* Reduction from geodetic latitude to geocentric latitude
@@ -174,7 +186,14 @@ set_geographic_position ()
 	trho /= aearth;
 }
 
-
+/*****************************************************************************************
+* @fn     : main
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int 
 main ()
@@ -182,8 +201,11 @@ main ()
   double jd;
   int geo_lon, geo_lat;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   kinit ();
-  printf("\nTable of lunar rise, transit, and set times.\n\n");
+
+  Trace1("\nTable of lunar rise, transit, and set times.\n\n");
   objnum = 0;
   jd = STARTDATE;
   while (jd <= ENDDATE)
@@ -199,7 +221,7 @@ main ()
 	      tlong = geo_lon;
 	      glat = geo_lat;
 	      set_geographic_position ();
-	      printf ("lon %d, lat %d\n", geo_lon, geo_lat);
+	      Trace1 ("lon %d, lat %d\n", geo_lon, geo_lat);
 
 #if USE_ITER_TRNSIT
       func (jd);
@@ -209,14 +231,14 @@ main ()
       if (f_trnsit)
         jtocal (t_rise);
       else
-	printf("\n");
+	Trace1("\n");
       jtocal (t_trnsit);
       if (f_trnsit)
         jtocal (t_set);
       else
-	printf("\n");
+	Trace1("\n");
       prtflg = 0;
-      printf ("\n");
+      Trace1 ("\n");
 #endif
 	    }
 	  /*
@@ -228,6 +250,15 @@ main ()
 }
 
 /* Search for improved rise and set time estimates.  */
+
+/*****************************************************************************************
+* @fn     : search
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 double
 search (t)
      double t;
@@ -235,6 +266,8 @@ search (t)
   double JDsave, TDTsave, UTsave;
   double date_save, date, t0, t1;
   double rise1, set1, trnsit1;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   JDsave = JD;
   TDTsave = TDT;
@@ -313,7 +346,7 @@ search (t)
   t_set = t1;
   r_trnsit = trnsit1;
   r_rise = rise1;
-  /*  printf("%.15e %.15e %.15e\n", rise1, trnsit1, set1); */
+  /*  Trace1("%.15e %.15e %.15e\n", rise1, trnsit1, set1); */
 sdone:
   JD = JDsave;
   TDT = TDTsave;
@@ -322,21 +355,36 @@ sdone:
 }
 
 /* Compute estimate of lunar rise and set times.  */
-static void
-func (t)
-     double t;
+
+/*****************************************************************************************
+* @fn     : func
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
+static void func (t)
+double t;
 {
   int prtsave;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   prtsave = prtflg;
   prtflg = 0;
   objnum = RISE_OBJ_NUM;
   JD = t;
+
   update ();			/* find UT */
   kepler (TDT, &earth, rearth, eapolar);
+
   RISE_OBJ_FUNC ();
+
 #if  USE_ITER_TRNSIT
   iter_trnsit (RISE_OBJ_FUNC);
 #endif
+
   prtflg = prtsave;
 }

@@ -183,7 +183,8 @@ $(LLCD)	:
 	
 $(XEPH)	:
 	cd ${REPH} ; make CC=$(CC) $(EPHX)
-
+	cp ${LEPH} ${RLIB}
+	
 .PHONY: all all-before all-after clean clean-custom
 
 clean: clean-custom
@@ -195,14 +196,16 @@ cleanlcd:
 	${RM} ${RLCD}/*.o
 	${RM} ${RLIB}/${LCDA}
 	
-cleanlib:
-	${RM} ${REPH}/*.o
-	${RM} ${LEPH}
-
 cleansolarsystem:
 	${RM} ${REPH}/*.o
 	${RM} ${XEPH}	
+	${RM} ${LEPH}
 
+cleanlib:
+	${RM} ${REPH}/*.o
+	${RM} ${LEPH}
+	${RM} ${LLCD}
+	
 cleanall: clean cleanlib cleansolarsystem cleanlcd
 
 lib: $(LEPH)

@@ -32,7 +32,6 @@ FILE * gp_File_Flog ;
 // Raccourci
 // ----------------------------------------------------------------
 
-#define KEYS_IF_MOT_IS(s)  if(!strcmp(gp_Key->key_mot,s))
 
 // ------------------------------------------------------------------------
 // Syslog
@@ -104,8 +103,6 @@ while (0)
 #define TraceLogLevel(loglevel,nb,fmt, args...) \
 do { \
   if (loglevel>=nb) { \
-    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
-  } else  { \
     fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
   } \
 } \

@@ -94,12 +94,33 @@
 #include <linux/i2c-dev.h>
 
 /*------------------------------------------------------------------------------*/
+/* Defintion des Macros pour tout le code qui n'est pas de type log             */
+/*------------------------------------------------------------------------------*/
+
+#define MACRO_ASTRO_GLOBAL_LOG_ROTATE(flaglogrotate) \
+do{                       \
+  switch (flaglogrotate ) \
+  {                       \
+    case 0 :              \
+     flaglogrotate = 1 ;  \
+      break;              \
+    case 1 :              \
+     flaglogrotate = 0 ;  \
+      break;              \
+    default:              \
+     flaglogrotate = 0 ;  \
+      break;              \
+  }                       \
+}                         \
+while(0)
+
+/*------------------------------------------------------------------------------*/
 /* Definition des constantes globales                                           */ 
 /* Ces constantes sont definies ici pour eviter les tests d inclusion multiples */
 /*------------------------------------------------------------------------------*/
 
 #define CODES_CODE_BUFFER_SIZE               255 
-#define CODES_CODE_NB_CODES                  70 
+#define CODES_CODE_NB_CODES                  110 
 #define CODES_NB_IN_OUT                      3
 
 #define CONFIG_ZERO_CHAR                     '\0'
@@ -163,8 +184,9 @@ typedef enum    t_en_Calculs_Mode           ENUM_CALCULS_MODE ;
 typedef struct  lirc_config                 STR_EXT_LIRC_CONFIG ;
 typedef struct  timeval                     STR_EXT_TIMEVAL ;
 typedef struct  termios                     STR_EXT_TERMIOS ;
+typedef struct  pthread_mutex_t             STR_EXT_PTHREAD_MUTEX_T ;
+typedef struct  pthread_t                   STR_EXT_PTHREAD_T ;
 
-typedef struct  pthread_t                   STRUCT_PTHREAD_T ;
 typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
 typedef struct  STR_ASTRE                   STRUCT_ASTRE ;
 typedef struct  STR_CALCULS                 STRUCT_CALCULS ;
@@ -258,8 +280,8 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_PTHREADS         g_Pthreads,           *gp_Pth ; \
   extern STRUCT_SUIVI            g_Suivi,              *gp_Sui ; \
   extern STRUCT_SUIVI_PAS        g_Suivi_Pas,          *gp_Pas ; \
-  extern STRUCT_SUIVI_FRE g_Suivi_Frequences,   *gp_Fre ; \
-  extern STRUCT_STATS      g_Suivi_Statistiques, *gp_Sta ; \
+  extern STRUCT_SUIVI_FRE        g_Suivi_Frequences,   *gp_Fre ; \
+  extern STRUCT_STATS            g_Suivi_Statistiques, *gp_Sta ; \
   extern STRUCT_TERMIOS          g_Termios,            *gp_Ter ; \
   extern STRUCT_TIME             g_Time,               *gp_Tim ; \
   extern STRUCT_TIME_TEMPOS      g_Time_Tempos,        *gp_Tpo ; \
@@ -279,10 +301,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern STRUCT_GPIO_PARAMS_MAT  g_Gpio_Params_Mat,  *gp_Mat_Par ; \
   extern STRUCT_GPIO_PARAMS_RAQ  g_Gpio_Params_Raq,  *gp_Raq_Par ; \
   extern STRUCT_GPIO_PARAMS_CON  g_Gpio_Params_Ctl,  *gp_Ctl_Par ; \
-/*
-#define MACRO_ASTRO_GLOBAL_EXTERN_LOG \
-  extern FILE * gp_File_Flog ; \
-*/
+
 #define MACRO_ASTRO_GLOBAL_EXTERN_GPIOS \
   extern int    gi_gpio_fd     [ GPIO_SIZE ] ; \
   extern int    gi_gpio_in   	 [ GPIO_SIZE ] ; \
@@ -314,173 +333,6 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 #define MACRO_ASTRO_GLOBAL_EXTERN_CONST \
   extern const char * gc_hach_suivi_menus[]  ; \
 
-/*
-#define MUTEX_GLO_AST_LOCK            pthread_mutex_lock(   & gp_Ast->ast_mutex ) ;  
-#define MUTEX_GLO_AST_UNLOCK          pthread_mutex_unlock( & gp_Ast->ast_mutex ) ;
-#define MUTEX_LOC_AST_LOCK            pthread_mutex_lock(   & gp_Ast->ast_mutex ) ;  
-#define MUTEX_LOC_AST_UNLOCK          pthread_mutex_unlock( & gp_Ast->ast_mutex ) ;
-
-#define MUTEX_GLO_ANG_LOCK            pthread_mutex_lock(   & gp_Ang->ang_mutex ) ;  
-#define MUTEX_GLO_ANG_UNLOCK          pthread_mutex_unlock( & gp_Ang->ang_mutex ) ;
-#define MUTEX_GLO_CAL_LOCK            pthread_mutex_lock(   & gp_Cal->cal_mutex ) ;  
-#define MUTEX_GLO_CAL_UNLOCK          pthread_mutex_unlock( & gp_Cal->cal_mutex ) ;
-#define MUTEX_GLO_CAL_PAR_LOCK        pthread_mutex_lock(   & gp_Cal_Par->cal_par_mutex) ;  
-#define MUTEX_GLO_CAL_PAR_UNLOCK      pthread_mutex_unlock( & gp_Cal_Par->cal_par_mutex ) ; 
-
-#define MUTEX_LOC_ANG_LOCK            pthread_mutex_lock(   & lp_Ang->ang_mutex ) ;  
-#define MUTEX_LOC_ANG_UNLOCK          pthread_mutex_unlock( & lp_Ang->ang_mutex ) ;
-#define MUTEX_LOC_CAL_LOCK            pthread_mutex_lock(   & gp_Cal->cal_mutex ) ;  
-#define MUTEX_LOC_CAL_UNLOCK          pthread_mutex_unlock( & gp_Cal->cal_mutex ) ;
-#define MUTEX_LOC_CAL_PAR_LOCK        pthread_mutex_lock(   & lp_Cal_Par->cal_par_mutex) ;  
-#define MUTEX_LOC_CAL_PAR_UNLOCK      pthread_mutex_unlock( & lp_Cal_Par->cal_par_mutex ) ; 
-
-#define MUTEX_GLO_CAT_LOCK            pthread_mutex_lock(   & gp_Cat->cat_mutex ) ;  
-#define MUTEX_GLO_CAT_UNLOCK          pthread_mutex_unlock( & gp_Cat->cat_mutex ) ; 
-#define MUTEX_LOC_CAT_LOCK            pthread_mutex_lock(   & gp_Cat->cat_mutex ) ;  
-#define MUTEX_LOC_CAT_UNLOCK          pthread_mutex_unlock( & gp_Cat->cat_mutex ) ; 
-
-#define MUTEX_GLO_COD_LOCK            pthread_mutex_lock(   & gp_Cod->cod_mutex ) ;  
-#define MUTEX_GLO_COD_UNLOCK          pthread_mutex_unlock( & gp_Cod->cod_mutex ) ; 
-#define MUTEX_LOC_COD_LOCK            pthread_mutex_lock(   & lp_Cod->cod_mutex ) ;  
-#define MUTEX_LOC_COD_UNLOCK          pthread_mutex_unlock( & lp_Cod->cod_mutex ) ; 
-
-#define MUTEX_GLO_CON_LOCK            pthread_mutex_lock(   & gp_Con->con_mutex ) ;  
-#define MUTEX_GLO_CON_UNLOCK          pthread_mutex_unlock( & gp_Con->con_mutex ) ; 
-#define MUTEX_GLO_CON_PAR_LOCK        pthread_mutex_lock(   & gp_Con_Par->con_par_mutex) ;  
-#define MUTEX_GLO_CON_PAR_UNLOCK      pthread_mutex_unlock( & gp_Con_Par->con_par_mutex ) ;
-#define MUTEX_LOC_CON_LOCK            pthread_mutex_lock(   & lp_Con->con_mutex ) ;  
-#define MUTEX_LOC_CON_UNLOCK          pthread_mutex_unlock( & lp_Con->con_mutex ) ; 
-#define MUTEX_LOC_CON_PAR_LOCK        pthread_mutex_lock(   & lp_Con_Par->con_par_mutex) ;  
-#define MUTEX_LOC_CON_PAR_UNLOCK      pthread_mutex_unlock( & lp_Con_Par->con_par_mutex ) ;
-
-#define MUTEX_GLO_DAT_LOCK            pthread_mutex_lock(   & gp_Dat->dat_mutex ) ;  
-#define MUTEX_GLO_DAT_UNLOCK          pthread_mutex_unlock( & gp_Dat->dat_mutex ) ;
-#define MUTEX_LOC_DAT_LOCK            pthread_mutex_lock(   & lp_Dat->dat_mutex ) ;  
-#define MUTEX_LOC_DAT_UNLOCK          pthread_mutex_unlock( & lp_Dat->dat_mutex ) ;
-
-#define MUTEX_GLO_DEV_LOCK            pthread_mutex_lock(   & gp_Dev->dev_mutex ) ;  
-#define MUTEX_GLO_DEV_UNLOCK          pthread_mutex_unlock( & gp_Dev->dev_mutex ) ;
-#define MUTEX_GLO_DEV_PAR_LOCK        pthread_mutex_lock(   & gp_Dev_Par->dev_par_mutex ) ;  
-#define MUTEX_GLO_DEV_PAR_UNLOCK      pthread_mutex_unlock( & gp_Dev_Par->dev_par_mutex ) ; 
-
-#define MUTEX_GLO_MOT_LOCK            pthread_mutex_lock(   & gp_Mot->mot_mutex ) ;
-#define MUTEX_GLO_MOT_UNLOCK          pthread_mutex_unlock( & gp_Mot->mot_mutex ) ;
-#define MUTEX_GLO_PHA_LOCK            pthread_mutex_lock(   & gp_Pha->pha_mutex ) ;
-#define MUTEX_GLO_PHA_UNLOCK          pthread_mutex_unlock( & gp_Pha->pha_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_PWM_LOCK   pthread_mutex_lock(   & gp_Pwm_Par->pha_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_PWM_UNLOCK pthread_mutex_unlock( & gp_Pwm_Par->pha_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_MAT_LOCK   pthread_mutex_lock(   & gp_Mat_Par->par_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_MAT_UNLOCK pthread_mutex_unlock( & gp_Mat_Par->par_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_RAQ_LOCK   pthread_mutex_lock(   & gp_Raq_Par->par_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_RAQ_UNLOCK pthread_mutex_unlock( & gp_Raq_Par->par_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_CON_LOCK   pthread_mutex_lock(   & gp_Ctl_Par->par_mutex ) ;
-#define MUTEX_GLO_GPIO_PAR_CON_UNLOCK pthread_mutex_unlock( & gp_Ctl_Par->par_mutex ) ;
-
-#define MUTEX_LOC_MOT_LOCK            pthread_mutex_lock(   & lp_Mot->mot_mutex ) ;
-#define MUTEX_LOC_MOT_UNLOCK          pthread_mutex_unlock( & lp_Mot->mot_mutex ) ;
-#define MUTEX_LOC_PHA_LOCK            pthread_mutex_lock(   & lp_Pha->pha_mutex ) ;
-#define MUTEX_LOC_PHA_UNLOCK          pthread_mutex_unlock( & lp_Pha->pha_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_PWM_LOCK   pthread_mutex_lock(   & lp_Gpi_Par_Pwm->pha_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_PWM_UNLOCK pthread_mutex_unlock( & lp_Gpi_Par_Pwm->pha_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_MAT_LOCK   pthread_mutex_lock(   & lp_Gpi_Par_Mat->par_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_MAT_UNLOCK pthread_mutex_unlock( & lp_Gpi_Par_Mat->par_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_RAQ_LOCK   pthread_mutex_lock(   & lp_Gpi_Par_Raq->par_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_RAQ_UNLOCK pthread_mutex_unlock( & lp_Gpi_Par_Raq->par_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_CON_LOCK   pthread_mutex_lock(   & lp_Gpi_Par_Con->par_mutex ) ;
-#define MUTEX_LOC_GPIO_PAR_CON_UNLOCK pthread_mutex_unlock( & lp_Gpi_Par_Con->par_mutex ) ;
-
-#define MUTEX_GLO_I2C_DEV_LOCK        pthread_mutex_lock(   & gp_I2c->i2c_dev_mutex ) ;
-#define MUTEX_GLO_I2C_DEV_UNLOCK      pthread_mutex_unlock( & gp_I2c->i2c_dev_mutex ) ;
-#define MUTEX_GLO_I2C_ACC_LOCK        pthread_mutex_lock(   & gp_Acc->acc_mutex ) ;
-#define MUTEX_GLO_I2C_ACC_UNLOCK      pthread_mutex_unlock( & gp_Acc->acc_mutex ) ;
-#define MUTEX_LOC_I2C_DEV_LOCK        pthread_mutex_lock(   & lp_I2c_Dev->i2c_dev_mutex ) ;
-#define MUTEX_LOC_I2C_DEV_UNLOCK      pthread_mutex_unlock( & lp_I2c_Dev->i2c_dev_mutex ) ;
-#define MUTEX_LOC_I2C_ACC_LOCK        pthread_mutex_lock(   & lp_I2c_Acc->acc_mutex ) ;
-#define MUTEX_LOC_I2C_ACC_UNLOCK      pthread_mutex_unlock( & lp_I2c_Acc->acc_mutex ) ;
-
-#define MUTEX_GLO_INF_LOCK            pthread_mutex_lock(   & gp_Inf->inf_mutex ) ;
-#define MUTEX_GLO_INF_UNLOCK          pthread_mutex_unlock( & gp_Inf->inf_mutex ) ;
-#define MUTEX_LOC_INF_LOCK            pthread_mutex_lock(   & lp_Inf->inf_mutex ) ;
-#define MUTEX_LOC_INF_UNLOCK          pthread_mutex_unlock( & lp_Inf->inf_mutex ) ;
-
-#define MUTEX_GLO_KEY_LOCK            pthread_mutex_lock(   & gp_Key->key_mutex ) ;  
-#define MUTEX_GLO_KEY_UNLOCK          pthread_mutex_unlock( & gp_Key->key_mutex ) ;
-#define MUTEX_LOC_KEY_LOCK            pthread_mutex_lock(   & lp_Key->key_mutex ) ;  
-#define MUTEX_LOC_KEY_UNLOCK          pthread_mutex_unlock( & lp_Key->key_mutex ) ;
-
-#define MUTEX_GLO_LCD_LOCK            pthread_mutex_lock(   & gp_Lcd->lcd_mutex ) ;  
-#define MUTEX_GLO_LCD_UNLOCK          pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
-#define MUTEX_LOC_LCD_LOCK            pthread_mutex_lock(   & lp_Lcd->lcd_mutex ) ;  
-#define MUTEX_LOC_LCD_UNLOCK          pthread_mutex_unlock( & lp_Lcd->lcd_mutex ) ;
-
-#define MUTEX_GLO_LIE_LOCK            pthread_mutex_lock(   & gp_Lie->lie_mutex ) ;  
-#define MUTEX_GLO_LIE_UNLOCK          pthread_mutex_unlock( & gp_Lie->lie_mutex ) ;
-#define MUTEX_GLO_LIE_PAR_LOCK        pthread_mutex_lock(   & gp_Lie_Par->lie_par_mutex ) ;  
-#define MUTEX_GLO_LIE_PAR_UNLOCK      pthread_mutex_unlock( & gp_Lie_Par->lie_par_mutex ) ; 
-#define MUTEX_LOC_LIE_LOCK            pthread_mutex_lock(   & lp_Lie->lie_mutex ) ;  
-#define MUTEX_LOC_LIE_UNLOCK          pthread_mutex_unlock( & lp_Lie->lie_mutex ) ;
-#define MUTEX_LOC_LIE_PAR_LOCK        pthread_mutex_lock(   & lp_Lie_Par->lie_par_mutex ) ;  
-#define MUTEX_LOC_LIE_PAR_UNLOCK      pthread_mutex_unlock( & lp_Lie_Par->lie_par_mutex ) ; 
-
-#define MUTEX_GLO_LOG_LOCK            pthread_mutex_lock(   & gp_Log->log_mutex ) ;  
-#define MUTEX_GLO_LOG_UNLOCK          pthread_mutex_unlock( & gp_Log->log_mutex ) ;
-#define MUTEX_LOC_LOG_LOCK            pthread_mutex_lock(   & lp_Log->log_mutex ) ;  
-#define MUTEX_LOC_LOG_UNLOCK          pthread_mutex_unlock( & lp_Log->log_mutex ) ;
-
-#define MUTEX_GLO_PID_LOCK            pthread_mutex_lock(   & gp_Pid->pid_mutex ) ;  
-#define MUTEX_GLO_PID_UNLOCK          pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
-#define MUTEX_GLO_PID_PAR_LOCK        pthread_mutex_lock(   & gp_Pid_Par->pid_par_mutex ) ;  
-#define MUTEX_GLO_PID_PAR_UNLOCK      pthread_mutex_unlock( & gp_Pid_Par->pid_par_mutex ) ; 
-#define MUTEX_LOC_PID_LOCK            pthread_mutex_lock(   & lp_Pid->pid_mutex ) ;  
-#define MUTEX_LOC_PID_UNLOCK          pthread_mutex_unlock( & lp_Pid->pid_mutex ) ;
-#define MUTEX_LOC_PID_PAR_LOCK        pthread_mutex_lock(   & lp_Pid_Par->pid_par_mutex ) ;  
-#define MUTEX_LOC_PID_PAR_UNLOCK      pthread_mutex_unlock( & lp_Pid_Par->pid_par_mutex ) ; 
-
-#define MUTEX_GLO_MUT_LOCK            pthread_mutex_lock(   & gp_Mut->mut_mutex ) ;  
-#define MUTEX_GLO_MUT_UNLOCK          pthread_mutex_unlock( & gp_Mut->mut_mutex ) ;
-#define MUTEX_GLO_PTH_LOCK            pthread_mutex_lock(   & gp_Pth->pth_mutex ) ;
-#define MUTEX_GLO_PTH_UNLOCK          pthread_mutex_unlock( & gp_Pth->pth_mutex ) ;
-#define MUTEX_LOC_MUT_LOCK            pthread_mutex_lock(   & lp_Mut->mut_mutex ) ;  
-#define MUTEX_LOC_MUT_UNLOCK          pthread_mutex_unlock( & lp_Mut->mut_mutex ) ;
-#define MUTEX_LOC_PTH_LOCK            pthread_mutex_lock(   & lp_Pth->pth_mutex ) ;
-#define MUTEX_LOC_PTH_UNLOCK          pthread_mutex_unlock( & lp_Pth->pth_mutex ) ;
-
-#define MUTEX_GLO_STA_LOCK            pthread_mutex_lock(   & gp_Sta->sta_mutex ) ;
-#define MUTEX_GLO_STA_UNLOCK          pthread_mutex_unlock( & gp_Sta->sta_mutex ) ;
-#define MUTEX_LOC_STA_LOCK            pthread_mutex_lock(   & lp_Sta->sta_mutex ) ;
-#define MUTEX_LOC_STA_UNLOCK          pthread_mutex_unlock( & lp_Sta->sta_mutex ) ;
-
-#define MUTEX_GLO_SUI_LOCK            pthread_mutex_lock(   & gp_Sui->sui_mutex ) ;  
-#define MUTEX_GLO_SUI_UNLOCK          pthread_mutex_unlock( & gp_Sui->sui_mutex ) ;
-#define HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Fre->fre_mutex ) ;            pthread_mutex_lock(   & gp_Fre->fre_mutex ) ;
-#define HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Fre->fre_mutex ) ;          pthread_mutex_unlock( & gp_Fre->fre_mutex ) ;
-#define MUTEX_GLO_PAS_LOCK            pthread_mutex_lock(   & gp_Pas->pas_mutex ) ;
-#define MUTEX_GLO_PAS_UNLOCK          pthread_mutex_unlock( & gp_Pas->pas_mutex ) ;
-#define MUTEX_LOC_SUI_LOCK            pthread_mutex_lock(   & lp_Sui->sui_mutex ) ;  
-#define MUTEX_LOC_SUI_UNLOCK          pthread_mutex_unlock( & lp_Sui->sui_mutex ) ;
-#define MUTEX_LOC_FRE_LOCK            pthread_mutex_lock(   & lp_Fre->fre_mutex ) ;
-#define MUTEX_LOC_FRE_UNLOCK          pthread_mutex_unlock( & lp_Fre->fre_mutex ) ;
-#define MUTEX_LOC_PAS_LOCK            pthread_mutex_lock(   & lp_Pas->pas_mutex ) ;
-#define MUTEX_LOC_PAS_UNLOCK          pthread_mutex_unlock( & lp_Pas->pas_mutex ) ;
-
-#define MUTEX_GLO_TIM_LOCK            pthread_mutex_lock(   & gp_Tim->tim_mutex ) ;
-#define MUTEX_GLO_TIM_UNLOCK          pthread_mutex_unlock( & gp_Tim->tim_mutex ) ;
-#define MUTEX_GLO_TPO_LOCK            pthread_mutex_lock(   & gp_Tpo->tpo_mutex ) ;
-#define MUTEX_GLO_TPO_UNLOCK          pthread_mutex_unlock( & gp_Tpo->tpo_mutex ) ;
-#define MUTEX_GLO_TIM_PAR_LOCK        pthread_mutex_lock(   & gp_Tim_Par->tim_par_mutex ) ;  
-#define MUTEX_GLO_TIM_PAR_UNLOCK      pthread_mutex_unlock( & gp_Tim_Par->tim_par_mutex ) ; 
-#define MUTEX_LOC_TIM_LOCK            pthread_mutex_lock(   & lp_Tim->tim_mutex ) ;
-#define MUTEX_LOC_TIM_UNLOCK          pthread_mutex_unlock( & lp_Tim->tim_mutex ) ;
-#define MUTEX_LOC_TPO_LOCK            pthread_mutex_lock(   & lp_Tpo->tpo_mutex ) ;
-#define MUTEX_LOC_TPO_UNLOCK          pthread_mutex_unlock( & lp_Tpo->tpo_mutex ) ;
-#define MUTEX_LOC_TIM_PAR_LOCK        pthread_mutex_lock(   & lp_Tim_Par->tim_par_mutex ) ;  
-#define MUTEX_LOC_TIM_PAR_UNLOCK      pthread_mutex_unlock( & lp_Tim_Par->tim_par_mutex ) ; 
-
-#define MUTEX_GLO_VOU_LOCK            pthread_mutex_lock(   & gp_Vou->vou_mutex ) ;
-#define MUTEX_GLO_VOU_UNLOCK          pthread_mutex_unlock( & gp_Vou->vou_mutex ) ;
-#define MUTEX_LOC_VOU_LOCK            pthread_mutex_lock(   & lp_Vou->vou_mutex ) ;
-#define MUTEX_LOC_VOU_UNLOCK          pthread_mutex_unlock( & lp_Vou->vou_mutex ) ;
-*/
 void ASTRO_GLOBAL_INIT(void) ;
 
 #endif

@@ -14,7 +14,7 @@
 #         lue grace a getcwd, les autres chemins dependent
 #         de ce chemin getcwd
 #         ajoutee des valeurs lues dans config.txt
-#       * mise a jour de la fonction CONFIG_PARAMETRES_DISPLAY 
+#       * mise a jour de la fonction CONFIG_PARAMS_DISPLAY 
 #         avec nouvelles variables
 # --------------------------------------------------------------
 # 15/11/2021  | * (astro_global.h) modification des types enum et contenu enum
@@ -107,6 +107,23 @@ void CONFIG_UNLOCK ( STRUCT_CONFIG * lp_Con) {
 }
 
 /*****************************************************************************************
+* @fn     : CONFIG_LOG
+* @author : s.gravois
+* @brief  : Unlock le mutex de la structure en parametre
+* @param  : STRUCT_CONFIG *
+* @date   : 2023-01-06 creation entete doxygen
+*****************************************************************************************/
+
+void CONFIG_LOG ( STRUCT_CONFIG * lp_Con) {
+
+  TraceArbo(__func__,2,"log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  
+  
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : CONFIG_INIT
 * @author : s.gravois
 * @brief  : Cette fonction initialise la structure config
@@ -126,6 +143,12 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
       memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
     }
   }
+
+  lp_Con->con_lock     = CONFIG_LOCK ;
+  lp_Con->con_log      = CONFIG_LOG ;
+  lp_Con->con_unlock   = CONFIG_UNLOCK ;
+  lp_Con->con_loglevel = 0 ;
+
   return ;
 }
 /*****************************************************************************************
@@ -331,7 +354,6 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
       if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_NON_ASSERVI" )) gp_Con_Par->con_par_default_menu = MENU_MANUEL_NON_ASSERVI ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_ASSERVI" ))     gp_Con_Par->con_par_default_menu = MENU_MANUEL_ASSERVI ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_GOTO" ))               gp_Con_Par->con_par_default_menu = MENU_GOTO ;
-      if(!strcmp(lp_Con->con_params[l][1],"MENU_INFO" ))               gp_Con_Par->con_par_default_menu = MENU_INFO ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_RESEAU_UP" ))          gp_Con_Par->con_par_default_menu = MENU_RESEAU_UP ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_RESEAU_DOWN" ))        gp_Con_Par->con_par_default_menu = MENU_RESEAU_DOWN ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_PROGRAMME_DOWN" ))     gp_Con_Par->con_par_default_menu = MENU_PROGRAMME_DOWN ;
@@ -477,17 +499,31 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
   /* Attention gp_Cal_Par->cal_par_alt_red_4 (micro pas) est traite independamment */
 
   if ( gp_Cal_Par->cal_par_alt_red_tot == 0 ) {
-    gp_Cal_Par->cal_par_alt_red_tot = gp_Cal_Par->cal_par_alt_red_1 * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_5 * gp_Cal_Par->cal_par_alt_red_6 * gp_Cal_Par->cal_par_alt_red_7 ;
+
+    gp_Cal_Par->cal_par_alt_red_tot = \
+        gp_Cal_Par->cal_par_alt_red_1 \
+      * gp_Cal_Par->cal_par_alt_red_2 \
+      * gp_Cal_Par->cal_par_alt_red_3 \
+      * gp_Cal_Par->cal_par_alt_red_5 \
+      * gp_Cal_Par->cal_par_alt_red_6 \
+      * gp_Cal_Par->cal_par_alt_red_7 ;
   }
   /* Attention gp_Cal_Par->cal_par_alt_red_4 (micro pas) est traite independamment */
 
   if ( gp_Cal_Par->cal_par_azi_red_tot == 0 ) {
-    gp_Cal_Par->cal_par_azi_red_tot = gp_Cal_Par->cal_par_azi_red_1 * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_5 * gp_Cal_Par->cal_par_azi_red_6 * gp_Cal_Par->cal_par_azi_red_7 ;
+    
+    gp_Cal_Par->cal_par_azi_red_tot = \
+      gp_Cal_Par->cal_par_azi_red_1 \
+    * gp_Cal_Par->cal_par_azi_red_2 \
+    * gp_Cal_Par->cal_par_azi_red_3 \
+    * gp_Cal_Par->cal_par_azi_red_5 \
+    * gp_Cal_Par->cal_par_azi_red_6 \
+    * gp_Cal_Par->cal_par_azi_red_7 ;
   }
 }
 
 /*****************************************************************************************
-* @fn     : CONFIG_PARAMETRES_DISPLAY
+* @fn     : CONFIG_PARAMS_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche les parametres 
 * @param  : void
@@ -497,13 +533,13 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 * @todo   : 
 *****************************************************************************************/
 
-void   CONFIG_PARAMETRES_DISPLAY(void) {
+void   CONFIG_PARAMS_DISPLAY(void) {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat    ", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat    ", gp_Pwm_Par->gpi_pwm_par_led_etat );  
+  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;  
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_default_menu", gc_hach_suivi_menus[ gp_Con_Par->con_par_default_menu ] ) ;
+
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cat     ", gp_Con_Par->con_par_rep_cat)  ;
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cfg     ", gp_Con_Par->con_par_rep_cfg)  ; 
   TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_log     ", gp_Con_Par->con_par_rep_log)  ; 
@@ -527,6 +563,8 @@ void   CONFIG_PARAMETRES_DISPLAY(void) {
   GPIO_PWM_PARAMS_DISPLAY ( gp_Pwm_Par ) ;
 
   Trace2("anciennes variables\n");
+  /* TODO: décommenter en cas de ré utilisation */
+/*
   Trace2("gp_Raq_Par->gpi_raq_par_ouest   = %d",  gp_Raq_Par->gpi_raq_par_ouest);
   Trace2("gp_Raq_Par->gpi_raq_par_est   = %d",  gp_Raq_Par->gpi_raq_par_est);
   Trace2("gp_Raq_Par->gpi_raq_par_sud   = %d",  gp_Raq_Par->gpi_raq_par_sud);
@@ -540,6 +578,7 @@ void   CONFIG_PARAMETRES_DISPLAY(void) {
   Trace2("gp_Mat_Par->gpi_mat_par_c2  = %d",  gp_Mat_Par->gpi_mat_par_c2);
   Trace2("gp_Mat_Par->gpi_mat_par_c3  = %d",  gp_Mat_Par->gpi_mat_par_c3);
   Trace2("gp_Mat_Par->gpi_mat_par_c4  = %d",  gp_Mat_Par->gpi_mat_par_c4);
+
   Trace2("gp_Ctl_Par->par_alt_dir = %d", gp_Ctl_Par->par_alt_dir);  
   Trace2("gp_Ctl_Par->par_alt_clk = %d", gp_Ctl_Par->par_alt_clk);  
   Trace2("gp_Ctl_Par->par_alt_slp = %d", gp_Ctl_Par->par_alt_slp);  
@@ -558,6 +597,7 @@ void   CONFIG_PARAMETRES_DISPLAY(void) {
   Trace2("gp_Ctl_Par->par_azi_m2 = %d",  gp_Ctl_Par->par_azi_m2)  ;
   Trace2("gp_Ctl_Par->par_azi_m1 = %d",  gp_Ctl_Par->par_azi_m1)  ; 
   Trace2("gp_Ctl_Par->par_azi_m0 = %d",  gp_Ctl_Par->par_azi_m0)  ; 
+  
   Trace2("=====================================================\n");
   Trace2("gp_Mcp->mcp_azi_dir = %d",  gp_Mcp->mcp_azi_dir)   ;
   Trace2("gp_Mcp->mcp_azi_clk = %d",  gp_Mcp->mcp_azi_clk)   ;
@@ -573,6 +613,8 @@ void   CONFIG_PARAMETRES_DISPLAY(void) {
   Trace2("gp_Mcp->mcp_alt_m2 = %d",   gp_Mcp->mcp_alt_m2)   ;  
   Trace2("gp_Mcp->mcp_alt_m1 = %d",   gp_Mcp->mcp_alt_m1)   ;  
   Trace2("gp_Mcp->mcp_alt_m0 = %d",   gp_Mcp->mcp_alt_m0)   ;  
+*/
+  return ;
 }
 /*****************************************************************************************
 * @fn     : CONFIG_GETCWD
@@ -884,7 +926,6 @@ void CONFIG_MENU_CHANGE_DETECT (void)  {
     case MENU_MANUEL_NON_ASSERVI   :strcpy( s_menu, "MENU_MANUEL_NON_ASSERVI") ; break ; 
     case MENU_MANUEL_ASSERVI       :strcpy( s_menu, "MENU_MANUEL_ASSERVI") ; break ; 
     case MENU_GOTO                 :strcpy( s_menu, "MENU_GOTO") ; break ; 
-    case MENU_INFO                 :strcpy( s_menu, "MENU_INFO") ; break ; 
     case MENU_RESEAU_UP            :strcpy( s_menu, "MENU_RESEAU_UP") ; break ; 
     case MENU_RESEAU_DOWN          :strcpy( s_menu, "MENU_RESEAU_DOWN") ; break ; 
     case MENU_PROGRAMME_DOWN       :strcpy( s_menu, "MENU_PROGRAMME_DOWN") ; break ; 

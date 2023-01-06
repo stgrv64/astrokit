@@ -1,7 +1,9 @@
 /* Constellation names
  */
 
-#include <stdio.h>
+/* ajout include 2023 */
+#include "kep.h"
+
 #if __STDC__
 static int islow (char *);
 static int isup (char *);
@@ -147,6 +149,15 @@ char *greek[NGREEK] = {
 "omega",
 };
 
+/*****************************************************************************************
+* @fn     : showcname
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int showcname( in )
 char *in;
 {
@@ -154,18 +165,20 @@ char *g, *p, *q;
 char ans[80];
 int i;
 
+TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
 p = in;
 q = ans;
 
-
 skipwh(p);
+
 if( isnumber(p) )
 	{
 	while( isnumber(p) )
 		*q++ = *p++;
 	}
 skipwh(p);
+
 *q++ = ' ';
 
 if( islow(p) )
@@ -184,7 +197,9 @@ if( islow(p) )
 	while( islow(p) )
 		++p;
 	}
+
 skipwh(p);
+
 /* copy things like "-a" until uppercase letter found */
 while( (*p != '\0') && !isup(p) )
 	*q++ = *p++;
@@ -210,7 +225,9 @@ if( isup(p) )
 		p += 3;
 		}
 	}
+
 skipwh(p);
+
 *q++ = ' ';
 while( *p )
 	*q++ = *p++;
@@ -223,54 +240,89 @@ while( *q != '\0' ) {
 	++q;
 }
 /* (mise en commentaire 2023) */
-// printf( "\n              %s\n", ans );
+// Trace1( "\n              %s\n", ans );
 return(0);
 }
 
-
-
+/*****************************************************************************************
+* @fn     : islow
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 static int islow(p)
 char *p;
 {
-if( (*p >= 'a') && (*p <= 'z') )
-	return(1);
-else
-	return(0);
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  if( (*p >= 'a') && (*p <= 'z') )
+    return(1);
+  else
+    return(0);
 }
 
-
+/*****************************************************************************************
+* @fn     : isup
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 static int isup(p)
 char *p;
 {
-if( (*p >= 'A') && (*p <= 'Z') )
-	return(1);
-else
-	return(0);
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  if( (*p >= 'A') && (*p <= 'Z') )
+    return(1);
+  else
+    return(0);
 }
-
-
-
+/*****************************************************************************************
+* @fn     : isnumber
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 static int isnumber(p)
 char *p;
 {
-if( (*p >= '0') && (*p <= '9') )
-	return(1);
-else
-	return(0);
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  if( (*p >= '0') && (*p <= '9') )
+    return(1);
+  else
+    return(0);
 }
-
-
+/*****************************************************************************************
+* @fn     : skipwh
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 static int skipwh(p)
 char *p;
 {
-while( ((*p == ' ') || (*p == '\t') || (*p == '_'))
-	&& (*p != '\0') && (*p != '\n') && (*p != '\r') )
-		++p;
-return(0);
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  while( ((*p == ' ') || (*p == '\t') || (*p == '_'))
+    && (*p != '\0') && (*p != '\n') && (*p != '\r') )
+      ++p;
+  return(0);
 }
 
 
@@ -651,6 +703,15 @@ long bndries[4*NBNDRIES] = {
    position P.  EPOCH is the precessional equinox and ecliptic date
    of P.  */
 
+/*****************************************************************************************
+* @fn     : whatconstel
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 char *
 whatconstel (pp, epoch)
 double pp[];
@@ -660,6 +721,8 @@ double epoch;
   double ra, dec, d;
   double p[3];
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   for (i = 0; i < 3; i++)
     p[i] = pp[i];
 
@@ -708,7 +771,7 @@ double r, d;
   p[0] = c * cos(r);
   p[1] = c * sin(r);
   jd = 2433282.423; /* 1950.0 Besselian epoch */
-  printf ("%8.4f %9.4f %s\n", r, d, whatconstel (p, jd));
+  Trace1 ("%8.4f %9.4f %s\n", r, d, whatconstel (p, jd));
 }
 
 

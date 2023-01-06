@@ -1,42 +1,13 @@
 /* General definitions for aa program */
 
 #include <stdio.h>
+#include <string.h>
+
 #include "plantbl.h"
+#include "log.h"
 
-#define DEBUG 0
-
-#ifndef DEBUG
-#define Trace(fmt, args...)  while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define Trace1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#endif
-
-#if defined(DEBUG) && DEBUG == 0 
-#define Trace(fmt, args...)              fprintf(stderr, "\n%s : " fmt, __func__, ##args)
-#define Trace1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#endif
-
-#if defined(DEBUG) && DEBUG == 1
-#define Trace(fmt, args...)              fprintf(stderr, "\n%s : " fmt, __func__, ##args)
-#define Trace1(fmt, args...){            fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
-#endif
-
-#if defined(DEBUG) && DEBUG == 2
-#define Trace(fmt, args...)              fprintf(stderr, "\n%s:%d:%s() : " fmt, __FILE__,__LINE__, __func__, ##args)
-#define Trace1(fmt, args...)             fprintf(stderr, "\n%s : " fmt, __func__, ##args) 
-#define Trace2(fmt, args...)             fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; 
-#endif
-
-typedef struct   {
-  double asc ;
-  double dec ;
-  double azi ;
-  double alt ;
-  char   nom[32] ;
-} 
-TOPOCENTRIC ;
+/* FIXME 2023 : TODO : comparer taille des 2 struct orbit et star */
+/* en effet , on caste l'une vers l'autre : utiliser plutot UNION */
 
 struct orbit
 	{
@@ -77,6 +48,9 @@ struct star
  */
 
 /* aa.c */
+extern int    objnum ;
+extern int    jdflag; 
+extern int    prtflg;
 extern double DTR;
 extern double RTD;
 extern double RTS;
@@ -90,8 +64,7 @@ extern double TDT;
 extern double UT;
 extern double FAR dradt;
 extern double FAR ddecdt;
-extern int objnum, jdflag, prtflg;
-extern double obpolar[];
+extern double     obpolar[];
 extern double FAR eapolar[];
 extern double FAR rearth[];
 extern double dp[];

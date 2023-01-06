@@ -36,9 +36,14 @@ int        embofs(), g3plan(), gplan(), gmoon();
 extern struct orbit earth;	   /* orbital elements of the earth */
 extern double eps, coseps, sineps; /* obliquity of ecliptic */
 
-//=============================================================================
-// fonction Kepler : 
-//=============================================================================
+/*****************************************************************************************
+* @fn     : kepler
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
 
 int kepler(J, e, rect, polar) double J, rect[], polar[]; struct orbit *e; { // declaration fonction
   
@@ -46,6 +51,8 @@ int kepler(J, e, rect, polar) double J, rect[], polar[]; struct orbit *e; { // d
   double     epoch, inclination, ascnode, argperih;
   double     meandistance, dailymotion, eccent, meananomaly;
   double     r, coso, sino, cosa;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Call program to compute position, if one is supplied.  */
 
@@ -215,11 +222,13 @@ int kepler(J, e, rect, polar) double J, rect[], polar[]; struct orbit *e; { // d
    */
 
   temp = sqrt( (1.0+eccent)/(1.0-eccent) );
+
   W = 2.0 * atan( temp * tan(0.5*E) );
 
   // The true anomaly. 
 
   W = modtp(W); // appel fonction
+
   meananomaly *= DTR;
   
   /* Orbital longitude measured from node
@@ -271,6 +280,7 @@ int kepler(J, e, rect, polar) double J, rect[], polar[]; struct orbit *e; { // d
    */
 
   epsiln( e->equinox );
+
   W = coseps*rect[1] - sineps*rect[2];
   M = sineps*rect[1] + coseps*rect[2];
   
@@ -322,11 +332,22 @@ int kepler(J, e, rect, polar) double J, rect[], polar[]; struct orbit *e; { // d
  
 extern double emrat;
 
+/*****************************************************************************************
+* @fn     : embofs
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 int embofs( J, ea, pr ) double J; double ea[]; double *pr; { // declaration fonction
 
   double pm[3], polm[3];
   double a, b;
   int i;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* Compute the vector Moon - Earth.  */
   
@@ -351,6 +372,7 @@ int embofs( J, ea, pr ) double J; double ea[]; double *pr; { // declaration fonc
 /* Sun-Earth distance.  */
 
   *pr = sqrt(b);
+  
   return(0);
 }
 

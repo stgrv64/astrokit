@@ -30,6 +30,8 @@
                 =   (r.r - p.r^2 / p.p) / q.q  .
 
 */
+/* ajout include 2023 */
+#include "kep.h"
 
 #if __STDC__
 double sqrt (double);
@@ -42,57 +44,68 @@ double sqrt(), acos(), asin(), atan();
 
 /* extern double PIO2, PI; */
 
+/*****************************************************************************************
+* @fn     : arcdot
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
 double arcdot(p,q)
 double p[], q[];
 {
-double pp, pr, qq, rr, rt, pt, qt, pq;
-int i;
+  double pp, pr, qq, rr, rt, pt, qt, pq;
+  int i;
 
-pq = 0.0;
-qq = 0.0;
-pp = 0.0;
-pr = 0.0;
-rr = 0.0;
-for (i=0; i<3; i++)
-  {
-    pt = p[i];
-    qt = q[i];
-    pq += pt * qt;
-    qq += qt * qt;
-    pp += pt * pt;
-    rt = qt - pt;
-    pr += pt * rt;
-    rr += rt * rt;
-  }
-if (rr == 0.0 || pp == 0.0 || qq == 0.0)
-  return 0.0;
-/*
-if (pq == 0.0)
-  return PIO2;
-if (pr == 0.0)
-  return (atan(sqrt(rr/pp)));
-*/
-rt = (rr - (pr * pr) / pp) / qq;
-#if DEBUG
-pt = pq / sqrt(pp*qq);
-pt = acos(pt);
-qt = sqrt(rt);
-qt = asin(qt);
-if( pq < 0.0)
-  qt = PI - qt;
-printf("%.16e %.16e\n", qt, pt);
-#endif
-if (rt <= 0.25 && pq > 0.0)
-  {
-    rt = sqrt(rt);
-    qt = asin(rt);
-  }
-else
-  {
-    pt = pq / sqrt(pp*qq);
-    qt = acos(pt);
-  }
-return qt;
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
+  pq = 0.0;
+  qq = 0.0;
+  pp = 0.0;
+  pr = 0.0;
+  rr = 0.0;
+  for (i=0; i<3; i++)
+    {
+      pt = p[i];
+      qt = q[i];
+      pq += pt * qt;
+      qq += qt * qt;
+      pp += pt * pt;
+      rt = qt - pt;
+      pr += pt * rt;
+      rr += rt * rt;
+    }
+  if (rr == 0.0 || pp == 0.0 || qq == 0.0)
+    return 0.0;
+  /*
+  if (pq == 0.0)
+    return PIO2;
+  if (pr == 0.0)
+    return (atan(sqrt(rr/pp)));
+  */
+  rt = (rr - (pr * pr) / pp) / qq;
+  #if DEBUG
+  pt = pq / sqrt(pp*qq);
+  pt = acos(pt);
+  qt = sqrt(rt);
+  qt = asin(qt);
+  if( pq < 0.0)
+    qt = PI - qt;
+  printf("%.16e %.16e\n", qt, pt);
+  #endif
+  if (rt <= 0.25 && pq > 0.0)
+    {
+      rt = sqrt(rt);
+      qt = asin(rt);
+    }
+  else
+    {
+      pt = pq / sqrt(pp*qq);
+      qt = acos(pt);
+    }
+  return qt;
 }
 
 #if DEBUG
