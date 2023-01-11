@@ -93,6 +93,51 @@ double AZI2 (double lat, double alt, double dec)   { return acos(( sin(dec) - si
 double RAD  (int degres, int minutes )                  { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / CALCULS_UN_RADIAN_EN_DEGRES ; }
 double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
 
+
+/*****************************************************************************************
+* @fn     : CALCULS_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_CALCULS *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void CALCULS_DISPLAY_FORMAT ( STRUCT_CALCULS * lp_Cal) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cal->cal_mutex ) ;
+
+  sprintf( lp_Cal->cal_dis_cmd , STR_CAL_FORMAT_0,\
+    gc_hach_calcul_mode[ lp_Cal->cal_mode ], \
+    gc_hach_calcul_mode[ lp_Cal->cal_type ]) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cal->cal_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static CALCULS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_CALCULS *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void CALCULS_DISPLAY(STRUCT_CALCULS *lp_Cal) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Calculs") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  CALCULS_DISPLAY_FORMAT( lp_Cal ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cal->cal_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Cal->cal_loglevel , 1 , "%s", lp_Cal->cal_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cal->cal_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : CALCULS_LOCK
 * @author : s.gravois
@@ -126,6 +171,20 @@ void CALCULS_UNLOCK ( STRUCT_CALCULS * lp_Cal) {
   return ;
 }
 /*****************************************************************************************
+* @fn     : CALCULS_LOCK
+* @author : s.gravois
+* @brief  : Log la structure
+* @param  : STRUCT_CALCULS *
+* @date   : 2023-01-11 creation
+*****************************************************************************************/
+
+void CALCULS_LOG ( STRUCT_CALCULS * lp_Cal) {
+
+  TraceArbo(__func__,2,"log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  return ;
+}
+/*****************************************************************************************
 * @fn     : CALCULS_REDUCTION_TOTALE
 * @author : s.gravois
 * @brief  : permet de calculer unela reduction totale de la vitesse 
@@ -155,8 +214,16 @@ void   CALCULS_INIT( STRUCT_CALCULS * lp_Cal ) {
   TraceArbo(__func__,0,"init calculs") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal->cal_mutex ) ;
- 
-  lp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
+                                     lp_Cal->cal_lock     = CALCULS_LOCK ;
+                                     lp_Cal->cal_unlock   = CALCULS_UNLOCK ;
+                                     lp_Cal->cal_log      = CALCULS_LOG ;
+                                     lp_Cal->cal_display  = CALCULS_DISPLAY ;
+                                     lp_Cal->cal_file     = NULL ;
+                                     lp_Cal->cal_loglevel = 0 ;
+  gettimeofday ( &                   lp_Cal->cal_tval, NULL ) ;
+
+  lp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+  lp_Cal->cal_mode = CALCULS_MODE_AZIMUTAL ;
 
   return ;
 }
@@ -234,32 +301,32 @@ void CALCULS_PARAMS_DISPLAY(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
   Trace("gp_Log->log_level = %d", gp_Log->log_level) ;
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1",          lp_Cal_Par->cal_par_alt_red_1);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2",          lp_Cal_Par->cal_par_alt_red_2);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_3",          lp_Cal_Par->cal_par_alt_red_3);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_4",          lp_Cal_Par->cal_par_alt_red_4);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_5",          lp_Cal_Par->cal_par_alt_red_5);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_6",          lp_Cal_Par->cal_par_alt_red_6);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_7",          lp_Cal_Par->cal_par_alt_red_7);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_alt_inv  ",          lp_Cal_Par->cal_par_alt_inv  );   
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_acc  ",          lp_Cal_Par->cal_par_alt_acc ) ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Cal_Par->cal_par_alt_f    ",          lp_Cal_Par->cal_par_alt_f ) ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_alt_n    ",          lp_Cal_Par->cal_par_alt_n ) ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_1",          lp_Cal_Par->cal_par_azi_red_1);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_2",          lp_Cal_Par->cal_par_azi_red_2);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_3",          lp_Cal_Par->cal_par_azi_red_3);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_4",          lp_Cal_Par->cal_par_azi_red_4);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_5",          lp_Cal_Par->cal_par_azi_red_5);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_6",          lp_Cal_Par->cal_par_azi_red_6);         
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_7",          lp_Cal_Par->cal_par_azi_red_7);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_azi_inv  ",          lp_Cal_Par->cal_par_azi_inv  );   
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_acc  ",          lp_Cal_Par->cal_par_azi_acc ) ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Cal_Par->cal_par_azi_f    ",          lp_Cal_Par->cal_par_azi_f ) ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_azi_n    ",          lp_Cal_Par->cal_par_azi_n ) ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_slow_forward", lp_Cal_Par->cal_par_altaz_slow_forward ) ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_slow_rewind ", lp_Cal_Par->cal_par_altaz_slow_rewind ) ;   
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_fast_forward", lp_Cal_Par->cal_par_altaz_fast_forward ) ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_fast_rewind ", lp_Cal_Par->cal_par_altaz_fast_rewind ) ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1",          lp_Cal_Par->cal_par_alt_red_1);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2",          lp_Cal_Par->cal_par_alt_red_2);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_3",          lp_Cal_Par->cal_par_alt_red_3);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_4",          lp_Cal_Par->cal_par_alt_red_4);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_5",          lp_Cal_Par->cal_par_alt_red_5);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_6",          lp_Cal_Par->cal_par_alt_red_6);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_7",          lp_Cal_Par->cal_par_alt_red_7);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_alt_inv  ",          lp_Cal_Par->cal_par_alt_inv  );   
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_acc  ",          lp_Cal_Par->cal_par_alt_acc ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Cal_Par->cal_par_alt_f    ",          lp_Cal_Par->cal_par_alt_f ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_alt_n    ",          lp_Cal_Par->cal_par_alt_n ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_1",          lp_Cal_Par->cal_par_azi_red_1);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_2",          lp_Cal_Par->cal_par_azi_red_2);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_3",          lp_Cal_Par->cal_par_azi_red_3);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_4",          lp_Cal_Par->cal_par_azi_red_4);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_5",          lp_Cal_Par->cal_par_azi_red_5);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_6",          lp_Cal_Par->cal_par_azi_red_6);         
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_red_7",          lp_Cal_Par->cal_par_azi_red_7);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_azi_inv  ",          lp_Cal_Par->cal_par_azi_inv  );   
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_azi_acc  ",          lp_Cal_Par->cal_par_azi_acc ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Cal_Par->cal_par_azi_f    ",          lp_Cal_Par->cal_par_azi_f ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d",  "lp_Cal_Par->cal_par_azi_n    ",          lp_Cal_Par->cal_par_azi_n ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_slow_forward", lp_Cal_Par->cal_par_altaz_slow_forward ) ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_slow_rewind ", lp_Cal_Par->cal_par_altaz_slow_rewind ) ;   
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_fast_forward", lp_Cal_Par->cal_par_altaz_fast_forward ) ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_altaz_fast_rewind ", lp_Cal_Par->cal_par_altaz_fast_rewind ) ;  
 
   return ;
 }
@@ -300,12 +367,13 @@ void   CALCULS_INIT_ANGLE( STRUCT_ANGLE * lp_Ang ) {
 * @date   : 2022-12-17 renmmage CALCULS_INIT_PTR
 * @todo   : voir si utile (but : simplification lecture du code)
 * @todo   : (non utilisé actuellement , IE Jan 2023)
+* @todo   : (obsolete - 2023)
 *****************************************************************************************/
 
 void   CALCULS_INIT_PTR( STRUCT_CALCULS * lp_Cal ) {
 
   TraceArbo(__func__,0,"init pointeurs") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
+/*
   lp_Cal->cal_p_Fre = gp_Fre ;
   lp_Cal->cal_p_Sta = gp_Sta ;
   lp_Cal->cal_p_Pas = gp_Pas ;
@@ -316,7 +384,7 @@ void   CALCULS_INIT_PTR( STRUCT_CALCULS * lp_Cal ) {
   lp_Cal->cal_p_Mut = gp_Mut ;
   lp_Cal->cal_p_Tim = gp_Tim ;
   lp_Cal->cal_p_Sui = gp_Sui ;
-
+*/
   return ;
 }
 
@@ -592,7 +660,7 @@ void CALCULS_VITESSES(STRUCT_ASTRE * lp_Ast, STRUCT_LIEU * lp_Lie, STRUCT_SUIVI 
   
   TraceArbo(__func__,3,"calculate speeds") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  if ( lp_Sui->sui_mode_equatorial == 1 ) {
+  if ( gp_Cal->cal_mode == CALCULS_MODE_EQUATORIAL ) {
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ;
 
@@ -1009,7 +1077,7 @@ void CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
   Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
-    ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
+    ASTRE_STELLARIUM_VIEW(gp_Ast) ;
   */
 }
 
@@ -1055,7 +1123,7 @@ void CALCULS_ASCENSION_DROITE(STRUCT_ASTRE * lp_Ast) {
   Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
-    ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
+    ASTRE_STELLARIUM_VIEW(gp_Ast) ;
   */
 
   return ;
@@ -1091,7 +1159,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK(&gp_Cal->cal_mutex) ;
 
-  gp_Cal->cal_mode = CALCULS_AZIMUTAL_VERS_EQUATORIAL ;   
+  gp_Cal->cal_type = CALCULS_TYPE_AZI_VERS_EQU ;   
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Cal->cal_mutex) ;
 
@@ -1123,13 +1191,13 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK(&gp_Cal->cal_mutex) ;
 
-    if      ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->ast_nom, CONFIG_PLA ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->ast_nom, CONFIG_AZI ) != NULL ) gp_Cal->cal_mode = CALCULS_EQUATORIAL_VERS_AZIMUTAL ;
-    else if ( strstr( gp_Ast->ast_nom, CONFIG_EQU ) != NULL ) gp_Cal->cal_mode = CALCULS_AZIMUTAL_VERS_EQUATORIAL ;
-    else                                                  gp_Cal->cal_mode = CALCULS_AZIMUTAL_VERS_EQUATORIAL ; 
+    if      ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_PLA ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_AZI ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+    else if ( strstr( gp_Ast->ast_nom, CONFIG_EQU ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_AZI_VERS_EQU ;
+    else                                                  gp_Cal->cal_type = CALCULS_TYPE_AZI_VERS_EQU ; 
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Cal->cal_mutex) ;
 
@@ -1172,7 +1240,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Ast->ast_mutex) ;
 
-  Trace("mode %-30s type %-30s", gc_hach_calcul_mode[ gp_Cal->cal_mode ] , gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
+  Trace("mode %-30s type %-30s", gc_hach_calcul_type[ gp_Cal->cal_type ] , gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
 
   return ;
 }
@@ -1204,7 +1272,7 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
-      if ( gp_Cal->cal_mode == CALCULS_AZIMUTAL_VERS_EQUATORIAL ) {
+      if ( gp_Cal->cal_type == CALCULS_TYPE_AZI_VERS_EQU ) {
         
         CALCULS_EQUATEUR(gp_Ast) ;
         CALCULS_ASCENSION_DROITE(gp_Ast) ;
@@ -1296,8 +1364,8 @@ void CALCULS_TOUT(void) {
       //---------------------------------------------------------------------------------------
 
       /* Le cas suivant est ancien : considerer le type de calcul
-         (nouveau code 2022) CALCULS_AZIMUTAL_VERS_EQUATORIAL
-         ou bien CALCULS_AZIMUTAL_VERS_EQUATORIAL */
+         (nouveau code 2022) CALCULS_TYPE_AZI_VERS_EQU
+         ou bien CALCULS_TYPE_AZI_VERS_EQU */
 
       /* 
       case CAPTEURS :

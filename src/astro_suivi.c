@@ -16,6 +16,173 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
+static void SUIVI_DISPLAY_FORMAT     ( STRUCT_SUIVI * ) ;
+static void SUIVI_DISPLAY            ( STRUCT_SUIVI * ) ;
+static void SUIVI_UNLOCK             ( STRUCT_SUIVI * ) ;
+static void SUIVI_LOCK               ( STRUCT_SUIVI * ) ;
+static void SUIVI_LOG                ( STRUCT_SUIVI * ) ;
+
+static void SUIVI_PAS_DISPLAY_FORMAT     ( STRUCT_SUIVI_PAS * ) ;
+static void SUIVI_PAS_DISPLAY            ( STRUCT_SUIVI_PAS * ) ;
+static void SUIVI_PAS_UNLOCK             ( STRUCT_SUIVI_PAS * ) ;
+static void SUIVI_PAS_LOCK               ( STRUCT_SUIVI_PAS * ) ;
+static void SUIVI_PAS_LOG                ( STRUCT_SUIVI_PAS * ) ;
+
+static void SUIVI_FRE_DISPLAY_FORMAT     ( STRUCT_SUIVI_FRE * ) ;
+static void SUIVI_FRE_DISPLAY            ( STRUCT_SUIVI_FRE * ) ;
+static void SUIVI_FRE_UNLOCK             ( STRUCT_SUIVI_FRE * ) ;
+static void SUIVI_FRE_LOCK               ( STRUCT_SUIVI_FRE * ) ;
+static void SUIVI_FRE_LOG                ( STRUCT_SUIVI_FRE * ) ;
+
+/*****************************************************************************************
+* @fn     : SUIVI_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_SUIVI *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void SUIVI_DISPLAY_FORMAT ( STRUCT_SUIVI * lp_Sui) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->ast_mutex ) ;
+
+  sprintf( lp_Sui->ast_dis_cmd , MACRO_SUIVI_DISPLAY_FORMAT,\
+    lp_Sui->ast_nom, \
+    lp_Sui->ast_hhmmss_asc, \
+    lp_Sui->ast_ddmm_dec, \
+    lp_Sui->ast_hhmmss_agh, \
+    lp_Sui->ast_ddmm_azi, \
+    lp_Sui->ast_ddmm_alt, \
+    lp_Sui->ast_azi_vit, \
+    lp_Sui->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static SUIVI_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche infos sur struct dédiée
+* @param  : STRUCT_SUIVI *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void SUIVI_DISPLAY(STRUCT_SUIVI *lp_Sui) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  SUIVI_DISPLAY_FORMAT( lp_Sui ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sui->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Sui->ast_loglevel , 1 , "%s", lp_Sui->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Sui->ast_loglevel ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_PAS_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_SUIVI_PAS *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void SUIVI_PAS_DISPLAY_FORMAT ( STRUCT_SUIVI_PAS * lp_Pas) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->ast_mutex ) ;
+
+  sprintf( lp_Pas->ast_dis_cmd , STR_PAS_FORMAT_0,\
+    lp_Pas->pas_ouest, \
+    lp_Pas->pas_est, \
+    lp_Pas->pas_nord, \
+    lp_Pas->pas_sud, \
+    lp_Pas->pas_acc_alt, \
+    lp_Pas->pas_acc_azi );
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pas->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static SUIVI_PAS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche infos sur struct dédiée
+* @param  : STRUCT_SUIVI_PAS *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void SUIVI_PAS_DISPLAY(STRUCT_SUIVI_PAS *lp_Pas) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  SUIVI_PAS_DISPLAY_FORMAT( lp_Pas ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pas->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Pas->ast_loglevel , 1 , "%s", lp_Pas->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pas->ast_loglevel ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : SUIVI_FREQ_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void SUIVI_FRE_DISPLAY_FORMAT ( STRUCT_SUIVI_FRE * lp_Fre) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->ast_mutex ) ;
+
+  sprintf( lp_Fre->ast_dis_cmd , STR_SUIVI_FORMAT,\
+    lp_Fre->ast_nom, \
+    lp_Fre->ast_hhmmss_asc, \
+    lp_Fre->ast_ddmm_dec, \
+    lp_Fre->ast_hhmmss_agh, \
+    lp_Fre->ast_ddmm_azi, \
+    lp_Fre->ast_ddmm_alt, \
+    lp_Fre->ast_azi_vit, \
+    lp_Fre->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Fre->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static SUIVI_FRE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche infos sur struct dédiée
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void SUIVI_FRE_DISPLAY(STRUCT_ASTRE *lp_Fre) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  SUIVI_FRE_DISPLAY_FORMAT( lp_Fre ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Fre->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Fre->ast_loglevel , 1 , "%s", lp_Fre->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Fre->ast_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : SUIVI_LOCK
 * @author : s.gravois
@@ -24,7 +191,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_LOCK ( STRUCT_SUIVI * lp_Sui) {
+static void SUIVI_LOCK ( STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -40,11 +207,28 @@ void SUIVI_LOCK ( STRUCT_SUIVI * lp_Sui) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_UNLOCK ( STRUCT_SUIVI * lp_Sui) {
+static void SUIVI_UNLOCK ( STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->sui_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_LOG
+* @author : s.gravois
+* @brief  : Log la structure dediee
+* @param  : STRUCT_SUIVI *
+* @date   : 2023-01-11 creation
+* @todo   : a terminer
+*****************************************************************************************/
+
+static void SUIVI_LOG ( STRUCT_SUIVI * lp_Sui) {
+
+  TraceArbo(__func__,2,"log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  /* TODO : to be defined */
 
   return ;
 }
@@ -56,11 +240,28 @@ void SUIVI_UNLOCK ( STRUCT_SUIVI * lp_Sui) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_PAS_LOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
+static void SUIVI_PAS_LOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->pas_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_PAS_LOG
+* @author : s.gravois
+* @brief  : Log la structure dediee
+* @param  : STRUCT_SUIVI_PAS *
+* @date   : 2023-01-11 creation
+* @todo   : a terminer
+*****************************************************************************************/
+
+static void SUIVI_PAS_LOG ( STRUCT_SUIVI_PAS * lp_Pas) {
+
+  TraceArbo(__func__,2,"log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  /* TODO : to be defined */
 
   return ;
 }
@@ -72,7 +273,7 @@ void SUIVI_PAS_LOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_PAS_UNLOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
+static void SUIVI_PAS_UNLOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -88,11 +289,28 @@ void SUIVI_PAS_UNLOCK ( STRUCT_SUIVI_PAS * lp_Pas) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
+static void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->fre_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : SUIVI_FRE_LOG
+* @author : s.gravois
+* @brief  : Log la structure dediee
+* @param  : STRUCT_SUIVI_FRE *
+* @date   : 2023-01-11 creation
+* @todo   : a terminer
+*****************************************************************************************/
+
+static void SUIVI_FRE_LOG ( STRUCT_SUIVI_FRE * lp_Fre) {
+
+  TraceArbo(__func__,2,"log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  /* TODO : to be defined */
 
   return ;
 }
@@ -104,7 +322,7 @@ void SUIVI_FRE_LOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void SUIVI_FRE_UNLOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
+static void SUIVI_FRE_UNLOCK ( STRUCT_SUIVI_FRE * lp_Fre) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -223,19 +441,19 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI_PAS * lp_Pas ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->pas_mutex ) ;
 
-  KEYS_IF_MOT_IS("n" )             { i++ ; lp_Pas->pas_nord          = 1 ; }
-  KEYS_IF_MOT_IS("o" )             { i++ ; lp_Pas->pas_ouest         = 1 ; }
-  KEYS_IF_MOT_IS("e" )             { i++ ; lp_Pas->pas_est           = 1 ; }
-  KEYS_IF_MOT_IS("s" )             { i++ ; lp_Pas->pas_sud           = 1 ; }
-  KEYS_IF_MOT_IS("forward" )       { i++ ; lp_Pas->pas_forward       = 1 ; }
-  KEYS_IF_MOT_IS("rewind" )        { i++ ; lp_Pas->pas_rewind        = 1 ; }
-  KEYS_IF_MOT_IS("forwardfast" )   { i++ ; lp_Pas->pas_forward_fast  = 1 ; }
-  KEYS_IF_MOT_IS("rewindfast" )    { i++ ; lp_Pas->pas_rewind_fast   = 1 ; }
-  KEYS_IF_MOT_IS("ne" )            { i++ ; lp_Pas->pas_nord          = 1 ; lp_Pas->pas_est   = 1 ; }
-  KEYS_IF_MOT_IS("no" )            { i++ ; lp_Pas->pas_nord          = 1 ; lp_Pas->pas_ouest = 1 ; }
-  KEYS_IF_MOT_IS("se" )            { i++ ; lp_Pas->pas_sud           = 1 ; lp_Pas->pas_est   = 1 ; }
-  KEYS_IF_MOT_IS("so" )            { i++ ; lp_Pas->pas_sud           = 1 ; lp_Pas->pas_ouest = 1 ; }
-  KEYS_IF_MOT_IS("reset" )         { i++ ; lp_Pas->pas_rst             = 1 ; }
+  MACRO_IF_KEY_MOT_IS("n" )             { i++ ; lp_Pas->pas_nord          = 1 ; }
+  MACRO_IF_KEY_MOT_IS("o" )             { i++ ; lp_Pas->pas_ouest         = 1 ; }
+  MACRO_IF_KEY_MOT_IS("e" )             { i++ ; lp_Pas->pas_est           = 1 ; }
+  MACRO_IF_KEY_MOT_IS("s" )             { i++ ; lp_Pas->pas_sud           = 1 ; }
+  MACRO_IF_KEY_MOT_IS("forward" )       { i++ ; lp_Pas->pas_forward       = 1 ; }
+  MACRO_IF_KEY_MOT_IS("rewind" )        { i++ ; lp_Pas->pas_rewind        = 1 ; }
+  MACRO_IF_KEY_MOT_IS("forwardfast" )   { i++ ; lp_Pas->pas_forward_fast  = 1 ; }
+  MACRO_IF_KEY_MOT_IS("rewindfast" )    { i++ ; lp_Pas->pas_rewind_fast   = 1 ; }
+  MACRO_IF_KEY_MOT_IS("ne" )            { i++ ; lp_Pas->pas_nord          = 1 ; lp_Pas->pas_est   = 1 ; }
+  MACRO_IF_KEY_MOT_IS("no" )            { i++ ; lp_Pas->pas_nord          = 1 ; lp_Pas->pas_ouest = 1 ; }
+  MACRO_IF_KEY_MOT_IS("se" )            { i++ ; lp_Pas->pas_sud           = 1 ; lp_Pas->pas_est   = 1 ; }
+  MACRO_IF_KEY_MOT_IS("so" )            { i++ ; lp_Pas->pas_sud           = 1 ; lp_Pas->pas_ouest = 1 ; }
+  MACRO_IF_KEY_MOT_IS("reset" )         { i++ ; lp_Pas->pas_rst             = 1 ; }
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pas->pas_mutex ) ;
   /* Si gp_Dat->dat_act a ete utilise, il peut etre remis a zero */
@@ -362,9 +580,23 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Lettres en Majuscules : affichages ponctuels */
 
-    KEYS_IF_MOT_IS("K" )                  { gp_Key->key_log(gp_Key) ; }
-    KEYS_IF_MOT_IS("P" )                  { gp_Pth->pth_log(gp_Pth) ; }
-    KEYS_IF_MOT_IS("I")                   { gp_Con−>con_log(gp_Con) ; }
+    MACRO_IF_KEY_MOT_IS("A" )                  { gp_Ast->ast_display(gp_Ast) ; }
+    MACRO_IF_KEY_MOT_IS("B" )                  { }
+    MACRO_IF_KEY_MOT_IS("C")                   { gp_Con->con_display(gp_Con) ; }
+    MACRO_IF_KEY_MOT_IS("D" )                  { }
+    MACRO_IF_KEY_MOT_IS("E" )                  { }
+    MACRO_IF_KEY_MOT_IS("F" )                  { }
+    MACRO_IF_KEY_MOT_IS("G" )                  { }
+    MACRO_IF_KEY_MOT_IS("H" )                  { }
+    MACRO_IF_KEY_MOT_IS("I" )                  { }
+    MACRO_IF_KEY_MOT_IS("J" )                  { }
+    MACRO_IF_KEY_MOT_IS("K" )                  { gp_Key->key_display(gp_Key) ; }
+    MACRO_IF_KEY_MOT_IS("L" )                  { }
+    MACRO_IF_KEY_MOT_IS("M" )                  { }
+    MACRO_IF_KEY_MOT_IS("N" )                  { }
+    MACRO_IF_KEY_MOT_IS("O" )                  { }
+    MACRO_IF_KEY_MOT_IS("P" )                  { gp_Pth->pth_display(gp_Pth) ; }
+    
 
       // Trace1("Mot_Is aff_infos") ;
       // CONFIG_DISPLAY_TOUT() ; 
@@ -377,19 +609,19 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
 
-    KEYS_IF_MOT_IS("n" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("o" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("e" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("s" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("forward" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("rewind" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("forwardfast" )        { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("rewindfast" )         { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("ne" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("no" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("se" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("so" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    KEYS_IF_MOT_IS("reset" )              { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("n" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("o" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("e" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("s" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("forward" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("rewind" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("forwardfast" )        { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("rewindfast" )         { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("ne" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("no" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("se" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("so" )                 { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("reset" )              { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->sui_mutex ) ;
 
@@ -397,33 +629,33 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Vou->vou_mutex ) ;
 
-    KEYS_IF_MOT_IS("stop")                { gp_Vou->vou_run = 0 ; i=1;}
-    KEYS_IF_MOT_IS("play")                { gp_Vou->vou_run = 1 ; i=1;}
+    MACRO_IF_KEY_MOT_IS("stop")                { gp_Vou->vou_run = 0 ; i=1;}
+    MACRO_IF_KEY_MOT_IS("play")                { gp_Vou->vou_run = 1 ; i=1;}
     
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Vou->vou_mutex ) ;
 
     /* Quelques actions d 'affichage a l'ecran  */
 
-    KEYS_IF_MOT_IS("v")       { CONFIG_PARAMS_DISPLAY() ; i=1 ; } ;
+    MACRO_IF_KEY_MOT_IS("v")       { CONFIG_PARAMS_DISPLAY() ; i=1 ; } ;
 
     /* Quelques actions d 'affichage a l'ecran LCD */
 
-    KEYS_IF_MOT_IS("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
-    KEYS_IF_MOT_IS("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
-    KEYS_IF_MOT_IS("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
-    KEYS_IF_MOT_IS("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
-    KEYS_IF_MOT_IS("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
-    KEYS_IF_MOT_IS("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
-    KEYS_IF_MOT_IS("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
-    KEYS_IF_MOT_IS("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
-    KEYS_IF_MOT_IS("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
-    KEYS_IF_MOT_IS("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
-    KEYS_IF_MOT_IS("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
-    KEYS_IF_MOT_IS("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
+    MACRO_IF_KEY_MOT_IS("aff_tps_lie")         { gp_Lcd->display_tps_lie( 2000000 ) ;i=1; }  
+    MACRO_IF_KEY_MOT_IS("aff_ast_vit")         { gp_Lcd->display_ast_vit( 2000000 ) ; i=1;}  
+    MACRO_IF_KEY_MOT_IS("aff_ast_fre")         { gp_Lcd->display_ast_fre( 2000000 ) ; i=1;}
+    MACRO_IF_KEY_MOT_IS("aff_ast_per")         { gp_Lcd->display_ast_per( 2000000 ) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("aff_azi_alt")         { gp_Lcd->display_azi_alt( 2000000 ) ; i=1;}
+    MACRO_IF_KEY_MOT_IS("aff_agh_dec")         { gp_Lcd->display_agh_dec( 2000000 ) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("aff_asc_dec")         { gp_Lcd->display_asc_dec( 2000000 ) ; i=1;}
+    MACRO_IF_KEY_MOT_IS("aff_mod_ste")         { gp_Lcd->display_mod_ste( 2000000 ) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("cfg_gpios_alt_azi")   { gp_Lcd->display_cfg_gpios_alt_azi( 2000000 ) ; i=1;}
+    MACRO_IF_KEY_MOT_IS("cfg_gpios_mas_fre")   { gp_Lcd->display_cfg_gpios_mas_fre( 2000000 ) ; i=1;}
+    MACRO_IF_KEY_MOT_IS("cfg_gpios_leds")      { gp_Lcd->display_cfg_gpios_leds( 2000000 ) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("cfg_reduction")       { gp_Lcd->display_cfg_reduction( 2000000 ) ; i=1;}
 
     /* Activation algorithme PID de regulation des periodes / frequences moteurs */
 
-    KEYS_IF_MOT_IS("l") { 
+    MACRO_IF_KEY_MOT_IS("l") { 
       i=1 ; 
       if ( gi_pid_trace == 0 ){
         gi_pid_trace = gp_Tpo->tpo_pid_loop ; 
@@ -443,7 +675,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation traces PID pour le moteur ALT */
 
-    KEYS_IF_MOT_IS("j") { 
+    MACRO_IF_KEY_MOT_IS("j") { 
       i=1 ; 
       if ( gi_pid_trace_alt == 0 ) {
         gi_pid_trace_alt=1;      
@@ -463,7 +695,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation traces PID pour le moteur AZI */
 
-    KEYS_IF_MOT_IS("k") { 
+    MACRO_IF_KEY_MOT_IS("k") { 
       i=1 ;
       if ( gi_pid_trace_azi == 0 ) {
         gi_pid_trace_azi=1 ; 
@@ -481,11 +713,11 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       }
     }
 
-    KEYS_IF_MOT_IS("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("aff_acc_alt_azi")     { gp_Lcd->display_acc_alt_azi( 2000000 ) ;i=1; }
 
     /*  touche mode equatorial */
     
-    KEYS_IF_MOT_IS("MODE_EQUATORIAL")      { 
+    MACRO_IF_KEY_MOT_IS("MODE_EQUATORIAL")      { 
       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
       lp_Sui->sui_menu = MENU_EQUATORIAL ; 
       i=1;
@@ -493,7 +725,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /*  touche mode azimutal */
 
-    KEYS_IF_MOT_IS("MODE_AZIMUTAL")      { 
+    MACRO_IF_KEY_MOT_IS("MODE_AZIMUTAL")      { 
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_AZIMUTAL ; 
       i=1;
@@ -501,7 +733,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* touche POWER : arret su systeme */
 
-    KEYS_IF_MOT_IS("key_power")     { 
+    MACRO_IF_KEY_MOT_IS("key_power")     { 
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_DOWN ; 
       i=1;
@@ -509,7 +741,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* touche key_exit : arret su programme */
 
-    KEYS_IF_MOT_IS("key_exit")      { 
+    MACRO_IF_KEY_MOT_IS("key_exit")      { 
       lp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; 
       i=1;
     } 
@@ -517,7 +749,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* touche reseau : arret du reseau */
     /* TODO : non implemente : a definir et coder */
 
-    KEYS_IF_MOT_IS("KEY_R") { 
+    MACRO_IF_KEY_MOT_IS("KEY_R") { 
       
       lp_Sui->sui_menu = MENU_RESEAU_UP ; 
       /* TODO : a terminer */
@@ -714,7 +946,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     gp_Pas->pas_acc_azi = 1 ;
 
-    if ( lp_Sui->sui_mode_equatorial )  gp_Pas->pas_acc_alt = 0.0 ;
+    if ( lp_Cal->cal_mode )  gp_Pas->pas_acc_alt = 0.0 ;
     else                             gp_Pas->pas_acc_alt = 1.0 ;
 
     gp_Pas->pas_rst = 0 ;
@@ -728,7 +960,11 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
   // actions a faire suivant appui sur NORD / SUD / OUEST /EST
   //------------------------------------------------------------
 
-  if ( gp_Pas->pas_nord || gp_Pas->pas_sud || gp_Pas->pas_est || gp_Pas->pas_ouest ) {
+  if (   gp_Pas->pas_nord \
+      || gp_Pas->pas_sud \
+      || gp_Pas->pas_est \
+      || gp_Pas->pas_ouest ) {
+
     flag_nord_sud_est_ouest = 1 ;
   }
 
@@ -941,7 +1177,12 @@ void SUIVI_MANUEL_ASSERVI(STRUCT_SUIVI * lp_Sui) {
   // TANT QUE J'APPUIE SUR UN BOUTON DE LA RAQUETTE ===>
   //------------------------------------------------------------
   
-  while( gp_Pas->pas_ouest || gp_Pas->pas_est || gp_Pas->pas_sud || gp_Pas->pas_nord || gp_Pas->pas_acc_plus || gp_Pas->pas_acc_moins )
+  while( gp_Pas->pas_ouest    || \
+         gp_Pas->pas_est      || \
+         gp_Pas->pas_sud      || \
+         gp_Pas->pas_nord     || \
+         gp_Pas->pas_acc_plus || \
+         gp_Pas->pas_acc_moins )
   { 
     // On remet une periode inferieure a la seconde pour eviter aux deux autres threads d'attendre
     
@@ -1052,18 +1293,25 @@ void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
   
   TraceArbo(__func__,0,"init suivi") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Sui->sui_mutex) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Sui->sui_mutex ) ;
+                                     lp_Sui->sui_log      = SUIVI_FRE_LOG ;
+                                     lp_Sui->sui_lock     = SUIVI_FRE_LOCK ;
+                                     lp_Sui->sui_unlock   = SUIVI_FRE_UNLOCK ;
+                                     lp_Sui->sui_display  = SUIVI_FRE_DISPLAY ;
+                                     lp_Sui->sui_loglevel = 0 ; 
+                                     lp_Sui->sui_file     = NULL ;
+  gettimeofday (                   & lp_Sui->sui_tval, NULL ) ; 
 
-  lp_Sui->sui_mode_equatorial = 0 ;
+  lp_Cal->cal_mode = 0 ;
 
   // a modifier  : instancier ces variables a l aide du fichier de config
            
   lp_Sui->sui_Da            = 0  ;      // nombre a injecter dans les diviseurs de frequence
   lp_Sui->sui_Dh            = 0 ;       // nombre a injecter dans les diviseurs de frequence
-  lp_Sui->sui_alarme            = 0 ;
+  lp_Sui->sui_alarme        = 0 ;
   lp_Sui->sui_tempo_percent = 0.99 ; 
-  lp_Sui->sui_dth               = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
-  lp_Sui->sui_dta               = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
+  lp_Sui->sui_dth           = gp_Fre->fre_th_mic * TIME_MICRO_SEC ;
+  lp_Sui->sui_dta           = gp_Fre->fre_ta_mic * TIME_MICRO_SEC ;
   lp_Sui->sui_menu          = gp_Con_Par->con_par_default_menu  ;    // menu par defaut
   lp_Sui->sui_menu_old      = gp_Con_Par->con_par_default_menu  ;
 
@@ -1087,7 +1335,14 @@ void SUIVI_PAS_INIT(STRUCT_SUIVI_PAS * lp_Pas) {
   
   TraceArbo(__func__,0,"init pas") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pas->pas_mutex) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pas->pas_mutex ) ;
+                                     lp_Pas->pas_log      = SUIVI_FRE_LOG ;
+                                     lp_Pas->pas_lock     = SUIVI_FRE_LOCK ;
+                                     lp_Pas->pas_unlock   = SUIVI_FRE_UNLOCK ;
+                                     lp_Pas->pas_display  = SUIVI_FRE_DISPLAY ;
+                                     lp_Pas->pas_loglevel = 0 ; 
+                                     lp_Pas->pas_file     = NULL ;
+  gettimeofday (                   & lp_Pas->pas_tval, NULL ) ; 
 
   lp_Pas->pas_rst           = 1 ;
   lp_Pas->pas_azi           = 1 ;
@@ -1109,13 +1364,8 @@ void SUIVI_PAS_INIT(STRUCT_SUIVI_PAS * lp_Pas) {
   lp_Pas->pas_asc           = 0 ;
   lp_Pas->pas_dec           = 0  ;
 
-  lp_Pas->pas_lock   = SUIVI_PAS_LOCK ;
-  lp_Pas->pas_unlock = SUIVI_PAS_UNLOCK ;
-
   return ;
-
 }
-
 /*****************************************************************************************
 * @fn     : SUIVI_FRE_INIT
 * @author : s.gravois
@@ -1131,7 +1381,14 @@ void SUIVI_FRE_INIT(STRUCT_SUIVI_FRE * lp_Fre) {
   
   TraceArbo(__func__,0,"init frequences") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Fre->fre_mutex) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Fre->fre_mutex ) ;
+                                     lp_Fre->fre_log      = SUIVI_FRE_LOG ;
+                                     lp_Fre->fre_lock     = SUIVI_FRE_LOCK ;
+                                     lp_Fre->fre_unlock   = SUIVI_FRE_UNLOCK ;
+                                     lp_Fre->fre_display  = SUIVI_FRE_DISPLAY ;
+                                     lp_Fre->fre_loglevel = 0 ; 
+                                     lp_Fre->fre_file     = NULL ;
+  gettimeofday (                   & lp_Fre->fre_tval, NULL ) ; 
 
   lp_Fre->fre_fa_mic        = 30 ;
   lp_Fre->fre_fh_mic        = 30 ;
@@ -1142,9 +1399,5 @@ void SUIVI_FRE_INIT(STRUCT_SUIVI_FRE * lp_Fre) {
   lp_Fre->fre_ta_mic        = 1 / lp_Fre->fre_fa_mic ;
   lp_Fre->fre_th_mic        = 1 / lp_Fre->fre_fh_mic ;
 
-  lp_Fre->fre_lock   = SUIVI_FRE_LOCK ;
-  lp_Fre->fre_unlock = SUIVI_FRE_UNLOCK ;
-
   return ;
-
 }

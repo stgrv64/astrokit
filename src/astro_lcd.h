@@ -87,11 +87,20 @@ typedef enum {
 }
 t_en_Lcd_Type_Affichage ; 
 
+typedef struct STR_LCD STRUCT_LCD ;
+
 struct STR_LCD {
 
-  pthread_mutex_t lcd_mutex ;
-  void          (*lcd_lock)   (void) ;
-  void          (*lcd_unlock) (void) ;  
+  pthread_mutex_t  lcd_mutex ;
+  STR_EXT_TIMEVAL  lcd_tval ; 
+  FILE            *lcd_file ; 
+  void           (*lcd_log)     ( STRUCT_LCD * ) ;
+  void           (*lcd_display) ( STRUCT_LCD * ) ;
+  void           (*lcd_lock)    ( STRUCT_LCD * ) ;
+  void           (*lcd_unlock)  ( STRUCT_LCD * ) ;  
+  int              lcd_loglevel ;
+  char             lcd_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             lcd_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
 
   int  lcd_fd ; 
   int  lcd_i2c_add ; 

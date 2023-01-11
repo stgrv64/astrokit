@@ -17,6 +17,57 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 
 /*****************************************************************************************
+* @fn     : ASTRE_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static ASTRE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  ASTRE_DISPLAY_FORMAT( lp_Ast ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : LIEU_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
@@ -85,9 +136,9 @@ void LIEU_PARAMS_DISPLAY(STRUCT_LIEU_PARAMS *lp_Lie_Par ) {
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_altitude ", lp_Lie_Par->par_altitude); 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_latitude ", lp_Lie_Par->par_latitude); 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_longitude", lp_Lie_Par->par_longitude); 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_altitude ", lp_Lie_Par->par_altitude); 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_latitude ", lp_Lie_Par->par_latitude); 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %.2f" , "lp_Lie_Par->par_longitude", lp_Lie_Par->par_longitude); 
 
   return ;
 }
@@ -107,6 +158,13 @@ void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
   TraceArbo(__func__,0,"init lieu") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Lie->lie_mutex ) ;
+                                     lp_Lie->lie_log      = LIEU_LOG ;
+                                     lp_Lie->lie_lock     = LIEU_LOCK ;
+                                     lp_Lie->lie_unlock   = LIEU_UNLOCK ;
+                                     lp_Lie->lie_display  = LIEU_DISPLAY ;
+                                     lp_Lie->lie_loglevel = 0 ; 
+                                     lp_Lie->lie_file     = NULL ;
+  gettimeofday (                   & lp_Lie->lie_tval, NULL ) ;  
 
   lp_Lie->lie_jj  = 0 ; // jour julien
   lp_Lie->lie_ts  = 0 ;  // temps sideral

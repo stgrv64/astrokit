@@ -15,6 +15,15 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+/* Static HERE is entended as private method for struct STRUCT_KEYS */
+/* These are pointer fct used as private methods inside STRUCT_KEYS */
+
+static void KEYS_LOG            ( STRUCT_KEYS * ) ;
+static void KEYS_DISPLAY        ( STRUCT_KEYS * ) ;
+static void KEYS_DISPLAY_FORMAT ( STRUCT_KEYS * ) ;
+static void KEYS_LOCK           ( STRUCT_KEYS * )  ;
+static void KEYS_UNLOCK         ( STRUCT_KEYS * ) ;
+
 /*****************************************************************************************
 * @fn     : KEYS_LOG
 * @author : s.gravois
@@ -43,7 +52,60 @@ static void KEYS_LOG ( STRUCT_KEYS * lp_Key) {
     lp_Key->key_menu, \
     lp_Key->key_mot_en_cours) ;
 
-  TraceLogLevel(lp_Key->key_loglevel,1,"%s", c_cmd) ;
+  MACRO_ASTRO_GLOBAL_LOG(lp_Key->key_loglevel,1,"%s", c_cmd) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYS_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_KEYS *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void KEYS_DISPLAY_FORMAT ( STRUCT_KEYS * lp_Key) {
+
+  TraceArbo(__func__,2,"keys format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
+  sprintf( lp_Key->key_dis_cmd , STR_KEYS_FORMAT,\
+    lp_Key->key_phrase,\
+    lp_Key->key_mot,\
+    lp_Key->key_symbole,\
+    lp_Key->key_nombre,\
+    lp_Key->key_premier,\
+    lp_Key->key_valider,\
+    lp_Key->key_menu, \
+    lp_Key->key_mot_en_cours) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYS_DISPLAY
+* @author : s.gravois
+* @brief  : Fonction qui gere les logs de la structure STRUCT_KEYS
+* @param  : STRUCT_KEYS *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
+
+static void KEYS_DISPLAY ( STRUCT_KEYS * lp_Key) {
+
+  TraceArbo(__func__,2,"keys display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+/*
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ROTATE( lp_Key->key_loglevel ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex) ;
+*/
+  KEYS_DISPLAY_FORMAT       ( lp_Key ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Key->key_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Key->key_loglevel , 1 , "%s" , lp_Key->key_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Key->key_loglevel ) ;
 
   return ;
 }
@@ -55,7 +117,7 @@ static void KEYS_LOG ( STRUCT_KEYS * lp_Key) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYS_LOCK ( STRUCT_KEYS * lp_Key) {
+static void KEYS_LOCK ( STRUCT_KEYS * lp_Key) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -71,7 +133,7 @@ void KEYS_LOCK ( STRUCT_KEYS * lp_Key) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYS_UNLOCK ( STRUCT_KEYS * lp_Key) {
+static void KEYS_UNLOCK ( STRUCT_KEYS * lp_Key) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -250,6 +312,13 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   TraceArbo(__func__,0,"init keys") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Key->key_mutex ) ;
+                                     lp_Key->key_log      = KEYS_LOG ;
+                                     lp_Key->key_lock     = KEYS_LOCK ;
+                                     lp_Key->key_unlock   = KEYS_UNLOCK ;
+                                     lp_Key->key_display  = KEYS_DISPLAY ;
+                                     lp_Key->key_loglevel = 0 ; 
+                                     lp_Key->key_file     = NULL ;
+  gettimeofday (                   & lp_Key->key_tval, NULL ) ;
 
   memset( lp_Key->key_phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
   memset( lp_Key->key_valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
@@ -290,55 +359,9 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   strcpy( lp_Key->key_actions[6], "TIME" ) ;
   strcpy( lp_Key->key_actions[7], "NET" ) ; /* ajout 2023 : network */
 
-  /* Pointeurs de fonctions */
-
-  lp_Key->key_lock     = KEYS_LOCK ;
-  lp_Key->key_unlock   = KEYS_UNLOCK ;
-  lp_Key->key_log      = KEYS_LOG ;
-
-  lp_Key->key_loglevel = 0 ;
-
   return ;
 } 
 
-/*****************************************************************************************
-* @fn     : KEYS_DISPLAY
-* @author : s.gravois
-* @brief  : Cette fonction affiche les informations d entrees input ("lp_Key")
-* @param  : STRUCT_KEYS *lp_Key
-* @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @todo   : 
-*****************************************************************************************/
-
-void KEYS_DISPLAY(STRUCT_KEYS *lp_Key) {
-  
-  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
-
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mot) %-5s (menu) %-10s (motencours) %-2d",\
-    lp_Key->key_phrase,\
-    lp_Key->key_mot,\
-    lp_Key->key_symbole,\
-    lp_Key->key_nombre,\
-    lp_Key->key_premier,\
-    lp_Key->key_valider,\
-    lp_Key->key_menu, \
-    lp_Key->key_mot_en_cours) ;
-
-  ASTRO_KEYS_LOG(lp_Key->key_loglevel,1,"%s", c_cmd) ;
-  
-  Trace2("lp_Key->key_mot         = %s",lp_Key->key_mot) ;
-  Trace2("lp_Key->key_premier     = %s",lp_Key->key_premier) ;
-  Trace2("lp_Key->key_phrase      = %s",lp_Key->key_phrase) ;
-  Trace2("lp_Key->key_nombre      = %s",lp_Key->key_nombre) ;
-  Trace2("lp_Key->key_symbole     = %s",lp_Key->key_symbole) ;
-  Trace2("lp_Key->key_phrase_lue  = %d",lp_Key->key_phrase_lue) ;
-
-  TraceArbo(__func__,1,c_cmd) ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  return ;
-}
 /*****************************************************************************************
 * @fn     : KEYS_RESET_MOT
 * @author : s.gravois

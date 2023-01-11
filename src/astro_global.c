@@ -31,7 +31,7 @@ STRUCT_MUTEXS           g_Mutexs,             *gp_Mut ;
 STRUCT_PTHREADS         g_Pthreads,           *gp_Pth ;
 STRUCT_SUIVI            g_Suivi,              *gp_Sui ;
 STRUCT_SUIVI_PAS        g_Suivi_Pas,          *gp_Pas ;
-STRUCT_SUIVI_FRE g_Suivi_Frequences,   *gp_Fre ;
+STRUCT_SUIVI_FRE        g_Suivi_Frequences,   *gp_Fre ;
 STRUCT_STATS            g_Suivi_Statistiques, *gp_Sta ;
 STRUCT_TERMIOS          g_Termios,            *gp_Ter ;
 STRUCT_TIME             g_Time,               *gp_Tim ;

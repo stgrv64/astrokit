@@ -150,12 +150,20 @@ typedef struct STR_MUTEXS STRUCT_MUTEXS ;
 typedef struct STR_PTHREADS STRUCT_PTHREADS ;
 
 struct STR_PTHREADS {
-  STRUCT_PTHREADS_ATTRIBUTS pth_att [ PTHREADS_MAX_THREADS ]  ; 
   pthread_mutex_t           pth_mutex ;
-  void                    (*pth_lock)   (STRUCT_PTHREADS*) ;
-  void                    (*pth_unlock) (STRUCT_PTHREADS*) ;  
-  void                    (*pth_log)    (STRUCT_PTHREADS*) ;
-  char                      pth_loglevel ;
+  STR_EXT_TIMEVAL           pth_tval ; 
+  FILE                     *pth_file ; 
+  void                    (*pth_log)     ( STRUCT_PTHREADS * ) ;
+  void                    (*pth_display) ( STRUCT_PTHREADS * ) ;
+  void                    (*pth_lock)    ( STRUCT_PTHREADS * ) ;
+  void                    (*pth_unlock)  ( STRUCT_PTHREADS * ) ;  
+  int                       pth_loglevel ;
+  char                      pth_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char                      pth_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  int                       pth_index ;
+  
+  STRUCT_PTHREADS_ATTRIBUTS pth_att [ PTHREADS_MAX_THREADS ]  ; 
   pthread_t                 pth_t   [ PTHREADS_MAX_THREADS ]  ;  
   unsigned int              pth_i_nb ; 
 } ;

@@ -26,7 +26,55 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+/*****************************************************************************************
+* @fn     : DEVICES_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_DEVICES *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
 
+static void DEVICES_DISPLAY_FORMAT ( STRUCT_DEVICES * lp_Dev) {
+
+  TraceArbo(__func__,2,"devices format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dev->dev_mutex ) ;
+/*
+ "(cla) %d (inf) %d (lcd) %d (cap) %d (ctl) %d (blu) %d (raq) %d"
+*/
+  sprintf( lp_Dev->dev_dis_cmd , STR_DEV_FORMAT_0,\
+    lp_Dev->dev_use_keyboard, \
+    lp_Dev->dev_use_infrarouge, \
+    lp_Dev->dev_use_lcd, \
+    lp_Dev->dev_use_capteurs, \
+    lp_Dev->dev_use_controler, \
+    lp_Dev->dev_use_bluetooth, \
+    lp_Dev->dev_use_raquette ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Dev->dev_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static DEVICES_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_DEVICES *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void DEVICES_DISPLAY(STRUCT_DEVICES *lp_Dev) {
+
+  TraceArbo(__func__,2,"display informations on I/O") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  DEVICES_DISPLAY_FORMAT( lp_Dev ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Dev->dev_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Dev->dev_loglevel , 1 , "%s", lp_Dev->dev_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Dev->dev_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : DEVICES_LOCK
 * @author : s.gravois
@@ -74,6 +122,13 @@ void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
   TraceArbo(__func__,0,"init devices") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Dev->dev_mutex ) ;
+                                     lp_Dev->dev_log      = DEVICES_LOG ;
+                                     lp_Dev->dev_lock     = DEVICES_LOCK ;
+                                     lp_Dev->dev_unlock   = DEVICES_UNLOCK ;
+                                     lp_Dev->dev_display  = DEVICES_DISPLAY ;
+                                     lp_Dev->dev_loglevel = 0 ; 
+                                     lp_Dev->dev_file     = NULL ;
+  gettimeofday ( &                   lp_Dev->dev_tval, NULL ) ;
 
   lp_Dev->dev_use_capteurs    = gp_Dev_Par->dev_par_use_capteurs ;
   lp_Dev->dev_use_raquette    = gp_Dev_Par->dev_par_use_raquette ;
@@ -86,7 +141,6 @@ void DEVICES_INIT(STRUCT_DEVICES *lp_Dev) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : CONFIG_PARAMS_INIT
 * @author : s.gravois
@@ -125,13 +179,13 @@ void DEVICES_PARAMS_DISPLAY(STRUCT_DEVICES_PARAMS *lp_Dev_Par ) {
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_controler", lp_Dev_Par->dev_par_use_controler);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_capteurs ", lp_Dev_Par->dev_par_use_capteurs);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_bluetooth", lp_Dev_Par->dev_par_use_bluetooth);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_infrared ", lp_Dev_Par->dev_par_use_infrared);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_raquette ", lp_Dev_Par->dev_par_use_raquette);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_keyboard ", lp_Dev_Par->dev_par_use_keyboard);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_lcd      ", lp_Dev_Par->dev_par_use_lcd);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_controler", lp_Dev_Par->dev_par_use_controler);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_capteurs ", lp_Dev_Par->dev_par_use_capteurs);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_bluetooth", lp_Dev_Par->dev_par_use_bluetooth);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_infrared ", lp_Dev_Par->dev_par_use_infrared);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_raquette ", lp_Dev_Par->dev_par_use_raquette);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_keyboard ", lp_Dev_Par->dev_par_use_keyboard);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d", "lp_Dev_Par->dev_par_use_lcd      ", lp_Dev_Par->dev_par_use_lcd);
 
   return ;
 }

@@ -15,6 +15,59 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+
+/*****************************************************************************************
+* @fn     : ASTRE_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static ASTRE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  ASTRE_DISPLAY_FORMAT( lp_Ast ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+
+  return ;
+}
+
+
 /*****************************************************************************************
 * @fn     : KEYBOARD_LOCK
 * @author : s.gravois
@@ -62,6 +115,13 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
   TraceArbo(__func__,0,"init termios") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ter->ter_mutex ) ;
+                                     lp_Ter->ter_log      = TERMIOS_LOG ;
+                                     lp_Ter->ter_lock     = TERMIOS_LOCK ;
+                                     lp_Ter->ter_unlock   = TERMIOS_UNLOCK ;
+                                     lp_Ter->ter_display  = TERMIOS_DISPLAY ;
+                                     lp_Ter->ter_loglevel = 0 ; 
+                                     lp_Ter->ter_file     = NULL ;
+  gettimeofday (                   & lp_Ter->ter_tval, NULL ) ;
 
   tcgetattr(0,&lp_Ter->ter_config_initiale); 
 
@@ -77,13 +137,6 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
 
   memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
   memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
-/*
-  for(int i=0;i<TERMIOS_KBHIT_SIZE_BUFFER_READ;i++) {
-    lp_Ter->ter_buffer[i]=-1;
-  }
-*/
-  lp_Ter->ter_lock   = KEYBOARD_LOCK ;
-  lp_Ter->ter_unlock = KEYBOARD_UNLOCK ;
 
   return ;
 }

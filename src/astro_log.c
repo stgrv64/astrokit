@@ -15,7 +15,56 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+/*****************************************************************************************
+* @fn     : LOG_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_LOG *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
 
+static void LOG_DISPLAY_FORMAT ( STRUCT_LOG * lp_Log) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Log->log_mutex ) ;
+
+  sprintf( lp_Log->log_dis_cmd , STR_LOG_FORMAT_0,\
+    lp_Log->log_nom, \
+    lp_Log->log_hhmmss_asc, \
+    lp_Log->log_ddmm_dec, \
+    lp_Log->log_hhmmss_agh, \
+    lp_Log->log_ddmm_azi, \
+    lp_Log->log_ddmm_alt, \
+    lp_Log->log_azi_vit, \
+    lp_Log->log_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Log->log_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static LOG_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur la structure 
+* @param  : STRUCT_LOG *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void LOG_DISPLAY ( STRUCT_LOG *lp_Log) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  LOG_DISPLAY_FORMAT( lp_Log ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Log->log_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Log->log_loglevel , 1 , "%s", lp_Log->log_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Log->log_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : LOG_LOCK
 * @author : s.gravois
@@ -48,7 +97,22 @@ void LOG_UNLOCK ( STRUCT_LOG * lp_Log) {
 
   return ;
 }
+/*****************************************************************************************
+* @fn     : LOG_LOG
+* @author : s.gravois
+* @brief  : Log la structure en parametre
+* @param  : STRUCT_LOG *
+* @date   : 2022-12-20 creation
+*****************************************************************************************/
 
+void LOG_LOG ( STRUCT_LOG * lp_Log) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Log->log_mutex ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : LOG_SYSTEM_LOG_0
 * @author : s.gravois
@@ -154,8 +218,15 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
   
   TraceArbo(__func__,0,"init log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Log->log_mutex )
-  
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Log->log_mutex ) ;
+                                     lp_Log->log_log      = LOG_LOG ;
+                                     lp_Log->log_lock     = LOG_LOCK ;
+                                     lp_Log->log_unlock   = LOG_UNLOCK ;
+                                     lp_Log->log_display  = LOG_DISPLAY ;
+                                     lp_Log->log_loglevel = 0 ; 
+                                     lp_Log->log_file     = NULL ;
+  gettimeofday (                   & lp_Log->log_tval, NULL ) ;  
+
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     
     memset(buf, CALCULS_ZERO_CHAR, sizeof(buf));

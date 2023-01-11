@@ -242,7 +242,7 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
     /* GPIO_CLAVIER_MATRICIEL_READ( gpio_key_l, gpio_key_c, gp_Key) ; */
     KEYS_INPUTS_GESTION_APPUIS( gp_Key) ;
-    KEYS_DISPLAY( gp_Key ) ;	
+    gp_Key->key_display(gp_Key);	
     /* SUIVI_OLD_0( gp_Sui) ; */
     SUIVI_TRAITEMENT_MOT( gp_Sui ) ;
 
@@ -254,7 +254,11 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
      
       case MENU_AZIMUTAL :
         
-        Trace1("MENU_AZIMUTAL") ;
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Cal->cal_mutex ) ;
+
+        gp_Cal->cal_mode             = CALCULS_MODE_AZIMUTAL ;
+        
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Cal->cal_mutex ) ;
 
         HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
@@ -271,7 +275,6 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
         HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Sui->sui_mutex ) ;
 
-        gp_Sui->sui_mode_equatorial  = 0 ;
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_BRUT ; 
 
@@ -283,7 +286,11 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
      
       case MENU_EQUATORIAL :
         
-        Trace1("MENU_EQUATORIAL") ;
+        HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Cal->cal_mutex ) ;
+
+        gp_Cal->cal_mode             = CALCULS_MODE_EQUATORIAL ;
+        
+        HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Cal->cal_mutex ) ;
         
         HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
@@ -294,7 +301,6 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
         HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Sui->sui_mutex ) ;
 
-        gp_Sui->sui_mode_equatorial = 1 ;
         gp_Sui->sui_menu_old         = gp_Sui->sui_menu ;
         gp_Sui->sui_menu             = MENU_MANUEL_BRUT ;
 
@@ -430,129 +436,6 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   return NULL ;
 }
 
-/*****************************************************************************************
-* @fn     : _SUIVI_VOUTE
-* @author : s.gravois
-* @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
-* @param  : STRUCT_SUIVI   *gp_Sui
-* @date   : 2022-01-18 creation entete de la fonction au format doxygen
-* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pth_numero++ ]
-* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
-* @todo   : 
-*****************************************************************************************/
-
-/*
-   _SUIVI_VOUTE :
-   le but de la fonction est de rafraichir a intervalles reguliers (1 seconde)
-   tous les calculs relatifs a la vitesse de l'as suivi
-*/
-
-void * _SUIVI_VOUTE(STRUCT_SUIVI * lp_Vou) {
-  
-  long long ll_inrc=0 ;
-  char c_l0[16] ={0};
-  char c_l1[16] ={0};
-
-  unsigned long  ul_vou_while_incr ;
-  struct timeval t00 ;
-  struct sched_param param;
-
-  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
-
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
-
-  
-  
-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
-  
-  ul_vou_while_incr =0 ;
-  
-  gettimeofday(&t00,NULL) ;
-  
-  VOUTE_CONFIG( lp_Vou, 1, 1, 0.985 ) ;
-  
-  // FIXME : 
-  // en mode equatorial, pas besoin de _SUIVI_VOUTE, en effet la vitesse ne change pas
-  // Va=15"/s et Vh=0 (le moteur en ascension droite est commande par azimut)
-  
-  //-------------------------------------------------------------------------------
-  // FIXME : debut boucle infinie du thread _SUIVI_VOUTE
-  //-------------------------------------------------------------------------------
-  
-  gp_Ast->ast_new = TRUE ;
-
-  /* Debut boucle _SUIVI_VOUTE */
-  while(TRUE) {
-    
-        /* Creee un point d 'annulation pour la fonction pthread_cancel */
-    pthread_testcancel() ;
-
-    Trace1("while") ;
-
-    if ( lp_Vou->vou_run ) {
-      
-      Trace1("lp_Vou->vou_run == true") ;
-
-      /* FIXME : modification 20121225 : tous les calculs generiques dans CALCULS_TOUT */
-      
-      CALCULS_TOUT() ;
-      
-      /* Exceptionnellement , utilisation variables globales */ 
-      /* LCD_DISPLAY_TEMPS_LIEU(0,gp_Lie,gp_Tim) ;*/
-
-      if ( gp_Ast->ast_new ) { 
-
-        ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;
-        CONFIG_DISPLAY_MODE_LONG(gp_Ast,gp_Lie,gp_Cal) ; 
-        ASTRE_DISPLAY_MODE_STELLARIUM(gp_Ast) ;
-        
-        gp_Lcd->display_ast_vit(2000000) ;
-        gp_Lcd->default_refresh() ;
-        
-        gp_Ast->ast_new = FALSE ;
-      }
-/*
-      if ( gp_Sui->sui_menu_old != gp_Sui->sui_menu  ) {
-        CONFIG_DISPLAY_TOUT() ;
-      }
-*/
-      gp_Ast->ast_agh += lp_Vou->vou_pas ;
-      lp_Vou->vou_begin += lp_Vou->vou_pas ;
-
-      Trace1("voute : temporisation") ;
-
-      lp_Vou->vou_temps_ecoule += VOUTE_TEMPORISATION( lp_Vou, t00 ) ; 
-      gettimeofday(&t00,NULL) ;
-
-			lp_Vou->vou_num ++ ;
-      ul_vou_while_incr++ ;
-      // attention cet appel systeme genere une interuption
-      // uniquement utiliser pour les tests
-      // system("/bin/date >> /root/astrokit.begin.log") ;
-    }
-    
-    // TRES IMPORTANT !!
-    // permet d eviter au thread de consommer toute la CPU
-    // si jamais la condition _SUIVI_VOUTE = 1 n est pas realisee
-    
-    else {
-      // attention cet appel systeme genere une interuption
-      // uniquement utiliser pour les tests
-      // system("/bin/date >> /root/astrokit.begin.log") ;
-      //Trace1("La voute ne tourne pas") ;
-
-      Trace("usleep %ld", lp_Vou->vou_tempo ) ;
-
-      usleep( lp_Vou->vou_tempo );
-    }
-  }
-  Trace1("Stop") ;
-
-  return NULL ; 
-}
 /*****************************************************************************************
 * @fn     : _SUIVI_INFRAROUGE
 * @author : s.gravois
@@ -739,13 +622,14 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
         
         if ( i_indice_code < CODES_CODE_NB_CODES ) {
 
+          DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ; 
+
           Trace("chaine %s ascii %d indice code %d code %s", \
             ch_chaine, \
             i_sum_ascii, \
             i_indice_code, \
             gp_Cod->cod_out_act[i_indice_code] ) ;
 
-          DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;          
         }
         else {
           Trace("chaine %s ascii %d indice code %d >= CODES_CODE_NB_CODES (%d) : aucune correspondance trouvee", \
@@ -1156,7 +1040,7 @@ int main(int argc, char ** argv) {
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)_GPIO_PWM_MOT,         gp_Alt_Mot ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MENU],            NULL, (void*)_SUIVI_MENU,           gp_Sui ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Sui ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Vou ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_INFRA],           NULL, (void*)_SUIVI_INFRAROUGE,     gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_CAPTEUR],         NULL, (void*)_SUIVI_CAPTEURS,       gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_CLAVIER],         NULL, (void*)_SUIVI_CLAVIER_TERMIOS,gp_Ter ) ;

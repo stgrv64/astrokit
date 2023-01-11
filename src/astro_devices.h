@@ -28,9 +28,16 @@ struct STR_DEVICES_PARAMS {
 
 struct STR_DEVICES {
   pthread_mutex_t dev_mutex ;
-  void          (*dev_lock)   (void) ;
-  void          (*dev_unlock) (void) ;  
-  FILE           *dev_file ;
+  STR_EXT_TIMEVAL dev_tval ; 
+  FILE           *dev_file ; 
+  char            dev_loglevel ;
+  void          (*dev_lock)       ( STRUCT_DEVICES *) ;
+  void          (*dev_unlock)     ( STRUCT_DEVICES *) ;  
+  void          (*dev_log)        ( STRUCT_DEVICES *) ;
+  void          (*dev_display)    ( STRUCT_DEVICES *) ;
+  char            dev_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            dev_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   int             dev_use_bluetooth ;
   int             dev_use_capteurs ;
   int             dev_use_infrarouge ;

@@ -61,8 +61,16 @@ typedef struct STR_TERMIOS STRUCT_TERMIOS ;
 
 struct STR_TERMIOS {
   pthread_mutex_t  ter_mutex ;
-  void          (* ter_lock)   (STRUCT_TERMIOS *) ;
-  void          (* ter_unlock) (STRUCT_TERMIOS *) ;
+  STR_EXT_TIMEVAL  ter_tval ; 
+  FILE            *ter_file ; 
+  char             ter_loglevel ;
+  void           (*ter_lock)       ( STRUCT_TERMIOS * ) ;
+  void           (*ter_unlock)     ( STRUCT_TERMIOS * ) ;  
+  void           (*ter_log)        ( STRUCT_TERMIOS * ) ;
+  void           (*ter_display)    ( STRUCT_TERMIOS * ) ;
+  char             ter_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             ter_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   STR_EXT_TERMIOS  ter_config_initiale; 
   STR_EXT_TERMIOS  ter_config_finale ;   
   char             ter_buffer    [ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 

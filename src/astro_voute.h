@@ -21,6 +21,16 @@ typedef struct   STR_VOUTE STRUCT_VOUTE ;
 
 struct STR_VOUTE {
    pthread_mutex_t vou_mutex ;
+   STR_EXT_TIMEVAL vou_tval ; 
+   FILE           *vou_file ;
+   void          (*vou_log)     ( STRUCT_VOUTE * ) ;
+   void          (*vou_display) ( STRUCT_VOUTE * ) ;
+   void          (*vou_lock)    ( STRUCT_VOUTE * ) ;
+   void          (*vou_unlock)  ( STRUCT_VOUTE * ) ;  
+   char            vou_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+   char            vou_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+   int             vou_loglevel ;
+
    unsigned long   vou_tempo ; 
    long long       vou_num ; 
    double          vou_tempo_percent ;
@@ -37,6 +47,14 @@ struct STR_VOUTE {
 void  VOUTE_INIT            ( STRUCT_VOUTE * ) ;
 void  VOUTE_CONFIG          ( STRUCT_VOUTE *, double , double , double  ) ;
 long  VOUTE_TEMPORISATION   ( STRUCT_VOUTE *, struct timeval ) ;
-void  VOUTE_DISPLAY        ( STRUCT_VOUTE * ) ;
+void  VOUTE_DISPLAY         ( STRUCT_VOUTE * ) ;
+
+void * _SUIVI_VOUTE           ( STRUCT_VOUTE * ) ;
 
 #endif
+
+/* =====================================================================================
+ *
+ * FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - 
+ * 
+ * ===================================================================================== */

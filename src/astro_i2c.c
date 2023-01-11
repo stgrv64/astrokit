@@ -30,6 +30,59 @@ STRUCT_I2C  rtcds1307, *rtc ;
 STRUCT_I2C         exemple,   *lp_I2c ;
 STRUCT_I2C_ACC_MAG accmag,    *lp_Acc ;
 
+
+/*****************************************************************************************
+* @fn     : ASTRE_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static ASTRE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  ASTRE_DISPLAY_FORMAT( lp_Ast ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+
+  return ;
+}
+
+
 /*****************************************************************************************
 * @fn     : I2C_LOCK
 * @author : s.gravois
@@ -165,8 +218,15 @@ int I2C_INIT( STRUCT_I2C * lp_i2c_dev, char * c_i2c_device_name, char * adress) 
   
   TraceArbo(__func__,1,"init i2c") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT(&lp_i2c_dev->i2c_dev_mutex) ;
-  
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT(& lp_i2c_dev->i2c_dev_mutex) ;
+                                    lp_i2c_dev->i2c_dev_log      = I2C_LOG ;
+                                    lp_i2c_dev->i2c_dev_lock     = I2C_LOCK ;
+                                    lp_i2c_dev->i2c_dev_unlock   = I2C_UNLOCK ;
+                                    lp_i2c_dev->i2c_dev_display  = I2C_DISPLAY ;
+                                    lp_i2c_dev->i2c_dev_loglevel = 0 ; 
+                                    lp_i2c_dev->i2c_dev_file     = NULL ;
+  gettimeofday ( &                  lp_i2c_dev->i2c_dev_tval, NULL ) ;
+
   if ( ( lp_i2c_dev->i2c_dev_fd = open(c_i2c_device_name, O_RDWR)) < 0) { 
     ret = -1 ;
   }

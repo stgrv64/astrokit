@@ -67,6 +67,57 @@ extern STRUCT_LCD     *gp_Lcd ;
 
 
 /*****************************************************************************************
+* @fn     : ASTRE_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static ASTRE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  ASTRE_DISPLAY_FORMAT( lp_Ast ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+
+  return ;
+}
+
+/*****************************************************************************************
 * @fn     : LCD_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
@@ -116,7 +167,13 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
   /* Initialisation mutex */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Lcd->lcd_mutex ) ;
-  
+                                     lp_Lcd->lcd_log      = LCD_LOG ;
+                                     lp_Lcd->lcd_lock     = LCD_LOCK ;
+                                     lp_Lcd->lcd_unlock   = LCD_UNLOCK ;
+                                     lp_Lcd->lcd_display  = LCD_DISPLAY ;
+                                     lp_Lcd->lcd_loglevel = 0 ; 
+                                     lp_Lcd->lcd_file     = NULL ;
+  gettimeofday (                   & lp_Lcd->lcd_tval, NULL ) ;  
   /* Initialisation pointeurs de fonctions */
 
   lp_Lcd->default_set     = LCD_DEFINE_DEFAULT ;
@@ -694,7 +751,7 @@ void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
 /*****************************************************************************************
 * @fn     : LCD_DISPLAY_MODE_STELLARIUM
 * @author : s.gravois
-* @brief  : Cette fonction s inspire de ASTRE_DISPLAY_MODE_STELLARIUM pour le LCD
+* @brief  : Cette fonction s inspire de ASTRE_STELLARIUM_VIEW pour le LCD
 * @param  : 
 * @date   : 2022-03-18 creation
 * @date   : 2022-03-28 simplification

@@ -97,18 +97,6 @@ while (0)
 #endif
 
 // ------------------------------------------------------------------------
-// ASTRO_LOG_DEBUG : NiveauX GENERIQUES DEPENDANT DE VARIABLES
-// ------------------------------------------------------------------------
-
-#define TraceLogLevel(loglevel,nb,fmt, args...) \
-do { \
-  if (loglevel>=nb) { \
-    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
-  } \
-} \
-while (0)
-
-// ------------------------------------------------------------------------
 // ASTRO_LOG_DEBUG : Niveau 0
 // ------------------------------------------------------------------------
 
@@ -229,13 +217,21 @@ while (0)
 // ASTRO_LOG_DEBUG : fin macros
 // ------------------------------------------------------------------------
 
-struct STR_LOG {
- pthread_mutex_t log_mutex ;
- void          (*log_lock)   (void) ;
- void          (*log_unlock) (void) ;  
- int             log_level ;
-} ;
 typedef struct STR_LOG STRUCT_LOG ;
+
+struct STR_LOG {
+  pthread_mutex_t  log_mutex ;
+  STR_EXT_TIMEVAL  log_tval ; 
+  FILE            *log_file ; 
+  void           (*log_log)     ( STRUCT_LOG * ) ;
+  void           (*log_display) ( STRUCT_LOG * ) ;
+  void           (*log_lock)    ( STRUCT_LOG * ) ;
+  void           (*log_unlock)  ( STRUCT_LOG * ) ;  
+  int              log_loglevel ;
+  char             log_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             log_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
+  int              log_level ;
+} ;
 
 void   LOG_INIT         ( STRUCT_LOG * )  ;
 void   LOG_TRACE        ( char *l_String , ... ) ;

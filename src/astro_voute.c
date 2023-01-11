@@ -15,6 +15,73 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+static void VOUTE_DISPLAY_FORMAT ( STRUCT_VOUTE * ) ;
+static void VOUTE_DISPLAY        ( STRUCT_VOUTE * ) ;
+static void VOUTE_UNLOCK         ( STRUCT_VOUTE * ) ;
+static void VOUTE_LOCK           ( STRUCT_VOUTE * ) ;
+static void VOUTE_LOG            ( STRUCT_VOUTE * ) ;
+
+/*****************************************************************************************
+* @fn     : VOUTE_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_VOUTE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void VOUTE_DISPLAY_FORMAT ( STRUCT_VOUTE * lp_Vou) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Vou->vou_mutex ) ;
+/*
+   unsigned long   vou_tempo ; 
+   long long       vou_num ; 
+   double          vou_tempo_percent ;
+   double          vou_calibration_delta_t ;
+   double          vou_begin ;
+   double          vou_end ;
+   double          vou_pas ;
+   double          vou_dt ;
+   double          vou_acc ;
+   double          vou_temps_ecoule ;   
+   int             vou_run ;
+*/
+  sprintf( lp_Vou->vou_dis_cmd , STR_VOU_FORMAT_0,\
+    lp_Vou->vou_num, \
+    lp_Vou->vou_run, \
+    lp_Vou->vou_temps_ecoule, \
+    lp_Vou->vou_begin, \
+    lp_Vou->vou_end );
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Vou->vou_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static VOUTE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_VOUTE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void VOUTE_DISPLAY(STRUCT_VOUTE *lp_Vou) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Voure") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  VOUTE_DISPLAY_FORMAT( lp_Vou ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Vou->vou_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Vou->vou_loglevel , 1 , "%s", lp_Vou->vou_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Vou->vou_loglevel ) ;
+
+  return ;
+}
+
+
 /*****************************************************************************************
 * @fn     : VOUTE_LOCK
 * @author : s.gravois
@@ -23,7 +90,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void VOUTE_LOCK ( STRUCT_VOUTE * lp_Vou) {
+static void VOUTE_LOCK ( STRUCT_VOUTE * lp_Vou) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -39,7 +106,7 @@ void VOUTE_LOCK ( STRUCT_VOUTE * lp_Vou) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void VOUTE_UNLOCK ( STRUCT_VOUTE * lp_Vou) {
+static void VOUTE_UNLOCK ( STRUCT_VOUTE * lp_Vou) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -64,7 +131,14 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
 
   TraceArbo(__func__,0,"init voute") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  HANDLE_ERROR_PTHREAD_MUTEX_INIT( &lp_Vou->vou_mutex) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Vou->vou_mutex ) ;
+                                     lp_Vou->vou_log      = VOUTE_LOG ;
+                                     lp_Vou->vou_lock     = VOUTE_LOCK ;
+                                     lp_Vou->vou_unlock   = VOUTE_UNLOCK ;
+                                     lp_Vou->vou_display  = VOUTE_DISPLAY ;
+                                     lp_Vou->vou_loglevel = 0 ; 
+                                     lp_Vou->vou_file     = NULL ;
+  gettimeofday (                   & lp_Vou->vou_tval, NULL ) ;  
 
   lp_Vou->vou_temps_ecoule        = 0 ;
   lp_Vou->vou_tempo_percent       = 0.96 ;   
@@ -95,6 +169,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
     }
   }
 
+  return ;
 }
 
 /*****************************************************************************************
@@ -157,22 +232,130 @@ long VOUTE_TEMPORISATION(STRUCT_VOUTE *lp_Vou, struct timeval t00) {
   return t_diff ;
 }
 
+
 /*****************************************************************************************
-* @fn     : VOUTE_DISPLAY
+* @fn     : _SUIVI_VOUTE
 * @author : s.gravois
-* @brief  : Cette fonction affiche les infos liees a la voute STRUCT_VOUTE *
-* @param  : void
-* @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @todo   : a completer eventuellement
+* @brief  : Ce mode permet de gerer la voute c'est a dire le rafraichissement des calculs
+* @param  : STRUCT_SUIVI   *gp_Sui
+* @date   : 2022-01-18 creation entete de la fonction au format doxygen
+* @date   : 2022-05-24 ajout protection par mutex des threads[ gi_pth_numero++ ]
+* @date   : 2022-05-26 ajout temporisation par usleep  plutot que sleep avant start
+* @todo   : 
 *****************************************************************************************/
 
-void VOUTE_DISPLAY( STRUCT_VOUTE * lp_Vou) {
-	
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+/*
+   _SUIVI_VOUTE :
+   le but de la fonction est de rafraichir a intervalles reguliers (1 seconde)
+   tous les calculs relatifs a la vitesse de l'as suivi
+*/
 
-	Trace1("lp_Vou->vou_num %lld", lp_Vou->vou_num) ;
-  Trace1("lp_Vou->vou_pas %lld", lp_Vou->vou_num) ;
+void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
+  
+  long long ll_inrc=0 ;
+  char c_l0[16] ={0};
+  char c_l1[16] ={0};
 
-  Trace1("----------------------------") ;
+  unsigned long  ul_vou_while_incr ;
+  struct timeval t00 ;
+  struct sched_param param;
 
+  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
+
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
+
+  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
+  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
+  
+  ul_vou_while_incr =0 ;
+  
+  gettimeofday(&t00,NULL) ;
+  
+  VOUTE_CONFIG( lp_Vou, 1, 1, 0.985 ) ;
+  
+  // FIXME : 
+  // en mode equatorial, pas besoin de _SUIVI_VOUTE, en effet la vitesse ne change pas
+  // Va=15"/s et Vh=0 (le moteur en ascension droite est commande par azimut)
+  
+  //-------------------------------------------------------------------------------
+  // FIXME : debut boucle infinie du thread _SUIVI_VOUTE
+  //-------------------------------------------------------------------------------
+  
+  gp_Ast->ast_new = TRUE ;
+
+  /* Debut boucle _SUIVI_VOUTE */
+  while(TRUE) {
+    
+        /* Creee un point d 'annulation pour la fonction pthread_cancel */
+    pthread_testcancel() ;
+
+    Trace1("while") ;
+
+    if ( lp_Vou->vou_run ) {
+      
+      Trace1("lp_Vou->vou_run == true") ;
+
+      /* FIXME : modification 20121225 : tous les calculs generiques dans CALCULS_TOUT */
+      
+      CALCULS_TOUT() ;
+      
+      /* Exceptionnellement , utilisation variables globales */ 
+      /* LCD_DISPLAY_TEMPS_LIEU(0,gp_Lie,gp_Tim) ;*/
+
+      if ( gp_Ast->ast_new ) { 
+
+        ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;
+        CONFIG_DISPLAY_MODE_LONG(gp_Ast,gp_Lie,gp_Cal) ; 
+        ASTRE_STELLARIUM_VIEW(gp_Ast) ;
+        
+        gp_Lcd->display_ast_vit(2000000) ;
+        gp_Lcd->default_refresh() ;
+        
+        gp_Ast->ast_new = FALSE ;
+      }
+/*
+      if ( gp_Sui->sui_menu_old != gp_Sui->sui_menu  ) {
+        CONFIG_DISPLAY_TOUT() ;
+      }
+*/
+      gp_Ast->ast_agh += lp_Vou->vou_pas ;
+      lp_Vou->vou_begin += lp_Vou->vou_pas ;
+
+      Trace1("voute : temporisation") ;
+
+      lp_Vou->vou_temps_ecoule += VOUTE_TEMPORISATION( lp_Vou, t00 ) ; 
+      gettimeofday(&t00,NULL) ;
+
+			lp_Vou->vou_num ++ ;
+      ul_vou_while_incr++ ;
+      // attention cet appel systeme genere une interuption
+      // uniquement utiliser pour les tests
+      // system("/bin/date >> /root/astrokit.begin.log") ;
+    }
+    
+    // TRES IMPORTANT !!
+    // permet d eviter au thread de consommer toute la CPU
+    // si jamais la condition _SUIVI_VOUTE = 1 n est pas realisee
+    
+    else {
+      // attention cet appel systeme genere une interuption
+      // uniquement utiliser pour les tests
+      // system("/bin/date >> /root/astrokit.begin.log") ;
+      //Trace1("La voute ne tourne pas") ;
+
+      Trace("usleep %ld", lp_Vou->vou_tempo ) ;
+
+      usleep( lp_Vou->vou_tempo );
+    }
+  }
+  Trace1("Stop") ;
+
+  return NULL ; 
 }
+/* =====================================================================================
+ *
+ * FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - 
+ * 
+ * ===================================================================================== */

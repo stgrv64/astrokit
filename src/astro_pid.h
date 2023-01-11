@@ -31,33 +31,43 @@ struct STR_PID_PARAMS {
 /* Parametres du regulateur PID en frequences */
 /*--------------------------------------------*/
 
-struct STR_PID {
+typedef struct STR_PID STRUCT_PID ;
 
-  pthread_mutex_t pid_mutex ;
-  void          (*pid_lock)   (void) ;
-  void          (*pid_unlock) (void) ;  
-  FILE           *pid_file ; 
-  double          pid_acc_azi ;  // acceleration deduite en azimut   pour asservissement
-  double          pid_acc_alt ;  // acceleration deduite en altitude pour asservissement
+struct STR_PID {
+  pthread_mutex_t  pid_mutex ;
+  STR_EXT_TIMEVAL  pid_tval ; 
+  FILE            *pid_file ; 
+  void           (*pid_log)     ( STRUCT_PID * ) ;
+  void           (*pid_display) ( STRUCT_PID * ) ;
+  void           (*pid_lock)    ( STRUCT_PID * ) ;
+  void           (*pid_unlock)  ( STRUCT_PID * ) ;  
+  void           (*pid_run)     ( STRUCT_PID *, double,double) ; 
+  void           (*pid_reset)   ( STRUCT_PID * ) ; 
+  void           (*pid_test)    ( STRUCT_PID * ) ;
+  int              pid_loglevel ;
+  char             pid_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             pid_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  double           pid_acc_azi ;  // acceleration deduite en azimut   pour asservissement
+  double           pid_acc_alt ;  // acceleration deduite en altitude pour asservissement
 
   /* Entree / sortie de l algorithme : input = consigne */ 
 
-  unsigned long   pid_long_incr ; /* numero d increment du calcul */ 
-
-  double          pid_input_consigne ;     /* consigne */ 
-  double          pid_output ;     /* sortie */ 
-  double          pid_ech ;     /* echantillonage */
-  double          pid_err ;     /* erreur  = out - inp */
-  double          pid_err_sum ; /* calcul de la somme des erreurs */ 
-  double          pid_err_kp ; /* calcul de la partie proportionnelle */  
-  double          pid_err_ki ; /* calcul de la partie integrale */  
-  double          pid_err_kd ; /* calcul de la partie derivee */
+  unsigned long    pid_long_incr ;      /* numero d increment du calcul */ 
+  double           pid_input ; /* consigne */ 
+  double           pid_output ;         /* sortie */ 
+  double           pid_ech ;            /* echantillonage */
+  double           pid_err ;            /* erreur  = out - inp */
+  double           pid_err_sum ;        /* calcul de la somme des erreurs */ 
+  double           pid_err_kp ;         /* calcul de la partie proportionnelle */  
+  double           pid_err_ki ;         /* calcul de la partie integrale */  
+  double           pid_err_kd ;         /* calcul de la partie derivee */
 
   /* resultat du calcul complet =
       Kp * (terme proportionnel ) + Ki * (terme integral) + Kd * (terme derivee) 
   */
-  double          pid_result ; /* resultat du calcul complet */
-  double          pid_err_pre ; /* sauvegarde de erreur precedente */ 
+  double          pid_result ;          /* resultat du calcul complet */
+  double          pid_err_pre ;         /* sauvegarde de erreur precedente */ 
   /* Parametres de regalges du PID proportionnel integral derive*/
 
   double          pid_kp ;
@@ -68,21 +78,19 @@ struct STR_PID {
   /* Pointeurs de fonctions associes a la structure */
   /*------------------------------------------------*/
   
-  void (* pid_run)   (double,double) ; 
-  void (* pid_reset) (void) ; 
-  void (* pid_test)  (void) ;
+
 } ;
 
-typedef struct STR_PID STRUCT_PID ;
 typedef struct STR_PID_PARAMS STRUCT_PID_PARAMS ;
 
-void PID_INIT           ( STRUCT_PID * ) ;
-void PID_PARAMS_INIT    ( STRUCT_PID_PARAMS * ) ;
-void PID_PARAMS_DISPLAY ( STRUCT_PID_PARAMS * ) ;
-void PID_RUN              (double, double ) ;
-void PID_RESET            (void) ;
-void PID_TEST             (void) ;
-void PID_ACTIVATE         (void) ;
-int  PID_IS_IN_CONDITION  (void) ;
+void PID_PARAMS_INIT      ( STRUCT_PID_PARAMS * ) ;
+void PID_PARAMS_DISPLAY   ( STRUCT_PID_PARAMS * ) ;
+
+void PID_INIT             ( STRUCT_PID * ) ;
+void PID_RUN              ( STRUCT_PID *, double, double ) ;
+void PID_RESET            ( STRUCT_PID * ) ;
+void PID_TEST             ( STRUCT_PID * ) ;
+void PID_ACTIVATE         ( STRUCT_PID * ) ;
+int  PID_IS_IN_CONDITION  ( STRUCT_PID * ) ;
 
 #endif

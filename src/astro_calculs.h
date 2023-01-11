@@ -55,27 +55,34 @@ typedef struct STR_ANGLE STRUCT_ANGLE ;
 
 typedef enum {
 
-  REDUCTION_INDETERMINE=0,
-  REDUCTION_MONTURE_NB_DENTS,
-  REDUCTION_POULIE_MONTURE_NB_DENTS,
-  REDUCTION_POULIE_MOTEUR_NB_DENTS,
-  REDUCTION_REDUCTEUR_PLANETAIRE,
-  REDUCTION_MOTEUR_NB_PAS,
-  REDUCTION_MOTEUR_NB_MICROPAS,
-  REDUCTION_CPU_CORRECTION
+  CALCULS_REDUCTION_INDETERMINE=0,
+  CALCULS_REDUCTION_MONTURE_NB_DENTS,
+  CALCULS_REDUCTION_POULIE_MONTURE_NB_DENTS,
+  CALCULS_REDUCTION_POULIE_MOTEUR_NB_DENTS,
+  CALCULS_REDUCTION_REDUCTEUR_PLANETAIRE,
+  CALCULS_REDUCTION_MOTEUR_NB_PAS,
+  CALCULS_REDUCTION_MOTEUR_NB_MICROPAS,
+  CALCULS_REDUCTION_CPU_CORRECTION
 }
 t_en_Reduction_Type ;
 
-typedef enum t_en_Reduction_Type ENUM_CALCULS_REDUCTION_TYPE ;
+typedef enum t_en_Reduction_Type ENUM_CALCULS_CALCULS_REDUCTION_TYPE ;
 
 typedef enum {
-  CALCULS_INDETERMINE=0,  
-  CALCULS_AZIMUTAL_VERS_EQUATORIAL,
-  CALCULS_EQUATORIAL_VERS_AZIMUTAL
+  CALCULS_TYPE_INDETERMINE=0,  
+  CALCULS_TYPE_AZI_VERS_EQU,
+  CALCULS_TYPE_EQU_VERS_AZI
 }
-t_en_Calculs_Mode ;
+t_en_Calculs_Type ;
 
 typedef enum t_en_Calculs_Mode ENUM_CALCULS_MODE ;
+
+typedef enum {
+  CALCULS_MODE_INDETERMINE=0,  
+  CALCULS_MODE_AZIMUTAL,
+  CALCULS_MODE_EQUATORIAL
+}
+t_en_Calculs_Mode ;
 
 /*---------------------------------------------------*/
 /* Parametres de fichier config (modif octobre 2022) */ 
@@ -133,40 +140,45 @@ typedef struct STR_CALCULS_PARAMS STRUCT_CALCULS_PARAMS ;
 /* Fin parametres de fichier config                  */ 
 /*---------------------------------------------------*/
 
-struct STR_CALCULS {
-  void (*mut_lock)   (void) ;
-  void (*mut_unlock) (void) ;
-  pthread_mutex_t           cal_mutex ;
-  STRUCT_SUIVI_FRE * cal_p_Fre ;
-  STRUCT_STATS      * cal_p_Sta ;
-  STRUCT_SUIVI_PAS        * cal_p_Pas ;
-  STRUCT_ASTRE            * cal_p_Ast ;
-  STRUCT_CALCULS          * cal_p_Cal ;
-  STRUCT_VOUTE            * cal_p_Vou ;
-  STRUCT_LIEU             * cal_p_Lie ;
-  STRUCT_DEVICES          * cal_p_Dev ;
-  STRUCT_MUTEXS           * cal_p_Mut ;
-  STRUCT_TIME             * cal_p_Tim ;
-  STRUCT_SUIVI            * cal_p_Sui ;
-  int                       cal_mode ;
-} ;
 typedef struct STR_CALCULS STRUCT_CALCULS ;
 
+struct STR_CALCULS {
+  void          (*cal_lock)       ( STRUCT_CALCULS *) ;
+  void          (*cal_unlock)     ( STRUCT_CALCULS *) ;  
+  void          (*cal_log)        ( STRUCT_CALCULS *) ;
+  void          (*cal_display)    ( STRUCT_CALCULS *) ;
+  pthread_mutex_t cal_mutex ;
+  STR_EXT_TIMEVAL cal_tval ; 
+  FILE           *cal_file ; 
+  char            cal_loglevel ;
+  char            cal_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            cal_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  int             cal_type ; /* equa -> azi ou azi -> equ */
+  int             cal_mode ; /* equatoral ou azimutal*/
+} ;
+
 static const char * gc_hach_reduction_type[] = {
-  "REDUCTION_INDETERMINE",
-  "REDUCTION_MONTURE_NB_DENTS",
-  "REDUCTION_POULIE_MONTURE_NB_DENTS",
-  "REDUCTION_POULIE_MOTEUR_NB_DENTS",
-  "REDUCTION_REDUCTEUR_PLANETAIRE",
-  "REDUCTION_MOTEUR_NB_PAS",
-  "REDUCTION_MOTEUR_NB_MICROPAS",
-  "REDUCTION_CPU_CORRECTION"
+  "CALCULS_REDUCTION_INDETERMINE",
+  "CALCULS_REDUCTION_MONTURE_NB_DENTS",
+  "CALCULS_REDUCTION_POULIE_MONTURE_NB_DENTS",
+  "CALCULS_REDUCTION_POULIE_MOTEUR_NB_DENTS",
+  "CALCULS_REDUCTION_REDUCTEUR_PLANETAIRE",
+  "CALCULS_REDUCTION_MOTEUR_NB_PAS",
+  "CALCULS_REDUCTION_MOTEUR_NB_MICROPAS",
+  "CALCULS_REDUCTION_CPU_CORRECTION"
+} ;
+
+static const char * gc_hach_calcul_type[] = {
+  "CALCULS_TYPE_INDETERMINE",  
+  "CALCULS_TYPE_AZI_VERS_EQU",
+  "CALCULS_TYPE_EQU_VERS_AZI"
 } ;
 
 static const char * gc_hach_calcul_mode[] = {
-  "CALCULS_INDETERMINE",  
-  "CALCULS_AZIMUTAL_VERS_EQUATORIAL",
-  "CALCULS_EQUATORIAL_VERS_AZIMUTAL"
+  "CALCULS_TYPE_INDETERMINE",  
+  "CALCULS_MODE_AZIMUTAL",
+  "CALCULS_MODE_EQUATORIAL"
 } ;
 
 // ------------------------------------------------------------------------

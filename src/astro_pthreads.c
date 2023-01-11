@@ -16,6 +16,12 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+static void PTHREADS_DISPLAY_FORMAT ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_DISPLAY        ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_UNLOCK         ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_LOCK           ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_LOG            ( STRUCT_PTHREADS * ) ;
+
 int gi_pth_numero ;  
 int gi_pthread_getuid ;
 int gi_pthread_nb_cpu ;
@@ -73,6 +79,94 @@ static const char * gc_hach_pth_sched_param[] = {
 
 
 /*****************************************************************************************
+* @fn     : PTHREADS_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_PTHREADS *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void PTHREADS_DISPLAY_FORMAT ( STRUCT_PTHREADS * lp_Pth) {
+
+  pthread_t i_id=0 ;
+  pthread_t i_id_pth=0 ;
+  int       i=0;
+  int       l_nb_threads = 0 ;
+  int       i_ord =0 ;
+  int       i_pri=0 ;
+  int       i_sta=0 ;
+  char      c_nam[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
+  char      c_ord[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
+  char      c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
+  char      c_cmd[ CONFIG_TAILLE_BUFFER_256] = {0} ;
+
+  TraceArbo(__func__,2,"display informations on Thread") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+
+  strcpy( c_nam, lp_Pth->pth_att[ lp_Pth->pth_index ].att_c_nam ) ;
+  strcpy( c_ord, lp_Pth->pth_att[ lp_Pth->pth_index ].att_c_ord ) ;
+  strcpy( c_sta, lp_Pth->pth_att[ lp_Pth->pth_index ].att_c_sta ) ;
+         i_id  = lp_Pth->pth_att[ lp_Pth->pth_index ].att_pid  ;
+         i_pri = lp_Pth->pth_att[ lp_Pth->pth_index ].att_pri.sched_priority  ;
+         i_ord = lp_Pth->pth_att[ lp_Pth->pth_index ].att_ord  ; 
+         i_sta = lp_Pth->pth_att[ lp_Pth->pth_index ].att_sta ;
+      i_id_pth = lp_Pth->pth_t  [ lp_Pth->pth_index ] ;
+
+  sprintf( lp_Pth->pth_dis_cmd , STR_PTH_FORMAT_0, \
+    c_nam, \
+    i_id, \
+    i_id_pth, \
+    c_ord, \
+    i_pri, \
+    c_sta, \
+    i_num_thread ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static PTHREADS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_PTHREADS *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void PTHREADS_DISPLAY ( STRUCT_PTHREADS *lp_Pth) {
+
+  int i_num_thread = 0 ;
+  int l_nb_threads = 0 ;
+
+  TraceArbo(__func__,2,"display informations on Threads") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+
+  l_nb_threads = gi_pth_numero ; 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pth->pth_loglevel ) ;
+
+  for( i_num_thread = 0 ; i_num_thread <= l_nb_threads ; i_num_thread++ ) {
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+
+    lp_Pth->pth_index = i_num_thread ;
+    
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
+
+    PTHREADS_DISPLAY_FORMAT( lp_Pth ) ;
+
+    MACRO_ASTRO_GLOBAL_LOG ( lp_Pth->pth_loglevel , 1 , "%s", lp_Pth->pth_dis_cmd ) ;
+  }
+
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pth->pth_loglevel ) ;
+
+  return ;
+}
+/*****************************************************************************************
 * @fn     : PTHREADS_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
@@ -104,7 +198,6 @@ static void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : PTHREADS_LOG
 * @author : s.gravois
@@ -175,7 +268,7 @@ static void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
       c_sta, \
       i_num_thread ) ;
 
-      TraceLogLevel(lp_Pth->pth_loglevel,1,"%s", c_cmd) ;
+      MACRO_ASTRO_GLOBAL_LOG(lp_Pth->pth_loglevel,1,"%s", c_cmd) ;
   }
 
   return ;
@@ -186,10 +279,11 @@ static void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
 * @brief  : Cette fonction initialise les mutexs specifiques a la structure STRUCT_MUTEX independante
 * @param  : void
 * @date   : 2022-11-04 creation
-* @todo   : 
+* @todo   : (obsolete : struct -> mutex are used in place of these)
 *****************************************************************************************/
 
 void PTHREADS_INIT_MUTEXS(void) {
+
   int i_error=0 ;
   int i_errno=0 ;
 
@@ -202,6 +296,7 @@ void PTHREADS_INIT_MUTEXS(void) {
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_dat ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_Mut->mut_pth ) ;
 
+  return ;
 }
 /*****************************************************************************************
 * @fn     : PTHREADS_INIT
@@ -225,6 +320,13 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
   TraceArbo(__func__,0,"init pthreads") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pth->pth_mutex ) ;
+                                     lp_Pth->pth_log      = PTHREADS_LOG ;
+                                     lp_Pth->pth_lock     = PTHREADS_LOCK ;
+                                     lp_Pth->pth_unlock   = PTHREADS_UNLOCK ;
+                                     lp_Pth->pth_display  = PTHREADS_DISPLAY ;
+                                     lp_Pth->pth_loglevel = 0 ; 
+                                     lp_Pth->pth_file     = NULL ;
+  gettimeofday (                   & lp_Pth->pth_tval, NULL ) ;  
 
   lp_Pth->pth_i_nb = 0 ;
   
@@ -254,18 +356,9 @@ void PTHREADS_INIT( STRUCT_PTHREADS *lp_Pth, pthread_t i_pth_self ) {
     perror("Execute with root privilege (because of threads -> sched_priority used)") ;
     exit(EXIT_FAILURE) ;
   }
-
-  /* Pointeurs de fonctions */
-
-  lp_Pth->pth_lock   = PTHREADS_LOCK ;
-  lp_Pth->pth_unlock = PTHREADS_UNLOCK ;
-  lp_Pth->pth_log    = PTHREADS_LOG ;
-
-  lp_Pth->pth_loglevel = 0 ;
   
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : PTHREADS_CONFIG
 * @author : s.gravois
@@ -389,7 +482,6 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
 
   if ( i_error == 0 ) {
     
-
     i_num_thread = gi_pth_numero ;
     gi_pth_numero++ ;
     
@@ -452,13 +544,13 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_Pth) {
   char c_ord[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
   char c_sta[ CONFIG_TAILLE_BUFFER_32 ] = {0} ;
 
-  pthread_mutex_lock( & gp_Mut->mut_pth) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
   l_nb_threads = gi_pth_numero ;
-  pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
 
   for( i_num_thread = 0 ; i_num_thread <= l_nb_threads ; i_num_thread++ ) {
 
-    pthread_mutex_lock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
 
     strcpy( c_nam, lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
     strcpy( c_ord, lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
@@ -468,7 +560,7 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_Pth) {
            i_ord = lp_Pth->pth_att[ i_num_thread ].att_ord  ; 
            i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
            i_id_pth = lp_Pth->pth_t[ i_num_thread ] ;
-    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
 
     Trace("thread %-16s : id %ld id2 %ld ord %s prio %d sta %s num %d", c_nam, i_id, i_id_pth,  c_ord, i_pri, c_sta, i_num_thread ) ;
   }
@@ -490,10 +582,10 @@ void PTHREADS_INFOS(STRUCT_PTHREADS* lp_Pth) {
     Trace("gi_pthread_getuid not PTHREADS_USERID_ROOT => cannot pthread_setschedparam(args)") ;
   }
 
-  pthread_mutex_lock( & gp_Mut->mut_pth) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
   pthread_setname_np( pthread_self(), "_SUIVI_VOUTE" ) ;
   gp_Sui->p_pthpth_att->att_pid[ gi_pth_numero++ ] = pthread_self() ;
-  pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
   */
 
  /*****************************************************************************************
@@ -523,7 +615,7 @@ void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_Pth) {
 
   for (i_num_thread=0; i_num_thread < PTHREADS_MAX_THREADS; i_num_thread++) {
 
-    pthread_mutex_lock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
 
     strcpy( c_nam,  lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
     strcpy( c_ord,  lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
@@ -532,7 +624,7 @@ void   PTHREADS_DISPLAY_ETAT(STRUCT_PTHREADS* lp_Pth) {
             i_pri = lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
             i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
 
-    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
 
     Trace("PTHREAD %-16s : id %lx ord %s prio %d sta %s", c_nam, i_id, c_ord, i_pri, c_sta ) ;
 
@@ -587,7 +679,7 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_Pth) {
 
     i_abandon=0 ;
 
-    pthread_mutex_lock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
 
     strcpy( c_nam,  lp_Pth->pth_att[ i_num_thread ].att_c_nam ) ;
     strcpy( c_ord,  lp_Pth->pth_att[ i_num_thread ].att_c_ord ) ;
@@ -596,7 +688,7 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_Pth) {
             i_pri = lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority  ;
             i_sta = lp_Pth->pth_att[ i_num_thread ].att_sta ;
 
-    pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
 
     if ( i_sta == PTHREAD_RUNNING ) {
       memset( c_thread_name, 0, sizeof(c_thread_name) ) ;
@@ -619,12 +711,12 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_Pth) {
           i_sta = (int)PTHREAD_KILLED ;
           strcpy( c_sta, "PTHREAD_KILLED");
 
-          pthread_mutex_lock( & gp_Mut->mut_pth) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
 
           lp_Pth->pth_att[ i_num_thread ].att_sta = (int) i_sta ;    
           strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
           
-          pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
         }
 */
       }
@@ -634,12 +726,12 @@ void PTHREADS_CANCEL_OR_KILL ( STRUCT_PTHREADS *lp_Pth) {
           i_sta = (int)PTHREAD_CANCELLED ;
           strcpy( c_sta, "PTHREAD_CANCELLED");
 
-          pthread_mutex_lock( & gp_Mut->mut_pth) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Mut->mut_pth) ;
 
           lp_Pth->pth_att[ i_num_thread ].att_sta = i_sta ;    
           strcpy( lp_Pth->pth_att[ i_num_thread ].att_c_sta , c_sta ) ;
           
-          pthread_mutex_unlock( & gp_Mut->mut_pth) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Mut->mut_pth) ;
       }
     }
     else {

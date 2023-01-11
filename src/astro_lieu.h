@@ -40,16 +40,24 @@ typedef struct STR_LIEU_PARAMS STRUCT_LIEU_PARAMS ;
 
 struct STR_LIEU {
  
- pthread_mutex_t lie_mutex ;
- void          (*lie_lock)   (void) ;
- void          (*lie_unlock) (void) ;  
- double          lie_lat ;  // latitude
- double          lie_lon ;  // longitude
- double          lie_alt ;
- double          lie_jj ;  // jour julien
- double          lie_ts ;   // temps sideral
- double          lie_tsr ;  // temps sideral ramene en radians
- double          lie_jd ;   // jour decimal
+  pthread_mutex_t  lie_mutex ;
+  STR_EXT_TIMEVAL  lie_tval ; 
+  FILE            *lie_file ; 
+  void           (*lie_log)     ( STRUCT_LOG * ) ;
+  void           (*lie_display) ( STRUCT_LOG * ) ;
+  void           (*lie_lock)    ( STRUCT_LOG * ) ;
+  void           (*lie_unlock)  ( STRUCT_LOG * ) ;  
+  int              lie_loglevel ;
+  char             lie_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             lie_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  double           lie_lat ;  // latitude
+  double           lie_lon ;  // longitude
+  double           lie_alt ;
+  double           lie_jj ;  // jour julien
+  double           lie_ts ;   // temps sideral
+  double           lie_tsr ;  // temps sideral ramene en radians
+  double           lie_jd ;   // jour decimal
 } ;
 
 void LIEU_INIT           ( STRUCT_LIEU    * ) ;

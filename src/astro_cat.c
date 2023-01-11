@@ -17,6 +17,67 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
+* @fn     : CAT_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_CAT *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void CAT_DISPLAY_FORMAT ( STRUCT_CAT * lp_Cat) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cat->cat_mutex ) ;
+
+  sprintf( lp_Cat->cat_dis_cmd , STR_CAT_FORMAT_0,\
+    lp_Cat->cat_path) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cat->cat_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static CAT_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_CAT *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void CAT_DISPLAY(STRUCT_CAT *lp_Cat) {
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  CAT_DISPLAY_FORMAT( lp_Cat ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cat->cat_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Cat->cat_loglevel , 1 , "%s", lp_Cat->cat_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cat->cat_loglevel ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static CAT_LOG
+* @author : s.gravois
+* @brief  : Cette fonction log les informations de la structure concernee
+* @param  : STRUCT_CAT *
+* @date   : 2023-01-09 creation 
+*****************************************************************************************/
+
+static void CAT_LOG(STRUCT_CAT *lp_Cat) {
+
+  TraceArbo(__func__,2,"display informations on Catalogue") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  CAT_DISPLAY_FORMAT( lp_Cat ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cat->cat_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Cat->cat_loglevel , 1 , "%s", lp_Cat->cat_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cat->cat_loglevel ) ;
+
+  return ;
+}
+/*****************************************************************************************
 * @fn     : CAT_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
@@ -48,7 +109,6 @@ void CAT_UNLOCK ( STRUCT_CAT * lp_Cat) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : CAT_FIN_MOT
 * @author : s.gravois
@@ -80,13 +140,23 @@ void CAT_INIT (STRUCT_CAT * lp_Cat ) {
   TraceArbo(__func__,0,"init catalogues") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cat->cat_mutex ) ;
-
+                                     lp_Cat->cat_lock     = CAT_LOCK ;
+                                     lp_Cat->cat_unlock   = CAT_UNLOCK ;
+                                     lp_Cat->cat_log      = CAT_LOG ;
+                                     lp_Cat->cat_display  = CAT_DISPLAY ;
+                                     lp_Cat->cat_loglevel = 0 ; 
+                                     lp_Cat->cat_file     = NULL ;
+  gettimeofday ( &                   lp_Cat->cat_tval, NULL ) ;
+  
   for(int L=0;L<CAT_NB_LIGNES;L++) {
     for(int C=0;C<CAT_NB_COLONNES;C++) {
       memset(lp_Cat->cat_dat[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
       memset(lp_Cat->cat_dec[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
     }
   }
+
+  memset(lp_Cat->cat_path, CALCULS_ZERO_CHAR, sizeof( lp_Cat->cat_path));
+
   return ;
 }
 /*****************************************************************************************
@@ -159,17 +229,19 @@ void CAT_DISPLAY_DEC(STRUCT_CAT * lp_Cat ) {
 * @brief  : Cette fonction lit le catalogue "datas" passe en parametre
 * @param  : STRUCT_CAT * lp_Cat 
 * @date   : 2022-22-13 creation entete doxygen
-* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+* @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
-void CAT_READ(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
+void CAT_READ(STRUCT_CAT * lp_Cat, char * lc_file_name) {
 
   FILE * fin ;
-  char buf[CAT_TAILLE_BUFFER * CAT_NB_COLONNES] ;
+  char buffer[CAT_TAILLE_BUFFER * CAT_NB_COLONNES] ;
   int  C,L ;
   char *str1, *token, *sptr ;
   
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cat->cat_mutex ) ;
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++) {
@@ -177,24 +249,30 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
       strcpy(lp_Cat->cat_dat[L][C],"_") ;
     }
   
-  memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cat->cat_mutex ) ;
 
-  sprintf(buf,"%s/%s/%s", \
-    gp_Con_Par->con_par_rep_home, \
-    gp_Con_Par->con_par_rep_cat, \
-    catalogue_txt) ;
+  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
+  sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
   
-  if ( (fin=fopen(buf,"r")) == NULL)  {
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cat->cat_mutex ) ;
+
+  if ( lp_Cat->cat_file != NULL ) {
+
+  }
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cat->cat_mutex ) ;
+
+  if ( (fin=fopen(buffer,"r")) == NULL)  {
     // completer et modifier
-    SyslogErrFmt("probleme ouverture 0 %s\n",buf) ;
+    SyslogErrFmt("probleme ouverture 0 %s\n",buffer) ;
     exit(2) ;
   }
-  else Trace1("open %s ok", buf) ;
+  else Trace1("open %s ok", buffer) ;
 
   L=0;C=0;
   
-  while( fgets( buf, CAT_TAILLE_BUFFER * CAT_NB_COLONNES , fin ) != NULL) {
-    for (C = 0, str1 = buf ; ; C++, str1 = NULL) {
+  while( fgets( buffer, CAT_TAILLE_BUFFER * CAT_NB_COLONNES , fin ) != NULL) {
+    for (C = 0, str1 = buffer ; ; C++, str1 = NULL) {
       token = strtok_r(str1, ";", &sptr);
       if (token == NULL) break ;
       strcpy( lp_Cat->cat_dat[L][C],token);
@@ -207,13 +285,13 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
   return ;
 }
 /*****************************************************************************************
-* @fn     : CAT_READ
+* @fn     : CAT_ZONE
 * @author : s.gravois
 * @brief  : Cette fonction recherche les objets dans un cercle autour de l astre en parametre
 * @param  : STRUCT_CAT * lp_Cat 
 * @param  : STRUCT_ASTRE * gp_Ast 
 * @date   : 2022-22-13 creation entete doxygen
-* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+* @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
 void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
@@ -267,7 +345,7 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
 * @brief  : Cette fonction recherche l astre en parametre dans le catalogue 'decimal'
 * @param  : STRUCT_CAT * lp_Cat 
 * @date   : 2022-22-13 creation entete doxygen
-* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+* @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
 void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
@@ -379,13 +457,13 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
             pour le catalogue de type "ngc.txt"
 * @param  : STRUCT_CAT * lp_Cat 
 * @date   : 2022-22-13 creation entete doxygen
-* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+* @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
-void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
+void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * lc_file_name) {
   
   FILE * fout ;
-  char   buf[CAT_TAILLE_BUFFER] ;
+  char   buffer[CAT_TAILLE_BUFFER] ;
   int    C,L ;
   int    ASC_HH,ASC_MM ;   // la 3eme et 4eme colonne sont HH  et MM  de la declinaison
   int    DEC_DEG,DEG_MIN ; // la 5eme et 6eme colonne sont DEG et MIN de l'ascension droite
@@ -399,12 +477,12 @@ void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * catalogue_txt) {
       strcpy(lp_Cat->cat_dec[L][C],"_") ;
   } 
   
-  memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_cat,catalogue_txt) ;
+  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+  sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
   
-  if ( (fout=fopen(buf,"w")) == NULL) {
+  if ( (fout=fopen(buffer,"w")) == NULL) {
     // completer et modifier
-    SyslogErrFmt("probleme ouverture 1 %s\n",buf) ;
+    SyslogErrFmt("probleme ouverture 1 %s\n",buffer) ;
     exit(2) ;
   }
   L=0 ;
@@ -457,13 +535,13 @@ et aussi un fichier dans le repertoire des catalogues
             pour le catalogue de type "ngc.txt"
 * @param  : STRUCT_CAT * lp_Cat 
 * @date   : 2022-22-13 creation entete doxygen
-* @todo   : passer char * catalogue_txt dans la structure et faire une fct dediee
+* @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
-void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * catalogue_txt ) {
+void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * lc_file_name ) {
   
   FILE * fout ;
-  char   buf[CAT_TAILLE_BUFFER] ;
+  char   buffer[CAT_TAILLE_BUFFER] ;
   int    C,L ;
   int    ASC_HH,ASC_MM ;   // la 3eme et 4eme colonne sont HH  et MM  de la declinaison
   double asc, dec ;        // ascension droite et declinaison sous forme decimale
@@ -476,12 +554,12 @@ void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * catalogue_txt ) {
       strcpy(lp_Cat->cat_dec[L][C],"_") ;
   } 
   
-  memset(buf,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
-  sprintf(buf,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,catalogue_txt) ;
+  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+  sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
   
-  if ( (fout=fopen(buf,"w")) == NULL) {
+  if ( (fout=fopen(buffer,"w")) == NULL) {
     // completer et modifier
-    SyslogErrFmt("probleme ouverture 2 %s\n",buf) ;
+    SyslogErrFmt("probleme ouverture 2 %s\n",buffer) ;
     exit(2) ;
   }
   L=0 ;

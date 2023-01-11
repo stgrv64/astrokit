@@ -21,23 +21,35 @@
 #define CONFIG_TAILLE_BUFFER_256 256
 #endif
 
+typedef struct STR_DATAS STRUCT_DATAS ;
+
 struct STR_DATAS {
   pthread_mutex_t dat_mutex ;
-  void          (*dat_lock)   (void) ;
-  void          (*dat_unlock) (void) ;  
-  FILE           *dat_file ;
+  STR_EXT_TIMEVAL dat_tval ; 
+  FILE           *dat_file ; 
+  char            dat_loglevel ;
+  void          (*dat_lock)       ( STRUCT_DEVICES *) ;
+  void          (*dat_unlock)     ( STRUCT_DEVICES *) ;  
+  void          (*dat_log)        ( STRUCT_DEVICES *) ;
+  void          (*dat_display)    ( STRUCT_DEVICES *) ;
+  char            dat_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            dat_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  
   char dat_act [ CONFIG_TAILLE_BUFFER_256 ] ;
   char dat_acc [ CONFIG_TAILLE_BUFFER_256 ] ;
   char dat_bou [ CONFIG_TAILLE_BUFFER_256 ] ;
 } ;
-typedef struct STR_DATAS STRUCT_DATAS ;
 
-void DATAS_INIT            ( STRUCT_DATAS * ) ;
-void DATAS_RESET           ( STRUCT_DATAS * )  ;
-
-void DATAS_ACTION_RESET    ( STRUCT_DATAS * )  ;
-
-void DATAS_ACTION_BUF_TO_DAT      ( STRUCT_DATAS * , const char * ) ;
-void DATAS_ACTION_DAT_TO_KEY      ( STRUCT_DATAS * , STRUCT_KEYS * );
+void DATAS_INIT               ( STRUCT_DATAS * ) ;
+void DATAS_RESET              ( STRUCT_DATAS * )  ;
+void DATAS_ACTION_RESET       ( STRUCT_DATAS * )  ;
+void DATAS_ACTION_BUF_TO_DAT  ( STRUCT_DATAS * , const char * )  ;
+void DATAS_ACTION_DAT_TO_KEY  ( STRUCT_DATAS * , STRUCT_KEYS * ) ;
 
 #endif
+
+/*****************************************************************************************
+ *
+ * END FILE - END FILE - END FILE - END FILE - END FILE - END FILE - END FILE - END FILE - 
+ * 
+ * ************************************************************************************* */ 

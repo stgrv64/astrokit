@@ -220,16 +220,24 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 
 typedef struct STR_CODES STRUCT_CODES ;
 
-
 struct STR_CODES {
+  void          (*cod_lock)       ( STRUCT_CODES *) ;
+  void          (*cod_unlock)     ( STRUCT_CODES *) ;  
+  void          (*cod_log)        ( STRUCT_CODES *) ;
+  void          (*cod_display)    ( STRUCT_CODES *) ;
   pthread_mutex_t cod_mutex ;
-  void          (*cod_lock)   (void) ;
-  void          (*cod_unlock) (void) ; 
-  FILE           *cod_file ;  
+  STR_EXT_TIMEVAL cod_tval ; 
+  FILE           *cod_file ; 
+  char            cod_loglevel ;
+  char            cod_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            cod_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   char            cod_in_term   [ CODES_CODE_NB_CODES][ CODES_CODE_BUFFER_SIZE] ;
   char            cod_in_lirc   [ CODES_CODE_NB_CODES][ CODES_CODE_BUFFER_SIZE] ;
   char            cod_out_act   [ CODES_CODE_NB_CODES][ CODES_CODE_BUFFER_SIZE] ;
   char            cod_hach_codes[ CODES_CODE_NB_CODES][ CODES_NB_IN_OUT ][CONFIG_TAILLE_BUFFER_32] ;
+
+  int             cod_index ;
 } ;
 
 /*------------------------------------------  */
@@ -238,8 +246,5 @@ struct STR_CODES {
 /*------------------------------------------  */
 
 void   CODES_INIT      ( STRUCT_CODES *) ;
-
-void   CODES_DISPLAY   ( STRUCT_CODES *) ;
-void   CODES_LOG       ( STRUCT_CODES *) ;
 
 #endif

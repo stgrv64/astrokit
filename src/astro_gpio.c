@@ -164,12 +164,12 @@ void   GPIO_PWM_PARAMS_DISPLAY (STRUCT_GPIO_PARAMS_PWM * lp_Pwm_Par) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_gpio", lp_Pwm_Par->gpi_pwm_par_alt_gpio)  ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_gpio", lp_Pwm_Par->gpi_pwm_par_azi_gpio)  ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_mask", lp_Pwm_Par->gpi_pwm_par_alt_mask)  ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_mask", lp_Pwm_Par->gpi_pwm_par_azi_mask)  ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_fpwm", lp_Pwm_Par->gpi_pwm_par_alt_fpwm)  ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_fpwm", lp_Pwm_Par->gpi_pwm_par_azi_fpwm)  ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_gpio", lp_Pwm_Par->gpi_pwm_par_alt_gpio)  ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_gpio", lp_Pwm_Par->gpi_pwm_par_azi_gpio)  ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_mask", lp_Pwm_Par->gpi_pwm_par_alt_mask)  ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_mask", lp_Pwm_Par->gpi_pwm_par_azi_mask)  ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_alt_fpwm", lp_Pwm_Par->gpi_pwm_par_alt_fpwm)  ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s", "lp_Pwm_Par->gpi_pwm_par_azi_fpwm", lp_Pwm_Par->gpi_pwm_par_azi_fpwm)  ;  
 
   return ;
 
@@ -1396,10 +1396,14 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
     }
     usleep( d_TUpwm_haut ) ;  
 
-    pwr ite( i_gpio_fd, c_buf0,strlen(c_buf0),0) ;
+    pwrite( i_gpio_fd, c_buf0,strlen(c_buf0),0) ;
     
     usleep( d_TUpwm_bas ) ;
   }
+
+  /* TODO : prevoir modif gp_Pth statut en cas de retour */
+  
+  return NULL ;
 }
 
 /*****************************************************************************************
@@ -1454,7 +1458,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   lp_Mot->mot_pas = 0 ;
   lp_Mot->mot_t = 0 ;
 
-  gettimeofday(&lp_Mot->mot_timeval,NULL) ; 
+  gettimeofday(&lp_Mot->mot_tval,NULL) ; 
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex ) ;
   
@@ -1527,6 +1531,9 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
       HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex) ;
     }
     else {
+
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_mutex) ;
+
       if ( lp_Mot->mot_upas == 0 ) { 
         lp_Mot->mot_upas = lp_Mot->mot_nb_upas-1 ;
         /* Si lp_Mot->mot_upas = lp_Mot->mot_nb_upas-1 , cela veut dire que tout le cycle de micro pas a ete ecoule */
@@ -1543,11 +1550,16 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
       else { 
         lp_Mot->mot_upas-- ; 
       }
+
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex) ;
     }
-    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK() ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_mutex) ;
 
     micropas  =  lp_Mot->mot_upas ;
-    per_tpwm =  lp_Mot->mot_per_pwm ;
+    per_tpwm  =  lp_Mot->mot_per_pwm ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex) ;
 
     //printf("%d\t",lp_Mot->mot_upas) ;
 
@@ -1556,7 +1568,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
     for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
 
-      pthread_mutex_lock( & lp_Mot->mot_pha[i]->pha_mutex ) ;
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_pha[i]->pha_mutex ) ;
 
         lp_Mot->mot_pha[i]->pha_upas    = micropas ;
         lp_Mot->mot_pha[i]->pha_per_pwm    = per_tpwm ;
@@ -1564,10 +1576,9 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
         lp_Mot->mot_pha[i]->pha_per_mot = periode_mot ; 
         lp_Mot->mot_pha[i]->pha_per_mic = periode_mic ; 
 
-      pthread_mutex_unlock( & lp_Mot->mot_pha[i]->pha_mutex ) ;
-      //printf("\t%f",lp_Mot->mot_pha[i]->pha_rc ) ;
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_pha[i]->pha_mutex ) ;
+      
     }
-    pthread_mutex_unlock(& lp_Mot->mot_mutex ) ;
 
     /*  ----------------------------------------------------------
         gestion des temporisations correspondant aux periodes 
@@ -1583,27 +1594,27 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
     usleep( periode_eff * TIME_MICRO_SEC ) ;
     
-    pthread_mutex_lock(  & lp_Mot->mot_mutex ) ;
-
-    periode_ree = TIME_CALCULS_DUREE_SECONDES( & lp_Mot->mot_timeval ) ;
+    periode_ree = TIME_CALCULS_DUREE_SECONDES( & lp_Mot->mot_tval ) ;
 
     /* les temps sont mis a jour en considerant que le passage
        dans la boucle while se fait au regard des temps micro pas */
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK(  & lp_Mot->mot_mutex ) ;
 
     lp_Mot->tps_mot += ( periode_mot ) ;
     lp_Mot->tps_bru += ( periode_bru ) ;
     lp_Mot->tps_mic += ( periode_eff ) ;
     lp_Mot->tps_ree += ( periode_ree ) ;
     
-    pthread_mutex_unlock(& lp_Mot->mot_mutex ) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(& lp_Mot->mot_mutex ) ;
 
-    gp_Pid->pid_run( periode_bru, periode_ree ) ;
+    gp_Pid->pid_run( gp_Pid, periode_bru, periode_ree ) ;
 
-    pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pid->pid_mutex ) ;
 
-    d_ecart = gp_Pid->pid_err ;
+    d_ecart = gp_Pid->pid_err ; /* TODO a mettre dans pid_run */
     
-    pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pid->pid_mutex ) ;
 
     if ( gi_pid_trace>0 && i_pas_change && ( lp_Mot->mot_pas % gi_pid_trace ) == 0 ) {
 
@@ -1617,22 +1628,22 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
         case 0 : 
           // Trace("acc alt %f tps_reel %f tps_mic %f as %lld", lp_Mot->p_sui->pas_acc_alt, lp_Mot->tps_ree, lp_Mot->tps_mic, lp_Mot->mot_pas ) ;
-          pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pid->pid_mutex ) ;
 
           gp_Pid->pid_acc_alt *= gp_Pid->pid_result ;
 
-          pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pid->pid_mutex ) ;
           // Trace("acc alt %f tps_reel %f tps_mic %f", lp_Mot->p_sui->pas_acc_alt, lp_Mot->tps_ree, lp_Mot->tps_mic ) ;
 
           break ;
 
         case 1 : 
           // Trace("acc azi %f tps_reel %f tps_mic %f pas %lld ", lp_Mot->p_sui->pas_acc_azi, lp_Mot->tps_ree, lp_Mot->tps_mic, lp_Mot->mot_pas ) ;
-          pthread_mutex_lock( & gp_Pid->pid_mutex ) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pid->pid_mutex ) ;
 
           gp_Pid->pid_acc_azi *= gp_Pid->pid_result ;
           
-          pthread_mutex_unlock( & gp_Pid->pid_mutex ) ;
+          HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pid->pid_mutex ) ;
           // Trace("acc azi %f tps_reel %f tps_mic %f", lp_Mot->p_sui->pas_acc_azi, lp_Mot->tps_ree, lp_Mot->tps_mic ) ;
           break ;
       }
@@ -1683,9 +1694,13 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
     // FIXME : calcule la duree reelle d une iteration dans la boucle
 
-    //tdiff = TIME_CALCULS_DUREE_MICROSEC( &lp_Mot->mot_timeval ) ; 
+    //tdiff = TIME_CALCULS_DUREE_MICROSEC( &lp_Mot->mot_tval ) ; 
     i_incr++ ;
   } // FIXME : fin boucle while 
+
+  /* TODO : prevoir modif gp_Pth statut en cas de retour */
+
+  return NULL ;
 }
 /*****************************************************************************************
 * @fn     : GPIO_INIT_PWM_MOTEUR
@@ -1708,18 +1723,19 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Mot->mot_mutex ) ;
-  
+  gettimeofday( &                    lp_Mot->mot_tval,NULL) ;
+
   memset(cmd, CONFIG_ZERO_CHAR ,sizeof(cmd)) ;
 
   lp_Mot->type_fonction = type_fonction ;
   lp_Mot->param0        = param0 ;
   lp_Mot->param1        = param1 ;
   lp_Mot->mot_id        = id ;
-  lp_Mot->mot_fre_pwm          = fpwm ;
-  lp_Mot->mot_fm            = fm / 8 ;
-  lp_Mot->mot_nb_upas    = upas ;
-  lp_Mot->mot_tm            = 1 / lp_Mot->mot_fm ;
-  lp_Mot->mot_per_pwm          = 1 / lp_Mot->mot_fre_pwm ;
+  lp_Mot->mot_fre_pwm   = fpwm ;
+  lp_Mot->mot_fm        = fm / 8 ;
+  lp_Mot->mot_nb_upas   = upas ;
+  lp_Mot->mot_tm        = 1 / lp_Mot->mot_fm ;
+  lp_Mot->mot_per_pwm   = 1 / lp_Mot->mot_fre_pwm ;
   lp_Mot->nbdeltat      = (long)(lp_Mot->mot_fm * lp_Mot->mot_nb_upas) ;
   lp_Mot->mot_per_mot   = 1 / lp_Mot->mot_fm ;
   lp_Mot->mot_per_mic   = 1 / ( lp_Mot->mot_fm * lp_Mot->mot_nb_upas ) ;
@@ -1731,8 +1747,6 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
 
   lp_Mot->temps_moyen      = 0 ; 
   lp_Mot->temps_reel_moyen = 0 ; 
-
-  gettimeofday(&lp_Mot->mot_timeval,NULL) ;
 
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     

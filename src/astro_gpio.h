@@ -127,12 +127,16 @@ t_en_Gpio_Red_Type ;
 
 struct STR_GPIO_PWM_PHASE {
 
-  STR_EXT_TIMEVAL    pha_tval ;
-  pthread_mutex_t   pha_mutex ;    
-  void            (*pha_lock)   (void) ;
-  void            (*pha_unlock) (void) ;  
-  /* STRUCT_SUIVI    * p_sui ; */
-  /* STRUCT_PTHREADS * p_pth ; */
+  pthread_mutex_t   pha_mutex ;
+  STR_EXT_TIMEVAL   pha_tval ; 
+  FILE             *pha_file ; 
+  char              pha_loglevel ;
+  void            (*pha_lock)       ( STRUCT_GPIO_PWM_PHASE *) ;
+  void            (*pha_unlock)     ( STRUCT_GPIO_PWM_PHASE *) ;  
+  void            (*pha_log)        ( STRUCT_GPIO_PWM_PHASE *) ;
+  void            (*pha_display)    ( STRUCT_GPIO_PWM_PHASE *) ;
+  char              pha_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char              pha_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
   double            pha_rap[ GPIO_MICROPAS_MAX ] ; 
   double            pha_per_pwm ;  
@@ -145,7 +149,6 @@ struct STR_GPIO_PWM_PHASE {
   int               pha_gpio ;
   int               pha_gpio_open_statut ;
   int               pha_gpio_fd ;
-
 } ;
 
 /*---------------------------------------------------*/
@@ -153,16 +156,22 @@ struct STR_GPIO_PWM_PHASE {
 /* Un moteur PAP = 2 bobines de 2 phases (4 fils)    */
 /*---------------------------------------------------*/
 
+typedef struct STR_GPIO_PWM_MOTEUR STRUCT_GPIO_PWM_MOTEUR ;
+
 struct STR_GPIO_PWM_MOTEUR {
   STRUCT_GPIO_PWM_PHASE * mot_pha[ GPIO_NB_PHASES_PAR_MOTEUR ] ;
-  pthread_mutex_t         mot_mutex ; 
-  void                  (*mot_lock)   (void) ;
-  void                  (*mot_unlock) (void) ;  
 
-  struct timeval          mot_timeval ;
-  /* STRUCT_SUIVI          * p_sui ; */
-  /* STRUCT_PTHREADS       * p_pth ; */
-  
+  pthread_mutex_t         mot_mutex ;
+  STR_EXT_TIMEVAL         mot_tval ; 
+  FILE                   *mot_file ; 
+  char                    mot_loglevel ;
+  void                  (*mot_lock)       ( STRUCT_GPIO_PWM_MOTEUR *) ;
+  void                  (*mot_unlock)     ( STRUCT_GPIO_PWM_MOTEUR *) ;  
+  void                  (*mot_log)        ( STRUCT_GPIO_PWM_MOTEUR *) ;
+  void                  (*mot_display)    ( STRUCT_GPIO_PWM_MOTEUR *) ;
+  char                    mot_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char                    mot_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   int                     mot_id ;
   long long               mot_pas ;
   int                     mot_upas ;

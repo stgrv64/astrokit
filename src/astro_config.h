@@ -272,14 +272,21 @@ typedef struct  STR_CONFIG STRUCT_CONFIG ;
 
 struct STR_CONFIG {
   pthread_mutex_t con_mutex ;
-  FILE           *con_file ;
-  int             con_loglevel ;
-  void          (*con_log)    (STRUCT_CONFIG*) ;
-  void          (*con_lock)   (STRUCT_CONFIG*) ;
-  void          (*con_unlock) (STRUCT_CONFIG*) ;  
-  char            con_params  [CONFIG_DATAS_NB_LIGNES] \
-                              [CONFIG_DATAS_NB_COLONNES] \
-                              [CONFIG_TAILLE_BUFFER_256] ;
+  STR_EXT_TIMEVAL con_tval ; 
+  FILE           *con_file ; 
+  char            con_loglevel ;
+  void          (*con_lock)       ( STRUCT_CONFIG *) ;
+  void          (*con_unlock)     ( STRUCT_CONFIG *) ;  
+  void          (*con_log)        ( STRUCT_CONFIG *) ;
+  void          (*con_display)    ( STRUCT_CONFIG *) ;
+  char            con_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            con_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  
+  int             con_index ;
+  
+  char            con_params   [CONFIG_DATAS_NB_LIGNES] \
+                               [CONFIG_DATAS_NB_COLONNES] \
+                               [CONFIG_TAILLE_BUFFER_256] ;
 } ;
 
 static const char * c_Bin_Possible_Paths[] = {

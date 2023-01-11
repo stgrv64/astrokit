@@ -94,8 +94,46 @@
 #include <linux/i2c-dev.h>
 
 /*------------------------------------------------------------------------------*/
+/* Defintion des format d'affichage pour les fonctions DISPLAY de chaque struct */
+/*------------------------------------------------------------------------------*/
+
+  int             dev_use_bluetooth ;
+  int             dev_use_capteurs ;
+  int             dev_use_infrarouge ;
+  int             dev_use_raquette ;
+  int             dev_use_controler ; 
+  int             dev_use_keyboard ;
+  int             dev_use_lcd ; 
+  int             dev_init_capteurs ;
+
+#define STR_AST_FORMAT_0 "(nom) %-15s (asc) %-15s (dec) %-15s (agh) %-15s (azi) %-15s (alt) %-5s (Va) %3.2f (Vh) %3.2f"
+#define STR_CAL_FORMAT_0 "(mode) %s (type) %s"
+#define STR_CAT_FORMAT_0 "(path) %s"
+#define STR_COD_FORMAT_0 "(in_lirc) %s (in_termios) %s (out_action) %s"
+#define STR_CON_FORMAT_0 ""
+#define STR_DEV_FORMAT_0 "(cla) %d (inf) %d (lcd) %d (cap) %d (ctl) %d (blu) %d (raq) %d"
+#define STR_KEY_FORMAT_0 "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mo) %-5s (menu) %-10s (motencours) %-2d"
+#define STR_VOU_FORMAT_0 "(num) %lld (run) %d (tps) %.2f"
+#define STR_PID_FORMAT_0 "(inp) %f (out) %f (err) %f (result) %f"
+#define STR_PTH_FORMAT_0 "(pth) %-16s (id) %ld (id2) %ld (ord) %s (prio) %d (sta) %s (num) %d"
+#define STR_STA_FORMAT_0 "(Ia) %lld (Ih) %lld (Tac) %f (Thc) %f (Ias) %f (Ihs) %f"
+#define STR_PAS_FORMAT_0 "(wst) %ld (est) %ld (nth) %ld (sou)%ld (acc-alt) %d (acc-azi) %d"
+#define STR_TIM_FORMAT_0 "(dec) %f (sig) %c (yea) %-4d (mon) %-3d (day) %-3d (hou) %-3d (min) %-3d (sec) %-3d "
+
+/*------------------------------------------------------------------------------*/
 /* Defintion des Macros pour tout le code qui n'est pas de type log             */
 /*------------------------------------------------------------------------------*/
+
+#define MACRO_ASTRO_GLOBAL_LOG(loglevel,nb,fmt, args...) \
+do { \
+  if (loglevel>=nb) { \
+    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
+  } \
+} \
+while (0)
+
+/* MACRO_ASTRO_GLOBAL_LOG_ROTATE est une MACRO : pas besoin de passer par adresse */
+/* FIXME : flaglogrotate n a pas besoin d'etre un pointeur */
 
 #define MACRO_ASTRO_GLOBAL_LOG_ROTATE(flaglogrotate) \
 do{                       \
@@ -113,6 +151,9 @@ do{                       \
   }                       \
 }                         \
 while(0)
+
+#define MACRO_ASTRO_GLOBAL_LOG_OFF(flaglogrotate) do{ flaglogrotate = 0 ; } while(0)
+#define MACRO_ASTRO_GLOBAL_LOG_ON( flaglogrotate) do{ flaglogrotate = 1 ; } while(0)
 
 /*------------------------------------------------------------------------------*/
 /* Definition des constantes globales                                           */ 
@@ -178,14 +219,13 @@ while(0)
 
 #define STATS_ASS                      3  
 
-typedef enum    t_en_Reduction_Type         ENUM_CALCULS_REDUCTION_TYPE ;
+typedef enum    t_en_Reduction_Type         ENUM_CALCULS_CALCULS_REDUCTION_TYPE ;
 typedef enum    t_en_Calculs_Mode           ENUM_CALCULS_MODE ;
 
 typedef struct  lirc_config                 STR_EXT_LIRC_CONFIG ;
 typedef struct  timeval                     STR_EXT_TIMEVAL ;
 typedef struct  termios                     STR_EXT_TERMIOS ;
-typedef struct  pthread_mutex_t             STR_EXT_PTHREAD_MUTEX_T ;
-typedef struct  pthread_t                   STR_EXT_PTHREAD_T ;
+typedef struct  pthread_t                   STR_EXT_PTH_T ;
 
 typedef struct  STR_ANGLE                   STRUCT_ANGLE ;
 typedef struct  STR_ASTRE                   STRUCT_ASTRE ;

@@ -14,6 +14,62 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+static void TIME_DISPLAY_FORMAT ( STRUCT_TIME * ) ;
+static void TIME_DISPLAY        ( STRUCT_TIME * ) ;
+static void TIME_UNLOCK         ( STRUCT_TIME * ) ;
+static void TIME_LOCK           ( STRUCT_TIME * ) ;
+static void TIME_LOG            ( STRUCT_TIME * ) ;
+
+/*****************************************************************************************
+* @fn     : TIME_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_TIME *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void TIME_DISPLAY_FORMAT ( STRUCT_TIME * lp_Tim) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Tim->ast_mutex ) ;
+
+  sprintf( lp_Tim->tim_dis_cmd , STR_TIM_FORMAT_0,\
+    lp_Tim->tim_hd, \
+    lp_Tim->tim_sig, \
+    lp_Tim->tim_yy, \
+    lp_Tim->tim_mm, \
+    lp_Tim->tim_dd, \
+    lp_Tim->tim_HH, \
+    lp_Tim->tim_MM, \
+    lp_Tim->tim_SS ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Tim->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static TIME_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_TIME *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void TIME_DISPLAY( STRUCT_TIME *lp_Tim) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  TIME_DISPLAY_FORMAT( lp_Tim ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Tim->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Tim->ast_loglevel , 1 , "%s", lp_Tim->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Tim->ast_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : TIME_LOCK
 * @author : s.gravois
@@ -22,7 +78,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void TIME_LOCK ( STRUCT_TIME * lp_Tim) {
+static void TIME_LOCK ( STRUCT_TIME * lp_Tim) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -38,7 +94,7 @@ void TIME_LOCK ( STRUCT_TIME * lp_Tim) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void TIME_UNLOCK ( STRUCT_TIME * lp_Tim) {
+static void TIME_UNLOCK ( STRUCT_TIME * lp_Tim) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -46,7 +102,23 @@ void TIME_UNLOCK ( STRUCT_TIME * lp_Tim) {
 
   return ;
 }
+/*****************************************************************************************
+* @fn     : TIME_LOG
+* @author : s.gravois
+* @brief  : Log la structure en parametre
+* @param  : STRUCT_TIME *
+* @date   : 2023-01-11 creation
+* @todo   : (completer)
+*****************************************************************************************/
 
+static void TIME_LOG ( STRUCT_TIME * lp_Tim) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  /* TODO : completer */
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : TIME_CALCULS_LOCAL_DATE
 * @author : s.gravois
@@ -342,7 +414,6 @@ int TIME_CALCULS_SIDERAL_TIME(STRUCT_TIME * lp_Tim, STRUCT_LIEU* lp_Lie ) {
 
   return 0 ;
 }
-
 /*****************************************************************************************
 * @fn     : TIME_CALCULS_HMS_VERS_DEC_DIR
 * @author : s.gravois
@@ -359,8 +430,9 @@ void TIME_CALCULS_HMS_VERS_DEC_DIR(double * hdec, double hou, double min, double
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   *hdec = hou + ( min / 60.0) + ( sec / 3600.0)  ;
-}
 
+  return ;
+}
 /*****************************************************************************************
 * @fn     : TIME_CALCULS_DEC_VERS_HMS
 * @author : s.gravois
@@ -396,13 +468,18 @@ void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
   Trace2("heure    decimale = %d" , lp_Tim->tim_HH) ;
   Trace2("minutes  decimale = %d" , lp_Tim->tim_MM) ;
   Trace2("secondes decimale = %d" , lp_Tim->tim_SS) ;
-}
 
-//========================================================================================
-// FIXME : TIME_TEMPORISATION_MICROSEC : 
-// FIXME : * permet de faire une temporisation 
-// TODO  : * supprimer ? non utilise actuellement
-//========================================================================================
+  return ;
+}
+/*****************************************************************************************
+* @fn     : TIME_TEMPORISATION_MICROSEC
+* @author : s.gravois
+* @brief  : Permet de faire une temporisation
+* @param  : STRUCT_TIME * lp_Tim
+* @date   : 2022-03-18 creation 
+* @date   : 2023-01-11 creation entete
+* @todo   : 
+*****************************************************************************************/
 
 long TIME_TEMPORISATION_MICROSEC(struct timeval t00, double microsecondes, double percent) {
   
@@ -561,6 +638,7 @@ void TIME_DISPLAY(STRUCT_TIME * lp_Tim) {
 
   Trace("----------------------------") ;
 
+  return ;
 }
 /*****************************************************************************************
 * @fn     : TIME_PARAMS_DISPLAY
@@ -576,15 +654,15 @@ void TIME_PARAMS_DISPLAY(STRUCT_TIME_PARAMS * lp_Tim_Par) {
   
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo         ", lp_Tim_Par->tim_par_tpo);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_raq     ", lp_Tim_Par->tim_par_tpo_raq);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_menu    ", lp_Tim_Par->tim_par_tpo_menu);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_ir      ", lp_Tim_Par->tim_par_tpo_ir);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_termios ", lp_Tim_Par->tim_par_tpo_termios);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_capteurs", lp_Tim_Par->tim_par_tpo_capteurs);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_loop", lp_Tim_Par->tim_par_tpo_lcd_loop);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_disp", lp_Tim_Par->tim_par_tpo_lcd_disp);
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_pid_loop", lp_Tim_Par->tim_par_tpo_pid_loop);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo         ", lp_Tim_Par->tim_par_tpo);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_raq     ", lp_Tim_Par->tim_par_tpo_raq);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_menu    ", lp_Tim_Par->tim_par_tpo_menu);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_ir      ", lp_Tim_Par->tim_par_tpo_ir);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_termios ", lp_Tim_Par->tim_par_tpo_termios);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_capteurs", lp_Tim_Par->tim_par_tpo_capteurs);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_loop", lp_Tim_Par->tim_par_tpo_lcd_loop);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_lcd_disp", lp_Tim_Par->tim_par_tpo_lcd_disp);
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %ld", "lp_Tim_Par->tim_par_tpo_pid_loop", lp_Tim_Par->tim_par_tpo_pid_loop);
 
   return ;
 }
@@ -608,8 +686,9 @@ void TIME_CALCULS_HMS_VERS_DEC(STRUCT_TIME * lp_Tim) {
   lp_Tim->tim_hd = lp_Tim->tim_HH + (lp_Tim->tim_MM / 60.0) + (lp_Tim->tim_SS / 3600.0)  ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
-}
 
+  return ;
+}
 /*****************************************************************************************
 * @fn     : TIME_DISPLAY_MSG_HHMMSS
 * @author : s.gravois
@@ -625,8 +704,9 @@ void TIME_DISPLAY_MSG_HHMMSS( STRUCT_TIME * lp_Tim, char * mesg ) {
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace2("%s : %dh%dmn%ds : %f", mesg, lp_Tim->tim_HH, lp_Tim->tim_MM, lp_Tim->tim_SS, lp_Tim->tim_hd ) ;
-}
 
+  return ;
+}
 /*****************************************************************************************
 * @fn     : TIME_SET_YEAR_MONTH_AND_DAY
 * @author : s.gravois
@@ -681,6 +761,7 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
 
   Trace("Nouvelle date : %s", buf) ;
 
+  return ;
 }
 /*****************************************************************************************
 * @fn     : TIME_SET_HOUR_AND_MINUTES
@@ -732,6 +813,8 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
 
   Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
+
+  return ;
 }
 
 /*
@@ -757,6 +840,13 @@ void TIME_INIT( STRUCT_TIME * lp_Tim) {
   TraceArbo(__func__,3,"init time") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tim->tim_mutex ) ;
+                                     lp_Tim->tim_log      = TIME_LOG ;
+                                     lp_Tim->tim_lock     = TIME_LOCK ;
+                                     lp_Tim->tim_unlock   = TIME_UNLOCK ;
+                                     lp_Tim->tim_display  = TIME_DISPLAY ;
+                                     lp_Tim->tim_loglevel = 0 ; 
+                                     lp_Tim->tim_file     = NULL ;
+  gettimeofday (                   & lp_Tim->tim_tval, NULL ) ;  
 
   lp_Tim->tim_sig = '+' ; // signe 
   lp_Tim->tim_mm  = 0 ;  // month
@@ -767,6 +857,7 @@ void TIME_INIT( STRUCT_TIME * lp_Tim) {
   lp_Tim->tim_SS  = 0 ;  // secondes
   lp_Tim->tim_hd  = 0 ;  // heure decimale (double)
 
+  return ;
 }
 /*****************************************************************************************
 * @fn     : TIME_RELEASE
@@ -806,6 +897,8 @@ void TIME_PARAMS_INIT( STRUCT_TIME_PARAMS * lp_Tim_Par) {
   lp_Tim_Par->tim_par_tpo_lcd_loop = 0 ;
   lp_Tim_Par->tim_par_tpo_lcd_disp = 0 ;
   lp_Tim_Par->tim_par_tpo_pid_loop = 0 ;
+
+  return ;
 }
 
 /*****************************************************************************************
@@ -837,6 +930,7 @@ void TIME_INIT_TEMPOS( STRUCT_TIME_TEMPOS * lp_Tpo) {
   lp_Tpo->tpo_lcd_loop = 0 ;
   lp_Tpo->tpo_pid_loop = 0 ;
 
+  return ;
 }
 
 /*****************************************************************************************
@@ -890,5 +984,11 @@ void TIME_TEMPOS_CONFIG( STRUCT_TIME_TEMPOS * lp_Tpo) {
     lp_Tpo->tpo_pid_loop = gp_Tim_Par->tim_par_tpo_pid_loop ; 
   }
 
-
+  return ;
 }
+
+/* =====================================================================================
+ *
+ * FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - 
+ * 
+ * ===================================================================================== */

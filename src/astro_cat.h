@@ -28,35 +28,38 @@
 #define   CAT_NGC_DEC_TXT    "ngc.csv.dec"
 #define   CAT_ETO_DEC_TXT    "eto.csv.dec"
 
-#define   CAT_NB_LIGNES      10000
-#define   CAT_NB_COLONNES    6
-#define   CAT_TAILLE_BUFFER  100
+#define   CAT_NB_LIGNES          10000
+#define   CAT_NB_COLONNES        6
+#define   CAT_TAILLE_BUFFER      100
+#define   CAT_TAILLE_BUFFER_256  256
 
 /* TODO : finir de modifier le code pour passer partout par la structure STRUCT_CAT */
 
-struct STR_CAT {
-  void          (*cat_lock)   (void) ;
-  void          (*cat_unlock) (void) ;
-  FILE           *cat_file ; 
-  pthread_mutex_t cat_mutex ;
-  char            cat_dat [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER] ;
-  char            cat_dec [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER] ;
-} ;
 typedef struct STR_CAT STRUCT_CAT ;
 
-char g_c_cat         [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
-char g_c_cat_dec     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
-char g_c_cat_eto     [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
-char g_c_cat_eto_dec [CAT_NB_LIGNES]   [CAT_NB_COLONNES]   [CAT_TAILLE_BUFFER] ;
+struct STR_CAT {
+  void          (*cat_lock)       ( STRUCT_CAT *) ;
+  void          (*cat_unlock)     ( STRUCT_CAT *) ;  
+  void          (*cat_log)        ( STRUCT_CAT *) ;
+  void          (*cat_display)    ( STRUCT_CAT *) ;
+  pthread_mutex_t cat_mutex ;
+  STR_EXT_TIMEVAL cat_tval ; 
+  FILE           *cat_file ; 
+  char            cat_loglevel ;
+  char            cat_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            cat_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
 
-/* TODO : creer une structure de catalogues STRUCT_CAT */ 
+  char            cat_dat [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER] ;
+  char            cat_dec [CAT_NB_LIGNES][CAT_NB_COLONNES][CAT_TAILLE_BUFFER] ;
+  char            cat_path [CAT_TAILLE_BUFFER_256] ;
+} ;
 
 void      CAT_INIT          ( STRUCT_CAT * ) ;
 void      CAT_READ          ( STRUCT_CAT * , char * ) ;
 void      CAT_FIND          ( STRUCT_CAT * , STRUCT_ASTRE *) ;
 void      CAT_ZONE          ( STRUCT_CAT * , STRUCT_ASTRE *, double ) ;
-void      CAT_DISPLAY_DAT  ( STRUCT_CAT * ) ;
-void      CAT_DISPLAY_DEC  ( STRUCT_CAT * ) ;
+void      CAT_DISPLAY_DAT   ( STRUCT_CAT * ) ;
+void      CAT_DISPLAY_DEC   ( STRUCT_CAT * ) ;
 
 void      CAT_FORMAT_DECIMAL_NGC ( STRUCT_CAT *, char * ) ;
 void      CAT_FORMAT_DECIMAL_ETO ( STRUCT_CAT *, char * ) ;

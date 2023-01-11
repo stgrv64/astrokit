@@ -13,7 +13,6 @@ void   ASTRO_TRAP_SUIVI_CAPTEURS(int )  ;
 void   ASTRO_TRAP_SUIVI_CLAVIER(int )  ;
 
 void * _SUIVI_MENU            ( STRUCT_SUIVI * ) ;
-void * _SUIVI_VOUTE           ( STRUCT_SUIVI * ) ;
 void * _SUIVI_INFRAROUGE      ( STRUCT_SUIVI * ) ;
 void * _SUIVI_CLAVIER_getchar ( STRUCT_SUIVI * ) ;
 void * _SUIVI_CLAVIER_TERMIOS ( STRUCT_TERMIOS * ) ;

@@ -65,21 +65,31 @@ typedef struct STR_TIME_TEMPOS STRUCT_TIME_TEMPOS ;
   * d'un angle sous la forme  : 12h25mn05s ( 360 degres = 24h )
   */
 
+typedef struct STR_TIME STRUCT_TIME ;
+
 struct STR_TIME {
-  
   pthread_mutex_t tim_mutex ;
-  double          tim_hd ;      // heure decimale
-  char            tim_sig ;    /* signe */ 
-  int             tim_si ;      // signe
-  int             tim_mm ;      // month
-  int             tim_yy ;      // year
-  int             tim_dd ;      // day
-  int             tim_HH ;      // hour
-  int             tim_MM ;      // minutes
-  int             tim_SS ;      // secondes
+  STR_EXT_TIMEVAL tim_tval ; 
+  FILE           *tim_file ;
+  void          (*tim_log)     ( STRUCT_CONFIG * ) ;
+  void          (*tim_display) ( STRUCT_CONFIG * ) ;
+  void          (*tim_lock)    ( STRUCT_CONFIG * ) ;
+  void          (*tim_unlock)  ( STRUCT_CONFIG * ) ;
+  int             tim_loglevel ;
+  char            tim_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            tim_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  double          tim_hd ;   // heure decimale
+  char            tim_sig ;  /* signe */ 
+  int             tim_si ;   // signe
+  int             tim_mm ;   // month
+  int             tim_yy ;   // year
+  int             tim_dd ;   // day
+  int             tim_HH ;   // hour
+  int             tim_MM ;   // minutes
+  int             tim_SS ;   // secondes
 
 } ;
-typedef struct STR_TIME STRUCT_TIME ;
 
 #include "astro_global.h"
 
@@ -132,6 +142,12 @@ void   TIME_SET_MONTH_AND_DAY         ( char *  ) ;
 void   TIME_SET_HOUR_AND_MINUTES      ( char *  ) ;
 
 #endif
+
+/* =====================================================================================
+ *
+ * FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - FIN FICHIER - 
+ * 
+ * ===================================================================================== */
 
 /* ---------------------------------------------------------------------------------------
  man date sur noyau compile 

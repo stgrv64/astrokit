@@ -107,28 +107,47 @@ struct STR_I2C_MCP23017 {
   unsigned char mcp_azi_m0   ;  // numero de port GPIO pour le choix du micro pas en azimut
 } ;
 
+typedef struct STR_I2C_DEVICE  STRUCT_I2C ;
+typedef struct STR_I2C_ACC_MAG STRUCT_I2C_ACC_MAG ;
+
 // structure decrivant un device
 //---------------------------------------------------
 struct STR_I2C_DEVICE {
 
-  pthread_mutex_t i2c_dev_mutex ;
-  void          (*i2c_dev_lock)   (void) ;
-  void          (*i2c_dev_unlock) (void) ;  
-  unsigned char   i2c_dev_buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
-  unsigned long   i2c_dev_usleep ;         // sleep entre chaque lecture (microseconde)
-  int             i2c_dev_statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
-  int             i2c_dev_fd ;                     // file descriptor pour le device utilise
-  int             i2c_dev_registre ;               // registre
-  int             i2c_dev_adress ;                 // adress du device (en hexa)
+  pthread_mutex_t  i2c_dev_mutex ;
+  STR_EXT_TIMEVAL  i2c_dev_tval ; 
+  FILE            *i2c_dev_file ; 
+  char             i2c_dev_loglevel ;
+  void           (*i2c_dev_lock)       ( STRUCT_I2C * ) ;
+  void           (*i2c_dev_unlock)     ( STRUCT_I2C * ) ;  
+  void           (*i2c_dev_log)        ( STRUCT_I2C * ) ;
+  void           (*i2c_dev_display)    ( STRUCT_I2C * ) ;
+  char             i2c_dev_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             i2c_dev_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  unsigned char    i2c_dev_buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
+  unsigned long    i2c_dev_usleep ;         // sleep entre chaque lecture (microseconde)
+  int              i2c_dev_statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
+  int              i2c_dev_fd ;                     // file descriptor pour le device utilise
+  int              i2c_dev_registre ;               // registre
+  int              i2c_dev_adress ;                 // adress du device (en hexa)
 } ;
 
 //---------------------------------------------------
 
 struct STR_I2C_ACC_MAG {
   
-  pthread_mutex_t acc_mutex ;
-  void          (*acc_lock)   (void) ;
-  void          (*acc_unlock) (void) ;  
+  pthread_mutex_t  acc_mutex ;
+  STR_EXT_TIMEVAL  acc_tval ; 
+  FILE            *acc_file ; 
+  char             acc_loglevel ;
+  void           (*acc_lock)       ( STRUCT_I2C_ACC_MAG * ) ;
+  void           (*acc_unlock)     ( STRUCT_I2C_ACC_MAG * ) ;  
+  void           (*acc_log)        ( STRUCT_I2C_ACC_MAG * ) ;
+  void           (*acc_display)    ( STRUCT_I2C_ACC_MAG * ) ;
+  char             acc_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             acc_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   float acc_acc_norme_max ; 
   float acc_mag_norme_max ;
   float acc_roll ;
@@ -184,9 +203,6 @@ struct STR_I2C_ACC_MAG {
   int acc_gpio ; // port GPIO pour tester la sortie son 
   
 } ;
-
-typedef struct STR_I2C_DEVICE  STRUCT_I2C ;
-typedef struct STR_I2C_ACC_MAG STRUCT_I2C_ACC_MAG ;
 
 int 	   I2C_INIT               ( STRUCT_I2C *, char * , char * ) ;
 void     I2C_CALCULS_ACCMAG     ( STRUCT_I2C_ACC_MAG * ) ;

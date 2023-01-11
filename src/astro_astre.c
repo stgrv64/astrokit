@@ -17,6 +17,62 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * ) ;
+static void ASTRE_DISPLAY        ( STRUCT_ASTRE * ) ;
+static void ASTRE_LOCK           ( STRUCT_ASTRE * ) ;
+static void ASTRE_UNLOCK         ( STRUCT_ASTRE * ) ;
+
+/*****************************************************************************************
+* @fn     : static ASTRE_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * lp_Ast) {
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  sprintf( lp_Ast->ast_dis_cmd , STR_AST_FORMAT_0,\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static ASTRE_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  ASTRE_DISPLAY_FORMAT( lp_Ast ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+
+  return ;
+}
+
 /*****************************************************************************************
 * @fn     : ASTRE_LOCK
 * @author : s.gravois
@@ -25,7 +81,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
+static void ASTRE_LOCK ( STRUCT_ASTRE * lp_Ast) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -68,12 +124,13 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   TraceArbo(__func__,0,"init astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast->ast_mutex ) ;
-
-  lp_Ast->ast_lock     = ASTRE_LOCK ;
-  lp_Ast->ast_unlock   = ASTRE_UNLOCK ;
-  lp_Ast->ast_log      = ASTRE_LOG ;
-
-  lp_Ast->ast_loglevel = 0 ;
+                                     lp_Ast->ast_lock     = ASTRE_LOCK ;
+                                     lp_Ast->ast_unlock   = ASTRE_UNLOCK ;
+                                     lp_Ast->ast_log      = ASTRE_LOG ;
+                                     lp_Ast->ast_display  = ASTRE_DISPLAY ;
+                                     lp_Ast->ast_loglevel = 0 ;
+                                     lp_Ast->ast_file     = NULL ;
+  gettimeofday ( &                   lp_Ast->ast_tval, NULL ) ;
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
     memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
@@ -98,7 +155,7 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   lp_Ast->ast_r3_zz   = 0 ;
   
   lp_Ast->ast_typ = ASTRE_INDETERMINE ;
-  lp_Ast->ast_num  = 0 ;
+  lp_Ast->ast_num = 0 ;
   lp_Ast->ast_new = TRUE ;
 
   TIME_INIT( & lp_Ast->ast_at     ) ;
@@ -123,7 +180,6 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : ASTRE_PARAMS_INIT
 * @author : s.gravois
@@ -138,6 +194,7 @@ void ASTRE_PARAMS_INIT(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   TraceArbo(__func__,1,"init astre params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast_Par->ast_par_mutex ) ;
+
 
   memset( lp_Ast_Par->ast_par_default_object, CALCULS_ZERO_CHAR, sizeof( lp_Ast_Par->ast_par_default_object ) ) ;
   
@@ -156,7 +213,7 @@ void ASTRE_PARAMS_DISPLAY(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   
   TraceArbo(__func__,1,"astre params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","lp_Ast_Par->ast_par_default_object", lp_Ast_Par->ast_par_default_object );  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","lp_Ast_Par->ast_par_default_object", lp_Ast_Par->ast_par_default_object );  
 
   return ;
 }
@@ -334,7 +391,46 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
 }
 
 /*****************************************************************************************
-* @fn     : ASTRE_DISPLAY_MODE_STELLARIUM
+* @fn     : ASTRE_LOG
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_ASTRE *
+* @date   : 2023-01-07 creation 
+* @todo   : (a modifier , c une recopie depuis ast_disp)
+*****************************************************************************************/
+
+void ASTRE_LOG(STRUCT_ASTRE *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"keys log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK  ( & lp_Ast->ast_mutex ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ROTATE    (   lp_Ast->ast_loglevel ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
+
+  Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;
+  Trace("AD / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_asc , lp_Ast->ast_ddmm_dec ) ;
+  Trace("AH / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_agh , lp_Ast->ast_ddmm_dec ) ;
+  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->ast_ddmm_azi   , lp_Ast->ast_ddmm_alt ) ;
+
+  sprintf( c_cmd , "(nom) %-15s (asc) %-15s (dec) %-15s (agh) %-15s (azi) %-15s (alt) %-5s (Va) %3.2f (Vh) %3.2f",\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG(lp_Ast->ast_loglevel,1,"%s", c_cmd) ;
+
+  return ;
+}
+
+/*****************************************************************************************
+* @fn     : ASTRE_STELLARIUM_VIEW
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations a la sauce stellarium
 * @param  : 
@@ -342,7 +438,7 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
 * @date   : 2022-03-28 simplification
 *****************************************************************************************/
 
-void ASTRE_DISPLAY_MODE_STELLARIUM(STRUCT_ASTRE *lp_Ast) {
+void ASTRE_STELLARIUM_VIEW(STRUCT_ASTRE *lp_Ast) {
 
   TraceArbo(__func__,1,"display mode stellarium") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 

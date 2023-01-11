@@ -15,6 +15,61 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+static void DATAS_DISPLAY_FORMAT ( STRUCT_DATAS * ) ;
+static void DATAS_DISPLAY        ( STRUCT_DATAS * ) ;
+static void DATAS_LOCK           ( STRUCT_DATAS * ) ;
+static void DATAS_UNLOCK         ( STRUCT_DATAS * ) ;
+
+/*****************************************************************************************
+* @fn     : DATAS_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_DATAS *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
+
+static void DATAS_DISPLAY_FORMAT ( STRUCT_DATAS * lp_Ast) {
+d
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+  sprintf( lp_Ast->ast_dis_cmd , STR_DATAS_FORMAT,\
+    lp_Ast->ast_nom, \
+    lp_Ast->ast_hhmmss_asc, \
+    lp_Ast->ast_ddmm_dec, \
+    lp_Ast->ast_hhmmss_agh, \
+    lp_Ast->ast_ddmm_azi, \
+    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_azi_vit, \
+    lp_Ast->ast_alt_vit ) ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static DATAS_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_DATAS *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void DATAS_DISPLAY(STRUCT_DATAS *lp_Ast) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  DATAS_DISPLAY_FORMAT( lp_Ast ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : DATAS_LOCK
 * @author : s.gravois
@@ -23,7 +78,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void DATAS_LOCK ( STRUCT_DATAS * lp_Dat) {
+static void DATAS_LOCK ( STRUCT_DATAS * lp_Dat) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -39,7 +94,7 @@ void DATAS_LOCK ( STRUCT_DATAS * lp_Dat) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void DATAS_UNLOCK ( STRUCT_DATAS * lp_Dat) {
+static void DATAS_UNLOCK ( STRUCT_DATAS * lp_Dat) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -47,7 +102,6 @@ void DATAS_UNLOCK ( STRUCT_DATAS * lp_Dat) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : DATAS_INIT
 * @author : s.gravois
@@ -64,6 +118,13 @@ void DATAS_INIT ( STRUCT_DATAS * lp_Dat ) {
   TraceArbo(__func__,0,"init datas") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Dat->dat_mutex ) ;
+                                     lp_Dat->dat_log      = DATAS_LOG ;
+                                     lp_Dat->dat_lock     = DATAS_LOCK ;
+                                     lp_Dat->dat_unlock   = DATAS_UNLOCK ;
+                                     lp_Dat->dat_display  = DATAS_DISPLAY ;
+                                     lp_Dat->dat_loglevel = 0 ; 
+                                     lp_Dat->dat_file     = NULL ;
+  gettimeofday ( &                   lp_Dat->dat_tval, NULL ) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
 
@@ -76,7 +137,6 @@ void DATAS_INIT ( STRUCT_DATAS * lp_Dat ) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : DATAS_RESET
 * @author : s.gravois
@@ -102,7 +162,6 @@ void DATAS_RESET( STRUCT_DATAS * lp_Dat ) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : DATAS_ACTION_RESET
 * @author : s.gravois
@@ -126,7 +185,6 @@ void DATAS_ACTION_RESET( STRUCT_DATAS * lp_Dat ) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : DATAS_ACTION_BUF_TO_DAT
 * @author : s.gravois
@@ -152,7 +210,6 @@ void DATAS_ACTION_BUF_TO_DAT( STRUCT_DATAS * lp_Dat, const char * c_char ) {
   
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : DATAS_ACTION_DAT_TO_KEY
 * @author : s.gravois

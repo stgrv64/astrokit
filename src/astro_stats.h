@@ -5,10 +5,20 @@
 
 #include "astro_global.h"
 
+typedef struct STR_STATS STRUCT_STATS ;
+
 struct STR_STATS {
   pthread_mutex_t  sta_mutex ;
-  void           (*sta_lock)   (void) ;
-  void           (*sta_unlock) (void) ;  
+  STR_EXT_TIMEVAL  sta_tval ; 
+  FILE            *sta_file ; 
+  void           (*sta_log)     ( STRUCT_STATS * ) ;
+  void           (*sta_display) ( STRUCT_STATS * ) ;
+  void           (*sta_lock)    ( STRUCT_STATS * ) ;
+  void           (*sta_unlock)  ( STRUCT_STATS * ) ;  
+  int              sta_loglevel ;
+  char             sta_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char             sta_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   unsigned long    sta_Ia ;              // nombre d'impulsions mesurees sur azimut
   unsigned long    sta_Ih ;              // nombre d'impulsions mesureees sur altitude
   unsigned long    sta_Ia_prec ;         // nombre d'impulsions mesurees sur azimut
@@ -22,8 +32,6 @@ struct STR_STATS {
   double           sta_Ias ;             // somme sur nombres d'impulsions mesurees 
   double           sta_Ihs ;             // somme sur nombres d'impulsions mesurees 
 } ;
-
-typedef struct STR_STATS STRUCT_STATS ;
 
 void STATS_INIT (STRUCT_STATS * ) ;
 

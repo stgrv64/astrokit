@@ -73,7 +73,7 @@ void ARGUMENTS_CREATE_VOUTE( void) {
      lp_Ast->ast_alt=h ;
      
      CALCULS_EQUATEUR(lp_Ast) ; // calcul coordonnees horaires en fait
-     CALCULS_VITESSES(lp_Ast,lp_Lie,lp_Sui) ; // TODO : verifier lp_Sui->sui_mode_equatorial avant
+     CALCULS_VITESSES(lp_Ast,lp_Lie,lp_Sui) ; // TODO : verifier lp_Cal->cal_mode avant
      
      /* Calcul de la norme de la vitesse */
 
@@ -413,8 +413,13 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 2  ) &&  ! strcmp("tou",argv[1]) ) {
   
-    Trace("passage en mode azimutal : lp_Sui->sui_mode_equatorial=0") ;
-    lp_Sui->sui_mode_equatorial=0 ;
+    Trace("passage en mode azimutal : lp_Cal->cal_mode=0") ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Cal->cal_mutex ) ;
+
+    gp_Cal->cal_mode = CALCULS_MODE_AZIMUTAL ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Cal->cal_mutex ) ;
 
     Trace("as nom mis a la valeur TST0");
     memset( lp_Ast->ast_nom, 0, sizeof(lp_Ast->ast_nom)) ;

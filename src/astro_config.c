@@ -59,6 +59,12 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_CONST ;
 
+static void CONFIG_DISPLAY_FORMAT ( STRUCT_CONFIG * ) ;
+static void CONFIG_DISPLAY        ( STRUCT_CONFIG * ) ;
+static void CONFIG_UNLOCK         ( STRUCT_CONFIG * ) ;
+static void CONFIG_LOCK           ( STRUCT_CONFIG * ) ;
+static void CONFIG_LOG            ( STRUCT_CONFIG * ) ;
+
 char  gc_config_path_cmd_stty[ CONFIG_TAILLE_BUFFER_32 ] ;
 
 // ------------------------------------------------------------------------
@@ -72,7 +78,57 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 // cas particulier equateur omega = 2Pi / 86164 rad.s-1
 // ==> 86164.F = 2^N.D.R
 
+/*****************************************************************************************
+* @fn     : CONFIG_DISPLAY_FORMAT
+* @author : s.gravois
+* @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
+* @param  : STRUCT_CONFIG *
+* @date   : 2023-01-08 creation
+*****************************************************************************************/
 
+static void CONFIG_DISPLAY_FORMAT ( STRUCT_CONFIG * lp_Con) {
+
+  char c_cmd[CONFIG_TAILLE_BUFFER_256] ;
+
+  TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Con->con_mutex ) ;
+
+  memset( lp_Con->con_dis_cmd, CONFIG_ZERO_CHAR, sizeof( lp_Con->con_dis_cmd ) ) ;
+
+  for (int j = 0; j < CONFIG_DATAS_NB_COLONNES;  j++) {
+    sprintf( c_cmd, STR_CON_FORMAT_0, lp_Con->con_params[lp_Con->con_index][j]) ;
+    sprintf( lp_Con->con_dis_cmd[lp_Con->con_index][j] , "%s%s", \
+      lp_Con->con_dis_cmd[lp_Con->con_index][j], \
+      c_cmd ) ;
+
+    STR_CON_FORMAT_0
+  }
+  
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Con->con_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : static CONFIG_DISPLAY
+* @author : s.gravois
+* @brief  : Cette fonction affiche les informations sur astre sur commande
+* @param  : STRUCT_CONFIG *
+* @date   : 2023-01-07 creation 
+*****************************************************************************************/
+
+static void CONFIG_DISPLAY(STRUCT_CONFIG *lp_Con) {
+
+  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  CONFIG_DISPLAY_FORMAT( lp_Con ) ;
+
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Con->con_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Con->con_loglevel , 1 , "%s", lp_Con->con_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Con->con_loglevel ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : CONFIG_LOCK
 * @author : s.gravois
@@ -105,7 +161,6 @@ void CONFIG_UNLOCK ( STRUCT_CONFIG * lp_Con) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : CONFIG_LOG
 * @author : s.gravois
@@ -122,7 +177,6 @@ void CONFIG_LOG ( STRUCT_CONFIG * lp_Con) {
   
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : CONFIG_INIT
 * @author : s.gravois
@@ -137,17 +191,19 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
   TraceArbo(__func__,0,"init config") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con->con_mutex ) ;
-
+                                     lp_Con->con_log      = CONFIG_LOG ;
+                                     lp_Con->con_lock     = CONFIG_LOCK ;
+                                     lp_Con->con_unlock   = CONFIG_UNLOCK ;
+                                     lp_Con->con_display  = CONFIG_DISPLAY ;
+                                     lp_Con->con_loglevel = 0 ; 
+                                     lp_Con->con_file     = NULL ;
+  gettimeofday ( &                   lp_Con->con_tval, NULL ) ;
+  
   for(int L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
     for(int C=0;C<CONFIG_DATAS_NB_COLONNES;C++) {
       memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
     }
   }
-
-  lp_Con->con_lock     = CONFIG_LOCK ;
-  lp_Con->con_log      = CONFIG_LOG ;
-  lp_Con->con_unlock   = CONFIG_UNLOCK ;
-  lp_Con->con_loglevel = 0 ;
 
   return ;
 }
@@ -537,22 +593,22 @@ void   CONFIG_PARAMS_DISPLAY(void) {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_default_menu", gc_hach_suivi_menus[ gp_Con_Par->con_par_default_menu ] ) ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %d","gp_Pwm_Par->gpi_pwm_par_led_etat", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_default_menu", gc_hach_suivi_menus[ gp_Con_Par->con_par_default_menu ] ) ;
 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cat     ", gp_Con_Par->con_par_rep_cat)  ;
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cfg     ", gp_Con_Par->con_par_rep_cfg)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_log     ", gp_Con_Par->con_par_rep_log)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_in      ", gp_Con_Par->con_par_rep_in)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_out     ", gp_Con_Par->con_par_rep_out)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_log     ", gp_Con_Par->con_par_fic_log)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_pid     ", gp_Con_Par->con_par_fic_pid)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_vou     ", gp_Con_Par->con_par_fic_vou)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_led     ", gp_Con_Par->con_par_fic_led)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_dat     ", gp_Con_Par->con_par_fic_dat)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_hhm     ", gp_Con_Par->con_par_fic_hhm)  ;  
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_scr     ", gp_Con_Par->con_par_rep_scr)  ; 
-  TraceLogLevel(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_src_ker     ", gp_Con_Par->con_par_src_ker)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cat     ", gp_Con_Par->con_par_rep_cat)  ;
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_cfg     ", gp_Con_Par->con_par_rep_cfg)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_log     ", gp_Con_Par->con_par_rep_log)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_in      ", gp_Con_Par->con_par_rep_in)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_out     ", gp_Con_Par->con_par_rep_out)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_log     ", gp_Con_Par->con_par_fic_log)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_pid     ", gp_Con_Par->con_par_fic_pid)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_vou     ", gp_Con_Par->con_par_fic_vou)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_led     ", gp_Con_Par->con_par_fic_led)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_dat     ", gp_Con_Par->con_par_fic_dat)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_fic_hhm     ", gp_Con_Par->con_par_fic_hhm)  ;  
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_rep_scr     ", gp_Con_Par->con_par_rep_scr)  ; 
+  MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %s","gp_Con_Par->con_par_src_ker     ", gp_Con_Par->con_par_src_ker)  ; 
 
   TIME_PARAMS_DISPLAY     ( gp_Tim_Par ) ;
   PID_PARAMS_DISPLAY      ( gp_Pid_Par ) ;
@@ -813,20 +869,19 @@ void CONFIG_FIC_DISPLAY(STRUCT_CONFIG *lp_Con ) {
   }
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : CONFIG_DISPLAY_MODE_LONG
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations relatives a l as observee
-* @param  : STRUCT_ASTRE *gp_Ast
+* @param  : STRUCT_ASTRE *lp_Ast
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
 *****************************************************************************************/
 
-void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *gp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_CALCULS *gp_Cal) {
+void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *lp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_CALCULS *lp_Cal) {
   
-  const char * c_nom  = gp_Ast->ast_nom ;
-  const char * c_type = gc_hach_astre_types [ gp_Ast->ast_typ ] ;
-  const char * c_mode = gc_hach_calcul_mode[ gp_Cal->cal_mode ] ;
+  const char * c_nom  = lp_Ast->ast_nom ;
+  const char * c_type = gc_hach_astre_types [ lp_Ast->ast_typ ] ;
+  const char * c_mode = gc_hach_calcul_type[ lp_Cal->cal_type ] ;
 
   char  c_hhmmss_agh0[ 16] ;
   char  c_hhmmss_agh1[ 16] ;
@@ -847,36 +902,36 @@ void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *gp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
 
-  sprintf( c_hhmmss_agh, "%dh%dm%ds",  gp_Ast->ast_agh_t.tim_HH,  gp_Ast->ast_agh_t.tim_MM,  gp_Ast->ast_agh_t.tim_SS  ) ;
-  sprintf( c_hhmmss_asc,  "%dh%dm%ds", gp_Ast->ast_asc_t.tim_HH,  gp_Ast->ast_asc_t.tim_MM,  gp_Ast->ast_asc_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh, "%dh%dm%ds",  lp_Ast->ast_agh_t.tim_HH,  lp_Ast->ast_agh_t.tim_MM,  lp_Ast->ast_agh_t.tim_SS  ) ;
+  sprintf( c_hhmmss_asc,  "%dh%dm%ds", lp_Ast->ast_asc_t.tim_HH,  lp_Ast->ast_asc_t.tim_MM,  lp_Ast->ast_asc_t.tim_SS  ) ;
 
-  sprintf( c_hhmmss_agh0, "%dh%dm%ds", gp_Ast->ast_agh0_t.tim_HH, gp_Ast->ast_agh0_t.tim_MM, gp_Ast->ast_agh0_t.tim_SS  ) ;
-  sprintf( c_hhmmss_agh1, "%dh%dm%ds", gp_Ast->ast_agh1_t.tim_HH, gp_Ast->ast_agh1_t.tim_MM, gp_Ast->ast_agh1_t.tim_SS  ) ;
-  sprintf( c_hhmmss_agh2, "%dh%dm%ds", gp_Ast->ast_agh2_t.tim_HH, gp_Ast->ast_agh2_t.tim_MM, gp_Ast->ast_agh2_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh0, "%dh%dm%ds", lp_Ast->ast_agh0_t.tim_HH, lp_Ast->ast_agh0_t.tim_MM, lp_Ast->ast_agh0_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh1, "%dh%dm%ds", lp_Ast->ast_agh1_t.tim_HH, lp_Ast->ast_agh1_t.tim_MM, lp_Ast->ast_agh1_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh2, "%dh%dm%ds", lp_Ast->ast_agh2_t.tim_HH, lp_Ast->ast_agh2_t.tim_MM, lp_Ast->ast_agh2_t.tim_SS  ) ;
 
-  sprintf( c_hhmmss_azi0, "%dh%dm%ds", gp_Ast->ast_azi0_t.tim_HH, gp_Ast->ast_azi0_t.tim_MM, gp_Ast->ast_azi0_t.tim_SS  ) ;
-  sprintf( c_hhmmss_azi1, "%dh%dm%ds", gp_Ast->ast_azi1_t.tim_HH, gp_Ast->ast_azi1_t.tim_MM, gp_Ast->ast_azi1_t.tim_SS  ) ;
-  sprintf( c_hhmmss_azi2, "%dh%dm%ds", gp_Ast->ast_azi2_t.tim_HH, gp_Ast->ast_azi2_t.tim_MM, gp_Ast->ast_azi2_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi0, "%dh%dm%ds", lp_Ast->ast_azi0_t.tim_HH, lp_Ast->ast_azi0_t.tim_MM, lp_Ast->ast_azi0_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi1, "%dh%dm%ds", lp_Ast->ast_azi1_t.tim_HH, lp_Ast->ast_azi1_t.tim_MM, lp_Ast->ast_azi1_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi2, "%dh%dm%ds", lp_Ast->ast_azi2_t.tim_HH, lp_Ast->ast_azi2_t.tim_MM, lp_Ast->ast_azi2_t.tim_SS  ) ;
 
-  Trace(" %s : infos         : %s", c_nom , gp_Ast->ast_infos ) ;
+  Trace(" %s : infos         : %s", c_nom , lp_Ast->ast_infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;
   Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
   Trace(" %s : latitude      : %.2f (deg) ", c_nom, lp_Lie->lie_lat    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
   Trace(" %s : longitude     : %.2f (deg) ", c_nom, lp_Lie->lie_lon    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, gp_Ast->ast_azi_vit,  gp_Ast->ast_alt_vit ) ; 
-  Trace(" %s : azimut        : %.2f (deg) ", c_nom, gp_Ast->ast_azi    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : altitude      : %.2f (deg) ", c_nom, gp_Ast->ast_alt    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, gp_Ast->ast_dec  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
-  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_asc    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
+  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, lp_Ast->ast_azi_vit,  lp_Ast->ast_alt_vit ) ; 
+  Trace(" %s : azimut        : %.2f (deg) ", c_nom, lp_Ast->ast_azi    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace(" %s : altitude      : %.2f (deg) ", c_nom, lp_Ast->ast_alt    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, lp_Ast->ast_dec  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
+  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_asc    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
+  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
 
-  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
-  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
-  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_agh2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh2 ) ;
+  Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
+  Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
+  Trace1(" %s : Agh2          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh2 ) ;
 
-  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_azi0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi0 ) ;
-  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_azi1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
-  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, gp_Ast->ast_azi2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
+  Trace1(" %s : Azi0          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_azi0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi0 ) ;
+  Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_azi1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
+  Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_azi2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
 
   Trace("----------------------------") ;
 }

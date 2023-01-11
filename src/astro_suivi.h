@@ -25,13 +25,6 @@
 #define SUIVI_MAIN_FH_TRANSITOIRE   4
 
 typedef enum { 
-	SUIVI_MANUEL=0,
-	SUIVI_EQUATORIAL,
-	SUIVI_AZIMUTAL,
-}
-t_en_Suivis ;
-
-typedef enum { 
 
   MENU_AZIMUTAL=0,
   MENU_EQUATORIAL,
@@ -51,8 +44,15 @@ typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
 struct STR_SUIVI_PAS {
 
   pthread_mutex_t   pas_mutex ;
-  void            (*pas_lock)   (STRUCT_SUIVI_PAS*) ;
-  void            (*pas_unlock) (STRUCT_SUIVI_PAS*) ;  
+  STR_EXT_TIMEVAL   pas_tval ; 
+  FILE             *pas_file ;
+  void            (*pas_log)     ( STRUCT_SUIVI_PAS * ) ;
+  void            (*pas_display) ( STRUCT_SUIVI_PAS * ) ;
+  void            (*pas_lock)    ( STRUCT_SUIVI_PAS * ) ;
+  void            (*pas_unlock)  ( STRUCT_SUIVI_PAS * ) ;  
+  int               pas_loglevel ;
+  char              pas_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char              pas_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
   int               pas_rst ; 
   double            pas_acc_azi ;   // acceleration volontaire en azimut   
   double            pas_acc_alt ;   // acceleration volontaire en altitude 
@@ -79,8 +79,16 @@ typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FRE ;
 struct STR_SUIVI_FREQUENCES {
 
   pthread_mutex_t   fre_mutex ;
-  void            (*fre_lock)   (STRUCT_SUIVI_FRE*) ;
-  void            (*fre_unlock) (STRUCT_SUIVI_FRE*) ;  
+  STR_EXT_TIMEVAL   fre_tval ; 
+  FILE             *fre_file ;
+  void            (*fre_log)     ( STRUCT_SUIVI_PAS * ) ;
+  void            (*fre_display) ( STRUCT_SUIVI_PAS * ) ;
+  void            (*fre_lock)    ( STRUCT_SUIVI_PAS * ) ;
+  void            (*fre_unlock)  ( STRUCT_SUIVI_PAS * ) ;  
+  int               fre_loglevel ;
+  char              fre_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char              fre_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
   double            fre_ta_mic ; // periode de la frequence a injecter directement
   double            fre_th_mic ; // periode de la frequence a injecter directement
   double            fre_fa_mic ; // frequence a injecter directement (tient compte des micro pas)
@@ -103,22 +111,27 @@ struct STR_SUIVI_FREQUENCES {
 typedef struct STR_SUIVI STRUCT_SUIVI ;
 
 struct STR_SUIVI {
-  pthread_mutex_t  sui_mutex ;
-  void           (*sui_lock)   (STRUCT_SUIVI*) ;
-  void           (*sui_unlock) (STRUCT_SUIVI*) ;  
-  STR_EXT_TIMEVAL  sui_tval ; 
-  int              sui_reset ; 
-  int              sui_mode_equatorial ;
-  double           sui_plus ;    // multiplicateur ajustement des periodes si besoin
-  double           sui_moins ;   // multiplicateur ajustement des periodes si besoin
-  double           sui_Da ;  // nombre a injecter dans les diviseurs de frequence
-  double           sui_Dh ;  // nombre a injecter dans les diviseurs de frequence
-  t_en_Menus       sui_menu;      // valeur du menu courant 
-  t_en_Menus       sui_menu_old ; // sauvegarde du menu precedent
-  int              sui_alarme ; // si different de 0 provoque une alarm(sui_alarme) au debut de main
-  double           sui_tempo_percent ;
-  double           sui_dth ;
-  double           sui_dta ;
+  STR_EXT_TIMEVAL   sui_tval ; 
+  pthread_mutex_t   sui_mutex ;
+  FILE             *sui_file ;
+  void            (*sui_log)     ( STRUCT_SUIVI_PAS * ) ;
+  void            (*sui_display) ( STRUCT_SUIVI_PAS * ) ;
+  void            (*sui_lock)    ( STRUCT_SUIVI_PAS * ) ;
+  void            (*sui_unlock)  ( STRUCT_SUIVI_PAS * ) ;  
+  int               sui_loglevel ;
+  char              sui_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char              sui_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  
+  double            sui_plus ;    // multiplicateur ajustement des periodes si besoin
+  double            sui_moins ;   // multiplicateur ajustement des periodes si besoin
+  double            sui_Da ;  // nombre a injecter dans les diviseurs de frequence
+  double            sui_Dh ;  // nombre a injecter dans les diviseurs de frequence
+  t_en_Menus        sui_menu;      // valeur du menu courant 
+  t_en_Menus        sui_menu_old ; // sauvegarde du menu precedent
+  int               sui_alarme ; // si different de 0 provoque une alarm(sui_alarme) au debut de main
+  double            sui_tempo_percent ;
+  double            sui_dth ;
+  double            sui_dta ;
     
 }  ;
 

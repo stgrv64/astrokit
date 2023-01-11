@@ -55,15 +55,22 @@ typedef struct STR_ASTRE_PARAMS STRUCT_ASTRE_PARAMS ;
 /* Fin parametres de fichier config                  */ 
 /*---------------------------------------------------*/
 
+typedef struct STR_ASTRE STRUCT_ASTRE ;
+
 struct STR_ASTRE {
 
   pthread_mutex_t ast_mutex ;
-  void          (*ast_log)    (struct STR_ASTRE *) ;
-  void          (*ast_lock)   (struct STR_ASTRE *) ;
-  void          (*ast_unlock) (struct STR_ASTRE *) ;  
-  int             ast_loglevel ;
+  STR_EXT_TIMEVAL ast_tval ; 
   FILE           *ast_file ; 
+  char            ast_loglevel ;
+  void          (*ast_lock)       ( STRUCT_ASTRE *) ;
+  void          (*ast_unlock)     ( STRUCT_ASTRE *) ;  
+  void          (*ast_log)        ( STRUCT_ASTRE *) ;
+  void          (*ast_display)    ( STRUCT_ASTRE *) ;
+  char            ast_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            ast_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
+ 
   STRUCT_TIME     ast_at ;
   STRUCT_TIME     ast_ht ;
   STRUCT_TIME     ast_azi_t ;
@@ -86,10 +93,17 @@ struct STR_ASTRE {
   int             ast_num ; 
   int             ast_new ; 
   int             ast_typ ;
+
   char            ast_nom         [ ASTRE_TAILLE_BUFFER ] ;
   char            ast_infos       [ ASTRE_TAILLE_BUFFER ] ;  
   char            ast_plus_proche [ ASTRE_NB_COLONNES   ][ ASTRE_TAILLE_BUFFER ] ;
-  
+
+  double          ast_azi ;     // azimut
+  double          ast_alt ;     // altitude
+  double          ast_agh ;     // angle horaire  ( = gp_Lie->tps_mic sideral - ASC)
+  double          ast_dec  ;    // un resultat de calcul de declinaison
+  double          ast_asc  ;    // un resultat de calcul de asc
+
   /* --------------------------------------------
   *  on deduit de l'azimut(h) et de l'altitude (a)
   *  les coordonnees x y et z dans la geode d'observation de rayon 1
@@ -110,11 +124,6 @@ struct STR_ASTRE {
   double          ast_r3_yy ;   // idem - ordonnee
   double          ast_r3_zz ; 
   
-  double          ast_azi ;     // azimut
-  double          ast_alt ;     // altitude
-  double          ast_agh ;     // angle horaire  ( = gp_Lie->tps_mic sideral - ASC)
-  double          ast_dec  ;    // un resultat de calcul de declinaison
-  double          ast_asc  ;    // un resultat de calcul de asc
   double          ast_agh0 ;    // un autre resultat de calcul de asc
   double          ast_agh1 ;    // un autre resultat de calcul de asc
   double          ast_agh2 ;    // un autre resultat de calcul de asc
@@ -150,17 +159,18 @@ struct STR_ASTRE {
   char            ast_dd_dec[ CONFIG_TAILLE_BUFFER_16] ;
 
 } ;
-typedef struct STR_ASTRE STRUCT_ASTRE ;
 
 /* Le contenu de cette variable permet le hachage avec 
  les valeurs de l enum t_en_Astre_Type defini dans astre.h */
- 
+
 void ASTRE_PARAMS_INIT               ( STRUCT_ASTRE_PARAMS * ) ;
 void ASTRE_PARAMS_DISPLAY            ( STRUCT_ASTRE_PARAMS * ) ;
 
 void ASTRE_INIT                      ( STRUCT_ASTRE * ) ;
-void ASTRE_RESET                     ( STRUCT_ASTRE *) ;
-void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE *) ;
-void ASTRE_DISPLAY_MODE_STELLARIUM   ( STRUCT_ASTRE *) ;
+void ASTRE_LOG                       ( STRUCT_ASTRE * ) ;
+
+void ASTRE_RESET                     ( STRUCT_ASTRE * ) ;
+void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE * ) ;
+void ASTRE_STELLARIUM_VIEW   ( STRUCT_ASTRE * ) ;
 
 #endif
