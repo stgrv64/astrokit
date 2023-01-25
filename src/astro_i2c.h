@@ -88,6 +88,8 @@
    Exemple = MCP23017 ou MCP23008 
  ----------------------------------- */
 
+typedef struct STR_I2C_MCP23017  STRUCT_I2C_MCP23017 ;
+
 struct STR_I2C_MCP23017 {
 
   unsigned char mcp_alt_dir   ; // numero de port GPIO pour la direction de l'altitude
@@ -107,11 +109,12 @@ struct STR_I2C_MCP23017 {
   unsigned char mcp_azi_m0   ;  // numero de port GPIO pour le choix du micro pas en azimut
 } ;
 
-typedef struct STR_I2C_DEVICE  STRUCT_I2C ;
-typedef struct STR_I2C_ACC_MAG STRUCT_I2C_ACC_MAG ;
-
 // structure decrivant un device
 //---------------------------------------------------
+
+typedef struct STR_I2C_DEVICE  STRUCT_I2C ;
+
+
 struct STR_I2C_DEVICE {
 
   pthread_mutex_t  i2c_dev_mutex ;
@@ -125,6 +128,7 @@ struct STR_I2C_DEVICE {
   char             i2c_dev_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char             i2c_dev_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
+  char             i2c_dev_file_path[ CONFIG_TAILLE_BUFFER_256  ] ;
   unsigned char    i2c_dev_buf[ I2C_BUFFER_SIZE ] ; // taille du buffer size pour echanges des g_Datas en read / write
   unsigned long    i2c_dev_usleep ;         // sleep entre chaque lecture (microseconde)
   int              i2c_dev_statut ;                 // statut (0 = OK, toutes autres valeurs = KO) 
@@ -134,6 +138,8 @@ struct STR_I2C_DEVICE {
 } ;
 
 //---------------------------------------------------
+
+typedef struct STR_I2C_ACC_MAG STRUCT_I2C_ACC_MAG ;
 
 struct STR_I2C_ACC_MAG {
   

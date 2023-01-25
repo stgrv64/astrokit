@@ -16,21 +16,21 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static void CODES_DISPLAY_FORMAT ( STRUCT_CODES * ) ;
+static void CODES_DISPLAY_PREPARE ( STRUCT_CODES * ) ;
 static void CODES_DISPLAY        ( STRUCT_CODES * ) ;
 static void CODES_UNLOCK         ( STRUCT_CODES * ) ;
 static void CODES_LOCK           ( STRUCT_CODES * ) ;
 static void CODES_LOG            ( STRUCT_CODES * ) ;
 
 /*****************************************************************************************
-* @fn     : CODES_DISPLAY_FORMAT
+* @fn     : CODES_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_CODES *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void CODES_DISPLAY_FORMAT ( STRUCT_CODES * lp_Cod) {
+static void CODES_DISPLAY_PREPARE ( STRUCT_CODES * lp_Cod) {
 
   int i_pos =0;
 
@@ -71,7 +71,7 @@ static void CODES_DISPLAY (STRUCT_CODES *lp_Cod) {
     
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cod->cod_mutex ) ;
 
-    CODES_DISPLAY_FORMAT( lp_Cod ) ;
+    CODES_DISPLAY_PREPARE( lp_Cod ) ;
 
     MACRO_ASTRO_GLOBAL_LOG( lp_Cod->cod_loglevel , 1 , "%s", lp_Cod->cod_dis_cmd ) ;
   }

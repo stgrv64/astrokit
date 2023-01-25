@@ -20,7 +20,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 static void KEYS_LOG            ( STRUCT_KEYS * ) ;
 static void KEYS_DISPLAY        ( STRUCT_KEYS * ) ;
-static void KEYS_DISPLAY_FORMAT ( STRUCT_KEYS * ) ;
+static void KEYS_DISPLAY_PREPARE ( STRUCT_KEYS * ) ;
 static void KEYS_LOCK           ( STRUCT_KEYS * )  ;
 static void KEYS_UNLOCK         ( STRUCT_KEYS * ) ;
 
@@ -58,14 +58,14 @@ static void KEYS_LOG ( STRUCT_KEYS * lp_Key) {
 }
 
 /*****************************************************************************************
-* @fn     : KEYS_DISPLAY_FORMAT
+* @fn     : KEYS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_KEYS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void KEYS_DISPLAY_FORMAT ( STRUCT_KEYS * lp_Key) {
+static void KEYS_DISPLAY_PREPARE ( STRUCT_KEYS * lp_Key) {
 
   TraceArbo(__func__,2,"keys format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -102,7 +102,7 @@ static void KEYS_DISPLAY ( STRUCT_KEYS * lp_Key) {
   MACRO_ASTRO_GLOBAL_LOG_ROTATE( lp_Key->key_loglevel ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex) ;
 */
-  KEYS_DISPLAY_FORMAT       ( lp_Key ) ;
+  KEYS_DISPLAY_PREPARE       ( lp_Key ) ;
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Key->key_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Key->key_loglevel , 1 , "%s" , lp_Key->key_dis_cmd ) ;
   MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Key->key_loglevel ) ;

@@ -95,14 +95,14 @@ double DEG  (int degres, int minutes )                  { return (double)degres 
 
 
 /*****************************************************************************************
-* @fn     : CALCULS_DISPLAY_FORMAT
+* @fn     : CALCULS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_CALCULS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void CALCULS_DISPLAY_FORMAT ( STRUCT_CALCULS * lp_Cal) {
+static void CALCULS_DISPLAY_PREPARE ( STRUCT_CALCULS * lp_Cal) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -130,7 +130,7 @@ static void CALCULS_DISPLAY(STRUCT_CALCULS *lp_Cal) {
 
   TraceArbo(__func__,2,"display informations on Calculs") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  CALCULS_DISPLAY_FORMAT( lp_Cal ) ;
+  CALCULS_DISPLAY_PREPARE( lp_Cal ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cal->cal_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Cal->cal_loglevel , 1 , "%s", lp_Cal->cal_dis_cmd ) ;

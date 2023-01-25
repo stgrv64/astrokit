@@ -15,36 +15,31 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static void DATAS_DISPLAY_FORMAT ( STRUCT_DATAS * ) ;
+static void DATAS_DISPLAY_PREPARE ( STRUCT_DATAS * ) ;
 static void DATAS_DISPLAY        ( STRUCT_DATAS * ) ;
 static void DATAS_LOCK           ( STRUCT_DATAS * ) ;
 static void DATAS_UNLOCK         ( STRUCT_DATAS * ) ;
 
 /*****************************************************************************************
-* @fn     : DATAS_DISPLAY_FORMAT
+* @fn     : DATAS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_DATAS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void DATAS_DISPLAY_FORMAT ( STRUCT_DATAS * lp_Ast) {
-d
+static void DATAS_DISPLAY_PREPARE ( STRUCT_DATAS * lp_Dat) {
+
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dat->dat_mutex ) ;
 
-  sprintf( lp_Ast->ast_dis_cmd , STR_DATAS_FORMAT,\
-    lp_Ast->ast_nom, \
-    lp_Ast->ast_hhmmss_asc, \
-    lp_Ast->ast_ddmm_dec, \
-    lp_Ast->ast_hhmmss_agh, \
-    lp_Ast->ast_ddmm_azi, \
-    lp_Ast->ast_ddmm_alt, \
-    lp_Ast->ast_azi_vit, \
-    lp_Ast->ast_alt_vit ) ;
+  sprintf( lp_Dat->dat_dis_cmd , STR_DAT_FORMAT_0,\
+    lp_Dat->dat_act, \
+    lp_Dat->dat_acc, \
+    lp_Dat->dat_bou ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Dat->dat_mutex ) ;
 
   return ;
 }
@@ -56,17 +51,17 @@ d
 * @date   : 2023-01-07 creation 
 *****************************************************************************************/
 
-static void DATAS_DISPLAY(STRUCT_DATAS *lp_Ast) {
+static void DATAS_DISPLAY(STRUCT_DATAS *lp_Dat) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  DATAS_DISPLAY_FORMAT( lp_Ast ) ;
+  DATAS_DISPLAY_PREPARE( lp_Dat ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Dat->dat_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Dat->dat_loglevel , 1 , "%s", lp_Dat->dat_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Dat->dat_loglevel ) ;
 
   return ;
 }
@@ -83,6 +78,27 @@ static void DATAS_LOCK ( STRUCT_DATAS * lp_Dat) {
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dat->dat_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : DATAS_LOG
+* @author : s.gravois
+* @brief  : Log la structure en parametre 
+* @param  : STRUCT_DATAS *
+* @date   : 2023-01-24 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+static void DATAS_LOG ( STRUCT_DATAS * lp_Dat) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dat->dat_mutex ) ;
+
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Dat->dat_mutex ) ;
 
   return ;
 }

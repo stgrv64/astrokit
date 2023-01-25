@@ -16,39 +16,39 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
-static void SUIVI_DISPLAY_FORMAT     ( STRUCT_SUIVI * ) ;
+static void SUIVI_DISPLAY_PREPARE     ( STRUCT_SUIVI * ) ;
 static void SUIVI_DISPLAY            ( STRUCT_SUIVI * ) ;
 static void SUIVI_UNLOCK             ( STRUCT_SUIVI * ) ;
 static void SUIVI_LOCK               ( STRUCT_SUIVI * ) ;
 static void SUIVI_LOG                ( STRUCT_SUIVI * ) ;
 
-static void SUIVI_PAS_DISPLAY_FORMAT     ( STRUCT_SUIVI_PAS * ) ;
+static void SUIVI_PAS_DISPLAY_PREPARE     ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_DISPLAY            ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_UNLOCK             ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_LOCK               ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_LOG                ( STRUCT_SUIVI_PAS * ) ;
 
-static void SUIVI_FRE_DISPLAY_FORMAT     ( STRUCT_SUIVI_FRE * ) ;
+static void SUIVI_FRE_DISPLAY_PREPARE     ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_DISPLAY            ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_UNLOCK             ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_LOCK               ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_LOG                ( STRUCT_SUIVI_FRE * ) ;
 
 /*****************************************************************************************
-* @fn     : SUIVI_DISPLAY_FORMAT
+* @fn     : SUIVI_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_SUIVI *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void SUIVI_DISPLAY_FORMAT ( STRUCT_SUIVI * lp_Sui) {
+static void SUIVI_DISPLAY_PREPARE ( STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->ast_mutex ) ;
 
-  sprintf( lp_Sui->ast_dis_cmd , MACRO_SUIVI_DISPLAY_FORMAT,\
+  sprintf( lp_Sui->ast_dis_cmd , MACRO_SUIVI_DISPLAY_PREPARE,\
     lp_Sui->ast_nom, \
     lp_Sui->ast_hhmmss_asc, \
     lp_Sui->ast_ddmm_dec, \
@@ -76,7 +76,7 @@ static void SUIVI_DISPLAY(STRUCT_SUIVI *lp_Sui) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  SUIVI_DISPLAY_FORMAT( lp_Sui ) ;
+  SUIVI_DISPLAY_PREPARE( lp_Sui ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sui->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Sui->ast_loglevel , 1 , "%s", lp_Sui->ast_dis_cmd ) ;
@@ -85,14 +85,14 @@ static void SUIVI_DISPLAY(STRUCT_SUIVI *lp_Sui) {
   return ;
 }
 /*****************************************************************************************
-* @fn     : SUIVI_PAS_DISPLAY_FORMAT
+* @fn     : SUIVI_PAS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_SUIVI_PAS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void SUIVI_PAS_DISPLAY_FORMAT ( STRUCT_SUIVI_PAS * lp_Pas) {
+static void SUIVI_PAS_DISPLAY_PREPARE ( STRUCT_SUIVI_PAS * lp_Pas) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -124,7 +124,7 @@ static void SUIVI_PAS_DISPLAY(STRUCT_SUIVI_PAS *lp_Pas) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  SUIVI_PAS_DISPLAY_FORMAT( lp_Pas ) ;
+  SUIVI_PAS_DISPLAY_PREPARE( lp_Pas ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pas->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Pas->ast_loglevel , 1 , "%s", lp_Pas->ast_dis_cmd ) ;
@@ -134,14 +134,14 @@ static void SUIVI_PAS_DISPLAY(STRUCT_SUIVI_PAS *lp_Pas) {
 }
 
 /*****************************************************************************************
-* @fn     : SUIVI_FREQ_DISPLAY_FORMAT
+* @fn     : SUIVI_FREQ_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_ASTRE *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void SUIVI_FRE_DISPLAY_FORMAT ( STRUCT_SUIVI_FRE * lp_Fre) {
+static void SUIVI_FRE_DISPLAY_PREPARE ( STRUCT_SUIVI_FRE * lp_Fre) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -175,7 +175,7 @@ static void SUIVI_FRE_DISPLAY(STRUCT_ASTRE *lp_Fre) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  SUIVI_FRE_DISPLAY_FORMAT( lp_Fre ) ;
+  SUIVI_FRE_DISPLAY_PREPARE( lp_Fre ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Fre->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Fre->ast_loglevel , 1 , "%s", lp_Fre->ast_dis_cmd ) ;

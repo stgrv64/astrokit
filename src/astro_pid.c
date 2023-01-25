@@ -20,14 +20,14 @@ int  gi_pid_trace_alt ;
 int  gi_pid_trace_azi ;
 
 /*****************************************************************************************
-* @fn     : PID_DISPLAY_FORMAT
+* @fn     : PID_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_PID *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void PID_DISPLAY_FORMAT ( STRUCT_PID * lp_Pid) {
+static void PID_DISPLAY_PREPARE ( STRUCT_PID * lp_Pid) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -57,7 +57,7 @@ static void PID_DISPLAY ( STRUCT_PID *lp_Pid) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  PID_DISPLAY_FORMAT( lp_Pid ) ;
+  PID_DISPLAY_PREPARE( lp_Pid ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pid->pid_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Pid->pid_loglevel , 1 , "%s", lp_Pid->pid_dis_cmd ) ;

@@ -27,14 +27,14 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
-* @fn     : DEVICES_DISPLAY_FORMAT
+* @fn     : DEVICES_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_DEVICES *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void DEVICES_DISPLAY_FORMAT ( STRUCT_DEVICES * lp_Dev) {
+static void DEVICES_DISPLAY_PREPARE ( STRUCT_DEVICES * lp_Dev) {
 
   TraceArbo(__func__,2,"devices format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -67,7 +67,7 @@ static void DEVICES_DISPLAY(STRUCT_DEVICES *lp_Dev) {
 
   TraceArbo(__func__,2,"display informations on I/O") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  DEVICES_DISPLAY_FORMAT( lp_Dev ) ;
+  DEVICES_DISPLAY_PREPARE( lp_Dev ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Dev->dev_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Dev->dev_loglevel , 1 , "%s", lp_Dev->dev_dis_cmd ) ;
@@ -89,6 +89,27 @@ void DEVICES_LOCK ( STRUCT_DEVICES * lp_Dev) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dev->dev_mutex ) ;
 
+  return ;
+}
+/*****************************************************************************************
+* @fn     : DEVICES_LOG
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_DEVICES *
+* @date   : 2023-01-24 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+void DEVICES_LOG ( STRUCT_DEVICES * lp_Dev) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Dev->dev_mutex ) ;
+  
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Dev->dev_mutex ) ;
+  
   return ;
 }
 /*****************************************************************************************

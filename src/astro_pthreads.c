@@ -16,7 +16,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static void PTHREADS_DISPLAY_FORMAT ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_DISPLAY_PREPARE ( STRUCT_PTHREADS * ) ;
 static void PTHREADS_DISPLAY        ( STRUCT_PTHREADS * ) ;
 static void PTHREADS_UNLOCK         ( STRUCT_PTHREADS * ) ;
 static void PTHREADS_LOCK           ( STRUCT_PTHREADS * ) ;
@@ -79,14 +79,14 @@ static const char * gc_hach_pth_sched_param[] = {
 
 
 /*****************************************************************************************
-* @fn     : PTHREADS_DISPLAY_FORMAT
+* @fn     : PTHREADS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_PTHREADS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void PTHREADS_DISPLAY_FORMAT ( STRUCT_PTHREADS * lp_Pth) {
+static void PTHREADS_DISPLAY_PREPARE ( STRUCT_PTHREADS * lp_Pth) {
 
   pthread_t i_id=0 ;
   pthread_t i_id_pth=0 ;
@@ -157,7 +157,7 @@ static void PTHREADS_DISPLAY ( STRUCT_PTHREADS *lp_Pth) {
     
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
 
-    PTHREADS_DISPLAY_FORMAT( lp_Pth ) ;
+    PTHREADS_DISPLAY_PREPARE( lp_Pth ) ;
 
     MACRO_ASTRO_GLOBAL_LOG ( lp_Pth->pth_loglevel , 1 , "%s", lp_Pth->pth_dis_cmd ) ;
   }

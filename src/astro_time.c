@@ -14,21 +14,21 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static void TIME_DISPLAY_FORMAT ( STRUCT_TIME * ) ;
+static void TIME_DISPLAY_PREPARE ( STRUCT_TIME * ) ;
 static void TIME_DISPLAY        ( STRUCT_TIME * ) ;
 static void TIME_UNLOCK         ( STRUCT_TIME * ) ;
 static void TIME_LOCK           ( STRUCT_TIME * ) ;
 static void TIME_LOG            ( STRUCT_TIME * ) ;
 
 /*****************************************************************************************
-* @fn     : TIME_DISPLAY_FORMAT
+* @fn     : TIME_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_TIME *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void TIME_DISPLAY_FORMAT ( STRUCT_TIME * lp_Tim) {
+static void TIME_DISPLAY_PREPARE ( STRUCT_TIME * lp_Tim) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -62,7 +62,7 @@ static void TIME_DISPLAY( STRUCT_TIME *lp_Tim) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TIME_DISPLAY_FORMAT( lp_Tim ) ;
+  TIME_DISPLAY_PREPARE( lp_Tim ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Tim->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Tim->ast_loglevel , 1 , "%s", lp_Tim->ast_dis_cmd ) ;

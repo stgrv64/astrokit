@@ -6,21 +6,21 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static void STATS_DISPLAY_FORMAT ( STRUCT_STATS * ) ;
+static void STATS_DISPLAY_PREPARE ( STRUCT_STATS * ) ;
 static void STATS_DISPLAY        ( STRUCT_STATS * ) ;
 static void STATS_UNLOCK         ( STRUCT_STATS * ) ;
 static void STATS_LOCK           ( STRUCT_STATS * ) ;
 static void STATS_LOG            ( STRUCT_STATS * ) ;
 
 /*****************************************************************************************
-* @fn     : STATS_DISPLAY_FORMAT
+* @fn     : STATS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_STATS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void STATS_DISPLAY_FORMAT ( STRUCT_STATS * lp_Sta) {
+static void STATS_DISPLAY_PREPARE ( STRUCT_STATS * lp_Sta) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -52,7 +52,7 @@ static void STATS_DISPLAY(STRUCT_STATS *lp_Sta) {
 
   TraceArbo(__func__,2,"display informations on Statisques") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  STATS_DISPLAY_FORMAT( lp_Sta ) ;
+  STATS_DISPLAY_PREPARE( lp_Sta ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sta->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Sta->ast_loglevel , 1 , "%s", lp_Sta->ast_dis_cmd ) ;

@@ -28,10 +28,10 @@ struct STR_DATAS {
   STR_EXT_TIMEVAL dat_tval ; 
   FILE           *dat_file ; 
   char            dat_loglevel ;
-  void          (*dat_lock)       ( STRUCT_DEVICES *) ;
-  void          (*dat_unlock)     ( STRUCT_DEVICES *) ;  
-  void          (*dat_log)        ( STRUCT_DEVICES *) ;
-  void          (*dat_display)    ( STRUCT_DEVICES *) ;
+  void          (*dat_lock)       ( STRUCT_DATAS *) ;
+  void          (*dat_unlock)     ( STRUCT_DATAS *) ;  
+  void          (*dat_log)        ( STRUCT_DATAS *) ;
+  void          (*dat_display)    ( STRUCT_DATAS *) ;
   char            dat_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char            dat_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
   

@@ -59,7 +59,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_CONST ;
 
-static void CONFIG_DISPLAY_FORMAT ( STRUCT_CONFIG * ) ;
+static void CONFIG_DISPLAY_PREPARE ( STRUCT_CONFIG * ) ;
 static void CONFIG_DISPLAY        ( STRUCT_CONFIG * ) ;
 static void CONFIG_UNLOCK         ( STRUCT_CONFIG * ) ;
 static void CONFIG_LOCK           ( STRUCT_CONFIG * ) ;
@@ -79,14 +79,14 @@ int NOR_EXCLUSIF(int i,int j) { return !i^j ;};
 // ==> 86164.F = 2^N.D.R
 
 /*****************************************************************************************
-* @fn     : CONFIG_DISPLAY_FORMAT
+* @fn     : CONFIG_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_CONFIG *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void CONFIG_DISPLAY_FORMAT ( STRUCT_CONFIG * lp_Con) {
+static void CONFIG_DISPLAY_PREPARE ( STRUCT_CONFIG * lp_Con) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256] ;
 
@@ -94,16 +94,10 @@ static void CONFIG_DISPLAY_FORMAT ( STRUCT_CONFIG * lp_Con) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Con->con_mutex ) ;
 
-  memset( lp_Con->con_dis_cmd, CONFIG_ZERO_CHAR, sizeof( lp_Con->con_dis_cmd ) ) ;
-
-  for (int j = 0; j < CONFIG_DATAS_NB_COLONNES;  j++) {
-    sprintf( c_cmd, STR_CON_FORMAT_0, lp_Con->con_params[lp_Con->con_index][j]) ;
-    sprintf( lp_Con->con_dis_cmd[lp_Con->con_index][j] , "%s%s", \
-      lp_Con->con_dis_cmd[lp_Con->con_index][j], \
-      c_cmd ) ;
-
-    STR_CON_FORMAT_0
-  }
+  memset(  lp_Con->con_dis_cmd, CONFIG_ZERO_CHAR, sizeof( lp_Con->con_dis_cmd ) ) ;
+  sprintf( lp_Con->con_dis_cmd, STR_CON_FORMAT_0, \
+     lp_Con->con_params[lp_Con->con_index][0], \
+     lp_Con->con_params[lp_Con->con_index][1]) ;
   
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Con->con_mutex ) ;
 
@@ -121,7 +115,7 @@ static void CONFIG_DISPLAY(STRUCT_CONFIG *lp_Con) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  CONFIG_DISPLAY_FORMAT( lp_Con ) ;
+  CONFIG_DISPLAY_PREPARE( lp_Con ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Con->con_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Con->con_loglevel , 1 , "%s", lp_Con->con_dis_cmd ) ;

@@ -67,14 +67,14 @@ extern STRUCT_LCD     *gp_Lcd ;
 
 
 /*****************************************************************************************
-* @fn     : ASTRE_DISPLAY_FORMAT
+* @fn     : ASTRE_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_ASTRE *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY_FORMAT ( STRUCT_ASTRE * lp_Ast) {
+static void ASTRE_DISPLAY_PREPARE ( STRUCT_ASTRE * lp_Ast) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -108,7 +108,7 @@ static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  ASTRE_DISPLAY_FORMAT( lp_Ast ) ;
+  ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;

@@ -17,14 +17,14 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
 /*****************************************************************************************
-* @fn     : CAT_DISPLAY_FORMAT
+* @fn     : CAT_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_CAT *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void CAT_DISPLAY_FORMAT ( STRUCT_CAT * lp_Cat) {
+static void CAT_DISPLAY_PREPARE ( STRUCT_CAT * lp_Cat) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -49,7 +49,7 @@ static void CAT_DISPLAY(STRUCT_CAT *lp_Cat) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  CAT_DISPLAY_FORMAT( lp_Cat ) ;
+  CAT_DISPLAY_PREPARE( lp_Cat ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cat->cat_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Cat->cat_loglevel , 1 , "%s", lp_Cat->cat_dis_cmd ) ;
@@ -69,7 +69,7 @@ static void CAT_LOG(STRUCT_CAT *lp_Cat) {
 
   TraceArbo(__func__,2,"display informations on Catalogue") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  CAT_DISPLAY_FORMAT( lp_Cat ) ;
+  CAT_DISPLAY_PREPARE( lp_Cat ) ;
 
   MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cat->cat_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Cat->cat_loglevel , 1 , "%s", lp_Cat->cat_dis_cmd ) ;
