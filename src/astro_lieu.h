@@ -43,10 +43,10 @@ struct STR_LIEU {
   pthread_mutex_t  lie_mutex ;
   STR_EXT_TIMEVAL  lie_tval ; 
   FILE            *lie_file ; 
-  void           (*lie_log)     ( STRUCT_LOG * ) ;
-  void           (*lie_display) ( STRUCT_LOG * ) ;
-  void           (*lie_lock)    ( STRUCT_LOG * ) ;
-  void           (*lie_unlock)  ( STRUCT_LOG * ) ;  
+  void           (*lie_log)     ( STRUCT_LIEU * ) ;
+  void           (*lie_display) ( STRUCT_LIEU * ) ;
+  void           (*lie_lock)    ( STRUCT_LIEU * ) ;
+  void           (*lie_unlock)  ( STRUCT_LIEU * ) ;  
   int              lie_loglevel ;
   char             lie_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
   char             lie_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
@@ -63,7 +63,5 @@ struct STR_LIEU {
 void LIEU_INIT           ( STRUCT_LIEU    * ) ;
 void LIEU_PARAMS_INIT    ( STRUCT_LIEU_PARAMS * ) ;
 void LIEU_PARAMS_DISPLAY ( STRUCT_LIEU_PARAMS * ) ;
-
-void LIEU_DISPLAY    ( STRUCT_LIEU * ) ;
 
 #endif

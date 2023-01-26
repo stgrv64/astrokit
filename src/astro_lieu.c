@@ -15,54 +15,48 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-
 /*****************************************************************************************
-* @fn     : ASTRE_DISPLAY_PREPARE
+* @fn     : LIEU_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LIEU *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY_PREPARE ( STRUCT_ASTRE * lp_Ast) {
+static void LIEU_DISPLAY_PREPARE ( STRUCT_LIEU * lp_Lie) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lie->lie_mutex ) ;
 
-  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
-    lp_Ast->ast_nom, \
-    lp_Ast->ast_hhmmss_asc, \
-    lp_Ast->ast_ddmm_dec, \
-    lp_Ast->ast_hhmmss_agh, \
-    lp_Ast->ast_ddmm_azi, \
-    lp_Ast->ast_ddmm_alt, \
-    lp_Ast->ast_azi_vit, \
-    lp_Ast->ast_alt_vit ) ;
+  sprintf( lp_Lie->lie_dis_cmd , STR_LIE_FORMAT_0,\
+    lp_Lie->lie_lat, \
+    lp_Lie->lie_lon, \
+    lp_Lie->lie_alt ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lie->lie_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : static ASTRE_DISPLAY
+* @fn     : static LIEU_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations sur astre sur commande
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LIEU *
 * @date   : 2023-01-07 creation 
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+static void LIEU_DISPLAY(STRUCT_LIEU *lp_Lie) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
+  LIEU_DISPLAY_PREPARE( lp_Lie ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Lie->lie_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Lie->lie_loglevel , 1 , "%s", lp_Lie->lie_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Lie->lie_loglevel ) ;
 
   return ;
 }
@@ -80,6 +74,27 @@ void LIEU_LOCK ( STRUCT_LIEU * lp_Lie) {
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lie->lie_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : LIEU_LOG
+* @author : s.gravois
+* @brief  : Log la structure en parametre 
+* @param  : STRUCT_LIEU *
+* @date   : 2023-01-24 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+static void LIEU_LOG ( STRUCT_LIEU * lp_Lie) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lie->lie_mutex ) ;
+
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lie->lie_mutex ) ;
 
   return ;
 }
@@ -177,15 +192,15 @@ void LIEU_INIT(STRUCT_LIEU *lp_Lie) {
 }
 
 /*****************************************************************************************
-* @fn     : LIEU_DISPLAY
+* @fn     : LIEU_DISPLAY_old
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations du lieu d observation
 * @param  : STRUCT_LIEU *lp_Lie
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @todo   : 
+* @todo   : (obsolete 2023)
 *****************************************************************************************/
 
-void LIEU_DISPLAY(STRUCT_LIEU *lp_Lie) {
+void LIEU_DISPLAY_old(STRUCT_LIEU *lp_Lie) {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 

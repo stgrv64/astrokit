@@ -15,68 +15,59 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-
 /*****************************************************************************************
-* @fn     : ASTRE_DISPLAY_PREPARE
+* @fn     : KEYBOARD_TERMIOS_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_TERMIOS *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY_PREPARE ( STRUCT_ASTRE * lp_Ast) {
+static void KEYBOARD_TERMIOS_DISPLAY_PREPARE ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ter->ter_mutex ) ;
 
-  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
-    lp_Ast->ast_nom, \
-    lp_Ast->ast_hhmmss_asc, \
-    lp_Ast->ast_ddmm_dec, \
-    lp_Ast->ast_hhmmss_agh, \
-    lp_Ast->ast_ddmm_azi, \
-    lp_Ast->ast_ddmm_alt, \
-    lp_Ast->ast_azi_vit, \
-    lp_Ast->ast_alt_vit ) ;
+  sprintf( lp_Ter->ter_dis_cmd , STR_TER_FORMAT_0,\
+    lp_Ter->ter_buffer, \
+    lp_Ter->ter_sum_ascii ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ter->ter_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : static ASTRE_DISPLAY
+* @fn     : static KEYBOARD_TERMIOS_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations sur astre sur commande
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_TERMIOS *
 * @date   : 2023-01-07 creation 
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+static void KEYBOARD_TERMIOS_DISPLAY( STRUCT_TERMIOS *lp_Ter) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
+  KEYBOARD_TERMIOS_DISPLAY_PREPARE( lp_Ter ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ter->ter_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ter->ter_loglevel , 1 , "%s", lp_Ter->ter_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ter->ter_loglevel ) ;
 
   return ;
 }
-
-
 /*****************************************************************************************
-* @fn     : KEYBOARD_LOCK
+* @fn     : KEYBOARD_TERMIOS_LOCK
 * @author : s.gravois
 * @brief  : Lock le mutex de la structure en parametre
 * @param  : STRUCT_TERMIOS *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYBOARD_LOCK ( STRUCT_TERMIOS * lp_Ter) {
+void KEYBOARD_TERMIOS_LOCK ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -85,14 +76,35 @@ void KEYBOARD_LOCK ( STRUCT_TERMIOS * lp_Ter) {
   return ;
 }
 /*****************************************************************************************
-* @fn     : KEYBOARD_UNLOCK
+* @fn     : KEYBOARD_TERMIOS_LOG
+* @author : s.gravois
+* @brief  : Log la structure en parametre 
+* @param  : STRUCT_TERMIOS *
+* @date   : 2023-01-24 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+static void KEYBOARD_TERMIOS_LOG ( STRUCT_TERMIOS * lp_Ter) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ter->ter_mutex ) ;
+
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ter->ter_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
 * @param  : STRUCT_TERMIOS *
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYBOARD_UNLOCK ( STRUCT_TERMIOS * lp_Ter) {
+void KEYBOARD_TERMIOS_UNLOCK ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -115,10 +127,10 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
   TraceArbo(__func__,0,"init termios") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ter->ter_mutex ) ;
-                                     lp_Ter->ter_log      = TERMIOS_LOG ;
-                                     lp_Ter->ter_lock     = TERMIOS_LOCK ;
-                                     lp_Ter->ter_unlock   = TERMIOS_UNLOCK ;
-                                     lp_Ter->ter_display  = TERMIOS_DISPLAY ;
+                                     lp_Ter->ter_log      = KEYBOARD_TERMIOS_LOG ;
+                                     lp_Ter->ter_lock     = KEYBOARD_TERMIOS_LOCK ;
+                                     lp_Ter->ter_unlock   = KEYBOARD_TERMIOS_UNLOCK ;
+                                     lp_Ter->ter_display  = KEYBOARD_TERMIOS_DISPLAY ;
                                      lp_Ter->ter_loglevel = 0 ; 
                                      lp_Ter->ter_file     = NULL ;
   gettimeofday (                   & lp_Ter->ter_tval, NULL ) ;

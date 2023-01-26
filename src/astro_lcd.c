@@ -65,58 +65,52 @@ extern STRUCT_LIEU    *gp_Lie ;
 extern STRUCT_LCD     *gp_Lcd ;
 */
 
-
 /*****************************************************************************************
-* @fn     : ASTRE_DISPLAY_PREPARE
+* @fn     : LCD_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LCD *
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY_PREPARE ( STRUCT_ASTRE * lp_Ast) {
+static void LCD_DISPLAY_PREPARE ( STRUCT_LCD * lp_Lcd) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lcd->lcd_mutex ) ;
 
-  sprintf( lp_Ast->ast_dis_cmd , STR_ASTRE_FORMAT,\
-    lp_Ast->ast_nom, \
-    lp_Ast->ast_hhmmss_asc, \
-    lp_Ast->ast_ddmm_dec, \
-    lp_Ast->ast_hhmmss_agh, \
-    lp_Ast->ast_ddmm_azi, \
-    lp_Ast->ast_ddmm_alt, \
-    lp_Ast->ast_azi_vit, \
-    lp_Ast->ast_alt_vit ) ;
+  sprintf( lp_Lcd->lcd_dis_cmd , STR_LCD_FORMAT_0,\
+    lp_Lcd->lcd_l0_cur, \
+    lp_Lcd->lcd_l1_cur, \
+    lp_Lcd->lcd_l0_def, \
+    lp_Lcd->lcd_l1_def  ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lcd->lcd_mutex ) ;
 
   return ;
 }
 /*****************************************************************************************
-* @fn     : static ASTRE_DISPLAY
+* @fn     : static LCD_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche les informations sur astre sur commande
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_LCD *
 * @date   : 2023-01-07 creation 
 *****************************************************************************************/
 
-static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
+static void LCD_DISPLAY(STRUCT_LCD *lp_Lcd) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
+  LCD_DISPLAY_PREPARE( lp_Lcd ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Lcd->lcd_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Lcd->lcd_loglevel , 1 , "%s", lp_Lcd->lcd_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Lcd->lcd_loglevel ) ;
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : LCD_LOCK
 * @author : s.gravois
@@ -130,6 +124,27 @@ void LCD_LOCK ( STRUCT_LCD * lp_Lcd) {
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lcd->lcd_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : LCD_LOG
+* @author : s.gravois
+* @brief  : Log la structure en parametre 
+* @param  : STRUCT_LCD *
+* @date   : 2023-01-24 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+static void LCD_LOG ( STRUCT_LCD * lp_Lcd) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lcd->lcd_mutex ) ;
+
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lcd->lcd_mutex ) ;
 
   return ;
 }
@@ -149,7 +164,6 @@ void LCD_UNLOCK ( STRUCT_LCD * lp_Lcd) {
 
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : LCD_INIT
 * @author : s.gravois
@@ -781,7 +795,6 @@ void LCD_DISPLAY_MODE_STELLARIUM( const int i_duree_us ) {
   }
   return ;
 }
-
 /*****************************************************************************************
 * @fn     : LCD_DISPLAY_INFORMATIONS
 * @author : s.gravois

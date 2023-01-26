@@ -42,7 +42,7 @@ static void KEYS_LOG ( STRUCT_KEYS * lp_Key) {
   MACRO_ASTRO_GLOBAL_LOG_ROTATE( lp_Key->key_loglevel ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex) ;
 
-  sprintf( c_cmd , "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mot) %-5s (menu) %-10s (motencours) %-2d",\
+  sprintf( c_cmd , STR_KEY_FORMAT_0,\
     lp_Key->key_phrase,\
     lp_Key->key_mot,\
     lp_Key->key_symbole,\
@@ -71,7 +71,7 @@ static void KEYS_DISPLAY_PREPARE ( STRUCT_KEYS * lp_Key) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
 
-  sprintf( lp_Key->key_dis_cmd , STR_KEYS_FORMAT,\
+  sprintf( lp_Key->key_dis_cmd , STR_KEY_FORMAT_0,\
     lp_Key->key_phrase,\
     lp_Key->key_mot,\
     lp_Key->key_symbole,\

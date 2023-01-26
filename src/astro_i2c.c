@@ -27,7 +27,7 @@ STRUCT_I2C  lsm303d,   *lsm ;
 STRUCT_I2C  mcp23008,  *mcp ;
 STRUCT_I2C  rtcds1307, *rtc ;
 */
-STRUCT_I2C         exemple,   *lp_I2c ;
+STRUCT_I2C         exemple,   *lp_I2c_dev ;
 STRUCT_I2C_ACC_MAG accmag,    *lp_Acc ;
 
 
@@ -39,19 +39,19 @@ STRUCT_I2C_ACC_MAG accmag,    *lp_Acc ;
 * @date   : 2023-01-08 creation
 *****************************************************************************************/
 
-static void I2C_DISPLAY_PREPARE ( STRUCT_I2C * lp_I2c) {
+static void I2C_DISPLAY_PREPARE ( STRUCT_I2C * lp_I2c_dev) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_I2c->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_I2c_dev->i2c_dev_mutex ) ;
 
-  sprintf( lp_I2c->ast_dis_cmd , STR_I2C_FORMAT_0,\
-    lp_I2c->i2c_dev_file, \
-    lp_I2c->i2c_dev_adress, \
-    lp_I2c->i2c_dev_registre, \
-    lp_I2c->i2c_dev_buf ) ;
+  sprintf( lp_I2c_dev->i2c_dev_dis_cmd , STR_I2C_FORMAT_0,\
+    lp_I2c_dev->i2c_dev_file_path, \
+    lp_I2c_dev->i2c_dev_adress, \
+    lp_I2c_dev->i2c_dev_registre, \
+    lp_I2c_dev->i2c_dev_buf ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_I2c->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_I2c_dev->i2c_dev_mutex ) ;
 
   return ;
 }
@@ -63,17 +63,17 @@ static void I2C_DISPLAY_PREPARE ( STRUCT_I2C * lp_I2c) {
 * @date   : 2023-01-07 creation 
 *****************************************************************************************/
 
-static void I2C_DISPLAY(STRUCT_I2C *lp_I2c) {
+static void I2C_DISPLAY(STRUCT_I2C *lp_I2c_dev) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  I2C_DISPLAY_PREPARE( lp_I2c ) ;
+  I2C_DISPLAY_PREPARE( lp_I2c_dev ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_I2c->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_I2c->ast_loglevel , 1 , "%s", lp_I2c->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_I2c->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_I2c_dev->i2c_dev_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_I2c_dev->i2c_dev_loglevel , 1 , "%s", lp_I2c_dev->i2c_dev_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_I2c_dev->i2c_dev_loglevel ) ;
 
   return ;
 }
@@ -87,12 +87,33 @@ static void I2C_DISPLAY(STRUCT_I2C *lp_I2c) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void I2C_LOCK ( STRUCT_I2C * lp_I2c) {
+void I2C_LOCK ( STRUCT_I2C * lp_I2c_dev) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_I2c->i2c_dev_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_I2c_dev->i2c_dev_mutex ) ;
 
+  return ;
+}
+/*****************************************************************************************
+* @fn     : I2C_LOG
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_I2C *
+* @date   : 2023-01-24 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+void I2C_LOG ( STRUCT_I2C * lp_I2c_dev) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_I2c_dev->i2c_dev_mutex ) ;
+  
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_I2c_dev->i2c_dev_mutex ) ;
+  
   return ;
 }
 /*****************************************************************************************
@@ -103,11 +124,11 @@ void I2C_LOCK ( STRUCT_I2C * lp_I2c) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void I2C_UNLOCK ( STRUCT_I2C * lp_I2c) {
+void I2C_UNLOCK ( STRUCT_I2C * lp_I2c_dev) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_I2c->i2c_dev_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_I2c_dev->i2c_dev_mutex ) ;
 
   return ;
 }
@@ -232,7 +253,9 @@ int I2C_INIT( STRUCT_I2C * lp_i2c_dev, char * c_i2c_device_name, char * adress) 
   else {
     lp_i2c_dev->i2c_dev_adress = strtoul(adress,NULL,16) ;
   }
-  
+  memset( lp_i2c_dev->i2c_dev_file_path , CONFIG_ZERO_CHAR, sizeof( lp_i2c_dev->i2c_dev_file_path )) ;
+  strcpy( lp_i2c_dev->i2c_dev_file_path, c_i2c_device_name ) ;
+
   lp_i2c_dev->i2c_dev_statut = ret ;  
   lp_i2c_dev->i2c_dev_usleep  = I2C_SLEEP_MICRO ;
   
@@ -397,21 +420,21 @@ void I2C_READ_6_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
 * @date   : 2022-12-20 creation entete
 *****************************************************************************************/
 
-void I2C_ACC_READ( STRUCT_I2C *lp_I2c, STRUCT_I2C_ACC_MAG *lp_Acc ) {
+void I2C_ACC_READ( STRUCT_I2C *lp_I2c_dev, STRUCT_I2C_ACC_MAG *lp_Acc ) {
 
-  lp_Acc->acc_axl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_X_L ) ;
-  lp_Acc->acc_axh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_X_H ) ; 
-  lp_Acc->acc_ayl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Y_L ) ;
-  lp_Acc->acc_ayh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Y_H ) ;
-  lp_Acc->acc_azl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Z_L ) ;
-  lp_Acc->acc_azh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_ACC_Z_H ) ;
+  lp_Acc->acc_axl = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_ACC_X_L ) ;
+  lp_Acc->acc_axh = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_ACC_X_H ) ; 
+  lp_Acc->acc_ayl = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_ACC_Y_L ) ;
+  lp_Acc->acc_ayh = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_ACC_Y_H ) ;
+  lp_Acc->acc_azl = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_ACC_Z_L ) ;
+  lp_Acc->acc_azh = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_ACC_Z_H ) ;
 
-  lp_Acc->acc_mxl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_X_L ) ;
-  lp_Acc->acc_mxh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_X_H ) ; 
-  lp_Acc->acc_myl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Y_L ) ;
-  lp_Acc->acc_myh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Y_H ) ;
-  lp_Acc->acc_mzl = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Z_L ) ;
-  lp_Acc->acc_mzh = I2C_READ_1_BYTES( lp_I2c, REG_OUT_MAG_Z_H ) ;
+  lp_Acc->acc_mxl = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_MAG_X_L ) ;
+  lp_Acc->acc_mxh = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_MAG_X_H ) ; 
+  lp_Acc->acc_myl = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_MAG_Y_L ) ;
+  lp_Acc->acc_myh = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_MAG_Y_H ) ;
+  lp_Acc->acc_mzl = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_MAG_Z_L ) ;
+  lp_Acc->acc_mzh = I2C_READ_1_BYTES( lp_I2c_dev, REG_OUT_MAG_Z_H ) ;
 
   return ;
 }
