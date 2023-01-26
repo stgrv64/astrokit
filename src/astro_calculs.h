@@ -22,6 +22,8 @@
 
 #include <pthread.h>
 
+typedef struct STR_ANGLE STRUCT_ANGLE ;
+
 struct STR_ANGLE {
 
   pthread_mutex_t ang_mutex ;
@@ -36,7 +38,6 @@ struct STR_ANGLE {
   int             ang_mm ;      
   int             ang_ss ; 
 } ;
-typedef struct STR_ANGLE STRUCT_ANGLE ;
 
 #include "astro_global.h"
 

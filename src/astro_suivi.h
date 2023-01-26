@@ -39,6 +39,10 @@ typedef enum {
 }
 t_en_Menus ;
 
+/*------------------------------------------------*/
+/* Structure de suivi des Pas                     */
+/*------------------------------------------------*/
+
 typedef struct STR_SUIVI_PAS STRUCT_SUIVI_PAS ;
 
 struct STR_SUIVI_PAS {
@@ -74,6 +78,10 @@ struct STR_SUIVI_PAS {
   int               pas_rewind_fast ;
 } ;
 
+/*------------------------------------------------*/
+/* Structure de suivi des Frequences              */
+/*------------------------------------------------*/
+
 typedef struct STR_SUIVI_FREQUENCES STRUCT_SUIVI_FRE ;
 
 struct STR_SUIVI_FREQUENCES {
@@ -81,10 +89,10 @@ struct STR_SUIVI_FREQUENCES {
   pthread_mutex_t   fre_mutex ;
   STR_EXT_TIMEVAL   fre_tval ; 
   FILE             *fre_file ;
-  void            (*fre_log)     ( STRUCT_SUIVI_PAS * ) ;
-  void            (*fre_display) ( STRUCT_SUIVI_PAS * ) ;
-  void            (*fre_lock)    ( STRUCT_SUIVI_PAS * ) ;
-  void            (*fre_unlock)  ( STRUCT_SUIVI_PAS * ) ;  
+  void            (*fre_log)     ( STRUCT_SUIVI_FRE * ) ;
+  void            (*fre_display) ( STRUCT_SUIVI_FRE * ) ;
+  void            (*fre_lock)    ( STRUCT_SUIVI_FRE * ) ;
+  void            (*fre_unlock)  ( STRUCT_SUIVI_FRE * ) ;  
   int               fre_loglevel ;
   char              fre_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char              fre_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
@@ -93,14 +101,17 @@ struct STR_SUIVI_FREQUENCES {
   double            fre_th_mic ; // periode de la frequence a injecter directement
   double            fre_fa_mic ; // frequence a injecter directement (tient compte des micro pas)
   double            fre_fh_mic ; // frequence a injecter directement (tient compte des micro pas)
+
   double            fre_ta_bru ; // periode brute avant corrections (accelerations et micro pas)
   double            fre_th_bru ; // periode brute avant corrections (accelerations et micro pas)
   double            fre_fa_bru ; // frequence brute avant corrections (accelerations et micro pas)
   double            fre_fh_bru ; // frequence brute avant corrections (accelerations et micro pas)
+
   double            fre_ta_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
   double            fre_th_mot ; // periode de la frequence moteur (ne tient compte des micro pas)
   double            fre_fa_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
   double            fre_fh_mot ; // frequence du moteur deduite      (ne tient compte des micro pas)
+  
   int               fre_sa ;      // signe de la vitesse (direction), tenir compte du flag de inversion
   int               fre_sh ;      // signe de la vitesse (direction), tenir compte du flag de inversion
   int               fre_sa_old ;  // flag de comparaison pour raffraichir ou non les ecritures
@@ -108,22 +119,28 @@ struct STR_SUIVI_FREQUENCES {
 
 } ;
 
+/*------------------------------------------------------------*/
+/* Structure de suivi (split dans pas et frequences (2023)    */
+/*------------------------------------------------------------*/
+
 typedef struct STR_SUIVI STRUCT_SUIVI ;
 
 struct STR_SUIVI {
+
   STR_EXT_TIMEVAL   sui_tval ; 
   pthread_mutex_t   sui_mutex ;
   FILE             *sui_file ;
-  void            (*sui_log)     ( STRUCT_SUIVI_PAS * ) ;
-  void            (*sui_display) ( STRUCT_SUIVI_PAS * ) ;
-  void            (*sui_lock)    ( STRUCT_SUIVI_PAS * ) ;
-  void            (*sui_unlock)  ( STRUCT_SUIVI_PAS * ) ;  
+  void            (*sui_log)     ( STRUCT_SUIVI * ) ;
+  void            (*sui_display) ( STRUCT_SUIVI * ) ;
+  void            (*sui_lock)    ( STRUCT_SUIVI * ) ;
+  void            (*sui_unlock)  ( STRUCT_SUIVI * ) ;  
   int               sui_loglevel ;
   char              sui_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char              sui_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
-  
+  /* obsolete ?
   double            sui_plus ;    // multiplicateur ajustement des periodes si besoin
   double            sui_moins ;   // multiplicateur ajustement des periodes si besoin
+  */
   double            sui_Da ;  // nombre a injecter dans les diviseurs de frequence
   double            sui_Dh ;  // nombre a injecter dans les diviseurs de frequence
   t_en_Menus        sui_menu;      // valeur du menu courant 

@@ -30,14 +30,7 @@ static void LOG_DISPLAY_PREPARE ( STRUCT_LOG * lp_Log) {
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Log->log_mutex ) ;
 
   sprintf( lp_Log->log_dis_cmd , STR_LOG_FORMAT_0,\
-    lp_Log->log_nom, \
-    lp_Log->log_hhmmss_asc, \
-    lp_Log->log_ddmm_dec, \
-    lp_Log->log_hhmmss_agh, \
-    lp_Log->log_ddmm_azi, \
-    lp_Log->log_ddmm_alt, \
-    lp_Log->log_azi_vit, \
-    lp_Log->log_alt_vit ) ;
+    lp_Log->log_level ) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Log->log_mutex ) ;
 

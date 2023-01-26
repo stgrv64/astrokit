@@ -47,9 +47,14 @@ struct STR_VOUTE {
 void  VOUTE_INIT            ( STRUCT_VOUTE * ) ;
 void  VOUTE_CONFIG          ( STRUCT_VOUTE *, double , double , double  ) ;
 long  VOUTE_TEMPORISATION   ( STRUCT_VOUTE *, struct timeval ) ;
-void  VOUTE_DISPLAY         ( STRUCT_VOUTE * ) ;
 
 void * _SUIVI_VOUTE           ( STRUCT_VOUTE * ) ;
+
+static void VOUTE_DISPLAY_PREPARE ( STRUCT_VOUTE * ) ;
+static void VOUTE_DISPLAY        ( STRUCT_VOUTE * ) ;
+static void VOUTE_UNLOCK         ( STRUCT_VOUTE * ) ;
+static void VOUTE_LOCK           ( STRUCT_VOUTE * ) ;
+static void VOUTE_LOG            ( STRUCT_VOUTE * ) ;
 
 #endif
 

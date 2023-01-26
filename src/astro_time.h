@@ -13,7 +13,42 @@
 #ifndef ASTRO_TIME_H
 #define ASTRO_TIME_H
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
+
+#ifndef CONFIG_TAILLE_BUFFER_256
+#define CONFIG_TAILLE_BUFFER_256 256
+#endif
+
+typedef struct STR_TIME STRUCT_TIME ;
+
+struct STR_TIME {
+  pthread_mutex_t tim_mutex ;
+  struct timeval  tim_tval ; 
+  FILE           *tim_file ;
+  void          (*tim_log)     ( STRUCT_TIME * ) ;
+  void          (*tim_display) ( STRUCT_TIME * ) ;
+  void          (*tim_lock)    ( STRUCT_TIME * ) ;
+  void          (*tim_unlock)  ( STRUCT_TIME * ) ;
+  int             tim_loglevel ;
+  char            tim_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
+  char            tim_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
+
+  double          tim_hd ;   // heure decimale
+  char            tim_sig ;  /* signe */ 
+  int             tim_si ;   // signe
+  int             tim_mm ;   // month
+  int             tim_yy ;   // year
+  int             tim_dd ;   // day
+  int             tim_HH ;   // hour
+  int             tim_MM ;   // minutes
+  int             tim_SS ;   // secondes
+
+} ;
+
+#include "astro_global.h"
 
 #define TIME_DEFAULT_TEMPO_VOUTE    1000000
 #define TIME_DEFAULT_TEMPO_NEMU     50000
@@ -65,33 +100,7 @@ typedef struct STR_TIME_TEMPOS STRUCT_TIME_TEMPOS ;
   * d'un angle sous la forme  : 12h25mn05s ( 360 degres = 24h )
   */
 
-typedef struct STR_TIME STRUCT_TIME ;
 
-struct STR_TIME {
-  pthread_mutex_t tim_mutex ;
-  STR_EXT_TIMEVAL tim_tval ; 
-  FILE           *tim_file ;
-  void          (*tim_log)     ( STRUCT_CONFIG * ) ;
-  void          (*tim_display) ( STRUCT_CONFIG * ) ;
-  void          (*tim_lock)    ( STRUCT_CONFIG * ) ;
-  void          (*tim_unlock)  ( STRUCT_CONFIG * ) ;
-  int             tim_loglevel ;
-  char            tim_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
-  char            tim_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
-
-  double          tim_hd ;   // heure decimale
-  char            tim_sig ;  /* signe */ 
-  int             tim_si ;   // signe
-  int             tim_mm ;   // month
-  int             tim_yy ;   // year
-  int             tim_dd ;   // day
-  int             tim_HH ;   // hour
-  int             tim_MM ;   // minutes
-  int             tim_SS ;   // secondes
-
-} ;
-
-#include "astro_global.h"
 
 struct STR_TIME_PARAMS {
 
@@ -110,9 +119,15 @@ typedef struct STR_TIME_PARAMS STRUCT_TIME_PARAMS ;
 
 // ------ TEMPORISATIONS DES BOUCLES ------------
 
-void   TIME_INIT                      ( STRUCT_TIME * ) ;
-void   TIME_RELEASE                   ( STRUCT_TIME * ) ;
-void   TIME_DISPLAY                   ( STRUCT_TIME * ) ;
+       void TIME_INIT                      ( STRUCT_TIME * ) ;
+       void TIME_RELEASE                   ( STRUCT_TIME * ) ;
+static void TIME_DISPLAY_2                 ( STRUCT_TIME * ) ;
+
+static void TIME_DISPLAY_PREPARE ( STRUCT_TIME * ) ;
+static void TIME_DISPLAY         ( STRUCT_TIME * ) ;
+static void TIME_UNLOCK          ( STRUCT_TIME * ) ;
+static void TIME_LOCK            ( STRUCT_TIME * ) ;
+static void TIME_LOG             ( STRUCT_TIME * ) ;
 
 void   TIME_INIT_TEMPOS               ( STRUCT_TIME_TEMPOS * ) ;
 void   TIME_PARAMS_INIT               ( STRUCT_TIME_PARAMS * ) ;
@@ -126,9 +141,7 @@ int    TIME_CALCULS_JULIAN_DAY        ( STRUCT_TIME * , STRUCT_LIEU * ) ;
 int    TIME_CALCULS_LOCAL_DATE        ( STRUCT_TIME *  ) ;
 void   TIME_CALCULS_HMS_VERS_DEC      ( STRUCT_TIME *  ) ;
 void   TIME_CALCULS_DEC_VERS_HMS      ( STRUCT_TIME *  ) ;
-
 void   TIME_DISPLAY_MSG_HHMMSS        ( STRUCT_TIME * , char * ) ;
-
 void   TIME_CALCULS_HMS_VERS_DEC_DIR  ( double *, double, double, double) ;
 
 double TIME_CALCULS_DUREE_SECONDES    ( struct timeval * )  ;

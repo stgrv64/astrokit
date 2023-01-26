@@ -16,19 +16,19 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 
-static void SUIVI_DISPLAY_PREPARE     ( STRUCT_SUIVI * ) ;
-static void SUIVI_DISPLAY            ( STRUCT_SUIVI * ) ;
-static void SUIVI_UNLOCK             ( STRUCT_SUIVI * ) ;
-static void SUIVI_LOCK               ( STRUCT_SUIVI * ) ;
-static void SUIVI_LOG                ( STRUCT_SUIVI * ) ;
+static void SUIVI_DISPLAY_PREPARE        ( STRUCT_SUIVI * ) ;
+static void SUIVI_DISPLAY                ( STRUCT_SUIVI * ) ;
+static void SUIVI_UNLOCK                 ( STRUCT_SUIVI * ) ;
+static void SUIVI_LOCK                   ( STRUCT_SUIVI * ) ;
+static void SUIVI_LOG                    ( STRUCT_SUIVI * ) ;
 
-static void SUIVI_PAS_DISPLAY_PREPARE     ( STRUCT_SUIVI_PAS * ) ;
+static void SUIVI_PAS_DISPLAY_PREPARE    ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_DISPLAY            ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_UNLOCK             ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_LOCK               ( STRUCT_SUIVI_PAS * ) ;
 static void SUIVI_PAS_LOG                ( STRUCT_SUIVI_PAS * ) ;
 
-static void SUIVI_FRE_DISPLAY_PREPARE     ( STRUCT_SUIVI_FRE * ) ;
+static void SUIVI_FRE_DISPLAY_PREPARE    ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_DISPLAY            ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_UNLOCK             ( STRUCT_SUIVI_FRE * ) ;
 static void SUIVI_FRE_LOCK               ( STRUCT_SUIVI_FRE * ) ;
@@ -46,19 +46,13 @@ static void SUIVI_DISPLAY_PREPARE ( STRUCT_SUIVI * lp_Sui) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
 
-  sprintf( lp_Sui->ast_dis_cmd , MACRO_SUIVI_DISPLAY_PREPARE,\
-    lp_Sui->ast_nom, \
-    lp_Sui->ast_hhmmss_asc, \
-    lp_Sui->ast_ddmm_dec, \
-    lp_Sui->ast_hhmmss_agh, \
-    lp_Sui->ast_ddmm_azi, \
-    lp_Sui->ast_ddmm_alt, \
-    lp_Sui->ast_azi_vit, \
-    lp_Sui->ast_alt_vit ) ;
+  sprintf( lp_Sui->sui_dis_cmd , STR_SUI_FORMAT_0,\
+           lp_Sui->sui_Da, \
+           lp_Sui->sui_Dh  ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Sui->sui_mutex ) ;
 
   return ;
 }
@@ -74,13 +68,13 @@ static void SUIVI_DISPLAY(STRUCT_SUIVI *lp_Sui) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
-  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"display informations on suivi") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   SUIVI_DISPLAY_PREPARE( lp_Sui ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sui->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Sui->ast_loglevel , 1 , "%s", lp_Sui->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Sui->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sui->sui_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Sui->sui_loglevel , 1 , "%s", lp_Sui->sui_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Sui->sui_loglevel ) ;
 
   return ;
 }
@@ -96,17 +90,17 @@ static void SUIVI_PAS_DISPLAY_PREPARE ( STRUCT_SUIVI_PAS * lp_Pas) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->pas_mutex ) ;
 
-  sprintf( lp_Pas->ast_dis_cmd , STR_PAS_FORMAT_0,\
-    lp_Pas->pas_ouest, \
-    lp_Pas->pas_est, \
-    lp_Pas->pas_nord, \
-    lp_Pas->pas_sud, \
-    lp_Pas->pas_acc_alt, \
-    lp_Pas->pas_acc_azi );
+  sprintf( lp_Pas->pas_dis_cmd , STR_PAS_FORMAT_0,\
+           lp_Pas->pas_ouest, \
+           lp_Pas->pas_est, \
+           lp_Pas->pas_nord, \
+           lp_Pas->pas_sud, \
+           lp_Pas->pas_acc_alt, \
+           lp_Pas->pas_acc_azi ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pas->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pas->pas_mutex ) ;
 
   return ;
 }
@@ -122,13 +116,13 @@ static void SUIVI_PAS_DISPLAY(STRUCT_SUIVI_PAS *lp_Pas) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
-  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"display informations on pas") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   SUIVI_PAS_DISPLAY_PREPARE( lp_Pas ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pas->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Pas->ast_loglevel , 1 , "%s", lp_Pas->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pas->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pas->pas_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Pas->pas_loglevel , 1 , "%s", lp_Pas->pas_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pas->pas_loglevel ) ;
 
   return ;
 }
@@ -145,19 +139,13 @@ static void SUIVI_FRE_DISPLAY_PREPARE ( STRUCT_SUIVI_FRE * lp_Fre) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Fre->fre_mutex ) ;
 
-  sprintf( lp_Fre->ast_dis_cmd , STR_SUIVI_FORMAT,\
-    lp_Fre->ast_nom, \
-    lp_Fre->ast_hhmmss_asc, \
-    lp_Fre->ast_ddmm_dec, \
-    lp_Fre->ast_hhmmss_agh, \
-    lp_Fre->ast_ddmm_azi, \
-    lp_Fre->ast_ddmm_alt, \
-    lp_Fre->ast_azi_vit, \
-    lp_Fre->ast_alt_vit ) ;
+  sprintf( lp_Fre->fre_dis_cmd , STR_FRE_FORMAT_0,\
+           lp_Fre->fre_fa_mic, \
+           lp_Fre->fre_fh_mic  ) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Fre->ast_mutex ) ;
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Fre->fre_mutex ) ;
 
   return ;
 }
@@ -165,21 +153,21 @@ static void SUIVI_FRE_DISPLAY_PREPARE ( STRUCT_SUIVI_FRE * lp_Fre) {
 * @fn     : static SUIVI_FRE_DISPLAY
 * @author : s.gravois
 * @brief  : Cette fonction affiche infos sur struct dédiée
-* @param  : STRUCT_ASTRE *
+* @param  : STRUCT_SUIVI_FRE *
 * @date   : 2023-01-07 creation 
 *****************************************************************************************/
 
-static void SUIVI_FRE_DISPLAY(STRUCT_ASTRE *lp_Fre) {
+static void SUIVI_FRE_DISPLAY(STRUCT_SUIVI_FRE *lp_Fre) {
 
   char c_cmd[CONFIG_TAILLE_BUFFER_256]={0} ;
 
-  TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"display informations on frequences") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   SUIVI_FRE_DISPLAY_PREPARE( lp_Fre ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Fre->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Fre->ast_loglevel , 1 , "%s", lp_Fre->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Fre->ast_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Fre->fre_loglevel ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Fre->fre_loglevel , 1 , "%s", lp_Fre->fre_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Fre->fre_loglevel ) ;
 
   return ;
 }
@@ -946,8 +934,13 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     gp_Pas->pas_acc_azi = 1 ;
 
-    if ( lp_Cal->cal_mode )  gp_Pas->pas_acc_alt = 0.0 ;
-    else                             gp_Pas->pas_acc_alt = 1.0 ;
+    if ( gp_Cal->cal_mode == CALCULS_MODE_AZIMUTAL)  {
+
+      gp_Pas->pas_acc_alt = 1.0 ;
+    }
+    else {
+      gp_Pas->pas_acc_alt = 0.0 ;
+    }
 
     gp_Pas->pas_rst = 0 ;
            
@@ -1294,15 +1287,13 @@ void SUIVI_INIT(STRUCT_SUIVI * lp_Sui) {
   TraceArbo(__func__,0,"init suivi") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Sui->sui_mutex ) ;
-                                     lp_Sui->sui_log      = SUIVI_FRE_LOG ;
-                                     lp_Sui->sui_lock     = SUIVI_FRE_LOCK ;
-                                     lp_Sui->sui_unlock   = SUIVI_FRE_UNLOCK ;
-                                     lp_Sui->sui_display  = SUIVI_FRE_DISPLAY ;
+                                     lp_Sui->sui_log      = SUIVI_LOG ;
+                                     lp_Sui->sui_lock     = SUIVI_LOCK ;
+                                     lp_Sui->sui_unlock   = SUIVI_UNLOCK ;
+                                     lp_Sui->sui_display  = SUIVI_DISPLAY ;
                                      lp_Sui->sui_loglevel = 0 ; 
                                      lp_Sui->sui_file     = NULL ;
   gettimeofday (                   & lp_Sui->sui_tval, NULL ) ; 
-
-  lp_Cal->cal_mode = 0 ;
 
   // a modifier  : instancier ces variables a l aide du fichier de config
            
@@ -1336,10 +1327,10 @@ void SUIVI_PAS_INIT(STRUCT_SUIVI_PAS * lp_Pas) {
   TraceArbo(__func__,0,"init pas") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Pas->pas_mutex ) ;
-                                     lp_Pas->pas_log      = SUIVI_FRE_LOG ;
-                                     lp_Pas->pas_lock     = SUIVI_FRE_LOCK ;
-                                     lp_Pas->pas_unlock   = SUIVI_FRE_UNLOCK ;
-                                     lp_Pas->pas_display  = SUIVI_FRE_DISPLAY ;
+                                     lp_Pas->pas_log      = SUIVI_PAS_LOG ;
+                                     lp_Pas->pas_lock     = SUIVI_PAS_LOCK ;
+                                     lp_Pas->pas_unlock   = SUIVI_PAS_UNLOCK ;
+                                     lp_Pas->pas_display  = SUIVI_PAS_DISPLAY ;
                                      lp_Pas->pas_loglevel = 0 ; 
                                      lp_Pas->pas_file     = NULL ;
   gettimeofday (                   & lp_Pas->pas_tval, NULL ) ; 

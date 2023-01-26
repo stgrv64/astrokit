@@ -64,4 +64,6 @@ void LIEU_INIT           ( STRUCT_LIEU    * ) ;
 void LIEU_PARAMS_INIT    ( STRUCT_LIEU_PARAMS * ) ;
 void LIEU_PARAMS_DISPLAY ( STRUCT_LIEU_PARAMS * ) ;
 
+void LIEU_DISPLAY_old    ( STRUCT_LIEU *)  ;
+
 #endif

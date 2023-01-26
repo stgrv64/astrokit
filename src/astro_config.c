@@ -943,10 +943,10 @@ void CONFIG_DISPLAY_TOUT(void) {
 
   TraceArbo(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  TIME_DISPLAY( gp_Tim ) ;
-  LIEU_DISPLAY( gp_Lie );
+  gp_Tim->tim_display( gp_Tim ) ;
+  LIEU_DISPLAY_old( gp_Lie );
   CONFIG_DISPLAY_MODE_LONG(gp_Ast,gp_Lie,gp_Cal) ; 
-  VOUTE_DISPLAY( gp_Vou ) ;
+  gp_Vou->vou_display( gp_Vou ) ;
 
   TraceArbo(__func__,1,"end") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 }

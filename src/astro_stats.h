@@ -33,8 +33,13 @@ struct STR_STATS {
   double           sta_Ihs ;             // somme sur nombres d'impulsions mesurees 
 } ;
 
-void STATS_INIT (STRUCT_STATS * ) ;
+       void STATS_INIT                       ( STRUCT_STATS * ) ;
+       void STAT_MESURE_PULSATIONS_INJECTEES ( STRUCT_STATS *) ;
 
-void STAT_MESURE_PULSATIONS_INJECTEES(STRUCT_STATS *) ;
+static void STATS_DISPLAY_PREPARE ( STRUCT_STATS * ) ;
+static void STATS_DISPLAY         ( STRUCT_STATS * ) ;
+static void STATS_UNLOCK          ( STRUCT_STATS * ) ;
+static void STATS_LOCK            ( STRUCT_STATS * ) ;
+static void STATS_LOG             ( STRUCT_STATS * ) ;
 
 #endif

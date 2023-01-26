@@ -16,12 +16,6 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-static void PTHREADS_DISPLAY_PREPARE ( STRUCT_PTHREADS * ) ;
-static void PTHREADS_DISPLAY        ( STRUCT_PTHREADS * ) ;
-static void PTHREADS_UNLOCK         ( STRUCT_PTHREADS * ) ;
-static void PTHREADS_LOCK           ( STRUCT_PTHREADS * ) ;
-static void PTHREADS_LOG            ( STRUCT_PTHREADS * ) ;
-
 int gi_pth_numero ;  
 int gi_pthread_getuid ;
 int gi_pthread_nb_cpu ;
@@ -120,7 +114,7 @@ static void PTHREADS_DISPLAY_PREPARE ( STRUCT_PTHREADS * lp_Pth) {
     c_ord, \
     i_pri, \
     c_sta, \
-    i_num_thread ) ;
+    lp_Pth->pth_index ) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
 
@@ -183,6 +177,27 @@ static void PTHREADS_LOCK ( STRUCT_PTHREADS * lp_Pth) {
   return ;
 }
 /*****************************************************************************************
+* @fn     : PTHREADS_LOG_new
+* @author : s.gravois
+* @brief  : Lock le mutex de la structure en parametre
+* @param  : STRUCT_PTHREADS *
+* @date   : 2023-01-26 creation
+* @todo   : (a completer )
+*****************************************************************************************/
+
+static void PTHREADS_LOG_new ( STRUCT_PTHREADS * lp_Pth) {
+
+  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pth->pth_mutex ) ;
+  
+  /* TODO : complete */ 
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
+  
+  return ;
+}
+/*****************************************************************************************
 * @fn     : PTHREADS_UNLOCK
 * @author : s.gravois
 * @brief  : Unlock le mutex de la structure en parametre
@@ -206,7 +221,7 @@ static void PTHREADS_UNLOCK ( STRUCT_PTHREADS * lp_Pth) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
- void PTHREADS_LOG ( STRUCT_PTHREADS * lp_Pth) {
+ static void PTHREADS_LOG ( STRUCT_PTHREADS * lp_Pth) {
 
   pthread_t i_id=0 ;
   pthread_t i_id_pth=0 ;

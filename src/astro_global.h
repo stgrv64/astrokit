@@ -117,13 +117,16 @@
 #define STR_KEY_FORMAT_0 "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mo) %-5s (menu) %-10s (motencours) %-2d"
 #define STR_LCD_FORMAT_0 "(cur0) %s (cur1) %s (def0) %s(def1) %s"
 #define STR_LIE_FORMAT_0 "(lon) %f (lat) %f (alt) %f"
+#define STR_LOG_FORMAT_0 "(level) %d"
 #define STR_VOU_FORMAT_0 "(num) %lld (run) %d (tps) %.2f"
 #define STR_PID_FORMAT_0 "(inp) %f (out) %f (err) %f (result) %f"
 #define STR_PTH_FORMAT_0 "(pth) %-16s (id) %ld (id2) %ld (ord) %s (prio) %d (sta) %s (num) %d"
-#define STR_STA_FORMAT_0 "(Ia) %lld (Ih) %lld (Tac) %f (Thc) %f (Ias) %f (Ihs) %f"
-#define STR_PAS_FORMAT_0 "(wst) %ld (est) %ld (nth) %ld (sou)%ld (acc-alt) %d (acc-azi) %d"
+#define STR_STA_FORMAT_0 "(Ia) %ld (Ih) %ld (Tac) %f (Thc) %f (Ias) %f (Ihs) %f"
+#define STR_PAS_FORMAT_0 "(wst) %ld (est) %ld (nth) %ld (sou)%ld (acc-alt) %f (acc-azi) %f"
 #define STR_TER_FORMAT_0 "(buf) %s (asc) %d"
 #define STR_TIM_FORMAT_0 "(dec) %f (sig) %c (yea) %-4d (mon) %-3d (day) %-3d (hou) %-3d (min) %-3d (sec) %-3d "
+#define STR_SUI_FORMAT_0 "(Da) %f (Dh) %f"
+#define STR_FRE_FORMAT_0 "(Fa) %f (Fh) %f"
 
 /*------------------------------------------------------------------------------*/
 /* Defintion des Macros pour tout le code qui n'est pas de type log             */

@@ -168,12 +168,16 @@ struct STR_PTHREADS {
   unsigned int              pth_i_nb ; 
 } ;
 
-void PTHREADS_INIT_MUTEXS     (void) ;
-void PTHREADS_INIT            ( STRUCT_PTHREADS * , pthread_t ) ;
-void PTHREADS_CONFIG          ( STRUCT_PTHREADS * , pthread_t, int  ) ;
-void PTHREADS_INFOS           ( STRUCT_PTHREADS * ) ;
-void PTHREADS_LOG             ( STRUCT_PTHREADS * ) ;
-void PTHREADS_DISPLAY_ETAT    ( STRUCT_PTHREADS * ) ;
-void PTHREADS_CANCEL_OR_KILL  ( STRUCT_PTHREADS * ) ;
-
+       void PTHREADS_INIT_MUTEXS     (void) ;
+       void PTHREADS_INIT            ( STRUCT_PTHREADS * , pthread_t ) ;
+       void PTHREADS_CONFIG          ( STRUCT_PTHREADS * , pthread_t, int  ) ;
+       void PTHREADS_INFOS           ( STRUCT_PTHREADS * ) ;
+       void PTHREADS_DISPLAY_ETAT    ( STRUCT_PTHREADS * ) ;
+       void PTHREADS_CANCEL_OR_KILL  ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_LOG             ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_DISPLAY_PREPARE ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_DISPLAY         ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_UNLOCK          ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_LOCK            ( STRUCT_PTHREADS * ) ;
+static void PTHREADS_LOG             ( STRUCT_PTHREADS * ) ;
 #endif

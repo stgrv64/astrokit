@@ -217,6 +217,25 @@ while (0)
 // ASTRO_LOG_DEBUG : fin macros
 // ------------------------------------------------------------------------
 
+/* Explication des log levels :
+
+ - log_level est un niveau de log modifiable en temps reel (via le clavier : termios)
+   durant execution du programme et qui concerne toutes les MACROS utilisant ce niveau de log
+   => cela permet d'activer les logs a la volee et de les arreter egalement
+
+ - log_loglevel est le pendant des struct->xxx_loglevel , idem log_level MAIS uniquement
+    pour la structure dediee , ce niveau est utilise principalement par les fonctions statiques
+    struct_xxx_DISPLAY et la chaine a affichee est preparee par la fonction struct_xxx_DISPLAY_PREPARE
+    qui vienne se greffer sur les pointeurs de fonctions −>display des struct concernées
+
+ - la modification des log level est faite sur reception d'un signal de clavier (termios)
+   et geree dans les MACROS MACRO_IF_KEY_MOT_IS dans  SUIVI_TRAITEMENT_MOT
+
+ - TODO : pour ne pas dependre de la frequence d'affichage de SUIVI_TRAITEMENT_MOT
+    qui est encapsulée par _SUIVI_MENU* , on pourra mettre ce traitement dans un thread dédié
+    ou bien dans _SUIVI_VOUTE*
+
+ */
 typedef struct STR_LOG STRUCT_LOG ;
 
 struct STR_LOG {

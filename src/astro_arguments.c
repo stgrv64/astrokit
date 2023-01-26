@@ -413,7 +413,7 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 2  ) &&  ! strcmp("tou",argv[1]) ) {
   
-    Trace("passage en mode azimutal : lp_Cal->cal_mode=0") ;
+    Trace("passage en mode azimutal : lp_Cal->cal_mode = CALCULS_MODE_AZIMUTAL") ;
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Cal->cal_mutex ) ;
 
