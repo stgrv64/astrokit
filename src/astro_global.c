@@ -153,3 +153,67 @@ void ASTRO_GLOBAL_INIT(void) {
   */
  return ;
 }
+/*****************************************************************************************
+* @fn     : ASTRO_GLOBAL_LOG_ROTATE
+* @author : s.gravois
+* @brief  : Effectue une rotation de valeur sur le parametre
+* @param  : int * logrotate
+* @date   : 2023-01-30
+* @todo   : 
+*****************************************************************************************/
+
+void ASTRO_GLOBAL_LOG_ROTATE(int * lp_loglevel) {
+
+  TraceArbo(__func__,2,"log rotate") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  switch (*lp_loglevel )
+  {                     
+    case 0 :            
+     *lp_loglevel = 1 ; 
+      break;            
+    case 1 :            
+     *lp_loglevel = 0 ; 
+      break;            
+    default:            
+     *lp_loglevel = 0 ; 
+      break;            
+  }                     
+  return ; 
+}
+
+/*****************************************************************************************
+* @fn     : ASTRO_GLOBAL_LOG_ON
+* @author : s.gravois
+* @brief  : Met le flag passe par adresse en parametre a 1
+* @param  : int * logrotate
+* @date   : 2023-01-30
+* @todo   : 
+*****************************************************************************************/
+
+void ASTRO_GLOBAL_LOG_ON(int * lp_loglevel) {
+
+  TraceArbo(__func__,2,"log on") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+          
+  *lp_loglevel = 1 ; 
+                     
+  return ; 
+}
+
+/*****************************************************************************************
+* @fn     : ASTRO_GLOBAL_LOG_OFF
+* @author : s.gravois
+* @brief  : Met le flag passe par adresse en parametre a 1
+* @param  : int * logrotate
+* @date   : 2023-01-30
+* @todo   : 
+*****************************************************************************************/
+
+void ASTRO_GLOBAL_LOG_OFF( int * lp_loglevel) {
+
+  TraceArbo(__func__,2,"log on") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+          
+  *lp_loglevel = 0 ; 
+                     
+  return ; 
+}
+

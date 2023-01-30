@@ -61,7 +61,7 @@ static void CODES_DISPLAY (STRUCT_CODES *lp_Cod) {
 
   TraceArbo(__func__,2,"display informations on Codes") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cod->cod_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Cod->cod_loglevel ) ;
 
   for(i_pos=0 ; i_pos < CODES_CODE_NB_CODES ; i_pos++ ) {
 
@@ -76,7 +76,7 @@ static void CODES_DISPLAY (STRUCT_CODES *lp_Cod) {
     MACRO_ASTRO_GLOBAL_LOG( lp_Cod->cod_loglevel , 1 , "%s", lp_Cod->cod_dis_cmd ) ;
   }
 
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cod->cod_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Cod->cod_loglevel ) ;
 
   return ;
 }

@@ -72,9 +72,9 @@ static void SUIVI_DISPLAY(STRUCT_SUIVI *lp_Sui) {
 
   SUIVI_DISPLAY_PREPARE( lp_Sui ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sui->sui_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Sui->sui_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Sui->sui_loglevel , 1 , "%s", lp_Sui->sui_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Sui->sui_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Sui->sui_loglevel ) ;
 
   return ;
 }
@@ -120,9 +120,9 @@ static void SUIVI_PAS_DISPLAY(STRUCT_SUIVI_PAS *lp_Pas) {
 
   SUIVI_PAS_DISPLAY_PREPARE( lp_Pas ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pas->pas_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Pas->pas_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Pas->pas_loglevel , 1 , "%s", lp_Pas->pas_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pas->pas_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Pas->pas_loglevel ) ;
 
   return ;
 }
@@ -165,9 +165,9 @@ static void SUIVI_FRE_DISPLAY(STRUCT_SUIVI_FRE *lp_Fre) {
 
   SUIVI_FRE_DISPLAY_PREPARE( lp_Fre ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Fre->fre_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Fre->fre_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Fre->fre_loglevel , 1 , "%s", lp_Fre->fre_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Fre->fre_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Fre->fre_loglevel ) ;
 
   return ;
 }
@@ -522,6 +522,7 @@ void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * lp_Sui) {
 * @date   : 2022-05-30 amelioration et visibilite du contenu fct 
 * @date   : 2022-05-30 ajout des mots concernant les touches F1->F12 du gp_Key
 * @todo   : analyser pour simplification <=> avec suivi menu etc..
+* @todo   : remplacer i=1 par autre chose
 *****************************************************************************************/
 
 void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
@@ -529,8 +530,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
   int i=0;
   char cmd[256]={0} ;
   char s_buffer4[ CONFIG_TAILLE_BUFFER_32 * 4 ]={0} ;
-  char c_l0[16] ={0};
-  char c_l1[16] ={0};
+  char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
+  char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
 
   TraceArbo(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
@@ -568,23 +569,31 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Lettres en Majuscules : affichages ponctuels */
 
-    MACRO_IF_KEY_MOT_IS("A" )                  { gp_Ast->ast_display(gp_Ast) ; }
+    MACRO_IF_KEY_MOT_IS("A" )                  { gp_Ast->ast_display(gp_Ast) ;i=1; }
     MACRO_IF_KEY_MOT_IS("B" )                  { }
-    MACRO_IF_KEY_MOT_IS("C")                   { gp_Con->con_display(gp_Con) ; }
-    MACRO_IF_KEY_MOT_IS("D" )                  { }
+    MACRO_IF_KEY_MOT_IS("C")                   { gp_Con->con_display(gp_Con) ;i=1;}
+    MACRO_IF_KEY_MOT_IS("D" )                  { gp_Dat->dat_display(gp_Dat) ;i=1;}
     MACRO_IF_KEY_MOT_IS("E" )                  { }
     MACRO_IF_KEY_MOT_IS("F" )                  { }
     MACRO_IF_KEY_MOT_IS("G" )                  { }
     MACRO_IF_KEY_MOT_IS("H" )                  { }
     MACRO_IF_KEY_MOT_IS("I" )                  { }
     MACRO_IF_KEY_MOT_IS("J" )                  { }
-    MACRO_IF_KEY_MOT_IS("K" )                  { gp_Key->key_display(gp_Key) ; }
-    MACRO_IF_KEY_MOT_IS("L" )                  { }
+    MACRO_IF_KEY_MOT_IS("K" )                  { gp_Key->key_display(gp_Key) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("L" )                  { gp_Lie->lie_display(gp_Lie) ;i=1; }
     MACRO_IF_KEY_MOT_IS("M" )                  { }
     MACRO_IF_KEY_MOT_IS("N" )                  { }
     MACRO_IF_KEY_MOT_IS("O" )                  { }
-    MACRO_IF_KEY_MOT_IS("P" )                  { gp_Pth->pth_display(gp_Pth) ; }
-    
+    MACRO_IF_KEY_MOT_IS("P" )                  { gp_Pth->pth_display(gp_Pth) ;i=1; }
+    MACRO_IF_KEY_MOT_IS("Q" )                  { }
+    MACRO_IF_KEY_MOT_IS("R" )                  { }
+    MACRO_IF_KEY_MOT_IS("S" )                  { }
+    MACRO_IF_KEY_MOT_IS("T" )                  { }
+    MACRO_IF_KEY_MOT_IS("U" )                  { }
+    MACRO_IF_KEY_MOT_IS("V" )                  { }
+    MACRO_IF_KEY_MOT_IS("W" )                  { }
+    MACRO_IF_KEY_MOT_IS("X" )                  { }
+    MACRO_IF_KEY_MOT_IS("Z" )                  { }
 
       // Trace1("Mot_Is aff_infos") ;
       // CONFIG_DISPLAY_TOUT() ; 
@@ -596,6 +605,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* Renvoi sur MANUEL_BRUT */
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Sui->sui_mutex ) ;
+
+    /* ne pas mettre i=1 pour les actions suivantes */
 
     MACRO_IF_KEY_MOT_IS("n" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
     MACRO_IF_KEY_MOT_IS("o" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
@@ -748,7 +759,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
 
     if (i>0) { 
-      KEYS_RESET_MOT(gp_Key) ; 
+      gp_Key->key_reset( gp_Key ) ; 
     }
   }
   else {

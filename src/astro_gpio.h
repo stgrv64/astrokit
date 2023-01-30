@@ -130,7 +130,7 @@ struct STR_GPIO_PWM_PHASE {
   pthread_mutex_t   pha_mutex ;
   STR_EXT_TIMEVAL   pha_tval ; 
   FILE             *pha_file ; 
-  char              pha_loglevel ;
+  int               pha_loglevel ;
   void            (*pha_lock)       ( STRUCT_GPIO_PWM_PHASE *) ;
   void            (*pha_unlock)     ( STRUCT_GPIO_PWM_PHASE *) ;  
   void            (*pha_log)        ( STRUCT_GPIO_PWM_PHASE *) ;
@@ -164,7 +164,7 @@ struct STR_GPIO_PWM_MOTEUR {
   pthread_mutex_t         mot_mutex ;
   STR_EXT_TIMEVAL         mot_tval ; 
   FILE                   *mot_file ; 
-  char                    mot_loglevel ;
+  int                     mot_loglevel ;
   void                  (*mot_lock)       ( STRUCT_GPIO_PWM_MOTEUR *) ;
   void                  (*mot_unlock)     ( STRUCT_GPIO_PWM_MOTEUR *) ;  
   void                  (*mot_log)        ( STRUCT_GPIO_PWM_MOTEUR *) ;

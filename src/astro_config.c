@@ -117,9 +117,9 @@ static void CONFIG_DISPLAY(STRUCT_CONFIG *lp_Con) {
 
   CONFIG_DISPLAY_PREPARE( lp_Con ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Con->con_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Con->con_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Con->con_loglevel , 1 , "%s", lp_Con->con_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Con->con_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Con->con_loglevel ) ;
 
   return ;
 }

@@ -120,7 +120,7 @@ struct STR_I2C_DEVICE {
   pthread_mutex_t  i2c_dev_mutex ;
   STR_EXT_TIMEVAL  i2c_dev_tval ; 
   FILE            *i2c_dev_file ; 
-  char             i2c_dev_loglevel ;
+  int              i2c_dev_loglevel ;
   void           (*i2c_dev_lock)       ( STRUCT_I2C * ) ;
   void           (*i2c_dev_unlock)     ( STRUCT_I2C * ) ;  
   void           (*i2c_dev_log)        ( STRUCT_I2C * ) ;
@@ -146,7 +146,7 @@ struct STR_I2C_ACC_MAG {
   pthread_mutex_t  acc_mutex ;
   STR_EXT_TIMEVAL  acc_tval ; 
   FILE            *acc_file ; 
-  char             acc_loglevel ;
+  int              acc_loglevel ;
   void           (*acc_lock)       ( STRUCT_I2C_ACC_MAG * ) ;
   void           (*acc_unlock)     ( STRUCT_I2C_ACC_MAG * ) ;  
   void           (*acc_log)        ( STRUCT_I2C_ACC_MAG * ) ;

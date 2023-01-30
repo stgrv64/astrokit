@@ -59,9 +59,9 @@ static void PID_DISPLAY ( STRUCT_PID *lp_Pid) {
 
   PID_DISPLAY_PREPARE( lp_Pid ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pid->pid_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Pid->pid_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Pid->pid_loglevel , 1 , "%s", lp_Pid->pid_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pid->pid_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Pid->pid_loglevel ) ;
 
   return ;
 }

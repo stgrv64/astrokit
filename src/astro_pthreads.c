@@ -141,7 +141,7 @@ static void PTHREADS_DISPLAY ( STRUCT_PTHREADS *lp_Pth) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Pth->pth_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Pth->pth_loglevel ) ;
 
   for( i_num_thread = 0 ; i_num_thread <= l_nb_threads ; i_num_thread++ ) {
 
@@ -156,7 +156,7 @@ static void PTHREADS_DISPLAY ( STRUCT_PTHREADS *lp_Pth) {
     MACRO_ASTRO_GLOBAL_LOG ( lp_Pth->pth_loglevel , 1 , "%s", lp_Pth->pth_dis_cmd ) ;
   }
 
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Pth->pth_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Pth->pth_loglevel ) ;
 
   return ;
 }

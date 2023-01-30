@@ -39,7 +39,7 @@ static void KEYS_LOG ( STRUCT_KEYS * lp_Key) {
   TraceArbo(__func__,2,"keys log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
-  MACRO_ASTRO_GLOBAL_LOG_ROTATE( lp_Key->key_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ROTATE( & lp_Key->key_loglevel ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex) ;
 
   sprintf( c_cmd , STR_KEY_FORMAT_0,\
@@ -99,13 +99,13 @@ static void KEYS_DISPLAY ( STRUCT_KEYS * lp_Key) {
   TraceArbo(__func__,2,"keys display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 /*
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
-  MACRO_ASTRO_GLOBAL_LOG_ROTATE( lp_Key->key_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ROTATE(  & lp_Key->key_loglevel ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex) ;
 */
   KEYS_DISPLAY_PREPARE       ( lp_Key ) ;
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Key->key_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Key->key_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Key->key_loglevel , 1 , "%s" , lp_Key->key_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Key->key_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Key->key_loglevel ) ;
 
   return ;
 }
@@ -316,6 +316,7 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
                                      lp_Key->key_lock     = KEYS_LOCK ;
                                      lp_Key->key_unlock   = KEYS_UNLOCK ;
                                      lp_Key->key_display  = KEYS_DISPLAY ;
+                                     lp_Key->key_reset    = KEYS_RESET ;
                                      lp_Key->key_loglevel = 0 ; 
                                      lp_Key->key_file     = NULL ;
   gettimeofday (                   & lp_Key->key_tval, NULL ) ;
@@ -378,7 +379,42 @@ void KEYS_RESET_MOT(STRUCT_KEYS *lp_Key) {
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
 
   lp_Key->key_mot_en_cours = 0 ;
+
   strcpy( lp_Key->key_mot, "" ) ;
+  strcpy( lp_Key->key_phrase, "" ) ;
+
+  lp_Key->key_mot_en_cours   = 0 ;
+  lp_Key->key_phrase_lue     = 0 ;
+  lp_Key->key_appui_en_cours = 0 ;
+
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+
+  return ;
+}
+/*****************************************************************************************
+* @fn     : KEYS_RESET
+* @author : s.gravois
+* @brief  : Cette fonction reset la structure STRUCT_KEYS
+* @param  : STRUCT_KEYS *lp_Key
+* @date   : 2022-01-20 creation entete de la fonction au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
+static void KEYS_RESET(STRUCT_KEYS *lp_Key) {
+  
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
+
+  strcpy( lp_Key->key_symbole,  "" ) ;
+  strcpy( lp_Key->key_phrase,   "" ) ;
+  strcpy( lp_Key->key_premier,  "" ) ;
+  strcpy( lp_Key->key_nombre,   "" ) ;
+  strcpy( lp_Key->key_mot,      "" ) ;
+
+  lp_Key->key_mot_en_cours   = 0 ;
+  lp_Key->key_phrase_lue     = 0 ;
+  lp_Key->key_appui_en_cours = 0 ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
 

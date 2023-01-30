@@ -51,9 +51,9 @@ static void CAT_DISPLAY(STRUCT_CAT *lp_Cat) {
 
   CAT_DISPLAY_PREPARE( lp_Cat ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cat->cat_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Cat->cat_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Cat->cat_loglevel , 1 , "%s", lp_Cat->cat_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cat->cat_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Cat->cat_loglevel ) ;
 
   return ;
 }
@@ -71,9 +71,9 @@ static void CAT_LOG(STRUCT_CAT *lp_Cat) {
 
   CAT_DISPLAY_PREPARE( lp_Cat ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cat->cat_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Cat->cat_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Cat->cat_loglevel , 1 , "%s", lp_Cat->cat_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cat->cat_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Cat->cat_loglevel ) ;
 
   return ;
 }

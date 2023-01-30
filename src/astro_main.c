@@ -242,7 +242,7 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
     /* GPIO_CLAVIER_MATRICIEL_READ( gpio_key_l, gpio_key_c, gp_Key) ; */
     KEYS_INPUTS_GESTION_APPUIS( gp_Key) ;
-    gp_Key->key_display(gp_Key);	
+    
     /* SUIVI_OLD_0( gp_Sui) ; */
     SUIVI_TRAITEMENT_MOT( gp_Sui ) ;
 
@@ -492,8 +492,8 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
   long long ll_inrc=0 ;
   int i_duree_us ;
   struct sched_param param;
-  char c_l0[16] ={0};
-  char c_l1[16] ={0};
+  char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
+  char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
 
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 

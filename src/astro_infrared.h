@@ -32,7 +32,7 @@ struct STR_INFRARED {
   pthread_mutex_t  inf_mutex ;
   STR_EXT_TIMEVAL  inf_tval ; 
   FILE            *inf_file ; 
-  char             inf_loglevel ;
+  int              inf_loglevel ;
   void           (*inf_lock)       ( STRUCT_INFRARED * ) ;
   void           (*inf_unlock)     ( STRUCT_INFRARED * ) ;  
   void           (*inf_log)        ( STRUCT_INFRARED * ) ;

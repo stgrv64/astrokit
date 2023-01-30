@@ -48,9 +48,9 @@ static void STATS_DISPLAY(STRUCT_STATS *lp_Sta) {
 
   STATS_DISPLAY_PREPARE( lp_Sta ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Sta->sta_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Sta->sta_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Sta->sta_loglevel , 1 , "%s", lp_Sta->sta_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Sta->sta_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Sta->sta_loglevel ) ;
 
   return ;
 }

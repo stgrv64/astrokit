@@ -59,9 +59,9 @@ static void DATAS_DISPLAY(STRUCT_DATAS *lp_Dat) {
 
   DATAS_DISPLAY_PREPARE( lp_Dat ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Dat->dat_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Dat->dat_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Dat->dat_loglevel , 1 , "%s", lp_Dat->dat_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Dat->dat_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Dat->dat_loglevel ) ;
 
   return ;
 }

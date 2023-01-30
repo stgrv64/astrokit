@@ -66,9 +66,9 @@ static void VOUTE_DISPLAY(STRUCT_VOUTE *lp_Vou) {
 
   VOUTE_DISPLAY_PREPARE( lp_Vou ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Vou->vou_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Vou->vou_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Vou->vou_loglevel , 1 , "%s", lp_Vou->vou_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Vou->vou_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Vou->vou_loglevel ) ;
 
   return ;
 }
@@ -260,8 +260,8 @@ long VOUTE_TEMPORISATION(STRUCT_VOUTE *lp_Vou, struct timeval t00) {
 void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
   
   long long ll_inrc=0 ;
-  char c_l0[16] ={0};
-  char c_l1[16] ={0};
+  char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
+  char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
 
   unsigned long  ul_vou_while_incr ;
   struct timeval t00 ;

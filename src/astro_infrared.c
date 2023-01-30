@@ -64,11 +64,11 @@ static void INFRARED_DISPLAY(STRUCT_INFRARED *lp_Inf) {
 
   INFRARED_DISPLAY_PREPARE( lp_Inf ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Inf->inf_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Inf->inf_loglevel ) ;
   /* TODO : to complete
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Inf->ast_loglevel , 1 , "%s", lp_Inf->ast_dis_cmd ) ;
   */
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Inf->inf_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Inf->inf_loglevel ) ;
 
   return ;
 }

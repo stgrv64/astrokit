@@ -228,7 +228,7 @@ struct STR_CODES {
   pthread_mutex_t cod_mutex ;
   STR_EXT_TIMEVAL cod_tval ; 
   FILE           *cod_file ; 
-  char            cod_loglevel ;
+  int             cod_loglevel ;
   char            cod_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char            cod_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 

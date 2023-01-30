@@ -105,9 +105,9 @@ static void LCD_DISPLAY(STRUCT_LCD *lp_Lcd) {
 
   LCD_DISPLAY_PREPARE( lp_Lcd ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Lcd->lcd_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Lcd->lcd_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Lcd->lcd_loglevel , 1 , "%s", lp_Lcd->lcd_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Lcd->lcd_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Lcd->lcd_loglevel ) ;
 
   return ;
 }
@@ -399,8 +399,8 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
 
 void LCD_REFRESH_DEFAULT(void) {
 
-  char c_l0[16] ={0};
-  char c_l1[16] ={0};
+  char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
+  char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
   
   memset( c_l0, 0, sizeof( c_l0) ) ;
   memset( c_l1, 0, sizeof( c_l1) ) ;
@@ -573,7 +573,7 @@ void LCD_DISPLAY_STRING_STRING( const int i_duree_us , const char* c_l0, const c
 *****************************************************************************************/
 
 void   LCD_DISPLAY_STRING_INT ( const int i_duree_us, const char* c_l0, const int i) {
-  char c_l1[16] = {0} ;
+  char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] = {0} ;
   memset(c_l1,0,sizeof(c_l1));
   sprintf( c_l1, "%d", i) ;
 
@@ -592,8 +592,8 @@ void   LCD_DISPLAY_STRING_INT ( const int i_duree_us, const char* c_l0, const in
 *****************************************************************************************/
 
 void   LCD_DISPLAY_INT_INT      ( const int i_duree_us, const int i_l0, const int i_l1) {
-  char c_l0[16] = {0} ;
-  char c_l1[16] = {0} ;
+  char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] = {0} ;
+  char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] = {0} ;
 
   if ( gp_Dev->dev_use_lcd ) {
     sprintf( c_l0, "%d", i_l0) ;

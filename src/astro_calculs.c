@@ -132,9 +132,9 @@ static void CALCULS_DISPLAY(STRUCT_CALCULS *lp_Cal) {
 
   CALCULS_DISPLAY_PREPARE( lp_Cal ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Cal->cal_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Cal->cal_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Cal->cal_loglevel , 1 , "%s", lp_Cal->cal_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Cal->cal_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Cal->cal_loglevel ) ;
 
   return ;
 }

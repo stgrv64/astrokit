@@ -274,7 +274,7 @@ struct STR_CONFIG {
   pthread_mutex_t con_mutex ;
   STR_EXT_TIMEVAL con_tval ; 
   FILE           *con_file ; 
-  char            con_loglevel ;
+  int             con_loglevel ;
   void          (*con_lock)       ( STRUCT_CONFIG *) ;
   void          (*con_unlock)     ( STRUCT_CONFIG *) ;  
   void          (*con_log)        ( STRUCT_CONFIG *) ;

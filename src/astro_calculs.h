@@ -151,7 +151,7 @@ struct STR_CALCULS {
   pthread_mutex_t cal_mutex ;
   STR_EXT_TIMEVAL cal_tval ; 
   FILE           *cal_file ; 
-  char            cal_loglevel ;
+  int             cal_loglevel ;
   char            cal_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char            cal_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 

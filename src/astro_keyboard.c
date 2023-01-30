@@ -53,9 +53,9 @@ static void KEYBOARD_TERMIOS_DISPLAY( STRUCT_TERMIOS *lp_Ter) {
 
   KEYBOARD_TERMIOS_DISPLAY_PREPARE( lp_Ter ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ter->ter_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Ter->ter_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Ter->ter_loglevel , 1 , "%s", lp_Ter->ter_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ter->ter_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Ter->ter_loglevel ) ;
 
   return ;
 }

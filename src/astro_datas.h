@@ -27,7 +27,7 @@ struct STR_DATAS {
   pthread_mutex_t dat_mutex ;
   STR_EXT_TIMEVAL dat_tval ; 
   FILE           *dat_file ; 
-  char            dat_loglevel ;
+  int             dat_loglevel ;
   void          (*dat_lock)       ( STRUCT_DATAS *) ;
   void          (*dat_unlock)     ( STRUCT_DATAS *) ;  
   void          (*dat_log)        ( STRUCT_DATAS *) ;

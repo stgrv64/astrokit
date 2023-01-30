@@ -58,9 +58,9 @@ static void TIME_DISPLAY( STRUCT_TIME *lp_Tim) {
 
   TIME_DISPLAY_PREPARE( lp_Tim ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Tim->tim_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Tim->tim_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Tim->tim_loglevel , 1 , "%s", lp_Tim->tim_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Tim->tim_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Tim->tim_loglevel ) ;
 
   return ;
 }

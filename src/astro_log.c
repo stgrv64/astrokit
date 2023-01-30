@@ -52,9 +52,9 @@ static void LOG_DISPLAY ( STRUCT_LOG *lp_Log) {
 
   LOG_DISPLAY_PREPARE( lp_Log ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Log->log_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Log->log_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Log->log_loglevel , 1 , "%s", lp_Log->log_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Log->log_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Log->log_loglevel ) ;
 
   return ;
 }

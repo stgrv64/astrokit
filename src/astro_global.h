@@ -135,33 +135,12 @@
 #define MACRO_ASTRO_GLOBAL_LOG(loglevel,nb,fmt, args...) \
 do { \
   if (loglevel>=nb) { \
+    fprintf(stdout,"\nloglevel %d nb %d\n", loglevel, nb ) ; \
     fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
   } \
 } \
 while (0)
 
-/* MACRO_ASTRO_GLOBAL_LOG_ROTATE est une MACRO : pas besoin de passer par adresse */
-/* FIXME : flaglogrotate n a pas besoin d'etre un pointeur */
-
-#define MACRO_ASTRO_GLOBAL_LOG_ROTATE(flaglogrotate) \
-do{                       \
-  switch (flaglogrotate ) \
-  {                       \
-    case 0 :              \
-     flaglogrotate = 1 ;  \
-      break;              \
-    case 1 :              \
-     flaglogrotate = 0 ;  \
-      break;              \
-    default:              \
-     flaglogrotate = 0 ;  \
-      break;              \
-  }                       \
-}                         \
-while(0)
-
-#define MACRO_ASTRO_GLOBAL_LOG_OFF(flaglogrotate) do{ flaglogrotate = 0 ; } while(0)
-#define MACRO_ASTRO_GLOBAL_LOG_ON( flaglogrotate) do{ flaglogrotate = 1 ; } while(0)
 
 /*------------------------------------------------------------------------------*/
 /* Definition des constantes globales                                           */ 
@@ -382,6 +361,9 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern const char * gc_hach_suivi_menus[]  ; \
 
 void ASTRO_GLOBAL_INIT(void) ;
+void ASTRO_GLOBAL_LOG_ROTATE(int * ) ;
+void ASTRO_GLOBAL_LOG_ON(int * ) ;
+void ASTRO_GLOBAL_LOG_OFF(int * ) ;
 
 #endif
 

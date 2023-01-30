@@ -34,11 +34,12 @@ struct STR_KEYS {
   pthread_mutex_t key_mutex ;
   STR_EXT_TIMEVAL key_tval ; 
   FILE           *key_file ; 
-  char            key_loglevel ;
+  int             key_loglevel ;
   void          (*key_lock)       ( STRUCT_KEYS*) ;
   void          (*key_unlock)     ( STRUCT_KEYS*) ;  
   void          (*key_log)        ( STRUCT_KEYS*) ;
   void          (*key_display)    ( STRUCT_KEYS*) ;
+  void          (*key_reset)      ( STRUCT_KEYS*) ;
   char            key_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char            key_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
@@ -47,10 +48,13 @@ struct STR_KEYS {
   char            key_mot         [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_phrase      [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_premier     [ CONFIG_TAILLE_BUFFER_32 ] ;
+
   char            key_valider     [ CONFIG_TAILLE_BUFFER_32 ] ;
   char            key_menu        [ CONFIG_TAILLE_BUFFER_32 ] ;
+  
   char            key_actions     [ KEYS_ACTIONS_SIZE       ][ CONFIG_TAILLE_BUFFER_32 ]  ;
   char            key_validations [ KEYS_VALIDATIONS_SIZE   ][ CONFIG_TAILLE_BUFFER_32 ]  ;
+
   int             key_appui_en_cours ;
   int             key_mot_en_cours ;
   int             key_phrase_lue ;
@@ -59,6 +63,8 @@ struct STR_KEYS {
 void KEYS_INIT                  ( STRUCT_KEYS * ) ;
 void KEYS_INPUTS_GESTION_APPUIS ( STRUCT_KEYS * ) ;
 void KEYS_RESET_MOT             ( STRUCT_KEYS * ) ;
+
+static void KEYS_RESET                 ( STRUCT_KEYS * ) ;
 
 #endif
 

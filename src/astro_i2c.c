@@ -71,9 +71,9 @@ static void I2C_DISPLAY(STRUCT_I2C *lp_I2c_dev) {
 
   I2C_DISPLAY_PREPARE( lp_I2c_dev ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_I2c_dev->i2c_dev_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_I2c_dev->i2c_dev_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_I2c_dev->i2c_dev_loglevel , 1 , "%s", lp_I2c_dev->i2c_dev_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_I2c_dev->i2c_dev_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_I2c_dev->i2c_dev_loglevel ) ;
 
   return ;
 }

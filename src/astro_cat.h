@@ -45,7 +45,7 @@ struct STR_CAT {
   pthread_mutex_t cat_mutex ;
   STR_EXT_TIMEVAL cat_tval ; 
   FILE           *cat_file ; 
-  char            cat_loglevel ;
+  int             cat_loglevel ;
   char            cat_dis_for [ CONFIG_TAILLE_BUFFER_256 ] ;
   char            cat_dis_cmd [ CONFIG_TAILLE_BUFFER_256 ] ;
 

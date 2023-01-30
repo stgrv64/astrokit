@@ -62,7 +62,7 @@ struct STR_ASTRE {
   pthread_mutex_t ast_mutex ;
   STR_EXT_TIMEVAL ast_tval ; 
   FILE           *ast_file ; 
-  char            ast_loglevel ;
+  int             ast_loglevel ;
   void          (*ast_lock)       ( STRUCT_ASTRE *) ;
   void          (*ast_unlock)     ( STRUCT_ASTRE *) ;  
   void          (*ast_log)        ( STRUCT_ASTRE *) ;

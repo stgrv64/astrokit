@@ -63,7 +63,7 @@ struct STR_TERMIOS {
   pthread_mutex_t  ter_mutex ;
   STR_EXT_TIMEVAL  ter_tval ; 
   FILE            *ter_file ; 
-  char             ter_loglevel ;
+  int              ter_loglevel ;
   void           (*ter_lock)       ( STRUCT_TERMIOS * ) ;
   void           (*ter_unlock)     ( STRUCT_TERMIOS * ) ;  
   void           (*ter_log)        ( STRUCT_TERMIOS * ) ;

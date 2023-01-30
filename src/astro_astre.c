@@ -66,9 +66,9 @@ static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
 
   ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Ast->ast_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Ast->ast_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Ast->ast_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Ast->ast_loglevel ) ;
 
   return ;
 }
@@ -406,7 +406,7 @@ void ASTRE_LOG(STRUCT_ASTRE *lp_Ast) {
   TraceArbo(__func__,2,"keys log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK  ( & lp_Ast->ast_mutex ) ;
-  MACRO_ASTRO_GLOBAL_LOG_ROTATE    (   lp_Ast->ast_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ROTATE    ( &  lp_Ast->ast_loglevel ) ;
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
 
   Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;

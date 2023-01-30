@@ -69,9 +69,9 @@ static void DEVICES_DISPLAY(STRUCT_DEVICES *lp_Dev) {
 
   DEVICES_DISPLAY_PREPARE( lp_Dev ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Dev->dev_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Dev->dev_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Dev->dev_loglevel , 1 , "%s", lp_Dev->dev_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Dev->dev_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Dev->dev_loglevel ) ;
 
   return ;
 }

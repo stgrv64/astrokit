@@ -54,9 +54,9 @@ static void LIEU_DISPLAY(STRUCT_LIEU *lp_Lie) {
 
   LIEU_DISPLAY_PREPARE( lp_Lie ) ;
 
-  MACRO_ASTRO_GLOBAL_LOG_ON ( lp_Lie->lie_loglevel ) ;
+  ASTRO_GLOBAL_LOG_ON ( &  lp_Lie->lie_loglevel ) ;
   MACRO_ASTRO_GLOBAL_LOG    ( lp_Lie->lie_loglevel , 1 , "%s", lp_Lie->lie_dis_cmd ) ;
-  MACRO_ASTRO_GLOBAL_LOG_OFF( lp_Lie->lie_loglevel ) ;
+  ASTRO_GLOBAL_LOG_OFF( &  lp_Lie->lie_loglevel ) ;
 
   return ;
 }

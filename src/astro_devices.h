@@ -30,7 +30,7 @@ struct STR_DEVICES {
   pthread_mutex_t dev_mutex ;
   STR_EXT_TIMEVAL dev_tval ; 
   FILE           *dev_file ; 
-  char            dev_loglevel ;
+  int             dev_loglevel ;
   void          (*dev_lock)       ( STRUCT_DEVICES *) ;
   void          (*dev_unlock)     ( STRUCT_DEVICES *) ;  
   void          (*dev_log)        ( STRUCT_DEVICES *) ;
