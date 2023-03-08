@@ -224,13 +224,13 @@ void DEVICES_DISPLAY_UTILISATION (STRUCT_DEVICES *lp_Dev) {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("lp_Dev->dev_use_infrarouge = %d",lp_Dev->dev_use_infrarouge) ;
-  Trace1("lp_Dev->dev_use_capteurs   = %d",lp_Dev->dev_use_capteurs) ;
-  Trace1("lp_Dev->dev_use_raquette   = %d",lp_Dev->dev_use_raquette) ;
-  Trace1("lp_Dev->dev_use_bluetooth  = %d",lp_Dev->dev_use_bluetooth) ;
-  Trace1("lp_Dev->dev_use_keyboard   = %d",lp_Dev->dev_use_keyboard) ;
-  Trace1("lp_Dev->dev_use_controler  = %d",lp_Dev->dev_use_controler) ;
-  Trace1("lp_Dev->dev_use_lcd        = %d",lp_Dev->dev_use_lcd) ;
+  Trace("lp_Dev->dev_use_infrarouge = %d",lp_Dev->dev_use_infrarouge) ;
+  Trace("lp_Dev->dev_use_capteurs   = %d",lp_Dev->dev_use_capteurs) ;
+  Trace("lp_Dev->dev_use_raquette   = %d",lp_Dev->dev_use_raquette) ;
+  Trace("lp_Dev->dev_use_bluetooth  = %d",lp_Dev->dev_use_bluetooth) ;
+  Trace("lp_Dev->dev_use_keyboard   = %d",lp_Dev->dev_use_keyboard) ;
+  Trace("lp_Dev->dev_use_controler  = %d",lp_Dev->dev_use_controler) ;
+  Trace("lp_Dev->dev_use_lcd        = %d",lp_Dev->dev_use_lcd) ;
 
   return ;
 }

@@ -6,6 +6,7 @@ astrokit @ 2022  - lGPLv2 - Stephane Gravois -
 date           | commentaires 
 --------------------------------------------------------------
 octobre 2022 :  * creation            
+2023         :  * ajout MACRO MACRO_ASTRO_GLOBAL_EXTERN_TIME
 -------------------------------------------------------------- */
 
 #include "astro_global.h"
@@ -61,6 +62,7 @@ MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PTHREADS ;
 MACRO_ASTRO_GLOBAL_EXTERN_PID ;
 MACRO_ASTRO_GLOBAL_EXTERN_CONFIG ;
+MACRO_ASTRO_GLOBAL_EXTERN_TIME ;
 
 /*****************************************************************************************
 * @fn     : ASTRO_GLOBAL_INIT

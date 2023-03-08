@@ -14,12 +14,60 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+const char * gc_hach_time_Display_Mon[] = {
+ "---", 
+ "Jan",
+ "Feb",
+ "Mar",
+ "Apr",
+ "May",
+ "Jun",
+ "Jul",
+ "Aug",
+ "Sep",
+ "Oct",
+ "Nov",
+ "Dec"
+} ;
+
+const char * gc_hach_time_Display_Day[] = {
+ "--", "01", "02", "03", "04", "05", "06", "07", "08", "09",
+ "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+ "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+ "30", "31"
+} ;
+
+const char * gc_hach_time_Display_Hou[] = {
+ "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
+ "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+ "20", "21", "22", "23", "24"
+} ;
+
+const char * gc_hach_time_Display_Min[] = {
+ "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
+ "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+ "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+ "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
+ "40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
+ "50", "51", "52", "53", "54", "55", "56", "57", "58", "59"
+} ;
+
+const char * gc_hach_time_Display_Sec[] = {
+ "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
+ "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+ "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+ "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
+ "40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
+ "50", "51", "52", "53", "54", "55", "56", "57", "58", "59"
+} ;
+
 /*****************************************************************************************
 * @fn     : TIME_DISPLAY_PREPARE
 * @author : s.gravois
 * @brief  : Fonction qui formate les donnees a afficher pour la fct DISPLAY
 * @param  : STRUCT_TIME *
 * @date   : 2023-01-08 creation
+* @date   : 2023-03-08 rempalcement STR_TIM_FORMAT_0 par STR_TIM_FORMAT_1
 *****************************************************************************************/
 
 static void TIME_DISPLAY_PREPARE ( STRUCT_TIME * lp_Tim) {
@@ -28,6 +76,13 @@ static void TIME_DISPLAY_PREPARE ( STRUCT_TIME * lp_Tim) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Tim->tim_mutex ) ;
 
+  sprintf( lp_Tim->tim_dis_cmd, STR_TIM_FORMAT_1, \
+    lp_Tim->tim_yy , \
+    gc_hach_time_Display_Mon [ lp_Tim->tim_mm ] , \
+    gc_hach_time_Display_Day [ lp_Tim->tim_dd ] , \
+    gc_hach_time_Display_Hou [ lp_Tim->tim_HH ] , \
+    gc_hach_time_Display_Sec [ lp_Tim->tim_MM ] ) ;
+/*
   sprintf( lp_Tim->tim_dis_cmd , STR_TIM_FORMAT_0,\
     lp_Tim->tim_hd, \
     lp_Tim->tim_sig, \
@@ -37,7 +92,7 @@ static void TIME_DISPLAY_PREPARE ( STRUCT_TIME * lp_Tim) {
     lp_Tim->tim_HH, \
     lp_Tim->tim_MM, \
     lp_Tim->tim_SS ) ;
-
+*/
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Tim->tim_mutex ) ;
 
   return ;

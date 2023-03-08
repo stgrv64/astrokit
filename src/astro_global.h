@@ -61,6 +61,7 @@
 # 
 # 07/10/2022    * refonte complete du code (consolidation .c / .h )
 #               * dispatch de tous les types dans leur .h respectif
+# 08/03/2023    * ajout  format STR_TIM_FORMAT_1
 # -------------------------------------------------------------- 
 */
 
@@ -125,6 +126,7 @@
 #define STR_PAS_FORMAT_0 "(wst) %ld (est) %ld (nth) %ld (sou)%ld (acc-alt) %f (acc-azi) %f"
 #define STR_TER_FORMAT_0 "(buf) %s (asc) %d"
 #define STR_TIM_FORMAT_0 "(dec) %f (sig) %c (yea) %-4d (mon) %-3d (day) %-3d (hou) %-3d (min) %-3d (sec) %-3d "
+#define STR_TIM_FORMAT_1 "%d%s%s %s:%s"
 #define STR_SUI_FORMAT_0 "(Da) %f (Dh) %f"
 #define STR_FRE_FORMAT_0 "(Fa) %f (Fh) %f"
 
@@ -359,6 +361,13 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_CONST \
   extern const char * gc_hach_suivi_menus[]  ; \
+
+#define MACRO_ASTRO_GLOBAL_EXTERN_TIME \
+  extern const char * gc_hach_time_Display_Mon[] ; \
+  extern const char * gc_hach_time_Display_Day[] ; \
+  extern const char * gc_hach_time_Display_Hou[] ; \
+  extern const char * gc_hach_time_Display_Min[] ; \
+  extern const char * gc_hach_time_Display_Sec[] ; \
 
 void ASTRO_GLOBAL_INIT(void) ;
 void ASTRO_GLOBAL_LOG_ROTATE(int * ) ;

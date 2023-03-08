@@ -891,12 +891,18 @@ int main(int argc, char ** argv) {
   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
   CONFIG_FIC_VERIFY          ( gp_Con ) ;
   CONFIG_PARAMETRES_CONFIG   ( gp_Con ) ;
+
   CONFIG_PARAMS_DISPLAY  () ;  
+
   TIME_INIT                  ( gp_Tim ) ;
+  LIEU_INIT                  ( gp_Lie ) ;
   TIME_INIT_TEMPOS           ( gp_Tpo ) ;
   TIME_TEMPOS_CONFIG         ( gp_Tpo ) ;
   TIME_TEMPOS_DISPLAY        ( gp_Tpo ) ;
   LOG_INIT                   ( gp_Log ); 
+
+  TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
+  
   CALCULS_INIT               ( gp_Cal ) ;
   CAT_INIT                   ( gp_Ngc ) ;
   CAT_INIT                   ( gp_Eto ) ;
@@ -908,8 +914,8 @@ int main(int argc, char ** argv) {
   VOUTE_INIT                 ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
   ASTRE_INIT                 ( gp_Ast ) ;
   KEYS_INIT                  ( gp_Key ) ;
-  LIEU_INIT                  ( gp_Lie ) ;
   DEVICES_INIT               ( gp_Dev ) ;
+  DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
   SUIVI_INIT                 ( gp_Sui ) ;
   SUIVI_PAS_INIT             ( gp_Pas ) ;
   SUIVI_FRE_INIT             ( gp_Fre ) ;
@@ -919,9 +925,6 @@ int main(int argc, char ** argv) {
   KEYBOARD_TERMIOS_INIT      (gp_Ter) ;
   
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
-
-  TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
-
 
   /* ---------------------------------------------------------------------------- */
   /* Initialisation des strcutures necessaires aux attributs de tread             */

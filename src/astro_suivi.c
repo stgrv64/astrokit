@@ -1384,6 +1384,7 @@ void SUIVI_FRE_INIT(STRUCT_SUIVI_FRE * lp_Fre) {
   TraceArbo(__func__,0,"init frequences") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Fre->fre_mutex ) ;
+
                                      lp_Fre->fre_log      = SUIVI_FRE_LOG ;
                                      lp_Fre->fre_lock     = SUIVI_FRE_LOCK ;
                                      lp_Fre->fre_unlock   = SUIVI_FRE_UNLOCK ;
@@ -1400,6 +1401,10 @@ void SUIVI_FRE_INIT(STRUCT_SUIVI_FRE * lp_Fre) {
   lp_Fre->fre_sh_old        = 0 ; // flag de comparaison pour raffraichir ou non les ecritures
   lp_Fre->fre_ta_mic        = 1 / lp_Fre->fre_fa_mic ;
   lp_Fre->fre_th_mic        = 1 / lp_Fre->fre_fh_mic ;
+
+  usleep(1000000) ;
+  
+  TraceArbo(__func__,0,"fin init frequences") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   return ;
 }

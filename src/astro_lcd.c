@@ -26,36 +26,8 @@
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
+MACRO_ASTRO_GLOBAL_EXTERN_TIME ;
 
-static const char * gc_hach_lcd_Display_Months[] = {
- "Jan",
- "Feb",
- "Mar",
- "Apr",
- "May",
- "Jun",
- "Jul",
- "Aug",
- "Sep",
- "Oct",
- "Nov",
- "Dec"
-} ;
-
-static const char * gc_hach_lcd_Display_Hours[] = {
- "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
- "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
- "20", "21", "22", "23", "24"
-} ;
-
-static const char * gc_hach_lcd_Display_Minutes[] = {
- "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
- "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
- "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
- "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
- "40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
- "50", "51", "52", "53", "54", "55", "56", "57", "58", "59"
-} ;
 /*
 extern STRUCT_LCD     *gp_Lcd ;
 extern STRUCT_ASTRE   *gp_Ast ;
@@ -190,6 +162,8 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
   gettimeofday (                   & lp_Lcd->lcd_tval, NULL ) ;  
   /* Initialisation pointeurs de fonctions */
 
+  Trace1("pointeurs intit") ;
+
   lp_Lcd->default_set     = LCD_DEFINE_DEFAULT ;
   lp_Lcd->default_refresh = LCD_REFRESH_DEFAULT ;
 
@@ -224,10 +198,14 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
 
   /* Initialisation autres champs */
 
+  Trace1("lcd init") ;
+
   memset( lp_Lcd->lcd_l0_cur, 0 , sizeof( lp_Lcd->lcd_l0_cur )) ;
   memset( lp_Lcd->lcd_l1_cur, 0 , sizeof( lp_Lcd->lcd_l1_cur )) ;
   memset( lp_Lcd->lcd_l0_def, 0 , sizeof( lp_Lcd->lcd_l0_def )) ;
   memset( lp_Lcd->lcd_l1_def, 0 , sizeof( lp_Lcd->lcd_l1_def )) ;
+
+  Trace1("strcpy init") ;
 
   strcpy( lp_Lcd->lcd_l0_cur, "") ; 
   strcpy( lp_Lcd->lcd_l1_cur, "") ; 
@@ -240,6 +218,8 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
   /* Initialisation ecran LCD */ 
   /*--------------------------*/
 
+  Trace1("LCD1602Init init") ;
+
   if ( gp_Dev->dev_use_lcd ) {
 
     if ((lp_Lcd->lcd_fd = LCD1602Init(lp_Lcd->lcd_i2c_add)) == -1) {
@@ -251,26 +231,40 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
       Trace("LCD1602Init(ok)") ;
     }
   }
+  else {
+    Trace("Lcd non utilise") ;
+  }
   /*--------------------------*/
   /* Affichage phrases init   */ 
   /*--------------------------*/
 
-  sprintf(lp_Lcd->lcd_l0_cur, "%d%s%d %-2d:%-2d", \
+  Trace1("def phrases current") ;
+
+  gp_Tim->tim_display(gp_Tim) ;
+
+  /* FIXME : 20230308 :  amelioration affichage*/ 
+
+  sprintf(lp_Lcd->lcd_l0_cur, "%d%s%s %s:%s", \
     gp_Tim->tim_yy , \
-    gc_hach_lcd_Display_Months[ gp_Tim->tim_mm -1  ] , \
-    gp_Tim->tim_dd, \
-    gp_Tim->tim_HH, \
-    gp_Tim->tim_MM ) ;
-  
+    gc_hach_time_Display_Mon [ gp_Tim->tim_mm ] , \
+    gc_hach_time_Display_Day [ gp_Tim->tim_dd ] , \
+    gc_hach_time_Display_Hou [ gp_Tim->tim_HH ] , \
+    gc_hach_time_Display_Min [ gp_Tim->tim_MM ] ) ;
+
   sprintf(lp_Lcd->lcd_l1_cur, "%.2f %.2f", \
     gp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES, \
     gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES ) ;
 
   /* ajout 26 mai 2022 */
+
+  Trace("def phrases defaut") ;
+
   strcpy( lp_Lcd->lcd_l0_def, lp_Lcd->lcd_l0_cur ) ;
   strcpy( lp_Lcd->lcd_l1_def, lp_Lcd->lcd_l1_cur ) ;
 
   if ( gp_Dev->dev_use_lcd ) {
+
+    Trace("LCD1602Clear") ;
 
     if ( LCD1602Clear(lp_Lcd->lcd_fd) == -1) {
       SyslogErr("Fail to LCD1602Clear\n");
@@ -283,6 +277,8 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
   
     usleep(LCD_USLEEP_AFTER_CLEARING) ;
   
+    Trace("LCD1602DispLines") ;
+
     if (LCD1602DispLines(lp_Lcd->lcd_fd, lp_Lcd->lcd_l0_cur, lp_Lcd->lcd_l1_cur ) == -1) {
       SyslogErr("Fail to LCD1602DispLines\n");
       Trace("Fail to LCD1602DispLines");
@@ -375,12 +371,20 @@ void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
 
     TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
 
+/* modif 2023
     sprintf( c_l0, "%d%s%d %-2d:%-2d", \
       gp_Tim->tim_yy , \
-      gc_hach_lcd_Display_Months[ gp_Tim->tim_mm -1  ] , \
+      gc_hach_time_Display_Mon[ gp_Tim->tim_mm -1  ] , \
       gp_Tim->tim_dd, \
       gp_Tim->tim_HH, \
       gp_Tim->tim_MM ) ;
+*/
+    sprintf( c_l0, "%d%s%s %s:%s", \
+      gp_Tim->tim_yy , \
+      gc_hach_time_Display_Mon [ gp_Tim->tim_mm ] , \
+      gc_hach_time_Display_Day [ gp_Tim->tim_dd ], \
+      gc_hach_time_Display_Hou [ gp_Tim->tim_HH ], \
+      gc_hach_time_Display_Min [ gp_Tim->tim_MM ] ) ;
 
     sprintf( c_l1, "%s", gp_Ast->ast_nom ) ;
 
@@ -628,14 +632,21 @@ void LCD_DISPLAY_TEMPS_LIEU( const int i_duree_us ) {
     TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
 
     /* Remplissage de line 0 et line 1 */
-
+/*
     sprintf( c_l0, "%d%s%d %d:%d", \
       gp_Tim->tim_yy ,\
-      gc_hach_lcd_Display_Months[ gp_Tim->tim_mm -1  ] , \
+      gc_hach_time_Display_Mon[ gp_Tim->tim_mm -1  ] , \
       gp_Tim->tim_dd, \
       gp_Tim->tim_HH, \
       gp_Tim->tim_MM ) ;
-    
+*/
+    sprintf( c_l0, "%d%s%s %s:%s", \
+      gp_Tim->tim_yy , \
+      gc_hach_time_Display_Mon [ gp_Tim->tim_mm ] , \
+      gc_hach_time_Display_Day [ gp_Tim->tim_dd ] , \
+      gc_hach_time_Display_Hou [ gp_Tim->tim_HH ] , \
+      gc_hach_time_Display_Min [ gp_Tim->tim_MM ] ) ;
+
     sprintf( c_l1, "%.2f %.2f", \
       gp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES, \
       gp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES ) ;
