@@ -54,6 +54,8 @@ z  = -sineps * yy  +  coseps * zz;
 yy = zatan2( x, y );
 zz = asin( z/r );
 
+/* FIXME : recuperations coordonnees equatoriale */ 
+
 polar[0] = yy;
 polar[1] = zz;
 polar[2] = r;

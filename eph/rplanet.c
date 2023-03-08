@@ -149,7 +149,9 @@ if( prtflg )
 /* Go do topocentric reductions.
  */
 polar[2] = EO;
+
 altaz( infos, polar, UT );
+
 return(0);
 }
 

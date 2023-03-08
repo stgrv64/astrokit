@@ -1,1 +1,2 @@
-src/stat.o
+src/*.o
+eph/*.o

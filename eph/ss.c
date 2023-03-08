@@ -346,12 +346,20 @@ void SOLAR_SYSTEM( \
   double zgetdate(), gethms();
   double tlongg, glatt, heightt;
   int    yearr, monthh, dayy, hourr, minn, secc ;
-  
+  double pol[3];
+
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("numero planete = %d", num) ;
+  Trace1("numero objet = %d", num) ;
   
-  if ( num > 9 ) return ;
+  /* Si num > 9 , on verifie que le nom est different de planete */
+  /* et on recupere les coordonnees equatoriales */
+
+  if ( num > 9 ) {
+    pol[0]=0 ;
+    pol[1]=0 ;
+    pol[2]=0 ;
+  } ;
 
   Trace1("RTD = %f", RTD) ;
   infos = &inf ;
@@ -386,7 +394,9 @@ void SOLAR_SYSTEM( \
 
   Trace1("sizeof orbit    = %ld", sizeof(struct orbit )) ;
   Trace1("sizeof star     = %ld", sizeof(struct star )) ;
-
+/*
+struct orbit       *elobject;	// pointer to orbital elements of object
+*/
   switch(objnum) {
     case -1: exit(0);
     case 0:  elobject = 0;        strcpy( infos->nom, "soleil" ) ;  break;
