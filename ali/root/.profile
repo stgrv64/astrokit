@@ -1,11 +1,23 @@
+# ~/.profile: executed by Bourne-compatible login shells.
+
+export LD_LIBRARY_PATH=/home/stef/git/astrokit/libhost
+
+if [ "$BASH" ]; then
+  if [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+  fi
+fi
+
+mesg n 2> /dev/null || true
+
 # -------------------------------------------------------------
-# astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
+# astrokit @ 2022  - lGPLv2 - Stephane Gravois -
 # --------------------------------------------------------------
-# date        | commentaires 
+# date        | commentaires
 # --------------------------------------------------------------
 # 2022-05-01  | * creation
 # 2022-06-01  | * ajout entete , alias et certaines fonctionalites
-# -------------------------------------------------------------- 
+# --------------------------------------------------------------
 
 pro=astrokit
 
@@ -27,51 +39,52 @@ g1="6,5,7,11"    # Masque GPIOS moteur azimut
 f0=1             # Frequence moteur alt
 f1=1             # Frequence moteur azi
 m0="0,1,2,3"     # Masque moteurs
-n0=1             # Nb mot a utiliser (1=2) 
+n0=1             # Nb mot a utiliser (1=2)
 l0=60            # rafraichissement des traces
 u0=128           # Nb micropas
 
 export PATH=$PATH:/usr/local/scr:$rep_ste
-export LD_LIBRARY_PATH=${rep_ste}/libtarget
+#export LD_LIBRARY_PATH=${rep_ste}/libtarget
+export LD_LIBRARY_PATH=${rep_ste}/git/${pro}/libhost
 
-alias astrokit-cd-rep-ste='cd ${rep_ste}'
-alias astrokit-pssansker='ps aux | grep -v "\["'
+alias ${pro}-cd-rep-ste='cd ${rep_ste}'
+alias ${pro}-pssansker='ps aux | grep -v "\["'
 
-alias astrokit-mnt-boo='umount ${rep_boo} 2>/dev/null ; mkdir ${rep_boo} 2>/dev/null ; mount ${dev_boo} $rep_boo ;'
-alias astrokit-mnt-dat='umount ${rep_dat} 2>/dev/null ; mkdir ${rep_dat} 2>/dev/null ; mount ${dev_dat} $rep_dat ;'
+alias ${pro}-mnt-boo='umount ${rep_boo} 2>/dev/null ; mkdir ${rep_boo} 2>/dev/null ; mount ${dev_boo} $rep_boo ;'
+alias ${pro}-mnt-dat='umount ${rep_dat} 2>/dev/null ; mkdir ${rep_dat} 2>/dev/null ; mount ${dev_dat} $rep_dat ;'
 
-alias astrokit-lcd-verif-0='${rep_ulb}/astrokit-lcd1602.targ Astrokit Welcome 1 1 5000'
+alias ${pro}-lcd-verif-0='${rep_ulb}/${pro}-lcd1602.targ Astrokit Welcome 1 1 5000'
 
-alias astrokit-boo-recup-led-ir='astrokit-mnt-boo ; cat $rep_boo/config.txt | grep overlay | grep gpio_pin | cut -d "=" -f3' 
-alias astrokit-sysd-verif-units='systemctl list-units | grep -i fail'
+alias ${pro}-boo-recup-led-ir='${pro}-mnt-boo ; cat $rep_boo/config.txt | grep overlay | grep gpio_pin | cut -d "=" -f3'
+alias ${pro}-sysd-verif-units='systemctl list-units | grep -i fail'
 
-alias astrokit-gpio-0='/home/stef/gpio -g $g0 -G $g1 -m $m -n $n0 -L $l0 -f $f0 -F $f1 -u u0'
+alias ${pro}-gpio-0='/home/stef/gpio -g $g0 -G $g1 -m $m -n $n0 -L $l0 -f $f0 -F $f1 -u u0'
 
 #--------------------------------------
 # Action a realiser au prompt
 #--------------------------------------
 
 echo "=> verification des units systemd"
-astrokit-sysd-verif-units
+${pro}-sysd-verif-units
 
-echo "=> montage $dev_dat sur $rep_dat"	
-astrokit-mnt-dat
+echo "=> montage $dev_dat sur $rep_dat"
+${pro}-mnt-dat
 
-echo "=> montage $dev_boo sur $rep_boo"	
-astrokit-mnt-boo
+echo "=> montage $dev_boo sur $rep_boo"
+${pro}-mnt-boo
 
 echo "=> affichage contenu $rep_dat"
-ls /datas 
+ls /datas
 
 echo "=> chargement module i2c-dev"
 ${scr_i2c}
 
 echo "=> affichage message sur ecran LCD"
-astrokit-lcd-verif-0
+${pro}-lcd-verif-0
 
 echo "=> affichage des alias"
-alias | grep astrokit 
+alias | grep ${pro}
 
 echo "=> deplacement dans ${rep_ste}"
-astrokit-cd-rep-ste
+${pro}-cd-rep-ste
 
