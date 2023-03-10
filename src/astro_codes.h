@@ -60,7 +60,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /* clavier alphabetique (majuscules) */ 
 /*-----------------------------------*/
 
-{ "65",  "KEY_A",    "A_"},  /* 97 ascii = 'a' */    
+{ "65",  "KEY_A",    "A"},  /* 97 ascii = 'a' */    
 { "66",  "KEY_B",    "B"},  
 { "67",  "KEY_C",    "C"},  
 { "68",  "KEY_D",    "D"},  
@@ -105,6 +105,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "108", "KEY_l",    "l" },  /* 108 sum ascii = touche 'l' = activer les traces pid temps reel */ 
 { "109", "KEY_MENU", "MENU"},     /* 109  ascii = touche 'm' */
 { "110", "KEY_n",    "n"},     
+
 { "111", "KEY_o",    "o"},  
 { "112", "KEY_p",    "p"},    
 { "113", "KEY_EXIT", "key_exit" },
@@ -115,6 +116,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "118", "KEY_v",    "v"}, /* 118 sum ascii = touche 'v' = log */ 
 { "119", "KEY_w",    "w"},     /* 119 sum ascii = touche 'w'     = log */
 { "120", "KEY_x",    "x"},    
+
 { "121", "KEY_y",    "y"},    
 { "122", "KEY_MODE", "MODE_EQUATORIAL"}, /* z=equatorial => touche 'z' */     
 
@@ -140,6 +142,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /*--------------------------------*/
 
 { "296",       "KEY_OK",    "reset"}, /* ascii 296 = touche 'FIN' */
+
 { "183",       "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
 { "184",       "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
 { "185",       "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 

@@ -7,6 +7,7 @@
 # --------------------------------------------------------------
 # 21/03/2022  | * ajout entete
 #               * ajout const TERMIOS_ESCAPE_CHAR
+#       2023  | * ajout ter_nread
 # -------------------------------------------------------------- 
 */
 
@@ -76,6 +77,7 @@ struct STR_TERMIOS {
   char             ter_buffer    [ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
   int              ter_sum_ascii ;
   int              ter_peek_char  ; 
+  int              ter_nread ;
 };
 
 void KEYBOARD_INIT             (STRUCT_TERMIOS *) ;

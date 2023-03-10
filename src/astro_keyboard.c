@@ -232,6 +232,7 @@ int KEYBOARD_TERMIOS_KBHIT_READ_CHARS(STRUCT_TERMIOS * lp_Ter) {
 
   lp_Ter->ter_sum_ascii=0 ;
   lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
+
   memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
   tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale ) ;
 
@@ -243,6 +244,7 @@ int KEYBOARD_TERMIOS_KBHIT_READ_CHARS(STRUCT_TERMIOS * lp_Ter) {
 
   lp_Ter->ter_lock(lp_Ter) ;
 
+  lp_Ter->ter_nread = nread ;
   lp_Ter->ter_config_finale.c_cc[VMIN] = 1 ;
   tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale )  ;
 

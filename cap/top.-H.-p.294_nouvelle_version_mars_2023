@@ -1,0 +1,24 @@
+
+top - 18:57:06 up 3 min,  1 user,  load average: 0.57, 0.23, 0.09
+Threads:  16 total,   0 running,  16 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 12.5 us, 25.0 sy,  0.0 ni, 62.5 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :    425.6 total,    174.5 free,    184.1 used,     67.0 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.    196.6 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                                  
+  301 root      -4   0  167452 159680   1972 S  99.9  36.6   0:11.44 pth_phases                                                                                                               
+  306 root      -4   0  167452 159680   1972 S  99.9  36.6   0:11.46 pth_phases                                                                                                               
+  294 root      -2   0  167452 159680   1972 S   0.0  36.6   0:01.05 pth_main                                                                                                                 
+  300 root      -4   0  167452 159680   1972 S   0.0  36.6   0:11.46 pth_phases                                                                                                               
+  302 root      -4   0  167452 159680   1972 S   0.0  36.6   0:11.39 pth_phases                                                                                                               
+  303 root      -4   0  167452 159680   1972 S   0.0  36.6   0:11.46 pth_phases                                                                                                               
+  304 root      -4   0  167452 159680   1972 S   0.0  36.6   0:00.98 pth_moteurs                                                                                                              
+  305 root      -4   0  167452 159680   1972 S   0.0  36.6   0:11.43 pth_phases                                                                                                               
+  307 root      -4   0  167452 159680   1972 S   0.0  36.6   0:11.41 pth_phases                                                                                                               
+  308 root      -4   0  167452 159680   1972 S   0.0  36.6   0:11.43 pth_phases                                                                                                               
+  309 root      -4   0  167452 159680   1972 S   0.0  36.6   0:01.09 pth_moteurs                                                                                                              
+  310 root      -3   0  167452 159680   1972 S   0.0  36.6   0:00.19 pth_menu                                                                                                                 
+  311 root      -3   0  167452 159680   1972 S   0.0  36.6   0:00.06 pth_voute                                                                                                                
+  312 root      -3   0  167452 159680   1972 S   0.0  36.6   0:00.72 pth_inf                                                                                                                  
+  314 root      -3   0  167452 159680   1972 S   0.0  36.6   0:00.12 pth_clavier                                                                                                              
+  315 root      -3   0  167452 159680   1972 S   0.0  36.6   0:00.00 pth_lcd                                                                                                                  

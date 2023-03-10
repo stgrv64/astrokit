@@ -561,7 +561,7 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 * @todo   : supprimer argument qui est variable globale
 *****************************************************************************************/
 
-void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
+void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
 
   unsigned long u_sleep_termios_demi_periode = 0 ; 
   long long ll_inrc=0 ;
@@ -599,14 +599,22 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
       memset(&c_char,0,sizeof(c_char)) ;
       memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
-      if ( ( i_nread = KEYBOARD_TERMIOS_KBHIT_READ_CHARS(lp_ter)) > 0) {
+      KEYBOARD_TERMIOS_KBHIT_READ_CHARS(lp_Ter) ;
 
-        lp_ter->ter_lock(lp_ter) ;
+      lp_Ter->ter_lock(lp_Ter) ;
 
-        strcpy( ch_chaine, lp_ter->ter_buffer ) ;
-        i_sum_ascii      = lp_ter->ter_sum_ascii ;
+      i_nread = lp_Ter->ter_nread  ;
 
-        lp_ter->ter_unlock(lp_ter) ;
+      lp_Ter->ter_unlock(lp_Ter) ;
+
+      if ( i_nread  > 0) {
+
+        lp_Ter->ter_lock(lp_Ter) ;
+
+        strcpy( ch_chaine, lp_Ter->ter_buffer ) ;
+        i_sum_ascii      = lp_Ter->ter_sum_ascii ;
+
+        lp_Ter->ter_unlock(lp_Ter) ;
 
         c_char=ch_chaine[0] ;
 
@@ -624,16 +632,18 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
 
           DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ; 
 
-          Trace("chaine %s ascii %d indice code %d code %s", \
+          Trace("chaine %s nread %d ascii %d indice code %d code %s", \
             ch_chaine, \
+            i_nread , \
             i_sum_ascii, \
             i_indice_code, \
             gp_Cod->cod_out_act[i_indice_code] ) ;
 
         }
         else {
-          Trace("chaine %s ascii %d indice code %d >= CODES_CODE_NB_CODES (%d) : aucune correspondance trouvee", \
+          Trace("chaine %s nread %d ascii %d indice code %d >= CODES_CODE_NB_CODES (%d) : aucune correspondance trouvee", \
             ch_chaine, \
+            i_nread , \
             i_sum_ascii, \
             i_indice_code, \
             CODES_CODE_NB_CODES ) ;          
@@ -642,7 +652,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_ter ) {
     }
   }
 
-  KEYBOARD_TERMIOS_EXIT(lp_ter) ;
+  KEYBOARD_TERMIOS_EXIT(lp_Ter) ;
   
   Trace("Stop") ;
 
