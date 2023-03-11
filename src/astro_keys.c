@@ -159,7 +159,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
   char c_mot[255]={0} ;
   char s_buffer[CONFIG_TAILLE_BUFFER_32]={0} ;
 
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   DATAS_ACTION_DAT_TO_KEY  ( gp_Dat, lp_Key ) ;
   DATAS_ACTION_RESET       ( gp_Dat );

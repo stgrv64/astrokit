@@ -7,7 +7,8 @@
 # --------------------------------------------------------------
 # 21/03/2022  | * ajout entete
 #               * ajout const TERMIOS_ESCAPE_CHAR
-#       2023  | * ajout ter_nread
+# mars 2023   | * ajout ter_nread
+# mars 2023   | * ajout mode enter et quit du mode TEMRIOS 
 # -------------------------------------------------------------- 
 */
 
@@ -69,11 +70,13 @@ struct STR_TERMIOS {
   void           (*ter_unlock)     ( STRUCT_TERMIOS * ) ;  
   void           (*ter_log)        ( STRUCT_TERMIOS * ) ;
   void           (*ter_display)    ( STRUCT_TERMIOS * ) ;
+  void           (*ter_enter)      ( STRUCT_TERMIOS * ) ;
+  void           (*ter_quit)       ( STRUCT_TERMIOS * ) ;    
   char             ter_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char             ter_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
   STR_EXT_TERMIOS  ter_config_initiale; 
-  STR_EXT_TERMIOS  ter_config_finale ;   
+  STR_EXT_TERMIOS  ter_config_current ;   
   char             ter_buffer    [ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ; 
   int              ter_sum_ascii ;
   int              ter_peek_char  ; 
@@ -84,11 +87,19 @@ void KEYBOARD_INIT             (STRUCT_TERMIOS *) ;
 void KEYBOARD_READ             (STRUCT_TERMIOS *) ;
 void KEYBOARD_TERMIOS_INIT     (STRUCT_TERMIOS *) ;
 void KEYBOARD_TERMIOS_EXIT     (STRUCT_TERMIOS *) ;
+
+
 int  KEYBOARD_TERMIOS_READCH   (STRUCT_TERMIOS *) ;
 int  KEYBOARD_TERMIOS_READ     (STRUCT_TERMIOS *) ;
 
-int  KEYBOARD_TERMIOS_KBHIT_READ_CHAR ( STRUCT_TERMIOS *) ; 
+/* Nouvelles fonctions 2022/2023 pour lire la somme des nread 
+   pour certain caracteers */
+
+int  KEYBOARD_TERMIOS_KBHIT_READ_CHAR  ( STRUCT_TERMIOS * ) ; 
 int  KEYBOARD_TERMIOS_KBHIT_READ_CHARS ( STRUCT_TERMIOS * ) ;
+
+/* Anciennes fonctions ncurses a revoir lors du placement dans un thread poxix :
+   en attendant on utilise TERMIOS */
 
 void KEYBOARD_NCURSES_READ     (void) ;
 void KEYBOARD_NCURSES_INIT     (void) ;

@@ -224,10 +224,10 @@ static const char  keyboard[4][4][GPIO_TAILLE_BUFFER] = \
   {"MES" ,"NGC", "ETO", "valider"}} ;
   
 static const char  raquette[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"no" ,"o"    ,"so"     ,"MENU"},\
-  { "n"  ,"reset","s"      ,"0" },\
-  { "ne" ,"e"    ,"se"     ,"."},\
-  { "MES"  ,"NGC"  , "ETO", "valider"}} ;
+  {{"no"   ,"ouest"  , "so"   ,"MENU"},\
+  { "nord" ,"reset"  , "sud"  ,"0" },\
+  { "ne"   ,"est"    , "se"   ,"."},\
+  { "MES"  ,"NGC"    , "ETO"  , "valider"}} ;
   
 static const char  keyboard_ir[4][4][GPIO_TAILLE_BUFFER] = \
   {{"KEY_1" ,"KEY_4" , "KEY_7" , "KEY_MENU"}, \

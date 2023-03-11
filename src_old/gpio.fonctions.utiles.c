@@ -210,10 +210,10 @@ void GPIO_CLAVIER_MATRICIEL_MAJ_SUIVI_PAS(int GPIO_KEY_L[4],int GPIO_KEY_C[4], c
     if ( ! strcmp( raquette[i][j], "se" ) ) { gp_Sui->pas_sud=1  ; gp_Sui->pas_est=1   ; }
     if ( ! strcmp( raquette[i][j], "so" ) ) { gp_Sui->pas_sud=1  ; gp_Sui->pas_ouest=1 ; }
     
-    if ( ! strcmp( raquette[i][j], "n" ) ) { gp_Sui->pas_nord  = 1 ; }
-    if ( ! strcmp( raquette[i][j], "o" ) ) { gp_Sui->pas_ouest = 1 ; }
-    if ( ! strcmp( raquette[i][j], "e" ) ) { gp_Sui->pas_est   = 1 ; }
-    if ( ! strcmp( raquette[i][j], "s" ) ) { gp_Sui->pas_sud   = 1 ; }
+    if ( ! strcmp( raquette[i][j], "nord" ) ) { gp_Sui->pas_nord  = 1 ; }
+    if ( ! strcmp( raquette[i][j], "ouest" ) ) { gp_Sui->pas_ouest = 1 ; }
+    if ( ! strcmp( raquette[i][j], "est" ) ) { gp_Sui->pas_est   = 1 ; }
+    if ( ! strcmp( raquette[i][j], "sud" ) ) { gp_Sui->pas_sud   = 1 ; }
     
     if ( ! strcmp( raquette[i][j], "reset" ) ) { gp_Sui->reset   = 1 ; }
     

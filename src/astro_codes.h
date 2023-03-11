@@ -141,12 +141,12 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /* touches gauche droite haut bas ok */ 
 /*--------------------------------*/
 
-{ "296",       "KEY_OK",    "reset"}, /* ascii 296 = touche 'FIN' */
+{ "183",       "KEY_UP",    "nord"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
+{ "184",       "KEY_DOWN",  "sud"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
+{ "185",       "KEY_RIGHT", "est"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
+{ "186",       "KEY_LEFT",  "ouest"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
 
-{ "183",       "KEY_UP",    "n"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
-{ "184",       "KEY_DOWN",  "s"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
-{ "185",       "KEY_RIGHT", "e"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
-{ "186",       "KEY_LEFT",  "o"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
+{ "188",       "KEY_OK",    "reset"}, /* ascii 296 = touche 'FIN' */
 
 /*--------------------------------*/
 /* touche rattrapages             */

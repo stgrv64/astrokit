@@ -596,11 +596,8 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
 
       usleep( gp_Tpo->tpo_termios ) ;
 
-      memset(&c_char,0,sizeof(c_char)) ;
-      memset(ch_chaine, 0, sizeof(ch_chaine)) ;
-
       KEYBOARD_TERMIOS_KBHIT_READ_CHARS(lp_Ter) ;
-
+      
       lp_Ter->ter_lock(lp_Ter) ;
 
       i_nread = lp_Ter->ter_nread  ;
@@ -608,6 +605,9 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
       lp_Ter->ter_unlock(lp_Ter) ;
 
       if ( i_nread  > 0) {
+
+        memset(&c_char,0,sizeof(c_char)) ;
+        memset(ch_chaine, 0, sizeof(ch_chaine)) ;
 
         lp_Ter->ter_lock(lp_Ter) ;
 
@@ -624,20 +624,13 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
 
         while( strcmp(gp_Cod->cod_in_term[i_indice_code],c_sum_ascii) \
                && ( i_indice_code < CODES_CODE_NB_CODES ) ) { 
-           Trace2("%s = %s ?", c_sum_ascii, gp_Cod->cod_in_term[i_indice_code]) ;  
-           i_indice_code++ ; 
+          Trace1("%s = %s ?", c_sum_ascii, gp_Cod->cod_in_term[i_indice_code]) ;  
+          i_indice_code++ ; 
         }
-        
+
         if ( i_indice_code < CODES_CODE_NB_CODES ) {
 
           DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ; 
-
-          Trace("chaine %s nread %d ascii %d indice code %d code %s", \
-            ch_chaine, \
-            i_nread , \
-            i_sum_ascii, \
-            i_indice_code, \
-            gp_Cod->cod_out_act[i_indice_code] ) ;
 
         }
         else {
@@ -910,6 +903,8 @@ int main(int argc, char ** argv) {
   TIME_TEMPOS_CONFIG         ( gp_Tpo ) ;
   TIME_TEMPOS_DISPLAY        ( gp_Tpo ) ;
   LOG_INIT                   ( gp_Log ); 
+
+  LOG_TRACE("%s %d","test", 2) ;
 
   TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
   

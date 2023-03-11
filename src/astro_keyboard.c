@@ -67,7 +67,7 @@ static void KEYBOARD_TERMIOS_DISPLAY( STRUCT_TERMIOS *lp_Ter) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYBOARD_TERMIOS_LOCK ( STRUCT_TERMIOS * lp_Ter) {
+static void KEYBOARD_TERMIOS_LOCK ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -104,13 +104,64 @@ static void KEYBOARD_TERMIOS_LOG ( STRUCT_TERMIOS * lp_Ter) {
 * @date   : 2022-12-20 creation
 *****************************************************************************************/
 
-void KEYBOARD_TERMIOS_UNLOCK ( STRUCT_TERMIOS * lp_Ter) {
+static void KEYBOARD_TERMIOS_UNLOCK ( STRUCT_TERMIOS * lp_Ter) {
 
   TraceArbo(__func__,2,"unlock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ter->ter_mutex ) ;
 
   return ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_MODE_ENTER
+* @author : s.gravois
+* @brief  : entre dans le mode TERMIOS pour le terminal
+* @param  : STRUCT_TERMIOS * 
+* @date   : 2023-03-11 creation
+* @todo   : 
+*****************************************************************************************/
+
+static void KEYBOARD_TERMIOS_MODE_ENTER(STRUCT_TERMIOS * lp_Ter) {
+
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  lp_Ter->ter_lock( lp_Ter ) ; 
+
+  lp_Ter->ter_config_current.c_cc[VMIN]   = 0 ;
+  tcsetattr(0, TCSANOW, &lp_Ter->ter_config_current ) ; 
+
+  lp_Ter->ter_nread = 0 ;
+  lp_Ter->ter_peek_char = '0' ;
+  lp_Ter->ter_sum_ascii = 0 ;
+  memset( lp_Ter->ter_buffer , 0, sizeof( lp_Ter->ter_buffer )) ;
+
+  lp_Ter->ter_unlock( lp_Ter ) ;
+
+ return ;
+}
+
+/*****************************************************************************************
+* @fn     : KEYBOARD_TERMIOS_MODE_QUIT
+* @author : s.gravois
+* @brief  : quitte dans le mode TERMIOS pour le terminal
+* @param  : STRUCT_TERMIOS * 
+* @date   : 2023-03-11 creation
+* @todo   : 
+*****************************************************************************************/
+
+static void KEYBOARD_TERMIOS_MODE_QUIT(STRUCT_TERMIOS * lp_Ter) {
+
+  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  lp_Ter->ter_lock( lp_Ter ) ; 
+
+  /* lp_Ter->ter_config_current.c_cc[VMIN]   = 1 ; */
+  tcsetattr(0, TCSANOW, &lp_Ter->ter_config_initiale ) ; 
+
+  lp_Ter->ter_unlock( lp_Ter ) ;
+
+ return ;
 }
 
 /*****************************************************************************************
@@ -131,24 +182,32 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
                                      lp_Ter->ter_lock     = KEYBOARD_TERMIOS_LOCK ;
                                      lp_Ter->ter_unlock   = KEYBOARD_TERMIOS_UNLOCK ;
                                      lp_Ter->ter_display  = KEYBOARD_TERMIOS_DISPLAY ;
+                                     lp_Ter->ter_enter    = KEYBOARD_TERMIOS_MODE_ENTER ;
+                                     lp_Ter->ter_quit     = KEYBOARD_TERMIOS_MODE_QUIT ;
                                      lp_Ter->ter_loglevel = 0 ; 
                                      lp_Ter->ter_file     = NULL ;
   gettimeofday (                   & lp_Ter->ter_tval, NULL ) ;
 
   tcgetattr(0,&lp_Ter->ter_config_initiale); 
 
-  lp_Ter->ter_config_finale = lp_Ter->ter_config_initiale ; 
+  /* Recuperation de la config TERMIOS  inititiale & sauvegarde */
 
-  lp_Ter->ter_config_finale.c_lflag     &= ~ICANON ;
-  lp_Ter->ter_config_finale.c_lflag     &= ~ECHO ;
-  lp_Ter->ter_config_finale.c_lflag     &= ~ISIG ;
-  lp_Ter->ter_config_finale.c_cc[VMIN]   = 1 ;
-  lp_Ter->ter_config_finale.c_cc[VTIME]  = 0 ;
+  lp_Ter->ter_config_current = lp_Ter->ter_config_initiale ; 
 
-  tcsetattr(0,TCSANOW, &lp_Ter->ter_config_initiale) ;
+  /* Modification de la config TERMIOS qui va servir ensuite comme "courante" */
 
-  memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
-  memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
+  lp_Ter->ter_config_current.c_lflag     &= ~ICANON ;
+  lp_Ter->ter_config_current.c_lflag     &= ~ECHO ;
+  lp_Ter->ter_config_current.c_lflag     &= ~ISIG ;
+  lp_Ter->ter_config_current.c_cc[VMIN]   = 1 ;
+  lp_Ter->ter_config_current.c_cc[VTIME]  = 0 ;
+
+  tcsetattr(0, TCSANOW, &lp_Ter->ter_config_initiale ) ; 
+
+  lp_Ter->ter_nread = 0 ;
+  lp_Ter->ter_peek_char = '0' ;
+  lp_Ter->ter_sum_ascii = 0 ;
+  memset( lp_Ter->ter_buffer , 0, sizeof( lp_Ter->ter_buffer )) ;
 
   return ;
 }
@@ -170,48 +229,6 @@ void KEYBOARD_TERMIOS_EXIT(STRUCT_TERMIOS * lp_Ter) {
 }
 
 /*****************************************************************************************
-* @fn     : KEYBOARD_TERMIOS_KBHIT_READ_CHAR
-* @author : s.gravois
-* @brief  : Lit un character depuis frappe d'une touche sur le clavier via termios
-* @param  : STRUCT_TERMIOS * lp_Ter
-* @date   : 2022-01-18 creation
-* @date   : passage du buffer de lecture de char a char[]
-* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
-*****************************************************************************************/
-
-int KEYBOARD_TERMIOS_KBHIT_READ_CHAR(STRUCT_TERMIOS * lp_Ter) {
-
-  char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
-  char ch ;
-  int nread ; 
-
-  if ( lp_Ter->ter_peek_char != -1 ) {
-    Trace("lp_Ter->ter_peek_char != -1") ;
-    return 1 ;
-  }
-  lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
-  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale ) ;
-
-  /* Lecture dans le file descriptor 0 (stdin) */
-
-  nread = read(0, &lc_buf, TERMIOS_KBHIT_SIZE_BUFFER_READ );
-
-  ch = lc_buf[0] ;
-  lp_Ter->ter_config_finale.c_cc[VMIN] = 1 ;
-  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale )  ;
-
-  if ( nread >0  ) {
-    // Trace1("nread = %d", nread) ;
-  }
-  if (nread == 1 ) {
-    lp_Ter->ter_peek_char = ch ; 
-    // Trace1("lp_Ter->ter_peek_char = ch = %c", ch) ;
-    return -1 ;
-  }
-  return 0 ;
-}
-
-/*****************************************************************************************
 * @fn     : KEYBOARD_TERMIOS_KBHIT_READ_CHARS
 * @author : s.gravois
 * @brief  : detecte la frappe d'une touche sur le clavier via termios
@@ -226,31 +243,17 @@ int KEYBOARD_TERMIOS_KBHIT_READ_CHARS(STRUCT_TERMIOS * lp_Ter) {
 
   // char lc_buf[ TERMIOS_KBHIT_SIZE_BUFFER_READ ] ;
   char ch ;
-  int nread ; 
+  int nread = 0 ; 
 
-  lp_Ter->ter_lock(lp_Ter) ;
+  lp_Ter->ter_enter(lp_Ter) ;
 
-  lp_Ter->ter_sum_ascii=0 ;
-  lp_Ter->ter_config_finale.c_cc[VMIN] = 0 ;
+  lp_Ter->ter_nread = read(0,&(lp_Ter->ter_buffer),TERMIOS_KBHIT_SIZE_BUFFER_READ);
+  
+  lp_Ter->ter_quit(lp_Ter) ;
 
-  memset(lp_Ter->ter_buffer, 0, sizeof(lp_Ter->ter_buffer)) ;
-  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale ) ;
-
-  lp_Ter->ter_unlock(lp_Ter) ;
-
-  // Trace1("--------------------- before read ----------------------------") ;
-
-  nread = read(0,&(lp_Ter->ter_buffer),TERMIOS_KBHIT_SIZE_BUFFER_READ);
-
-  lp_Ter->ter_lock(lp_Ter) ;
-
-  lp_Ter->ter_nread = nread ;
-  lp_Ter->ter_config_finale.c_cc[VMIN] = 1 ;
-  tcsetattr( 0, TCSANOW, &lp_Ter->ter_config_finale )  ;
-
-  lp_Ter->ter_unlock(lp_Ter) ;
-
-  if ( nread > 0  ) {
+  /* UNLOCK ---------------------------------- */
+  
+  if ( lp_Ter->ter_nread > 0  ) {
 
     // Trace("nread positif = %d", nread) ;
     
@@ -296,32 +299,6 @@ int KEYBOARD_TERMIOS_READCH(STRUCT_TERMIOS * lp_Ter) {
   return ch ;
 }
 
-/*****************************************************************************************
-* @fn     : main
-* @author : s.gravois
-* @brief  : point de depart du programme 
-* @param  : STRUCT_TERMIOS *
-* @date   : 2022-01-18 creation
-* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
-*****************************************************************************************/
-
-int KEYBOARD_TERMIOS_READ(STRUCT_TERMIOS * lp_Ter) {
-
-  int ch =0 ;
-
-  KEYBOARD_TERMIOS_INIT(lp_Ter) ;
-
-  while(ch!='q') {
-    // printf("boucle en cours\n") ;
-    usleep(50000) ;
-    if ( KEYBOARD_TERMIOS_KBHIT_READ_CHAR(lp_Ter)) {
-      ch= KEYBOARD_TERMIOS_READCH(lp_Ter) ;
-      printf("keycode %c => %d\n", ch, ch) ;
-    }
-  }
-  KEYBOARD_TERMIOS_EXIT(lp_Ter) ;
-  exit(0) ;
-}
 
 /*****************************************************************************************
 * @fn     : KEYBOARD_LOG_LAST_LINE
@@ -476,3 +453,37 @@ void KEYBOARD_END(void) {
 ----------------------------------------------
 ----------------------------------------------
 ---------------------------------------------- */
+
+
+/*****************************************************************************************
+* @fn     : main
+* @author : s.gravois
+* @brief  : point de depart du programme 
+* @param  : STRUCT_TERMIOS *
+* @date   : 2022-01-18 creation
+* @date   : 2023-03-11 ajout commentaire (non utilise)
+* @todo   : verifier fonctionnement dans astrokit au milieu d'un thread
+* @todo   : (non utilise)
+*****************************************************************************************/
+/*
+int KEYBOARD_TERMIOS_READ(STRUCT_TERMIOS * lp_Ter) {
+
+  int ch =0 ;
+
+  KEYBOARD_TERMIOS_INIT(lp_Ter) ;
+
+  while(ch!='q') {
+    // printf("boucle en cours\n") ;
+    usleep(50000) ;
+
+    if ( KEYBOARD_TERMIOS_KBHIT_READ_CHAR(lp_Ter)) {
+
+      ch= KEYBOARD_TERMIOS_READCH(lp_Ter) ;
+      
+      Trace("keycode %c => %d\n", ch, ch) ;
+    }
+  }
+  KEYBOARD_TERMIOS_EXIT(lp_Ter) ;
+  exit(0) ;
+}
+*/

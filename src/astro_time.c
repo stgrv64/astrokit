@@ -1012,7 +1012,7 @@ void TIME_TEMPOS_CONFIG( STRUCT_TIME_TEMPOS * lp_Tpo) {
   if ( gp_Tim_Par->tim_par_tpo > 0 )  {
 
     lp_Tpo->tpo_voute    = TIME_DEFAULT_TEMPO_VOUTE ;
-    lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_NEMU ;
+    lp_Tpo->tpo_menu     = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_MENU ;
     lp_Tpo->tpo_raq      = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_RAQ ; /* est utilisee uniquement dans SUIVI_MANUEL_ASSERVI */
     lp_Tpo->tpo_ir       = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_IR ;
     lp_Tpo->tpo_termios  = gp_Tim_Par->tim_par_tpo * TIME_DEFAULT_TEMPO_COEFF_MULT_TERMIOS ;

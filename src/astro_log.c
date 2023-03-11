@@ -6,6 +6,8 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 07/10/2022  | * creation
+# 11/03/2023  | * terminer et utliser une trace generique 
+#                 avec prise de mutex
 # -------------------------------------------------------------- 
 */
 
@@ -100,7 +102,7 @@ void LOG_UNLOCK ( STRUCT_LOG * lp_Log) {
 
 void LOG_LOG ( STRUCT_LOG * lp_Log) {
 
-  TraceArbo(__func__,2,"lock mutex") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Log->log_mutex ) ;
 
@@ -171,7 +173,9 @@ void LOG_SYSTEM_LOG_1(char *txt) {
   }
 
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
+
     if ( strftime(s_date, sizeof(s_date), "%Y%m%d.%H%M", tmp) == 0 ) {
+
         fprintf(stderr, "strftime a renvoyé 0");
         exit(EXIT_FAILURE);
     }
@@ -211,7 +215,14 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
   
   TraceArbo(__func__,0,"init log") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  HANDLE_ERROR_PTHREAD_MUTEX_INIT( & gp_mutex_log ) ;
+  
+  /* FIXME :dans l'attente de trouver une solution pereenne
+     utilisation du mutex gp_mutex_log et des macros Traces* 
+  */
+
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Log->log_mutex ) ;
+
                                      lp_Log->log_log      = LOG_LOG ;
                                      lp_Log->log_lock     = LOG_LOCK ;
                                      lp_Log->log_unlock   = LOG_UNLOCK ;
@@ -264,8 +275,6 @@ void   LOG_TRACE  ( char *l_String , ... ) {
   char c_out_tmp [ CONFIG_TAILLE_BUFFER_256 ]={0};
 
   memset( c_out,0, sizeof(c_out));
-
-  va_start(valist, l_String);
 
   while (*l_String) {
     switch (*l_String++) {

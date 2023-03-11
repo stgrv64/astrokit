@@ -243,6 +243,7 @@ void INFRARED_READ(void) {
     if ( k == 0 && i_indice_code < CODES_CODE_NB_CODES ) {
       
       DATAS_ACTION_BUF_TO_DAT( gp_Dat, gp_Cod->cod_out_act[i_indice_code] ) ;
+
     }
 
     if ( k > 0 && \

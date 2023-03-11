@@ -219,7 +219,9 @@ void DATAS_ACTION_BUF_TO_DAT( STRUCT_DATAS * lp_Dat, const char * c_char ) {
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
 
   strcpy( lp_Dat->dat_act, c_char) ;
-
+  
+  Trace("code / action : %s",  lp_Dat->dat_act ) ;
+  
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Dat->dat_mutex ) ; ;
 
   // GPIO_LED_ETAT_CLIGNOTE(1,10) ;
@@ -243,14 +245,16 @@ void DATAS_ACTION_DAT_TO_KEY( STRUCT_DATAS * lp_Dat, STRUCT_KEYS * lp_Key ) {
 
   if ( strcmp(lp_Dat->dat_act,DATAS_ZERO_CHAR) != 0 ) {
 
-    Trace1("cp %s to lp_Key->key_mot", lp_Dat->dat_act) ;
-
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Key->key_mutex ) ;
+
+    Trace1("cp %s to lp_Key->key_mot", lp_Dat->dat_act) ;
 
     memset( lp_Key->key_mot, 0, sizeof(lp_Key->key_mot)) ;   
     strcpy( lp_Key->key_mot, lp_Dat->dat_act) ;
       
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Key->key_mutex ) ;
+
+    Trace("action / key : %s",  lp_Key->key_mot ) ;
 
     lp_Key->key_mot_en_cours = 1 ;
   }

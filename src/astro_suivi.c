@@ -429,10 +429,10 @@ void SUIVI_MAJ_PAS( STRUCT_SUIVI_PAS * lp_Pas ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Pas->pas_mutex ) ;
 
-  MACRO_IF_KEY_MOT_IS("n" )             { i++ ; lp_Pas->pas_nord          = 1 ; }
-  MACRO_IF_KEY_MOT_IS("o" )             { i++ ; lp_Pas->pas_ouest         = 1 ; }
-  MACRO_IF_KEY_MOT_IS("e" )             { i++ ; lp_Pas->pas_est           = 1 ; }
-  MACRO_IF_KEY_MOT_IS("s" )             { i++ ; lp_Pas->pas_sud           = 1 ; }
+  MACRO_IF_KEY_MOT_IS("nord" )          { i++ ; lp_Pas->pas_nord          = 1 ; }
+  MACRO_IF_KEY_MOT_IS("ouest" )         { i++ ; lp_Pas->pas_ouest         = 1 ; }
+  MACRO_IF_KEY_MOT_IS("est" )           { i++ ; lp_Pas->pas_est           = 1 ; }
+  MACRO_IF_KEY_MOT_IS("sud" )           { i++ ; lp_Pas->pas_sud           = 1 ; }
   MACRO_IF_KEY_MOT_IS("forward" )       { i++ ; lp_Pas->pas_forward       = 1 ; }
   MACRO_IF_KEY_MOT_IS("rewind" )        { i++ ; lp_Pas->pas_rewind        = 1 ; }
   MACRO_IF_KEY_MOT_IS("forwardfast" )   { i++ ; lp_Pas->pas_forward_fast  = 1 ; }
@@ -521,6 +521,7 @@ void SUIVI_MENU_BEFORE_WHILE (STRUCT_SUIVI * lp_Sui) {
 * @date   : 2022-01-18 creation entete de la fonction au format doxygen
 * @date   : 2022-05-30 amelioration et visibilite du contenu fct 
 * @date   : 2022-05-30 ajout des mots concernant les touches F1->F12 du gp_Key
+* @date   : 2023-03-11 renommage touches e/s/o/n => est/sud/ouest/nord
 * @todo   : analyser pour simplification <=> avec suivi menu etc..
 * @todo   : remplacer i=1 par autre chose
 *****************************************************************************************/
@@ -608,10 +609,10 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* ne pas mettre i=1 pour les actions suivantes */
 
-    MACRO_IF_KEY_MOT_IS("n" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    MACRO_IF_KEY_MOT_IS("o" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    MACRO_IF_KEY_MOT_IS("e" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
-    MACRO_IF_KEY_MOT_IS("s" )                  { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("nord" )               { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("ouest" )              { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("est" )                { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
+    MACRO_IF_KEY_MOT_IS("sud" )                { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
     MACRO_IF_KEY_MOT_IS("forward" )            { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
     MACRO_IF_KEY_MOT_IS("rewind" )             { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
     MACRO_IF_KEY_MOT_IS("forwardfast" )        { lp_Sui->sui_menu = MENU_MANUEL_BRUT ; }
