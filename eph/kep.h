@@ -90,12 +90,12 @@ extern double jvearth, vearth[];
 #include "protos.h"
 #define ANSIPROT
 #else
-int showrd(), showcor(), dms(), hms(), jtocal(), epsiln();
+int showrd(), showcor(), dms(), hms(), myhms(), jtocal(), epsiln();
 int fk4fk5(), kepler(), kinit(), KINIT_ASTROKIT(), getnum(), getnum_moi(), deltap();
 int lonlat(), nutate(), precess(), reduce(), rstar();
 int lightt(), velearth(), diurpx(), diurab(), update();
 int relativity(), showcname(), annuab(), angles(), altaz();
-int domoon(), dosun(), doplanet(), dostar(), iter_trnsit();
+int domoon(), dosun(), doplanet(), dostar(), domyobj(), iter_trnsit();
 double mod360(), modtp();
 int getstar(), getorbit(), trnsit();
 double sidrlt(), refrac();

@@ -51,6 +51,14 @@ int altaz(infos,  pol, J )
   dec  = pol[1];
   dist = pol[2];
 
+  Trace("asc %.2f dec %.2f alt %.2f : ",\
+    pol[0], \
+    pol[1] * RTD, \
+    pol[2] ) ;
+
+  myhms("asc",pol[0]) ;
+  Trace("%-10s : %.2f degres", "dec", pol[1] * RTD) ;
+
   TPI = 2.0*PI;
   
   /* local apparent sidereal time, seconds converted to radians
@@ -143,6 +151,7 @@ int altaz(infos,  pol, J )
   	y -= TPI;
   y = RTS*y/15.0;
   z = RTS*(dec - z);
+
   if( prtflg )
   	{
   	//Trace1( "atmospheric refraction %.3f deg  dRA %.3fs dDec %.2f\"\n", D, y, z );
@@ -154,12 +163,11 @@ int altaz(infos,  pol, J )
     infos->asc = ra ;
     infos->dec = dec ;
   
-  	Trace1( "AD  (hms) =\t" );
+    Trace("alt %.2f azi %.2f",infos->alt * RTD , infos->azi * RTD );
+
   	hms( ra );
-  	Trace1( "DEC (hms) =\t" );
   	dms( dec );
   
-  	Trace1( "=========" );
-  	}
+  }
   return(0);
 }

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  -1 /* valeurs possibles => 0    : fonctions de base , > 0 : suivantes  */
+#define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  0 /* valeurs possibles => 0    : fonctions de base , > 0 : suivantes  */
 #define DEBUG 0
 
 // ------------------------------------------------------------------------
@@ -36,7 +36,7 @@ while (0)
 #endif
 
 #if defined(DEBUG) && DEBUG == 0 
-#define Trace(fmt, args...)              fprintf(stderr, "\n%s : " fmt, __func__, ##args)
+#define Trace(fmt, args...)              fprintf(stderr, "\n%-20s : " fmt, __func__, ##args)
 #define Trace1(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #define Trace2(fmt, args...) while(0) {  fprintf(stderr, "\n%s : " fmt, __func__, ##args) ; } 
 #endif

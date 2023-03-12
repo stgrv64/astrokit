@@ -162,6 +162,28 @@ return(0);
 extern struct orbit *elobject;
 
 /*****************************************************************************************
+* @fn     : domyobj
+* @author : s.gravois / nasa
+* @brief  : compute only altaz for my object which I know asc and dec
+* @param  : ras
+* @date   : 2023-03-12 creation
+* @todo   : verifier calculs et appel depuis ss.c (fct solar_system)
+*****************************************************************************************/
+
+int domyobj ( TOPOCENTRIC *infos )
+{
+	double pol[3] ;
+	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+	pol[0] = infos->asc ;
+	pol[2] = infos->dec ;
+
+	altaz(infos, pol, UT ) ;
+
+	return 0;
+}
+
+/*****************************************************************************************
 * @fn     : dostar
 * @author : s.gravois / nasa
 * @brief  : ras

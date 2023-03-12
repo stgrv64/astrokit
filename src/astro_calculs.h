@@ -14,6 +14,7 @@
 # 29/09/2022  | * correction buffer overfow => 
 #     deplacement et correction code de recuperation type et nom de astre
 #     dans CALCULS_RECUP_MODE_ET_ASTRE_TYPE()
+# 12/03/2023  | * ajout CALCULS_SOLAR_SYSTEM
 # -------------------------------------------------------------- 
 */
 
@@ -203,35 +204,33 @@ double DEG  (int degres, int minutes )                  ;
 // en profitant d'un sleep parametrable (eviter une consommation CPU
 // avant de rentrer en boucle active d'attente
 
-void CALCULS_INIT            ( STRUCT_CALCULS * ) ;
-void CALCULS_PARAMS_INIT     ( STRUCT_CALCULS_PARAMS * ) ;
-void CALCULS_PARAMS_DISPLAY  ( STRUCT_CALCULS_PARAMS * ) ;
-
-void CALCULS_LOCK            ( STRUCT_CALCULS * ) ;
-void CALCULS_UNLOCK          ( STRUCT_CALCULS * ) ;
-
-void CALCULS_INIT_PTR        ( STRUCT_CALCULS * )  ;
-void CALCULS_INIT_ANGLE      ( STRUCT_ANGLE * ) ;
-
-void CALCULS_VOUTE                   (void) ;
-void CALCULS_COORD_R3                (STRUCT_ASTRE *) ;
-void CALCULS_AZIMUT                  (STRUCT_ASTRE *) ;
-void CALCULS_EQUATEUR                (STRUCT_ASTRE *) ;
-void CALCULS_PERIODE                 (STRUCT_ASTRE *) ;
-void CALCULS_PERIODES_SUIVI_MANUEL   (STRUCT_ASTRE *, STRUCT_SUIVI_PAS *, STRUCT_SUIVI_FRE *) ;
-void CALCULS_VITESSES                (STRUCT_ASTRE *, STRUCT_LIEU * , STRUCT_SUIVI * ) ;
-void CALCULS_ANGLE_HORAIRE           (STRUCT_ASTRE *) ;
-void CALCULS_ASCENSION_DROITE        (STRUCT_ASTRE *) ; 
-void CALCULS_DIVISEUR_FREQUENCE      (void) ;   
-void CALCULS_CONVERSIONS_ANGLES      (STRUCT_ASTRE *) ;
-void CALCULS_TOUT                    (void) ;
-void CALCULS_RECUP_MODE_ET_ASTRE_TYPE(void) ;
-void CALCULS_ANGLE_VERS_DMS          (STRUCT_ANGLE *) ;
+void CALCULS_INIT                    ( STRUCT_CALCULS * ) ;
+void CALCULS_PARAMS_INIT             ( STRUCT_CALCULS_PARAMS * ) ;
+void CALCULS_PARAMS_DISPLAY          ( STRUCT_CALCULS_PARAMS * ) ;
+void CALCULS_LOCK                    ( STRUCT_CALCULS * ) ;
+void CALCULS_UNLOCK                  ( STRUCT_CALCULS * ) ;
+void CALCULS_INIT_PTR                ( STRUCT_CALCULS * )  ;
+void CALCULS_INIT_ANGLE              ( STRUCT_ANGLE * ) ;
+void CALCULS_VOUTE                   ( void) ;
+void CALCULS_COORD_R3                ( STRUCT_ASTRE *) ;
+void CALCULS_AZIMUT                  ( STRUCT_ASTRE *) ;
+void CALCULS_EQUATEUR                ( STRUCT_ASTRE *) ;
+void CALCULS_PERIODE                 ( STRUCT_ASTRE *) ;
+void CALCULS_PERIODES_SUIVI_MANUEL   ( STRUCT_ASTRE *, STRUCT_SUIVI_PAS *, STRUCT_SUIVI_FRE *) ;
+void CALCULS_VITESSES                ( STRUCT_ASTRE *, STRUCT_LIEU * , STRUCT_SUIVI * ) ;
+void CALCULS_ANGLE_HORAIRE           ( STRUCT_ASTRE *) ;
+void CALCULS_ASCENSION_DROITE        ( STRUCT_ASTRE *) ; 
+void CALCULS_DIVISEUR_FREQUENCE      ( void) ;   
+void CALCULS_CONVERSIONS_ANGLES      ( STRUCT_ASTRE *) ;
+void CALCULS_TOUT                    ( void) ;
+void CALCULS_RECUP_MODE_ET_ASTRE_TYPE( void) ;
+void CALCULS_ANGLE_VERS_DMS          ( STRUCT_ANGLE *) ;
 /* TODO : decommenter
 void   SET_ASTRE ( STRUCT_ASTRE *gp_Ast,char *parametre, double valeur) ;
 void   SET_LIEU  ( STRUCT_LIEU *gp_Lie,char *parametre, double valeur) ;
 void   SET_VOUTE ( STRUCT_VOUTE *gp_Vou,char *parametre, double valeur) ;
 */
+void CALCULS_SOLAR_SYSTEM            ( STRUCT_ASTRE *, STRUCT_LIEU *, STRUCT_TIME  *) ; 
 
 #endif
 

@@ -28,6 +28,7 @@ extern int    showrd ( char *msg, double p[], double pol[] );
 extern int    showcor ( char *strng, double p[], double dp[] );
 extern int    dms ( double x );
 extern int    hms ( double x );
+extern int    myhms ( char * , double x );
 extern double zgetdate ( void );
 extern double zgetdate_moi(int yearr, int monthh, int dayy) ;
 extern double caltoj ( long year, int month, double day );
@@ -64,6 +65,7 @@ extern int    reduce ( TOPOCENTRIC *infos, struct orbit *elemnt, double q[], dou
 extern int    doplanet (TOPOCENTRIC *infos);
 extern int    rstar ( TOPOCENTRIC *infos, struct star *el );
 extern int    dostar (TOPOCENTRIC *infos);
+extern int    domyobj (TOPOCENTRIC *infos);
 extern double sidrlt ( double j, double tlong );
 extern int    dosun ( TOPOCENTRIC *infos );
 extern double tdb ( double JED );

@@ -1244,6 +1244,44 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   return ;
 }
+
+/*****************************************************************************************
+* @fn     : CALCULS_SOLAR_SYSTEM
+* @author : s.gravois
+* @brief  : Encapsule appel a extern SOLAR_SYSTEM (libeph.a)
+* @param  : STRUCT_ASTRE * lp_Ast
+* @param  : STRUCT_LIEU  * lp_Lie
+* @param  : STRUCT_TIME  * lp_Tim
+* @date   : 2022-06-13 correction argument 1 de SOLAR_SYSTEM astre->nom => astre->infos
+* @date   : 2022-09-29 deplacement code recup type et nom dans une fct dediee
+* @todo   : ras
+*****************************************************************************************/
+
+void CALCULS_SOLAR_SYSTEM( \
+  STRUCT_ASTRE * lp_Ast, \
+  STRUCT_LIEU  * lp_Lie, \
+  STRUCT_TIME  * lp_Tim, ) {
+
+  TraceArbo(__func__,0,"solar system") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  SOLAR_SYSTEM(     lp_Ast->ast_infos, \
+                  & lp_Ast->ast_asc,  \
+                  & lp_Ast->ast_dec, \
+                  & lp_Ast->ast_azi, \
+                  & lp_Ast->ast_alt , \
+                    lp_Lie->lie_lat, \
+                    lp_Lie->lie_lon, \
+                    lp_Lie->lie_alt, \
+                    lp_Tim->tim_yy, \
+                    lp_Tim->tim_mm, \
+                    lp_Tim->tim_dd, \
+                    lp_Tim->tim_HH, \
+                    lp_Tim->tim_MM, \
+                    lp_Tim->tim_SS,\
+                    lp_Ast->ast_num ) ;
+
+  return ;
+}
 /*****************************************************************************************
 * @fn     : CALCULS_TOUT
 * @author : s.gravois
@@ -1305,7 +1343,8 @@ void CALCULS_TOUT(void) {
          ) ;
         gp_Ast->ast_num = 0 ; 
       }
-
+      CALCULS_SOLAR_SYSTEM( gp_Ast, gp_Lie, gp_Tim ) ;
+      /*
       SOLAR_SYSTEM(     gp_Ast->ast_infos, \
                       & gp_Ast->ast_asc,  \
                       & gp_Ast->ast_dec, \
@@ -1321,7 +1360,7 @@ void CALCULS_TOUT(void) {
                         gp_Tim->tim_MM, \
                         gp_Tim->tim_SS,\
                         gp_Ast->ast_num ) ;
-      
+      */
       Trace2("(infos) %s (asc) %.2f (dec) %.2f (azi) %.2f (alt) %.2f", \
         gp_Ast->ast_infos, \
         gp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES, \
@@ -1386,6 +1425,7 @@ void CALCULS_TOUT(void) {
         break ;
       */
   }  
+  return ;
 }
 //================================================================================================
 /* On cherche a balayer la voute avec un pas de 1 degres par exemple
@@ -1467,6 +1507,8 @@ void CALCULS_VOUTE(void) {
    }
   
   fclose(fout) ;
+
+  return ;
 }
 //========================================================================================
 // FIXME : FIN FICHIER

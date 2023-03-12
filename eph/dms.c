@@ -138,7 +138,7 @@ int dms( x ) double x; {
 #define RTOH (12.0/PI)
 
 /*****************************************************************************************
-* @fn     : hms
+* @fn     : myhms
 * @author : s.gravois / nasa
 * @brief  : ras
 * @param  : ras
@@ -146,12 +146,10 @@ int dms( x ) double x; {
 * @todo   : ras
 *****************************************************************************************/
 
-int hms( x ) double x; {
+int myhms( char * s_message, double x ) {
  int h, m;
  long sint, sfrac;
  double s;
-
-TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
  s = x * RTOH;
  if( s < 0.0 ) s += 24.0;
@@ -179,7 +177,53 @@ TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
  sint = sfrac / 1000;
  sfrac -= sint * 1000;
  
- Trace1( "%3dh %02dm %02ld.%03lds  ", h, m, sint, sfrac );
+ Trace( "%-10s : %.02d h %.02d m %.02ds  ", s_message, h, m, (int)s );
+ 
+return(0);
+}
+/*****************************************************************************************
+* @fn     : hms
+* @author : s.gravois / nasa
+* @brief  : ras
+* @param  : ras
+* @date   : 2023-01-04 creation entete doxygen
+* @todo   : ras
+*****************************************************************************************/
+
+int hms( x ) double x; {
+ int h, m;
+ long sint, sfrac;
+ double s;
+
+TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+ s = x * RTOH;
+ if( s < 0.0 ) s += 24.0;
+ h = (int) s;
+ s -= h;
+ s *= 60;
+ m = (int) s;
+ s -= m;
+ s *= 60;
+
+ /* Handle shillings and pence roundoff. */
+
+ sfrac = (long) (1000.0 * s + 0.5);
+
+ if( sfrac >= 60000L ) {
+  sfrac -= 60000L;
+  m += 1;
+  
+  if( m >= 60 ) {
+   m -= 60;
+   h += 1;
+  }
+ }
+
+ sint = sfrac / 1000;
+ sfrac -= sint * 1000;
+ 
+ Trace1( "%.02d h %.02d m %.02ds  ", h, m, (int)s );
  
 return(0);
 }

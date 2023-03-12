@@ -409,7 +409,7 @@ struct orbit       *elobject;	// pointer to orbital elements of object
     case 7:  elobject = &uranus;  strcpy( infos->nom, "uranus" ) ;  break;
     case 8:  elobject = &neptune; strcpy( infos->nom, "neptune" ) ; break;
     case 9:  elobject = &pluto;   strcpy( infos->nom, "pluton" ) ;  break;
-    case 10: elobject = &test;    strcpy( infos->nom, "test" ) ;    break;
+    case 10: elobject = 0;        strcpy( infos->nom, "myobj" ) ;    break;
     case 88: elobject = (struct orbit *)&fstar; 
          i = getstar( (struct star *) elobject ); // fonction
     case 99: elobject = &forbit;
@@ -430,10 +430,19 @@ struct orbit       *elobject;	// pointer to orbital elements of object
     kepler( TDT, &earth, rearth, eapolar );
 
     switch( objnum ) {
-      case 0:   dosun(     infos);  /* iter_trnsit( dosun ); */    break;
-      case 3:   domoon(    infos);  /* iter_trnsit( domoon );*/    break;
-      case 88:  dostar(    infos);  /* iter_trnsit( dostar );*/    break;
-      default:  doplanet(  infos);  /* iter_trnsit( doplanet );*/  break;
+      case 0:   dosun(     infos);  /* Soleil */ break;
+      case 1:   doplanet(  infos);  /* Mercure*/ break;
+      case 2:   doplanet(  infos);  /* Venus */ break;
+      case 3:   domoon(    infos);  /* Lune */ break;
+      case 4:   doplanet(  infos);  /* Mars */ break;
+      case 5:   doplanet(  infos);  /* Jupiter */ break;
+      case 6:   doplanet(  infos);  /* Saturne */ break;
+      case 7:   doplanet(  infos);  /* Uranus */ break;
+      case 8:   doplanet(  infos);  /* Neptune */ break;
+      case 9:   doplanet(  infos);  /* Pluton */ break;
+      case 10:  domyobj(   infos);  /* Objet PERSO avec infos* renseignés (asc/dec) */ break;
+      case 11:  dostar(    infos);  /* inutilisé (a etudier) */ break;
+      default:  doplanet(  infos);  /* par defaut */ break;
     }
     Trace1( "\ninfos->nom = %s\n" , infos->nom );
     Trace1( "infos->asc = %f deg\n" , infos->asc * RTD );
