@@ -1260,7 +1260,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 void CALCULS_SOLAR_SYSTEM( \
   STRUCT_ASTRE * lp_Ast, \
   STRUCT_LIEU  * lp_Lie, \
-  STRUCT_TIME  * lp_Tim, ) {
+  STRUCT_TIME  * lp_Tim ) {
 
   TraceArbo(__func__,0,"solar system") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
