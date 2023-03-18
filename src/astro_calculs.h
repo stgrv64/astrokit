@@ -15,6 +15,7 @@
 #     deplacement et correction code de recuperation type et nom de astre
 #     dans CALCULS_RECUP_MODE_ET_ASTRE_TYPE()
 # 12/03/2023  | * ajout CALCULS_SOLAR_SYSTEM
+#             | * ajout 
 # -------------------------------------------------------------- 
 */
 

@@ -346,21 +346,11 @@ void SOLAR_SYSTEM( \
   double zgetdate(), gethms();
   double tlongg, glatt, heightt;
   int    yearr, monthh, dayy, hourr, minn, secc ;
-  double pol[3];
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace1("numero objet = %d", num) ;
   
-  /* Si num > 9 , on verifie que le nom est different de planete */
-  /* et on recupere les coordonnees equatoriales */
-
-  if ( num > 9 ) {
-    pol[0]=0 ;
-    pol[1]=0 ;
-    pol[2]=0 ;
-  } ;
-
   Trace1("RTD = %f", RTD) ;
   infos = &inf ;
 
@@ -399,6 +389,7 @@ struct orbit       *elobject;	// pointer to orbital elements of object
 */
   switch(objnum) {
     case -1: exit(0);
+    case -2: elobject = &forbit; i = getorbit( elobject ); if( i == 0 ) break;
     case 0:  elobject = 0;        strcpy( infos->nom, "soleil" ) ;  break;
     case 1:  elobject = &mercury; strcpy( infos->nom, "mercure" ) ; break;
     case 2:  elobject = &venus;   strcpy( infos->nom, "venus" ) ;   break;
@@ -409,18 +400,12 @@ struct orbit       *elobject;	// pointer to orbital elements of object
     case 7:  elobject = &uranus;  strcpy( infos->nom, "uranus" ) ;  break;
     case 8:  elobject = &neptune; strcpy( infos->nom, "neptune" ) ; break;
     case 9:  elobject = &pluto;   strcpy( infos->nom, "pluton" ) ;  break;
-    case 10: elobject = 0;        strcpy( infos->nom, "myobj" ) ;    break;
-    case 88: elobject = (struct orbit *)&fstar; 
-         i = getstar( (struct star *) elobject ); // fonction
-    case 99: elobject = &forbit;
-         i = getorbit( elobject ); // fonction
-         //if( i == 1 ) goto loop1;
-         if( i == 0 ) break;
-    default: exit(1) ;
+    case 10: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); break ;
+    default: elobject = 0 ;
   }
 
   if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
-  else if( elobject )                      Trace1( "\n\t%s", &elobject->obname[0] ); 
+  else if( elobject ) Trace1( "\n\t%s", &elobject->obname[0] ); 
 
   for( i=0; i<ntab; i++ ) {
   
@@ -440,9 +425,8 @@ struct orbit       *elobject;	// pointer to orbital elements of object
       case 7:   doplanet(  infos);  /* Uranus */ break;
       case 8:   doplanet(  infos);  /* Neptune */ break;
       case 9:   doplanet(  infos);  /* Pluton */ break;
-      case 10:  domyobj(   infos);  /* Objet PERSO avec infos* renseignés (asc/dec) */ break;
-      case 11:  dostar(    infos);  /* inutilisé (a etudier) */ break;
-      default:  doplanet(  infos);  /* par defaut */ break;
+      case 10:  dostar(   infos);  break;
+      default:  domyobj(  infos);  break;
     }
     Trace1( "\ninfos->nom = %s\n" , infos->nom );
     Trace1( "infos->asc = %f deg\n" , infos->asc * RTD );

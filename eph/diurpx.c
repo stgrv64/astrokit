@@ -35,7 +35,7 @@ double dist; /* Earth - object distance, au */
 	/* Don't bother with this unless the equatorial horizontal parallax
 	* is at least 0.005"
 	*/
-	if( dist > 1758.8 )
+	if( dist > DIURPX_MIN_DIST_TO_CONSIDER )
 		return(-1);
 
 	DISFAC = au / (0.001 * aearth);

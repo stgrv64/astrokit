@@ -38,7 +38,6 @@ t_en_Codes_Pos ;
 - le nom    du code dans le code C (action correspondante)
 */
 
-
 static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 
 /*--------------------------------*/

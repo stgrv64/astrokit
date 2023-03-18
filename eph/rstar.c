@@ -175,8 +175,14 @@ int domyobj ( TOPOCENTRIC *infos )
 	double pol[3] ;
 	TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+	/* pol = ascension droite / declinaison et distance pour calcul de la parallaxe
+	   (correction depuis point de la Terre )
+	   => pour les objets du ciel profonds , on prend dist >  DIURPX_MIN_DIST_TO_CONSIDER
+	   (cf fichier diurpx.c)
+	*/
 	pol[0] = infos->asc ;
 	pol[2] = infos->dec ;
+	pol[3] = DIURPX_MIN_DIST_TO_CONSIDER +1 ;
 
 	altaz(infos, pol, UT ) ;
 

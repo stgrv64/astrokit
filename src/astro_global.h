@@ -98,15 +98,6 @@
 /* Defintion des format d'affichage pour les fonctions DISPLAY de chaque struct */
 /*------------------------------------------------------------------------------*/
 
-  int             dev_use_bluetooth ;
-  int             dev_use_capteurs ;
-  int             dev_use_infrarouge ;
-  int             dev_use_raquette ;
-  int             dev_use_controler ; 
-  int             dev_use_keyboard ;
-  int             dev_use_lcd ; 
-  int             dev_init_capteurs ;
-
 #define STR_AST_FORMAT_0 "(nom) %-15s (asc) %-15s (dec) %-15s (agh) %-15s (azi) %-15s (alt) %-5s (Va) %3.2f (Vh) %3.2f"
 #define STR_CAL_FORMAT_0 "(mode) %s (type) %s"
 #define STR_CAT_FORMAT_0 "(path) %s"

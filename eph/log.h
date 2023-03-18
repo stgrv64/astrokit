@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DIURPX_MIN_DIST_TO_CONSIDER 1758.8
+
 #define ASTRO_LOG_DEBUG_ARBO_APPEL_FCTS  0 /* valeurs possibles => 0    : fonctions de base , > 0 : suivantes  */
 #define DEBUG 0
 
