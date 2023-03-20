@@ -485,9 +485,10 @@ void TIME_CALCULS_HMS_VERS_DEC_DIR(double * hdec, double hou, double min, double
 /*****************************************************************************************
 * @fn     : TIME_CALCULS_DEC_VERS_HMS
 * @author : s.gravois
-* @brief  : Convertit heure decimale en heure minutes secondes decimales
+* @brief  : Convertit heure non decimale en heure minutes secondes decimales
 * @param  : STRUCT_TIME * lp_Tim
 * @date   : 2022-03-18 creation 
+* @date   : 2023-03-19 trap le cas ou heure decimale a des valeurs farfelues
 * @todo   : 
 *****************************************************************************************/
 
@@ -495,7 +496,7 @@ void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
   
   TraceArbo(__func__,3,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace2("TEMPS    decimal  = %.4f" , lp_Tim->tim_hd) ;
+  Trace2("TEMPS non decimal  = %.4f" , lp_Tim->tim_hd) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Tim->tim_mutex ) ;
 
@@ -507,13 +508,21 @@ void TIME_CALCULS_DEC_VERS_HMS(STRUCT_TIME * lp_Tim) {
     lp_Tim->tim_si   = -1 ;
     lp_Tim->tim_sig = '-' ; 
   }
+  /* ajout 2023 */
+
+  if ( lp_Tim->tim_hd > 1000 ) {
+    lp_Tim->tim_hd = 0 ;
+  } else if ( lp_Tim->tim_hd > 24 ) {
+    lp_Tim->tim_hd = (int)lp_Tim->tim_hd % 24 ;
+  }
   
   lp_Tim->tim_HH = (int)fabs(  lp_Tim->tim_hd ) ;
   lp_Tim->tim_MM = (int)fabs( (fabs(lp_Tim->tim_hd) - lp_Tim->tim_HH ) * 60.0 ) ;
   lp_Tim->tim_SS = (int)fabs(((fabs(lp_Tim->tim_hd) - lp_Tim->tim_HH ) * 60.0 - lp_Tim->tim_MM ) * 60.0 ) ;
-
+  
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Tim->tim_mutex ) ;
 
+  Trace2("heure non decimal = %f" , lp_Tim->tim_hd) ;
   Trace2("heure    decimale = %d" , lp_Tim->tim_HH) ;
   Trace2("minutes  decimale = %d" , lp_Tim->tim_MM) ;
   Trace2("secondes decimale = %d" , lp_Tim->tim_SS) ;
@@ -886,7 +895,7 @@ void   TIME_PARAMS_INIT               ( STRUCT_TIME_PARAMS * ) ;
 
 void TIME_INIT( STRUCT_TIME * lp_Tim) {
   
-  TraceArbo(__func__,3,"init time") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"init time") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tim->tim_mutex ) ;
                                      lp_Tim->tim_log      = TIME_LOG ;

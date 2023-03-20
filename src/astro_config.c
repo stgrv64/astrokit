@@ -877,16 +877,16 @@ void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *lp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_
   const char * c_type = gc_hach_astre_types [ lp_Ast->ast_typ ] ;
   const char * c_mode = gc_hach_calcul_type[ lp_Cal->cal_type ] ;
 
-  char  c_hhmmss_agh0[ 16] ;
-  char  c_hhmmss_agh1[ 16] ;
-  char  c_hhmmss_agh2[ 16] ;
+  char  c_hhmmss_agh0[ CONFIG_TAILLE_BUFFER_32] ;
+  char  c_hhmmss_agh1[ CONFIG_TAILLE_BUFFER_32] ;
+  char  c_hhmmss_agh2[ CONFIG_TAILLE_BUFFER_32] ;
 
-  char  c_hhmmss_azi0[ 16] ;
-  char  c_hhmmss_azi1[ 16] ;
-  char  c_hhmmss_azi2[ 16] ;
+  char  c_hhmmss_azi0[ CONFIG_TAILLE_BUFFER_32] ;
+  char  c_hhmmss_azi1[ CONFIG_TAILLE_BUFFER_32] ;
+  char  c_hhmmss_azi2[ CONFIG_TAILLE_BUFFER_32] ;
 
-  char  c_hhmmss_agh[ 16] ;
-  char  c_hhmmss_asc[ 16] ;
+  char  c_hhmmss_agh[ CONFIG_TAILLE_BUFFER_32] ;
+  char  c_hhmmss_asc[ CONFIG_TAILLE_BUFFER_32] ;
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -896,16 +896,14 @@ void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *lp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_
   memset( c_hhmmss_agh, 0, sizeof(c_hhmmss_agh) ) ;
   memset( c_hhmmss_asc, 0, sizeof(c_hhmmss_asc) ) ;
 
-  sprintf( c_hhmmss_agh, "%dh%dm%ds",  lp_Ast->ast_agh_t.tim_HH,  lp_Ast->ast_agh_t.tim_MM,  lp_Ast->ast_agh_t.tim_SS  ) ;
-  sprintf( c_hhmmss_asc,  "%dh%dm%ds", lp_Ast->ast_asc_t.tim_HH,  lp_Ast->ast_asc_t.tim_MM,  lp_Ast->ast_asc_t.tim_SS  ) ;
-
-  sprintf( c_hhmmss_agh0, "%dh%dm%ds", lp_Ast->ast_agh0_t.tim_HH, lp_Ast->ast_agh0_t.tim_MM, lp_Ast->ast_agh0_t.tim_SS  ) ;
-  sprintf( c_hhmmss_agh1, "%dh%dm%ds", lp_Ast->ast_agh1_t.tim_HH, lp_Ast->ast_agh1_t.tim_MM, lp_Ast->ast_agh1_t.tim_SS  ) ;
-  sprintf( c_hhmmss_agh2, "%dh%dm%ds", lp_Ast->ast_agh2_t.tim_HH, lp_Ast->ast_agh2_t.tim_MM, lp_Ast->ast_agh2_t.tim_SS  ) ;
-
-  sprintf( c_hhmmss_azi0, "%dh%dm%ds", lp_Ast->ast_azi0_t.tim_HH, lp_Ast->ast_azi0_t.tim_MM, lp_Ast->ast_azi0_t.tim_SS  ) ;
-  sprintf( c_hhmmss_azi1, "%dh%dm%ds", lp_Ast->ast_azi1_t.tim_HH, lp_Ast->ast_azi1_t.tim_MM, lp_Ast->ast_azi1_t.tim_SS  ) ;
-  sprintf( c_hhmmss_azi2, "%dh%dm%ds", lp_Ast->ast_azi2_t.tim_HH, lp_Ast->ast_azi2_t.tim_MM, lp_Ast->ast_azi2_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh,  "%3dh%2dm%2ds",  lp_Ast->ast_agh_t.tim_HH,  lp_Ast->ast_agh_t.tim_MM,  lp_Ast->ast_agh_t.tim_SS  ) ;
+  sprintf( c_hhmmss_asc,  "%3dh%2dm%2ds", lp_Ast->ast_asc_t.tim_HH,  lp_Ast->ast_asc_t.tim_MM,  lp_Ast->ast_asc_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh0, "%3dh%2dm%2ds", lp_Ast->ast_agh0_t.tim_HH, lp_Ast->ast_agh0_t.tim_MM, lp_Ast->ast_agh0_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh1, "%3dh%2dm%2ds", lp_Ast->ast_agh1_t.tim_HH, lp_Ast->ast_agh1_t.tim_MM, lp_Ast->ast_agh1_t.tim_SS  ) ;
+  sprintf( c_hhmmss_agh2, "%3dh%2dm%2ds", lp_Ast->ast_agh2_t.tim_HH, lp_Ast->ast_agh2_t.tim_MM, lp_Ast->ast_agh2_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi0, "%3dh%2dm%2ds", lp_Ast->ast_azi0_t.tim_HH, lp_Ast->ast_azi0_t.tim_MM, lp_Ast->ast_azi0_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi1, "%3dh%2dm%2ds", lp_Ast->ast_azi1_t.tim_HH, lp_Ast->ast_azi1_t.tim_MM, lp_Ast->ast_azi1_t.tim_SS  ) ;
+  sprintf( c_hhmmss_azi2, "%3dh%2dm%2ds", lp_Ast->ast_azi2_t.tim_HH, lp_Ast->ast_azi2_t.tim_MM, lp_Ast->ast_azi2_t.tim_SS  ) ;
 
   Trace(" %s : infos         : %s", c_nom , lp_Ast->ast_infos ) ;
   Trace(" %s : type          : %s", c_nom , c_type ) ;

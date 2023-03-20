@@ -13,6 +13,7 @@ octobre 2022 :  * creation
 
 STRUCT_ANGLE            g_Angle,              *gp_Ang ;
 STRUCT_ASTRE            g_Astre,              *gp_Ast ;
+STRUCT_ASTRE            g_AstSav,             *gp_AstSav ;
 STRUCT_CALCULS          g_Calculs,            *gp_Cal ; 
 STRUCT_CAT              g_Cat_Ngc,            *gp_Ngc ;
 STRUCT_CAT              g_Cat_Eto,            *gp_Eto ;
@@ -95,6 +96,7 @@ void ASTRO_GLOBAL_INIT(void) {
 
   gp_Ang      = & g_Angle ;
   gp_Ast      = & g_Astre ;
+  gp_AstSav   = & g_AstSav ;
   gp_Cal      = & g_Calculs ;
   gp_Ngc      = & g_Cat_Ngc ;
   gp_Eto      = & g_Cat_Eto ;
@@ -212,7 +214,7 @@ void ASTRO_GLOBAL_LOG_ON(int * lp_loglevel) {
 
 void ASTRO_GLOBAL_LOG_OFF( int * lp_loglevel) {
 
-  TraceArbo(__func__,2,"log on") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,2,"log off") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
           
   *lp_loglevel = 0 ; 
                      

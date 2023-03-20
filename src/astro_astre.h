@@ -67,6 +67,7 @@ struct STR_ASTRE {
   void          (*ast_unlock)     ( STRUCT_ASTRE *) ;  
   void          (*ast_log)        ( STRUCT_ASTRE *) ;
   void          (*ast_display)    ( STRUCT_ASTRE *) ;
+  void          (*ast_display_format_datas) ( STRUCT_ASTRE * ) ;
   char            ast_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char            ast_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
@@ -103,7 +104,8 @@ struct STR_ASTRE {
   double          ast_agh ;     // angle horaire  ( = gp_Lie->tps_mic sideral - ASC)
   double          ast_dec  ;    // un resultat de calcul de declinaison
   double          ast_asc  ;    // un resultat de calcul de asc
-
+  double          ast_asc_sav ;
+  double          ast_dec_sav ;
   /* --------------------------------------------
   *  on deduit de l'azimut(h) et de l'altitude (a)
   *  les coordonnees x y et z dans la geode d'observation de rayon 1
@@ -137,26 +139,26 @@ struct STR_ASTRE {
   
   /* formatage des informations de coordonnnes sur l astre */
 
-  char            ast_hhmmss_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmmss_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmmss_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmmss_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmmss_dec[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_hhmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_ddmm_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_ddmm_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_ddmm_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_ddmm_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_ddmm_dec[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_dd_agh[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_dd_asc[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_dd_azi[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_dd_alt[ CONFIG_TAILLE_BUFFER_16] ;
-  char            ast_dd_dec[ CONFIG_TAILLE_BUFFER_16] ;
+  char            ast_hhmmss_agh[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmmss_asc[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmmss_azi[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmmss_alt[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmmss_dec[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_hhmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_ddmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_ddmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_ddmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_ddmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_ddmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dd_agh    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dd_asc    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dd_azi    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dd_alt    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dd_dec    [ CONFIG_TAILLE_BUFFER_32 ] ;
 
 } ;
 

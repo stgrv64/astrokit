@@ -51,6 +51,8 @@ int altaz(infos,  pol, J )
   dec  = pol[1];
   dist = pol[2];
 
+  Trace("infos->nom = %s", infos->nom) ;
+
   Trace("asc %.2f dec %.2f alt %.2f : ",\
     pol[0], \
     pol[1] * RTD, \

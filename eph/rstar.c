@@ -181,8 +181,8 @@ int domyobj ( TOPOCENTRIC *infos )
 	   (cf fichier diurpx.c)
 	*/
 	pol[0] = infos->asc ;
-	pol[2] = infos->dec ;
-	pol[3] = DIURPX_MIN_DIST_TO_CONSIDER +1 ;
+	pol[1] = infos->dec ;
+	pol[2] = DIURPX_MIN_DIST_TO_CONSIDER +1 ;
 
 	altaz(infos, pol, UT ) ;
 

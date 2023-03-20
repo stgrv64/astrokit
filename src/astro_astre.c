@@ -128,6 +128,7 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
                                      lp_Ast->ast_unlock   = ASTRE_UNLOCK ;
                                      lp_Ast->ast_log      = ASTRE_LOG ;
                                      lp_Ast->ast_display  = ASTRE_DISPLAY ;
+                        lp_Ast->ast_display_format_datas  = ASTRE_FORMATE_DONNEES_AFFICHAGE ;                 
                                      lp_Ast->ast_loglevel = 0 ;
                                      lp_Ast->ast_file     = NULL ;
   gettimeofday ( &                   lp_Ast->ast_tval, NULL ) ;
@@ -140,13 +141,15 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   memset( lp_Ast->ast_infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   memset( lp_Ast->ast_plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
   
-  lp_Ast->ast_azi    = 0 ;
-  lp_Ast->ast_alt    = 0 ;
-  lp_Ast->ast_agh  = 0 ; 
-  lp_Ast->ast_asc  = 0 ;
-  lp_Ast->ast_dec  = 0 ;
-  lp_Ast->ast_azi_vit   = 0 ;
-  lp_Ast->ast_alt_vit   = 0 ;
+  lp_Ast->ast_azi     = 0 ;
+  lp_Ast->ast_alt     = 0 ;
+  lp_Ast->ast_agh     = 0 ; 
+  lp_Ast->ast_asc     = 0 ;
+  lp_Ast->ast_dec     = 0 ;
+  lp_Ast->ast_asc_sav = 0 ;
+  lp_Ast->ast_dec_sav = 0 ;
+  lp_Ast->ast_azi_vit = 0 ;
+  lp_Ast->ast_alt_vit = 0 ;
   lp_Ast->ast_r3_x    = 0 ;
   lp_Ast->ast_r3_xx   = 0 ;
   lp_Ast->ast_r3_y    = 0 ;
@@ -278,29 +281,26 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
 
 void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
 
-  char  c_hhmmss_agh[ 16] ;
-  char  c_hhmmss_asc[ 16] ;
-  char  c_hhmmss_azi[ 16] ;
-  char  c_hhmmss_alt[ 16] ;
-  char  c_hhmmss_dec[ 16] ;
-
-  char  c_hhmm_agh[ 16] ;
-  char  c_hhmm_asc[ 16] ;
-  char  c_hhmm_azi[ 16] ;
-  char  c_hhmm_alt[ 16] ;
-  char  c_hhmm_dec[ 16] ;
-
-  char  c_ddmm_agh[ 16] ;
-  char  c_ddmm_asc[ 16] ;
-  char  c_ddmm_azi[ 16] ;
-  char  c_ddmm_alt[ 16] ;
-  char  c_ddmm_dec[ 16] ;
-
-  char  c_dd_agh[ 16] ;
-  char  c_dd_asc[ 16] ;
-  char  c_dd_azi[ 16] ;
-  char  c_dd_alt[ 16] ;
-  char  c_dd_dec[ 16] ;
+  char  c_hhmmss_agh[ CONFIG_TAILLE_BUFFER_32] ;
+  char  c_hhmmss_asc[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmmss_azi[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmmss_alt[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmmss_dec[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_hhmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_ddmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_ddmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_ddmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_ddmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_ddmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_dd_agh    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_dd_asc    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_dd_azi    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_dd_alt    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char  c_dd_dec    [ CONFIG_TAILLE_BUFFER_32 ] ;
 
   TraceArbo(__func__,2,"format astre display datas") ;
 

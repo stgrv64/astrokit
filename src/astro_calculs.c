@@ -16,6 +16,8 @@
 # 
 # mars  2022  | * reprise des calculs et ajout de fonctions de conversions
 #               * correction deuxieme argument appel SOLAR_SYSTEM
+#               * ajouts macros xxx_SIN et xxx_COS xxx_TAN pour prevoir assert() prealable
+#                 avant injection dans fonctions acos, asin, atan
 # -------------------------------------------------------------- 
 */
 
@@ -78,20 +80,25 @@ cos (azi) = {sin (dec) - sin (alt) sin (lat)} / { cos (alt) cos (lat)}
 - azimut 0 / 360 au nord , 
 */
 
-double DEC  (double lat, double azi, double alt)     { return asin( sin(lat)*sin(alt) + cos(lat)*cos(alt)*cos(azi));}
-double ALT  (double lat, double agh, double dec)     { return asin( sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(agh));}
+double DEC_SIN  (double lat, double azi, double alt)               { return  sin(lat)*sin(alt) + cos(lat)*cos(alt)*cos(azi);}
+double ALT_SIN  (double lat, double agh, double dec)               { return  sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(agh);}
+double AGH0_SIN (double azi,  double alt, double dec)              { return  -1.0 * sin(azi) * cos(alt) / cos(dec);}
+double AZI0_SIN (double agh,  double dec, double alt)              { return  -1.0 * sin(agh) * cos(dec) / cos(alt);}
+double AGH1_COS  (double lat, double azi, double alt, double dec)  { return (sin(lat)*cos(alt)*cos(azi)-cos(lat)*sin(alt))/cos(dec) ;}
+double AZI1_COS  (double lat, double agh, double dec, double alt)  { return (sin(lat)*cos(dec)*cos(agh)-cos(lat)*sin(dec))/cos(alt) ;}
+double AGH2_COS (double lat, double dec, double alt)               { return ((sin(alt) - sin(dec)*sin(lat)) / cos(dec)) * cos(lat)  ;}
+double AZI2_COS (double lat, double alt, double dec)               { return ( sin(dec) - sin(alt)*sin(lat)) / ( cos(alt) * cos(lat)) ;}
 
-double AGH0 (double azi,  double alt, double dec)     { return asin( -1.0 * sin(azi) * cos(alt) / cos(dec));}
-double AZI0 (double agh,  double dec, double alt)     { return asin( -1.0 * sin(agh) * cos(dec) / cos(alt));}
-
+double DEC  (double lat, double azi, double alt)               { return asin( sin(lat)*sin(alt) + cos(lat)*cos(alt)*cos(azi));}
+double ALT  (double lat, double agh, double dec)               { return asin( sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(agh));}
+double AGH0 (double azi,  double alt, double dec)              { return asin( -1.0 * sin(azi) * cos(alt) / cos(dec));}
+double AZI0 (double agh,  double dec, double alt)              { return asin( -1.0 * sin(agh) * cos(dec) / cos(alt));}
 double AGH1  (double lat, double azi, double alt, double dec)  { return acos((sin(lat)*cos(alt)*cos(azi)-cos(lat)*sin(alt))/cos(dec)) ;}
 double AZI1  (double lat, double agh, double dec, double alt)  { return acos((sin(lat)*cos(dec)*cos(agh)-cos(lat)*sin(dec))/cos(alt)) ;}
-
-double AGH2 (double lat, double dec, double alt)   { return acos(((sin(alt) - sin(dec)*sin(lat)) / cos(dec)) * cos(lat) ) ;}
-double AZI2 (double lat, double alt, double dec)   { return acos(( sin(dec) - sin(alt)*sin(lat)) / ( cos(alt) * cos(lat))) ;}
-
-double RAD  (int degres, int minutes )                  { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / CALCULS_UN_RADIAN_EN_DEGRES ; }
-double DEG  (int degres, int minutes )                  { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
+double AGH2 (double lat, double dec, double alt)               { return acos(((sin(alt) - sin(dec)*sin(lat)) / cos(dec)) * cos(lat) ) ;}
+double AZI2 (double lat, double alt, double dec)               { return acos(( sin(dec) - sin(alt)*sin(lat)) / ( cos(alt) * cos(lat))) ;}
+double RAD  (int degres, int minutes )                         { return ((double)degres + ( SGN(degres)*(double)minutes) / 60.0 ) / CALCULS_UN_RADIAN_EN_DEGRES ; }
+double DEG  (int degres, int minutes )                         { return (double)degres  + ( SGN(degres)*(double)minutes) / 60.0 ; }
 
 
 /*****************************************************************************************
@@ -430,6 +437,7 @@ void CALCULS_COORD_R3(STRUCT_ASTRE * lp_Ast) {
 * @param  : STRUCT_LIEU  * gp_Lie
 * @param  : STRUCT_ASTRE * gp_Ast
 * @date   : 2022-10-11 creation entete doxygen 
+* @todo   : TODO : ajouter MACRO assert pour exclure les cas particuliers
 *****************************************************************************************/
 
 void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
@@ -442,7 +450,15 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
   // gp_Ast->ast_agh  = TS - (asc droite absolue)
   // Une fonction de calcul du temps sid�ral doit etre faite ult�rieurement 
   
-  double lat,A,H,a0,h,a1,a2,af ;
+  double lat = 0 ;
+  double A = 0 ;
+  double H = 0 ; 
+  double a0 = -1 ;
+  double h = 0; 
+  double a1 = -1 ; 
+  double a2 = -1 ; 
+  double af = -1 ;
+  double f_assert = 0 ; 
   
   TraceArbo(__func__,2,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
@@ -469,16 +485,45 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
 
   /* calculs a partir des variables locales recuperees */
 
+  Trace1("lat A H : %f %f %f", lat, A, H ) ;
   h  = ALT(lat,A,H) ;
+  Trace1("h : %f", h) ;
   a0 = AZI0(A,H,h) ;
-  a1 = AZI1(lat,A,H,h) ;
-  a2 = AZI2(lat,h,H) ;
+  Trace1("a0 : %f", a0) ;
+
+  Trace1("sin lat : %f", sin(lat))  ;
+  Trace1("cos H   : %f", cos(H))  ;
+  Trace1("cos A   : %f", cos(A))  ;
+  Trace1("cos lat : %f", cos(lat))  ;
+  Trace1("sin H   : %f", sin(H))  ;
+  Trace1("cos h   : %f", cos(h))  ;
+
+  /* La condition AZI1_SIN et AZI2_SIN == 1 sont a proscrire = valeurs limites pour angle horaire == 0 */
+
+  if( (sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h) > 0.999999 ) {
+
+    Trace("sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h) > 0.999999");
+    a1=M_PI ;
+    a2=M_PI ;
+  }
+  else {
+    Trace1("(sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H)        : %f", sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H) )  ;
+    Trace1("(sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H)/cos(h) : %f", (sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h) )  ;
+    a1 = acos((sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h)) ;
+    Trace1("a1 : %f", a1)  ;
+    a1 = AZI1(lat,A,H,h) ;
+    Trace1("a1 : %f", a1)  ;
+    a2 = AZI2(lat,h,H) ;
+    Trace1("a2 : %f", a2)  ;
+    Trace1("%f %f %f %f", h, a0, a1, a2) ;
+  }
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &gp_Ast->ast_mutex ) ;
 
   gp_Ast->ast_alt = h ;
   gp_Ast->ast_azi = SGN(a0)*a2 ;
 
+  Trace1("%f %f", gp_Ast->ast_alt, gp_Ast->ast_azi) ;
   /* Si azimut negatif on ajoute 360 degres */  
   
   if ( gp_Ast->ast_azi < 0 ) {
@@ -917,6 +962,7 @@ void CALCULS_PERIODES_SUIVI_MANUEL(STRUCT_ASTRE * lp_Ast, STRUCT_SUIVI_PAS * lp_
 * @brief  : Convertit angle en heure minutes secondes decimales
 * @param  : STRUCT_ANGLE *lp_Ang
 * @date   : 2022-03-18 creation 
+* @date   : 2023-03-19 trap le cas ou heure decimale a des valeurs farfelues
 * @todo   : ras
 *****************************************************************************************/
 
@@ -938,11 +984,19 @@ void CALCULS_ANGLE_VERS_DMS(STRUCT_ANGLE *lp_Ang) {
     lp_Ang->ang_si = -1 ;
     lp_Ang->ang_sig = '-' ;
   }
+  /* ajout 2023 */
 
+  if ( lp_Ang->ang_dec_deg > 10000 ) {
+    lp_Ang->ang_dec_deg = 0 ;
+  }
+  else if ( lp_Ang->ang_dec_deg > 360 ) {
+    lp_Ang->ang_dec_deg = (int)lp_Ang->ang_dec_deg % 360 ;
+  }
+  
   lp_Ang->ang_dd = (int)fabs(       lp_Ang->ang_dec_deg ) ;
   lp_Ang->ang_mm = (int)fabs( (fabs(lp_Ang->ang_dec_deg) - lp_Ang->ang_dd ) * 60.0 ) ;
   lp_Ang->ang_ss = (int)fabs(((fabs(lp_Ang->ang_dec_deg) - lp_Ang->ang_dd ) * 60.0 - lp_Ang->ang_mm ) * 60.0 ) ;
-
+  
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ang->ang_mutex ) ;
 
   Trace2("minutes  decimale = %d" , lp_Ang->ang_mm) ;
@@ -964,33 +1018,49 @@ void CALCULS_ANGLE_VERS_DMS(STRUCT_ANGLE *lp_Ang) {
 
 void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
   
-  TraceArbo(__func__,3,"calculate astre angles converrsions") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"calculate astre angles converrsions") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* ----------------------------*/
   /* azimut et altitude          */
   /* ----------------------------*/
 
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
+  Trace1("lp_Ast->ast_azi = %f" , lp_Ast->ast_azi) ;
+
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex) ;
 
-  (lp_Ast->ast_at).tim_hd         = lp_Ast->ast_azi * 24.0 / CALCULS_PI_FOIS_DEUX ;
-  (lp_Ast->ast_ht).tim_hd         = lp_Ast->ast_alt * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  Trace1("lp_Ast->ast_azi = %f" , lp_Ast->ast_azi) ;
+  (lp_Ast->ast_at).tim_hd = lp_Ast->ast_azi * 24.0 / CALCULS_PI_FOIS_DEUX ;
 
+   Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
+
+  (lp_Ast->ast_ht).tim_hd = lp_Ast->ast_alt * 24.0 / CALCULS_PI_FOIS_DEUX ;
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
   (lp_Ast->ast_azi_a).ang_dec_rad = lp_Ast->ast_azi ;
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
   (lp_Ast->ast_azi_a).ang_dec_deg = lp_Ast->ast_azi * CALCULS_UN_RADIAN_EN_DEGRES ;
-
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
   (lp_Ast->ast_alt_a).ang_dec_rad = lp_Ast->ast_alt ;
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
   (lp_Ast->ast_alt_a).ang_dec_deg = lp_Ast->ast_alt * CALCULS_UN_RADIAN_EN_DEGRES ;
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
 
   /* -----------------------------*/
   /* angle horaire et declinaison */
   /* ascension droite             */
   /* -----------------------------*/
 
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
+
+
   (lp_Ast->ast_agh_t).tim_hd = lp_Ast->ast_agh * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_dec_t).tim_hd = lp_Ast->ast_dec * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_asc_t).tim_hd  = lp_Ast->ast_asc * 24.0 / CALCULS_PI_FOIS_DEUX ;
 
   /* -------------------------------*/
+
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
+
 
   (lp_Ast->ast_agh_a).ang_dec_rad = lp_Ast->ast_agh ;
   (lp_Ast->ast_agh_a).ang_dec_deg = lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES ;
@@ -1003,6 +1073,9 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
   /* les calculs intermediaires     */
   /* -------------------------------*/
 
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
+
+
   (lp_Ast->ast_agh0_t).tim_hd = lp_Ast->ast_agh0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_agh1_t).tim_hd = lp_Ast->ast_agh1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_agh2_t).tim_hd = lp_Ast->ast_agh2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
@@ -1011,6 +1084,8 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
   (lp_Ast->ast_azi2_t).tim_hd = lp_Ast->ast_azi2 * 24.0 / CALCULS_PI_FOIS_DEUX ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
+
+    Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
 
   TIME_CALCULS_DEC_VERS_HMS ( & lp_Ast->ast_at    ) ;
   TIME_CALCULS_DEC_VERS_HMS ( & lp_Ast->ast_ht    ) ;
@@ -1326,12 +1401,35 @@ void CALCULS_TOUT(void) {
     /* ----------------------------------------------------------------- */
 
     case ASTRE_CIEL_PROFOND :
-    
+
+      Trace("-----------------------------------------------------") ;
+      
+      memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
+/*
       CALCULS_ANGLE_HORAIRE(gp_Ast) ;
       CALCULS_AZIMUT(gp_Ast) ;
       CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
       CALCULS_PERIODE(gp_Ast) ;
-      
+
+      gp_Ast->ast_display_format_datas(gp_Ast) ;
+      gp_Ast->ast_display(gp_Ast) ;
+
+      memcpy( gp_Ast, gp_AstSav, sizeof( STRUCT_ASTRE) ) ;  
+*/
+      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+      CALCULS_SOLAR_SYSTEM( gp_Ast, gp_Lie, gp_Tim ) ;
+/*
+      gp_Ast->ast_display_format_datas(gp_Ast) ;
+      gp_Ast->ast_display(gp_Ast) ;
+*/
+      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+      CALCULS_PERIODE(gp_Ast) ;
+
+      gp_Ast->ast_display_format_datas(gp_Ast) ;
+      gp_Ast->ast_display(gp_Ast) ;
+
+      memcpy( gp_Ast, gp_AstSav, sizeof( STRUCT_ASTRE)  ) ; 
+
       break ;
     /* ----------------------------------------------------------------- */
     

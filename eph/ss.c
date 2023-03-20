@@ -349,7 +349,8 @@ void SOLAR_SYSTEM( \
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace1("numero objet = %d", num) ;
+  Trace("nom = %s", nom) ;
+  Trace("num = %d", num) ;
   
   Trace1("RTD = %f", RTD) ;
   infos = &inf ;
@@ -401,7 +402,13 @@ struct orbit       *elobject;	// pointer to orbital elements of object
     case 8:  elobject = &neptune; strcpy( infos->nom, "neptune" ) ; break;
     case 9:  elobject = &pluto;   strcpy( infos->nom, "pluton" ) ;  break;
     case 10: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); break ;
-    default: elobject = 0 ;
+    /* FIXME : default = ciel profond */
+    default: elobject = 0 ; 
+      infos->asc = *ASC  ;
+      infos->dec = *H ;
+      infos->azi = 0 ;
+      infos->alt = 0 ;
+      strcpy( infos->nom, nom ) ; break ;
   }
 
   if( elobject == (struct orbit *)&fstar ) showcname( &elobject->obname[0] ); // fonction
@@ -411,7 +418,6 @@ struct orbit       *elobject;	// pointer to orbital elements of object
   
     Trace1( "\nJD %.2f,", JD );
     update(); 
-
     kepler( TDT, &earth, rearth, eapolar );
 
     switch( objnum ) {
@@ -443,6 +449,8 @@ struct orbit       *elobject;	// pointer to orbital elements of object
   *H = infos->dec  ;
   *a = infos->azi ;
   *h = infos->alt ;
+
+  return ;
 }
 /*****************************************************************************************
 * @fn     : mainSS

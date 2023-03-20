@@ -98,7 +98,7 @@
 /* Defintion des format d'affichage pour les fonctions DISPLAY de chaque struct */
 /*------------------------------------------------------------------------------*/
 
-#define STR_AST_FORMAT_0 "(nom) %-15s (asc) %-15s (dec) %-15s (agh) %-15s (azi) %-15s (alt) %-5s (Va) %3.2f (Vh) %3.2f"
+#define STR_AST_FORMAT_0 "(nom) %-15s (asc) %-10s (dec) %-10s (agh) %-10s (azi) %-10s (alt) %-5s (Va) %3.2f (Vh) %3.2f"
 #define STR_CAL_FORMAT_0 "(mode) %s (type) %s"
 #define STR_CAT_FORMAT_0 "(path) %s"
 #define STR_COD_FORMAT_0 "(in_lirc) %s (in_termios) %s (out_action) %s"
@@ -125,10 +125,11 @@
 /* Defintion des Macros pour tout le code qui n'est pas de type log             */
 /*------------------------------------------------------------------------------*/
 
+/* fprintf(stdout,"\nloglevel %d nb %d\n", loglevel, nb ) ; \ */
+
 #define MACRO_ASTRO_GLOBAL_LOG(loglevel,nb,fmt, args...) \
 do { \
   if (loglevel>=nb) { \
-    fprintf(stdout,"\nloglevel %d nb %d\n", loglevel, nb ) ; \
     fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
   } \
 } \
@@ -281,6 +282,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
 #define MACRO_ASTRO_GLOBAL_EXTERN_STRUCT \
   extern STRUCT_ANGLE            g_Angle,              *gp_Ang ; \
   extern STRUCT_ASTRE            g_Astre,              *gp_Ast ; \
+  extern STRUCT_ASTRE            g_AstSav,             *gp_AstSav ; \
   extern STRUCT_CALCULS          g_Calculs,            *gp_Cal ; \
   extern STRUCT_CAT              g_Cat_Ngc,            *gp_Ngc ; \
   extern STRUCT_CAT              g_Cat_Eto,            *gp_Eto ; \

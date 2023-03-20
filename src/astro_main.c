@@ -918,6 +918,7 @@ int main(int argc, char ** argv) {
   CODES_INIT                 ( gp_Cod ) ;
   VOUTE_INIT                 ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
   ASTRE_INIT                 ( gp_Ast ) ;
+  ASTRE_INIT                 ( gp_AstSav ) ;
   KEYS_INIT                  ( gp_Key ) ;
   DEVICES_INIT               ( gp_Dev ) ;
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
