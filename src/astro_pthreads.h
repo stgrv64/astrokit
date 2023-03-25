@@ -7,6 +7,7 @@
 # --------------------------------------------------------------
 # 2022-06-01  | * creation
 # 2022-06-01  | * rapatriement code depuis astro_config.h
+# 2023-03-25  | * modif t_en_Pthreads_Usleep_Before_Start
 # -------------------------------------------------------------- 
 */
 
@@ -49,6 +50,27 @@ typedef enum {
 t_en_Pthreads_Phases ;
 
 typedef enum {
+  PTHREAD_T_MOT_ALT_PHASE_0 = 0,
+  PTHREAD_T_MOT_ALT_PHASE_1 ,
+  PTHREAD_T_MOT_ALT_PHASE_2 ,
+  PTHREAD_T_MOT_ALT_PHASE_3 ,
+  PTHREAD_T_MOT_AZI_PHASE_0 ,
+  PTHREAD_T_MOT_AZI_PHASE_1 ,
+  PTHREAD_T_MOT_AZI_PHASE_2 ,
+  PTHREAD_T_MOT_AZI_PHASE_3 ,              
+  PTHREAD_T_MOT_ALT    ,
+  PTHREAD_T_MOT_AZI    ,
+  PTHREAD_T_MENU       ,
+  PTHREAD_T_VOUTE      ,
+  PTHREAD_T_INFRA      ,
+  PTHREAD_T_LCD        ,
+  PTHREAD_T_CLAVIER    ,
+  PTHREAD_T_CAPTEUR    ,
+  PTHREAD_T_MAIN
+} 
+t_en_Pthreads_T ;
+
+typedef enum {
   PTHREAD_POLICY_0=0,
   PTHREAD_POLICY_1,
   PTHREAD_POLICY_2,
@@ -73,35 +95,15 @@ typedef enum {
 t_en_Pthreads_Type ;
 
 typedef enum {
-  PTHREAD_T_MOT_ALT_PHASE_0 = 0,
-  PTHREAD_T_MOT_ALT_PHASE_1 ,
-  PTHREAD_T_MOT_ALT_PHASE_2 ,
-  PTHREAD_T_MOT_ALT_PHASE_3 ,
-  PTHREAD_T_MOT_AZI_PHASE_0 ,
-  PTHREAD_T_MOT_AZI_PHASE_1 ,
-  PTHREAD_T_MOT_AZI_PHASE_2 ,
-  PTHREAD_T_MOT_AZI_PHASE_3 ,              
-  PTHREAD_T_MOT_ALT    ,
-  PTHREAD_T_MOT_AZI    ,
-  PTHREAD_T_MENU       ,
-  PTHREAD_T_VOUTE      ,
-  PTHREAD_T_INFRA      ,
-  PTHREAD_T_LCD        ,
-  PTHREAD_T_CLAVIER    ,
-  PTHREAD_T_CAPTEUR    ,
-  PTHREAD_T_MAIN
-} 
-t_en_Pthreads_T ;
-
-typedef enum {
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_PHASES = 250000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_MAIN   = 500000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA      = 500000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD        = 500000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER    = 500000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU       = 500000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR    = 500000,
-  PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE      = 1000000
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_PHASES = 2500,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_MOTOR  = 2500,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU       = 5000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE      = 7500,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA      = 5000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD        = 5000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER    = 5000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR    = 5000,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_MAIN       = 5000
 }
 t_en_Pthreads_Usleep_Before_Start ;
 
@@ -123,6 +125,7 @@ struct STR_PTHREADS_ATTRIBUTS {
   int                att_sta ;
   pthread_t          att_pid  ;
   int                att_ord ;
+  int                att_slp ;
   int                att_nbc ;
   struct sched_param att_pri ; 
   int                att_bef ;
@@ -165,6 +168,7 @@ struct STR_PTHREADS {
   STRUCT_PTHREADS_ATTRIBUTS pth_att [ PTHREADS_MAX_THREADS ]  ; 
   pthread_t                 pth_t   [ PTHREADS_MAX_THREADS ]  ;  
   unsigned int              pth_i_nb ; 
+  unsigned int              pth_i_usleep_before_while ;
 } ;
 
        void PTHREADS_INIT_MUTEXS     (void) ;

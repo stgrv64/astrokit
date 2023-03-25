@@ -1355,7 +1355,8 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
 
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  sleep(1) ;
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  // sleep(1) ;
 
   d_TUpwm = d_TUpwm_haut  = d_TUpwm_bas = d_rap = 0 ;
 

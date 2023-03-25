@@ -438,6 +438,7 @@ void CALCULS_COORD_R3(STRUCT_ASTRE * lp_Ast) {
 * @param  : STRUCT_ASTRE * gp_Ast
 * @date   : 2022-10-11 creation entete doxygen 
 * @todo   : TODO : ajouter MACRO assert pour exclure les cas particuliers
+* @todo   : TODO : deplacer du code a l exterieur
 *****************************************************************************************/
 
 void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
@@ -538,6 +539,8 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &gp_Ast->ast_mutex ) ;
 
+  /* 2023 : deplacement code suivant a un niveau plus haut */
+/*
   CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
 
   Trace2("AZI0 = %d.%d.%d (hms) %.2f (deg)", \
@@ -565,7 +568,7 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
     gp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES );
 
   Trace1("alt = %f (deg)" , (gp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES) ;
-
+*/
   return ;
 }
 
@@ -639,6 +642,8 @@ void CALCULS_EQUATEUR(STRUCT_ASTRE * lp_Ast) {
   
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ;
 
+  /* 2023 : deplacement code suivant a un niveau plus haut */
+/*
   CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
   
   Trace1(" %s : ASC = %d.%d.%d (hms) %.2f (deg) %.2f (rad)", \
@@ -681,7 +686,7 @@ void CALCULS_EQUATEUR(STRUCT_ASTRE * lp_Ast) {
    (lp_Ast->ast_alt)*CALCULS_UN_RADIAN_EN_DEGRES,\
    (lp_Ast->ast_agh)*CALCULS_UN_RADIAN_EN_DEGRES,\
    (lp_Ast->ast_dec)*CALCULS_UN_RADIAN_EN_DEGRES) ;
-
+*/
    return ;
 } 
 
@@ -1145,8 +1150,10 @@ void CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex );
 
+  /* 2023 : deplacement code suivant a un niveau plus haut */
+/*
   CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
-  
+*/  
   Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
   Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
@@ -1191,8 +1198,10 @@ void CALCULS_ASCENSION_DROITE(STRUCT_ASTRE * lp_Ast) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex );
 
+  /* 2023 : deplacement code suivant a un niveau plus haut */
+/*
   CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
-  
+*/  
   Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
   Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
@@ -1389,10 +1398,12 @@ void CALCULS_TOUT(void) {
         
         CALCULS_EQUATEUR(gp_Ast) ;
         CALCULS_ASCENSION_DROITE(gp_Ast) ;
+        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
       }
       else {
         CALCULS_ANGLE_HORAIRE(gp_Ast) ;
         CALCULS_AZIMUT(gp_Ast) ;
+        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
       }
       CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
       CALCULS_PERIODE(gp_Ast) ;
@@ -1405,31 +1416,25 @@ void CALCULS_TOUT(void) {
       Trace("-----------------------------------------------------") ;
       
       memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
-/*
-      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
-      CALCULS_AZIMUT(gp_Ast) ;
-      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-      CALCULS_PERIODE(gp_Ast) ;
 
-      gp_Ast->ast_display_format_datas(gp_Ast) ;
-      gp_Ast->ast_display(gp_Ast) ;
-
-      memcpy( gp_Ast, gp_AstSav, sizeof( STRUCT_ASTRE) ) ;  
-*/
       CALCULS_ANGLE_HORAIRE(gp_Ast) ;
       CALCULS_SOLAR_SYSTEM( gp_Ast, gp_Lie, gp_Tim ) ;
-/*
+      CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
+
       gp_Ast->ast_display_format_datas(gp_Ast) ;
       gp_Ast->ast_display(gp_Ast) ;
-*/
+/*
+      memcpy( gp_Ast, gp_AstSav, sizeof( STRUCT_ASTRE) ) ;  
+
+      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+      CALCULS_AZIMUT(gp_Ast) ;
+      CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
       CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
       CALCULS_PERIODE(gp_Ast) ;
 
       gp_Ast->ast_display_format_datas(gp_Ast) ;
       gp_Ast->ast_display(gp_Ast) ;
-
-      memcpy( gp_Ast, gp_AstSav, sizeof( STRUCT_ASTRE)  ) ; 
-
+*/
       break ;
     /* ----------------------------------------------------------------- */
     

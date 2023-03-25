@@ -34,6 +34,8 @@ static void ASTRE_DISPLAY_PREPARE ( STRUCT_ASTRE * lp_Ast) {
 
   TraceArbo(__func__,2,"astre format display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  ASTRE_FORMATE_DONNEES_AFFICHAGE(lp_Ast) ;
+  
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
 
   sprintf( lp_Ast->ast_dis_cmd , STR_AST_FORMAT_0,\

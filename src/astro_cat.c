@@ -418,7 +418,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
     strcpy( lp_Ast->ast_nom, "undefined" ) ;
     strcpy( lp_Ast->ast_infos, "undefined" ) ;
   }
-
+/* 2023 : deplacment code suivant a un niveau plus haut */
+/*
   CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
 
   Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
@@ -428,7 +429,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
     lp_Ast->ast_asc_t.tim_SS, \
     lp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES
   ) ; 
-
+*/
   return ; 
 }
 /*****************************************************************************************

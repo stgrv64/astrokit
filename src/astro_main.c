@@ -221,9 +221,11 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
  
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_MENU ) ;
-   
+
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */ 
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU ) ;
-  
+  */
   SUIVI_MENU_BEFORE_WHILE ( gp_Sui) ;
 
   //-------------------------------------------------------------------------------
@@ -456,9 +458,11 @@ void * _SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_INFRARED ) ;
-  
+
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA ) ;
-  
+  */
   if ( gp_Dev->dev_use_infrarouge ) {
   
     i_ret = INFRARED_OPEN( gp_LircConfig ) ;
@@ -501,9 +505,12 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 
   memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
   memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
-    
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
   
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  /*      
+  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
+  */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     gp_Lcd->default_display() ;
@@ -580,8 +587,10 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-    
+  */    
   if ( gp_Dev->dev_use_keyboard ) {
 
     /* Debut boucle _SUIVI_CLAVIER_TERMIOS */
@@ -673,8 +682,10 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  
+  */
   if ( gp_Dev->dev_use_keyboard ) {
 
     /* Debut boucle SUIVI_CLAVIER_getchar */
@@ -718,8 +729,10 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  
+  */
   if ( gp_Dev->dev_use_keyboard ) {
 
     // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
@@ -788,8 +801,10 @@ void * _SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CAPTEURS ) ;
 
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
-
+  */
   lp_I2c = & l_I2c ;
   lp_Acc = & l_Acc ;
 

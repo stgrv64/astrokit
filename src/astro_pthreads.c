@@ -44,6 +44,18 @@ static const int gi_Pth_Sched_Priority[] = {
   PTHREAD_POLICY_1
 } ;
 
+static const int gi_Pth_Sleep_Before_While[] = {
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_PHASES,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_PWM_MOTOR ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU      ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE     ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA     ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD       ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER   ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR   ,
+  PTHREAD_USLEEP_BEFORE_START_SUIVI_MAIN      
+} ;
+
 /* Les  structures suivantes definissent la politique d ordonnancement */
 /* par defaut tout le temps ROUND ROBIN */
 
@@ -387,6 +399,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
   int   i_num_thread = 0 ;
   int   i_error=0 ;
   int   i_errno=0 ;
+  int   i_slp=0 ;
   int   i_pri=0, i_ord=0 ;
   char  c_name[PTHREADS_BUFFER_MAX_LENGTH] = {0} ; 
   char  c_ord[PTHREADS_BUFFER_MAX_LENGTH] = {0} ; 
@@ -404,8 +417,9 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
   /* Recuperation des valeurs d 'attributs de treads */
   /*-------------------------------------------------*/
 
-  i_ord = gi_Pth_Sched_Param[ (int) l_en_thread ] ;
-  i_pri = gi_Pth_Sched_Priority[ (int) l_en_thread ] ;
+  i_ord = gi_Pth_Sched_Param[        (int) l_en_thread ] ;
+  i_pri = gi_Pth_Sched_Priority[     (int) l_en_thread ] ;
+  i_slp = gi_Pth_Sleep_Before_While[ (int) l_en_thread ] ;
 
   memset( c_name, 0, sizeof(c_name)) ;
   strcpy( c_name, gc_hach_pth_name[(int)l_en_thread]) ;
@@ -508,6 +522,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
             lp_Pth->pth_att[ i_num_thread ].att_pid                = i_pth_self ;
             lp_Pth->pth_att[ i_num_thread ].att_pri.sched_priority = i_pri ;
             lp_Pth->pth_att[ i_num_thread ].att_ord                = i_ord ; 
+            lp_Pth->pth_att[ i_num_thread ].att_slp                = i_slp ;
             lp_Pth->pth_att[ i_num_thread ].att_nbc                = gi_pthread_nb_cpu ; 
             lp_Pth->pth_att[ i_num_thread ].att_sta                = (int) PTHREAD_RUNNING ;
     
@@ -534,6 +549,10 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
   pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL) ;
   pthread_setcanceltype ( PTHREAD_CANCEL_ASYNCHRONOUS, NULL ) ;
 */ 
+  /* FIXME : ajout 2023 mars */
+  
+  usleep( i_slp ) ;
+
   return ;
 }
 
