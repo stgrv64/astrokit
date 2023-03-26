@@ -134,7 +134,7 @@ static void KEYBOARD_TERMIOS_MODE_ENTER(STRUCT_TERMIOS * lp_Ter) {
   lp_Ter->ter_nread = 0 ;
   lp_Ter->ter_peek_char = '0' ;
   lp_Ter->ter_sum_ascii = 0 ;
-  memset( lp_Ter->ter_buffer , 0, sizeof( lp_Ter->ter_buffer )) ;
+  memset( lp_Ter->ter_buffer , CONFIG_ZERO_CHAR, sizeof( lp_Ter->ter_buffer )) ;
 
   lp_Ter->ter_unlock( lp_Ter ) ;
 
@@ -207,7 +207,7 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
   lp_Ter->ter_nread = 0 ;
   lp_Ter->ter_peek_char = '0' ;
   lp_Ter->ter_sum_ascii = 0 ;
-  memset( lp_Ter->ter_buffer , 0, sizeof( lp_Ter->ter_buffer )) ;
+  memset( lp_Ter->ter_buffer , CONFIG_ZERO_CHAR, sizeof( lp_Ter->ter_buffer )) ;
 
   return ;
 }
@@ -473,7 +473,7 @@ int KEYBOARD_TERMIOS_READ(STRUCT_TERMIOS * lp_Ter) {
   KEYBOARD_TERMIOS_INIT(lp_Ter) ;
 
   while(ch!='q') {
-    // printf("boucle en cours\n") ;
+    // Trace("boucle en cours\n") ;
     usleep(50000) ;
 
     if ( KEYBOARD_TERMIOS_KBHIT_READ_CHAR(lp_Ter)) {

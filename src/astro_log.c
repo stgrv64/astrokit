@@ -233,7 +233,7 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
 
   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
     
-    memset(buf, CALCULS_ZERO_CHAR, sizeof(buf));
+    memset(buf, CONFIG_ZERO_CHAR, sizeof(buf));
     sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_log) ;
     
     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {

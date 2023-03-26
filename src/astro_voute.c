@@ -162,7 +162,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
 
   if ( ASTRO_LOG_DEBUG_VOUTE ) {
   
-    memset( buf, CALCULS_ZERO_CHAR, sizeof(buf));
+    memset( buf, CONFIG_ZERO_CHAR, sizeof(buf));
     sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_vou) ;
     
     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {
@@ -270,11 +270,12 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
-
+  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */ 
+  /*
   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
-
-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
+  */
+  memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
+  memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
   
   ul_vou_while_incr =0 ;
   

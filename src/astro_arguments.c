@@ -136,15 +136,15 @@ void ARGUMENTS_MANAGE_VA_ARGS(const char *fmt, ... ) {
        switch ((int)*fmt ++) {
         case ARGUMENTS_VARG_STRING :            
             s = va_arg (ap, char *);
-            printf("arg chaine = %s\n", s);
+            Trace("arg chaine = %s\n", s);
             break;
         case ARGUMENTS_VARG_INT :             
             d = va_arg (ap, int);
-            printf("arg int = %d\n", d);
+            Trace("arg int = %d\n", d);
             break;
 	      case ARGUMENTS_VARG_CHAR :             
             c = (char)va_arg (ap, int);
-            printf("arg char = %c\n", c);
+            Trace("arg char = %c\n", c);
             break;
         }
     }
@@ -167,7 +167,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 
   TraceArbo(__func__,0,"help") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  memset(binaire, CALCULS_ZERO_CHAR,sizeof(binaire)) ;
+  memset(binaire, CONFIG_ZERO_CHAR,sizeof(binaire)) ;
   strcpy(binaire,argv[0]) ;
   
   /* janvier 2022 : ajout argument pour afficher les paramatres 
@@ -178,32 +178,32 @@ void ARGUMENTS_HELP(int argc, char** argv) {
 
     if (!strcmp("-h",argv[1]) || !strcmp("--help",argv[1])) {
 
-      printf("%s : USAGE : \n",binaire) ;
-      printf("%s -a / ast (astre) <nom>      : calcule tout et affiche tout en fonction de l'astre\n",binaire) ;
-      printf("%s -A / AST (astre) <nom>      : idem -a mais continue et effectue le suivi\n",binaire) ;
-      printf("%s -L / ala (aLarm)            : arrete le main aubout de argv[1] secondes\n",binaire) ;
-      printf("%s -z / azi (aZimut) <A> <H>   : <angle horaire(deg) <declinaison(deg)> : calcul l'azimut en fonction de AH et DEC\n",binaire) ;
-      printf("%s -q / equ (eQuateur) <a> <h> : <azimut(deg) <hauteur(deg)>            : calcul l'angle horaire et la declinaison en fonction de azimut et altitude\n",binaire) ;
-      printf("%s ast+equ                     : combinaison ast + equ , l idee est de retouver le calcul des vitesses en sens inverse", binaire) ;
-      printf("%s -p / pla (planete)          : afficher les calculs concernant la planete (SOLAR_SYSTEM)\n",binaire) ;
-      printf("%s -t / tou (tout)             : calcule et affiche toutes les caracteristiques\n", binaire) ;      
-      printf("%s -m / mot (moteurs)          : effectue un test simple sur les moteurs\n",binaire) ;
-      printf("%s -v / g_Voute (voute) <r(deg)> <l>  : genere un fichier de la voute entiere : voute.csv (resolution,latitude))\n",binaire) ;
+      Trace("%s : USAGE : \n",binaire) ;
+      Trace("%s -a / ast (astre) <nom>      : calcule tout et affiche tout en fonction de l'astre\n",binaire) ;
+      Trace("%s -A / AST (astre) <nom>      : idem -a mais continue et effectue le suivi\n",binaire) ;
+      Trace("%s -L / ala (aLarm)            : arrete le main aubout de argv[1] secondes\n",binaire) ;
+      Trace("%s -z / azi (aZimut) <A> <H>   : <angle horaire(deg) <declinaison(deg)> : calcul l'azimut en fonction de AH et DEC\n",binaire) ;
+      Trace("%s -q / equ (eQuateur) <a> <h> : <azimut(deg) <hauteur(deg)>            : calcul l'angle horaire et la declinaison en fonction de azimut et altitude\n",binaire) ;
+      Trace("%s ast+equ                     : combinaison ast + equ , l idee est de retouver le calcul des vitesses en sens inverse", binaire) ;
+      Trace("%s -p / pla (planete)          : afficher les calculs concernant la planete (SOLAR_SYSTEM)\n",binaire) ;
+      Trace("%s -t / tou (tout)             : calcule et affiche toutes les caracteristiques\n", binaire) ;      
+      Trace("%s -m / mot (moteurs)          : effectue un test simple sur les moteurs\n",binaire) ;
+      Trace("%s -v / g_Voute (voute) <r(deg)> <l>  : genere un fichier de la voute entiere : voute.csv (resolution,latitude))\n",binaire) ;
       
-      printf("\n") ;
+      Trace("\n") ;
       
-      printf("%s -c / cal0 (calibration)      : \n \
+      Trace("%s -c / cal0 (calibration)      : \n \
        <sens> <nombre de tours par minute> <nombre de tours> <atl/azi> : \n \
        deplace les moteurs en fonction des 3 args suivants en altitude ou \n \
        bien en azimut en fonction de la configuration \n",binaire) ;
 
-      printf("%s -C / cal1 (calibration)      : \n \
+      Trace("%s -C / cal1 (calibration)      : \n \
        <sens> <nombre de tours par minute> <nombre de tours> <atl/azi> \n \
        idem calib mais gerer par les threads (et donc un suivi meilleur de la periode SIC)\n",binaire) ;
 
-      printf("%s -g / gpios (gpios) : affiche le statut des broches GPIO\n",binaire) ;
+      Trace("%s -g / gpios (gpios) : affiche le statut des broches GPIO\n",binaire) ;
 
-      printf("%s <LAT> <DEC> <vou_begin voute> <fin voute> <pas voute> <acc voute>\n",binaire);
+      Trace("%s <LAT> <DEC> <vou_begin voute> <fin voute> <pas voute> <acc voute>\n",binaire);
 
       exit(0) ;
     }
@@ -454,11 +454,11 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 4  ) &&  ! strcmp("vou",argv[1]) ) {
     /*
-    printf("Generation d'un fichier de quadrillage de la voute avec une resolution de %f degres pour la latitude %d",\
+    Trace("Generation d'un fichier de quadrillage de la voute avec une resolution de %f degres pour la latitude %d",\
      atof(argv[2]),\
      atof(argv[3])) ;
     
-    printf("Champs du fichier produit =\n \
+    Trace("Champs du fichier produit =\n \
      <altitude>\n\
      <azimut>\n\
      <angle horaire>\n\
@@ -496,23 +496,23 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   // -----------------------------------------------------------------
   if ( ( argc == 2 ) &&  ! strcmp("sta",argv[1]) ) {
     
-    printf("ARGUMENTS_MANAGE : GPIO_STATUT demander\n") ;
+    Trace("ARGUMENTS_MANAGE : GPIO_STATUT demander\n") ;
     GPIO_STATUT() ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
   if ( ( argc == 6 ) &&  ! strcmp("cal0",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
     if ( ! strcmp("alt", argv[5]) ) {
 
-     printf("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
+     Trace("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
      nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4  ;
      periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
-     printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
+     Trace("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_alt_dir, gp_Ctl_Par->par_alt_clk) ;
 
@@ -520,102 +520,76 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
     }
     if ( ! strcmp("azi", argv[5]) ) {
 
-     printf("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
+     Trace("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
      nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4   ;
      periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
-     printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
+     Trace("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_1( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_azi_dir, gp_Ctl_Par->par_azi_clk) ;
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
   if ( ( argc == 6 ) &&  ! strcmp("calib2",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
     if ( ! strcmp("alt", argv[5]) ) {
-     printf("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
+     Trace("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
      nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4  ;
      periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
-     printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
+     Trace("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_alt_dir, gp_Ctl_Par->par_alt_clk) ;
 
      GPIO_SET_ALT( 0,0,0,0,0,0 ) ;
     }
     if ( ! strcmp("azi", argv[5]) ) {
-     printf("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
+     Trace("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
      nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4   ;
      periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
-     printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
+     Trace("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
 
      GPIO_MOVE_3( atoi(argv[2]), periode, nbpulse , gp_Ctl_Par->par_azi_dir, gp_Ctl_Par->par_azi_clk) ;
 
      GPIO_SET_AZI( 0,0,0,0,0,0 ) ;
     }
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
     exit(0) ;
   }
   // -----------------------------------------------------------------
   if ( ( argc == 5 ) &&  ! strcmp("calibt",argv[1]) ) {
   
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
+    Trace("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
     
-     printf("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
+     Trace("reduction totale altitude  = %f\n", gp_Cal_Par->cal_par_alt_red_tot) ;
      GPIO_SET_ALT( 0,0,1,1,1,0 ) ;
      nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4  ;
      periode = 60 / ( gp_Cal_Par->cal_par_alt_red_2 * gp_Cal_Par->cal_par_alt_red_3 * gp_Cal_Par->cal_par_alt_red_4 * atof(argv[3]) ) ;
-     printf("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
+     Trace("deplacement moteur en altitude Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
      
      gp_Fre->fre_th_mic = periode ;
     
-     printf("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
+     Trace("reduction totale azimut    = %f\n", gp_Cal_Par->cal_par_azi_red_tot) ; 
      GPIO_SET_AZI( 0,0,1,1,1,0 ) ;
      nbpulse = atof(argv[4]) * gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4   ;
      periode = 60 / ( gp_Cal_Par->cal_par_azi_red_2 * gp_Cal_Par->cal_par_azi_red_3 * gp_Cal_Par->cal_par_azi_red_4 * atof(argv[3]) ) ;
-     printf("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
+     Trace("deplacement moteur en azimut Nb tours par minute = %f =  Nombre de tours = %f\n", atof(argv[3]), atof(argv[4]) ) ;
      
      gp_Fre->fre_ta_mic = periode ;
   }    
-  /* (obsolete)
-  if ( ( argc == 2 ) &&  ! strcmp("ir",argv[1]) ) {
-  
-    printf("ret GPIO_CLOSE = %d\n",GPIO_CLOSE(gi_gpio_in,gi_gpio_out)) ;
-    printf("ret GPIO_OPEN  = %d\n",GPIO_OPEN(gi_gpio_in,gi_gpio_out)) ;
-    
-    //gettimeofday(&t00,NULL) ;
-    ir_old=1 ;
-    ir=1;
-    while(1) {
-      //usleep( (long)(1000000/38000.0)) ;
-      //gettimeofday(&t01,NULL) ;
-      //t_diff = (( t01.tv_sec - t00.tv_sec ) * TIME_MICRO_SEC) + t01.tv_usec - t00.tv_usec ;
-      //if ( (double)t_diff >= TIME_MICRO_SEC / ARGUMENTS_FREQ_TRAME_INFRAROUGE ) {
-      //	gettimeofday(&t00,NULL) ;
-      ir = GPIO_GET(21) ;
-      if ( ir == 0 && ir_old == 0 ) { c_ir_0++ ; }
-      if ( ir == 1 && ir_old == 1 ) { c_ir_1++ ; }
-      if ( ir == 0 && ir_old == 1 ) { printf("%ld ",c_ir_1) ; if(c_ir_1>1000) printf("\n"); c_ir_0 = 1 ; }
-      if ( ir == 1 && ir_old == 0 ) { printf("%ld ",c_ir_0) ; if(c_ir_0>1000) printf("\n"); c_ir_1 = 1 ; }
-      ir_old = ir ;
-      // t_diff=0 ;
-      //}
-    }
-    exit(0) ;
-  }
-  */
+
   // -----------------------------------------------------------------
   Trace1("as %s pris en compte",argv[1]);
-  printf("fin %s\n","ARGUMENTS_MANAGE") ;
+  Trace("fin %s\n","ARGUMENTS_MANAGE") ;
 }
 
 /*****************************************************************************************

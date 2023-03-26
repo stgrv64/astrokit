@@ -304,9 +304,7 @@ void CALCULS_PARAMS_INIT(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
 void CALCULS_PARAMS_DISPLAY(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
 
-  TraceArbo(__func__,1,"params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  Trace("gp_Log->log_level = %d", gp_Log->log_level) ;
+  TraceArbo(__func__,1,"calculs params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1",          lp_Cal_Par->cal_par_alt_red_1);         
   MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2",          lp_Cal_Par->cal_par_alt_red_2);
@@ -1593,13 +1591,13 @@ void CALCULS_VOUTE(void) {
        gp_Ast->ast_ah ) ;
      
      /*  	
-     printf("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
+     Trace("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
        gp_Ast->ast_r3_xx , \
        gp_Ast->ast_r3_yy , \
        gp_Ast->ast_r3_zz , \
        gp_Ast->ast_vit ) ;
      
-     printf("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
+     Trace("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
        gp_Ast->ast_r3_xx , \
        gp_Ast->ast_r3_yy , \
        gp_Ast->ast_r3_zz , \

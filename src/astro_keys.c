@@ -276,6 +276,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
 
           strcpy(lp_Key->key_premier,lp_Key->key_mot) ;
           strcpy(lp_Key->key_symbole,lp_Key->key_mot)  ;
+
           strcpy(lp_Key->key_nombre,"")  ;
           strcpy(lp_Key->key_phrase,"")  ;
           strcpy(lp_Key->key_mot,"") ;
@@ -292,6 +293,8 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
     // lp_Key->key_appui_en_cours = 0 ;
   }
+
+  return ;
 }
 
 /*****************************************************************************************
@@ -321,13 +324,13 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
                                      lp_Key->key_file     = NULL ;
   gettimeofday (                   & lp_Key->key_tval, NULL ) ;
 
-  memset( lp_Key->key_phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
-  memset( lp_Key->key_valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
-  memset( lp_Key->key_symbole, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_symbole ) );
-  memset( lp_Key->key_menu,    CALCULS_ZERO_CHAR, sizeof( lp_Key->key_menu ) );
-  memset( lp_Key->key_premier, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_premier ) );
-  memset( lp_Key->key_nombre,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_nombre ) );
-  memset( lp_Key->key_mot,     CALCULS_ZERO_CHAR, sizeof( lp_Key->key_mot ) );
+  memset( lp_Key->key_phrase,  CONFIG_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
+  memset( lp_Key->key_valider, CONFIG_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
+  memset( lp_Key->key_symbole, CONFIG_ZERO_CHAR, sizeof( lp_Key->key_symbole ) );
+  memset( lp_Key->key_menu,    CONFIG_ZERO_CHAR, sizeof( lp_Key->key_menu ) );
+  memset( lp_Key->key_premier, CONFIG_ZERO_CHAR, sizeof( lp_Key->key_premier ) );
+  memset( lp_Key->key_nombre,  CONFIG_ZERO_CHAR, sizeof( lp_Key->key_nombre ) );
+  memset( lp_Key->key_mot,     CONFIG_ZERO_CHAR, sizeof( lp_Key->key_mot ) );
   
   strcpy( lp_Key->key_valider, "valider" ) ;
   strcpy( lp_Key->key_menu,    "MENU" ) ;
@@ -347,9 +350,9 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   // Les actions servent a 
   
   for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
-    memset( lp_Key->key_actions[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+    memset( lp_Key->key_actions[i], CONFIG_ZERO_CHAR, sizeof( lp_Key->key_actions[i] ));
   }
-  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->key_validations[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->key_validations[i], CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
 
   strcpy( lp_Key->key_actions[0], "MENU" ) ;
   strcpy( lp_Key->key_actions[1], "SETUP" ) ;
@@ -359,6 +362,8 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   strcpy( lp_Key->key_actions[5], "PLA" ) ;
   strcpy( lp_Key->key_actions[6], "TIME" ) ;
   strcpy( lp_Key->key_actions[7], "NET" ) ; /* ajout 2023 : network */
+  strcpy( lp_Key->key_actions[8], "LON" ) ; /* ajout 2023 : network */
+  strcpy( lp_Key->key_actions[9], "LAT" ) ; /* ajout 2023 : network */
 
   return ;
 } 

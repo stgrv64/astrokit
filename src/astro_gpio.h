@@ -230,13 +230,13 @@ static const char  raquette[4][4][GPIO_TAILLE_BUFFER] = \
   { "MES"  ,"NGC"    , "ETO"  , "valider"}} ;
   
 static const char  keyboard_ir[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"KEY_1" ,"KEY_4" , "KEY_7" , "KEY_MENU"}, \
+  {{"KEY_1" ,"KEY_4" , "KEY_7" , "MENU"}, \
   { "KEY_2" ,"KEY_5" , "KEY_8" , "KEY_0" },\
   { "KEY_3" ,"KEY_6" , "KEY_9" , "KEY_P"}, \
   { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
   
 static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
-  {{"KEY_1"  ,"KEY_LEFT"  , "KEY_7"  , "KEY_MENU"}, \
+  {{"KEY_1"  ,"KEY_LEFT"  , "KEY_7"  , "MENU"}, \
   { "KEY_UP" ,"KEY_OK"    , "KEY_DOWN" , "KEY_0" },\
   { "KEY_3"  ,"KEY_RIGHT" , "KEY_9" , "KEY_P"}, \
   { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;

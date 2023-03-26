@@ -144,7 +144,7 @@ void DATAS_INIT ( STRUCT_DATAS * lp_Dat ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
 
-  memset( lp_Dat, 0, sizeof (STRUCT_DATAS ) ) ;
+  memset( lp_Dat, 0, sizeof ( STRUCT_DATAS ) ) ;
   strcpy( lp_Dat->dat_acc, ""  ) ;
   strcpy( lp_Dat->dat_bou, ""  ) ;
   strcpy( lp_Dat->dat_act, ""  ) ;
@@ -168,7 +168,7 @@ void DATAS_RESET( STRUCT_DATAS * lp_Dat ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
 
-  memset( lp_Dat, 0, sizeof (STRUCT_DATAS ) ) ;
+  memset( lp_Dat, 0, sizeof ( STRUCT_DATAS ) ) ;
 
   strcpy( lp_Dat->dat_acc, ""  ) ;
   strcpy( lp_Dat->dat_bou, ""  ) ;

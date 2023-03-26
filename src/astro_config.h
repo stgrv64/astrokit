@@ -241,26 +241,24 @@ t_en_Config_Parametres_Obligatoires_Types ;
 struct STR_CONFIG_PARAMS {
 
   pthread_mutex_t con_par_mutex ;
+  /*
   void          (*con_par_lock)   (void) ;
   void          (*con_par_unlock) (void) ;  
-  
+  */
   int             con_par_default_menu ;
-
   char            con_par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            con_par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            con_par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
   char            con_par_rep_log    [ CONFIG_TAILLE_BUFFER_64 ] ;      
   char            con_par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
   char            con_par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
-  char            con_par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
-
+  char            con_par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            con_par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            con_par_fic_vou    [ CONFIG_TAILLE_BUFFER_64 ] ;
   char            con_par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
   char            con_par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
   char            con_par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
   char            con_par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
-
   char            con_par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
 } ;
 
@@ -268,7 +266,7 @@ struct STR_CONFIG_PARAMS {
 /* Fin parametres de fichier config                  */ 
 /*---------------------------------------------------*/
 
-typedef struct  STR_CONFIG STRUCT_CONFIG ;
+typedef struct  STR_CONFIG_PARAMS STRUCT_CONFIG_PARAMS ;
 
 struct STR_CONFIG {
   pthread_mutex_t con_mutex ;
@@ -288,6 +286,8 @@ struct STR_CONFIG {
                                [CONFIG_DATAS_NB_COLONNES] \
                                [CONFIG_TAILLE_BUFFER_256] ;
 } ;
+
+typedef struct  STR_CONFIG STRUCT_CONFIG ;
 
 static const char * c_Bin_Possible_Paths[] = {
   "/bin",

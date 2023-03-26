@@ -503,8 +503,8 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_LCD ) ;
 
-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
+  memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
+  memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
   
   /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
   /*      
@@ -891,23 +891,39 @@ int main(int argc, char ** argv) {
   /* Alternative : Trace1 */ 
 
   ASTRO_GLOBAL_INIT          () ;
+  CONFIG_PARAMS_INIT         ( gp_Con_Par ) ;
   ARGUMENTS_MANAGE_REP_HOME  ( argc, argv) ;
   CONFIG_PATH_FIND           ( gc_config_path_cmd_stty, "stty") ;
   
   ASTRE_PARAMS_INIT          ( gp_Ast_Par ) ;
   CALCULS_PARAMS_INIT        ( gp_Cal_Par ) ;
-  CONFIG_PARAMS_INIT         ( gp_Con_Par ) ;
+
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+
   DEVICES_PARAMS_INIT        ( gp_Dev_Par ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   LIEU_PARAMS_INIT           ( gp_Lie_Par ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   PID_PARAMS_INIT            ( gp_Pid_Par ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   TIME_PARAMS_INIT           ( gp_Tim_Par ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   GPIO_PWM_PARAMS_INIT       ( gp_Pwm_Par ) ;
-  
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   CONFIG_INIT                ( gp_Con ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+
   CONFIG_FIC_READ            ( gp_Con ) ;
+  
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   GPIO_CONFIG_FIC_READ       ( gp_Con ) ; 
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   CONFIG_FIC_VERIFY          ( gp_Con ) ;
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  CONFIG_PARAMS_DISPLAY  () ;  
+  
   CONFIG_PARAMETRES_CONFIG   ( gp_Con ) ;
 
   CONFIG_PARAMS_DISPLAY  () ;  
@@ -924,8 +940,8 @@ int main(int argc, char ** argv) {
   TIME_CALCULS_SIDERAL_TIME( gp_Tim, gp_Lie ) ;
   
   CALCULS_INIT               ( gp_Cal ) ;
-  CAT_INIT                   ( gp_Ngc ) ;
   CAT_INIT                   ( gp_Eto ) ;
+  CAT_INIT                   ( gp_Ngc ) ;
   CAT_READ                   ( gp_Ngc, CAT_NGC_TXT ) ;    
   CAT_READ                   ( gp_Eto, CAT_ETO_TXT ) ;                  
   CAT_FORMAT_DECIMAL_NGC     ( gp_Ngc, CAT_NGC_DEC_TXT ) ;         
@@ -969,7 +985,7 @@ int main(int argc, char ** argv) {
   
   
   gp_Pwm_Par->gpi_pwm_par_led_etat=0;
-  printf( "LED : %d\n", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;
+  Trace( "LED : %d\n", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;
   Trace("led_etat    : %d", gp_Pwm_Par->gpi_pwm_par_led_etat );
   
   Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;

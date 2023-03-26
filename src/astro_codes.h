@@ -90,40 +90,40 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /* clavier alphabetique (minuscules) */ 
 /*-----------------------------------*/
 
-{ "97",  "KEY_LIST", "MODE_AZIMUTAL"},  /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
+{ "97",  "KEY_LIST", "key_azi"},    /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
 { "98",  "KEY_b",    "b"},  
 { "99",  "KEY_c",    "c"},  
 { "100", "KEY_d",    "d"},     
 { "101", "KEY_e",    "e"},  
 { "102", "KEY_f",    "f"},  
 { "103", "KEY_g",    "g"},     
-{ "104", "KEY_h",    "h"}, /* 104 sum ascii = touche 'h' = affichage threads infos */
+{ "104", "KEY_h",    "h"},          /* 104 sum ascii = touche 'h' = affichage threads infos */
 { "105", "KEY_i",    "i"},    
-{ "106", "KEY_j",    "j" },  /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
-{ "107", "KEY_k",    "k" },  /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
-{ "108", "KEY_l",    "l" },  /* 108 sum ascii = touche 'l' = activer les traces pid temps reel */ 
-{ "109", "KEY_MENU", "MENU"},     /* 109  ascii = touche 'm' */
+{ "106", "KEY_j",    "j" },         /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
+{ "107", "KEY_k",    "k" },         /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
+{ "108", "KEY_l",    "l" },         /* changement longitude */ 
+{ "109", "KEY_MENU", "MENU"},       /* 109  ascii = touche 'm' */
 { "110", "KEY_n",    "n"},     
 
 { "111", "KEY_o",    "o"},  
-{ "112", "KEY_p",    "p"},    
-{ "113", "KEY_EXIT", "key_exit" },
-{ "114", "KEY_r",    "r" },           /* 114 sum ascii = touche 'r' = reseau */ 
-{ "115", "KEY_s",    "s"},     /* 115 sum ascii = touche 's'        = log */ 
-{ "116", "KEY_MUTE", "TIME"},        /* 116 ascii = touche 't' */
-{ "117", "KEY_u",    "u"},     /* 117 sum ascii = touche 'u'     = log */ 
-{ "118", "KEY_v",    "v"}, /* 118 sum ascii = touche 'v' = log */ 
-{ "119", "KEY_w",    "w"},     /* 119 sum ascii = touche 'w'     = log */
+{ "112", "KEY_p",    "key_pid"},    /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
+{ "113", "KEY_EXIT", "key_exit" },  /* 113 sum ascii = touche 'q' = 'quit' = quitter le programme */ 
+{ "114", "KEY_r",    "r" },         /* 114 sum ascii = touche 'r' = reseau */ 
+{ "115", "KEY_s",    "s"},          /* 115 sum ascii = touche 's'        = log */ 
+{ "116", "KEY_MUTE", "TIME"},       /* 116 sum ascii = touche 't' = temps */
+{ "117", "KEY_u",    "u"},          /* 117 sum ascii = touche 'u'     = log */ 
+{ "118", "KEY_v",    "v"},          /* 118 sum ascii = touche 'v' = log */ 
+{ "119", "KEY_w",    "w"},          /* 119 sum ascii = touche 'w'     = log */
 { "120", "KEY_x",    "x"},    
 
 { "121", "KEY_y",    "y"},    
-{ "122", "KEY_MODE", "MODE_EQUATORIAL"}, /* z=equatorial => touche 'z' */     
+{ "122", "KEY_MODE", "key_equ"}, /* z=equatorial => touche 'z' */     
 
 /*--------------------------------*/
 /* objets MES NGC ETO PLA         */
 /*--------------------------------*/
 
-{ "47",  "KEY_M",    "MES"},  /* 47 ascii = touche '/' */
+{ "47",  "KEY_M",    "key_mes"},  /* 47 ascii = touche '/' */
 { "42",  "KEY_N",    "NGC"},  /* 42 ascii = touche '*' */
 { "45",  "KEY_E",    "ETO"},  /* 45 ascii = touche '-' */
 { "43",  "KEY_P",    "PLA"},  /* 43 ascii = touche '+' */
@@ -201,7 +201,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /*--------------------------------*/
 
 { "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = touche '>' */
-{ "obsolete",  "KEY_PREVIOUS","previous"}, /* action a definir */
+{ "obsolete",  "KEY_PREVIOUS","key_previous"}, /* action a definir */
 { "obsolete",  "KEY_SETUP",   "SETUP"},    /* non mis en place pour l instant (2022/04) */
 { "obsolete",  "KEY_SOUND",   "TIME"  },   /* remplace par KEY_MUTE sur la telecommande */
 { "obsolete",  "KEY_FORWARD", "forward"},  /* remplace par KEY_VOLUMEUP */

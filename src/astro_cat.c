@@ -150,12 +150,12 @@ void CAT_INIT (STRUCT_CAT * lp_Cat ) {
   
   for(int L=0;L<CAT_NB_LIGNES;L++) {
     for(int C=0;C<CAT_NB_COLONNES;C++) {
-      memset(lp_Cat->cat_dat[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
-      memset(lp_Cat->cat_dec[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+      memset(lp_Cat->cat_dat[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Cat->cat_dat[L][C]));
+      memset(lp_Cat->cat_dec[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Cat->cat_dat[L][C]));
     }
   }
 
-  memset(lp_Cat->cat_path, CALCULS_ZERO_CHAR, sizeof( lp_Cat->cat_path));
+  memset(lp_Cat->cat_path, CONFIG_ZERO_CHAR, sizeof( lp_Cat->cat_path));
 
   return ;
 }
@@ -178,7 +178,7 @@ void CAT_DISPLAY_DAT(STRUCT_CAT * lp_Cat ) {
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   l=0 ;
   while( strcmp( lp_Cat->cat_dat[l][3], "_" ) ) {
-   memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
+   memset( buffer,CONFIG_ZERO_CHAR, sizeof(buffer)) ;
    for(c=0;c<CAT_NB_COLONNES;c++) {
     /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
     memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
@@ -209,7 +209,7 @@ void CAT_DISPLAY_DEC(STRUCT_CAT * lp_Cat ) {
   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   l=0 ;
   while( strcmp( lp_Cat->cat_dec[l][3], "_" ) ) {
-   memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
+   memset( buffer,CONFIG_ZERO_CHAR, sizeof(buffer)) ;
    for(c=0;c<CAT_NB_COLONNES;c++) {
     /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
     memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
@@ -245,13 +245,13 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * lc_file_name) {
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++) {
-      memset(lp_Cat->cat_dat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
-      strcpy(lp_Cat->cat_dat[L][C],"_") ;
+      memset( lp_Cat->cat_dat[L][C], CONFIG_ZERO_CHAR, sizeof( lp_Cat->cat_dat[L][C] ));
+      strcpy( lp_Cat->cat_dat[L][C], "_") ;
     }
   
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cat->cat_mutex ) ;
 
-  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
+  memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer) );
   sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
   
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cat->cat_mutex ) ;
@@ -265,6 +265,7 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * lc_file_name) {
   if ( (fin=fopen(buffer,"r")) == NULL)  {
     // completer et modifier
     SyslogErrFmt("probleme ouverture 0 %s\n",buffer) ;
+    Trace("probleme ouverture 0 %s",buffer) ;
     exit(2) ;
   }
   else Trace1("open %s ok", buffer) ;
@@ -329,7 +330,7 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
         d_min = d_angulaire ;
         for(C=0;C<CAT_NB_COLONNES;C++) { 
-          memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
+          memset( lp_Ast->ast_plus_proche[C], CONFIG_ZERO_CHAR, sizeof( lp_Ast->ast_plus_proche[C] ));
           strcpy( lp_Ast->ast_plus_proche[C], lp_Cat->cat_dec[L][C]) ;
         }
       }
@@ -371,7 +372,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   i_ligne = L ;
 
   while( strcmp(lp_Cat->cat_dec[L][3],"_") && L < CAT_NB_LIGNES ) {
-    //usleep(10000) ;
+    
     Trace2("L=%d %s %s %s %s" , \
       L , \
       lp_Cat->cat_dec[L][0], \
@@ -474,16 +475,17 @@ void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * lc_file_name) {
 
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
-      memset(lp_Cat->cat_dec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+      memset(lp_Cat->cat_dec[L][C],CONFIG_ZERO_CHAR, sizeof(lp_Cat->cat_dec[L][C]) );
       strcpy(lp_Cat->cat_dec[L][C],"_") ;
   } 
   
-  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+  memset(buffer,CONFIG_ZERO_CHAR, sizeof( buffer) );
   sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
   
   if ( (fout=fopen(buffer,"w")) == NULL) {
     // completer et modifier
     SyslogErrFmt("probleme ouverture 1 %s\n",buffer) ;
+    Trace("probleme ouverture 0 %s",buffer) ;
     exit(2) ;
   }
   L=0 ;
@@ -551,16 +553,17 @@ void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * lc_file_name ) {
   
   for(L=0;L<CAT_NB_LIGNES;L++)
     for(C=0;C<CAT_NB_COLONNES;C++)  {
-      memset(lp_Cat->cat_dec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+      memset(lp_Cat->cat_dec[L][C],CONFIG_ZERO_CHAR, sizeof(buffer) );
       strcpy(lp_Cat->cat_dec[L][C],"_") ;
   } 
   
-  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
+  memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer));
   sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
   
   if ( (fout=fopen(buffer,"w")) == NULL) {
     // completer et modifier
     SyslogErrFmt("probleme ouverture 2 %s\n",buffer) ;
+    Trace("probleme ouverture 0 %s",buffer) ;
     exit(2) ;
   }
   L=0 ;

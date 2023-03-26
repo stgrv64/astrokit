@@ -214,7 +214,7 @@ int TIME_CALCULS_LOCAL_DATE(STRUCT_TIME * lp_Tim) {
 
   TIME_CALCULS_HMS_VERS_DEC (lp_Tim ) ;
   
-  //printf("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
+  //Trace("%d %d %d %d %d %d\n",tm->tm_sec,tm->tm_min,tm->tm_hour,tm->tm_mday,tm->tm_mon,tm->tm_year ) ;
   Trace2("%d %d %d %d %d %d %f", \
     lp_Tim->tim_yy, \
     lp_Tim->tim_mm, \
@@ -791,10 +791,10 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
     Trace("Exemple : 20190822 = 22 aout 2019") ;
     return ;
   }
-  memset( buf,   CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  memset( year,  CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_8 ) ;
-  memset( month, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
-  memset( day,   CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+  memset( buf,   CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+  memset( year,  CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_8 ) ;
+  memset( month, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+  memset( day,   CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
   
   for(i=0;i<4;i++) year[i]  = s_data[i] ;
   for(i=0;i<2;i++) month[i] = s_data[i+4] ;
@@ -804,7 +804,7 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
   if ( system( buf ) < 0 ) perror( buf) ;
 	Trace("buf = %s", buf) ;
 
-  memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+  memset( buf, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
   sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", \
     year, \
     month, \
@@ -849,9 +849,9 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
     return ;
   }
 
-  memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
-  memset( hou, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
-  memset( min, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+  memset( buf, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+  memset( hou, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+  memset( min, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
   
   for(i=0;i<2;i++) hou[i]=s_data[i] ;
   for(i=0;i<2;i++) min[i]=s_data[i+2] ;
@@ -860,7 +860,7 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
   Trace("buf = %s", buf) ;
   if ( system( buf ) < 0 ) perror( buf) ;
 
-  memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+  memset( buf, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
 
   sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", \
     hou, \

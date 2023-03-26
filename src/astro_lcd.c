@@ -200,10 +200,10 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
 
   Trace1("lcd init") ;
 
-  memset( lp_Lcd->lcd_l0_cur, 0 , sizeof( lp_Lcd->lcd_l0_cur )) ;
-  memset( lp_Lcd->lcd_l1_cur, 0 , sizeof( lp_Lcd->lcd_l1_cur )) ;
-  memset( lp_Lcd->lcd_l0_def, 0 , sizeof( lp_Lcd->lcd_l0_def )) ;
-  memset( lp_Lcd->lcd_l1_def, 0 , sizeof( lp_Lcd->lcd_l1_def )) ;
+  memset( lp_Lcd->lcd_l0_cur, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l0_cur )) ;
+  memset( lp_Lcd->lcd_l1_cur, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l1_cur )) ;
+  memset( lp_Lcd->lcd_l0_def, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l0_def )) ;
+  memset( lp_Lcd->lcd_l1_def, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l1_def )) ;
 
   Trace1("strcpy init") ;
 
@@ -306,8 +306,8 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
 
     pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
 
-    memset( gp_Lcd->lcd_l0_cur, 0, sizeof( gp_Lcd->lcd_l0_cur )) ;
-    memset( gp_Lcd->lcd_l1_cur, 0, sizeof( gp_Lcd->lcd_l1_cur )) ;
+    memset( gp_Lcd->lcd_l0_cur, CONFIG_ZERO_CHAR, sizeof( gp_Lcd->lcd_l0_cur )) ;
+    memset( gp_Lcd->lcd_l1_cur, CONFIG_ZERO_CHAR, sizeof( gp_Lcd->lcd_l1_cur )) ;
 
     strcpy( gp_Lcd->lcd_l0_cur, c_l0 ) ;
     strcpy( gp_Lcd->lcd_l1_cur, c_l1 ) ;

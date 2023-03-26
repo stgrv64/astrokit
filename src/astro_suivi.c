@@ -536,11 +536,11 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
   TraceArbo(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
+  memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
+  memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
 
-  memset( cmd,       CALCULS_ZERO_CHAR, sizeof( cmd )) ;
-  memset( s_buffer4, CALCULS_ZERO_CHAR, sizeof( s_buffer4 )) ;
+  memset( cmd,       CONFIG_ZERO_CHAR, sizeof( cmd )) ;
+  memset( s_buffer4, CONFIG_ZERO_CHAR, sizeof( s_buffer4 )) ;
   
   //---------------------------------------------------------------------------------------------------------
   // TRAITEMENT DES ACTIONS SANS NECESSAIREMENT UNE VALIDATION
@@ -717,7 +717,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /*  touche mode equatorial */
     
-    MACRO_IF_KEY_MOT_IS("MODE_EQUATORIAL")      { 
+    MACRO_IF_KEY_MOT_IS("key_equ")      { 
       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
       lp_Sui->sui_menu = MENU_EQUATORIAL ; 
       i=1;
@@ -725,7 +725,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /*  touche mode azimutal */
 
-    MACRO_IF_KEY_MOT_IS("MODE_AZIMUTAL")      { 
+    MACRO_IF_KEY_MOT_IS("key_azi")      { 
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_AZIMUTAL ; 
       i=1;
@@ -801,7 +801,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     if ( strstr( s_buffer4, gp_Key->key_symbole ) != NULL ) {
 
-      memset( gp_Ast->ast_nom, CALCULS_ZERO_CHAR, sizeof(gp_Ast->ast_nom)) ;
+      memset( gp_Ast->ast_nom, CONFIG_ZERO_CHAR, sizeof(gp_Ast->ast_nom)) ;
       sprintf( gp_Ast->ast_nom, "%s%s", gp_Key->key_symbole, gp_Key->key_nombre) ;
     
       Trace("== %s ==",gp_Ast->ast_nom) ;
@@ -831,13 +831,21 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
       switch ( strlen( gp_Key->key_nombre ) ) {
 
-        case 2 : // Si longueur = 2 cela ne peut etre qu'un changement de mois
+        /* ----------------------------------------------------------------------
+           Si longueur = 2 cela ne peut etre qu'un changement de mois
+         ----------------------------------------------------------------------*/
+
+        case 2 : 
           
           Trace1("demande changement heure minutes : %s" , gp_Key->key_nombre) ;
 
           /* CONFIG_SET_MONTH( gp_Key->key_nombre ) ; */
 
-        case 4 : // Si longueur = 4 cela ne peut etre qu'un changement d'heure et de minutes
+        /* ----------------------------------------------------------------------
+           Si longueur = 4 cela ne peut etre qu'un changement d'heure et de minutes
+         ----------------------------------------------------------------------*/
+
+        case 4 : 
           
           Trace1("demande changement heure minutes : %s" , gp_Key->key_nombre) ;
     
@@ -847,8 +855,12 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
           
           // FIXME : 20190822 : modification configuration de la date
 
-        case 8 : // Si longueur = 5 cela est un changement de mois jour avec verif de l'annee
+        /* ----------------------------------------------------------------------
+           Si longueur = 8 cela est un changement de mois jour avec verif de l'annee
+         ----------------------------------------------------------------------*/
 
+        case 8 : 
+        
           Trace1("demande changement annee : %s" , gp_Key->key_nombre) ;
           
           TIME_SET_YEAR_MONTH_AND_DAY( gp_Key->key_nombre ) ;

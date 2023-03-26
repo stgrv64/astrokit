@@ -114,7 +114,7 @@ int jdflag = 0;
 /* correction vector, saved for display  */
 double dp[3];
 
-/* display formats for printf() */
+/* display formats for Trace() */
 extern char *intfmt, *dblfmt;
 
 /* display enable flag */

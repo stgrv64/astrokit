@@ -277,7 +277,7 @@ double Y;
   ans += B*(d[1] + d[2]);
   #if DEMO
   /* (mise en commentaire 2023) */
-  /* printf( "B %.4lf, ans %.4lf\n", B, ans ); */
+  /* Trace( "B %.4lf, ans %.4lf\n", B, ans ); */
   #endif
   if( iy+2 >= TABSIZ )
     goto done;
@@ -289,7 +289,7 @@ double Y;
   B = 2.0*B/3.0;
   ans += (p-0.5)*B*d[1];
   #if DEMO
-  printf( "B %.4lf, ans %.4lf\n", B*(p-0.5), ans );
+  Trace( "B %.4lf, ans %.4lf\n", B*(p-0.5), ans );
   #endif
   if( (iy-2 < 0) || (iy+3 > TABSIZ) )
     goto done;
@@ -301,7 +301,7 @@ double Y;
   B = 0.125*B*(p+1.0)*(p-2.0);
   ans += B*(d[0] + d[1]);
   #if DEMO
-  printf( "B %.4lf, ans %.4lf\n", B, ans );
+  Trace( "B %.4lf, ans %.4lf\n", B, ans );
   #endif
 
   done:
@@ -407,11 +407,11 @@ char s[20];
 double ans, y;
 
 loop:
-printf( "year ? " );
+Trace( "year ? " );
 gets(s);
 sscanf( s, "%lf", &y );
 ans = periode(y);
-printf( "%.4lf\n", ans );
+Trace( "%.4lf\n", ans );
 goto loop;
 }
 #endif

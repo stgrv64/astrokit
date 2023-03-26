@@ -209,14 +209,14 @@ void I2C_CALCULS_ACCMAG(STRUCT_I2C_ACC_MAG *lp_Acc) {
   if ( lp_Acc->acc_gauss_field_x == 0 && lp_Acc->acc_gauss_field_y < 0 ) lp_Acc->acc_heading = M_PI / 2.0 ;
   if ( lp_Acc->acc_gauss_field_x == 0 && lp_Acc->acc_gauss_field_y > 0 ) lp_Acc->acc_heading = M_PI * 1.5  ;
   
-  // printf("%.0f\t%.0f\t%.0f\t%.0f\n", lp_Acc->acc_acc_x , lp_Acc->acc_acc_y , lp_Acc->acc_acc_z, norme_acc) ;
-  // printf("%.0f\t%.0f\t%.0f\t%.0f\n", lp_Acc->acc_mag_x , lp_Acc->acc_mag_y , lp_Acc->acc_mag_z, norme_mag) ;
-  // printf("%.2f\t%.2f\t%.2f\t%.2f\n", lp_Acc->acc_mag_norm_x , lp_Acc->acc_mag_norm_y , lp_Acc->acc_mag_norm_z, sqrt( (lp_Acc->acc_mag_norm_x * lp_Acc->acc_mag_norm_x) + (lp_Acc->acc_mag_norm_y * lp_Acc->acc_mag_norm_y) + ( lp_Acc->acc_mag_norm_z * lp_Acc->acc_mag_norm_z) ) ) ;
+  // Trace("%.0f\t%.0f\t%.0f\t%.0f\n", lp_Acc->acc_acc_x , lp_Acc->acc_acc_y , lp_Acc->acc_acc_z, norme_acc) ;
+  // Trace("%.0f\t%.0f\t%.0f\t%.0f\n", lp_Acc->acc_mag_x , lp_Acc->acc_mag_y , lp_Acc->acc_mag_z, norme_mag) ;
+  // Trace("%.2f\t%.2f\t%.2f\t%.2f\n", lp_Acc->acc_mag_norm_x , lp_Acc->acc_mag_norm_y , lp_Acc->acc_mag_norm_z, sqrt( (lp_Acc->acc_mag_norm_x * lp_Acc->acc_mag_norm_x) + (lp_Acc->acc_mag_norm_y * lp_Acc->acc_mag_norm_y) + ( lp_Acc->acc_mag_norm_z * lp_Acc->acc_mag_norm_z) ) ) ;
   
-  //printf("%.0f\t%.0f\t%.0f\n", lp_Acc->acc_pitch * I2C_DEGRAD, lp_Acc->acc_roll * I2C_DEGRAD, lp_Acc->acc_heading * I2C_DEGRAD) ;
-  //printf("%.0f\t%.0f\t%.0f\n", phi, psi, the) ;
-  //printf("%.0f\t%.0f\t%.0f\n",lp_Acc->acc_mag_x * 90 / 16384 , lp_Acc->acc_mag_y * 90 / 16384, lp_Acc->acc_mag_z * 90 / 16384 );
-  //printf("---------\n") ;
+  //Trace("%.0f\t%.0f\t%.0f\n", lp_Acc->acc_pitch * I2C_DEGRAD, lp_Acc->acc_roll * I2C_DEGRAD, lp_Acc->acc_heading * I2C_DEGRAD) ;
+  //Trace("%.0f\t%.0f\t%.0f\n", phi, psi, the) ;
+  //Trace("%.0f\t%.0f\t%.0f\n",lp_Acc->acc_mag_x * 90 / 16384 , lp_Acc->acc_mag_y * 90 / 16384, lp_Acc->acc_mag_z * 90 / 16384 );
+  //Trace("---------\n") ;
 
   return ;
 }
@@ -260,7 +260,7 @@ int I2C_INIT( STRUCT_I2C * lp_i2c_dev, char * c_i2c_device_name, char * adress) 
   lp_i2c_dev->i2c_dev_usleep  = I2C_SLEEP_MICRO ;
   
   Trace1("I2C_INIT : %ld : statut : %d\n", strtoul(adress,NULL,16) , ret);
-  printf("I2C_INIT : fd = %d adress = %d statut : %d\n", lp_i2c_dev->i2c_dev_fd , lp_i2c_dev->i2c_dev_adress,  lp_i2c_dev->i2c_dev_statut);
+  Trace("I2C_INIT : fd = %d adress = %d statut : %d\n", lp_i2c_dev->i2c_dev_fd , lp_i2c_dev->i2c_dev_adress,  lp_i2c_dev->i2c_dev_statut);
   
   return ret ;
 }
@@ -284,7 +284,7 @@ int I2C_WRITE_DAC_MCP4726( STRUCT_I2C * lp_i2c_dev, unsigned long value) {
   //value2 =0;
   usleep( lp_i2c_dev->i2c_dev_usleep ) ;
   ret=0 ;
-  memset( lp_i2c_dev->i2c_dev_buf, 0 , I2C_BUFFER_SIZE ) ;
+  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR , sizeof( lp_i2c_dev->i2c_dev_buf) ) ;
   
   //lp_i2c_dev->i2c_dev_buf[0] = lp_i2c_dev->i2c_dev_adress ;
   
@@ -304,7 +304,7 @@ int I2C_WRITE_DAC_MCP4726( STRUCT_I2C * lp_i2c_dev, unsigned long value) {
   // I2CMasterBuffer[3] = (value % 16) << 4;              // Lower data bits          (D3.D2.D1.D0.x.x.x.x)
   
   if ((write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 3)) != 3 ) {
-    printf("Error when writing to i2c slave\n");
+    Trace("Error when writing to i2c slave\n");
     ret = -1 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
@@ -325,14 +325,14 @@ int I2C_WRITE( STRUCT_I2C * lp_i2c_dev, char * registre, char * value) {
   
   usleep( lp_i2c_dev->i2c_dev_usleep ) ;
   ret=0 ;
-  memset( lp_i2c_dev->i2c_dev_buf, 0, I2C_BUFFER_SIZE ) ;
+  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR, sizeof( lp_i2c_dev->i2c_dev_buf ) ) ;
   
   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
   lp_i2c_dev->i2c_dev_buf[1] = strtoul( value, NULL, 16 ) ;
   
   if (( write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 2)) != 2 ) {
 
-    printf("Error writing to i2c slave\n");
+    Trace("Error writing to i2c slave\n");
     ret = -1 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
@@ -353,7 +353,7 @@ uint16_t I2C_READ_1_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
   
   usleep( lp_i2c_dev->i2c_dev_usleep) ;
   ret=0 ;
-  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR, I2C_BUFFER_SIZE ) ;
+  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR, sizeof( lp_i2c_dev->i2c_dev_buf ) ) ;
   
   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
   
@@ -362,13 +362,13 @@ uint16_t I2C_READ_1_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
   /*-------------------------*/
 
   if ((write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 1)) != 1 ) {
-    printf("Error writing to i2c slave register %s\n", registre);
+    Trace("Error writing to i2c slave register %s\n", registre);
     ret = -1 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
 
   if ((read( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 1)) != 1 ) {
-    printf("Error reading to i2c slave register\n");
+    Trace("Error reading to i2c slave register\n");
     ret = -2 ;
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
@@ -396,17 +396,17 @@ void I2C_READ_6_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
   ret=0 ;
 
   usleep( lp_i2c_dev->i2c_dev_usleep) ;
-  memset( lp_i2c_dev->i2c_dev_buf, 0 , I2C_BUFFER_SIZE ) ;
+  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR , sizeof( lp_i2c_dev->i2c_dev_buf ) ) ;
   
   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
   
   if ((write( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 1)) != 1 ) {
-    printf("Error writing to i2c slave register %s\n", registre);
+    Trace("Error writing to i2c slave register %s\n", registre);
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
 
   if ((read( lp_i2c_dev->i2c_dev_fd, lp_i2c_dev->i2c_dev_buf, 6)) != 6 ) {
-    printf("Error reading to i2c slave register %s\n", registre);
+    Trace("Error reading to i2c slave register %s\n", registre);
     lp_i2c_dev->i2c_dev_statut = ret ;
   }
 

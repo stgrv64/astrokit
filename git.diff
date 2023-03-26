@@ -1,0 +1,1233 @@
+diff --git a/astrokit.mars.2023.host b/astrokit.mars.2023.host
+index a348a6b..58f05c4 100755
+Binary files a/astrokit.mars.2023.host and b/astrokit.mars.2023.host differ
+diff --git a/src/astro_arguments.c b/src/astro_arguments.c
+index 59b9b42..ca4b2e5 100644
+--- a/src/astro_arguments.c
++++ b/src/astro_arguments.c
+@@ -167,7 +167,7 @@ void ARGUMENTS_HELP(int argc, char** argv) {
+ 
+   TraceArbo(__func__,0,"help") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
+-  memset(binaire, CALCULS_ZERO_CHAR,sizeof(binaire)) ;
++  memset(binaire, CONFIG_ZERO_CHAR,sizeof(binaire)) ;
+   strcpy(binaire,argv[0]) ;
+   
+   /* janvier 2022 : ajout argument pour afficher les paramatres 
+diff --git a/src/astro_astre.c b/src/astro_astre.c
+index beaa5eb..c90057b 100644
+--- a/src/astro_astre.c
++++ b/src/astro_astre.c
+@@ -136,12 +136,12 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
+   gettimeofday ( &                   lp_Ast->ast_tval, NULL ) ;
+ 
+   for(C=0; C< ASTRE_NB_COLONNES;C++) {
+-    memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
++    memset( lp_Ast->ast_plus_proche[C], CONFIG_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+     strcpy( lp_Ast->ast_plus_proche[C], "") ;
+   }
+-  memset( lp_Ast->ast_nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+-  memset( lp_Ast->ast_infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+-  memset( lp_Ast->ast_plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
++  memset( lp_Ast->ast_nom,         CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_nom));
++  memset( lp_Ast->ast_infos,       CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_infos));
++  memset( lp_Ast->ast_plus_proche, CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_plus_proche));
+   
+   lp_Ast->ast_azi     = 0 ;
+   lp_Ast->ast_alt     = 0 ;
+@@ -201,7 +201,7 @@ void ASTRE_PARAMS_INIT(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
+   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast_Par->ast_par_mutex ) ;
+ 
+ 
+-  memset( lp_Ast_Par->ast_par_default_object, CALCULS_ZERO_CHAR, sizeof( lp_Ast_Par->ast_par_default_object ) ) ;
++  memset( lp_Ast_Par->ast_par_default_object, CONFIG_ZERO_CHAR, sizeof( lp_Ast_Par->ast_par_default_object ) ) ;
+   
+   /* TODO : finalize */
+ }
+@@ -242,12 +242,12 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
+   // HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ; ;
+ 
+   for(C=0; C< ASTRE_NB_COLONNES;C++) {
+-    memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
++    memset( lp_Ast->ast_plus_proche[C], CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_plus_proche[C]));
+     strcpy( lp_Ast->ast_plus_proche[C], "") ;
+   }
+-  memset( lp_Ast->ast_nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+-  memset( lp_Ast->ast_infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+-  memset( lp_Ast->ast_plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
++  memset( lp_Ast->ast_nom,   CONFIG_ZERO_CHAR,       sizeof(lp_Ast->ast_nom));
++  memset( lp_Ast->ast_infos, CONFIG_ZERO_CHAR,       sizeof(lp_Ast->ast_infos));
++  memset( lp_Ast->ast_plus_proche, CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_plus_proche));
+ 
+   lp_Ast->ast_typ = ASTRE_INDETERMINE ;
+   lp_Ast->ast_num = 0 ;
+diff --git a/src/astro_calculs.c b/src/astro_calculs.c
+index d9a1d09..286b96e 100644
+--- a/src/astro_calculs.c
++++ b/src/astro_calculs.c
+@@ -304,9 +304,7 @@ void CALCULS_PARAMS_INIT(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
+ 
+ void CALCULS_PARAMS_DISPLAY(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
+ 
+-  TraceArbo(__func__,1,"params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+-
+-  Trace("gp_Log->log_level = %d", gp_Log->log_level) ;
++  TraceArbo(__func__,1,"calculs params display") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
+   MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_1",          lp_Cal_Par->cal_par_alt_red_1);         
+   MACRO_ASTRO_GLOBAL_LOG(gp_Log->log_level,1,"%-50s = %f",  "lp_Cal_Par->cal_par_alt_red_2",          lp_Cal_Par->cal_par_alt_red_2);
+diff --git a/src/astro_calculs.h b/src/astro_calculs.h
+index b56ed53..c52db00 100644
+--- a/src/astro_calculs.h
++++ b/src/astro_calculs.h
+@@ -43,7 +43,6 @@ struct STR_ANGLE {
+ 
+ #include "astro_global.h"
+ 
+-#define  CALCULS_ZERO_CHAR            0
+ #define  CALCULS_DUREE_JOUR_SIDERAL   86164.0   /* duree du jour sideral en seconde */
+ #define  CALCULS_PI_FOIS_DEUX         6.283185307179586476925
+ #define  CALCULS_OMEGA                0.000072921235169903748
+diff --git a/src/astro_cat.c b/src/astro_cat.c
+index 559a4ff..870eea7 100644
+--- a/src/astro_cat.c
++++ b/src/astro_cat.c
+@@ -150,12 +150,12 @@ void CAT_INIT (STRUCT_CAT * lp_Cat ) {
+   
+   for(int L=0;L<CAT_NB_LIGNES;L++) {
+     for(int C=0;C<CAT_NB_COLONNES;C++) {
+-      memset(lp_Cat->cat_dat[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+-      memset(lp_Cat->cat_dec[L][C], CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
++      memset(lp_Cat->cat_dat[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Cat->cat_dat[L][C]));
++      memset(lp_Cat->cat_dec[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Cat->cat_dat[L][C]));
+     }
+   }
+ 
+-  memset(lp_Cat->cat_path, CALCULS_ZERO_CHAR, sizeof( lp_Cat->cat_path));
++  memset(lp_Cat->cat_path, CONFIG_ZERO_CHAR, sizeof( lp_Cat->cat_path));
+ 
+   return ;
+ }
+@@ -178,7 +178,7 @@ void CAT_DISPLAY_DAT(STRUCT_CAT * lp_Cat ) {
+   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+   l=0 ;
+   while( strcmp( lp_Cat->cat_dat[l][3], "_" ) ) {
+-   memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
++   memset( buffer,CONFIG_ZERO_CHAR, sizeof(buffer)) ;
+    for(c=0;c<CAT_NB_COLONNES;c++) {
+     /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+     memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+@@ -209,7 +209,7 @@ void CAT_DISPLAY_DEC(STRUCT_CAT * lp_Cat ) {
+   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+   l=0 ;
+   while( strcmp( lp_Cat->cat_dec[l][3], "_" ) ) {
+-   memset( buffer,CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER * CAT_NB_COLONNES) ;
++   memset( buffer,CONFIG_ZERO_CHAR, sizeof(buffer)) ;
+    for(c=0;c<CAT_NB_COLONNES;c++) {
+     /* modif stgrv 01/2022 : avoid -Wrestrict passing pointers */ 
+     memset( buffer_recopie, 0, sizeof(buffer_recopie) ) ;
+@@ -245,13 +245,13 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * lc_file_name) {
+ 
+   for(L=0;L<CAT_NB_LIGNES;L++)
+     for(C=0;C<CAT_NB_COLONNES;C++) {
+-      memset(lp_Cat->cat_dat[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER);
+-      strcpy(lp_Cat->cat_dat[L][C],"_") ;
++      memset( lp_Cat->cat_dat[L][C], CONFIG_ZERO_CHAR, sizeof( lp_Cat->cat_dat[L][C] ));
++      strcpy( lp_Cat->cat_dat[L][C], "_") ;
+     }
+   
+   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Cat->cat_mutex ) ;
+ 
+-  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER * CAT_NB_COLONNES);
++  memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer) );
+   sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
+   
+   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Cat->cat_mutex ) ;
+@@ -265,6 +265,7 @@ void CAT_READ(STRUCT_CAT * lp_Cat, char * lc_file_name) {
+   if ( (fin=fopen(buffer,"r")) == NULL)  {
+     // completer et modifier
+     SyslogErrFmt("probleme ouverture 0 %s\n",buffer) ;
++    Trace("probleme ouverture 0 %s",buffer) ;
+     exit(2) ;
+   }
+   else Trace1("open %s ok", buffer) ;
+@@ -329,7 +330,7 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
+       if ( d_min > d_angulaire ) {  // Si objet encore plus proche trouve
+         d_min = d_angulaire ;
+         for(C=0;C<CAT_NB_COLONNES;C++) { 
+-          memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, CAT_TAILLE_BUFFER);
++          memset( lp_Ast->ast_plus_proche[C], CONFIG_ZERO_CHAR, sizeof( lp_Ast->ast_plus_proche[C] ));
+           strcpy( lp_Ast->ast_plus_proche[C], lp_Cat->cat_dec[L][C]) ;
+         }
+       }
+@@ -474,16 +475,17 @@ void CAT_FORMAT_DECIMAL_NGC(STRUCT_CAT * lp_Cat, char * lc_file_name) {
+ 
+   for(L=0;L<CAT_NB_LIGNES;L++)
+     for(C=0;C<CAT_NB_COLONNES;C++)  {
+-      memset(lp_Cat->cat_dec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
++      memset(lp_Cat->cat_dec[L][C],CONFIG_ZERO_CHAR, sizeof(lp_Cat->cat_dec[L][C]) );
+       strcpy(lp_Cat->cat_dec[L][C],"_") ;
+   } 
+   
+-  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
++  memset(buffer,CONFIG_ZERO_CHAR, sizeof( buffer) );
+   sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
+   
+   if ( (fout=fopen(buffer,"w")) == NULL) {
+     // completer et modifier
+     SyslogErrFmt("probleme ouverture 1 %s\n",buffer) ;
++    Trace("probleme ouverture 0 %s",buffer) ;
+     exit(2) ;
+   }
+   L=0 ;
+@@ -551,16 +553,17 @@ void CAT_FORMAT_DECIMAL_ETO(STRUCT_CAT * lp_Cat, char * lc_file_name ) {
+   
+   for(L=0;L<CAT_NB_LIGNES;L++)
+     for(C=0;C<CAT_NB_COLONNES;C++)  {
+-      memset(lp_Cat->cat_dec[L][C],CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
++      memset(lp_Cat->cat_dec[L][C],CONFIG_ZERO_CHAR, sizeof(buffer) );
+       strcpy(lp_Cat->cat_dec[L][C],"_") ;
+   } 
+   
+-  memset(buffer,CALCULS_ZERO_CHAR,CAT_TAILLE_BUFFER-1);
++  memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer));
+   sprintf(buffer,"%s/%s/%s",gp_Con_Par->con_par_rep_home,gp_Con_Par->con_par_rep_cat,lc_file_name) ;
+   
+   if ( (fout=fopen(buffer,"w")) == NULL) {
+     // completer et modifier
+     SyslogErrFmt("probleme ouverture 2 %s\n",buffer) ;
++    Trace("probleme ouverture 0 %s",buffer) ;
+     exit(2) ;
+   }
+   L=0 ;
+diff --git a/src/astro_codes.h b/src/astro_codes.h
+index 730a7ba..5b32a4b 100644
+--- a/src/astro_codes.h
++++ b/src/astro_codes.h
+@@ -90,40 +90,40 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
+ /* clavier alphabetique (minuscules) */ 
+ /*-----------------------------------*/
+ 
+-{ "97",  "KEY_LIST", "MODE_AZIMUTAL"},  /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
++{ "97",  "KEY_LIST", "key_azi"},    /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
+ { "98",  "KEY_b",    "b"},  
+ { "99",  "KEY_c",    "c"},  
+ { "100", "KEY_d",    "d"},     
+ { "101", "KEY_e",    "e"},  
+ { "102", "KEY_f",    "f"},  
+ { "103", "KEY_g",    "g"},     
+-{ "104", "KEY_h",    "h"}, /* 104 sum ascii = touche 'h' = affichage threads infos */
++{ "104", "KEY_h",    "h"},          /* 104 sum ascii = touche 'h' = affichage threads infos */
+ { "105", "KEY_i",    "i"},    
+-{ "106", "KEY_j",    "j" },  /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
+-{ "107", "KEY_k",    "k" },  /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
+-{ "108", "KEY_l",    "l" },  /* 108 sum ascii = touche 'l' = activer les traces pid temps reel */ 
+-{ "109", "KEY_MENU", "MENU"},     /* 109  ascii = touche 'm' */
++{ "106", "KEY_j",    "j" },         /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
++{ "107", "KEY_k",    "k" },         /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
++{ "108", "KEY_l",    "l" },         /* changement longitude */ 
++{ "109", "KEY_MENU", "MENU"},       /* 109  ascii = touche 'm' */
+ { "110", "KEY_n",    "n"},     
+ 
+ { "111", "KEY_o",    "o"},  
+-{ "112", "KEY_p",    "p"},    
+-{ "113", "KEY_EXIT", "key_exit" },
+-{ "114", "KEY_r",    "r" },           /* 114 sum ascii = touche 'r' = reseau */ 
+-{ "115", "KEY_s",    "s"},     /* 115 sum ascii = touche 's'        = log */ 
+-{ "116", "KEY_MUTE", "TIME"},        /* 116 ascii = touche 't' */
+-{ "117", "KEY_u",    "u"},     /* 117 sum ascii = touche 'u'     = log */ 
+-{ "118", "KEY_v",    "v"}, /* 118 sum ascii = touche 'v' = log */ 
+-{ "119", "KEY_w",    "w"},     /* 119 sum ascii = touche 'w'     = log */
++{ "112", "KEY_p",    "key_pid"},    /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
++{ "113", "KEY_EXIT", "key_exit" },  /* 113 sum ascii = touche 'q' = 'quit' = quitter le programme */ 
++{ "114", "KEY_r",    "r" },         /* 114 sum ascii = touche 'r' = reseau */ 
++{ "115", "KEY_s",    "s"},          /* 115 sum ascii = touche 's'        = log */ 
++{ "116", "KEY_MUTE", "TIME"},       /* 116 sum ascii = touche 't' = temps */
++{ "117", "KEY_u",    "u"},          /* 117 sum ascii = touche 'u'     = log */ 
++{ "118", "KEY_v",    "v"},          /* 118 sum ascii = touche 'v' = log */ 
++{ "119", "KEY_w",    "w"},          /* 119 sum ascii = touche 'w'     = log */
+ { "120", "KEY_x",    "x"},    
+ 
+ { "121", "KEY_y",    "y"},    
+-{ "122", "KEY_MODE", "MODE_EQUATORIAL"}, /* z=equatorial => touche 'z' */     
++{ "122", "KEY_MODE", "key_equ"}, /* z=equatorial => touche 'z' */     
+ 
+ /*--------------------------------*/
+ /* objets MES NGC ETO PLA         */
+ /*--------------------------------*/
+ 
+-{ "47",  "KEY_M",    "MES"},  /* 47 ascii = touche '/' */
++{ "47",  "KEY_M",    "key_mes"},  /* 47 ascii = touche '/' */
+ { "42",  "KEY_N",    "NGC"},  /* 42 ascii = touche '*' */
+ { "45",  "KEY_E",    "ETO"},  /* 45 ascii = touche '-' */
+ { "43",  "KEY_P",    "PLA"},  /* 43 ascii = touche '+' */
+@@ -201,7 +201,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
+ /*--------------------------------*/
+ 
+ { "obsolete",  "KEY_NEXT",    "plus"},     /* 62  ascii = touche '>' */
+-{ "obsolete",  "KEY_PREVIOUS","previous"}, /* action a definir */
++{ "obsolete",  "KEY_PREVIOUS","key_previous"}, /* action a definir */
+ { "obsolete",  "KEY_SETUP",   "SETUP"},    /* non mis en place pour l instant (2022/04) */
+ { "obsolete",  "KEY_SOUND",   "TIME"  },   /* remplace par KEY_MUTE sur la telecommande */
+ { "obsolete",  "KEY_FORWARD", "forward"},  /* remplace par KEY_VOLUMEUP */
+diff --git a/src/astro_config.c b/src/astro_config.c
+index dc683bc..5a3a884 100644
+--- a/src/astro_config.c
++++ b/src/astro_config.c
+@@ -195,7 +195,7 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
+   
+   for(int L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
+     for(int C=0;C<CONFIG_DATAS_NB_COLONNES;C++) {
+-      memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
++      memset(lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params[L][C]));
+     }
+   }
+ 
+@@ -216,19 +216,19 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
+ 
+   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con_Par->con_par_mutex ) ;
+ 
+-  memset( lp_Con_Par->con_par_rep_cat, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cat ) ) ;
+-  memset( lp_Con_Par->con_par_rep_cfg, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cfg ) ) ;
+-  memset( lp_Con_Par->con_par_rep_log, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_log ) ) ;
+-  memset( lp_Con_Par->con_par_rep_in,  CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_in ) ) ;
+-  memset( lp_Con_Par->con_par_rep_out, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_out ) ) ;
+-  memset( lp_Con_Par->con_par_rep_scr, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_scr ) ) ;
+-  memset( lp_Con_Par->con_par_fic_led, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_led ) ) ;
+-  memset( lp_Con_Par->con_par_fic_log, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_log ) ) ;
+-  memset( lp_Con_Par->con_par_fic_pid, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_pid ) ) ;
+-  memset( lp_Con_Par->con_par_fic_vou, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_vou ) ) ;
+-  memset( lp_Con_Par->con_par_fic_dat, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_dat ) ) ;
+-  memset( lp_Con_Par->con_par_fic_hhm, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_hhm ) ) ;
+-  memset( lp_Con_Par->con_par_src_ker, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_src_ker ) ) ;
++  memset( lp_Con_Par->con_par_rep_cat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cat ) ) ;
++  memset( lp_Con_Par->con_par_rep_cfg, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cfg ) ) ;
++  memset( lp_Con_Par->con_par_rep_log, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_log ) ) ;
++  memset( lp_Con_Par->con_par_rep_in,  CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_in ) ) ;
++  memset( lp_Con_Par->con_par_rep_out, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_out ) ) ;
++  memset( lp_Con_Par->con_par_rep_scr, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_scr ) ) ;
++  memset( lp_Con_Par->con_par_fic_led, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_led ) ) ;
++  memset( lp_Con_Par->con_par_fic_log, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_log ) ) ;
++  memset( lp_Con_Par->con_par_fic_pid, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_pid ) ) ;
++  memset( lp_Con_Par->con_par_fic_vou, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_vou ) ) ;
++  memset( lp_Con_Par->con_par_fic_dat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_dat ) ) ;
++  memset( lp_Con_Par->con_par_fic_hhm, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_hhm ) ) ;
++  memset( lp_Con_Par->con_par_src_ker, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_src_ker ) ) ;
+ 
+   strcpy( lp_Con_Par->con_par_rep_cat , "" ) ;
+   strcpy( lp_Con_Par->con_par_rep_cfg , "" ) ;
+@@ -243,7 +243,11 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
+   strcpy( lp_Con_Par->con_par_fic_dat , "" ) ;
+   strcpy( lp_Con_Par->con_par_fic_hhm , "" ) ;
+   strcpy( lp_Con_Par->con_par_src_ker , "" ) ;
+-  /* TODO : finalize */
++  
++  lp_Con_Par->con_par_default_menu = 0 ;
++
++  return ;
++
+ }
+ /*****************************************************************************************
+ * @fn     : CONFIG_FORMAT_ADMIS
+@@ -398,7 +402,15 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
+ 
+     if(!strcmp("MENU_PAR_DEFAUT",lp_Con->con_params[l][0])) {
+ 
+-      if(!strcmp(lp_Con->con_params[l][1],"MENU_AZIMUTAL" ))           gp_Con_Par->con_par_default_menu = MENU_AZIMUTAL ;
++      Trace("lp_Con->con_params[l][0]= _%s_", lp_Con->con_params[l][0]) ;
++      Trace("lp_Con->con_params[l][1]= _%s_", lp_Con->con_params[l][1]) ;
++      Trace("gp_Con_Par->con_par_default_menu = %d" , gp_Con_Par->con_par_default_menu) ;
++      Trace("MENU_AZIMUTAL = %d", MENU_AZIMUTAL ) ;
++
++      if(!strcmp(lp_Con->con_params[l][1],"MENU_AZIMUTAL" ))          { 
++        gp_Con_Par->con_par_default_menu = MENU_AZIMUTAL ;
++      }
++
+       if(!strcmp(lp_Con->con_params[l][1],"MENU_EQUATORIAL" ))         gp_Con_Par->con_par_default_menu = MENU_EQUATORIAL ;
+       if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_BRUT" ))        gp_Con_Par->con_par_default_menu = MENU_MANUEL_BRUT ;
+       if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_NON_ASSERVI" )) gp_Con_Par->con_par_default_menu = MENU_MANUEL_NON_ASSERVI ;
+@@ -717,21 +729,21 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+ 
+   for(L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
+     for(C=0;C<CONFIG_DATAS_NB_COLONNES;C++) { 
+-      memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
++      memset( lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params[L][C]) );
+     }
+   }
+   
+   // FIXME : construction du chemin du fichier de configuration
+   // FIXME : la variable gp_Con_Par->con_par_rep_home doit etre lue auparavant (getcwd) (2021)
+ 
+-  memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
++  memset(buf, CONFIG_ZERO_CHAR, sizeof(buf));
+   sprintf(buf,"%s/%s",gp_Con_Par->con_par_rep_home, CONFIG_FIC_CFG) ;
+   
+   // FIXME : ouverture du fichier de configuration
+ 
+ 
+   if ( (fin=fopen(buf,"r")) == NULL) {
+-   memset(buffer,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
++   memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer));
+    sprintf(buffer,"Pbme ouverture %s",buf) ;
+    //LOG(buffer) ;
+    Trace("probleme ouverture 4 %s",buf) ; 
+@@ -739,7 +751,7 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+   }
+   else Trace("open %s ok", buf) ;
+ 
+-  memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
++  memset(buf,CONFIG_ZERO_CHAR, sizeof(buf));
+   i_Mot_Caractere_Lu_En_cours=0;
+   L=0;
+   C=0;
+@@ -754,12 +766,14 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+       Trace2("%-2d %-2d %-2d %-30s", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
+ 
+     if (CONFIG_FIN_FICHIER(c)) { 
++      Trace("CONFIG_FIN_FICHIER") ;
+       if (L<i_trace_ligne_max) 
+         Trace2(" --- %-2d %-2d %-2d %-30s (lecture fin fichier & continue)", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
+       break ;
+     }
+ 
+     if (CONFIG_DEB_COM(c)) {
++      Trace("CONFIG_DEB_COM") ;
+       while(!CONFIG_FIN_LIGNE(fgetc(fin)));
+       L++;
+       C=0;
+@@ -767,31 +781,63 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+ 
+     if ( CONFIG_FIN_MOT(c) ) {
+ 
++      Trace("CONFIG_FIN_MOT") ;
++
++      Trace("gp_Con_Par = %p", gp_Con_Par) ;
++      Trace(" 0 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++
+       if (L<i_trace_ligne_max) 
+-        Trace2(" --- %-2d %-2d %-2d %-30s lecture fin mot", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
++
++        Trace(" --- %-2d %-2d %-2d %-30s lecture fin mot", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
+ 
+       /* Si un mot est en cours de lecture */
++      
+       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
+-        memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
++
++        Trace("gp_Con_Par = %p", gp_Con_Par) ;
++        Trace("lp_Con     = %p", lp_Con) ;
++        Trace(" 1a gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++
++/* FIXME :  erreur incomprehensible lors de la mise en place de ce memset 
++            cela rend l adresse du pointeur gp_Con_Par en (nil)
++*/   /*
++        memset(lp_Con->con_params[L][C],CONFIG_ZERO_CHAR,sizeof(lp_Con->con_params[L][C]));
++*/
++        printf("gp_Con_Par=%p\n", gp_Con_Par );
++        Trace("gp_Con_Par = %p", gp_Con_Par) ;
++        printf(" 1b gp_Con_Par->con_par_default_menu =%d\n", gp_Con_Par->con_par_default_menu ); 
++
+         strcpy(lp_Con->con_params[L][C],buf);
+-        memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
++
++        Trace("gp_Con_Par = %p", gp_Con_Par) ;
++        Trace(" 1c gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++
++        memset(buf,CONFIG_ZERO_CHAR,sizeof(buf));
++
++        Trace("gp_Con_Par = %p", gp_Con_Par) ;
++        Trace(" 2 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+ 
+         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
++        
++        Trace("gp_Con_Par = %p", gp_Con_Par) ;
++        Trace("3 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+ 
+         i_Mot_Caractere_Lu_En_cours=0;
+         C++;
+       }
+     }
+     if ((CONFIG_FIN_LIGNE(c))) {
++      
++      Trace("CONFIG_FIN_LIGNE") ;
+ 
+       if (L<i_trace_ligne_max) 
+         Trace2(" --- %-2d %-2d %-2d %-30s lecture fin ligne", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
+ 
+       /* Si un mot est en cours de lecture */
+       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
+-        memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+-        strcpy(lp_Con->con_params[L][C],buf);
+-        memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
++        memset( lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof( lp_Con->con_params[L][C] ));
++        strcpy( lp_Con->con_params[L][C], buf);
++        memset(buf,CONFIG_ZERO_CHAR, sizeof( buf));
+ 
+         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
+ 
+@@ -812,12 +858,16 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     }
+     
+     if (CONFIG_FORMAT_ADMIS(c)){
++
++      Trace("CONFIG_FORMAT_ADMIS") ;
+       buf[i_Mot_Caractere_Lu_En_cours]=(char)c;
+       i_Mot_Caractere_Lu_En_cours++;
+     }
+   }
+   fclose(fin);
+ 
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++
+   return 0 ;
+ }
+ /*****************************************************************************************
+@@ -963,7 +1013,7 @@ void CONFIG_MENU_CHANGE_DETECT (void)  {
+ 
+   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
+-  memset(s_menu, 0, sizeof(s_menu)) ;
++  memset(s_menu, CONFIG_ZERO_CHAR, sizeof(s_menu)) ;
+ 
+   switch(gp_Sui->sui_menu) {
+      
+diff --git a/src/astro_config.h b/src/astro_config.h
+index 1ae4142..91a5edc 100644
+--- a/src/astro_config.h
++++ b/src/astro_config.h
+@@ -241,26 +241,24 @@ t_en_Config_Parametres_Obligatoires_Types ;
+ struct STR_CONFIG_PARAMS {
+ 
+   pthread_mutex_t con_par_mutex ;
++  /*
+   void          (*con_par_lock)   (void) ;
+   void          (*con_par_unlock) (void) ;  
+-  
++  */
+   int             con_par_default_menu ;
+-
+   char            con_par_rep_home   [ CONFIG_TAILLE_BUFFER_64 ] ;
+   char            con_par_rep_cat    [ CONFIG_TAILLE_BUFFER_64 ] ;
+   char            con_par_rep_cfg    [ CONFIG_TAILLE_BUFFER_64 ] ;      
+   char            con_par_rep_log    [ CONFIG_TAILLE_BUFFER_64 ] ;      
+   char            con_par_rep_in     [ CONFIG_TAILLE_BUFFER_64 ] ;    
+   char            con_par_rep_out    [ CONFIG_TAILLE_BUFFER_64 ] ;    
+-  char            con_par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+-
++  char            con_par_rep_scr    [ CONFIG_TAILLE_BUFFER_64 ] ;
+   char            con_par_fic_pid    [ CONFIG_TAILLE_BUFFER_64 ] ;
+   char            con_par_fic_vou    [ CONFIG_TAILLE_BUFFER_64 ] ;
+   char            con_par_fic_log    [ CONFIG_TAILLE_BUFFER_64 ] ;            
+   char            con_par_fic_dat    [ CONFIG_TAILLE_BUFFER_64 ] ;            
+   char            con_par_fic_hhm    [ CONFIG_TAILLE_BUFFER_64 ] ;        
+   char            con_par_fic_led    [ CONFIG_TAILLE_BUFFER_64 ] ; 
+-
+   char            con_par_src_ker    [ CONFIG_TAILLE_BUFFER_64 ] ;
+ } ;
+ 
+@@ -268,7 +266,7 @@ struct STR_CONFIG_PARAMS {
+ /* Fin parametres de fichier config                  */ 
+ /*---------------------------------------------------*/
+ 
+-typedef struct  STR_CONFIG STRUCT_CONFIG ;
++typedef struct  STR_CONFIG_PARAMS STRUCT_CONFIG_PARAMS ;
+ 
+ struct STR_CONFIG {
+   pthread_mutex_t con_mutex ;
+@@ -289,6 +287,8 @@ struct STR_CONFIG {
+                                [CONFIG_TAILLE_BUFFER_256] ;
+ } ;
+ 
++typedef struct  STR_CONFIG STRUCT_CONFIG ;
++
+ static const char * c_Bin_Possible_Paths[] = {
+   "/bin",
+   "/sbin",
+diff --git a/src/astro_datas.c b/src/astro_datas.c
+index 3b36639..e58f335 100644
+--- a/src/astro_datas.c
++++ b/src/astro_datas.c
+@@ -144,7 +144,7 @@ void DATAS_INIT ( STRUCT_DATAS * lp_Dat ) {
+ 
+   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
+ 
+-  memset( lp_Dat, 0, sizeof (STRUCT_DATAS ) ) ;
++  memset( lp_Dat, 0, sizeof ( STRUCT_DATAS ) ) ;
+   strcpy( lp_Dat->dat_acc, ""  ) ;
+   strcpy( lp_Dat->dat_bou, ""  ) ;
+   strcpy( lp_Dat->dat_act, ""  ) ;
+@@ -168,7 +168,7 @@ void DATAS_RESET( STRUCT_DATAS * lp_Dat ) {
+ 
+   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
+ 
+-  memset( lp_Dat, 0, sizeof (STRUCT_DATAS ) ) ;
++  memset( lp_Dat, 0, sizeof ( STRUCT_DATAS ) ) ;
+ 
+   strcpy( lp_Dat->dat_acc, ""  ) ;
+   strcpy( lp_Dat->dat_bou, ""  ) ;
+diff --git a/src/astro_global.h b/src/astro_global.h
+index 651aaca..ba56482 100644
+--- a/src/astro_global.h
++++ b/src/astro_global.h
+@@ -129,6 +129,7 @@
+ 
+ #define MACRO_ASTRO_GLOBAL_LOG(loglevel,nb,fmt, args...) \
+ do { \
++    fprintf(stdout, "\n%-36s -> loglevel %d nb %d" fmt, __func__, loglevel, nb, ##args) ; \
+   if (loglevel>=nb) { \
+     fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
+   } \
+diff --git a/src/astro_gpio.c b/src/astro_gpio.c
+index 306a207..d878a17 100644
+--- a/src/astro_gpio.c
++++ b/src/astro_gpio.c
+@@ -354,7 +354,7 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     if(!strcmp("ALT_GPIO",lp_Con->con_params[l][0])) {
+ 
+       // FIXME ajout stephane 2021
+-      memset( gp_Pwm_Par->gpi_pwm_par_alt_gpio,0,sizeof(gp_Pwm_Par->gpi_pwm_par_alt_gpio)) ;
++      memset( gp_Pwm_Par->gpi_pwm_par_alt_gpio, CONFIG_ZERO_CHAR, sizeof(gp_Pwm_Par->gpi_pwm_par_alt_gpio)) ;
+       strcpy( gp_Pwm_Par->gpi_pwm_par_alt_gpio, lp_Con->con_params[l][1] ) ;
+ 
+       Trace1("ALT_GPIO trouve ligne %d = (%s)", l,gp_Pwm_Par->gpi_pwm_par_alt_gpio) ;
+@@ -375,7 +375,7 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     if(!strcmp("AZI_GPIO",lp_Con->con_params[l][0])) {
+ 
+       // FIXME ajout stephane 2021
+-      memset( gp_Pwm_Par->gpi_pwm_par_azi_gpio,0,sizeof(gp_Pwm_Par->gpi_pwm_par_azi_gpio)) ;
++      memset( gp_Pwm_Par->gpi_pwm_par_azi_gpio, CONFIG_ZERO_CHAR, sizeof(gp_Pwm_Par->gpi_pwm_par_azi_gpio)) ;
+       strcpy( gp_Pwm_Par->gpi_pwm_par_azi_gpio, lp_Con->con_params[l][1] ) ;
+ 
+       Trace1("AZI_GPIO trouve ligne %d = (%s)", l,gp_Pwm_Par->gpi_pwm_par_azi_gpio) ;
+@@ -396,7 +396,7 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     if(!strcmp("ALT_MASK",lp_Con->con_params[l][0])) {
+ 
+       // FIXME ajout stephane 2021
+-      memset( gp_Pwm_Par->gpi_pwm_par_alt_mask,0,sizeof(gp_Pwm_Par->gpi_pwm_par_alt_mask)) ;
++      memset( gp_Pwm_Par->gpi_pwm_par_alt_mask, CONFIG_ZERO_CHAR, sizeof(gp_Pwm_Par->gpi_pwm_par_alt_mask)) ;
+       strcpy( gp_Pwm_Par->gpi_pwm_par_alt_mask, lp_Con->con_params[l][1] ) ;
+ 
+       Trace1("ALT_MASK trouve ligne %d = (%s)", l,gp_Pwm_Par->gpi_pwm_par_alt_mask) ;
+@@ -417,7 +417,7 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     if(!strcmp("AZI_MASK",lp_Con->con_params[l][0])) {
+ 
+       // FIXME ajout stephane 2021
+-      memset( gp_Pwm_Par->gpi_pwm_par_azi_mask,0,sizeof(gp_Pwm_Par->gpi_pwm_par_azi_mask)) ;
++      memset( gp_Pwm_Par->gpi_pwm_par_azi_mask, CONFIG_ZERO_CHAR, sizeof(gp_Pwm_Par->gpi_pwm_par_azi_mask)) ;
+       strcpy( gp_Pwm_Par->gpi_pwm_par_azi_mask, lp_Con->con_params[l][1] ) ;
+ 
+       Trace1("AZI_MASK trouve ligne %d = (%s)", l,gp_Pwm_Par->gpi_pwm_par_azi_mask) ;
+@@ -438,7 +438,7 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     if(!strcmp("ALT_FPWM",lp_Con->con_params[l][0])) {
+ 
+       // FIXME ajout stephane 2021
+-      memset( gp_Pwm_Par->gpi_pwm_par_alt_fpwm,0,sizeof(gp_Pwm_Par->gpi_pwm_par_alt_fpwm)) ;
++      memset( gp_Pwm_Par->gpi_pwm_par_alt_fpwm, CONFIG_ZERO_CHAR, sizeof(gp_Pwm_Par->gpi_pwm_par_alt_fpwm)) ;
+       strcpy( gp_Pwm_Par->gpi_pwm_par_alt_fpwm, lp_Con->con_params[l][1] ) ;
+ 
+       gd_alt_fpwm = 1000 ;
+@@ -459,7 +459,7 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
+     if(!strcmp("AZI_FPWM",lp_Con->con_params[l][0])) {
+ 
+       // FIXME ajout stephane 2021
+-      memset( gp_Pwm_Par->gpi_pwm_par_azi_fpwm,0,sizeof(gp_Pwm_Par->gpi_pwm_par_azi_fpwm)) ;
++      memset( gp_Pwm_Par->gpi_pwm_par_azi_fpwm, CONFIG_ZERO_CHAR, sizeof(gp_Pwm_Par->gpi_pwm_par_azi_fpwm)) ;
+       strcpy( gp_Pwm_Par->gpi_pwm_par_azi_fpwm, lp_Con->con_params[l][1] ) ;
+ 
+       gd_azi_fpwm = 1000 ;
+@@ -553,7 +553,7 @@ int GPIO_GET(int gpio) {
+   
+   char buf[GPIO_BUFFER_SIZE_256] ;
+   int  val ;
+-  memset(buf,0,GPIO_BUFFER_SIZE_256);
++  memset(buf, CONFIG_ZERO_CHAR, sizeof(buf));
+   
+   if ( GPIO_OPEN_STATUT == 0 ) {
+     if(pread(gi_gpio_fd[gpio],buf,GPIO_BUFFER_SIZE_256,0)>0)
+@@ -585,7 +585,7 @@ int GPIO_SET(int gpio,int val) {
+ 
+   TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
+-  memset(buf,0,GPIO_BUFFER_SIZE_256);
++  memset(buf, CONFIG_ZERO_CHAR, sizeof(buf));
+   snprintf(buf,GPIO_BUFFER_SIZE_256,"%d\n",val) ;
+ 
+  /* PWM :   pwrite( lp_Pha->pha_gpio_fd,c_buf0,strlen(c_buf0),0) ; */
+@@ -620,11 +620,11 @@ int GPIO_OPEN_BROCHE(int gpio,int output) {
+ 
+   GPIO_OPEN_STATUT=0 ;
+   
+-  memset(exp,0,GPIO_BUFFER_SIZE_256);
+-  memset(dir,0,GPIO_BUFFER_SIZE_256);
+-  memset(val,0,GPIO_BUFFER_SIZE_256);
++  memset( exp, CONFIG_ZERO_CHAR, sizeof( exp ) );
++  memset( dir, CONFIG_ZERO_CHAR, sizeof( dir ) );
++  memset( val, CONFIG_ZERO_CHAR, sizeof( val ) );
+   
+-  memset(gi_gpio_fd,0,GPIO_SIZE*sizeof(int));
++  memset(gi_gpio_fd, CONFIG_ZERO_CHAR, sizeof( gi_gpio_fd) );
+     
+   sprintf(exp,"%s/export",GPIO_PATH) ;
+   sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gpio) ;
+@@ -679,10 +679,10 @@ void GPIO_OPEN_BROCHE_PWM(STRUCT_GPIO_PWM_PHASE *lp_Pha) {
+   char exp[GPIO_BUFFER_SIZE_256] ;
+   char unexport[GPIO_BUFFER_SIZE_256] ;
+   
+-  memset(unexport,0,GPIO_BUFFER_SIZE_256);
+-  memset(exp,0,GPIO_BUFFER_SIZE_256);
+-  memset(dir,0,GPIO_BUFFER_SIZE_256);
+-  memset(val,0,GPIO_BUFFER_SIZE_256);
++  memset(unexport,CONFIG_ZERO_CHAR, sizeof( unexport ));
++  memset(exp,     CONFIG_ZERO_CHAR, sizeof( exp ));
++  memset(dir,     CONFIG_ZERO_CHAR, sizeof( dir ));
++  memset(val,     CONFIG_ZERO_CHAR, sizeof( val ));
+   
+   sprintf(unexport,"%s/unexport",GPIO_PATH) ;
+   //close( lp_Pha->pha_gpio_fd ) ;
+@@ -755,14 +755,14 @@ int GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
+   
+   while(gi_gpio_out[++i]>0) {
+   
+-    memset(err,0,GPIO_BUFFER_SIZE_256) ;
+-    memset(exp,0,GPIO_BUFFER_SIZE_256);
+-    memset(dir,0,GPIO_BUFFER_SIZE_256);
+-    memset(val,0,GPIO_BUFFER_SIZE_256);
++    memset( err, CONFIG_ZERO_CHAR, sizeof( err ) ) ;
++    memset( exp, CONFIG_ZERO_CHAR, sizeof( exp ) );
++    memset( dir, CONFIG_ZERO_CHAR, sizeof( dir ) );
++    memset( val, CONFIG_ZERO_CHAR, sizeof( val ) );
+     
+-    sprintf(exp,"%s/export",GPIO_PATH) ;
+-    sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gi_gpio_out[i]) ;
+-    sprintf(val,"%s/gpio%d/value",GPIO_PATH,gi_gpio_out[i]) ;
++    sprintf( exp,"%s/export",           GPIO_PATH) ;
++    sprintf( dir,"%s/gpio%d/direction", GPIO_PATH, gi_gpio_out[i]) ;
++    sprintf( val,"%s/gpio%d/value",     GPIO_PATH, gi_gpio_out[i]) ;
+     /*
+     printf("exp=%s\n",exp);
+     printf("dir=%s\n",dir);
+@@ -783,9 +783,9 @@ int GPIO_OPEN(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
+   if ( GPIO_OPEN_STATUT == 0 )
+    while(gi_gpio_in[++i]>0) {
+     
+-    memset(dir,0,GPIO_BUFFER_SIZE_256);
+-    memset(exp,0,GPIO_BUFFER_SIZE_256);
+-    memset(val,0,GPIO_BUFFER_SIZE_256);
++    memset(dir, CONFIG_ZERO_CHAR, sizeof( dir ) );
++    memset(exp, CONFIG_ZERO_CHAR, sizeof( exp ) );
++    memset(val, CONFIG_ZERO_CHAR, sizeof( val ) );
+     
+     sprintf(exp,"%s/export",GPIO_PATH) ;
+     sprintf(dir,"%s/gpio%d/direction",GPIO_PATH,gi_gpio_in[i]) ;
+@@ -820,7 +820,7 @@ int GPIO_CLOSE_BROCHE(int gpio) {
+   
+   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+ 
+-  memset(une,0,GPIO_BUFFER_SIZE_256);
++  memset( une, CONFIG_ZERO_CHAR, sizeof( une ));
+   sprintf(une,"%s/unexport",GPIO_PATH) ;
+ 
+   Trace("fermeture GPIO %d", gi_gpio_fd [ gpio ] ) ;
+@@ -849,7 +849,7 @@ int GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
+   
+   i=-1;
+   while(gi_gpio_out[++i]>0) {
+-    memset(une,0,GPIO_BUFFER_SIZE_256);
++    memset(une, CONFIG_ZERO_CHAR, sizeof(une));
+     sprintf(une,"%s/unexport",GPIO_PATH) ;
+     close( gi_gpio_fd [ gi_gpio_out [ i ] ] ) ;
+     if ((f=fopen(une,"w")) == NULL )   { return -1 ;}
+@@ -858,7 +858,7 @@ int GPIO_CLOSE(int gi_gpio_in[GPIO_SIZE],int gi_gpio_out[GPIO_SIZE]) {
+   }
+   i=-1;
+   while(gi_gpio_in[++i]>0) {
+-    memset(une,0,GPIO_BUFFER_SIZE_256);
++    memset(une, CONFIG_ZERO_CHAR, sizeof(une));
+     sprintf(une,"%s/unexport",GPIO_PATH) ;
+     close( gi_gpio_fd [ gi_gpio_in [ i ] ] ) ;
+     if ((f=fopen(une,"w")) == NULL )   { return -4 ;}
+@@ -1360,8 +1360,11 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
+ 
+   d_TUpwm = d_TUpwm_haut  = d_TUpwm_bas = d_rap = 0 ;
+ 
+-  memset(c_buf0,0,GPIO_BUFFER_SIZE_256); snprintf(c_buf0,GPIO_BUFFER_SIZE_256,"%d\n",0) ;
+-  memset(c_buf1,0,GPIO_BUFFER_SIZE_256); snprintf(c_buf1,GPIO_BUFFER_SIZE_256,"%d\n",1) ;
++  memset(c_buf0, CONFIG_ZERO_CHAR, sizeof( c_buf0 ) ); 
++  memset(c_buf1, CONFIG_ZERO_CHAR, sizeof( c_buf1 ) ); 
++
++  snprintf(c_buf0,GPIO_BUFFER_SIZE_256,"%d\n",0) ;
++  snprintf(c_buf1,GPIO_BUFFER_SIZE_256,"%d\n",1) ;
+  
+   Trace2("debut while") ;
+ 
+diff --git a/src/astro_gpio.h b/src/astro_gpio.h
+index 17dcba4..a78a70a 100644
+--- a/src/astro_gpio.h
++++ b/src/astro_gpio.h
+@@ -230,13 +230,13 @@ static const char  raquette[4][4][GPIO_TAILLE_BUFFER] = \
+   { "MES"  ,"NGC"    , "ETO"  , "valider"}} ;
+   
+ static const char  keyboard_ir[4][4][GPIO_TAILLE_BUFFER] = \
+-  {{"KEY_1" ,"KEY_4" , "KEY_7" , "KEY_MENU"}, \
++  {{"KEY_1" ,"KEY_4" , "KEY_7" , "MENU"}, \
+   { "KEY_2" ,"KEY_5" , "KEY_8" , "KEY_0" },\
+   { "KEY_3" ,"KEY_6" , "KEY_9" , "KEY_P"}, \
+   { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
+   
+ static const char  raquette_ir[4][4][GPIO_TAILLE_BUFFER] = \
+-  {{"KEY_1"  ,"KEY_LEFT"  , "KEY_7"  , "KEY_MENU"}, \
++  {{"KEY_1"  ,"KEY_LEFT"  , "KEY_7"  , "MENU"}, \
+   { "KEY_UP" ,"KEY_OK"    , "KEY_DOWN" , "KEY_0" },\
+   { "KEY_3"  ,"KEY_RIGHT" , "KEY_9" , "KEY_P"}, \
+   { "KEY_M" ,"KEY_N" , "KEY_E",  "KEY_OK"}} ;
+diff --git a/src/astro_i2c.c b/src/astro_i2c.c
+index 9ec61e2..c7cd04e 100644
+--- a/src/astro_i2c.c
++++ b/src/astro_i2c.c
+@@ -284,7 +284,7 @@ int I2C_WRITE_DAC_MCP4726( STRUCT_I2C * lp_i2c_dev, unsigned long value) {
+   //value2 =0;
+   usleep( lp_i2c_dev->i2c_dev_usleep ) ;
+   ret=0 ;
+-  memset( lp_i2c_dev->i2c_dev_buf, 0 , I2C_BUFFER_SIZE ) ;
++  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR , sizeof( lp_i2c_dev->i2c_dev_buf) ) ;
+   
+   //lp_i2c_dev->i2c_dev_buf[0] = lp_i2c_dev->i2c_dev_adress ;
+   
+@@ -325,7 +325,7 @@ int I2C_WRITE( STRUCT_I2C * lp_i2c_dev, char * registre, char * value) {
+   
+   usleep( lp_i2c_dev->i2c_dev_usleep ) ;
+   ret=0 ;
+-  memset( lp_i2c_dev->i2c_dev_buf, 0, I2C_BUFFER_SIZE ) ;
++  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR, sizeof( lp_i2c_dev->i2c_dev_buf ) ) ;
+   
+   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
+   lp_i2c_dev->i2c_dev_buf[1] = strtoul( value, NULL, 16 ) ;
+@@ -353,7 +353,7 @@ uint16_t I2C_READ_1_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
+   
+   usleep( lp_i2c_dev->i2c_dev_usleep) ;
+   ret=0 ;
+-  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR, I2C_BUFFER_SIZE ) ;
++  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR, sizeof( lp_i2c_dev->i2c_dev_buf ) ) ;
+   
+   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
+   
+@@ -396,7 +396,7 @@ void I2C_READ_6_BYTES( STRUCT_I2C * lp_i2c_dev, char * registre) {
+   ret=0 ;
+ 
+   usleep( lp_i2c_dev->i2c_dev_usleep) ;
+-  memset( lp_i2c_dev->i2c_dev_buf, 0 , I2C_BUFFER_SIZE ) ;
++  memset( lp_i2c_dev->i2c_dev_buf, CONFIG_ZERO_CHAR , sizeof( lp_i2c_dev->i2c_dev_buf ) ) ;
+   
+   lp_i2c_dev->i2c_dev_buf[0] = strtoul( registre, NULL, 16 ) ;
+   
+diff --git a/src/astro_keyboard.c b/src/astro_keyboard.c
+index 7177823..fa5e1b9 100644
+--- a/src/astro_keyboard.c
++++ b/src/astro_keyboard.c
+@@ -134,7 +134,7 @@ static void KEYBOARD_TERMIOS_MODE_ENTER(STRUCT_TERMIOS * lp_Ter) {
+   lp_Ter->ter_nread = 0 ;
+   lp_Ter->ter_peek_char = '0' ;
+   lp_Ter->ter_sum_ascii = 0 ;
+-  memset( lp_Ter->ter_buffer , 0, sizeof( lp_Ter->ter_buffer )) ;
++  memset( lp_Ter->ter_buffer , CONFIG_ZERO_CHAR, sizeof( lp_Ter->ter_buffer )) ;
+ 
+   lp_Ter->ter_unlock( lp_Ter ) ;
+ 
+@@ -207,7 +207,7 @@ void KEYBOARD_TERMIOS_INIT(STRUCT_TERMIOS * lp_Ter) {
+   lp_Ter->ter_nread = 0 ;
+   lp_Ter->ter_peek_char = '0' ;
+   lp_Ter->ter_sum_ascii = 0 ;
+-  memset( lp_Ter->ter_buffer , 0, sizeof( lp_Ter->ter_buffer )) ;
++  memset( lp_Ter->ter_buffer , CONFIG_ZERO_CHAR, sizeof( lp_Ter->ter_buffer )) ;
+ 
+   return ;
+ }
+diff --git a/src/astro_keys.c b/src/astro_keys.c
+index 0450865..f8b5c50 100644
+--- a/src/astro_keys.c
++++ b/src/astro_keys.c
+@@ -321,13 +321,13 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
+                                      lp_Key->key_file     = NULL ;
+   gettimeofday (                   & lp_Key->key_tval, NULL ) ;
+ 
+-  memset( lp_Key->key_phrase,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
+-  memset( lp_Key->key_valider, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
+-  memset( lp_Key->key_symbole, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_symbole ) );
+-  memset( lp_Key->key_menu,    CALCULS_ZERO_CHAR, sizeof( lp_Key->key_menu ) );
+-  memset( lp_Key->key_premier, CALCULS_ZERO_CHAR, sizeof( lp_Key->key_premier ) );
+-  memset( lp_Key->key_nombre,  CALCULS_ZERO_CHAR, sizeof( lp_Key->key_nombre ) );
+-  memset( lp_Key->key_mot,     CALCULS_ZERO_CHAR, sizeof( lp_Key->key_mot ) );
++  memset( lp_Key->key_phrase,  CONFIG_ZERO_CHAR, sizeof( lp_Key->key_phrase ) );
++  memset( lp_Key->key_valider, CONFIG_ZERO_CHAR, sizeof( lp_Key->key_valider ) );
++  memset( lp_Key->key_symbole, CONFIG_ZERO_CHAR, sizeof( lp_Key->key_symbole ) );
++  memset( lp_Key->key_menu,    CONFIG_ZERO_CHAR, sizeof( lp_Key->key_menu ) );
++  memset( lp_Key->key_premier, CONFIG_ZERO_CHAR, sizeof( lp_Key->key_premier ) );
++  memset( lp_Key->key_nombre,  CONFIG_ZERO_CHAR, sizeof( lp_Key->key_nombre ) );
++  memset( lp_Key->key_mot,     CONFIG_ZERO_CHAR, sizeof( lp_Key->key_mot ) );
+   
+   strcpy( lp_Key->key_valider, "valider" ) ;
+   strcpy( lp_Key->key_menu,    "MENU" ) ;
+@@ -347,9 +347,9 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
+   // Les actions servent a 
+   
+   for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
+-    memset( lp_Key->key_actions[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
++    memset( lp_Key->key_actions[i], CONFIG_ZERO_CHAR, sizeof( lp_Key->key_actions[i] ));
+   }
+-  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->key_validations[i], CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
++  // for( i=0 ; i < KEYS_VALIDATIONS_SIZE ; i++ )  memset( lp_Key->key_validations[i], CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_32);
+ 
+   strcpy( lp_Key->key_actions[0], "MENU" ) ;
+   strcpy( lp_Key->key_actions[1], "SETUP" ) ;
+diff --git a/src/astro_lcd.c b/src/astro_lcd.c
+index 9cc9a85..a680029 100644
+--- a/src/astro_lcd.c
++++ b/src/astro_lcd.c
+@@ -200,10 +200,10 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
+ 
+   Trace1("lcd init") ;
+ 
+-  memset( lp_Lcd->lcd_l0_cur, 0 , sizeof( lp_Lcd->lcd_l0_cur )) ;
+-  memset( lp_Lcd->lcd_l1_cur, 0 , sizeof( lp_Lcd->lcd_l1_cur )) ;
+-  memset( lp_Lcd->lcd_l0_def, 0 , sizeof( lp_Lcd->lcd_l0_def )) ;
+-  memset( lp_Lcd->lcd_l1_def, 0 , sizeof( lp_Lcd->lcd_l1_def )) ;
++  memset( lp_Lcd->lcd_l0_cur, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l0_cur )) ;
++  memset( lp_Lcd->lcd_l1_cur, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l1_cur )) ;
++  memset( lp_Lcd->lcd_l0_def, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l0_def )) ;
++  memset( lp_Lcd->lcd_l1_def, CONFIG_ZERO_CHAR, sizeof( lp_Lcd->lcd_l1_def )) ;
+ 
+   Trace1("strcpy init") ;
+ 
+@@ -306,8 +306,8 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
+ 
+     pthread_mutex_lock( & gp_Lcd->lcd_mutex ) ;
+ 
+-    memset( gp_Lcd->lcd_l0_cur, 0, sizeof( gp_Lcd->lcd_l0_cur )) ;
+-    memset( gp_Lcd->lcd_l1_cur, 0, sizeof( gp_Lcd->lcd_l1_cur )) ;
++    memset( gp_Lcd->lcd_l0_cur, CONFIG_ZERO_CHAR, sizeof( gp_Lcd->lcd_l0_cur )) ;
++    memset( gp_Lcd->lcd_l1_cur, CONFIG_ZERO_CHAR, sizeof( gp_Lcd->lcd_l1_cur )) ;
+ 
+     strcpy( gp_Lcd->lcd_l0_cur, c_l0 ) ;
+     strcpy( gp_Lcd->lcd_l1_cur, c_l1 ) ;
+diff --git a/src/astro_log.c b/src/astro_log.c
+index 8063123..9a29ab7 100644
+--- a/src/astro_log.c
++++ b/src/astro_log.c
+@@ -233,7 +233,7 @@ void LOG_INIT(STRUCT_LOG* lp_Log) {
+ 
+   if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
+     
+-    memset(buf, CALCULS_ZERO_CHAR, sizeof(buf));
++    memset(buf, CONFIG_ZERO_CHAR, sizeof(buf));
+     sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_log) ;
+     
+     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {
+diff --git a/src/astro_log.h b/src/astro_log.h
+index 14b2016..985773e 100644
+--- a/src/astro_log.h
++++ b/src/astro_log.h
+@@ -110,9 +110,9 @@ while (0)
+ #if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 0 && ASTRO_LOG_DEBUG_WRITE_FS == 0
+ 
+ #define Trace(fmt, args...) { \
+-  pthread_mutex_lock( & gp_mutex_log ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+@@ -123,10 +123,10 @@ while (0)
+ #if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 0 && ASTRO_LOG_DEBUG_WRITE_FS == 1
+ 
+ #define Trace(fmt, args...) { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */
+   fprintf( stdout,       "\n%-36s : " fmt, __func__, ##args) ; \
+   fprintf( gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */
+ }
+ 
+ #define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+@@ -141,15 +141,15 @@ while (0)
+ #if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 1 && ASTRO_LOG_DEBUG_WRITE_FS == 0
+ 
+ #define Trace(fmt, args...) { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #define Trace1(fmt, args...) { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+@@ -159,16 +159,16 @@ while (0)
+ #if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 1 && ASTRO_LOG_DEBUG_WRITE_FS == 1
+ 
+ #define Trace(fmt, args...) { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+   fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
+-}
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
++} 
+ #define Trace1(fmt, args...) { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+   fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ #define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+ 
+@@ -181,21 +181,21 @@ while (0)
+ #if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 2 && ASTRO_LOG_DEBUG_WRITE_FS == 0
+ 
+ #define Trace(fmt, args...)           { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ } 
+ 
+ #define Trace1(fmt, args...)          { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
+-}
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
++} 
+ 
+ #define Trace2(fmt, args...)          { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #endif
+@@ -203,24 +203,24 @@ while (0)
+ #if defined(ASTRO_LOG_DEBUG) && defined(ASTRO_LOG_DEBUG_WRITE_FS) && ASTRO_LOG_DEBUG == 2 && ASTRO_LOG_DEBUG_WRITE_FS == 1
+ 
+ #define Trace(fmt, args...)           { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+   fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #define Trace1(fmt, args...)          { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+   fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #define Trace2(fmt, args...)          { \
+-  pthread_mutex_lock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
+   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
+   fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
+-  pthread_mutex_unlock( & gp_mutex_log  ) ; \
++  /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
+ }
+ 
+ #endif
+diff --git a/src/astro_main.c b/src/astro_main.c
+index 53f8fe9..055ecd5 100644
+--- a/src/astro_main.c
++++ b/src/astro_main.c
+@@ -503,8 +503,8 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
+ 
+   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_LCD ) ;
+ 
+-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
+-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
++  memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
++  memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
+   
+   /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
+   /*      
+@@ -891,23 +891,39 @@ int main(int argc, char ** argv) {
+   /* Alternative : Trace1 */ 
+ 
+   ASTRO_GLOBAL_INIT          () ;
++  CONFIG_PARAMS_INIT         ( gp_Con_Par ) ;
+   ARGUMENTS_MANAGE_REP_HOME  ( argc, argv) ;
+   CONFIG_PATH_FIND           ( gc_config_path_cmd_stty, "stty") ;
+   
+   ASTRE_PARAMS_INIT          ( gp_Ast_Par ) ;
+   CALCULS_PARAMS_INIT        ( gp_Cal_Par ) ;
+-  CONFIG_PARAMS_INIT         ( gp_Con_Par ) ;
++
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++
+   DEVICES_PARAMS_INIT        ( gp_Dev_Par ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   LIEU_PARAMS_INIT           ( gp_Lie_Par ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   PID_PARAMS_INIT            ( gp_Pid_Par ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   TIME_PARAMS_INIT           ( gp_Tim_Par ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   GPIO_PWM_PARAMS_INIT       ( gp_Pwm_Par ) ;
+-  
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   CONFIG_INIT                ( gp_Con ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++
+   CONFIG_FIC_READ            ( gp_Con ) ;
++  
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   GPIO_CONFIG_FIC_READ       ( gp_Con ) ; 
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+   CONFIG_FIC_VERIFY          ( gp_Con ) ;
++  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
++  CONFIG_PARAMS_DISPLAY  () ;  
++  
+   CONFIG_PARAMETRES_CONFIG   ( gp_Con ) ;
+ 
+   CONFIG_PARAMS_DISPLAY  () ;  
+diff --git a/src/astro_suivi.c b/src/astro_suivi.c
+index 768c4fc..0de7877 100644
+--- a/src/astro_suivi.c
++++ b/src/astro_suivi.c
+@@ -536,11 +536,11 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
+ 
+   TraceArbo(__func__,1,"start") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+   
+-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
+-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
++  memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
++  memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
+ 
+-  memset( cmd,       CALCULS_ZERO_CHAR, sizeof( cmd )) ;
+-  memset( s_buffer4, CALCULS_ZERO_CHAR, sizeof( s_buffer4 )) ;
++  memset( cmd,       CONFIG_ZERO_CHAR, sizeof( cmd )) ;
++  memset( s_buffer4, CONFIG_ZERO_CHAR, sizeof( s_buffer4 )) ;
+   
+   //---------------------------------------------------------------------------------------------------------
+   // TRAITEMENT DES ACTIONS SANS NECESSAIREMENT UNE VALIDATION
+@@ -717,7 +717,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
+ 
+     /*  touche mode equatorial */
+     
+-    MACRO_IF_KEY_MOT_IS("MODE_EQUATORIAL")      { 
++    MACRO_IF_KEY_MOT_IS("key_equ")      { 
+       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
+       lp_Sui->sui_menu = MENU_EQUATORIAL ; 
+       i=1;
+@@ -725,7 +725,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
+ 
+     /*  touche mode azimutal */
+ 
+-    MACRO_IF_KEY_MOT_IS("MODE_AZIMUTAL")      { 
++    MACRO_IF_KEY_MOT_IS("key_azi")      { 
+       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
+       lp_Sui->sui_menu = MENU_AZIMUTAL ; 
+       i=1;
+@@ -801,7 +801,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
+ 
+     if ( strstr( s_buffer4, gp_Key->key_symbole ) != NULL ) {
+ 
+-      memset( gp_Ast->ast_nom, CALCULS_ZERO_CHAR, sizeof(gp_Ast->ast_nom)) ;
++      memset( gp_Ast->ast_nom, CONFIG_ZERO_CHAR, sizeof(gp_Ast->ast_nom)) ;
+       sprintf( gp_Ast->ast_nom, "%s%s", gp_Key->key_symbole, gp_Key->key_nombre) ;
+     
+       Trace("== %s ==",gp_Ast->ast_nom) ;
+diff --git a/src/astro_time.c b/src/astro_time.c
+index 414af65..eb757ee 100644
+--- a/src/astro_time.c
++++ b/src/astro_time.c
+@@ -791,10 +791,10 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
+     Trace("Exemple : 20190822 = 22 aout 2019") ;
+     return ;
+   }
+-  memset( buf,   CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+-  memset( year,  CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_8 ) ;
+-  memset( month, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+-  memset( day,   CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
++  memset( buf,   CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
++  memset( year,  CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_8 ) ;
++  memset( month, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
++  memset( day,   CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+   
+   for(i=0;i<4;i++) year[i]  = s_data[i] ;
+   for(i=0;i<2;i++) month[i] = s_data[i+4] ;
+@@ -804,7 +804,7 @@ void TIME_SET_YEAR_MONTH_AND_DAY(char * s_data) { // taille des lc_Params = 5 (u
+   if ( system( buf ) < 0 ) perror( buf) ;
+ 	Trace("buf = %s", buf) ;
+ 
+-  memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
++  memset( buf, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+   sprintf(buf, "/bin/echo %s-%s-%s > %s/%s/%s ", \
+     year, \
+     month, \
+@@ -849,9 +849,9 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
+     return ;
+   }
+ 
+-  memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+-  memset( hou, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+-  memset( min, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
++  memset( buf, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
++  memset( hou, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
++  memset( min, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_4 ) ;
+   
+   for(i=0;i<2;i++) hou[i]=s_data[i] ;
+   for(i=0;i<2;i++) min[i]=s_data[i+2] ;
+@@ -860,7 +860,7 @@ void TIME_SET_HOUR_AND_MINUTES(char * s_data) {
+   Trace("buf = %s", buf) ;
+   if ( system( buf ) < 0 ) perror( buf) ;
+ 
+-  memset( buf, CALCULS_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
++  memset( buf, CONFIG_ZERO_CHAR, CONFIG_TAILLE_BUFFER_64 ) ;
+ 
+   sprintf(buf, "/bin/echo %s:%s > %s/%s/%s ", \
+     hou, \
+diff --git a/src/astro_voute.c b/src/astro_voute.c
+index 561920b..5a6385d 100644
+--- a/src/astro_voute.c
++++ b/src/astro_voute.c
+@@ -162,7 +162,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
+ 
+   if ( ASTRO_LOG_DEBUG_VOUTE ) {
+   
+-    memset( buf, CALCULS_ZERO_CHAR, sizeof(buf));
++    memset( buf, CONFIG_ZERO_CHAR, sizeof(buf));
+     sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_vou) ;
+     
+     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {
+@@ -273,8 +273,8 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
+ 
+   usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_VOUTE ) ;
+ 
+-  memset( c_l0, CALCULS_ZERO_CHAR, sizeof( c_l0 )) ;
+-  memset( c_l1, CALCULS_ZERO_CHAR, sizeof( c_l1 )) ;
++  memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
++  memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
+   
+   ul_vou_while_incr =0 ;
+   

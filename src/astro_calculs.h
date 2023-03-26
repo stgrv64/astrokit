@@ -43,7 +43,6 @@ struct STR_ANGLE {
 
 #include "astro_global.h"
 
-#define  CALCULS_ZERO_CHAR            0
 #define  CALCULS_DUREE_JOUR_SIDERAL   86164.0   /* duree du jour sideral en seconde */
 #define  CALCULS_PI_FOIS_DEUX         6.283185307179586476925
 #define  CALCULS_OMEGA                0.000072921235169903748
@@ -200,10 +199,6 @@ double AZI  (double A, double H, double h)              ;
 double AZI1 (double LAT, double A, double H, double h)  ;
 double RAD  (int degres, int minutes )                  ;
 double DEG  (int degres, int minutes )                  ;
-
-// Ces deux fonctions permettent une temporisation precises (microsedondes) 
-// en profitant d'un sleep parametrable (eviter une consommation CPU
-// avant de rentrer en boucle active d'attente
 
 void CALCULS_INIT                    ( STRUCT_CALCULS * ) ;
 void CALCULS_PARAMS_INIT             ( STRUCT_CALCULS_PARAMS * ) ;

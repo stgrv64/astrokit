@@ -195,7 +195,7 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
   
   for(int L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
     for(int C=0;C<CONFIG_DATAS_NB_COLONNES;C++) {
-      memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+      memset(lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params[L][C]));
     }
   }
 
@@ -216,19 +216,19 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con_Par->con_par_mutex ) ;
 
-  memset( lp_Con_Par->con_par_rep_cat, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cat ) ) ;
-  memset( lp_Con_Par->con_par_rep_cfg, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cfg ) ) ;
-  memset( lp_Con_Par->con_par_rep_log, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_log ) ) ;
-  memset( lp_Con_Par->con_par_rep_in,  CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_in ) ) ;
-  memset( lp_Con_Par->con_par_rep_out, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_out ) ) ;
-  memset( lp_Con_Par->con_par_rep_scr, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_scr ) ) ;
-  memset( lp_Con_Par->con_par_fic_led, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_led ) ) ;
-  memset( lp_Con_Par->con_par_fic_log, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_log ) ) ;
-  memset( lp_Con_Par->con_par_fic_pid, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_pid ) ) ;
-  memset( lp_Con_Par->con_par_fic_vou, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_vou ) ) ;
-  memset( lp_Con_Par->con_par_fic_dat, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_dat ) ) ;
-  memset( lp_Con_Par->con_par_fic_hhm, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_hhm ) ) ;
-  memset( lp_Con_Par->con_par_src_ker, CALCULS_ZERO_CHAR, sizeof( lp_Con_Par->con_par_src_ker ) ) ;
+  memset( lp_Con_Par->con_par_rep_cat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cat ) ) ;
+  memset( lp_Con_Par->con_par_rep_cfg, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cfg ) ) ;
+  memset( lp_Con_Par->con_par_rep_log, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_log ) ) ;
+  memset( lp_Con_Par->con_par_rep_in,  CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_in ) ) ;
+  memset( lp_Con_Par->con_par_rep_out, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_out ) ) ;
+  memset( lp_Con_Par->con_par_rep_scr, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_scr ) ) ;
+  memset( lp_Con_Par->con_par_fic_led, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_led ) ) ;
+  memset( lp_Con_Par->con_par_fic_log, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_log ) ) ;
+  memset( lp_Con_Par->con_par_fic_pid, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_pid ) ) ;
+  memset( lp_Con_Par->con_par_fic_vou, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_vou ) ) ;
+  memset( lp_Con_Par->con_par_fic_dat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_dat ) ) ;
+  memset( lp_Con_Par->con_par_fic_hhm, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_hhm ) ) ;
+  memset( lp_Con_Par->con_par_src_ker, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_src_ker ) ) ;
 
   strcpy( lp_Con_Par->con_par_rep_cat , "" ) ;
   strcpy( lp_Con_Par->con_par_rep_cfg , "" ) ;
@@ -243,7 +243,11 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
   strcpy( lp_Con_Par->con_par_fic_dat , "" ) ;
   strcpy( lp_Con_Par->con_par_fic_hhm , "" ) ;
   strcpy( lp_Con_Par->con_par_src_ker , "" ) ;
-  /* TODO : finalize */
+  
+  lp_Con_Par->con_par_default_menu = 0 ;
+
+  return ;
+
 }
 /*****************************************************************************************
 * @fn     : CONFIG_FORMAT_ADMIS
@@ -374,7 +378,6 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
    // Variables susceptibles de ne pas etre lues (doivent etre mise a zero)
    //----------------------------------------------------------------------
    
-
    gp_Dev_Par->dev_par_use_capteurs = 0    ;
    gp_Dev_Par->dev_par_use_raquette = 0    ;
    gp_Dev_Par->dev_par_use_bluetooth = 0   ;
@@ -389,7 +392,6 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 
   gp_Pid_Par->par_pid_ech = 3 ;
 
-
   for(l=0;l<CONFIG_DATAS_NB_LIGNES;l++) {
 
     // FIXME : note 2021 : les variables GPIO_xxx sont gérées dans le ficheir gpio.c
@@ -398,7 +400,15 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 
     if(!strcmp("MENU_PAR_DEFAUT",lp_Con->con_params[l][0])) {
 
-      if(!strcmp(lp_Con->con_params[l][1],"MENU_AZIMUTAL" ))           gp_Con_Par->con_par_default_menu = MENU_AZIMUTAL ;
+      Trace("lp_Con->con_params[l][0]= _%s_", lp_Con->con_params[l][0]) ;
+      Trace("lp_Con->con_params[l][1]= _%s_", lp_Con->con_params[l][1]) ;
+      Trace("gp_Con_Par->con_par_default_menu = %d" , gp_Con_Par->con_par_default_menu) ;
+      Trace("MENU_AZIMUTAL = %d", MENU_AZIMUTAL ) ;
+
+      if(!strcmp(lp_Con->con_params[l][1],"MENU_AZIMUTAL" ))          { 
+        gp_Con_Par->con_par_default_menu = MENU_AZIMUTAL ;
+      }
+
       if(!strcmp(lp_Con->con_params[l][1],"MENU_EQUATORIAL" ))         gp_Con_Par->con_par_default_menu = MENU_EQUATORIAL ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_BRUT" ))        gp_Con_Par->con_par_default_menu = MENU_MANUEL_BRUT ;
       if(!strcmp(lp_Con->con_params[l][1],"MENU_MANUEL_NON_ASSERVI" )) gp_Con_Par->con_par_default_menu = MENU_MANUEL_NON_ASSERVI ;
@@ -717,21 +727,21 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
   for(L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
     for(C=0;C<CONFIG_DATAS_NB_COLONNES;C++) { 
-      memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+      memset( lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params[L][C]) );
     }
   }
   
   // FIXME : construction du chemin du fichier de configuration
   // FIXME : la variable gp_Con_Par->con_par_rep_home doit etre lue auparavant (getcwd) (2021)
 
-  memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+  memset(buf, CONFIG_ZERO_CHAR, sizeof(buf));
   sprintf(buf,"%s/%s",gp_Con_Par->con_par_rep_home, CONFIG_FIC_CFG) ;
   
   // FIXME : ouverture du fichier de configuration
 
 
   if ( (fin=fopen(buf,"r")) == NULL) {
-   memset(buffer,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+   memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer));
    sprintf(buffer,"Pbme ouverture %s",buf) ;
    //LOG(buffer) ;
    Trace("probleme ouverture 4 %s",buf) ; 
@@ -739,7 +749,7 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
   }
   else Trace("open %s ok", buf) ;
 
-  memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256-1);
+  memset(buf,CONFIG_ZERO_CHAR, sizeof(buf));
   i_Mot_Caractere_Lu_En_cours=0;
   L=0;
   C=0;
@@ -754,12 +764,14 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
       Trace2("%-2d %-2d %-2d %-30s", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
 
     if (CONFIG_FIN_FICHIER(c)) { 
+      Trace("CONFIG_FIN_FICHIER\n") ;
       if (L<i_trace_ligne_max) 
         Trace2(" --- %-2d %-2d %-2d %-30s (lecture fin fichier & continue)", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
       break ;
     }
 
     if (CONFIG_DEB_COM(c)) {
+      Trace("CONFIG_DEB_COM") ;
       while(!CONFIG_FIN_LIGNE(fgetc(fin)));
       L++;
       C=0;
@@ -767,31 +779,65 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
     if ( CONFIG_FIN_MOT(c) ) {
 
+      Trace("CONFIG_FIN_MOT") ;
+
+      Trace("gp_Con_Par = %p", gp_Con_Par) ;
+      Trace(" 0 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+
       if (L<i_trace_ligne_max) 
-        Trace2(" --- %-2d %-2d %-2d %-30s lecture fin mot", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
+
+        Trace(" --- %-2d %-2d %-2d %-30s lecture fin mot", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
 
       /* Si un mot est en cours de lecture */
+      
       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
-        memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+
+        Trace("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace("lp_Con     = %p", lp_Con) ;
+        Trace("1a : gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+
+/* FIXME :  erreur incomprehensible lors de la mise en place de ce memset 
+            cela rend l adresse du pointeur gp_Con_Par en (nil)
+*/   
+        Trace("sizeof(lp_Con->con_params[L][C]) = %ld", sizeof(lp_Con->con_params[L][C]) ) ;
+
+        memset(lp_Con->con_params[L][C],CONFIG_ZERO_CHAR,sizeof(lp_Con->con_params[L][C]));
+
+        Trace("gp_Con_Par=%p\n", gp_Con_Par );
+        Trace("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace(" 1b : gp_Con_Par->con_par_default_menu =%d\n", gp_Con_Par->con_par_default_menu ); 
+
         strcpy(lp_Con->con_params[L][C],buf);
-        memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+
+        Trace("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace(" 1c : gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+
+        memset(buf,CONFIG_ZERO_CHAR,sizeof(buf));
+
+        Trace("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace(" 2  :gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
+        
+        Trace("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace("3 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
         i_Mot_Caractere_Lu_En_cours=0;
         C++;
       }
     }
     if ((CONFIG_FIN_LIGNE(c))) {
+      
+      Trace("CONFIG_FIN_LIGNE") ;
 
       if (L<i_trace_ligne_max) 
         Trace2(" --- %-2d %-2d %-2d %-30s lecture fin ligne", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
 
       /* Si un mot est en cours de lecture */
       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
-        memset(lp_Con->con_params[L][C],CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
-        strcpy(lp_Con->con_params[L][C],buf);
-        memset(buf,CALCULS_ZERO_CHAR,CONFIG_TAILLE_BUFFER_256);
+        memset( lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof( lp_Con->con_params[L][C] ));
+        strcpy( lp_Con->con_params[L][C], buf);
+        memset(buf,CONFIG_ZERO_CHAR, sizeof( buf));
 
         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
 
@@ -812,11 +858,15 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
     }
     
     if (CONFIG_FORMAT_ADMIS(c)){
+
+      Trace("CONFIG_FORMAT_ADMIS") ;
       buf[i_Mot_Caractere_Lu_En_cours]=(char)c;
       i_Mot_Caractere_Lu_En_cours++;
     }
   }
   fclose(fin);
+
+  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
   return 0 ;
 }
@@ -963,7 +1013,7 @@ void CONFIG_MENU_CHANGE_DETECT (void)  {
 
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  memset(s_menu, 0, sizeof(s_menu)) ;
+  memset(s_menu, CONFIG_ZERO_CHAR, sizeof(s_menu)) ;
 
   switch(gp_Sui->sui_menu) {
      

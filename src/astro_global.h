@@ -129,6 +129,7 @@
 
 #define MACRO_ASTRO_GLOBAL_LOG(loglevel,nb,fmt, args...) \
 do { \
+    fprintf(stdout, "\n%-36s -> loglevel %d nb %d" fmt, __func__, loglevel, nb, ##args) ; \
   if (loglevel>=nb) { \
     fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
   } \
@@ -162,7 +163,7 @@ while (0)
 #define CONFIG_TAILLE_BUFFER_64              64
 #define CONFIG_TAILLE_BUFFER_256             256
 #define CONFIG_C_BIN_POSSIBLE_PATHS_LENGTH   6
-#define CONFIG_DATAS_NB_LIGNES               200 
+#define CONFIG_DATAS_NB_LIGNES               1000 
 #define CONFIG_DATAS_NB_COLONNES             2
 
 #define GPIO_DEFAULT_ALT_MOTOR_GPIOS         "26,19,13,6"
@@ -172,7 +173,6 @@ while (0)
 #define TIME_MILLI_SEC    1000                // frequence d'une microseconde (pour les usleep et calculs)
 #define TIME_MICRO_SEC    1000000             // frequence d'une microseconde (pour les usleep et calculs)
 #define TIME_NANO_SEC     1000000000          // frequence d'une nanoseconde (pour les nanosleep et calculs) 
-
 
 /*
 #define GPIO_DEFAULT_ALT_MOTOR_GPIOS  "21,26,19,13"

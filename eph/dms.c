@@ -342,15 +342,15 @@ double zgetdate() {
 
   getnum( "Calendar date: Year", &cyear, lngfmt );
 
-  if( (cyear > 53994L) || (cyear < -4713L) ) { printf( "Year out of range.\n" ); goto err; }
-  if( cyear == 0 )                           { printf( "There is no year 0.\n" ); err:	J = 0.0; goto pdate; }
+  if( (cyear > 53994L) || (cyear < -4713L) ) { Trace( "Year out of range.\n" ); goto err; }
+  if( cyear == 0 )                           { Trace( "There is no year 0.\n" ); err:	J = 0.0; goto pdate; }
 
   getnum( "Month (1-12)", &month, intfmt);
   getnum( "Day.fraction", &day, dblfmt );
 
   /* Find the Julian day. */
   J = caltoj(cyear,month,day);
-  /*printf( "Julian day %.1f\n", J );*/
+  /*Trace( "Julian day %.1f\n", J );*/
 
   pdate:
   /* Convert back to calendar date. */
@@ -401,7 +401,7 @@ double caltoj( year, month, day ) long year; int month; double day; {
 
   julius:
    /* (mise en commentaire 2023) */
-   /* printf( " Julian Calendar assumed.\n" ); */
+   /* Trace( " Julian Calendar assumed.\n" ); */
    b = -38;
  }
  else { /* -number of century years that are not leap years */
@@ -478,20 +478,20 @@ int jtocal( J ) double J; {
 	cyear = -year;
 	if( prtflg ) {
     /* (mise en commentaire 2023) */
-		/* printf( "%ld B.C. ", year ); */
+		/* Trace( "%ld B.C. ", year ); */
   }
 	}
  else {
 	if( prtflg ) {
     /* (mise en commentaire 2023) */
-		// printf( "%ld ", year );
+		// Trace( "%ld ", year );
   }
  }
  day = (int) dd;
 
  if( prtflg ) {
  /* (mise en commentaire 2023) */
-	/* printf( "%s %d %s", months[month-1], day, days[(int) a] ); */
+	/* Trace( "%s %d %s", months[month-1], day, days[(int) a] ); */
  }
  /* Flag last or first day of year */
  if( ((month == 1) && (day == 1))
@@ -511,13 +511,13 @@ int jtocal( J ) double J; {
     /* (mise en commentaire 2023) */
     /*
     if( J == TDT ) {
-      printf( "TDT\n" ); // Indicate Terrestrial Dynamical Time
+      Trace( "TDT\n" ); // Indicate Terrestrial Dynamical Time
     }
     else if( J == UT ) {
-      printf( "UT\n" ); // Universal Time
+      Trace( "UT\n" ); // Universal Time
     }
     else {
-      printf( "\n" );
+      Trace( "\n" );
     }
     */
  }
@@ -657,11 +657,11 @@ int getnum_moi( char s[40], void *num, char *format) {
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /*
-  if     ( format == strfmt ) printf( format,  (char *)  num );
-  else if( format == dblfmt ) printf( format, *(double *)num );
-  else if( format == intfmt ) printf( format, *(int *)   num );
-  else if( format == lngfmt ) printf( format, *(long *)  num );
-  else                        printf( "Illegal input format\n"  );
+  if     ( format == strfmt ) Trace( format,  (char *)  num );
+  else if( format == dblfmt ) Trace( format, *(double *)num );
+  else if( format == intfmt ) Trace( format, *(int *)   num );
+  else if( format == lngfmt ) Trace( format, *(long *)  num );
+  else                        Trace( "Illegal input format\n"  );
   */
   if( s[0] != '\0' ) sscanf( s, format, num );
 
@@ -681,15 +681,15 @@ int getnum( msg, num, format ) char *msg; void *num; char *format; {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  printf( "%s (", msg );
+  Trace( "%s (", msg );
   /*
-  if     ( format == strfmt ) printf( format, (char *) num );
-  else if( format == dblfmt ) printf( format, *(double *)num );
-  else if( format == intfmt ) printf( format, *(int *)num );
-  else if( format == lngfmt ) printf( format, *(long *)num );
-  else                        printf( "Illegal input format\n"  );
+  if     ( format == strfmt ) Trace( format, (char *) num );
+  else if( format == dblfmt ) Trace( format, *(double *)num );
+  else if( format == intfmt ) Trace( format, *(int *)num );
+  else if( format == lngfmt ) Trace( format, *(long *)num );
+  else                        Trace( "Illegal input format\n"  );
 
-  printf( ") ? ");
+  Trace( ") ? ");
   */
   // gets(s);
   memset(s,0, sizeof(s));

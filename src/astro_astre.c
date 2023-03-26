@@ -136,12 +136,12 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
   gettimeofday ( &                   lp_Ast->ast_tval, NULL ) ;
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
-    memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+    memset( lp_Ast->ast_plus_proche[C], CONFIG_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
     strcpy( lp_Ast->ast_plus_proche[C], "") ;
   }
-  memset( lp_Ast->ast_nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( lp_Ast->ast_infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( lp_Ast->ast_plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( lp_Ast->ast_nom,         CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_nom));
+  memset( lp_Ast->ast_infos,       CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_infos));
+  memset( lp_Ast->ast_plus_proche, CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_plus_proche));
   
   lp_Ast->ast_azi     = 0 ;
   lp_Ast->ast_alt     = 0 ;
@@ -201,7 +201,7 @@ void ASTRE_PARAMS_INIT(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast_Par->ast_par_mutex ) ;
 
 
-  memset( lp_Ast_Par->ast_par_default_object, CALCULS_ZERO_CHAR, sizeof( lp_Ast_Par->ast_par_default_object ) ) ;
+  memset( lp_Ast_Par->ast_par_default_object, CONFIG_ZERO_CHAR, sizeof( lp_Ast_Par->ast_par_default_object ) ) ;
   
   /* TODO : finalize */
 }
@@ -242,12 +242,12 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
   // HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ; ;
 
   for(C=0; C< ASTRE_NB_COLONNES;C++) {
-    memset( lp_Ast->ast_plus_proche[C], CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+    memset( lp_Ast->ast_plus_proche[C], CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_plus_proche[C]));
     strcpy( lp_Ast->ast_plus_proche[C], "") ;
   }
-  memset( lp_Ast->ast_nom,   CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( lp_Ast->ast_infos, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
-  memset( lp_Ast->ast_plus_proche, CALCULS_ZERO_CHAR, ASTRE_TAILLE_BUFFER);
+  memset( lp_Ast->ast_nom,   CONFIG_ZERO_CHAR,       sizeof(lp_Ast->ast_nom));
+  memset( lp_Ast->ast_infos, CONFIG_ZERO_CHAR,       sizeof(lp_Ast->ast_infos));
+  memset( lp_Ast->ast_plus_proche, CONFIG_ZERO_CHAR, sizeof(lp_Ast->ast_plus_proche));
 
   lp_Ast->ast_typ = ASTRE_INDETERMINE ;
   lp_Ast->ast_num = 0 ;

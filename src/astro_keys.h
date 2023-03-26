@@ -25,7 +25,7 @@ do { \
 } \
 while (0)
 
-#define KEYS_ACTIONS_SIZE     8
+#define KEYS_ACTIONS_SIZE     10
 #define KEYS_VALIDATIONS_SIZE 10
 
 typedef struct STR_KEYS STRUCT_KEYS ;
