@@ -146,7 +146,7 @@ while (0)
 #define CODES_CODE_NB_CODES                  110 
 #define CODES_NB_IN_OUT                      3
 
-#define CONFIG_ZERO_CHAR                     '\0'
+#define CONFIG_ZERO_CHAR                     0
 #define CONFIG_FIC_CFG                       "astrokit.cfg"
 #define CONFIG_MES                           "MES"
 #define CONFIG_NGC                           "NGC"

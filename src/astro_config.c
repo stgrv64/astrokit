@@ -46,6 +46,8 @@
 #                * ajout gp_Pid_Par->par_pid_ech gp_Pid_Par->par_pid_kp gp_Pid_Par->par_pid_ki gp_Pid_Par->par_pid_kd
 #
 # octobre 2022   ! refonte complete du code 
+# 2023           | refonte globale 
+#  avril 2023    | memset sur ( struct entiere)
 # -------------------------------------------------------------- 
 */
 
@@ -184,7 +186,10 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
 
   TraceArbo(__func__,0,"init config") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  Trace ( "%p", lp_Con ) ;
+
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con->con_mutex ) ;
+
                                      lp_Con->con_log      = CONFIG_LOG ;
                                      lp_Con->con_lock     = CONFIG_LOCK ;
                                      lp_Con->con_unlock   = CONFIG_UNLOCK ;
@@ -193,11 +198,11 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
                                      lp_Con->con_file     = NULL ;
   gettimeofday ( &                   lp_Con->con_tval, NULL ) ;
   
-  for(int L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
-    for(int C=0;C<CONFIG_DATAS_NB_COLONNES;C++) {
-      memset(lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params[L][C]));
-    }
-  }
+  Trace ( "%p", lp_Con ) ;
+
+  memset(lp_Con->con_params, CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params));
+
+  Trace ( "%p", lp_Con ) ;
 
   return ;
 }
@@ -216,6 +221,9 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con_Par->con_par_mutex ) ;
 
+  memset ( lp_Con_Par, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par )  ) ;
+
+/*
   memset( lp_Con_Par->con_par_rep_cat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cat ) ) ;
   memset( lp_Con_Par->con_par_rep_cfg, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cfg ) ) ;
   memset( lp_Con_Par->con_par_rep_log, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_log ) ) ;
@@ -229,7 +237,7 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
   memset( lp_Con_Par->con_par_fic_dat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_dat ) ) ;
   memset( lp_Con_Par->con_par_fic_hhm, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_fic_hhm ) ) ;
   memset( lp_Con_Par->con_par_src_ker, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_src_ker ) ) ;
-
+*/
   strcpy( lp_Con_Par->con_par_rep_cat , "" ) ;
   strcpy( lp_Con_Par->con_par_rep_cfg , "" ) ;
   strcpy( lp_Con_Par->con_par_rep_log , "" ) ;
@@ -705,6 +713,7 @@ int CONFIG_GETCWD(char * c_getcwd) {
 * @param  : lp_Con->con_params[CONFIG_DATAS_NB_LIGNES][CONFIG_DATAS_NB_COLONNES][CONFIG_TAILLE_BUFFER_256]
 * @date   : 2022-01-20 creation entete de la fonction au format doxygen 
 * @date   : 2022-11-02 correction bug quand espace apres 2 eme colonne (valeur parametre) avant \n (FIN_LIGNE)
+* @date   : 2023-04-10 chagement for for memset => memset (struct entiere)
 * @todo   : voir si un passage par librairie JSON plus pratique (comme pour mesDep)
 *****************************************************************************************/
 
@@ -725,12 +734,15 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
   Trace2(" CONFIG_DATAS_NB_LIGNES   = %d",   CONFIG_DATAS_NB_LIGNES) ;
   Trace2(" CONFIG_DATAS_NB_COLONNES = %d", CONFIG_DATAS_NB_COLONNES) ;
 
+  memset( lp_Con->con_params, CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params) );
+
+/*
   for(L=0;L<CONFIG_DATAS_NB_LIGNES;L++) {
     for(C=0;C<CONFIG_DATAS_NB_COLONNES;C++) { 
       memset( lp_Con->con_params[L][C], CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params[L][C]) );
     }
   }
-  
+  */
   // FIXME : construction du chemin du fichier de configuration
   // FIXME : la variable gp_Con_Par->con_par_rep_home doit etre lue auparavant (getcwd) (2021)
 

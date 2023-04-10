@@ -910,7 +910,16 @@ int main(int argc, char ** argv) {
   Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
   GPIO_PWM_PARAMS_INIT       ( gp_Pwm_Par ) ;
   Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+
+  printf("%p\n", gp_Con_Par ) ;
+  
   CONFIG_INIT                ( gp_Con ) ;
+
+  printf("%p\n", gp_Con_Par ) ;
+
+  if ( gp_Con_Par == NULL  ) {
+    Trace("gp_Con_Par is null") ;
+  }
   Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
   CONFIG_FIC_READ            ( gp_Con ) ;
