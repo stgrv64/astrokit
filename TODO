@@ -1,5 +1,7 @@
 16 mai 2022 :
+
  * mise a jour de ce fichier suite a point general et tests yocto hardknott sur le ciel
+ 
  * copie de ce fichier dans les repertoires de sauvegardes de cardes SD : 
    /media/stef/ssd/astrokit-sdcard-save/2022-rpi2-model2v1.1-yocto-systemd-1.0
    /media/stef/ssd/astrokit-sdcard-save/2022-rpi3aplus-yocto-systemd-1.0
@@ -57,8 +59,10 @@ avril 2022 :
 22 mars 2022 : 
 
  * parametrer eclairage LED (important) suite appui touche
+ 
  * RPI3B+ probleme alim : remettre un regulateur de tension
    => tester chez moi sur breadboards
+   
  * nombre de pas moteurs NEQ teste precisement a 5760 (32*180) ou 64*90 ) 
    => teste avec /usr/local/bin/gpio23 21,26,19,13 50 28800 1 1 (5 tours)
    => modifier le fichier cxonfig.txt 
@@ -178,25 +182,32 @@ E => generer une trace visible au moment du boot (variable Yocto ?)
 juin 2022 : modification ordre priorites 
 
 0  => traiter message VALGRIND (conditional  dumpm or move)
+      resolu (2023)
+      
 0  => traiter message VALGRIND ( CALCUL_TOUT (calculs.c:1123) )
       *** memcpy_chk: buffer overflow detected ***: program terminated
-
+      resolu (2023)
+      
 0 => inverser les signes dans les vitesses affichees
      : plus logique d 'afficher une vitesse positive qd ça monte
-           
+      TODO
+                       
 0  => consolider affichage commencé des temps "moteurs" , temps "reel" 
       et mettre en place une API de choix de methode "sleep" et de mesure
       ... usleep         ... cleck-gettime 
       ... nanolsleep     ... gettimeofday
       etc..
-
+      TODO mais a priori peu d'impact 
+      
 0  => mettre en place mutex systematiquement dans toutes les structures
       : commencé 
+      resolu et a terminer (2023)
       
 0  => en se basant sur ce qui a ete fait sur mesdep , consolider les etats
       cancell des threads pour pouvoir les arrêter sur demande
       : important pour tester en temps reel les calculs stats 
-
+      
+      
 0  => prioritaire
       gerer les TEMPO* et le bug qui execute 2 fois les touches FAST et SLOW
       (OK) traite
@@ -336,7 +347,7 @@ OK  => prevoir de pouvoir quitter le programme avec le clavier (termios/ncurses)
   => corriger / verifier les calculs flottants notamment lors de la conversion
      des fichiers eto.csv etc... / en eto.csv.dec
   
-  => analyser l'interraction avec systemd , et diff avec sysVinit
+  => analyser l'interaction avec systemd , et diff avec sysVinit
      notamment lors de la génération des traces à l'écran via la strcuture tty
   
   
