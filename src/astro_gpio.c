@@ -473,7 +473,12 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
       }
     }
   }
-  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_azi_gpios[%d]=%d",i,gi_azi_gpios[i]);
+  printf("gi_azi_gpios[]=>");
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) { 
+    printf("%d ",gi_azi_gpios[i]);
+  }
+  printf("\n") ;
+
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_alt_gpios[%d]=%d",i,gi_alt_gpios[i]);
   
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_alt_masque[%d]=%d",i,gi_alt_masque[i]);
@@ -1358,7 +1363,7 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
   snprintf(c_buf0,GPIO_BUFFER_SIZE_256,"%d\n",0) ;
   snprintf(c_buf1,GPIO_BUFFER_SIZE_256,"%d\n",1) ;
  
-  Trace2("debut while") ;
+  Trace("debut while") ;
 
   while(1) {
     
@@ -1377,7 +1382,7 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
     d_TUpwm_haut = d_TUpwm * d_rap  ; 
     d_TUpwm_bas  = d_TUpwm - d_TUpwm_haut ;
     
-    // Trace("Phid%-3d upas %-3d rapc %.3f Tpwmh %-3f Tpwmb %-3f ",lp_Pha->id, lp_Pha->pha_upas, d_rap, d_TUpwm_haut, d_TUpwm_bas) ;
+    Trace1("Phid%-3d upas %-3d rapc %.3f Tpwmh %-3f Tpwmb %-3f ",lp_Pha->pha_id, lp_Pha->pha_upas, d_rap, d_TUpwm_haut, d_TUpwm_bas) ;
 
     // =================================================================
     // ecriture sur GPIO
@@ -1647,7 +1652,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
-    Trace2("i_pas_change %d lp_Mot->mot_pas %lld gp_Tpo->tpo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
+    Trace("i_pas_change %d lp_Mot->mot_pas %lld gp_Tpo->tpo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
       i_pas_change, \
       lp_Mot->mot_pas, \
       gp_Tpo->tpo_pid_loop, \

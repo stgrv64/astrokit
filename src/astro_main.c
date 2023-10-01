@@ -898,18 +898,18 @@ int main(int argc, char ** argv) {
   ASTRE_PARAMS_INIT          ( gp_Ast_Par ) ;
   CALCULS_PARAMS_INIT        ( gp_Cal_Par ) ;
 
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
 
   DEVICES_PARAMS_INIT        ( gp_Dev_Par ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   LIEU_PARAMS_INIT           ( gp_Lie_Par ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   PID_PARAMS_INIT            ( gp_Pid_Par ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   TIME_PARAMS_INIT           ( gp_Tim_Par ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   GPIO_PWM_PARAMS_INIT       ( gp_Pwm_Par ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
 
   printf("%p\n", gp_Con_Par ) ;
   
@@ -920,18 +920,17 @@ int main(int argc, char ** argv) {
   if ( gp_Con_Par == NULL  ) {
     Trace("gp_Con_Par is null") ;
   }
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
 
   CONFIG_FIC_READ            ( gp_Con ) ;
   
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   GPIO_CONFIG_FIC_READ       ( gp_Con ) ; 
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   CONFIG_FIC_DISPLAY         ( gp_Con ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   CONFIG_FIC_VERIFY          ( gp_Con ) ;
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
-  CONFIG_PARAMS_DISPLAY  () ;  
+  /* Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu );  */
   
   CONFIG_PARAMETRES_CONFIG   ( gp_Con ) ;
 
@@ -1077,41 +1076,69 @@ int main(int argc, char ** argv) {
       gp_Azi_Mot->mot_pha[3]->pha_rap[i]) ;
   }
 
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MENU],            NULL, (void*)_SUIVI_MENU,           gp_Sui ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Vou ) ;
+
+  if ( gp_Dev->dev_use_infrarouge ){ pthread_create( &gp_Pth->pth_t[PTHREAD_T_INFRA],  NULL, (void*)_SUIVI_INFRAROUGE,     gp_Sui ) ; }
+  if ( gp_Dev->dev_use_capteurs )  { pthread_create( &gp_Pth->pth_t[PTHREAD_T_CAPTEUR],NULL, (void*)_SUIVI_CAPTEURS,       gp_Sui ) ; }
+  if ( gp_Dev->dev_use_keyboard )  { pthread_create( &gp_Pth->pth_t[PTHREAD_T_CLAVIER],NULL, (void*)_SUIVI_CLAVIER_TERMIOS,gp_Ter ) ; }
+  if ( gp_Dev->dev_use_lcd )       { pthread_create( &gp_Pth->pth_t[PTHREAD_T_LCD],    NULL, (void*)_SUIVI_LCD,            gp_Sui ) ; }
+
+  if ( gp_Dev->dev_use_lcd )         { pthread_join( gp_Pth->pth_t[PTHREAD_T_LCD], NULL) ;    } 
+  if ( gp_Dev->dev_use_keyboard )    { pthread_join( gp_Pth->pth_t[PTHREAD_T_CLAVIER], NULL) ;} 
+  if ( gp_Dev->dev_use_capteurs )    { pthread_join( gp_Pth->pth_t[PTHREAD_T_CAPTEUR], NULL) ;} 
+  if ( gp_Dev->dev_use_infrarouge )  { pthread_join( gp_Pth->pth_t[PTHREAD_T_INFRA], NULL) ;  } 
+
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_VOUTE], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MENU],  NULL) ;
+
+    exit(0);
+    
 
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)_GPIO_PWM_MOT,         gp_Azi_Mot ) ;
+
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)_GPIO_PWM_MOT,         gp_Alt_Mot ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MENU],            NULL, (void*)_SUIVI_MENU,           gp_Sui ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Vou ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_INFRA],           NULL, (void*)_SUIVI_INFRAROUGE,     gp_Sui ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_CAPTEUR],         NULL, (void*)_SUIVI_CAPTEURS,       gp_Sui ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_CLAVIER],         NULL, (void*)_SUIVI_CLAVIER_TERMIOS,gp_Ter ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_LCD],             NULL, (void*)_SUIVI_LCD,            gp_Sui ) ;
 
-  /* Affichage d'informations sur les threads lancés */
-
-  // ============================== join des threads  ===================================
-  /* TODO : statut cancellable implique de ne pas forcement mettre en join */
-
-  if ( gp_Dev->dev_use_lcd )         pthread_join( gp_Pth->pth_t[PTHREAD_T_LCD], NULL) ;
-  if ( gp_Dev->dev_use_keyboard )    pthread_join( gp_Pth->pth_t[PTHREAD_T_CLAVIER], NULL) ;
-  if ( gp_Dev->dev_use_capteurs )    pthread_join( gp_Pth->pth_t[PTHREAD_T_CAPTEUR], NULL) ;
-  if ( gp_Dev->dev_use_infrarouge )  pthread_join( gp_Pth->pth_t[PTHREAD_T_INFRA], NULL) ;
-
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_VOUTE], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MENU],  NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL) ;
+
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL) ;
+
+  exit(0);
+
+  
+  // ============================== join des threads  ===================================
+  /* TODO : statut cancellable implique de ne pas forcement mettre en join */
+
+  if ( gp_Dev->dev_use_lcd )         { pthread_join( gp_Pth->pth_t[PTHREAD_T_LCD], NULL) ;    } 
+  if ( gp_Dev->dev_use_keyboard )    { pthread_join( gp_Pth->pth_t[PTHREAD_T_CLAVIER], NULL) ;} 
+  if ( gp_Dev->dev_use_capteurs )    { pthread_join( gp_Pth->pth_t[PTHREAD_T_CAPTEUR], NULL) ;} 
+  if ( gp_Dev->dev_use_infrarouge )  { pthread_join( gp_Pth->pth_t[PTHREAD_T_INFRA], NULL) ;  } 
+
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_VOUTE], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MENU],  NULL) ;
+
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL) ;
+  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL) ;
+
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL) ;
   pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL) ;

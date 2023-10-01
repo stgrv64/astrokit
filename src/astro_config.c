@@ -186,8 +186,6 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
 
   TraceArbo(__func__,0,"init config") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace ( "%p", lp_Con ) ;
-
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con->con_mutex ) ;
 
                                      lp_Con->con_log      = CONFIG_LOG ;
@@ -198,11 +196,7 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
                                      lp_Con->con_file     = NULL ;
   gettimeofday ( &                   lp_Con->con_tval, NULL ) ;
   
-  Trace ( "%p", lp_Con ) ;
-
   memset(lp_Con->con_params, CONFIG_ZERO_CHAR, sizeof(lp_Con->con_params));
-
-  Trace ( "%p", lp_Con ) ;
 
   return ;
 }
@@ -221,7 +215,7 @@ void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con_Par->con_par_mutex ) ;
 
-  memset ( lp_Con_Par, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par )  ) ;
+  memset ( lp_Con_Par, CONFIG_ZERO_CHAR, sizeof( STRUCT_CONFIG_PARAMS )  ) ;
 
 /*
   memset( lp_Con_Par->con_par_rep_cat, CONFIG_ZERO_CHAR, sizeof( lp_Con_Par->con_par_rep_cat ) ) ;
@@ -408,10 +402,10 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
 
     if(!strcmp("MENU_PAR_DEFAUT",lp_Con->con_params[l][0])) {
 
-      Trace("lp_Con->con_params[l][0]= _%s_", lp_Con->con_params[l][0]) ;
-      Trace("lp_Con->con_params[l][1]= _%s_", lp_Con->con_params[l][1]) ;
-      Trace("gp_Con_Par->con_par_default_menu = %d" , gp_Con_Par->con_par_default_menu) ;
-      Trace("MENU_AZIMUTAL = %d", MENU_AZIMUTAL ) ;
+      Trace1("lp_Con->con_params[l][0]= _%s_", lp_Con->con_params[l][0]) ;
+      Trace1("lp_Con->con_params[l][1]= _%s_", lp_Con->con_params[l][1]) ;
+      Trace1("gp_Con_Par->con_par_default_menu = %d" , gp_Con_Par->con_par_default_menu) ;
+      Trace1("MENU_AZIMUTAL = %d", MENU_AZIMUTAL ) ;
 
       if(!strcmp(lp_Con->con_params[l][1],"MENU_AZIMUTAL" ))          { 
         gp_Con_Par->con_par_default_menu = MENU_AZIMUTAL ;
@@ -699,7 +693,7 @@ int CONFIG_GETCWD(char * c_getcwd) {
   TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if (getcwd(c_getcwd, sizeof(c_getcwd)) != NULL) {
-     Trace("Current working dir: %s\n", c_getcwd);
+     Trace1("Current working dir: %s\n", c_getcwd);
   } else {
      perror("getcwd() error");
      return 1;
@@ -756,10 +750,10 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
    memset(buffer,CONFIG_ZERO_CHAR, sizeof(buffer));
    sprintf(buffer,"Pbme ouverture %s",buf) ;
    //LOG(buffer) ;
-   Trace("probleme ouverture 4 %s",buf) ; 
+   Trace1("probleme ouverture 4 %s",buf) ; 
    exit(2) ;
   }
-  else Trace("open %s ok", buf) ;
+  else Trace1("open %s ok", buf) ;
 
   memset(buf,CONFIG_ZERO_CHAR, sizeof(buf));
   i_Mot_Caractere_Lu_En_cours=0;
@@ -776,14 +770,14 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
       Trace2("%-2d %-2d %-2d %-30s", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
 
     if (CONFIG_FIN_FICHIER(c)) { 
-      Trace("CONFIG_FIN_FICHIER\n") ;
+      Trace1("CONFIG_FIN_FICHIER\n") ;
       if (L<i_trace_ligne_max) 
         Trace2(" --- %-2d %-2d %-2d %-30s (lecture fin fichier & continue)", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
       break ;
     }
 
     if (CONFIG_DEB_COM(c)) {
-      Trace("CONFIG_DEB_COM") ;
+      Trace1("CONFIG_DEB_COM") ;
       while(!CONFIG_FIN_LIGNE(fgetc(fin)));
       L++;
       C=0;
@@ -791,48 +785,48 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 
     if ( CONFIG_FIN_MOT(c) ) {
 
-      Trace("CONFIG_FIN_MOT") ;
+      Trace1("CONFIG_FIN_MOT") ;
 
-      Trace("gp_Con_Par = %p", gp_Con_Par) ;
-      Trace(" 0 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+      Trace1("gp_Con_Par = %p", gp_Con_Par) ;
+      Trace1(" 0 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
       if (L<i_trace_ligne_max) 
 
-        Trace(" --- %-2d %-2d %-2d %-30s lecture fin mot", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
+        Trace1(" --- %-2d %-2d %-2d %-30s lecture fin mot", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
 
       /* Si un mot est en cours de lecture */
       
       if ( i_Mot_Caractere_Lu_En_cours>0 ) {
 
-        Trace("gp_Con_Par = %p", gp_Con_Par) ;
-        Trace("lp_Con     = %p", lp_Con) ;
-        Trace("1a : gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+        Trace1("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace1("lp_Con     = %p", lp_Con) ;
+        Trace1("1a : gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
 /* FIXME :  erreur incomprehensible lors de la mise en place de ce memset 
             cela rend l adresse du pointeur gp_Con_Par en (nil)
 */   
-        Trace("sizeof(lp_Con->con_params[L][C]) = %ld", sizeof(lp_Con->con_params[L][C]) ) ;
+        Trace1("sizeof(lp_Con->con_params[L][C]) = %ld", sizeof(lp_Con->con_params[L][C]) ) ;
 
         memset(lp_Con->con_params[L][C],CONFIG_ZERO_CHAR,sizeof(lp_Con->con_params[L][C]));
 
-        Trace("gp_Con_Par=%p\n", gp_Con_Par );
-        Trace("gp_Con_Par = %p", gp_Con_Par) ;
-        Trace(" 1b : gp_Con_Par->con_par_default_menu =%d\n", gp_Con_Par->con_par_default_menu ); 
+        Trace1("gp_Con_Par=%p\n", gp_Con_Par );
+        Trace1("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace1(" 1b : gp_Con_Par->con_par_default_menu =%d\n", gp_Con_Par->con_par_default_menu ); 
 
         strcpy(lp_Con->con_params[L][C],buf);
 
-        Trace("gp_Con_Par = %p", gp_Con_Par) ;
-        Trace(" 1c : gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+        Trace1("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace1(" 1c : gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
         memset(buf,CONFIG_ZERO_CHAR,sizeof(buf));
 
-        Trace("gp_Con_Par = %p", gp_Con_Par) ;
-        Trace(" 2  :gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+        Trace1("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace1(" 2  :gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
         Trace1("lp_Con->con_params fin lig[%d][%d]=(%s)",L,C,lp_Con->con_params[L][C] );
         
-        Trace("gp_Con_Par = %p", gp_Con_Par) ;
-        Trace("3 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+        Trace1("gp_Con_Par = %p", gp_Con_Par) ;
+        Trace1("3 gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
         i_Mot_Caractere_Lu_En_cours=0;
         C++;
@@ -840,7 +834,7 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
     }
     if ((CONFIG_FIN_LIGNE(c))) {
       
-      Trace("CONFIG_FIN_LIGNE") ;
+      Trace1("CONFIG_FIN_LIGNE") ;
 
       if (L<i_trace_ligne_max) 
         Trace2(" --- %-2d %-2d %-2d %-30s lecture fin ligne", L, C, i_Mot_Caractere_Lu_En_cours, buf) ; 
@@ -871,14 +865,14 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
     
     if (CONFIG_FORMAT_ADMIS(c)){
 
-      Trace("CONFIG_FORMAT_ADMIS") ;
+      Trace1("CONFIG_FORMAT_ADMIS") ;
       buf[i_Mot_Caractere_Lu_En_cours]=(char)c;
       i_Mot_Caractere_Lu_En_cours++;
     }
   }
   fclose(fin);
 
-  Trace("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
+  Trace1("gp_Con_Par->con_par_default_menu =%d", gp_Con_Par->con_par_default_menu ); 
 
   return 0 ;
 }
@@ -967,17 +961,17 @@ void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *lp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_
   sprintf( c_hhmmss_azi1, "%3dh%2dm%2ds", lp_Ast->ast_azi1_t.tim_HH, lp_Ast->ast_azi1_t.tim_MM, lp_Ast->ast_azi1_t.tim_SS  ) ;
   sprintf( c_hhmmss_azi2, "%3dh%2dm%2ds", lp_Ast->ast_azi2_t.tim_HH, lp_Ast->ast_azi2_t.tim_MM, lp_Ast->ast_azi2_t.tim_SS  ) ;
 
-  Trace(" %s : infos         : %s", c_nom , lp_Ast->ast_infos ) ;
-  Trace(" %s : type          : %s", c_nom , c_type ) ;
-  Trace(" %s : mode calcul   : %s", c_nom , c_mode ) ;
-  Trace(" %s : latitude      : %.2f (deg) ", c_nom, lp_Lie->lie_lat    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : longitude     : %.2f (deg) ", c_nom, lp_Lie->lie_lon    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, lp_Ast->ast_azi_vit,  lp_Ast->ast_alt_vit ) ; 
-  Trace(" %s : azimut        : %.2f (deg) ", c_nom, lp_Ast->ast_azi    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : altitude      : %.2f (deg) ", c_nom, lp_Ast->ast_alt    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
-  Trace(" %s : declinaison   : %.2f (deg) ", c_nom, lp_Ast->ast_dec  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
-  Trace(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_asc    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
-  Trace(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
+  Trace1(" %s : infos         : %s", c_nom , lp_Ast->ast_infos ) ;
+  Trace1(" %s : type          : %s", c_nom , c_type ) ;
+  Trace1(" %s : mode calcul   : %s", c_nom , c_mode ) ;
+  Trace1(" %s : latitude      : %.2f (deg) ", c_nom, lp_Lie->lie_lat    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace1(" %s : longitude     : %.2f (deg) ", c_nom, lp_Lie->lie_lon    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace1(" %s : vitesses      : %.2f (Va) %.2f (Vh)", c_nom, lp_Ast->ast_azi_vit,  lp_Ast->ast_alt_vit ) ; 
+  Trace1(" %s : azimut        : %.2f (deg) ", c_nom, lp_Ast->ast_azi    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace1(" %s : altitude      : %.2f (deg) ", c_nom, lp_Ast->ast_alt    * CALCULS_UN_RADIAN_EN_DEGRES ) ;
+  Trace1(" %s : declinaison   : %.2f (deg) ", c_nom, lp_Ast->ast_dec  * CALCULS_UN_RADIAN_EN_DEGRES  ) ;
+  Trace1(" %s : ascension dro : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_asc    * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_asc ) ;
+  Trace1(" %s : angle horaire : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh   * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh ) ;
 
   Trace1(" %s : Agh0          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh0  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh0 ) ;
   Trace1(" %s : Agh1          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_agh1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_agh1 ) ;
@@ -987,7 +981,7 @@ void CONFIG_DISPLAY_MODE_LONG(STRUCT_ASTRE *lp_Ast, STRUCT_LIEU *lp_Lie, STRUCT_
   Trace1(" %s : Azi1          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_azi1  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi1 ) ;
   Trace1(" %s : Azi2          : %.2f (deg) %s (HH.MM.SS)", c_nom, lp_Ast->ast_azi2  * CALCULS_UN_RADIAN_EN_DEGRES, c_hhmmss_azi2 ) ;
 
-  Trace("----------------------------") ;
+  Trace1("----------------------------") ;
 }
 
 /*****************************************************************************************
@@ -1043,7 +1037,7 @@ void CONFIG_MENU_CHANGE_DETECT (void)  {
 
   if ( gp_Sui->sui_menu_old != gp_Sui->sui_menu ) {
 
-    Trace("appel : %d : %s" , gp_Sui->sui_menu, s_menu) ;
+    Trace1("appel : %d : %s" , gp_Sui->sui_menu, s_menu) ;
     GPIO_LED_ETAT_CLIGNOTE(1, 100) ;
   }
 
@@ -1069,13 +1063,13 @@ int   CONFIG_PATH_FIND (char * g_paths, char *cmd) {
 
   while( ++i < CONFIG_C_BIN_POSSIBLE_PATHS_LENGTH && i_retour == FALSE ) {
     sprintf( c_path, "%s/%s", c_Bin_Possible_Paths[i], cmd) ;
-    Trace("Test chemin %s", c_path) ;
+    Trace1("Test chemin %s", c_path) ;
     if( access( c_path, F_OK ) == 0 ) { 
       i_retour = TRUE ; 
       strcpy( g_paths, c_path ) ;
     }
   }
-  Trace("%s = %s", cmd, g_paths) ;
+  Trace1("%s = %s", cmd, g_paths) ;
 
   return i_retour ; 
 }
@@ -1111,7 +1105,7 @@ void CONFIG_FIC_VERIFY(STRUCT_CONFIG *lp_Con) {
       }
     }
     if (i_Non_Trouve ) {
-      Trace("parametre %s non trouve dans fichier de configguration", gc_Config_Params_Obligatoires[l] ) ;
+      Trace1("parametre %s non trouve dans fichier de configguration", gc_Config_Params_Obligatoires[l] ) ;
     }
   }
 
