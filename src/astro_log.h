@@ -26,10 +26,6 @@
 #define ASTRO_LOG_DEBUG_PID              0 /* valeurs possibles => 0/1  : pas d ecriture / ecriture sur disque */
 #define ASTRO_LOG_DEBUG_VOUTE            0 /* valeurs possibles => 0/1  : pas d ecriture / ecriture sur disque */
 
-FILE *          gp_File_Flog ;
-/* gp_File_Flog */
-pthread_mutex_t gp_mutex_log ; 
-
 /* ------------------------------------------------------------------------
  HANDLE_ASSERT_xxx
  ------------------------------------------------------------------------ */
@@ -125,12 +121,11 @@ while (0)
 #define Trace(fmt, args...) { \
   /* pthread_mutex_lock( & gp_mutex_log ) ; \ */
   fprintf( stdout,       "\n%-36s : " fmt, __func__, ##args) ; \
-  fprintf( gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
   /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */
 }
 
-#define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
-#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace1(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
@@ -161,16 +156,14 @@ while (0)
 #define Trace(fmt, args...) { \
   /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
-  fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
   /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
 } 
 #define Trace1(fmt, args...) { \
   /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
-  fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
   /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
 }
-#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; }
+#define Trace2(fmt, args...) while(0) { fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; }
 
 #endif
 
@@ -205,21 +198,18 @@ while (0)
 #define Trace(fmt, args...)           { \
   /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
-  fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
   /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
 }
 
 #define Trace1(fmt, args...)          { \
   /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
-  fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
   /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
 }
 
 #define Trace2(fmt, args...)          { \
   /* pthread_mutex_lock( & gp_mutex_log ) ; \ */ \
   fprintf(stdout, "\n%-36s : " fmt, __func__, ##args) ; \
-  fprintf(gp_File_Flog, "\n%-36s : " fmt, __func__, ##args) ; \
   /* pthread_mutex_unlock( & gp_mutex_log ) ; \ */ \
 }
 

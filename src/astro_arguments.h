@@ -24,7 +24,6 @@
 #define ARGUMENTS_FREQ_TRAME_INFRAROUGE 10000000.0
 #define ARGUMENTS_FILE_VOUTE            "voute.csv"
 
-int incrlog ;
 
 //extern void ASTRO_TRAP_MAIN(int sig) ;
 /* janvier 2022 : 

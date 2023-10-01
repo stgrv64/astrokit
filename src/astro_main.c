@@ -222,10 +222,6 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
  
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_MENU ) ;
 
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */ 
-  /*
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_MENU ) ;
-  */
   SUIVI_MENU_BEFORE_WHILE ( gp_Sui) ;
 
   //-------------------------------------------------------------------------------
@@ -459,10 +455,6 @@ void * _SUIVI_INFRAROUGE(STRUCT_SUIVI * gp_Sui) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_INFRARED ) ;
 
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
-  /*
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_INFRA ) ;
-  */
   if ( gp_Dev->dev_use_infrarouge ) {
   
     i_ret = INFRARED_OPEN( gp_LircConfig ) ;
@@ -506,11 +498,6 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
   memset( c_l0, CONFIG_ZERO_CHAR, sizeof( c_l0 )) ;
   memset( c_l1, CONFIG_ZERO_CHAR, sizeof( c_l1 )) ;
   
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
-  /*      
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_LCD ) ;
-  */
-
   if ( gp_Dev->dev_use_lcd ) {
 
     gp_Lcd->default_display() ;
@@ -586,11 +573,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
   TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
-
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
-  /*
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  */    
+ 
   if ( gp_Dev->dev_use_keyboard ) {
 
     /* Debut boucle _SUIVI_CLAVIER_TERMIOS */
@@ -682,10 +665,6 @@ void * SUIVI_CLAVIER_getchar( STRUCT_SUIVI * gp_Sui ) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
-  /*
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  */
   if ( gp_Dev->dev_use_keyboard ) {
 
     /* Debut boucle SUIVI_CLAVIER_getchar */
@@ -729,10 +708,6 @@ void * SUIVI_CLAVIER_NCURSES(STRUCT_SUIVI * gp_Sui ) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CLAVIER ) ;
 
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
-  /*
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CLAVIER ) ;
-  */
   if ( gp_Dev->dev_use_keyboard ) {
 
     // signal( SIGTERM, ASTRO_TRAP_SUIVI_CLAVIER) ;
@@ -801,13 +776,8 @@ void * _SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_CAPTEURS ) ;
 
-  /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */
-  /*
-  usleep( PTHREAD_USLEEP_BEFORE_START_SUIVI_CAPTEUR ) ;
-  */
   lp_I2c = & l_I2c ;
   lp_Acc = & l_Acc ;
-
   lp_I2c->i2c_dev_fd = 0 ;
   
   if ( gp_Dev->dev_use_capteurs ) {
@@ -1076,6 +1046,19 @@ int main(int argc, char ** argv) {
       gp_Azi_Mot->mot_pha[3]->pha_rap[i]) ;
   }
 
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)_GPIO_PWM_MOT,   gp_Azi_Mot ) ;     
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)_GPIO_PWM_MOT,   gp_Alt_Mot ) ;
+
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
+
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
+
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MENU],            NULL, (void*)_SUIVI_MENU,           gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Vou ) ;
 
@@ -1083,44 +1066,6 @@ int main(int argc, char ** argv) {
   if ( gp_Dev->dev_use_capteurs )  { pthread_create( &gp_Pth->pth_t[PTHREAD_T_CAPTEUR],NULL, (void*)_SUIVI_CAPTEURS,       gp_Sui ) ; }
   if ( gp_Dev->dev_use_keyboard )  { pthread_create( &gp_Pth->pth_t[PTHREAD_T_CLAVIER],NULL, (void*)_SUIVI_CLAVIER_TERMIOS,gp_Ter ) ; }
   if ( gp_Dev->dev_use_lcd )       { pthread_create( &gp_Pth->pth_t[PTHREAD_T_LCD],    NULL, (void*)_SUIVI_LCD,            gp_Sui ) ; }
-
-  if ( gp_Dev->dev_use_lcd )         { pthread_join( gp_Pth->pth_t[PTHREAD_T_LCD], NULL) ;    } 
-  if ( gp_Dev->dev_use_keyboard )    { pthread_join( gp_Pth->pth_t[PTHREAD_T_CLAVIER], NULL) ;} 
-  if ( gp_Dev->dev_use_capteurs )    { pthread_join( gp_Pth->pth_t[PTHREAD_T_CAPTEUR], NULL) ;} 
-  if ( gp_Dev->dev_use_infrarouge )  { pthread_join( gp_Pth->pth_t[PTHREAD_T_INFRA], NULL) ;  } 
-
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_VOUTE], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MENU],  NULL) ;
-
-    exit(0);
-    
-
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)_GPIO_PWM_MOT,         gp_Azi_Mot ) ;
-
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)_GPIO_PWM_MOT,         gp_Alt_Mot ) ;
-
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL) ;
-
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL) ;
-  pthread_join( gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL) ;
-
-  exit(0);
-
   
   // ============================== join des threads  ===================================
   /* TODO : statut cancellable implique de ne pas forcement mettre en join */

@@ -164,7 +164,9 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
   
     memset( buf, CONFIG_ZERO_CHAR, sizeof(buf));
     sprintf(buf,"%s/%s/%s", gp_Con_Par->con_par_rep_home, gp_Con_Par->con_par_rep_log, gp_Con_Par->con_par_fic_vou) ;
-    
+
+    /* TODO remplacer gp_File_Flog par une var de struct VOUTE */
+    /*
     if ( (gp_File_Flog=fopen(buf,"a")) == NULL) {
       // completer et modifier
       Trace("probleme ouverture 3 %s",buf) ;
@@ -173,7 +175,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
     }
     else {
       Trace("open %s ok", buf) ;
-    }
+    } */
   }
 
   return ;

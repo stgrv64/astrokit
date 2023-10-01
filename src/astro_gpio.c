@@ -1365,8 +1365,8 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
  
   Trace("debut while") ;
 
-  while(1) {
-    
+  while(TRUE) {
+  
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
     pthread_testcancel() ;
 
@@ -1470,7 +1470,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Cal_Par->cal_par_mutex ) ;
 
-  while (1) {
+  while(TRUE) {
 
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
     pthread_testcancel() ;
@@ -1652,7 +1652,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
       /* Fin Correction du calcul asservissement juin 2022 */
     }
 
-    Trace("i_pas_change %d lp_Mot->mot_pas %lld gp_Tpo->tpo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
+    Trace1("i_pas_change %d lp_Mot->mot_pas %lld gp_Tpo->tpo_pid_loop %ld gp_Pid_Par->par_pid_ech %f" , \
       i_pas_change, \
       lp_Mot->mot_pas, \
       gp_Tpo->tpo_pid_loop, \

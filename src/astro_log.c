@@ -17,6 +17,10 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
+FILE *          gp_File_Flog ;
+/* gp_File_Flog */
+pthread_mutex_t gp_mutex_log ; 
+
 /*****************************************************************************************
 * @fn     : LOG_DISPLAY_PREPARE
 * @author : s.gravois
@@ -107,93 +111,6 @@ void LOG_LOG ( STRUCT_LOG * lp_Log) {
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Log->log_mutex ) ;
 
   return ;
-}
-/*****************************************************************************************
-* @fn     : LOG_SYSTEM_LOG_0
-* @author : s.gravois
-* @brief  : Cette fonction ecrit dans la log via un appel systeme avec system
-* @param  : int *incrlog
-* @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @date   : 2022-10-07 deplacement fonction depuis config.c (renomme en astro_config.c)
-* @todo   : (obsolete)
-*****************************************************************************************/
-
-void LOG_SYSTEM_LOG_0(int *incrlog) {
-  int ret ;
-
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  (*incrlog)++ ;
-  char cmd[255] ;
-  if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
-
-    // FIXME 01 mai 2021 : modification chemin relatif
-
-    sprintf(cmd,"echo %d >> %s/%s/%s", \
-      *incrlog, \
-      gp_Con_Par->con_par_rep_home, \
-      gp_Con_Par->con_par_rep_log, \
-      gp_Con_Par->con_par_fic_log) ;
-
-    ret = system(cmd) ;
-
-    if ( ret < 0 ) Trace("Probleme avec %s : retourner avec error negative",cmd) ;
-    //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
-  }
-}
-/*****************************************************************************************
-* @fn     : LOG_SYSTEM_LOG_1
-* @author : s.gravois
-* @brief  : Cette fonction ecrit dans la log via un strtime et system
-* @param  : int *incrlog
-* @date   : 2022-01-20 creation entete de la fonction au format doxygen
-* @date   : 2022-10-07 deplacement fonction depuis config.c (renomme en astro_config.c)
-* @todo   : (obsolete)
-*****************************************************************************************/
-/* obsolete */
-
-void LOG_SYSTEM_LOG_1(char *txt) {
-
-  int ret ;
-  char cmd[255] ;
-  char c_out[255] ;
-  time_t now = time (NULL);
-  struct tm *tmp;
-  tmp = localtime(&now);
-  char s_date[16];
-
-  TraceArbo(__func__,2,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-
-  memset( s_date, 0, sizeof( s_date)) ;
-  memset( c_out, 0, sizeof( c_out)) ;
-  
-  if (tmp == NULL) {
-    perror("localtime");
-    exit(EXIT_FAILURE);
-  }
-
-  if ( ASTRO_LOG_DEBUG_WRITE_FS ) {
-
-    if ( strftime(s_date, sizeof(s_date), "%Y%m%d.%H%M", tmp) == 0 ) {
-
-        fprintf(stderr, "strftime a renvoyé 0");
-        exit(EXIT_FAILURE);
-    }
-    sprintf( c_out, "%s : %s", s_date, txt ) ;
-
-    sprintf( cmd,"echo %s >> %s/%s/%s", \
-      c_out, \
-      gp_Con_Par->con_par_rep_home, \
-      gp_Con_Par->con_par_rep_log, \
-      gp_Con_Par->con_par_fic_log ) ;
-
-    ret =  system(cmd) ;
-    
-    if ( ret < 0 ) { 
-      Trace("Probleme avec %s : retourner avec error negative",cmd) ;
-    }
-    //if ( ret == 0 ) Trace("Probleme avec %s : shell non disponible",cmd) ;
-  }
 }
 /*****************************************************************************************
 * @fn     : LOG_INIT

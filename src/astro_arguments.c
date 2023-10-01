@@ -18,7 +18,7 @@
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
-
+MACRO_ASTRO_GLOBAL_EXTERN_CONFIG ;
 // extern ASTRO_TRAP_MAIN();
 
 /*****************************************************************************************
@@ -270,8 +270,6 @@ void ARGUMENTS_MANAGE_FACON_CLASSIQUE(int argc, char** argv) {
   STRUCT_LIEU  * lp_Lie = (STRUCT_LIEU  *)gp_Lie ;
 
   TraceArbo(__func__,0,"manage argc/argv") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
-  
-  incrlog=30 ;
 
   /* ---------------------------------------------------------------
   * Gestion de l Alarme

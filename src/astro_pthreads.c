@@ -434,15 +434,15 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
   /* Configuration et attribution des CPUs pour chaque thread */
   /*----------------------------------------------------------*/
 
-  CPU_ZERO(&cpu_set) ;
+  // CPU_ZERO(&cpu_set) ;
 
   /* TODO : FIXME : parametrer les CPUS a utiliser avec un masque */
   /* pour l instant 2022-11 , chaque thread est en ROUND ROBIN sur tous les CPUs */
 
-  for(int i = 0 ; i< gi_pthread_nb_cpu; i++ ) {
-    CPU_SET(i,&cpu_set); 
-  }
-  
+  // for(int i = 0 ; i< gi_pthread_nb_cpu; i++ ) {
+  //   CPU_SET(i,&cpu_set); 
+  // }
+
   /*----------------------------------------------------------*/
   /* Initialisation et attribution des attributs de thread    */
   /*----------------------------------------------------------*/
@@ -528,6 +528,7 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
     
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Pth->pth_mutex ) ;
   }
+  
   if ( i_error == 0 ) {
     Trace("%-16s : id %lx ord %s prio %d sta %s num %d", \
       c_name, \
@@ -552,6 +553,8 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
   /* FIXME : ajout 2023 mars */
   
   usleep( i_slp ) ;
+
+  TraceArbo(__func__,0,"fin usleep") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   return ;
 }
