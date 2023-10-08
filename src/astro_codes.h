@@ -7,6 +7,7 @@
 # --------------------------------------------------------------
 # 2022-06-01  | * creation
 # 2022-06-01  | * rapatriement code depuis astro_config.h
+# 2023-10-01  | correction bug sur lettres deja prises (MES => M) ...
 # -------------------------------------------------------------- 
 */
 
@@ -63,7 +64,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "66",  "KEY_B",    "B"},  
 { "67",  "KEY_C",    "C"},  
 { "68",  "KEY_D",    "D"},  
-{ "69",  "KEY_E",    "E"},  
+{ "deja_pris",  "deja_pris",    "deja_pris"},   /* ETOILES */
 { "70",  "KEY_F",    "F"},  
 { "71",  "KEY_G",    "G"},  
 { "72",  "KEY_H",    "H"},  
@@ -71,10 +72,10 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "74",  "KEY_J",    "J"},  
 { "75",  "KEY_K",    "K"},  
 { "76",  "KEY_L",    "L"},  
-{ "77",  "KEY_M",    "M"},  
-{ "78",  "KEY_N",    "N"},  
+{ "deja_pris",  "deja_pris",    "deja_pris"},  /* MESSIER */
+{ "deja_pris",  "deja_pris",    "deja_pris"},  /* NGC */
 { "79",  "KEY_O",    "O"},  
-{ "80",  "KEY_P",    "P"},  
+{ "deja_pris",  "deja_pris",    "deja_pris"},  /* PLANETES */
 { "81",  "KEY_Q",    "Q"},  
 { "82",  "KEY_R",    "R"},  
 { "83",  "KEY_S",    "S"},  
@@ -123,7 +124,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /* objets MES NGC ETO PLA         */
 /*--------------------------------*/
 
-{ "47",  "KEY_M",    "key_mes"},  /* 47 ascii = touche '/' */
+{ "47",  "KEY_M",    "MES"},  /* 47 ascii = touche '/' */
 { "42",  "KEY_N",    "NGC"},  /* 42 ascii = touche '*' */
 { "45",  "KEY_E",    "ETO"},  /* 45 ascii = touche '-' */
 { "43",  "KEY_P",    "PLA"},  /* 43 ascii = touche '+' */

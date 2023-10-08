@@ -35,6 +35,7 @@
 #
 # octobre 2022  * refonte complete du code : deplacemements de code
 #                 dans des fichiers *.c dedies 
+# octobre 2023  * correction bug priorite pthreads
 # -------------------------------------------------------------- 
 */
 

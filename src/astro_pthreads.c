@@ -5,8 +5,9 @@
 # astrokit @ 2022  - lGPLv2 - Stephane Gravois - 
 # --------------------------------------------------------------
 # date        | commentaires 
-# juin 2022   * creation
-# juin 2022   * deport du code concernant temps teel et threads ici
+# juin 2022     * creation
+# juin 2022     * deport du code concernant temps teel et threads ici
+# octobre 2023  * correction bug priorite pthreads + cpu_set (a analyser)
 # -------------------------------------------------------------- 
 */
 
