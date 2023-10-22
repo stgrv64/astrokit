@@ -142,6 +142,8 @@ while (0)
 /* Ces constantes sont definies ici pour eviter les tests d inclusion multiples */
 /*------------------------------------------------------------------------------*/
 
+#define CALCUL_PAR_SOLAR_SYSTEM              FALSE
+
 #define CODES_CODE_BUFFER_SIZE               255 
 #define CODES_CODE_NB_CODES                  110 
 #define CODES_NB_IN_OUT                      3

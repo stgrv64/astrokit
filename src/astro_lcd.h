@@ -133,10 +133,10 @@ struct STR_LCD {
   void (*display_mod_ste)           ( const int ) ;
   void (*display_ast_fre)           ( const int ) ;
   void (*display_ast_per)           ( const int ) ;
-  void (*display_cfg_gpios_alt_azi) ( const int ) ;
-  void (*display_cfg_gpios_mas_fre) ( const int ) ;
-  void (*display_cfg_gpios_leds)    ( const int ) ;
-  void (*display_cfg_reduction)     ( const int ) ;
+  void (*display_gpios_alt_azi) ( const int ) ;
+  void (*display_gpios_mas_fre) ( const int ) ;
+  void (*display_gpios_leds)    ( const int ) ;
+  void (*display_reductions)     ( const int ) ;
   void (*display_informations)      ( const int ) ;
   void (*display_acc_alt_azi)       ( const int ) ;
 }  ;

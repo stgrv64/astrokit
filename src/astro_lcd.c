@@ -173,25 +173,22 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
   lp_Lcd->default_change = LCD_CHANGE_DEFAULT ;
   lp_Lcd->current_change = LCD_CHANGE_CURRENT ;
 
-  lp_Lcd->display_str_str = LCD_DISPLAY_STRING_STRING ;
-  lp_Lcd->display_str_int = LCD_DISPLAY_STRING_INT ;
-  lp_Lcd->display_int_int = LCD_DISPLAY_INT_INT ;
-  /* lp_Lcd->display_str_lng =  */
-  lp_Lcd->display_tps_lie = LCD_DISPLAY_TEMPS_LIEU ;
-  lp_Lcd->display_ast_vit = LCD_DISPLAY_ASTRE_VITESSES ;
-  lp_Lcd->display_azi_alt = LCD_DISPLAY_AZI_ALT ;
-  lp_Lcd->display_agh_dec = LCD_DISPLAY_AGH_DEC ;
-  lp_Lcd->display_asc_dec = LCD_DISPLAY_ASC_DEC ;
-
-  lp_Lcd->display_ast_fre = LCD_DISPLAY_AST_FREQUENCES ;
-  lp_Lcd->display_ast_per = LCD_DISPLAY_AST_PERIODES ;
-
-  lp_Lcd->display_mod_ste = LCD_DISPLAY_MODE_STELLARIUM ;
-
-  lp_Lcd->display_cfg_gpios_alt_azi  = LCD_DISPLAY_CFG_GPIOS_ALT_AZI ;
-  lp_Lcd->display_cfg_gpios_mas_fre  = LCD_DISPLAY_CFG_GPIOS_MAS_FRE ;
-  lp_Lcd->display_cfg_gpios_leds     = LCD_DISPLAY_CFG_GPIOS_LEDS ;
-  lp_Lcd->display_cfg_reduction      = LCD_DISPLAY_CFG_REDUCTION ;
+  lp_Lcd->display_str_str        = LCD_DISPLAY_STRING_STRING ;
+  lp_Lcd->display_str_int        = LCD_DISPLAY_STRING_INT ;
+  lp_Lcd->display_int_int        = LCD_DISPLAY_INT_INT ;
+  
+  lp_Lcd->display_tps_lie        = LCD_DISPLAY_TEMPS_LIEU ;
+  lp_Lcd->display_ast_vit        = LCD_DISPLAY_ASTRE_VITESSES ;
+  lp_Lcd->display_azi_alt        = LCD_DISPLAY_AZI_ALT ;
+  lp_Lcd->display_agh_dec        = LCD_DISPLAY_AGH_DEC ;
+  lp_Lcd->display_asc_dec        = LCD_DISPLAY_ASC_DEC ;
+  lp_Lcd->display_ast_fre        = LCD_DISPLAY_AST_FREQUENCES ;
+  lp_Lcd->display_ast_per        = LCD_DISPLAY_AST_PERIODES ;
+  lp_Lcd->display_mod_ste        = LCD_DISPLAY_MODE_STELLARIUM ;
+  lp_Lcd->display_gpios_alt_azi  = LCD_DISPLAY_CFG_GPIOS_ALT_AZI ;
+  lp_Lcd->display_gpios_mas_fre  = LCD_DISPLAY_CFG_GPIOS_MAS_FRE ;
+  lp_Lcd->display_gpios_leds     = LCD_DISPLAY_CFG_GPIOS_LEDS ;
+  lp_Lcd->display_reductions     = LCD_DISPLAY_CFG_REDUCTION ;
 
   lp_Lcd->display_informations       = LCD_DISPLAY_INFORMATIONS ;
   lp_Lcd->display_acc_alt_azi        = LCD_DISPLAY_ACC_ALT_AZI ;

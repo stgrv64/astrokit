@@ -1368,7 +1368,7 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
   while(TRUE) {
   
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
-    pthread_testcancel() ;
+    // pthread_testcancel() ;
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Pha->pha_mutex ) ;
     
@@ -1473,7 +1473,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   while(TRUE) {
 
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
-    pthread_testcancel() ;
+    // pthread_testcancel() ;
 
     /* -----------------------------------------------------
        Recopie des donnees de suivi dans les variables locales 

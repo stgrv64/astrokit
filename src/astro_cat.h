@@ -56,7 +56,7 @@ struct STR_CAT {
 
 void      CAT_INIT          ( STRUCT_CAT * ) ;
 void      CAT_READ          ( STRUCT_CAT * , char * ) ;
-void      CAT_FIND          ( STRUCT_CAT * , STRUCT_ASTRE *) ;
+void      CAT_FIND          ( STRUCT_CAT * , STRUCT_ASTRE *, int ) ;
 void      CAT_ZONE          ( STRUCT_CAT * , STRUCT_ASTRE *, double ) ;
 void      CAT_DISPLAY_DAT   ( STRUCT_CAT * ) ;
 void      CAT_DISPLAY_DEC   ( STRUCT_CAT * ) ;

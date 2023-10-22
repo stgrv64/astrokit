@@ -459,7 +459,7 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
   double af = -1 ;
   double f_assert = 0 ; 
   
-  TraceArbo(__func__,2,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* recupere information latitude dans une var locale */
 
@@ -1122,13 +1122,15 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
 * @todo   : ras
 *****************************************************************************************/
 
-void CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
+void  CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
   
-  TraceArbo(__func__,2,"calculate horaire angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"calculate horaire angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // en radians 
 
   /* correction ascension droite si negatif (on ajoute 360 degres) */
+
+  Trace("debut : (sid) %.2f (asc) %.2f", gp_Lie->lie_tsr, lp_Ast->ast_asc ) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex );
 
@@ -1152,9 +1154,9 @@ void CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
 /*
   CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
 */  
-  Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
-  Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
     ASTRE_STELLARIUM_VIEW(gp_Ast) ;
@@ -1392,6 +1394,8 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
+      Trace("traitement ASTRE_INDETERMINE") ;
+
       if ( gp_Cal->cal_type == CALCULS_TYPE_AZI_VERS_EQU ) {
         
         CALCULS_EQUATEUR(gp_Ast) ;
@@ -1411,32 +1415,32 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_CIEL_PROFOND :
 
-      Trace("-----------------------------------------------------") ;
+      Trace("traitement ASTRE_CIEL_PROFOND") ;
       
       memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
 
-      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
-      CALCULS_SOLAR_SYSTEM( gp_Ast, gp_Lie, gp_Tim ) ;
-      CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
+      if ( CALCUL_PAR_SOLAR_SYSTEM == TRUE ) {
 
+        CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+        CALCULS_SOLAR_SYSTEM( gp_Ast, gp_Lie, gp_Tim ) ;
+        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
+        }
+      else {
+        CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+        CALCULS_AZIMUT(gp_Ast) ;
+        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
+        CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+        CALCULS_PERIODE(gp_Ast) ;
+      }
       gp_Ast->ast_display_format_datas(gp_Ast) ;
       gp_Ast->ast_display(gp_Ast) ;
-/*
-      memcpy( gp_Ast, gp_AstSav, sizeof( STRUCT_ASTRE) ) ;  
 
-      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
-      CALCULS_AZIMUT(gp_Ast) ;
-      CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
-      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-      CALCULS_PERIODE(gp_Ast) ;
-
-      gp_Ast->ast_display_format_datas(gp_Ast) ;
-      gp_Ast->ast_display(gp_Ast) ;
-*/
       break ;
     /* ----------------------------------------------------------------- */
     
     case ASTRE_PLANETE :
+
+      Trace("traitement ASTRE_PLANETE") ;
 
       if ( gp_Ast->ast_num > 9 ) {
         Trace("numero de planete interdit = %d", gp_Ast->ast_num ) ;
@@ -1487,12 +1491,18 @@ void CALCULS_TOUT(void) {
       //---------------------------------------------------------------------------------------
       
       case ASTRE_SATELLITE :
+
+        Trace("traitement ASTRE_PLANETE") ;
+
         /* TODO completer */
         break ;
 
       //---------------------------------------------------------------------------------------
 
       case ASTRE_COMETE :
+
+        Trace("traitement ASTRE_COMETE") ;
+
         /* TODO completer */
         break ;
 

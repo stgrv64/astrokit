@@ -762,8 +762,10 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
   
   // FIXME : lecture du fichier de configuration 
 
-  while(1) {
-   
+  while(TRUE) {
+
+    Trace1("while ..") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+       
     c = fgetc(fin) ;
 
     if (L<i_trace_ligne_max) 

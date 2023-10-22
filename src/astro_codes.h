@@ -42,92 +42,90 @@ t_en_Codes_Pos ;
 static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 
 /*--------------------------------*/
+/* objets MES NGC ETO PLA         */
+/*--------------------------------*/
+
+{ "47",  "KEY_M", "MES"},  /* 47 ascii = touche '/' */
+{ "42",  "KEY_N", "NGC"},  /* 42 ascii = touche '*' */
+{ "45",  "KEY_E", "ETO"},  /* 45 ascii = touche '-' */
+{ "43",  "KEY_P", "PLA"},  /* 43 ascii = touche '+' */
+
+/*--------------------------------*/
 /* clavier numerique              */ 
 /*--------------------------------*/
 
-{ "48", "KEY_0", "0"}, /* 48 ascii = 0 */
-{ "49", "KEY_1", "1"},  
-{ "50", "KEY_2", "2"},
-{ "51", "KEY_3", "3"},
-{ "52", "KEY_4", "4"},
-{ "53", "KEY_5", "5"},
-{ "54", "KEY_6", "6"},
-{ "55", "KEY_7", "7"},
-{ "56", "KEY_8", "8"},
-{ "57", "KEY_9", "9"},
+{ "48",  "KEY_0", "0"}, /* 48 ascii = 0 */
+{ "49",  "KEY_1", "1"},  
+{ "50",  "KEY_2", "2"},
+{ "51",  "KEY_3", "3"},
+{ "52",  "KEY_4", "4"},
+{ "53",  "KEY_5", "5"},
+{ "54",  "KEY_6", "6"},
+{ "55",  "KEY_7", "7"},
+{ "56",  "KEY_8", "8"},
+{ "57",  "KEY_9", "9"},
 
 /*-----------------------------------*/
 /* clavier alphabetique (majuscules) */ 
 /*-----------------------------------*/
 
-{ "65",  "KEY_A",    "A"},  /* 97 ascii = 'a' */    
-{ "66",  "KEY_B",    "B"},  
-{ "67",  "KEY_C",    "C"},  
-{ "68",  "KEY_D",    "D"},  
-{ "deja_pris",  "deja_pris",    "deja_pris"},   /* ETOILES */
-{ "70",  "KEY_F",    "F"},  
-{ "71",  "KEY_G",    "G"},  
-{ "72",  "KEY_H",    "H"},  
-{ "73",  "KEY_I",    "I"},  
-{ "74",  "KEY_J",    "J"},  
-{ "75",  "KEY_K",    "K"},  
-{ "76",  "KEY_L",    "L"},  
-{ "deja_pris",  "deja_pris",    "deja_pris"},  /* MESSIER */
-{ "deja_pris",  "deja_pris",    "deja_pris"},  /* NGC */
-{ "79",  "KEY_O",    "O"},  
-{ "deja_pris",  "deja_pris",    "deja_pris"},  /* PLANETES */
-{ "81",  "KEY_Q",    "Q"},  
-{ "82",  "KEY_R",    "R"},  
-{ "83",  "KEY_S",    "S"},  
-{ "84",  "KEY_T",    "T"},  
-{ "85",  "KEY_U",    "U"},  
-{ "86",  "KEY_V",    "V"},  
-{ "87",  "KEY_W",    "W"},  
-{ "88",  "KEY_X",    "X"},  
-{ "89",  "KEY_Y",    "Y"},  
-{ "90",  "KEY_Z",    "Z"},  
+{ "65",  "KEY_A_MAJ",    "KEY_A_MAJ"},  /* 97 ascii = 'a' */    
+{ "66",  "KEY_B_MAJ",    "KEY_B_MAJ"},  
+{ "67",  "KEY_C_MAJ",    "KEY_C_MAJ"},  
+{ "68",  "KEY_D_MAJ",    "KEY_D_MAJ"},  
+{ "69",  "KEY_E_MAJ",    "KEY_E_MAJ"},
+{ "70",  "KEY_F_MAJ",    "KEY_F_MAJ"},  
+{ "71",  "KEY_G_MAJ",    "KEY_G_MAJ"},  
+{ "72",  "KEY_H_MAJ",    "KEY_H_MAJ"},  
+{ "73",  "KEY_I_MAJ",    "KEY_I_MAJ"},  
+{ "74",  "KEY_J_MAJ",    "KEY_J_MAJ"},  
+{ "75",  "KEY_K_MAJ",    "KEY_K_MAJ"},  
+{ "76",  "KEY_L_MAJ",    "KEY_L_MAJ"},  
+{ "77",  "KEY_M_MAJ",    "KEY_M_MAJ"},  
+{ "78",  "KEY_N_MAJ",    "KEY_N_MAJ"},  
+{ "79",  "KEY_O_MAJ",    "KEY_O_MAJ"},  
+{ "80",  "KEY_P_MAJ",    "KEY_P_MAJ"},  
+{ "81",  "KEY_Q_MAJ",    "KEY_Q_MAJ"},  
+{ "82",  "KEY_R_MAJ",    "KEY_R_MAJ"},  
+{ "83",  "KEY_S_MAJ",    "KEY_S_MAJ"},  
+{ "84",  "KEY_T_MAJ",    "KEY_T_MAJ"},  
+{ "85",  "KEY_U_MAJ",    "KEY_U_MAJ"},  
+{ "86",  "KEY_V_MAJ",    "KEY_V_MAJ"},  
+{ "87",  "KEY_W_MAJ",    "KEY_W_MAJ"},  
+{ "88",  "KEY_X_MAJ",    "KEY_X_MAJ"},  
+{ "89",  "KEY_Y_MAJ",    "KEY_Y_MAJ"},  
+{ "90",  "KEY_Z_MAJ",    "KEY_Z_MAJ"},  
 
 /*-----------------------------------*/
 /* clavier alphabetique (minuscules) */ 
 /*-----------------------------------*/
 
-{ "97",  "KEY_LIST", "key_azi"},    /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
-{ "98",  "KEY_b",    "b"},  
-{ "99",  "KEY_c",    "c"},  
-{ "100", "KEY_d",    "d"},     
-{ "101", "KEY_e",    "e"},  
-{ "102", "KEY_f",    "f"},  
-{ "103", "KEY_g",    "g"},     
-{ "104", "KEY_h",    "h"},          /* 104 sum ascii = touche 'h' = affichage threads infos */
-{ "105", "KEY_i",    "i"},    
-{ "106", "KEY_j",    "j" },         /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
-{ "107", "KEY_k",    "k" },         /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
-{ "108", "KEY_l",    "l" },         /* changement longitude */ 
-{ "109", "KEY_MENU", "MENU"},       /* 109  ascii = touche 'm' */
-{ "110", "KEY_n",    "n"},     
-
-{ "111", "KEY_o",    "o"},  
-{ "112", "KEY_p",    "key_pid"},    /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
-{ "113", "KEY_EXIT", "key_exit" },  /* 113 sum ascii = touche 'q' = 'quit' = quitter le programme */ 
-{ "114", "KEY_r",    "r" },         /* 114 sum ascii = touche 'r' = reseau */ 
-{ "115", "KEY_s",    "s"},          /* 115 sum ascii = touche 's'        = log */ 
-{ "116", "KEY_MUTE", "TIME"},       /* 116 sum ascii = touche 't' = temps */
-{ "117", "KEY_u",    "u"},          /* 117 sum ascii = touche 'u'     = log */ 
-{ "118", "KEY_v",    "v"},          /* 118 sum ascii = touche 'v' = log */ 
-{ "119", "KEY_w",    "w"},          /* 119 sum ascii = touche 'w'     = log */
-{ "120", "KEY_x",    "x"},    
-
-{ "121", "KEY_y",    "y"},    
-{ "122", "KEY_MODE", "key_equ"}, /* z=equatorial => touche 'z' */     
-
-/*--------------------------------*/
-/* objets MES NGC ETO PLA         */
-/*--------------------------------*/
-
-{ "47",  "KEY_M",    "MES"},  /* 47 ascii = touche '/' */
-{ "42",  "KEY_N",    "NGC"},  /* 42 ascii = touche '*' */
-{ "45",  "KEY_E",    "ETO"},  /* 45 ascii = touche '-' */
-{ "43",  "KEY_P",    "PLA"},  /* 43 ascii = touche '+' */
+{ "97",  "KEY_LIST",  "key_azi"},    /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
+{ "98",  "KEY_B_MIN", "key_b_min"},  
+{ "99",  "KEY_C_MIN", "key_c_min"},  
+{ "100", "KEY_D_MIN", "key_d_min"},     
+{ "101", "KEY_E_MIN", "key_e_min"},  
+{ "102", "KEY_F_MIN", "key_f_min"},  
+{ "103", "KEY_G_MIN", "key_g_min"},     
+{ "104", "KEY_H_MIN", "key_h_min"},    /* 104 sum ascii = touche 'h' = affichage threads infos */
+{ "105", "KEY_I_MIN", "key_i_min"},    /* 105 sum ascii = touche 'i' = affichage infos generales astre / vitesses / etc */
+{ "106", "KEY_J_MIN", "key_j_min" },   /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
+{ "107", "KEY_K_MIN", "key_k_min" },   /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
+{ "108", "KEY_L_MIN", "key_l_min" },   /* changement longitude */ 
+{ "109", "KEY_MENU",  "MENU"},         /* 109  ascii = touche 'm' */
+{ "110", "KEY_N_MIN", "key_n_min"},     
+{ "111", "KEY_O_MIN", "key_o_min"},  
+{ "112", "KEY_P_MIN", "key_pid"},       /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
+{ "113", "KEY_EXIT",  "key_exit" },     /* 113 sum ascii = touche 'q' = 'quit' = quitter le programme */ 
+{ "114", "KEY_R_MIN", "key_r_min" },            /* 114 sum ascii = touche 'r' = reseau */ 
+{ "115", "KEY_S_MIN", "key_s_min"},             /* 115 sum ascii = touche 's'        = log */ 
+{ "116", "KEY_MUTE",  "TIME"},          /* 116 sum ascii = touche 't' = temps */
+{ "117", "KEY_U_MIN", "key_u_min"},             /* 117 sum ascii = touche 'u'     = log */ 
+{ "118", "KEY_V_MIN", "key_v_min"},             /* 118 sum ascii = touche 'v' = log */ 
+{ "119", "KEY_W_MIN", "key_w_min"},             /* 119 sum ascii = touche 'w'     = log */
+{ "120", "KEY_X_MIN", "key_x_min"},    
+{ "121", "KEY_Y_MIN", "key_y_min"},    
+{ "122", "KEY_MODE",  "key_equ"},    /* z=equatorial => touche 'z' */     
 
 /*--------------------------------*/
 /* touches de MENUS               */
@@ -138,20 +136,14 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "32",        "KEY_PAUSE",   "pause"},    /* 32 ascii = espace = pause */
 
 /*--------------------------------*/
-/* touches gauche droite haut bas ok */ 
+/* touches rattrapages & reset    */ 
 /*--------------------------------*/
 
-{ "183",       "KEY_UP",    "nord"},     /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
-{ "184",       "KEY_DOWN",  "sud"},     /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
-{ "185",       "KEY_RIGHT", "est"},     /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
-{ "186",       "KEY_LEFT",  "ouest"},     /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
-
-{ "188",       "KEY_OK",    "reset"}, /* ascii 296 = touche 'FIN' */
-
-/*--------------------------------*/
-/* touche rattrapages             */
-/*--------------------------------*/
-
+{ "188",       "KEY_OK",          "reset"},       /* ascii 188 = touche FIN  => reset (annule tous les rattrapages) */
+{ "183",       "KEY_UP",          "nord"},        /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
+{ "184",       "KEY_DOWN",        "sud"},         /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
+{ "185",       "KEY_RIGHT",       "est"},         /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
+{ "186",       "KEY_LEFT",        "ouest"},       /* ascii SUM 186 (nread=3) => fleche de gauche clavier */ 
 { "297",       "KEY_CHANNELUP" ,  "forwardfast"}, /* ascii 297 (nread=3) => page up */
 { "298",       "KEY_CHANNELDOWN", "rewindfast"},  /* ascii 298 (nread=3) => page down */
 { "45",        "KEY_VOLUMEUP"  ,  "forward"},     /* ascii 45 => - */
@@ -177,14 +169,14 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "277",       "KEY_ZOOM",    "aff_agh_dec" },  /* 277 sum ascii = touche 'F4'  */ /* info 3 */
 
 { "278",       "non_defini",  "aff_asc_dec"       },   /* 278 sum ascii = touche 'F5'  */ /* info 4 */
-{ "348",       "non_defini",  "cfg_gpios_alt_azi" },   /* 348 sum ascii = touche 'F6'  */ /* info 5 */
-{ "349",       "non_defini",  "cfg_gpios_mas_fre" },   /* 348 sum ascii = touche 'F7'  */ /* info 5 */
-{ "350",       "non_defini",  "cfg_gpios_leds"    },   /* 348 sum ascii = touche 'F8'  */ /* info 5 */
-{ "342",       "non_defini",  "cfg_reduction"     },   /* 348 sum ascii = touche 'F9'  */ /* info 5 */
+{ "348",       "non_defini",  "aff_gpios_alt_azi" },   /* 348 sum ascii = touche 'F6'  */ /* info 5 */
+{ "349",       "non_defini",  "aff_gpios_mas_fre" },   /* 348 sum ascii = touche 'F7'  */ /* info 5 */
+{ "350",       "non_defini",  "aff_gpios_leds"    },   /* 348 sum ascii = touche 'F8'  */ /* info 5 */
+{ "342",       "non_defini",  "aff_reductions"     },   /* 348 sum ascii = touche 'F9'  */ /* info 5 */
 { "343",       "non_defini",  "aff_ast_fre"       },   /* 348 sum ascii = touche 'F10' */ /* info 5 */
 { "345",       "non_defini",  "aff_ast_per"       },   /* 348 sum ascii = touche 'F11' */ /* info 5 */
 { "346",       "non_defini",  "aff_acc_alt_azi"   },   /* 346 sum ascii = touche 'F12'  */ /* info 5 */
-{ "105",       "non_defini",  "aff_infos"         },   /* 346 sum ascii = touche 'F12'  */ /* info 5 */
+{ "105",       "non_defini",  "non_defini"         },   /* 346 sum ascii = touche 'F12'  */ /* info 5 */
 
 /*--------------------------------*/
 /* touches de permutations        */

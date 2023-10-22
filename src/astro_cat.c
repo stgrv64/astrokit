@@ -349,13 +349,15 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
 * @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
-void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
+void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, int i_indication) {
   
   int    L=0 ;
   int    i_ligne=0 ;
   int    i_trouve =FALSE ;
 
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"debut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
+  Trace("recherche %s infos %s indication %d ", lp_Ast->ast_nom, lp_Ast->ast_infos, i_indication ) ;
 
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
@@ -364,11 +366,14 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   
   L=0 ;
   
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+  
   memset( lp_Ast->ast_infos, 0 , sizeof( lp_Ast->ast_infos) ) ;
-
   lp_Ast->ast_asc=0;
   lp_Ast->ast_dec=0 ;
   
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
   i_ligne = L ;
 
   while( strcmp(lp_Cat->cat_dec[L][3],"_") && L < CAT_NB_LIGNES ) {
@@ -387,50 +392,77 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
        * dans la structure STRUCT_ASTRE 
        **************************************************/
 
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
       lp_Ast->ast_asc = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       lp_Ast->ast_dec = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+
+      memset( lp_Ast->ast_infos, 0 , sizeof( lp_Ast->ast_infos) ) ;
       strcpy( lp_Ast->ast_infos, lp_Cat->cat_dec[L][0] ) ;
+
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
 
       i_ligne = L ;
       i_trouve = TRUE ;
+
+      Trace("ligne %d : astre %s : cat asc %s cat dec %s",i_ligne, lp_Ast->ast_nom , lp_Cat->cat_dec[L][2] , lp_Cat->cat_dec[L][3] ) ;
+      Trace("ligne %d : astre %s : ast asc %f ast dec %f infos %s",i_ligne, lp_Ast->ast_nom , lp_Ast->ast_asc , lp_Ast->ast_dec, lp_Ast->ast_infos) ;
+
       break  ;
     }
 
     if(!strcmp(lp_Cat->cat_dec[L][1],lp_Ast->ast_nom)) {
 
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
       lp_Ast->ast_asc = atof( lp_Cat->cat_dec[L][2] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
       lp_Ast->ast_dec = atof( lp_Cat->cat_dec[L][3] ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+      
+      memset( lp_Ast->ast_infos, 0 , sizeof( lp_Ast->ast_infos) ) ;
       strcpy( lp_Ast->ast_infos, lp_Cat->cat_dec[L][1] ) ;
 
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+      
       i_ligne = L ; 
       i_trouve = TRUE ;
+
+      Trace("ligne %d : astre %s : cat asc %s cat dec %s",i_ligne, lp_Ast->ast_nom , lp_Cat->cat_dec[L][2] , lp_Cat->cat_dec[L][3] ) ;
+      Trace("ligne %d : astre %s : ast asc %f ast dec %f infos %s",i_ligne, lp_Ast->ast_nom , lp_Ast->ast_asc , lp_Ast->ast_dec, lp_Ast->ast_infos) ;
+
       break ;
     }
     L++;
   }
+  /* fin while*/
+
   if ( L < CAT_NB_LIGNES && i_trouve == TRUE ) {
-    Trace1("(trouve) : (nom) %s (infos) %s: ",lp_Ast->ast_nom , lp_Ast->ast_infos ) ;
+    Trace("(trouve) : (nom) %s (asc) %-5.2f (dec) %-5.2f: ",lp_Ast->ast_nom , lp_Ast->ast_asc, lp_Ast->ast_dec  ) ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
+    Trace("affectation lp_Ast->ast_new = TRUE") ;
+    lp_Ast->ast_new = TRUE ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
   }
   else {
     
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex ) ;
+
     lp_Ast->ast_asc = 0.0 ;
     lp_Ast->ast_dec = 0.0 ;
-    Trace1(" %s : non trouve dans catalogue",lp_Ast->ast_nom) ;
+
     strcpy( lp_Ast->ast_nom, "undefined" ) ;
     strcpy( lp_Ast->ast_infos, "undefined" ) ;
-  }
-/* 2023 : deplacment code suivant a un niveau plus haut */
-/*
-  CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
 
-  Trace(" %s : asc %d.%d.%d (hms) dec %.2f (deg)", \
-    lp_Ast->ast_nom , \
-    lp_Ast->ast_asc_t.tim_HH, \
-    lp_Ast->ast_asc_t.tim_MM, \
-    lp_Ast->ast_asc_t.tim_SS, \
-    lp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES
-  ) ; 
-*/
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex ) ;
+
+    Trace(" %s : non trouve dans catalogue",lp_Ast->ast_nom) ;
+  }
+
+  TraceArbo(__func__,0,"fin") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   return ; 
 }
 /*****************************************************************************************

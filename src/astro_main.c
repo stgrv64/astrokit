@@ -233,8 +233,9 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
   
   while(TRUE) {
 
+    Trace1("while ..") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
     /* Creee un point d 'annulation pour la fonction pthread_cancel */
-    pthread_testcancel() ;
+    // pthread_testcancel() ;
 
     Trace1("temporisation %ld", gp_Tpo->tpo_menu ) ;
     usleep( gp_Tpo->tpo_menu ) ;
@@ -510,9 +511,9 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
     while(TRUE) {
 
       /* Creee un point d 'annulation pour la fonction pthread_cancel */
-      pthread_testcancel() ;
+      // pthread_testcancel() ;
 
-      Trace1("while") ;
+      Trace1("while ..") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
       usleep( gp_Tpo->tpo_lcd_loop );
       
@@ -534,7 +535,9 @@ void * _SUIVI_LCD(STRUCT_SUIVI * gp_Sui) {
         Trace1("gp_Lcd->lcd_change_current == TRUE");
         gp_Lcd->default_refresh() ;
       }
-      gp_Ast->ast_new = FALSE ;
+      /* TODO : verifier cetrte connerie : */
+      // Trace("affectation gp_Ast->ast_new = FALSE") ;
+      // gp_Ast->ast_new = FALSE ;
       
     }
   }
@@ -585,7 +588,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
     while( c_char != 'q' ) {
 
       /* Creee un point d 'annulation pour la fonction pthread_cancel */
-      pthread_testcancel() ;
+      // pthread_testcancel() ;
 
       usleep( gp_Tpo->tpo_termios ) ;
 
@@ -783,15 +786,16 @@ void * _SUIVI_CAPTEURS(STRUCT_SUIVI * gp_Sui) {
   
   if ( gp_Dev->dev_use_capteurs ) {
 
-    
+    /*------------------------------*/    
     /* Debut boucle _SUIVI_CAPTEURS */
-    
+    /*------------------------------*/    
+
     while(TRUE) {
 
       /* Creee un point d 'annulation pour la fonction pthread_cancel */
-      pthread_testcancel() ;
+      // pthread_testcancel() ;
 
-      Trace1("while") ;
+      Trace1("while ..") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
       if ( ! gp_Dev->dev_init_capteurs ) {
         
@@ -967,7 +971,7 @@ int main(int argc, char ** argv) {
   Trace( "LED : %d\n", gp_Pwm_Par->gpi_pwm_par_led_etat ) ;
   Trace("led_etat    : %d", gp_Pwm_Par->gpi_pwm_par_led_etat );
   
-  Trace1("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
+  Trace("gp_Ast_Par->ast_par_default_object : %s", gp_Ast_Par->ast_par_default_object) ;
   
   Trace1("gp_Pid_Par->par_pid_ech = %f",  gp_Pid_Par->par_pid_ech);
   
@@ -985,11 +989,10 @@ int main(int argc, char ** argv) {
 
     CALCULS_RECUP_MODE_ET_ASTRE_TYPE() ;
 
-    if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast) ; ;
-    if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast) ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_MES ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast,10) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) CAT_FIND( gp_Ngc, gp_Ast,11) ; ;
+    if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) CAT_FIND( gp_Eto, gp_Ast,12) ;
 
-    gp_Ast->ast_new = TRUE ;
   }
 
   // -----------------------------------------------------------------

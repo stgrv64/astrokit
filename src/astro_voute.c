@@ -269,7 +269,7 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
   struct timeval t00 ;
   struct sched_param param;
 
-  TraceArbo(__func__,1,"pthread_create_callback_fct") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"debut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   PTHREADS_CONFIG( gp_Pth, pthread_self(), PTHREAD_TYPE_VOUTE ) ;
   /* 2023 : deport du sleep dans la fonction PTHREADS_CONFIG */ 
@@ -293,15 +293,17 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
   // FIXME : debut boucle infinie du thread _SUIVI_VOUTE
   //-------------------------------------------------------------------------------
   
+  Trace1("affectation gp_Ast->ast_new = TRUE ..") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   gp_Ast->ast_new = TRUE ;
 
   /* Debut boucle _SUIVI_VOUTE */
   while(TRUE) {
     
         /* Creee un point d 'annulation pour la fonction pthread_cancel */
-    pthread_testcancel() ;
+    // // pthread_testcancel() ;
 
-    Trace1("while") ;
+    Trace1("while ..") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
     if ( lp_Vou->vou_run ) {
       
@@ -309,20 +311,34 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
 
       /* FIXME : modification 20121225 : tous les calculs generiques dans CALCULS_TOUT */
       
+      Trace1("CALCULS_TOUT") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
       CALCULS_TOUT() ;
       
+      Trace1("apres CALCULS_TOUT") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
       /* Exceptionnellement , utilisation variables globales */ 
       /* LCD_DISPLAY_TEMPS_LIEU(0,gp_Lie,gp_Tim) ;*/
 
-      if ( gp_Ast->ast_new ) { 
+      if ( gp_Ast->ast_new == TRUE ) { 
+
+        Trace1("avant  ASTRE_FORMATE_DONNEES_AFFICHAGE") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
         ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;
+
+        Trace1("avant  CONFIG_DISPLAY_MODE_LONG") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
         CONFIG_DISPLAY_MODE_LONG(gp_Ast,gp_Lie,gp_Cal) ; 
+
+        Trace1("avant  ASTRE_STELLARIUM_VIEW") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
         ASTRE_STELLARIUM_VIEW(gp_Ast) ;
-        
+
         gp_Lcd->display_ast_vit(2000000) ;
         gp_Lcd->default_refresh() ;
         
+        Trace1("affectation gp_Ast->ast_new = FALSE") ;
+
         gp_Ast->ast_new = FALSE ;
       }
 /*
@@ -336,6 +352,9 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
       Trace1("voute : temporisation") ;
 
       lp_Vou->vou_temps_ecoule += VOUTE_TEMPORISATION( lp_Vou, t00 ) ; 
+
+      Trace1("voute : fin temporisation") ;
+
       gettimeofday(&t00,NULL) ;
 
 			lp_Vou->vou_num ++ ;
