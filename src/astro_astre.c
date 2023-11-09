@@ -69,7 +69,7 @@ static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
   ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
 
   ASTRO_GLOBAL_LOG_ON ( &  lp_Ast->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 1 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 2 , "%s", lp_Ast->ast_dis_cmd ) ;
   ASTRO_GLOBAL_LOG_OFF( &  lp_Ast->ast_loglevel ) ;
 
   return ;
@@ -196,7 +196,7 @@ void ASTRE_INIT(STRUCT_ASTRE *lp_Ast ) {
 
 void ASTRE_PARAMS_INIT(STRUCT_ASTRE_PARAMS *lp_Ast_Par ) {
   
-  TraceArbo(__func__,1,"init astre params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init astre params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Ast_Par->ast_par_mutex ) ;
 
@@ -444,10 +444,10 @@ void ASTRE_STELLARIUM_VIEW(STRUCT_ASTRE *lp_Ast) {
 
   TraceArbo(__func__,1,"display mode stellarium") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;
-  Trace("AD / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_asc , lp_Ast->ast_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_agh , lp_Ast->ast_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->ast_ddmm_azi   , lp_Ast->ast_ddmm_alt ) ;
+  Trace("%-10s : Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_nom, lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;
+  Trace("%-10s : AD / Dec   : %s / %s"       , lp_Ast->ast_nom, lp_Ast->ast_hhmmss_asc , lp_Ast->ast_ddmm_dec ) ;
+  Trace("%-10s : AH / Dec   : %s / %s"       , lp_Ast->ast_nom, lp_Ast->ast_hhmmss_agh , lp_Ast->ast_ddmm_dec ) ;
+  Trace("%-10s : AZ./ Haut. : %s / %s"       , lp_Ast->ast_nom, lp_Ast->ast_ddmm_azi   , lp_Ast->ast_ddmm_alt ) ;
 
   return ;
 }

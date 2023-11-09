@@ -269,6 +269,8 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
     for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
 
       if ( ! strcmp( lp_Key->key_mot, lp_Key->key_actions[i] )) {
+          
+          MACRO_KEY_TRACE ;
 
           Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
 

@@ -943,7 +943,7 @@ void TIME_RELEASE( STRUCT_TIME * lp_Tim) {
 
 void TIME_PARAMS_INIT( STRUCT_TIME_PARAMS * lp_Tim_Par) {
   
-  TraceArbo(__func__,1,"init time params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init time params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Tim_Par->tim_par_mutex ) ;
 

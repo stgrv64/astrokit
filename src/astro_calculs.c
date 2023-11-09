@@ -245,7 +245,7 @@ void   CALCULS_INIT( STRUCT_CALCULS * lp_Cal ) {
 
 void CALCULS_PARAMS_INIT(STRUCT_CALCULS_PARAMS *lp_Cal_Par ) {
   
-  TraceArbo(__func__,1,"init calculs params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init calculs params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cal_Par->cal_par_mutex ) ;
 
@@ -459,7 +459,7 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
   double af = -1 ;
   double f_assert = 0 ; 
   
-  TraceArbo(__func__,0,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"calculate azimut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   /* recupere information latitude dans une var locale */
 
@@ -501,7 +501,7 @@ void CALCULS_AZIMUT(STRUCT_ASTRE * lp_Ast) {
 
   if( (sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h) > 0.999999 ) {
 
-    Trace("sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h) > 0.999999");
+    Trace1("sin(lat)*cos(H)*cos(A)-cos(lat)*sin(H))/cos(h) > 0.999999");
     a1=M_PI ;
     a2=M_PI ;
   }
@@ -1124,13 +1124,13 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
 
 void  CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
   
-  TraceArbo(__func__,0,"calculate horaire angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"calculate horaire angle") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   // en radians 
 
   /* correction ascension droite si negatif (on ajoute 360 degres) */
 
-  Trace("debut : (sid) %.2f (asc) %.2f", gp_Lie->lie_tsr, lp_Ast->ast_asc ) ;
+  Trace1("debut : (sid) %.2f (asc) %.2f", gp_Lie->lie_tsr, lp_Ast->ast_asc ) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex );
 
@@ -1154,9 +1154,9 @@ void  CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
 /*
   CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
 */  
-  Trace("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
-  Trace("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
+  Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
   /*
     ASTRE_STELLARIUM_VIEW(gp_Ast) ;
@@ -1306,8 +1306,8 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
     if( strlen(gp_Ast->ast_nom) > i_len_prefixe ) {
 
-      if ( len > sizeof(c_sub) ) { Trace("erreur : %d >  %d", len,(int)sizeof(c_sub) ) ;}
-      if ( len <= 0 )            { Trace("erreur : %d <= 0",   len) ;}
+      if ( len > sizeof(c_sub) ) { Trace1("erreur : %d >  %d", len,(int)sizeof(c_sub) ) ;}
+      if ( len <= 0 )            { Trace1("erreur : %d <= 0",   len) ;}
 
       memcpy( c_sub, &gp_Ast->ast_nom[i_len_prefixe], len );
 
@@ -1324,7 +1324,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Ast->ast_mutex) ;
 
-  Trace("mode %-30s type %-30s", gc_hach_calcul_type[ gp_Cal->cal_type ] , gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
+  Trace1("mode %-30s type %-30s", gc_hach_calcul_type[ gp_Cal->cal_type ] , gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
 
   return ;
 }
@@ -1346,7 +1346,7 @@ void CALCULS_SOLAR_SYSTEM( \
   STRUCT_LIEU  * lp_Lie, \
   STRUCT_TIME  * lp_Tim ) {
 
-  TraceArbo(__func__,0,"solar system") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"solar system") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   SOLAR_SYSTEM(     lp_Ast->ast_infos, \
                   & lp_Ast->ast_asc,  \
@@ -1394,7 +1394,7 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
-      Trace("traitement ASTRE_INDETERMINE") ;
+      Trace1("traitement ASTRE_INDETERMINE") ;
 
       if ( gp_Cal->cal_type == CALCULS_TYPE_AZI_VERS_EQU ) {
         
@@ -1415,7 +1415,7 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_CIEL_PROFOND :
 
-      Trace("traitement ASTRE_CIEL_PROFOND") ;
+      Trace1("traitement ASTRE_CIEL_PROFOND") ;
       
       memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
 
@@ -1440,11 +1440,11 @@ void CALCULS_TOUT(void) {
     
     case ASTRE_PLANETE :
 
-      Trace("traitement ASTRE_PLANETE") ;
+      Trace1("traitement ASTRE_PLANETE") ;
 
       if ( gp_Ast->ast_num > 9 ) {
-        Trace("numero de planete interdit = %d", gp_Ast->ast_num ) ;
-        Trace("=> forçage a zero (soleil)"
+        Trace1("numero de planete interdit = %d", gp_Ast->ast_num ) ;
+        Trace1("=> forçage a zero (soleil)"
          ) ;
         gp_Ast->ast_num = 0 ; 
       }
@@ -1492,7 +1492,7 @@ void CALCULS_TOUT(void) {
       
       case ASTRE_SATELLITE :
 
-        Trace("traitement ASTRE_PLANETE") ;
+        Trace1("traitement ASTRE_SATELLITE") ;
 
         /* TODO completer */
         break ;
@@ -1501,7 +1501,7 @@ void CALCULS_TOUT(void) {
 
       case ASTRE_COMETE :
 
-        Trace("traitement ASTRE_COMETE") ;
+        Trace1("traitement ASTRE_COMETE") ;
 
         /* TODO completer */
         break ;
@@ -1601,13 +1601,13 @@ void CALCULS_VOUTE(void) {
        gp_Ast->ast_ah ) ;
      
      /*  	
-     Trace("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
+     Trace1("%.15f %.15f %.15f %.15f %.15f %.15f\n", \
        gp_Ast->ast_r3_xx , \
        gp_Ast->ast_r3_yy , \
        gp_Ast->ast_r3_zz , \
        gp_Ast->ast_vit ) ;
      
-     Trace("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
+     Trace1("%.1f %.1f %.1f %.1f %.1f %.1f\n", \
        gp_Ast->ast_r3_xx , \
        gp_Ast->ast_r3_yy , \
        gp_Ast->ast_r3_zz , \

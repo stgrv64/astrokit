@@ -16,6 +16,8 @@
 #include "astro_global.h"
 
 #define MACRO_IF_KEY_MOT_IS(s)  if(!strcmp(gp_Key->key_mot,s))
+#define MACRO_KEY_TRACE         Trace("code LIRS is %s / code TERM is %s / mot is %s  ", \
+                                      gp_Cod->cod_in_lirc, gp_Cod->cod_in_term, gp_Key->key_mot) ;
 
 #define ASTRO_KEYS_LOG(loglevel,nb,fmt, args...) \
 do { \

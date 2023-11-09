@@ -211,7 +211,7 @@ void   CONFIG_INIT (STRUCT_CONFIG * lp_Con) {
 
 void CONFIG_PARAMS_INIT(STRUCT_CONFIG_PARAMS *lp_Con_Par ) {
   
-  TraceArbo(__func__,1,"init config params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"init config params") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Con_Par->con_par_mutex ) ;
 

@@ -193,7 +193,7 @@ void VOUTE_INIT(STRUCT_VOUTE *lp_Vou) {
 
 void VOUTE_CONFIG( STRUCT_VOUTE *lp_Vou, double dt, double acc, double percent ) {
   
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   lp_Vou->vou_temps_ecoule        = 0 ;
   lp_Vou->vou_tempo_percent       = percent ; 

@@ -349,7 +349,7 @@ void CAT_ZONE( STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, double deg) {
 * @todo   : passer char * lc_file_name dans la structure et faire une fct dediee
 *****************************************************************************************/
 
-void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, int i_indication) {
+void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
   
   int    L=0 ;
   int    i_ligne=0 ;
@@ -357,7 +357,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast, int i_indication) {
 
   TraceArbo(__func__,0,"debut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("recherche %s infos %s indication %d ", lp_Ast->ast_nom, lp_Ast->ast_infos, i_indication ) ;
+  Trace("recherche %s infos %s", lp_Ast->ast_nom, lp_Ast->ast_infos ) ;
 
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison

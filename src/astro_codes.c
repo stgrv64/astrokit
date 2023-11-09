@@ -146,7 +146,7 @@ void CODES_INIT(STRUCT_CODES *lp_Cod) {
   int i_pos=0 ;
   int j_pos=0 ;
 
-  TraceArbo(__func__,0,"init codes") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,1,"init codes") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Cod->cod_mutex ) ;
                                      lp_Cod->cod_lock     = CODES_LOCK ;

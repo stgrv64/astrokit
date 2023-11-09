@@ -480,7 +480,8 @@ void GPIO_CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
   printf("\n") ;
 
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_alt_gpios[%d]=%d",i,gi_alt_gpios[i]);
-  
+  for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_azi_gpios[%d]=%d",i,gi_azi_gpios[i]);
+
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_alt_masque[%d]=%d",i,gi_alt_masque[i]);
   for(i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++) Trace("gi_azi_masque[%d]=%d",i,gi_azi_masque[i]);
 
