@@ -1039,7 +1039,7 @@ void CONFIG_MENU_CHANGE_DETECT (void)  {
 
   if ( gp_Sui->sui_menu_old != gp_Sui->sui_menu ) {
 
-    Trace1("appel : %d : %s" , gp_Sui->sui_menu, s_menu) ;
+    Trace("appel : %d : %s" , gp_Sui->sui_menu, s_menu) ;
     GPIO_LED_ETAT_CLIGNOTE(1, 100) ;
   }
 

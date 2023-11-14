@@ -297,7 +297,7 @@ void LCD_INIT(STRUCT_LCD * lp_Lcd) {
 
 void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l1) {
 
-  Trace("") ;
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -326,7 +326,7 @@ void LCD_CHANGE_CURRENT(const int i_duree_us, const char* c_l0, const char * c_l
 
 void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l1) {
 
-  Trace("") ;
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -356,7 +356,7 @@ void LCD_CHANGE_DEFAULT(const int i_duree_us, const char* c_l0, const char * c_l
 
 void LCD_DEFINE_DEFAULT( char * c_l0,  char * c_l1) {
 
-  Trace("") ;
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -402,7 +402,9 @@ void LCD_REFRESH_DEFAULT(void) {
 
   char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
   char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] ={0};
-  
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */  
+
   memset( c_l0, 0, sizeof( c_l0) ) ;
   memset( c_l1, 0, sizeof( c_l1) ) ;
 
@@ -441,7 +443,8 @@ void LCD_REFRESH_DEFAULT(void) {
 
 void LCD_DISPLAY_DEFAULT(void) {
 
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   Trace("%d",gp_Dev->dev_use_lcd) ;
 
   if ( gp_Dev->dev_use_lcd ) {
@@ -498,7 +501,7 @@ void LCD_DISPLAY_DEFAULT(void) {
 
 void LCD_DISPLAY_CURRENT(void) {
 
-  TraceArbo(__func__,1,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   Trace("%d",gp_Dev->dev_use_lcd) ;
 
@@ -558,6 +561,8 @@ void LCD_DISPLAY_CURRENT(void) {
 
 void LCD_DISPLAY_STRING_STRING( const int i_duree_us , const char* c_l0, const char * c_l1) {
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
   gp_Lcd->current_display() ;
 
@@ -574,7 +579,11 @@ void LCD_DISPLAY_STRING_STRING( const int i_duree_us , const char* c_l0, const c
 *****************************************************************************************/
 
 void   LCD_DISPLAY_STRING_INT ( const int i_duree_us, const char* c_l0, const int i) {
+
   char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] = {0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   memset(c_l1,0,sizeof(c_l1));
   sprintf( c_l1, "%d", i) ;
 
@@ -593,12 +602,17 @@ void   LCD_DISPLAY_STRING_INT ( const int i_duree_us, const char* c_l0, const in
 *****************************************************************************************/
 
 void   LCD_DISPLAY_INT_INT      ( const int i_duree_us, const int i_l0, const int i_l1) {
+
   char c_l0[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] = {0} ;
   char c_l1[LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure] = {0} ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
+
     sprintf( c_l0, "%d", i_l0) ;
     sprintf( c_l1, "%d", i_l1) ;
+
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
   }
@@ -620,6 +634,8 @@ void LCD_DISPLAY_TEMPS_LIEU( const int i_duree_us ) {
 
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -669,6 +685,8 @@ void LCD_DISPLAY_ASTRE_VITESSES( const int i_duree_us ) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -697,6 +715,8 @@ void LCD_DISPLAY_AZI_ALT( const int i_duree_us ) {
 
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -727,6 +747,8 @@ void LCD_DISPLAY_AGH_DEC( const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -756,6 +778,8 @@ void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -783,6 +807,8 @@ void LCD_DISPLAY_MODE_STELLARIUM( const int i_duree_us ) {
 
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -817,6 +843,8 @@ void   LCD_DISPLAY_INFORMATIONS (  const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -845,6 +873,8 @@ void   LCD_DISPLAY_CFG_GPIOS_ALT_AZI ( const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -872,6 +902,8 @@ void   LCD_DISPLAY_CFG_GPIOS_MAS_FRE ( const int i_duree_us ) {
 
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]={0}  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -904,6 +936,8 @@ void   LCD_DISPLAY_CFG_GPIOS_LEDS    ( const int i_duree_us ) {
   char*  pc_gets ;
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -958,6 +992,8 @@ void   LCD_DISPLAY_CFG_REDUCTION    ( const int i_duree_us ) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ]  ={0};
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -984,6 +1020,8 @@ void   LCD_DISPLAY_AST_FREQUENCES    ( const int i_duree_us) {
 
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
+
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   if ( gp_Dev->dev_use_lcd ) {
 
@@ -1013,6 +1051,8 @@ void   LCD_DISPLAY_AST_PERIODES      ( const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 
@@ -1041,6 +1081,8 @@ void   LCD_DISPLAY_ACC_ALT_AZI     ( const int i_duree_us) {
   char c_l0[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0}  ;
   char c_l1[ LCD_LINES_CHAR_NUMBERS + LCD_LINES_CHAR_NUMBERS_secure ] ={0} ;
 
+  TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
+  
   if ( gp_Dev->dev_use_lcd ) {
 
     memset( c_l0, 0, sizeof(c_l0)) ; 

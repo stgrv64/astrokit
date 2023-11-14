@@ -254,9 +254,9 @@ void DATAS_ACTION_DAT_TO_KEY( STRUCT_DATAS * lp_Dat, STRUCT_KEYS * lp_Key ) {
       
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Key->key_mutex ) ;
 
-    Trace("action / key := lp_Key->key_mot = %s",  lp_Key->key_mot ) ;
-
     lp_Key->key_mot_en_cours = 1 ;
+
+    Trace("key_mot = %s",  lp_Key->key_mot ) ;
   }
   else {
     Trace1("lp_Dat->dat_act vide") ;

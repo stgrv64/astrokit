@@ -130,7 +130,7 @@
 #define MACRO_ASTRO_GLOBAL_LOG(loglevel,nb,fmt, args...) \
 do { \
   if (loglevel>=nb) { \
-    fprintf(stdout, "\n%-36s -> " fmt, __func__, ##args) ; \
+    fprintf(stdout, "\n%-2d %-2d %-36s -> " fmt, loglevel,nb, __func__, ##args) ; \
   } \
 } \
 while (0)

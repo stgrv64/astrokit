@@ -946,6 +946,8 @@ int main(int argc, char ** argv) {
   
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
 
+  // gp_Cod->cod_display( gp_Cod ) ;
+  
   /* ---------------------------------------------------------------------------- */
   /* Initialisation des strcutures necessaires aux attributs de tread             */
   /* configuration du thread et des attributs de tread du MAIN                    */

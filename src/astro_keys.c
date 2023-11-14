@@ -270,7 +270,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
 
       if ( ! strcmp( lp_Key->key_mot, lp_Key->key_actions[i] )) {
           
-          MACRO_KEY_TRACE ;
+          MACRO_COD_TRC(lp_Key->key_mot) ;
 
           Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
 
@@ -295,6 +295,8 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
     // lp_Key->key_appui_en_cours = 0 ;
   }
+
+  Trace1("lp_Key->key_mot = %s", lp_Key->key_mot ) ;
 
   return ;
 }

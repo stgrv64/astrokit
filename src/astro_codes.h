@@ -220,6 +220,8 @@ struct STR_CODES {
   void          (*cod_unlock)     ( STRUCT_CODES *) ;  
   void          (*cod_log)        ( STRUCT_CODES *) ;
   void          (*cod_display)    ( STRUCT_CODES *) ;
+  void          (*cod_display_act)( STRUCT_CODES *, const char * ) ;
+
   pthread_mutex_t cod_mutex ;
   STR_EXT_TIMEVAL cod_tval ; 
   FILE           *cod_file ; 
