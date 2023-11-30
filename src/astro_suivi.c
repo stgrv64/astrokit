@@ -709,7 +709,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
   if ( strcmp( gp_Key->key_mot, "" ) != 0 ) {
 
-    Trace("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
+    Trace1("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
 
     ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
 
@@ -953,9 +953,34 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       lp_Sui->sui_menu_old = lp_Sui->sui_menu ;
       lp_Sui->sui_menu     = atoi( gp_Key->key_nombre ) ; 
     }
-    
     //---------------------------------------------------------------------------------------------------------
-    // Si un nouvel as a ete pris en compte
+    /* FIXME : jout novembre 2023 : changement latitude / longitude */
+    //---------------------------------------------------------------------------------------------------------
+
+    if ( ! strcmp( gp_Key->key_symbole, CONFIG_LAT )) {
+
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Lie->lie_mutex )  ;
+
+      gp_Lie->lie_lat = atof( gp_Key->key_nombre ) /  CALCULS_UN_RADIAN_EN_DEGRES ;
+
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Lie->lie_mutex )  ;
+
+      gp_Lie->lie_display( gp_Lie ) ;
+    }
+
+    if ( ! strcmp( gp_Key->key_symbole, CONFIG_LON )) {
+
+      HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Lie->lie_mutex )  ;
+
+      gp_Lie->lie_lon = atof( gp_Key->key_nombre ) / CALCULS_UN_RADIAN_EN_DEGRES ;
+
+      HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Lie->lie_mutex )  ;
+
+      gp_Lie->lie_display( gp_Lie ) ;
+    }
+
+    //---------------------------------------------------------------------------------------------------------
+    // Si un nouvel astre a ete pris en compte
     //---------------------------------------------------------------------------------------------------------
     
     sprintf( s_buffer4, "%s%s%s%s", CONFIG_MES, CONFIG_NGC, CONFIG_ETO, CONFIG_PLA) ;
@@ -1086,10 +1111,11 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       }
       //---------------------------------------------------------------------------------------------------------
     }
-    gp_Key->key_phrase_lue=0 ;
+    // gp_Key->key_phrase_lue=0 ;
+    // strcpy( gp_Key->key_mot, "" ) ;
+    // strcpy( gp_Key->key_nombre, "" ) ;
 
-    strcpy( gp_Key->key_mot, "" ) ;
-    strcpy( gp_Key->key_nombre, "" ) ;
+    gp_Key->key_reset ( gp_Key )  ;
   }
 }
 /*****************************************************************************************
@@ -1138,8 +1164,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     Trace1("prise en compte : gp_Pas->pas_rst" ) ;
 
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
     if ( gp_Fre->fre_sh != 0 ) gp_Pas->pas_alt = gp_Fre->fre_sh ; else gp_Pas->pas_alt = 1 ;
     if ( gp_Fre->fre_sa != 0 ) gp_Pas->pas_azi = gp_Fre->fre_sa ; else gp_Pas->pas_azi = 1 ;
@@ -1158,7 +1183,9 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
            
     // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
     // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
-           
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
+
     flag_calcul = 1 ;
   }
   // -----------------------------------------------------------
@@ -1179,8 +1206,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
   
     strcpy(c_action,"fleches") ;
 
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
     // On utilise les memes touches que dans SUIVI_MANUEL_ASSERVI
 
@@ -1212,8 +1238,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
     gp_Pas->pas_sud     = 0 ;
     gp_Pas->pas_rst     = 0 ;
 
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
 
     flag_calcul = 1 ;
   }
@@ -1226,21 +1251,15 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     strcpy(c_action,"forward") ;
 
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
     gp_Pas->pas_acc_azi *= gp_Cal_Par->cal_par_altaz_slow_forward ;
     gp_Pas->pas_acc_alt *= gp_Cal_Par->cal_par_altaz_slow_forward ; 
 
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
-/*
-    Trace1("acc*gp_Cal_Par->cal_par_altaz_slow_forward %.4f pas_acc_azi %.4f pas_acc_alt %.4f", gp_Cal_Par->cal_par_altaz_slow_forward, gp_Pas->pas_acc_azi, gp_Pas->pas_acc_alt ) ;
-*/
-    Trace("%-15s : fre_sh %d fre_sa %d pas_azi = %ld pas_alt = %ld pas_acc_azi = %f pas_acc_alt = %f", "forward.." , \
-           gp_Fre->fre_sh , gp_Fre->fre_sa, gp_Pas->pas_azi, gp_Pas->pas_alt, gp_Pas->pas_acc_azi , gp_Pas->pas_acc_alt) ;
-
     gp_Pas->pas_forward = 0 ;
+
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
+
     flag_calcul = 1 ;
   }
   
@@ -1248,16 +1267,15 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     strcpy(c_action,"rewind") ;
 
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
     gp_Pas->pas_acc_azi /= gp_Cal_Par->cal_par_altaz_slow_rewind ;
     gp_Pas->pas_acc_alt /= gp_Cal_Par->cal_par_altaz_slow_rewind ; 
 
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
 
     gp_Pas->pas_rewind  = 0 ;
+
     flag_calcul = 1 ;
   }
   // ======================================================
@@ -1269,14 +1287,12 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     strcpy(c_action,"forward fast") ;
 
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
     gp_Pas->pas_acc_azi *= gp_Cal_Par->cal_par_altaz_fast_forward ;          
     gp_Pas->pas_acc_alt *= gp_Cal_Par->cal_par_altaz_fast_forward ; 
 
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
 
     gp_Pas->pas_forward_fast = 0 ;
     flag_calcul = 1 ;
@@ -1286,14 +1302,12 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
 
     strcpy(c_action,"rewind fast") ;
     
-    // pthread_mutex_lock(& gp_Mut->mut_glo_azi );   
-    // pthread_mutex_lock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Pas->pas_mutex ) ;
 
     gp_Pas->pas_acc_azi /= gp_Cal_Par->cal_par_altaz_fast_rewind ;
     gp_Pas->pas_acc_alt /= gp_Cal_Par->cal_par_altaz_fast_rewind ; 
 
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_azi );
-    // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
+    HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
             
     gp_Pas->pas_rewind_fast  = 0 ;
     flag_calcul = 1 ;

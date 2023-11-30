@@ -630,7 +630,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
 
         }
         else {
-          Trace("chaine %s nread %d ascii %d indice code %d >= CODES_CODE_NB_CODES (%d) : aucune correspondance trouvee", \
+          Trace("chaine %s nread %d ascii %d / ( indice code %d >= CODES_CODE_NB_CODES %d ) : aucune correspondance trouvee", \
             ch_chaine, \
             i_nread , \
             i_sum_ascii, \
@@ -912,7 +912,7 @@ int main(int argc, char ** argv) {
   CONFIG_PARAMS_DISPLAY  () ;  
 
   TIME_INIT                  ( gp_Tim ) ;
-  LIEU_INIT                  ( gp_Lie ) ;
+  LIEU_INIT                  ( gp_Lie ) ; gp_Lie->lie_display(gp_Lie) ;
   TIME_INIT_TEMPOS           ( gp_Tpo ) ;
   TIME_TEMPOS_CONFIG         ( gp_Tpo ) ;
   TIME_TEMPOS_DISPLAY        ( gp_Tpo ) ;

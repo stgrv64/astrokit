@@ -807,7 +807,7 @@ int CONFIG_FIC_READ(STRUCT_CONFIG * lp_Con) {
 /* FIXME :  erreur incomprehensible lors de la mise en place de ce memset 
             cela rend l adresse du pointeur gp_Con_Par en (nil)
 */   
-        Trace1("sizeof(lp_Con->con_params[L][C]) = %ld", sizeof(lp_Con->con_params[L][C]) ) ;
+        Trace1("sizeof(lp_Con->con_params[L][C]) = %d", sizeof(lp_Con->con_params[L][C]) ) ;
 
         memset(lp_Con->con_params[L][C],CONFIG_ZERO_CHAR,sizeof(lp_Con->con_params[L][C]));
 

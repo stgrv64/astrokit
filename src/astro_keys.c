@@ -220,7 +220,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
           HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
         }
       }
-      Trace1("resultat => nombre = %s \n",lp_Key->key_nombre ) ;
+      Trace("resultat => nombre = %s \n",lp_Key->key_nombre ) ;
     }    
     //------------------------------------------------------------
     // On met le mot dans premier si il est vide 
@@ -366,8 +366,9 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   strcpy( lp_Key->key_actions[5], "PLA" ) ;
   strcpy( lp_Key->key_actions[6], "TIME" ) ;
   strcpy( lp_Key->key_actions[7], "NET" ) ; /* ajout 2023 : network */
-  strcpy( lp_Key->key_actions[8], "LON" ) ; /* ajout 2023 : network */
-  strcpy( lp_Key->key_actions[9], "LAT" ) ; /* ajout 2023 : network */
+  strcpy( lp_Key->key_actions[8], "LON" ) ; /* ajout 2023 : longitude */
+  strcpy( lp_Key->key_actions[9], "LAT" ) ; /* ajout 2023 : latitude */
+  
 
   return ;
 } 

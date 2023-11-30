@@ -17,9 +17,10 @@ MACRO_ASTRO_GLOBAL_EXTERN_STRUCT ;
 MACRO_ASTRO_GLOBAL_EXTERN_STRUCT_PARAMS ;
 MACRO_ASTRO_GLOBAL_EXTERN_GPIOS ;
 
-int gi_pth_numero ;  
-int gi_pthread_getuid ;
-int gi_pthread_nb_cpu ;
+int  gi_pth_numero ;  
+int  gi_pthread_getuid ;
+int  gi_pthread_nb_cpu ;
+char gc_hostname [ CONFIG_TAILLE_BUFFER_256 ] ; 
 
 static const char *  gc_hach_pth_name[] = {
   "pth_phases" ,

@@ -62,6 +62,8 @@
 # 07/10/2022    * refonte complete du code (consolidation .c / .h )
 #               * dispatch de tous les types dans leur .h respectif
 # 08/03/2023    * ajout  format STR_TIM_FORMAT_1
+#
+# nov 2023      * ajout CONFIG_LAT CONFIG_LON
 # -------------------------------------------------------------- 
 */
 
@@ -144,11 +146,12 @@ while (0)
 #define CALCUL_PAR_SOLAR_SYSTEM              FALSE
 
 #define CODES_CODE_BUFFER_SIZE               255 
-#define CODES_CODE_NB_CODES                  110 
+#define CODES_CODE_NB_CODES                  111 
 #define CODES_NB_IN_OUT                      3
 
 #define CONFIG_ZERO_CHAR                     0
 #define CONFIG_FIC_CFG                       "astrokit.cfg"
+
 #define CONFIG_MES                           "MES"
 #define CONFIG_NGC                           "NGC"
 #define CONFIG_ETO                           "ETO"
@@ -156,6 +159,10 @@ while (0)
 #define CONFIG_AZI                           "AZI"
 #define CONFIG_EQU                           "EQU"
 #define CONFIG_CAP                           "CAP"
+/* FIXME : ajout nov 2023 */
+#define CONFIG_LAT                           "LAT"  
+#define CONFIG_LON                           "LON"
+
 #define CONFIG_TAILLE_BUFFER_4               4
 #define CONFIG_TAILLE_BUFFER_5               5
 #define CONFIG_TAILLE_BUFFER_8               8
@@ -343,6 +350,7 @@ typedef struct  STR_GPIO_PARAMS_CONTROLER   STRUCT_GPIO_PARAMS_CON ;
   extern int    gi_pth_numero ; \
   extern int    gi_pthread_getuid ; \
   extern int    gi_pthread_nb_cpu ; \
+  extern char   gc_hostname [ CONFIG_TAILLE_BUFFER_256 ] ; \
 
 #define MACRO_ASTRO_GLOBAL_EXTERN_PID \
   extern int    gi_pid_trace ; \

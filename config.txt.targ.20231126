@@ -22,9 +22,8 @@
 #               * ajout des reductions R5 R6 et R7 (prevoyant deux poulies)
 # juin 2022     * ajout TEMPO_LCD_LOOP et  TEMPO_LCD_DISP
 #               * ajout CONFIG_FIC_LED
-#               * ajout TEMPO_PID_LOOP
-#               * ajout PID_ECH PID_KP PID_KI PID_KD
-#               * correction longitude et latitude orgeres
+#               * ajout PID_KP etc;.
+#               * correction lat et lon de orgeres
 #--------------------------------------------------------------
 # Menus possibles par defaut : 
 #
@@ -37,54 +36,36 @@
 
 MENU_PAR_DEFAUT  MENU_AZIMUTAL
 ASTRE_PAR_DEFAUT NGC7662
-LED_ETAT_GPIOS   4
 
-#--------------------------------------------------------------
+# ----------------------- parametres temporisation
 # tempo_menu     doit etre legerement inferieur aux autres tempo
 # tempo_raq      doit etre etre deux fois inferieur aux autres tempos
-# une valeur non nulle sur TEMPO permet de deduire toutes les autres temporisations par pourcentage
-# les valeurs de pourcentage sont dans le code
-#--------------------------------------------------------------
 
-#define TIME_DEFAULT_TEMPO_VOUTE    1000000
-#define TIME_DEFAULT_TEMPO_NEMU     50000
-#define TIME_DEFAULT_TEMPO_RAQ      51000
-#define TIME_DEFAULT_TEMPO_IR       52000
-#define TIME_DEFAULT_TEMPO_TERMIOS  53000
-#define TIME_DEFAULT_TEMPO_CAPTEURS 54000
-#define TIME_DEFAULT_TEMPO_LCD_LOOP 250000
-#define TIME_DEFAULT_TEMPO_LCD_DISP 100000
-#define TIME_DEFAULT_TEMPO_PID_LOOP 100000
-
-TEMPO           10000
-
-TEMPO_MENU      200000
-TEMPO_RAQ       120000
-TEMPO_IR        250010
-TEMPO_TERMIOS   250020
-TEMPO_CLAVIER   250030
-TEMPO_CAPTEURS  250040
+TEMPO_MENU      20000
+TEMPO_RAQ       10000
+TEMPO_IR        27000
+TEMPO_TERMIOS   27500
+TEMPO_CLAVIER   27500
+TEMPO_CAPTEURS  27500
 TEMPO_LCD_LOOP  100000
-TEMPO_LCD_DISP  25006
-TEMPO_PID_LOOP  5
+TEMPO_LCD_DISP  200000
+TEMPO_PID_LOOP  3 
 
 # ----------------------- parametres repertoires et fichiers
-#
-CONFIG_REP_CAT       cat  
-CONFIG_REP_CFG       cfg 
-CONFIG_REP_LOG       log   
-CONFIG_REP_IN        inp 
+
+CONFIG_REP_CAT       cat
+CONFIG_REP_CFG       cfg
+CONFIG_REP_LOG       log
+CONFIG_REP_IN        inp
 CONFIG_REP_OUT       out
 CONFIG_REP_SCR       scr
-CONFIG_SCR_KERNEL    script_kernel.sh
 CONFIG_FIC_LED       /tmp/astrokit-boo-recup-led-ir.txt
 CONFIG_FIC_LOG       astrokit.log.new
+CONFIG_FIC_PID       astrokit.pid.infos.log
 CONFIG_FIC_DATE      date.txt
 CONFIG_FIC_HHMM      hhmm.txt
-CONFIG_FIC_PID       pid.csv
-CONFIG_FIC_VOUY      vou.csv
 
-# ----------------------- parametres regultaur de frequence pid
+CONFIG_SCR_KERNEL   script_kernel.sh
 
 PID_ECH 1.0
 PID_KP  1.0
@@ -95,7 +76,7 @@ PID_KD  0.05
 
 DEVICE_USE_INFRAROUGE       1  # flag qui indique utilisation de infrarouge comme source input
 DEVICE_USE_KEYBOARD         1  # flag qui indique utilisation du clavier comme source input
-DEVICE_USE_LCD              0  # flag qui indique utilisation de ecran LCD1602 / PCA8574
+DEVICE_USE_LCD              1  # flag qui indique utilisation de ecran LCD1602 / PCA8574
 DEVICE_USE_CONTROLER        0  # flag qui indique utilisation des controleurs de moteur externes
 DEVICE_USE_CAPTEURS         0  # flag qui indique utilisation de capteurs comme source input
 DEVICE_USE_RAQUETTE         0  # flag qui indique utilisation d une raquette (gpio) comme source input
@@ -103,95 +84,67 @@ DEVICE_USE_BLUETOOTH        0  # flag qui indique utilisation du bluetooth comme
 
 # ----------------------- parametres geographiques
 
-# Latitude et longitude Pau (64)
-#LATITUDE   43.28
-#LONGITUDE  -0.37
-#ALTITUDE   100
-
 # Latitude et longitude Oloron (64)
-# LATITUDE   43.18
-# LONGITUDE  -0.6
-# ALTITUDE   100
+#LATITUDE   43.3
+#LONGITUDE  -0.36 
+#ALTITUDE   100
 
 # Latitude et longitude Orgeres (35)
 LATITUDE   48.0
-LONGITUDE  -1.67 
+LONGITUDE  -1.67
 ALTITUDE   100
 
-# Latitude et longitude de test  
-# LATITUDE   61.0
-# LONGITUDE  -149.9
-# ALTITUDE   100
+# ----------------------- parametres gpios
 
-#LATITUDE   43.2
-#LONGITUDE  -0.55
-#ALTITUDE   100
+# la led est parametree grace a :
+# insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
+# GPIO_LED_IR     27  
+# inutiles (2021) :
+# GPIO_INPUT      7,8 
+# GPIO_OUTPUT     14,15 
 
-#---------------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # Conf corecte pour carte essai carre (celle qui s enfiche sur rpi3aplus)
 # et moteurs en metal NEMA 11 (pas ceux qui sont sur la monture vixen gp)
 #--------------------------------------------------------------------------
-# ALT_GPIOS    21,26,19,13
-# AZI_GPIO     6,5,7,11
-# ALT_MASK     0,1,2,3
-# AZI_MASK     0,1,2,3
-#--------------------------------------------------------------------------
-# Masque corect pour carte essai carre (celle qui s enfiche sur rpi3aplus)
-#--------------------------------------------------------------------------
-# ALT_GPIO     21,26,19,13
-# AZI_GPIO     6,5,7,11
-# ALT_MASK     3,1,0,2
-# AZI_MASK     3,1,0,2
+
+GPIO_LED_ETAT   4
+
+GPIO_AZI   26,19,13,6
+GPIO_ALT   25,24,23,18
+
+GPIO_MASQUE    0,3,1,2 # moteurs nema
+#GPIO_MASQUE     0,2,1,3
+
 # ----------------------- parametres pwm
-# GPIO_FREQUENCE_PWM  250 
-#---------------------------------------------------------------------------------
+
+GPIO_FREQUENCE_PWM  1000
 
 # ----------------------- parametres reductions altitude
 # Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760 
 # mesure precisemebnt sur 5 tours en 28800 pas avec le binaire /usr/local/bin/gpio23 
 
-# ALT_GPIO  21,26,19,13  # numeros des gpios pour generation des signaux (4 phases, 2 bobines)
-# ALT_MASK  3,1,0,2      # ordre (masque) de generation des signaux (4 phases, 2 bobines)
-
-ALT_GPIO  25,24,23,18  # numeros des gpios pour generation des signaux (4 phases, 2 bobines)
-ALT_GPIO  21,26,19,13  # pour tests nema + carte old 
-ALT_GPIO  25,24,23,18  # boitier noir (nouvelle carte)
-ALT_MASK  0,3,1,2      # ordre (masque) de generation des signaux (4 phases, 2 bobines)
-ALT_MASK  0,1,2,3      # pour tests nema + carte old
-ALT_MASK  0,3,1,2      # boitier noir (nouvelle carte) + moteurs nema
-ALT_FPWM  1000     # frequence pwm (doit etre au moins superieure a 10 fois la plus grande frequence micropas moteur)
-ALT_R1    144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
-ALT_R2    64       # reducteur du moteur (nombre de pas) = 5760 (64*90) (32*180)
-ALT_R3    90       # reducteur du moteur (gearbox)       = 5760 (64*90) (32*180)
-ALT_R4    64       # mode micro pas utilise (1/x)
-ALT_R5    1        # reduction liee a la poulie
-ALT_R6    1        # reduction liee au cpu
-ALT_R7    1        # reduction non decrite plus haut ....
-ALT_INV   0        # Flag de inversion du sens de rotation
-ALT_ACC   2        # Facteur de multiplication en mode MANUEL
+ALT_R1  144      # reduction liee a la monture (nombre de dents de la roue dentee de l axe)
+ALT_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
+ALT_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
+ALT_R4  64      # mode micro pas utilise (1/x)
+ALT_R5  1        # reduction liee a la poulie
+ALT_R6  1        # reduction liee au cpu
+ALT_R7  1        # reduction non decrite plus haut ....
+ALT_ROT 0       # Flag de reversibilite du sens de rotation (en cas d'erreur) val = 0 ou 1
+ALT_ACC 2        # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions azimut
-# Parametres des moteurs NEQ corriges a la date du 27 mars 2022 : reduction = 5760 
-# mesure precisemebnt sur 5 tours en 28800 pas avec le binaire /usr/local/bin/gpio23 
 
-# AZI_GPIO  6,5,7,11   # numeros des gpios pour generation des signaux (4 phases, 2 bobines)
-# AZI_MASK  3,1,0,2    # ordre (masque) de generation des signaux (4 phases, 2 bobines)
-AZI_GPIO  26,19,13,6   # numeros des gpios pour generation des signaux (4 phases, 2 bobines)
-AZI_GPIO  6,5,7,11     # pour tests nema + carte old
-AZI_GPIO  26,19,13,6   # boitier noir (nouvelle carte)
-AZI_MASK  0,3,1,2      # ordre (masque) de generation des signaux (4 phases, 2 bobines)
-AZI_MASK  0,1,2,3      # pour tests nema + carte old
-AZI_MASK  0,3,1,2      # boitier noir (nouvelle carte) + moteurs nema
-AZI_FPWM  1000         # frequence pwm (doit etre au moins superieure a 10 fois la plus grande frequence micropas moteur)
-AZI_R1    144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
-AZI_R2    64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
-AZI_R3    90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
-AZI_R4    64       # mode micro pas utilise (1/x)
-AZI_R5    1        # reduction liee a la poulie
-AZI_R6    1        # reduction liee au cpu
-AZI_R7    1        # reduction non decrite plus haut ....
-AZI_INV   0        # Flag de inversion du sens de rotation
-AZI_ACC   2        # Facteur de multiplication en mode MANUEL
+AZI_R1  144      # reduction lee a la monture (nombre de dents de la roue dentee de l axe)
+AZI_R2  64       # reducteur du moteur (nombre de pas) : R total = 5760 (64*90) (32*180)
+AZI_R3  90       # reducteur du moteur (gearbox) : R total = 5760 (64*90) (32*180)
+AZI_R4  64      # mode micro pas utilise (1/x)
+AZI_R5  1        # reduction liee a la poulie
+AZI_R6  1        # reduction liee au cpu
+AZI_R7  1        # reduction non decrite plus haut ....
+AZI_ROT 0       # Flag de reversibilite du sens de rotation 1 <=> gauche->droite
+AZI_ACC 2       # Facteur de multiplication en mode MANUEL
 
 # ----------------------- parametres reductions altaz
 
@@ -216,7 +169,6 @@ GPIO_SLP_ALT 16    # sleep du controleur du moteur
 GPIO_RST_ALT 12    # reset du controleur du moteur
 GPIO_MMM_ALT 7     # mode micro pas du controleur du moteur
 GPIO_ENA_ALT 8     # broche enable du controleur du moteur
-
 GPIO_DIR_AZI 25    # direction de l'azimut
 GPIO_CLK_AZI 24    # horloge de l'azimut
 GPIO_SLP_AZI 23    # sleep du controleur du moteur
@@ -248,15 +200,6 @@ GPIO_KEY_C1  6    # sortie keyboard colonnne 1
 GPIO_KEY_C2  13   # sortie keyboard colonnne 2
 GPIO_KEY_C3  19   # sortie keyboard colonnne 3
 GPIO_KEY_C4  26   # sortie keyboard colonnne 4
-
-# ----------------------- parametres gpios
-
-# la led est parametree grace a :
-# insmod lirc_rpi.ko gpio_in_pin=27 dans /etc/init.d/rcS
-# GPIO_LED_IR     27  
-# inutiles (2021) :
-# GPIO_INPUT      7,8 
-# GPIO_OUTPUT     14,15 
 
 #===============================================================
 # fin fichier - fin fichier - fin fichier - fin fichier - fin fi

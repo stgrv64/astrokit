@@ -79,8 +79,11 @@ void ASTRO_GLOBAL_INIT(void) {
   TraceArbo(__func__,0,"init global variables") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
   
   gi_pthread_nb_cpu = sysconf(_SC_NPROCESSORS_ONLN);
+  
+  gethostname(gc_hostname,256) ;
 
-  Trace("%d processors dispo", gi_pthread_nb_cpu ) ;
+  Trace("%d : processors dispo", gi_pthread_nb_cpu ) ;
+  Trace("%s : hostname", gc_hostname ) ;
 
   gi_pid_trace        = 0 ;
   gi_pid_trace_alt    = 0 ;

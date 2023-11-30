@@ -363,7 +363,7 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
       // uniquement utiliser pour les tests
       // system("/bin/date >> /root/astrokit.begin.log") ;
 
-    Trace("fre_sh %d fre_sa %d pas_azi = %ld pas_alt = %ld pas_acc_azi = %f pas_acc_alt = %f",
+    Trace1("fre_sh %d fre_sa %d pas_azi = %ld pas_alt = %ld pas_acc_azi = %f pas_acc_alt = %f",
         gp_Fre->fre_sh, \
         gp_Fre->fre_sa, \
         gp_Pas->pas_azi, \

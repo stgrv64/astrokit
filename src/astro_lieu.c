@@ -30,8 +30,8 @@ static void LIEU_DISPLAY_PREPARE ( STRUCT_LIEU * lp_Lie) {
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Lie->lie_mutex ) ;
 
   sprintf( lp_Lie->lie_dis_cmd , STR_LIE_FORMAT_0,\
-    lp_Lie->lie_lat, \
-    lp_Lie->lie_lon, \
+    lp_Lie->lie_lat * CALCULS_UN_RADIAN_EN_DEGRES, \
+    lp_Lie->lie_lon * CALCULS_UN_RADIAN_EN_DEGRES, \
     lp_Lie->lie_alt ) ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Lie->lie_mutex ) ;

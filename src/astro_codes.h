@@ -41,6 +41,8 @@ t_en_Codes_Pos ;
 
 static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 
+{ "46",  "KEY_POINT", "."},  /* 47 ascii = touche '/' */
+
 /*--------------------------------*/
 /* objets MES NGC ETO PLA         */
 /*--------------------------------*/
@@ -80,7 +82,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "73",  "KEY_I_MAJ",    "KEY_I_MAJ"},  
 { "74",  "KEY_J_MAJ",    "KEY_J_MAJ"},  
 { "75",  "KEY_K_MAJ",    "KEY_K_MAJ"},  
-{ "76",  "KEY_L_MAJ",    "KEY_L_MAJ"},  
+{ "76",  "KEY_TV",    "LON"},   /* FIXME : nov 2023 changement longitude : KEY_TV / touche L majuscule */ 
 { "77",  "KEY_M_MAJ",    "KEY_M_MAJ"},  
 { "78",  "KEY_N_MAJ",    "KEY_N_MAJ"},  
 { "79",  "KEY_O_MAJ",    "KEY_O_MAJ"},  
@@ -111,7 +113,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "105", "KEY_I_MIN", "key_i_min"},    /* 105 sum ascii = touche 'i' = affichage infos generales astre / vitesses / etc */
 { "106", "KEY_J_MIN", "key_j_min" },   /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
 { "107", "KEY_K_MIN", "key_k_min" },   /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
-{ "108", "KEY_L_MIN", "key_l_min" },   /* changement longitude */ 
+{ "108", "KEY_SCREEN", "LAT" },        /* FIXME : nov 2023 changement latitude : KEY_SCREEN / touche l minuscule */ 
 { "109", "KEY_MENU",  "MENU"},         /* 109  ascii = touche 'm' */
 { "110", "KEY_N_MIN", "key_n_min"},     
 { "111", "KEY_O_MIN", "key_o_min"},  
@@ -140,6 +142,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /*--------------------------------*/
 
 { "188",       "KEY_OK",          "reset"},       /* ascii 188 = touche FIN  => reset (annule tous les rattrapages) */
+{ "296",       "KEY_OK",          "reset"},       /* ascii 296 = touche FIN  => reset (annule tous les rattrapages) */
 { "183",       "KEY_UP",          "nord"},        /* ascii SUM 183 (nread=3) => fleche du haut clavier */ 
 { "184",       "KEY_DOWN",        "sud"},         /* ascii SUM 184 (nread=3) => fleche du bas clavier */ 
 { "185",       "KEY_RIGHT",       "est"},         /* ascii SUM 185 (nread=3) => fleche de droite clavier */ 
@@ -163,8 +166,13 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /* F1 : 274  F2 : 275  F3 : 276  F4  : 277  F5  : 278  F6  : 348 */
 /* F7 : 349  F8 : 350  F9 : 342  F10 : 343  F11 : 345  F12 : 346 */
 
-{ "274",       "KEY_SCREEN",  "aff_tps_lie" },  /* 274 sum ascii = touche 'F1'  */ /* info 0 */
-{ "275",       "KEY_TV",      "aff_ast_vit" },  /* 274 sum ascii = touche 'F2'  */ /* info 1 */
+/* FIXME : novembre 2023 : remplcament 2 touches suivantes affichage par modif longitude et latitude */
+
+/*
+{ "274",       "KEY_SCREEN",  "aff_tps_lie" },  // 274 sum ascii = touche 'F1'  */ /* info 0 
+{ "275",       "KEY_TV",      "aff_ast_vit" },  // 274 sum ascii = touche 'F2'  */ /* info 1 
+*/
+
 { "276",       "KEY_INFO",    "aff_azi_alt" },  /* 275 sum ascii = touche 'F3'  */ /* info 2 */
 { "277",       "KEY_ZOOM",    "aff_agh_dec" },  /* 277 sum ascii = touche 'F4'  */ /* info 3 */
 
@@ -207,7 +215,6 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 
 { "undefined", "undefined", "undefined"}, /* 121 sum ascii = touche 'w' = reseau */
 { "undefined", "undefined", "undefined"}, /* 122 sum ascii = touche 'w' = reseau */
-{ "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},
 { "undefined", "undefined", "undefined"},
