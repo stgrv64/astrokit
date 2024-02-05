@@ -1,2 +1,96 @@
 Ce repertoire contient les fichiers necessaires a systemd : 
 /etc/systemd/system/<unit>
+
+astrokit-init.service
+astrokit-run.service
+astrokit-halt.service
+
+sont a placer dans /etc/systemd/system
+
+override.conf
+
+est a placer dans /etc/systemd/system/astrokit-run.service.d
+
+script_astrokit_init.sh
+script_astrokit_run.sh
+script_astrokit_halt.sh
+
+sont a placer dans /usr/localcr
+
+
+stef@astrokit-yocto-hardknott-systemd-v2.1:/etc/systemd/system() > find . -name "astroki*" -ls
+     1728      0 lrwxrwxrwx   1 root     root           40 May 14  2023 ./multi-user.target.wants/astrokit-run.service -> /etc/systemd/system/astrokit-run.service
+      597      0 lrwxrwxrwx   1 root     root           41 May  6  2022 ./multi-user.target.wants/astrokit-init.service -> /etc/systemd/system/astrokit-init.service
+      580      4 -rw-r--r--   1 root     root          221 Jun 13  2022 ./astrokit-halt.service
+      566      4 -rw-r--r--   1 root     root          405 Jun 13  2022 ./astrokit-run.service
+      567      4 -rw-r--r--   1 root     root          211 May  6  2022 ./astrokit-init.service
+      574      0 lrwxrwxrwx   1 root     root           43 Jun 16  2022 ./basic.target.wants/astrokit-boot-0.service -> /lib/systemd/system/astrokit-boot-0.service
+      581      4 drwxr-xr-x   2 root     root         4096 Jun  9  2022 ./astrokit-run.service.d
+      572      4 -rw-r--r--   1 root     root          243 Jun 13  2022 ./old/astrokit-boot.service
+      571      4 -rw-r--r--   1 root     root          211 May  6  2022 ./old/astrokit-init.service
+      570      4 -rw-r--r--   1 root     root          382 Jun  8  2022 ./old/astrokit-run-0.service
+      561      0 lrwxrwxrwx   1 root     root           41 Jun 13  2022 ./shutdown.target.wants/astrokit-halt.service -> /etc/systemd/system/astrokit-halt.service
+
+stef@astrokit-yocto-hardknott-systemd-v2.1:/etc/systemd/system() > find . -type d -name "astroki*" -ls
+      581      4 drwxr-xr-x   2 root     root         4096 Jun  9  2022 ./astrokit-run.service.d
+
+stef@astrokit-yocto-hardknott-systemd-v2.1:/etc/systemd/system() > find . -type d -name "astroki*" -exec ls -l {} \;
+total 4
+-rw-r--r-- 1 root root 210 Jun  9  2022 override.conf
+
+# -------------------------------------------------------------------------------------------------------
+
+stef@astrokit-yocto-hardknott-systemd-v2.1:/etc/systemd/system() > cat astrokit-init.service 
+[Unit]
+Description=astrokit init script : load fr kmap + others actions
+After=getty.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/scr/script_astrokit_init.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target
+
+# -------------------------------------------------------------------------------------------------------
+
+stef@astrokit-yocto-hardknott-systemd-v2.1:/etc/systemd/system() > cat astrokit-run.service  
+[Unit]
+Description=astrokit run script : export env and termios and run astrokit
+After=getty.target
+# Conflicts=getty@tty1.service
+
+[Service]
+#Type=simple
+#Type=oneshot
+Type=idle
+User=root
+ExecStart=/usr/local/scr/script_astrokit_run.sh
+StandardOutput=tty
+StandardInput=tty
+TTYPath=/dev/tty1
+# StandardInput=tty-force
+# StandardOutput=inherit
+# StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
+
+# -------------------------------------------------------------------------------------------------------
+
+stef@astrokit-yocto-hardknott-systemd-v2.1:/etc/systemd/system() > cat astrokit-halt.service 
+[Unit]
+Description=Astrokit message at shutdown
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/scr/script_astrokit_halt.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=shutdown.target
+
+

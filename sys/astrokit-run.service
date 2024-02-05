@@ -1,0 +1,20 @@
+[Unit]
+Description=astrokit run script : export env and termios and run astrokit
+After=getty.target
+# Conflicts=getty@tty1.service
+
+[Service]
+#Type=simple
+#Type=oneshot
+Type=idle
+User=root
+ExecStart=/usr/local/scr/script_astrokit_run.sh
+StandardOutput=tty
+StandardInput=tty
+TTYPath=/dev/tty1
+# StandardInput=tty-force
+# StandardOutput=inherit
+# StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
