@@ -35,8 +35,8 @@ static const char *  gc_hach_pth_name[] = {
 } ;
 
 static const int gi_Pth_Sched_Priority[] = {
-  PTHREAD_POLICY_5,
-  PTHREAD_POLICY_5,
+  PTHREAD_POLICY_99,
+  PTHREAD_POLICY_99,
   PTHREAD_POLICY_2,
   PTHREAD_POLICY_2,
   PTHREAD_POLICY_2,
@@ -532,8 +532,9 @@ void PTHREADS_CONFIG( STRUCT_PTHREADS* lp_Pth, pthread_t i_pth_self, int l_en_th
   }
   
   if ( i_error == 0 ) {
-    Trace("%-16s : id %lx ord %s prio %d sta %s num %d", \
+    Trace("%-16s : enum %d id %lx ord %s prio %d sta %s num %d", \
       c_name, \
+      l_en_thread, \
       i_pth_self, \
       c_ord, \
       i_pri, \

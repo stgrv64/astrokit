@@ -1383,7 +1383,13 @@ void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) {
     d_TUpwm_haut = d_TUpwm * d_rap  ; 
     d_TUpwm_bas  = d_TUpwm - d_TUpwm_haut ;
     
-    Trace1("Phid%-3d upas %-3d rapc %.3f Tpwmh %-3f Tpwmb %-3f ",lp_Pha->pha_id, lp_Pha->pha_upas, d_rap, d_TUpwm_haut, d_TUpwm_bas) ;
+    Trace2("Moteur-Id %d Phase-id %-3d upas %-3d rapc %.3f Tpwmh %-3f Tpwmb %-3f ", \
+      lp_Pha->pha_mot_id, \
+      lp_Pha->pha_id, \
+      lp_Pha->pha_upas, \
+      d_rap, \
+      d_TUpwm_haut, \
+      d_TUpwm_bas ) ;
 
     // =================================================================
     // ecriture sur GPIO
@@ -1573,7 +1579,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
       HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_pha[i]->pha_mutex ) ;
 
         lp_Mot->mot_pha[i]->pha_upas    = micropas ;
-        lp_Mot->mot_pha[i]->pha_per_pwm    = per_tpwm ;
+        lp_Mot->mot_pha[i]->pha_per_pwm = per_tpwm ;
         lp_Mot->mot_pha[i]->pha_rc      = lp_Mot->mot_pha[i]->pha_rap[ micropas ] ;
         lp_Mot->mot_pha[i]->pha_per_mot = periode_mot ; 
         lp_Mot->mot_pha[i]->pha_per_mic = periode_mic ; 
@@ -1763,11 +1769,12 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
     /* lp_Mot->mot_pha[i]->pha_p_sui            = lp_Mot->p_sui ;*/ 
     lp_Mot->mot_pha[i]->pha_gpio             = gpios[ masque[i] ]  ;
     lp_Mot->mot_pha[i]->pha_id               = i ;
-    lp_Mot->mot_pha[i]->pha_per_pwm             = 0 ;
-    lp_Mot->mot_pha[i]->pha_upas         = 0 ;
+    lp_Mot->mot_pha[i]->pha_per_pwm          = 0 ;
+    lp_Mot->mot_pha[i]->pha_upas             = 0 ;
     lp_Mot->mot_pha[i]->pha_gpio_open_statut = 0 ;
-    lp_Mot->mot_pha[i]->pha_gpio_fd       = 0 ;
-    
+    lp_Mot->mot_pha[i]->pha_gpio_fd          = 0 ;
+    lp_Mot->mot_pha[i]->pha_mot_id           = lp_Mot->mot_id ; /* FIXME ajout 2023*/
+
     GPIO_OPEN_BROCHE_PWM( lp_Mot->mot_pha[i] ) ;
     /*
     if ( lp_Mot->mot_pha[i]->pha_gpio_open_statut < 0 )  {

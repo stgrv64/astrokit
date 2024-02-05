@@ -1052,18 +1052,19 @@ int main(int argc, char ** argv) {
       gp_Azi_Mot->mot_pha[3]->pha_rap[i]) ;
   }
 
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)_GPIO_PWM_MOT,   gp_Azi_Mot ) ;     
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)_GPIO_PWM_MOT,   gp_Alt_Mot ) ;
-
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
-  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;
-
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[0] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[1] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[2] ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[3] ) ;
+
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_0], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[0] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_1], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[1] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_2], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[2] ) ;
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI_PHASE_3], NULL, (void*)_GPIO_PWM_PHASE, gp_Azi_Mot->mot_pha[3] ) ;  
+
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_AZI],         NULL, (void*)_GPIO_PWM_MOT,   gp_Azi_Mot ) ;     
+  pthread_create( &gp_Pth->pth_t[PTHREAD_T_MOT_ALT],         NULL, (void*)_GPIO_PWM_MOT,   gp_Alt_Mot ) ;
+
 
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_MENU],            NULL, (void*)_SUIVI_MENU,           gp_Sui ) ;
   pthread_create( &gp_Pth->pth_t[PTHREAD_T_VOUTE],           NULL, (void*)_SUIVI_VOUTE,          gp_Vou ) ;

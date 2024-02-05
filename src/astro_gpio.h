@@ -143,6 +143,7 @@ struct STR_GPIO_PWM_PHASE {
   double            pha_per_mic ;
   double            pha_per_mot ;  
   double            pha_rc ;
+  int               pha_mot_id ; /* recopie moteur ID */
   int               pha_id ;  
   int               pha_pas ;
   int               pha_upas ;
