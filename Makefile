@@ -32,8 +32,7 @@
 # CC  = /usr/bin/aarch64-linux-gnu-gcc
 #--------------------------------------------------------------------------------------
 
-#CCTARG=/usr/bin/arm-linux-gnueabihf-gcc
-CCTARG=/usr/bin/arm-linux-gnueabi-gcc
+CCTARG=/usr/bin/arm-linux-gnueabihf-gcc
 CCHOST=gcc
 
 GIT=git
