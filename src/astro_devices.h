@@ -7,6 +7,7 @@
 # --------------------------------------------------------------
 # 2022-10-07  | * creation
 # 2022-10-07  | * rapatriement code depuis astro_config.h
+# 2024-04-15  | ajout parametres dev_par_use_motor_xx
 # -------------------------------------------------------------- 
 */
 
@@ -24,6 +25,9 @@ struct STR_DEVICES_PARAMS {
   int dev_par_use_controler ;
   int dev_par_use_keyboard  ;
   int dev_par_use_lcd ; 
+  int dev_par_use_motor_alt ; 
+  int dev_par_use_motor_azi ; 
+  int dev_par_use_motor_rot ;   
 } ;
 
 struct STR_DEVICES {

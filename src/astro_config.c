@@ -48,6 +48,7 @@
 # octobre 2022   ! refonte complete du code 
 # 2023           | refonte globale 
 #  avril 2023    | memset sur ( struct entiere)
+# 2024-04-15     | ajout parametres dev_par_use_motor_xx
 # -------------------------------------------------------------- 
 */
 
@@ -463,6 +464,9 @@ void CONFIG_PARAMETRES_CONFIG(STRUCT_CONFIG * lp_Con) {
     if(!strcmp("DEVICE_USE_INFRAROUGE",lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_infrared=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_KEYBOARD",  lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_keyboard=atoi(lp_Con->con_params[l][1]);
     if(!strcmp("DEVICE_USE_LCD",       lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_lcd=atoi(lp_Con->con_params[l][1]);
+    if(!strcmp("DEVICE_USE_MOTOR_ALT", lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_alt=atoi(lp_Con->con_params[l][1]);
+    if(!strcmp("DEVICE_USE_MOTOR_AZI", lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_azi=atoi(lp_Con->con_params[l][1]);
+    if(!strcmp("DEVICE_USE_MOTOR_ROT", lp_Con->con_params[l][0])) gp_Dev_Par->dev_par_use_rot=atoi(lp_Con->con_params[l][1]);
 
     if(!strcmp("LONGITUDE",     lp_Con->con_params[l][0])) gp_Lie_Par->par_longitude=atof(lp_Con->con_params[l][1]);
     if(!strcmp("LATITUDE",      lp_Con->con_params[l][0])) gp_Lie_Par->par_latitude=atof(lp_Con->con_params[l][1]);

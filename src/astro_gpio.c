@@ -2163,7 +2163,7 @@ int mainG(int argc, char **argv) {
     param1) ;
   }
   
-  // lancement des pthreads moteurs ----------------------------------------------------
+  // creation des pthreads moteurs ----------------------------------------------------
   
   for( i=0;i<GPIO_NB_PHASES_PAR_MOTEUR;i++ ) {
     pthread_create( &p_thread_pha_alt[i], NULL,(void*)_GPIO_PWM_PHASE, gp_Alt_Mot->mot_pha[i] ) ;
@@ -2177,7 +2177,7 @@ int mainG(int argc, char **argv) {
     pthread_create( &p_thread_mot_azi, NULL, (void*)_GPIO_PWM_MOT, gp_Azi_Mot ) ;
   }
 
-  // lancement des autres pthreads  ----------------------------------------------------
+  // creation des autres pthreads  ----------------------------------------------------
 
   pthread_create( &p_thread_getc, NULL, (void*)suivi_clavier, NULL ) ;
 
