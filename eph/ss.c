@@ -404,7 +404,7 @@ struct orbit       *elobject;	// pointer to orbital elements of object
     case 10: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); break ;
     /* FIXME : default = ciel profond */
     default: elobject = 0 ; 
-      Trace("ciel profond : recuperations coordonnees") ;
+      Trace1("ciel profond : recuperations coordonnees") ;
       infos->asc = *ASC  ;
       infos->dec = *H ;
       infos->azi = 0 ;

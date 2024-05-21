@@ -357,8 +357,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
 
   TraceArbo(__func__,0,"debut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("lp_Ast->ast_nom = %s" , lp_Ast->ast_nom ) ; 
-  Trace("recherche %s infos %s", lp_Ast->ast_nom, lp_Ast->ast_infos ) ;
+  Trace1("lp_Ast->ast_nom = %s" , lp_Ast->ast_nom ) ; 
+  Trace1("recherche %s infos %s", lp_Ast->ast_nom, lp_Ast->ast_infos ) ;
 
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite
   // et degres minutes pour declinaison
@@ -406,8 +406,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
       i_ligne = L ;
       i_trouve = TRUE ;
 
-      Trace("ligne %d : astre %s : cat asc %s cat dec %s",i_ligne, lp_Ast->ast_nom , lp_Cat->cat_dec[L][2] , lp_Cat->cat_dec[L][3] ) ;
-      Trace("ligne %d : astre %s : ast asc %f ast dec %f infos %s",i_ligne, lp_Ast->ast_nom , lp_Ast->ast_asc , lp_Ast->ast_dec, lp_Ast->ast_infos) ;
+      Trace1("ligne %d : astre %s : cat asc %s cat dec %s",i_ligne, lp_Ast->ast_nom , lp_Cat->cat_dec[L][2] , lp_Cat->cat_dec[L][3] ) ;
+      Trace1("ligne %d : astre %s : ast asc %f ast dec %f infos %s",i_ligne, lp_Ast->ast_nom , lp_Ast->ast_asc , lp_Ast->ast_dec, lp_Ast->ast_infos) ;
 
       break  ;
     }
@@ -427,8 +427,8 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
       i_ligne = L ; 
       i_trouve = TRUE ;
 
-      Trace("ligne %d : astre %s : cat asc %s cat dec %s",i_ligne, lp_Ast->ast_nom , lp_Cat->cat_dec[L][2] , lp_Cat->cat_dec[L][3] ) ;
-      Trace("ligne %d : astre %s : ast asc %f ast dec %f infos %s",i_ligne, lp_Ast->ast_nom , lp_Ast->ast_asc , lp_Ast->ast_dec, lp_Ast->ast_infos) ;
+      Trace1("ligne %d : astre %s : cat asc %s cat dec %s",i_ligne, lp_Ast->ast_nom , lp_Cat->cat_dec[L][2] , lp_Cat->cat_dec[L][3] ) ;
+      Trace1("ligne %d : astre %s : ast asc %f ast dec %f infos %s",i_ligne, lp_Ast->ast_nom , lp_Ast->ast_asc , lp_Ast->ast_dec, lp_Ast->ast_infos) ;
 
       break ;
     }

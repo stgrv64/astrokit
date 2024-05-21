@@ -509,8 +509,6 @@ void ASTRE_STELLARIUM_VIEW(void) {
     gp_AstSav->ast_alt_ddmm,\
     gp_AstSav->ast_alt_hhmmss ) ;
 
-  Trace("") ;
-
   Trace("%-10s : Va  : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom,\
        gp_Ast->ast_azi_vit_dd,\
        gp_Ast->ast_azi_vit_dd,\
@@ -522,6 +520,10 @@ void ASTRE_STELLARIUM_VIEW(void) {
        gp_Ast->ast_alt_vit_dd,\
     gp_AstSav->ast_alt_vit_dd,\
     gp_AstSav->ast_alt_vit_dd ) ;
+
+  Trace("%-10s : %-41s / %-41s" , gp_Ast->ast_nom, \
+       "-----------------------------------------" ,\
+       "-----------------------------------------" ) ; 
 
   // HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Ast->ast_mutex ) ;
 

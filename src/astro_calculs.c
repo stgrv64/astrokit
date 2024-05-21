@@ -1321,7 +1321,7 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Ast->ast_mutex) ;
 
-  Trace("%s => mode %-30s type %-30s", \
+  Trace1("%s => mode %-30s type %-30s", \
     gp_Ast->ast_nom , \
     gc_hach_calcul_type[ gp_Cal->cal_type ] , \
     gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
@@ -1394,7 +1394,7 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
-      Trace("traitement ASTRE_INDETERMINE") ;
+      Trace1("traitement ASTRE_INDETERMINE") ;
 
       if ( gp_Cal->cal_type == CALCULS_TYPE_AZI_VERS_EQU ) {
         
@@ -1416,7 +1416,7 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_CIEL_PROFOND :
 
-      Trace("traitement ASTRE_CIEL_PROFOND") ;
+      Trace1("traitement ASTRE_CIEL_PROFOND") ;
       
       memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
 
@@ -1432,7 +1432,7 @@ void CALCULS_TOUT(void) {
     
     case ASTRE_PLANETE :
 
-      Trace("traitement ASTRE_PLANETE") ;
+      Trace1("traitement ASTRE_PLANETE") ;
 
       if ( gp_Ast->ast_num > 9 ) {
         Trace1("numero de planete interdit = %d", gp_Ast->ast_num ) ;
@@ -1487,7 +1487,7 @@ void CALCULS_TOUT(void) {
       
       case ASTRE_SATELLITE :
 
-        Trace("traitement ASTRE_SATELLITE") ;
+        Trace1("traitement ASTRE_SATELLITE") ;
 
         /* TODO completer */
         break ;
@@ -1496,7 +1496,7 @@ void CALCULS_TOUT(void) {
 
       case ASTRE_COMETE :
 
-        Trace("traitement ASTRE_COMETE") ;
+        Trace1("traitement ASTRE_COMETE") ;
 
         /* TODO completer */
         break ;
