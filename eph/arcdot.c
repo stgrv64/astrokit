@@ -93,7 +93,7 @@ double p[], q[];
   qt = asin(qt);
   if( pq < 0.0)
     qt = PI - qt;
-  Trace("%.16e %.16e\n", qt, pt);
+  Trace1("%.16e %.16e\n", qt, pt);
   #endif
   if (rt <= 0.25 && pq > 0.0)
     {

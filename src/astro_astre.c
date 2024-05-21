@@ -40,11 +40,11 @@ static void ASTRE_DISPLAY_PREPARE ( STRUCT_ASTRE * lp_Ast) {
 
   sprintf( lp_Ast->ast_dis_cmd , STR_AST_FORMAT_0,\
     lp_Ast->ast_nom, \
-    lp_Ast->ast_hhmmss_asc, \
-    lp_Ast->ast_ddmm_dec, \
-    lp_Ast->ast_hhmmss_agh, \
-    lp_Ast->ast_ddmm_azi, \
-    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_asc_hhmmss, \
+    lp_Ast->ast_dec_ddmm, \
+    lp_Ast->ast_agh_hhmmss, \
+    lp_Ast->ast_azi_ddmm, \
+    lp_Ast->ast_alt_ddmm, \
     lp_Ast->ast_azi_vit, \
     lp_Ast->ast_alt_vit ) ;
 
@@ -273,12 +273,14 @@ void ASTRE_RESET(STRUCT_ASTRE * lp_Ast) {
 * @fn     : ASTRE_FORMATE_DONNEES_AFFICHAGE
 * @author : s.gravois
 * @brief  : Cette fonction formate divers string en vue d un affichage pertinent
+* @brief  : doit etre executee apres CALCULS_CONVERSIONS_ANGLES
 * @param  : STRUCT_ASTRE *lp_Ast
 * @date   : 2022-04-12 creation
 * @date   : 2022-04-21 remplacement ° par o (affichage LCD ° impossible)
 * @date   : 2022-04-21 ajout de 2 resolutions plus simple (affichage contraint par LCD) :
 * @date   : 2022-04-21 - c_hhmm_*
 * @date   : 2022-04-21 - c_dd_*  
+* @date   : 2024-05-20 - ajout pour les vitesses
 *****************************************************************************************/
 
 void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
@@ -288,21 +290,27 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
   char  c_hhmmss_azi[ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_hhmmss_alt[ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_hhmmss_dec[ CONFIG_TAILLE_BUFFER_32 ] ;
+
   char  c_hhmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_hhmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_hhmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_hhmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_hhmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
+
   char  c_ddmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_ddmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_ddmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_ddmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_ddmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
+
   char  c_dd_agh    [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_dd_asc    [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_dd_azi    [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_dd_alt    [ CONFIG_TAILLE_BUFFER_32 ] ;
   char  c_dd_dec    [ CONFIG_TAILLE_BUFFER_32 ] ;
+
+  char  c_alt_vit   [ CONFIG_TAILLE_BUFFER_32 ] ;  
+  char  c_azi_vit   [ CONFIG_TAILLE_BUFFER_32 ] ;  
 
   TraceArbo(__func__,2,"format astre display datas") ;
 
@@ -329,6 +337,9 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
   memset( c_dd_azi, 0, sizeof(c_dd_azi) ) ;
   memset( c_dd_alt, 0, sizeof(c_dd_alt) ) ;
   memset( c_dd_dec, 0, sizeof(c_dd_dec) ) ;
+
+  memset( c_alt_vit, 0, sizeof(c_alt_vit) ) ;
+  memset( c_azi_vit, 0, sizeof(c_azi_vit) ) ;
 
   /* traitement des donnees en heures / minutes / secondes */
 
@@ -359,33 +370,41 @@ void ASTRE_FORMATE_DONNEES_AFFICHAGE(STRUCT_ASTRE *lp_Ast) {
   sprintf( c_dd_alt,   "%c %-3d deg",   lp_Ast->ast_alt_a.ang_sig, lp_Ast->ast_alt_a.ang_dd ) ;
   sprintf( c_dd_dec,   "%c %-3d deg",   lp_Ast->ast_dec_a.ang_sig, lp_Ast->ast_dec_a.ang_dd ) ;
 
+  sprintf( c_alt_vit,  "%f",            lp_Ast->ast_alt_vit) ;
+  sprintf( c_azi_vit,  "%f",            lp_Ast->ast_azi_vit) ;
+
   /* Sauvegarde des donnees formatees dans la structure astre */
   
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Ast->ast_mutex ) ;
 
-  strcpy( lp_Ast->ast_hhmmss_agh, c_hhmmss_agh)  ;
-  strcpy( lp_Ast->ast_hhmmss_asc, c_hhmmss_asc)  ;
-  strcpy( lp_Ast->ast_hhmmss_azi, c_hhmmss_azi)  ;
-  strcpy( lp_Ast->ast_hhmmss_alt, c_hhmmss_alt)  ;
-  strcpy( lp_Ast->ast_hhmmss_dec, c_hhmmss_dec)  ;
+  strcpy( lp_Ast->ast_agh_hhmmss, c_hhmmss_agh)  ;
+  strcpy( lp_Ast->ast_asc_hhmmss, c_hhmmss_asc)  ; 
+  strcpy( lp_Ast->ast_azi_hhmmss, c_hhmmss_azi)  ;
+  strcpy( lp_Ast->ast_alt_hhmmss, c_hhmmss_alt)  ;
+  strcpy( lp_Ast->ast_dec_hhmmss, c_hhmmss_dec)  ;
 
-  strcpy( lp_Ast->ast_hhmm_agh, c_hhmm_agh)  ;
-  strcpy( lp_Ast->ast_hhmm_asc, c_hhmm_asc)  ;
-  strcpy( lp_Ast->ast_hhmm_azi, c_hhmm_azi)  ;
-  strcpy( lp_Ast->ast_hhmm_alt, c_hhmm_alt)  ;
-  strcpy( lp_Ast->ast_hhmm_dec, c_hhmm_dec)  ;
+  strcpy( lp_Ast->ast_agh_hhmm, c_hhmm_agh)  ;
+  strcpy( lp_Ast->ast_asc_hhmm, c_hhmm_asc)  ;
+  strcpy( lp_Ast->ast_azi_hhmm, c_hhmm_azi)  ;
+  strcpy( lp_Ast->ast_alt_hhmm, c_hhmm_alt)  ;
+  strcpy( lp_Ast->ast_dec_hhmm, c_hhmm_dec)  ;
 
-  strcpy( lp_Ast->ast_ddmm_agh, c_ddmm_agh)  ;
-  strcpy( lp_Ast->ast_ddmm_asc, c_ddmm_asc)  ;
-  strcpy( lp_Ast->ast_ddmm_azi, c_ddmm_azi)  ;
-  strcpy( lp_Ast->ast_ddmm_alt, c_ddmm_alt)  ;
-  strcpy( lp_Ast->ast_ddmm_dec, c_ddmm_dec)  ;
+  strcpy( lp_Ast->ast_agh_ddmm, c_ddmm_agh)  ;
+  strcpy( lp_Ast->ast_asc_ddmm, c_ddmm_asc)  ;
+  strcpy( lp_Ast->ast_azi_ddmm, c_ddmm_azi)  ;
+  strcpy( lp_Ast->ast_alt_ddmm, c_ddmm_alt)  ;
+  strcpy( lp_Ast->ast_dec_ddmm, c_ddmm_dec)  ;
 
-  strcpy( lp_Ast->ast_dd_agh, c_dd_agh)  ;
-  strcpy( lp_Ast->ast_dd_asc, c_dd_asc)  ;
-  strcpy( lp_Ast->ast_dd_azi, c_dd_azi)  ;
-  strcpy( lp_Ast->ast_dd_alt, c_dd_alt)  ;
-  strcpy( lp_Ast->ast_dd_dec, c_dd_dec)  ;
+  strcpy( lp_Ast->ast_agh_dd, c_dd_agh)  ;
+  strcpy( lp_Ast->ast_asc_dd, c_dd_asc)  ;
+  strcpy( lp_Ast->ast_azi_dd, c_dd_azi)  ;
+  strcpy( lp_Ast->ast_alt_dd, c_dd_alt)  ;
+  strcpy( lp_Ast->ast_dec_dd, c_dd_dec)  ;
+
+  /* FIXME : ajout 2024 */
+
+  strcpy( lp_Ast->ast_alt_vit_dd, c_alt_vit)  ;
+  strcpy( lp_Ast->ast_azi_vit_dd, c_azi_vit)  ;
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( &lp_Ast->ast_mutex ) ;
 
@@ -412,17 +431,17 @@ void ASTRE_LOG(STRUCT_ASTRE *lp_Ast) {
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
 
   Trace("Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;
-  Trace("AD / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_asc , lp_Ast->ast_ddmm_dec ) ;
-  Trace("AH / Dec   : %s / %s"       , lp_Ast->ast_hhmmss_agh , lp_Ast->ast_ddmm_dec ) ;
-  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->ast_ddmm_azi   , lp_Ast->ast_ddmm_alt ) ;
+  Trace("AD / Dec   : %s / %s"       , lp_Ast->ast_asc_hhmmss , lp_Ast->ast_dec_ddmm ) ;
+  Trace("AH / Dec   : %s / %s"       , lp_Ast->ast_agh_hhmmss , lp_Ast->ast_dec_ddmm ) ;
+  Trace("AZ./ Haut. : %s / %s"       , lp_Ast->ast_azi_ddmm   , lp_Ast->ast_alt_ddmm ) ;
 
   sprintf( c_cmd , "(nom) %-15s (asc) %-15s (dec) %-15s (agh) %-15s (azi) %-15s (alt) %-5s (Va) %3.2f (Vh) %3.2f",\
     lp_Ast->ast_nom, \
-    lp_Ast->ast_hhmmss_asc, \
-    lp_Ast->ast_ddmm_dec, \
-    lp_Ast->ast_hhmmss_agh, \
-    lp_Ast->ast_ddmm_azi, \
-    lp_Ast->ast_ddmm_alt, \
+    lp_Ast->ast_asc_hhmmss, \
+    lp_Ast->ast_dec_ddmm, \
+    lp_Ast->ast_agh_hhmmss, \
+    lp_Ast->ast_azi_ddmm, \
+    lp_Ast->ast_alt_ddmm, \
     lp_Ast->ast_azi_vit, \
     lp_Ast->ast_alt_vit ) ;
 
@@ -438,16 +457,73 @@ void ASTRE_LOG(STRUCT_ASTRE *lp_Ast) {
 * @param  : 
 * @date   : 2022-03-18 creation
 * @date   : 2022-03-28 simplification
+* @date   : 2024       suppression arg gp_Ast + ajout affichage AstSav
 *****************************************************************************************/
 
-void ASTRE_STELLARIUM_VIEW(STRUCT_ASTRE *lp_Ast) {
+void ASTRE_STELLARIUM_VIEW(void) {
 
   TraceArbo(__func__,1,"display mode stellarium") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("%-10s : Va / Vh    : %3.2f / %3.2f" , lp_Ast->ast_nom, lp_Ast->ast_azi_vit    , lp_Ast->ast_alt_vit ) ;
-  Trace("%-10s : AD / Dec   : %s / %s"       , lp_Ast->ast_nom, lp_Ast->ast_hhmmss_asc , lp_Ast->ast_ddmm_dec ) ;
-  Trace("%-10s : AH / Dec   : %s / %s"       , lp_Ast->ast_nom, lp_Ast->ast_hhmmss_agh , lp_Ast->ast_ddmm_dec ) ;
-  Trace("%-10s : AZ./ Haut. : %s / %s"       , lp_Ast->ast_nom, lp_Ast->ast_ddmm_azi   , lp_Ast->ast_ddmm_alt ) ;
+  // ne pas locker pendant les affichages (juste accces aux donnees sans modifs)
+  // HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Ast->ast_mutex ) ;
+
+  Trace("%-10s : %-41s / %-41s" , gp_Ast->ast_nom, \
+       "-----------------------------------------" ,\
+       "-----------------------------------------" ) ; 
+
+  Trace("%-10s : %-41s / %-41s" , gp_Ast->ast_nom, \
+       "calculs normaux" ,\
+       "calculs ALTAZ via solar_system" ) ;
+
+  Trace("%-10s : %-41s / %-41s" , gp_Ast->ast_nom, \
+       "-----------------------------------------" ,\
+       "-----------------------------------------" ) ; 
+
+  Trace("%-10s : Dec : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom, \
+       gp_Ast->ast_dec_ddmm,\
+       gp_Ast->ast_dec_hhmmss,\
+    gp_AstSav->ast_dec_ddmm,\
+    gp_AstSav->ast_dec_hhmmss ) ;
+
+  Trace("%-10s : Asc : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom, \
+       gp_Ast->ast_asc_ddmm,\
+       gp_Ast->ast_asc_hhmmss,\
+    gp_AstSav->ast_asc_ddmm,\
+    gp_AstSav->ast_asc_hhmmss ) ;
+
+  Trace("%-10s : Agh : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom, \
+       gp_Ast->ast_agh_ddmm,\
+       gp_Ast->ast_agh_hhmmss,\
+    gp_AstSav->ast_agh_ddmm,\
+    gp_AstSav->ast_agh_hhmmss ) ;
+
+  Trace("%-10s : Azi : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom, \
+       gp_Ast->ast_azi_ddmm,\
+       gp_Ast->ast_azi_hhmmss,\
+    gp_AstSav->ast_azi_ddmm,\
+    gp_AstSav->ast_azi_hhmmss ) ;
+
+  Trace("%-10s : Alt : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom, \
+       gp_Ast->ast_alt_ddmm,\
+       gp_Ast->ast_alt_hhmmss,\
+    gp_AstSav->ast_alt_ddmm,\
+    gp_AstSav->ast_alt_hhmmss ) ;
+
+  Trace("") ;
+
+  Trace("%-10s : Va  : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom,\
+       gp_Ast->ast_azi_vit_dd,\
+       gp_Ast->ast_azi_vit_dd,\
+    gp_AstSav->ast_azi_vit_dd,\
+    gp_AstSav->ast_azi_vit_dd ) ;
+
+  Trace("%-10s : Vh  : %-15s ( %-15s ) / %-15s ( %-15s )" , gp_Ast->ast_nom,\
+       gp_Ast->ast_alt_vit_dd ,\
+       gp_Ast->ast_alt_vit_dd,\
+    gp_AstSav->ast_alt_vit_dd,\
+    gp_AstSav->ast_alt_vit_dd ) ;
+
+  // HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Ast->ast_mutex ) ;
 
   return ;
 }

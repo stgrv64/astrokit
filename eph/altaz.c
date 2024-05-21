@@ -51,15 +51,15 @@ int altaz(infos,  pol, J )
   dec  = pol[1];
   dist = pol[2];
 
-  Trace("infos->nom = %s", infos->nom) ;
+  Trace1("infos->nom = %s", infos->nom) ;
 
-  Trace("asc %.2f dec %.2f alt %.2f : ",\
+  Trace1("asc %.2f dec %.2f alt %.2f : ",\
     pol[0], \
     pol[1] * RTD, \
     pol[2] ) ;
 
   myhms("asc",pol[0]) ;
-  Trace("%-10s : %.2f degres", "dec", pol[1] * RTD) ;
+  Trace1("%-10s : %.2f degres", "dec", pol[1] * RTD) ;
 
   TPI = 2.0*PI;
   
@@ -165,7 +165,7 @@ int altaz(infos,  pol, J )
     infos->asc = ra ;
     infos->dec = dec ;
   
-    Trace("alt %.2f azi %.2f",infos->alt * RTD , infos->azi * RTD );
+    Trace1("alt %.2f azi %.2f",infos->alt * RTD , infos->azi * RTD );
 
   	hms( ra );
   	dms( dec );

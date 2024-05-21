@@ -325,14 +325,16 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
         Trace1("avant  ASTRE_FORMATE_DONNEES_AFFICHAGE") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
         ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;
+        ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_AstSav) ;
 
         Trace1("avant  CONFIG_DISPLAY_MODE_LONG") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-        CONFIG_DISPLAY_MODE_LONG(gp_Ast,gp_Lie,gp_Cal) ; 
+        CONFIG_DISPLAY_MODE_LONG(gp_Ast,   gp_Lie,gp_Cal) ; 
+        CONFIG_DISPLAY_MODE_LONG(gp_AstSav,gp_Lie,gp_Cal) ; 
 
         Trace1("avant  ASTRE_STELLARIUM_VIEW") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-        ASTRE_STELLARIUM_VIEW(gp_Ast) ;
+        ASTRE_STELLARIUM_VIEW() ;
 
         gp_Lcd->display_ast_vit(2000000) ;
         gp_Lcd->default_refresh() ;

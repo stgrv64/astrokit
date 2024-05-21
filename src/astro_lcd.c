@@ -723,8 +723,8 @@ void LCD_DISPLAY_AZI_ALT( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "AZI %s", gp_Ast->ast_ddmm_azi ) ;
-    sprintf( c_l1, "ALT %s", gp_Ast->ast_ddmm_alt );
+    sprintf( c_l0, "AZI %s", gp_Ast->ast_azi_ddmm ) ;
+    sprintf( c_l1, "ALT %s", gp_Ast->ast_alt_ddmm );
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -754,8 +754,8 @@ void LCD_DISPLAY_AGH_DEC( const int i_duree_us) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "AGH %s", gp_Ast->ast_hhmm_agh ) ;
-    sprintf( c_l1, "DEC %s", gp_Ast->ast_ddmm_dec ) ;
+    sprintf( c_l0, "AGH %s", gp_Ast->ast_agh_hhmm ) ;
+    sprintf( c_l1, "DEC %s", gp_Ast->ast_dec_ddmm ) ;
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -785,8 +785,8 @@ void LCD_DISPLAY_ASC_DEC( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "ASC %s", gp_Ast->ast_hhmm_asc ) ;
-    sprintf( c_l1, "DEC %s", gp_Ast->ast_ddmm_dec ) ;
+    sprintf( c_l0, "ASC %s", gp_Ast->ast_asc_hhmm ) ;
+    sprintf( c_l1, "DEC %s", gp_Ast->ast_dec_ddmm ) ;
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
@@ -815,16 +815,16 @@ void LCD_DISPLAY_MODE_STELLARIUM( const int i_duree_us ) {
     memset( c_l0, 0, sizeof(c_l0)) ; 
     memset( c_l1, 0, sizeof(c_l1)) ;
 
-    sprintf( c_l0, "(AZI) %s", gp_Ast->ast_ddmm_azi ) ;
-    sprintf( c_l1, "(ALT) %s", gp_Ast->ast_ddmm_alt );
+    sprintf( c_l0, "(AZI) %s", gp_Ast->ast_azi_ddmm ) ;
+    sprintf( c_l1, "(ALT) %s", gp_Ast->ast_alt_ddmm );
 
     gp_Lcd->current_change( i_duree_us, c_l0, c_l1) ;
     gp_Lcd->current_display() ;
     /*
     Trace("Va / Vh    : %3.2f / %3.2f" , gp_Ast->ast_azi_vit           , gp_Ast->ast_alt_vit ) ;
-    Trace("AD / Dec   : %s / %s"       , gp_Ast->ast_hhmmss_asc , gp_Ast->ast_ddmm_dec ) ;
-    Trace("AH / Dec   : %s / %s"       , gp_Ast->ast_hhmmss_agh , gp_Ast->ast_ddmm_dec ) ;
-    Trace("AZ./ Haut. : %s / %s"       , gp_Ast->ast_ddmm_azi   , gp_Ast->ast_ddmm_alt ) ;
+    Trace("AD / Dec   : %s / %s"       , gp_Ast->ast_asc_hhmmss , gp_Ast->ast_dec_ddmm ) ;
+    Trace("AH / Dec   : %s / %s"       , gp_Ast->ast_agh_hhmmss , gp_Ast->ast_dec_ddmm ) ;
+    Trace("AZ./ Haut. : %s / %s"       , gp_Ast->ast_azi_ddmm   , gp_Ast->ast_alt_ddmm ) ;
     */
   }
   return ;

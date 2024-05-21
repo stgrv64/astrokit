@@ -206,7 +206,7 @@ struct STR_GPIO_PWM_MOTEUR {
   */
   double  tps_mic ; /* somme des usleep dans la fonction de thread void * SUIVI_MAIN */
   double  tps_ree ; /* somme des temps reels consomme entre les usleep (en utilisant gettimeofday )*/
-  double  tps_bru ; /* somme des periodes T<x>_bru brutes calculees dans CALCULS_PERIODE */
+  double  tps_bru ; /* somme des periodes T<x>_bru brutes calculees dans CALCULS_FREQUENCES */
   double  tps_mot ; /* somme des periodes T<x>_mot (T<x>_bru * accelerations) */ 
   double  temps_moyen ;       
 

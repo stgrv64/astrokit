@@ -766,7 +766,7 @@ void CALCULS_DIVISEUR_FREQUENCE(void) {
 }
 
 /*****************************************************************************************
-* @fn     : CALCULS_PERIODE
+* @fn     : CALCULS_FREQUENCES
 * @author : s.gravois
 * @brief  : calcule les "vraies" periodes et frequences des moteurs pas a pas
 * @brief  : en tant que parametres de la sinusoide de reference 
@@ -778,7 +778,7 @@ void CALCULS_DIVISEUR_FREQUENCE(void) {
 * @date   : 2022-06 ajout champs xxx_bru freq /periode avant multiplication par acceleration
 *****************************************************************************************/
 
-void CALCULS_PERIODE(STRUCT_ASTRE * lp_Ast) {
+void CALCULS_FREQUENCES(STRUCT_ASTRE * lp_Ast) {
 
   double freq_alt_mic, freq_azi_mic ;
   double freq_alt_mot, freq_azi_mot ;
@@ -1030,8 +1030,6 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
   Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
   Trace1("lp_Ast->ast_azi = %f" , lp_Ast->ast_azi) ;
 
-  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex) ;
-
   Trace1("lp_Ast->ast_azi = %f" , lp_Ast->ast_azi) ;
   (lp_Ast->ast_at).tim_hd = lp_Ast->ast_azi * 24.0 / CALCULS_PI_FOIS_DEUX ;
 
@@ -1055,15 +1053,18 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
 
   Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex) ;
 
   (lp_Ast->ast_agh_t).tim_hd = lp_Ast->ast_agh * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_dec_t).tim_hd = lp_Ast->ast_dec * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_asc_t).tim_hd  = lp_Ast->ast_asc * 24.0 / CALCULS_PI_FOIS_DEUX ;
 
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
   /* -------------------------------*/
 
   Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex) ;
 
   (lp_Ast->ast_agh_a).ang_dec_rad = lp_Ast->ast_agh ;
   (lp_Ast->ast_agh_a).ang_dec_deg = lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES ;
@@ -1072,12 +1073,15 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
   (lp_Ast->ast_dec_a).ang_dec_rad = lp_Ast->ast_dec ;
   (lp_Ast->ast_dec_a).ang_dec_deg = lp_Ast->ast_dec * CALCULS_UN_RADIAN_EN_DEGRES ;
 
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
+
   /* -------------------------------*/
   /* les calculs intermediaires     */
   /* -------------------------------*/
 
   Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
 
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Ast->ast_mutex) ;
 
   (lp_Ast->ast_agh0_t).tim_hd = lp_Ast->ast_agh0 * 24.0 / CALCULS_PI_FOIS_DEUX ;
   (lp_Ast->ast_agh1_t).tim_hd = lp_Ast->ast_agh1 * 24.0 / CALCULS_PI_FOIS_DEUX ;
@@ -1088,7 +1092,7 @@ void CALCULS_CONVERSIONS_ANGLES(STRUCT_ASTRE * lp_Ast) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex) ;
 
-    Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
+  Trace1("(lp_Ast->ast_at).tim_hd = %f" , (lp_Ast->ast_at).tim_hd) ;
 
   TIME_CALCULS_DEC_VERS_HMS ( & lp_Ast->ast_at    ) ;
   TIME_CALCULS_DEC_VERS_HMS ( & lp_Ast->ast_ht    ) ;
@@ -1151,16 +1155,11 @@ void  CALCULS_ANGLE_HORAIRE(STRUCT_ASTRE * lp_Ast) {
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Ast->ast_mutex );
 
   /* 2023 : deplacement code suivant a un niveau plus haut */
-/*
-  CALCULS_CONVERSIONS_ANGLES(lp_Ast) ;
-*/  
+
   Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
   Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
 
-  /*
-    ASTRE_STELLARIUM_VIEW(gp_Ast) ;
-  */
 }
 
 /*****************************************************************************************
@@ -1205,10 +1204,6 @@ void CALCULS_ASCENSION_DROITE(STRUCT_ASTRE * lp_Ast) {
   Trace1("ascension droite (deg)   = %.2f", lp_Ast->ast_asc * CALCULS_UN_RADIAN_EN_DEGRES) ;
   /* Trace1("temps sideral (rad)      = %.2f", gp_Lie->lie_tsr ) ; */
   Trace1("angle horaire (deg)      = %.2f", lp_Ast->ast_agh * CALCULS_UN_RADIAN_EN_DEGRES) ;
-
-  /*
-    ASTRE_STELLARIUM_VIEW(gp_Ast) ;
-  */
 
   return ;
 }
@@ -1265,9 +1260,10 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
     else if ( strstr( gp_Ast->ast_nom, CONFIG_NGC ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
     else if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) gp_Ast->ast_typ = ASTRE_CIEL_PROFOND ;
     else if ( strstr( gp_Ast->ast_nom, CONFIG_PLA ) != NULL ) gp_Ast->ast_typ = ASTRE_PLANETE ;
+
     else if ( strstr( gp_Ast->ast_nom, CONFIG_AZI ) != NULL ) gp_Ast->ast_typ = ASTRE_INDETERMINE ;
     else if ( strstr( gp_Ast->ast_nom, CONFIG_EQU ) != NULL ) gp_Ast->ast_typ = ASTRE_INDETERMINE ;
-    else                                                  gp_Ast->ast_typ = ASTRE_INDETERMINE ;
+    else                                                      gp_Ast->ast_typ = ASTRE_INDETERMINE ;
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Ast->ast_mutex) ;
 
@@ -1280,8 +1276,9 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
     else if ( strstr( gp_Ast->ast_nom, CONFIG_ETO ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
     else if ( strstr( gp_Ast->ast_nom, CONFIG_PLA ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
     else if ( strstr( gp_Ast->ast_nom, CONFIG_AZI ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_EQU_VERS_AZI ;
+
     else if ( strstr( gp_Ast->ast_nom, CONFIG_EQU ) != NULL ) gp_Cal->cal_type = CALCULS_TYPE_AZI_VERS_EQU ;
-    else                                                  gp_Cal->cal_type = CALCULS_TYPE_AZI_VERS_EQU ; 
+    else                                                      gp_Cal->cal_type = CALCULS_TYPE_AZI_VERS_EQU ; 
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Cal->cal_mutex) ;
 
@@ -1324,7 +1321,10 @@ void CALCULS_RECUP_MODE_ET_ASTRE_TYPE() {
 
   HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK(&gp_Ast->ast_mutex) ;
 
-  Trace1("mode %-30s type %-30s", gc_hach_calcul_type[ gp_Cal->cal_type ] , gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
+  Trace("%s => mode %-30s type %-30s", \
+    gp_Ast->ast_nom , \
+    gc_hach_calcul_type[ gp_Cal->cal_type ] , \
+    gc_hach_astre_types[ gp_Ast->ast_typ ] ) ;
 
   return ;
 }
@@ -1394,53 +1394,45 @@ void CALCULS_TOUT(void) {
 
     case ASTRE_INDETERMINE :
     
-      Trace1("traitement ASTRE_INDETERMINE") ;
+      Trace("traitement ASTRE_INDETERMINE") ;
 
       if ( gp_Cal->cal_type == CALCULS_TYPE_AZI_VERS_EQU ) {
         
         CALCULS_EQUATEUR(gp_Ast) ;
         CALCULS_ASCENSION_DROITE(gp_Ast) ;
-        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
+        
       }
       else {
         CALCULS_ANGLE_HORAIRE(gp_Ast) ;
         CALCULS_AZIMUT(gp_Ast) ;
-        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
+        
       }
-      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-      CALCULS_PERIODE(gp_Ast) ;
-            
+
+      memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
+      gp_AstSav->ast_calcul_type_solar_system = TRUE ;
+
       break ;
     /* ----------------------------------------------------------------- */
 
     case ASTRE_CIEL_PROFOND :
 
-      Trace1("traitement ASTRE_CIEL_PROFOND") ;
+      Trace("traitement ASTRE_CIEL_PROFOND") ;
       
       memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
 
-      if ( CALCUL_PAR_SOLAR_SYSTEM == TRUE ) {
+      /* Azimut / Altitude calcule dans CALCULS_SOLAR_SYSTEM */
+      CALCULS_SOLAR_SYSTEM( gp_AstSav, gp_Lie, gp_Tim ) ;
+      CALCULS_ANGLE_HORAIRE(gp_AstSav) ;
 
-        CALCULS_ANGLE_HORAIRE(gp_Ast) ;
-        CALCULS_SOLAR_SYSTEM( gp_Ast, gp_Lie, gp_Tim ) ;
-        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
-        }
-      else {
-        CALCULS_ANGLE_HORAIRE(gp_Ast) ;
-        CALCULS_AZIMUT(gp_Ast) ;
-        CALCULS_CONVERSIONS_ANGLES(gp_Ast) ;
-        CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-        CALCULS_PERIODE(gp_Ast) ;
-      }
-      gp_Ast->ast_display_format_datas(gp_Ast) ;
-      gp_Ast->ast_display(gp_Ast) ;
+      CALCULS_ANGLE_HORAIRE(gp_Ast) ;
+      CALCULS_AZIMUT(gp_Ast) ;
 
       break ;
     /* ----------------------------------------------------------------- */
     
     case ASTRE_PLANETE :
 
-      Trace1("traitement ASTRE_PLANETE") ;
+      Trace("traitement ASTRE_PLANETE") ;
 
       if ( gp_Ast->ast_num > 9 ) {
         Trace1("numero de planete interdit = %d", gp_Ast->ast_num ) ;
@@ -1484,15 +1476,18 @@ void CALCULS_TOUT(void) {
       // CALCULS_AZIMUT  ( gp_Lie, gp_Ast) ;
       
       CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-      CALCULS_PERIODE(gp_Ast) ;
+      CALCULS_FREQUENCES(gp_Ast) ;
 
+      memcpy( gp_AstSav, gp_Ast, sizeof( STRUCT_ASTRE) ) ;  
+      gp_AstSav->ast_calcul_type_solar_system = TRUE ;
+      
       break ;
 
       //---------------------------------------------------------------------------------------
       
       case ASTRE_SATELLITE :
 
-        Trace1("traitement ASTRE_SATELLITE") ;
+        Trace("traitement ASTRE_SATELLITE") ;
 
         /* TODO completer */
         break ;
@@ -1501,7 +1496,7 @@ void CALCULS_TOUT(void) {
 
       case ASTRE_COMETE :
 
-        Trace1("traitement ASTRE_COMETE") ;
+        Trace("traitement ASTRE_COMETE") ;
 
         /* TODO completer */
         break ;
@@ -1536,6 +1531,17 @@ void CALCULS_TOUT(void) {
         break ;
       */
   }  
+
+  CALCULS_VITESSES(gp_AstSav,gp_Lie,gp_Sui) ;
+  CALCULS_FREQUENCES(gp_AstSav) ;
+  CALCULS_CONVERSIONS_ANGLES(gp_AstSav) ; 
+  ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_AstSav) ;
+
+  CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
+  CALCULS_FREQUENCES(gp_Ast) ;
+  CALCULS_CONVERSIONS_ANGLES(gp_Ast) ; 
+  ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;
+
   return ;
 }
 //================================================================================================
@@ -1558,7 +1564,7 @@ void CALCULS_VOUTE(void) {
   CALCULS_EQUATEUR         ( gp_Lie, gp_Ast ) ;
   CALCULS_ASCENSION_DROITE ( gp_Lie, gp_Ast ) ;
   CALCULS_VITESSES         ( gp_Lie, gp_Ast, gp_Sui) ;
-  CALCULS_PERIODE          ( gp_Ast, gp_Sui, gp_Vou) ;
+  CALCULS_FREQUENCES          ( gp_Ast, gp_Sui, gp_Vou) ;
 */
   fout=fopen("voute.csv","w") ;
   
@@ -1576,7 +1582,7 @@ void CALCULS_VOUTE(void) {
      CALCULS_EQUATEUR(gp_Ast) ; 
      CALCULS_ASCENSION_DROITE(gp_Ast) ;
      CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-     CALCULS_PERIODE(gp_Ast) ;
+     CALCULS_FREQUENCES(gp_Ast) ;
 
      gp_Ast->ast_vit  = sqrt( sqr( gp_Ast->ast_azi_vit ) + sqr( gp_Ast->ast_alt_vit )) ;
      

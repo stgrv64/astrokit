@@ -349,8 +349,8 @@ void SOLAR_SYSTEM( \
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace("nom = %s", nom) ;
-  Trace("num = %d", num) ;
+  Trace1("nom = %s", nom) ;
+  Trace1("num = %d", num) ;
   
   Trace1("RTD = %f", RTD) ;
   infos = &inf ;
@@ -404,6 +404,7 @@ struct orbit       *elobject;	// pointer to orbital elements of object
     case 10: elobject = (struct orbit *)&fstar; i = getstar( (struct star *) elobject ); break ;
     /* FIXME : default = ciel profond */
     default: elobject = 0 ; 
+      Trace("ciel profond : recuperations coordonnees") ;
       infos->asc = *ASC  ;
       infos->dec = *H ;
       infos->azi = 0 ;

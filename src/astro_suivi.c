@@ -712,7 +712,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     Trace1("gp_Key->key_mot non vide : %s", gp_Key->key_mot) ;
 
     ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast);
-
+    ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_AstSav);
+    
     /*---------------------------------------------*/
     /* Lettres en Majuscules : affichages ponctuels */
     /*---------------------------------------------*/
@@ -757,7 +758,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     MACRO_IF_KEY_MOT_IS("key_f_min" ) { MACRO_COD_TRC("key_f_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_g_min" ) { MACRO_COD_TRC("key_g_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_h_min" ) { MACRO_COD_TRC("key_h_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_i_min" ) { MACRO_COD_TRC("key_i_min" ) ; }
+    MACRO_IF_KEY_MOT_IS("key_i_min" ) { MACRO_COD_TRC("key_i_min" ) ; ASTRE_STELLARIUM_VIEW() ;  }
     MACRO_IF_KEY_MOT_IS("key_j_min" ) { MACRO_COD_TRC("key_j_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_k_min" ) { MACRO_COD_TRC("key_k_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_l_min" ) { MACRO_COD_TRC("key_l_min" ) ; }
@@ -1027,6 +1028,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Ast->ast_mutex )  ;
 
       gp_Ast->ast_new = TRUE ;
+
+      Trace("gp_Ast->ast_new = TRUE ;") ;
 
       HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Ast->ast_mutex )  ;
       
@@ -1332,7 +1335,7 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
     /* pthread_mutex_lock( & gp_Mut->mut_cal ); */
     
     CALCULS_VITESSES(gp_Ast,gp_Lie,gp_Sui) ;
-    CALCULS_PERIODE(gp_Ast) ;
+    CALCULS_FREQUENCES(gp_Ast) ;
     
     /* pthread_mutex_unlock( & gp_Mut->mut_cal ); */
   }

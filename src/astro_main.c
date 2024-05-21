@@ -933,6 +933,10 @@ int main(int argc, char ** argv) {
   VOUTE_INIT                 ( gp_Vou ) ; /* soit etre place avant SUIVI_INIT */
   ASTRE_INIT                 ( gp_Ast ) ;
   ASTRE_INIT                 ( gp_AstSav ) ;
+
+  gp_Ast->ast_calcul_type_solar_system = FALSE ; 
+  gp_AstSav->ast_calcul_type_solar_system = TRUE ; 
+
   KEYS_INIT                  ( gp_Key ) ;
   DEVICES_INIT               ( gp_Dev ) ;
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
@@ -984,6 +988,8 @@ int main(int argc, char ** argv) {
 
   // -----------------------------------------------------------------
   
+    memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;
+    
   if ( strcmp(gp_Ast_Par->ast_par_default_object,"") != 0 ) {
 
     memset( gp_Ast->ast_nom, 0, sizeof(gp_Ast->ast_nom)) ;

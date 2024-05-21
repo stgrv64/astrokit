@@ -211,7 +211,7 @@ void CALCULS_VOUTE                   ( void) ;
 void CALCULS_COORD_R3                ( STRUCT_ASTRE *) ;
 void CALCULS_AZIMUT                  ( STRUCT_ASTRE *) ;
 void CALCULS_EQUATEUR                ( STRUCT_ASTRE *) ;
-void CALCULS_PERIODE                 ( STRUCT_ASTRE *) ;
+void CALCULS_FREQUENCES                 ( STRUCT_ASTRE *) ;
 void CALCULS_PERIODES_SUIVI_MANUEL   ( STRUCT_ASTRE *, STRUCT_SUIVI_PAS *, STRUCT_SUIVI_FRE *) ;
 void CALCULS_VITESSES                ( STRUCT_ASTRE *, STRUCT_LIEU * , STRUCT_SUIVI * ) ;
 void CALCULS_ANGLE_HORAIRE           ( STRUCT_ASTRE *) ;

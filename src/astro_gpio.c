@@ -1436,7 +1436,7 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
   double d_ecart =0;       /* ecart entre Periodes attendues et reelles */
   double d_pid = 0 ;         /* parametre PID a appliquer */
 
-  double periode_bru=0 ; /* periode brute calculee dans CALCULS_PERIODE */
+  double periode_bru=0 ; /* periode brute calculee dans CALCULS_FREQUENCES */
   double periode_eff=0 ; /* periode effective pour la temporisation */
   double periode_ree=0 ; /* periode effective reelle consommee pour la temporisation */
   double periode_mic=0 ; /* periode de referefence (micro pas) pour la temporisation */

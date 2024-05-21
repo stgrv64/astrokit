@@ -177,7 +177,7 @@ int myhms( char * s_message, double x ) {
  sint = sfrac / 1000;
  sfrac -= sint * 1000;
  
- Trace( "%-10s : %.02d h %.02d m %.02ds  ", s_message, h, m, (int)s );
+ Trace1( "%-10s : %.02d h %.02d m %.02ds  ", s_message, h, m, (int)s );
  
 return(0);
 }
@@ -342,8 +342,8 @@ double zgetdate() {
 
   getnum( "Calendar date: Year", &cyear, lngfmt );
 
-  if( (cyear > 53994L) || (cyear < -4713L) ) { Trace( "Year out of range.\n" ); goto err; }
-  if( cyear == 0 )                           { Trace( "There is no year 0.\n" ); err:	J = 0.0; goto pdate; }
+  if( (cyear > 53994L) || (cyear < -4713L) ) { Trace1( "Year out of range.\n" ); goto err; }
+  if( cyear == 0 )                           { Trace1( "There is no year 0.\n" ); err:	J = 0.0; goto pdate; }
 
   getnum( "Month (1-12)", &month, intfmt);
   getnum( "Day.fraction", &day, dblfmt );
@@ -681,7 +681,7 @@ int getnum( msg, num, format ) char *msg; void *num; char *format; {
 
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
-  Trace( "%s (", msg );
+  Trace1( "%s (", msg );
   /*
   if     ( format == strfmt ) Trace( format, (char *) num );
   else if( format == dblfmt ) Trace( format, *(double *)num );

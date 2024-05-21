@@ -357,6 +357,7 @@ void  CAT_FIND(STRUCT_CAT * lp_Cat, STRUCT_ASTRE *lp_Ast) {
 
   TraceArbo(__func__,0,"debut") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  Trace("lp_Ast->ast_nom = %s" , lp_Ast->ast_nom ) ; 
   Trace("recherche %s infos %s", lp_Ast->ast_nom, lp_Ast->ast_infos ) ;
 
   // dans les catalogues, coordonnnees en H et MIN pour ascension droite

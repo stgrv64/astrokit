@@ -7,6 +7,7 @@
 # --------------------------------------------------------------
 # 2022-10-07  | * creation
 # 2022-10-07  | * rapatriement code depuis partout
+# 2024-05-20  | * ajout formatage chaine de charactere pour les vitesses
 # -------------------------------------------------------------- 
 */
 
@@ -95,6 +96,11 @@ struct STR_ASTRE {
   int             ast_new ; 
   int             ast_typ ;
 
+  /* ajout 2024 :suivant objet gpt_ast ou gpt_ast_save :
+     * calcul SOLAR_SYSTEM ou pas
+  */
+  int             ast_calcul_type_solar_system ; 
+
   char            ast_nom         [ ASTRE_TAILLE_BUFFER ] ;
   char            ast_infos       [ ASTRE_TAILLE_BUFFER ] ;  
   char            ast_plus_proche [ ASTRE_NB_COLONNES   ][ ASTRE_TAILLE_BUFFER ] ;
@@ -139,27 +145,33 @@ struct STR_ASTRE {
   
   /* formatage des informations de coordonnnes sur l astre */
 
-  char            ast_hhmmss_agh[ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmmss_asc[ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmmss_azi[ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmmss_alt[ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmmss_dec[ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_hhmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_ddmm_agh  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_ddmm_asc  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_ddmm_azi  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_ddmm_alt  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_ddmm_dec  [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_dd_agh    [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_dd_asc    [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_dd_azi    [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_dd_alt    [ CONFIG_TAILLE_BUFFER_32 ] ;
-  char            ast_dd_dec    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_agh_hhmmss[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_asc_hhmmss[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_azi_hhmmss[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_alt_hhmmss[ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dec_hhmmss[ CONFIG_TAILLE_BUFFER_32 ] ;
 
+  char            ast_agh_hhmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_asc_hhmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_azi_hhmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_alt_hhmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dec_hhmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+
+  char            ast_agh_ddmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_asc_ddmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_azi_ddmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_alt_ddmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dec_ddmm  [ CONFIG_TAILLE_BUFFER_32 ] ;
+  
+  char            ast_agh_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_asc_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_azi_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_alt_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_dec_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
+
+  /* FIXME : ajout 2024 */
+  char            ast_alt_vit_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
+  char            ast_azi_vit_dd    [ CONFIG_TAILLE_BUFFER_32 ] ;
 } ;
 
 /* Le contenu de cette variable permet le hachage avec 
@@ -173,6 +185,7 @@ void ASTRE_LOG                       ( STRUCT_ASTRE * ) ;
 
 void ASTRE_RESET                     ( STRUCT_ASTRE * ) ;
 void ASTRE_FORMATE_DONNEES_AFFICHAGE ( STRUCT_ASTRE * ) ;
-void ASTRE_STELLARIUM_VIEW   ( STRUCT_ASTRE * ) ;
+
+void ASTRE_STELLARIUM_VIEW   ( ) ;
 
 #endif
