@@ -1710,6 +1710,56 @@ void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
 
   return NULL ;
 }
+
+/*****************************************************************************************
+* @fn     : GPIO_DISPLAY_TEMPS
+* @author : s.gravois
+* @brief  : Affiche les temps utilises lors de utlisation moteurs / phases
+* @brief  :  champs tps_* de la structure STRUCT_GPIO_PWM_MOTEUR
+* @param  : STRUCT_GPIO_PWM_MOTEUR *lp_Mot
+* @param  : double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1
+* @date   : 2022-11-30 creation entete au format doxygen
+* @todo   : 
+*****************************************************************************************/
+
+void GPIO_DISPLAY_TEMPS(STRUCT_GPIO_PWM_MOTEUR *lp_Alt_Mot, STRUCT_GPIO_PWM_MOTEUR *lp_Azi_Mot) {
+
+      Trace("ALT pid temps : %.2f %.2f %.2f %.2f", \
+        lp_Alt_Mot->tps_mot , \
+        lp_Alt_Mot->tps_bru , \
+        lp_Alt_Mot->tps_mic , \
+        lp_Alt_Mot->tps_ree ) ;
+      
+      Trace("AZI pid temps : %.2f %.2f %.2f %.2f", \
+        lp_Azi_Mot->tps_mot , \
+        lp_Azi_Mot->tps_bru , \
+        lp_Azi_Mot->tps_mic , \
+        lp_Azi_Mot->tps_ree ) ;
+
+}
+/*****************************************************************************************
+* @fn     : GPIO_RESET_PID_TEMPS
+* @author : s.gravois
+* @brief  : Reset les champs de temps et de PID (lorque changement astre par exemple)
+* @brief  :  de la structure moteurs STRUCT_GPIO_PWM_MOTEUR
+* @param  : STRUCT_GPIO_PWM_MOTEUR *lp_Mot
+* @date   : 2024-05-20 creation 
+*****************************************************************************************/
+
+void GPIO_RESET_PID_TEMPS(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) {
+
+  HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Mot->mot_mutex ) ;    
+
+  lp_Mot->tps_bru = 0 ; 
+  lp_Mot->tps_mic = 0 ; 
+  lp_Mot->tps_mot = 0 ; 
+  lp_Mot->tps_ree = 0 ; 
+  
+  lp_Mot->temps_moyen = 0 ;
+  lp_Mot->temps_reel_moyen = 0 ;
+  
+  HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Mot->mot_mutex ) ;     
+}
 /*****************************************************************************************
 * @fn     : GPIO_INIT_PWM_MOTEUR
 * @author : s.gravois
@@ -1731,6 +1781,8 @@ void GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHA
   TraceArbo(__func__,0,"") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
   HANDLE_ERROR_PTHREAD_MUTEX_INIT( & lp_Mot->mot_mutex ) ;
+                                     lp_Mot->mot_reset = GPIO_RESET_PID_TEMPS ; 
+                                     
   gettimeofday( &                    lp_Mot->mot_tval,NULL) ;
 
   memset(cmd, CONFIG_ZERO_CHAR ,sizeof(cmd)) ;

@@ -765,7 +765,11 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     MACRO_IF_KEY_MOT_IS("key_m_min" ) { MACRO_COD_TRC("key_m_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_n_min" ) { MACRO_COD_TRC("key_n_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_o_min" ) { MACRO_COD_TRC("key_o_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_p_min" ) { MACRO_COD_TRC("key_p_min" ) ; }
+    
+    MACRO_IF_KEY_MOT_IS("key_t_min" ) { MACRO_COD_TRC("key_t_min" ) ; 
+      GPIO_DISPLAY_TEMPS( gp_Alt_Mot, gp_Azi_Mot) ;
+    }
+
     MACRO_IF_KEY_MOT_IS("key_q_min" ) { MACRO_COD_TRC("key_q_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_r_min" ) { MACRO_COD_TRC("key_r_min" ) ; }
     MACRO_IF_KEY_MOT_IS("key_s_min" ) { MACRO_COD_TRC("key_s_min" ) ; }
@@ -805,8 +809,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation algorithme PID de regulation des periodes / frequences moteurs */
 
-    MACRO_IF_KEY_MOT_IS("l") { 
-      MACRO_COD_TRC("l") ;
+    MACRO_IF_KEY_MOT_IS("key_l_min") { 
+      MACRO_COD_TRC("key_l_min") ;
       i=1 ; 
       if ( gi_pid_trace == 0 ){
         gi_pid_trace = gp_Tpo->tpo_pid_loop ; 
@@ -826,8 +830,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation traces PID pour le moteur ALT */
 
-    MACRO_IF_KEY_MOT_IS("j") { 
-      MACRO_COD_TRC("j") ;
+    MACRO_IF_KEY_MOT_IS("key_j_min") { 
+      MACRO_COD_TRC("key_j_min") ;
       i=1 ; 
       if ( gi_pid_trace_alt == 0 ) {
         gi_pid_trace_alt=1;      
@@ -847,8 +851,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /* Activation traces PID pour le moteur AZI */
 
-    MACRO_IF_KEY_MOT_IS("k") { 
-      MACRO_COD_TRC("k") ;
+    MACRO_IF_KEY_MOT_IS("key_k_min") { 
+      MACRO_COD_TRC("key_k_min") ;
       i=1 ;
       if ( gi_pid_trace_azi == 0 ) {
         gi_pid_trace_azi=1 ; 
@@ -873,8 +877,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /*  touche mode equatorial */
     
-    MACRO_IF_KEY_MOT_IS("key_equ")      { 
-      MACRO_COD_TRC("key_equ")  ;
+    MACRO_IF_KEY_MOT_IS("MODE_EQUATORIAL")      { 
+      MACRO_COD_TRC("MODE_EQUATORIAL")  ;
       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
       lp_Sui->sui_menu = MENU_EQUATORIAL ; 
       
@@ -882,8 +886,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
     /*  touche mode azimutal */
 
-    MACRO_IF_KEY_MOT_IS("key_azi")      { 
-      MACRO_COD_TRC("key_azi") ;
+    MACRO_IF_KEY_MOT_IS("MODE_AZIMUTAL")      { 
+      MACRO_COD_TRC("MODE_AZIMUTAL") ;
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_AZIMUTAL ; 
       
@@ -898,10 +902,10 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       
     } 
 
-    /* touche key_exit : arret su programme */
+    /* touche QUIT : arret su programme */
 
-    MACRO_IF_KEY_MOT_IS("key_exit")      { 
-      MACRO_COD_TRC("key_exit") ;
+    MACRO_IF_KEY_MOT_IS("QUIT")      { 
+      MACRO_COD_TRC("QUIT") ;
       lp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; 
       
     } 
@@ -1053,7 +1057,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
         case 2 : 
           
-          Trace1("demande changement heure minutes : %s" , gp_Key->key_nombre) ;
+          Trace("longueur 2 non prevue") ;
 
           /* CONFIG_SET_MONTH( gp_Key->key_nombre ) ; */
 
@@ -1063,7 +1067,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
         case 4 : 
           
-          Trace1("demande changement heure minutes : %s" , gp_Key->key_nombre) ;
+          Trace("demande changement heure minutes : %s" , gp_Key->key_nombre) ;
     
           TIME_SET_HOUR_AND_MINUTES( gp_Key->key_nombre ) ;
           
@@ -1077,7 +1081,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
         case 8 : 
         
-          Trace1("demande changement annee : %s" , gp_Key->key_nombre) ;
+          Trace("demande changement annee : %s" , gp_Key->key_nombre) ;
           
           TIME_SET_YEAR_MONTH_AND_DAY( gp_Key->key_nombre ) ;
       
@@ -1188,6 +1192,11 @@ void SUIVI_MANUEL_BRUT(STRUCT_SUIVI * lp_Sui) {
     // pthread_mutex_unlock(& gp_Mut->mut_glo_alt );
 
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Pas->pas_mutex ) ;
+
+    // 2024 : on reset aussi les compteurs pid & temps
+
+    gp_Alt_Mot->mot_reset( gp_Alt_Mot ) ;
+    gp_Azi_Mot->mot_reset( gp_Azi_Mot ) ;
 
     flag_calcul = 1 ;
   }

@@ -71,7 +71,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 /* clavier alphabetique (majuscules) */ 
 /*-----------------------------------*/
 
-{ "65",  "KEY_A_MAJ",    "KEY_A_MAJ"},  /* 97 ascii = 'a' */    
+{ "65",  "KEY_LIST",     "MODE_AZIMUTAL"},  /* changement vers mode azimutal */    
 { "66",  "KEY_B_MAJ",    "KEY_B_MAJ"},  
 { "67",  "KEY_C_MAJ",    "KEY_C_MAJ"},  
 { "68",  "KEY_D_MAJ",    "KEY_D_MAJ"},  
@@ -82,46 +82,46 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "73",  "KEY_I_MAJ",    "KEY_I_MAJ"},  
 { "74",  "KEY_J_MAJ",    "KEY_J_MAJ"},  
 { "75",  "KEY_K_MAJ",    "KEY_K_MAJ"},  
-{ "76",  "KEY_TV",    "LON"},   /* FIXME : nov 2023 changement longitude : KEY_TV / touche L majuscule */ 
-{ "77",  "KEY_M_MAJ",    "KEY_M_MAJ"},  
+{ "76",  "KEY_TV",       "LON"      },   /* changement longitude */ 
+{ "77",  "KEY_MENU",     "MENU"},  
 { "78",  "KEY_N_MAJ",    "KEY_N_MAJ"},  
 { "79",  "KEY_O_MAJ",    "KEY_O_MAJ"},  
 { "80",  "KEY_P_MAJ",    "KEY_P_MAJ"},  
-{ "81",  "KEY_Q_MAJ",    "KEY_Q_MAJ"},  
+{ "81",  "KEY_EXIT",     "QUIT"     }, /* quitter le programme */  
 { "82",  "KEY_R_MAJ",    "KEY_R_MAJ"},  
 { "83",  "KEY_S_MAJ",    "KEY_S_MAJ"},  
-{ "84",  "KEY_T_MAJ",    "KEY_T_MAJ"},  
+{ "84",  "KEY_MUTE",     "TIME"     }, /* changement date / heure */  
 { "85",  "KEY_U_MAJ",    "KEY_U_MAJ"},  
 { "86",  "KEY_V_MAJ",    "KEY_V_MAJ"},  
 { "87",  "KEY_W_MAJ",    "KEY_W_MAJ"},  
 { "88",  "KEY_X_MAJ",    "KEY_X_MAJ"},  
 { "89",  "KEY_Y_MAJ",    "KEY_Y_MAJ"},  
-{ "90",  "KEY_Z_MAJ",    "KEY_Z_MAJ"},  
+{ "90",  "KEY_MODE",     "MODE_EQUATORIAL"}, /* changement vers mode equatorial */     
 
 /*-----------------------------------*/
 /* clavier alphabetique (minuscules) */ 
 /*-----------------------------------*/
 
-{ "97",  "KEY_LIST",  "key_azi"},    /* 97 ascii = 'a' */ /* a=azimutal   => touche 'a' */    
+{ "97",  "KEY_A_MIN", "key_a_min"},   
 { "98",  "KEY_B_MIN", "key_b_min"},  
 { "99",  "KEY_C_MIN", "key_c_min"},  
 { "100", "KEY_D_MIN", "key_d_min"},     
 { "101", "KEY_E_MIN", "key_e_min"},  
 { "102", "KEY_F_MIN", "key_f_min"},  
 { "103", "KEY_G_MIN", "key_g_min"},     
-{ "104", "KEY_H_MIN", "key_h_min"},    /* 104 sum ascii = touche 'h' = affichage threads infos */
-{ "105", "KEY_I_MIN", "key_i_min"},    /* 105 sum ascii = touche 'i' = affichage infos generales astre / vitesses / etc */
-{ "106", "KEY_J_MIN", "key_j_min" },   /* 108 sum ascii = touche 'j' = generer les traces pid alt */ 
-{ "107", "KEY_K_MIN", "key_k_min" },   /* 108 sum ascii = touche 'k' = generer les traces pid azi */ 
-{ "108", "KEY_SCREEN", "LAT" },        /* FIXME : nov 2023 changement latitude : KEY_SCREEN / touche l minuscule */ 
-{ "109", "KEY_MENU",  "MENU"},         /* 109  ascii = touche 'm' */
+{ "104", "KEY_H_MIN", "key_h_min"},   
+{ "105", "KEY_I_MIN", "key_i_min"},  /* affichage infos generales astre / vitesses / etc */
+{ "106", "KEY_J_MIN", "key_j_min" }, /* generer les traces pid alt */ 
+{ "107", "KEY_K_MIN", "key_k_min" }, /* generer les traces pid azi */ 
+{ "108", "KEY_L_MIN", "key_l_min" },        
+{ "109", "KEY_M_MIN", "key_m_min"},         
 { "110", "KEY_N_MIN", "key_n_min"},     
 { "111", "KEY_O_MIN", "key_o_min"},  
-{ "112", "KEY_P_MIN", "key_pid"},       /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
-{ "113", "KEY_EXIT",  "key_exit" },     /* 113 sum ascii = touche 'q' = 'quit' = quitter le programme */ 
+{ "112", "KEY_P_MIN", "key_p_min"},       /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
+{ "113", "KEY_Q_MIN", "key_q_min" },  
 { "114", "KEY_R_MIN", "key_r_min" },            /* 114 sum ascii = touche 'r' = reseau */ 
 { "115", "KEY_S_MIN", "key_s_min"},             /* 115 sum ascii = touche 's'        = log */ 
-{ "116", "KEY_MUTE",  "TIME"},          /* 116 sum ascii = touche 't' = temps */
+{ "116", "KEY_T_MIN", "key_t_min"},          /* 116 sum ascii = touche 't' = temps */
 { "117", "KEY_U_MIN", "key_u_min"},             /* 117 sum ascii = touche 'u'     = log */ 
 { "118", "KEY_V_MIN", "key_v_min"},             /* 118 sum ascii = touche 'v' = log */ 
 { "119", "KEY_W_MIN", "key_w_min"},             /* 119 sum ascii = touche 'w'     = log */

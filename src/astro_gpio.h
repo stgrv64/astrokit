@@ -166,10 +166,13 @@ struct STR_GPIO_PWM_MOTEUR {
   STR_EXT_TIMEVAL         mot_tval ; 
   FILE                   *mot_file ; 
   int                     mot_loglevel ;
+
   void                  (*mot_lock)       ( STRUCT_GPIO_PWM_MOTEUR *) ;
   void                  (*mot_unlock)     ( STRUCT_GPIO_PWM_MOTEUR *) ;  
   void                  (*mot_log)        ( STRUCT_GPIO_PWM_MOTEUR *) ;
   void                  (*mot_display)    ( STRUCT_GPIO_PWM_MOTEUR *) ;
+  void                  (*mot_reset)      ( STRUCT_GPIO_PWM_MOTEUR *) ;  
+  
   char                    mot_dis_for     [ CONFIG_TAILLE_BUFFER_256 ] ;
   char                    mot_dis_cmd     [ CONFIG_TAILLE_BUFFER_256 ] ;
 
@@ -285,12 +288,17 @@ long   GPIO_ACCELERATION_2(int alt, int azi, double f_deb,double f_fin, double d
 void   GPIO_PWM_PARAMS_INIT    ( STRUCT_GPIO_PARAMS_PWM * ) ;
 void   GPIO_PWM_PARAMS_DISPLAY ( STRUCT_GPIO_PARAMS_PWM * ) ;
 
-void   GPIO_INIT_PWM_MOTEUR(STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
-void   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
+void   GPIO_INIT_PWM_MOTEUR( STRUCT_GPIO_PWM_MOTEUR *lp_Mot, int gpios[ GPIO_NB_PHASES_PAR_MOTEUR ], int masque[ GPIO_NB_PHASES_PAR_MOTEUR ],  double upas, double fm, double fpwm, int id, int type_fonction, double param0, double param1) ;
+void   GPIO_CALCULS_PWM_RAPPORTS_CYCLIQUES( STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
 
 // Fonction de threads
 
-void * _GPIO_PWM_PHASE(STRUCT_GPIO_PWM_PHASE *lp_Pha ) ;
-void * _GPIO_PWM_MOT(STRUCT_GPIO_PWM_MOTEUR *lp_Mot) ;
+void * _GPIO_PWM_PHASE( STRUCT_GPIO_PWM_PHASE * ) ;
+void * _GPIO_PWM_MOT( STRUCT_GPIO_PWM_MOTEUR *) ;
+
+// ajouts 2024 
+
+void GPIO_RESET_PID_TEMPS ( STRUCT_GPIO_PWM_MOTEUR *) ;
+void GPIO_DISPLAY_TEMPS   ( STRUCT_GPIO_PWM_MOTEUR *, STRUCT_GPIO_PWM_MOTEUR *) ;
 
 #endif

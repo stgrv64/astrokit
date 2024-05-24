@@ -272,7 +272,7 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
           
           MACRO_COD_TRC(lp_Key->key_mot) ;
 
-          Trace1("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
+          Trace("Si le mot est une ACTION, alors on efface la phrase en cours et on met mot dans premier et symbole") ;
 
           HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & lp_Key->key_mutex ) ;
 
@@ -282,9 +282,12 @@ void KEYS_INPUTS_GESTION_APPUIS(STRUCT_KEYS *lp_Key) {
           strcpy(lp_Key->key_nombre,"")  ;
           strcpy(lp_Key->key_phrase,"")  ;
           strcpy(lp_Key->key_mot,"") ;
+
           lp_Key->key_phrase_lue=0 ;
 
           HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & lp_Key->key_mutex ) ;
+
+          lp_Key->key_display( lp_Key ) ; 
       }
     }
     
@@ -348,10 +351,25 @@ void KEYS_INIT(STRUCT_KEYS * lp_Key) {
   lp_Key->key_mot_en_cours   = 0 ;
   lp_Key->key_phrase_lue     = 0 ;
   lp_Key->key_appui_en_cours = 0 ;
+
   /* lp_Key->tempo_clavier = gp_Tim_Par->tim_par_tpo_Clavier ; */ 
  
-  // FIXME : definitions des actions : 
-  // Les actions servent a 
+  /* FIXME : definitions des actions : 
+
+     Les actions servent a initier une valeur en particulier 
+     en suivant l ordre suivant :
+
+       * appui sur la touche action : definit l action   exemple TIME
+       * lit PLUSIEURS touches pour ajouter a une phrase exemple 1204
+       * la touche VALIDER permet de definir une nouvelle heure 
+          I.E. 12h04 
+  */
+
+  //------------------------------------------------------------
+  // Si le mot est une ACTION, on efface la phrase en cours    
+  // on met le mot dans PREMIER (premier mot de la phrase) 
+  // on met le mot dans SYMBOLE (symbole utilise dans prog main) 
+  //------------------------------------------------------------
   
   for( i=0 ; i < KEYS_ACTIONS_SIZE ; i++ ) {
     memset( lp_Key->key_actions[i], CONFIG_ZERO_CHAR, sizeof( lp_Key->key_actions[i] ));

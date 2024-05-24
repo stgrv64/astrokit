@@ -322,6 +322,9 @@ void * _SUIVI_VOUTE(STRUCT_VOUTE * lp_Vou) {
 
       if ( gp_Ast->ast_new == TRUE ) { 
 
+        gp_Alt_Mot->mot_reset( gp_Alt_Mot ) ;
+        gp_Azi_Mot->mot_reset( gp_Azi_Mot ) ;
+        
         Trace1("avant  ASTRE_FORMATE_DONNEES_AFFICHAGE") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
         ASTRE_FORMATE_DONNEES_AFFICHAGE(gp_Ast) ;

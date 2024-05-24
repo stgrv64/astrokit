@@ -162,7 +162,7 @@ void PID_PARAMS_DISPLAY(STRUCT_PID_PARAMS * lp_Pid_Par ) {
 /*****************************************************************************************
 * @fn     : PID_INIT
 * @author : s.gravois
-* @brief  : Cette fonction initialise la structure lcd *l
+* @brief  : Cette fonction initialise la structure STRUCT_PID * lp_Pid
 * @param  : STRUCT_PID *lp_Pid
 * @date   : 2022-06 creation
 *****************************************************************************************/
