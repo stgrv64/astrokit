@@ -308,7 +308,8 @@ void * _SUIVI_MENU(STRUCT_SUIVI * gp_Sui) {
 
         HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Vou->vou_mutex ) ;
 
-        gp_Vou->vou_run      = 0 ; 
+        // correction mai 2024 : la voute continue de tourner meme en mode equatorial
+        // gp_Vou->vou_run      = 0 ; 
 
         HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Vou->vou_mutex ) ;
 
