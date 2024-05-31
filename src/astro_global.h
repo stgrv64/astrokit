@@ -105,7 +105,7 @@
 #define STR_CAT_FORMAT_0 "(path) %s"
 #define STR_COD_FORMAT_0 "(in_lirc) %s (in_termios) %s (out_action) %s"
 #define STR_CON_FORMAT_0 "(attr) %s (value) %s"
-#define STR_DAT_FORMAT_0 "(action) %s (acc) %s (bou) %s"
+#define STR_DAT_FORMAT_0 "(action) %-10s (acc) %-10s (bou) %-10s"
 #define STR_DEV_FORMAT_0 "(cla) %d (inf) %d (lcd) %d (cap) %d (ctl) %d (blu) %d (raq) %d"
 #define STR_I2C_FORMAT_0 "(file) %s (adr) %x (reg) %x (buf) %s" 
 #define STR_KEY_FORMAT_0 "(phr) %-5s (mot) %-5s (sym) %-5s (nom) %-5s (pre) %-5s (c_mo) %-5s (menu) %-10s (motencours) %-2d"
@@ -133,6 +133,7 @@
 do { \
   if (loglevel>=nb) { \
     fprintf(stdout, "\n%-2d %-2d %-36s -> " fmt, loglevel,nb, __func__, ##args) ; \
+    fprintf(stdout, "\n") ; \
   } \
 } \
 while (0)

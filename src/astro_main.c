@@ -36,6 +36,7 @@
 # octobre 2022  * refonte complete du code : deplacemements de code
 #                 dans des fichiers *.c dedies 
 # octobre 2023  * correction bug priorite pthreads
+# mai 2024      * remplacement while( c_char != 'q' ) => while ( TRUE )
 # -------------------------------------------------------------- 
 */
 
@@ -118,7 +119,7 @@ void ASTRO_TRAP_MAIN(int sig) {
 
     if ( system("/sbin/halt") < 0 ) {
       SyslogErr("Probleme avec /sbin/halt\n") ;
-      Trace1("Probleme avec /sbin/halt") ;
+      Trace("Probleme avec /sbin/halt") ;
 
       gp_Lcd->display_str_int(1000000,"exit with return", 2) ;
       exit(2) ;
@@ -133,7 +134,15 @@ void ASTRO_TRAP_MAIN(int sig) {
 	}
 	if ( sig == SIGKILL ){
 		kill(getpid(),SIGKILL) ;
-	} */
+	} 
+	if ( sig == SIGALRM ){
+		kill(getpid(),SIGKILL) ;
+	}   
+*/
+
+	if ( sig == SIGALRM ){
+		kill(getpid(),SIGKILL) ;
+	} 
 
   Trace("appel LCD_DISPLAY_STRING_INT") ;
   gp_Lcd->display_str_int(0,"Exit with pid :", getpid()) ;
@@ -586,7 +595,7 @@ void * _SUIVI_CLAVIER_TERMIOS( STRUCT_TERMIOS * lp_Ter ) {
        Eviter les traces dans la boucle TERMIOS 
        pour eviter interraction avec 
     */
-    while( c_char != 'q' ) {
+    while( TRUE ) {
 
       /* Creee un point d 'annulation pour la fonction pthread_cancel */
       // pthread_testcancel() ;
@@ -938,6 +947,7 @@ int main(int argc, char ** argv) {
   gp_Ast->ast_calcul_type_solar_system = FALSE ; 
   gp_AstSav->ast_calcul_type_solar_system = TRUE ; 
 
+  DATAS_INIT                 ( gp_Dat) ;
   KEYS_INIT                  ( gp_Key ) ;
   DEVICES_INIT               ( gp_Dev ) ;
   DEVICES_DISPLAY_UTILISATION( gp_Dev) ;
@@ -1009,7 +1019,9 @@ int main(int argc, char ** argv) {
   ARGUMENTS_HELP                  ( argc, argv ) ;
   ARGUMENTS_MANAGE_FACON_CLASSIQUE ( argc, argv  ) ;
   
-  if ( gp_Sui->sui_alarme != 0 ) {
+  // gp_Sui->sui_alarme = 10 ;
+
+  if ( gp_Sui->sui_alarme > 0 ) {
     alarm( gp_Sui->sui_alarme) ;
   }  
 

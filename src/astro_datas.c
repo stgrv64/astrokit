@@ -6,6 +6,7 @@
 # date        | commentaires 
 # --------------------------------------------------------------
 # 07/10/2022  | * creation
+# 27/05/2024  | * correction bug (suppression memset)
 # -------------------------------------------------------------- 
 */
 
@@ -57,11 +58,15 @@ static void DATAS_DISPLAY(STRUCT_DATAS *lp_Dat) {
 
   TraceArbo(__func__,2,"display informations on Astre") ; /* MACRO_DEBUG_ARBO_FONCTIONS */
 
+  Trace("") ; usleep(50000) ; 
   DATAS_DISPLAY_PREPARE( lp_Dat ) ;
-
+  Trace("") ; usleep(50000) ; 
   ASTRO_GLOBAL_LOG_ON ( &  lp_Dat->dat_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Dat->dat_loglevel , 1 , "%s", lp_Dat->dat_dis_cmd ) ;
+  Trace("") ; usleep(50000) ; 
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Dat->dat_loglevel , 0 , "%s", lp_Dat->dat_dis_cmd ) ;
+  Trace("") ; usleep(50000) ; 
   ASTRO_GLOBAL_LOG_OFF( &  lp_Dat->dat_loglevel ) ;
+  Trace("") ; usleep(50000) ; 
 
   return ;
 }
@@ -144,7 +149,9 @@ void DATAS_INIT ( STRUCT_DATAS * lp_Dat ) {
 
   HANDLE_ERROR_PTHREAD_MUTEX_LOCK( &lp_Dat->dat_mutex ) ; ;
 
-  memset( lp_Dat, 0, sizeof ( STRUCT_DATAS ) ) ;
+  // FIXME : correction bug 2024 : ne pas faire le memset ici !! 
+  // memset( lp_Dat, 0, sizeof ( STRUCT_DATAS ) ) ;
+
   strcpy( lp_Dat->dat_acc, ""  ) ;
   strcpy( lp_Dat->dat_bou, ""  ) ;
   strcpy( lp_Dat->dat_act, ""  ) ;

@@ -518,7 +518,7 @@ void LCD_DISPLAY_CURRENT(void) {
       return ;
     }
     else {
-      Trace1("LCD1602Clear : OK")
+      Trace("LCD1602Clear : OK")
     }
     /* TODO  : mettre le usleep a interieur de mutex */
     pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
@@ -542,7 +542,7 @@ void LCD_DISPLAY_CURRENT(void) {
       return ;
     }
     else {
-      Trace1("LCD1602DispLines : OK");
+      Trace("LCD1602DispLines : OK");
     }
     pthread_mutex_unlock( & gp_Lcd->lcd_mutex ) ;
   }

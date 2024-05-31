@@ -6,6 +6,7 @@ astrokit @ 2022  - lGPLv2 - Stephane Gravois -
 date        | commentaires 
 --------------------------------------------------------------
 07/10/2022  | * creation a partir du code de astro.c et autre
+28/05/2024  | * suppression MACRO_COD_TRC
 -------------------------------------------------------------- 
 */
 
@@ -718,167 +719,190 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* Lettres en Majuscules : affichages ponctuels */
     /*---------------------------------------------*/
 
-    MACRO_IF_KEY_MOT_IS("key_A_MAJ" ) { MACRO_COD_TRC("key_A_MAJ" ) ; gp_Ast->ast_display(gp_Ast) ; }
-    MACRO_IF_KEY_MOT_IS("key_B_MAJ" ) { MACRO_COD_TRC("key_B_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_C_MAJ" ) { MACRO_COD_TRC("key_C_MAJ" ) ; gp_Con->con_display(gp_Con) ;}
-    MACRO_IF_KEY_MOT_IS("key_D_MAJ" ) { MACRO_COD_TRC("key_D_MAJ" ) ; gp_Dat->dat_display(gp_Dat) ;}
-    MACRO_IF_KEY_MOT_IS("key_E_MAJ" ) { MACRO_COD_TRC("key_E_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_F_MAJ" ) { MACRO_COD_TRC("key_F_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_G_MAJ" ) { MACRO_COD_TRC("key_G_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_H_MAJ" ) { MACRO_COD_TRC("key_H_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_I_MAJ" ) { MACRO_COD_TRC("key_I_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_J_MAJ" ) { MACRO_COD_TRC("key_J_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_K_MAJ" ) { MACRO_COD_TRC("key_K_MAJ" ) ; gp_Key->key_display(gp_Key) ; }
-    MACRO_IF_KEY_MOT_IS("key_L_MAJ" ) { MACRO_COD_TRC("key_L_MAJ" ) ; gp_Lie->lie_display(gp_Lie) ; }
-    MACRO_IF_KEY_MOT_IS("key_M_MAJ" ) { MACRO_COD_TRC("key_M_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_N_MAJ" ) { MACRO_COD_TRC("key_N_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_O_MAJ" ) { MACRO_COD_TRC("key_O_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_P_MAJ" ) { MACRO_COD_TRC("key_P_MAJ" ) ; gp_Pth->pth_display(gp_Pth) ; }
-    MACRO_IF_KEY_MOT_IS("key_Q_MAJ" ) { MACRO_COD_TRC("key_Q_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_R_MAJ" ) { MACRO_COD_TRC("key_R_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_S_MAJ" ) { MACRO_COD_TRC("key_S_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_T_MAJ" ) { MACRO_COD_TRC("key_T_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_U_MAJ" ) { MACRO_COD_TRC("key_U_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_V_MAJ" ) { MACRO_COD_TRC("key_V_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_W_MAJ" ) { MACRO_COD_TRC("key_W_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_X_MAJ" ) { MACRO_COD_TRC("key_X_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_Y_MAJ" ) { MACRO_COD_TRC("key_Y_MAJ" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_Z_MAJ" ) { MACRO_COD_TRC("key_Z_MAJ" ) ; }
+    MACRO_IF_KEY_MOT_IS("KEY_A_MAJ" ) { i++; gp_Ast->ast_display(gp_Ast) ; }
+    MACRO_IF_KEY_MOT_IS("KEY_B_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_C_MAJ" ) { i++; gp_Con->con_display(gp_Con) ;}
+    MACRO_IF_KEY_MOT_IS("KEY_D_MAJ" ) { i++; gp_Dat->dat_display(gp_Dat) ;}
+    MACRO_IF_KEY_MOT_IS("KEY_E_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_F_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_G_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_H_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_I_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_J_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_K_MAJ" ) { i++; gp_Key->key_display(gp_Key) ; }
+    MACRO_IF_KEY_MOT_IS("KEY_L_MAJ" ) { i++; gp_Lie->lie_display(gp_Lie) ; }
+    MACRO_IF_KEY_MOT_IS("KEY_M_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_N_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_O_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_P_MAJ" ) { i++; gp_Pth->pth_display(gp_Pth) ; }
+    MACRO_IF_KEY_MOT_IS("KEY_Q_MAJ" ) { i++; lp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; }
+    MACRO_IF_KEY_MOT_IS("KEY_R_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_S_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_T_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_U_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_V_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_W_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_X_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_Y_MAJ" ) { }
+    MACRO_IF_KEY_MOT_IS("KEY_Z_MAJ" ) { }
 
 
     /*---------------------------------------------*/
-    /* Lettres en Minuscules : affichages continus */
+    /* Lettres en Minuscules : affichages informations */
     /*---------------------------------------------*/
 
-    MACRO_IF_KEY_MOT_IS("key_a_min" ) { MACRO_COD_TRC("key_a_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_b_min" ) { MACRO_COD_TRC("key_b_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_c_min" ) { MACRO_COD_TRC("key_c_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_d_min" ) { MACRO_COD_TRC("key_d_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_e_min" ) { MACRO_COD_TRC("key_e_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_f_min" ) { MACRO_COD_TRC("key_f_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_g_min" ) { MACRO_COD_TRC("key_g_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_h_min" ) { MACRO_COD_TRC("key_h_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_i_min" ) { MACRO_COD_TRC("key_i_min" ) ; ASTRE_STELLARIUM_VIEW() ;  }
-    MACRO_IF_KEY_MOT_IS("key_j_min" ) { MACRO_COD_TRC("key_j_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_k_min" ) { MACRO_COD_TRC("key_k_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_l_min" ) { MACRO_COD_TRC("key_l_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_m_min" ) { MACRO_COD_TRC("key_m_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_n_min" ) { MACRO_COD_TRC("key_n_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_o_min" ) { MACRO_COD_TRC("key_o_min" ) ; }
-    
-    MACRO_IF_KEY_MOT_IS("key_t_min" ) { MACRO_COD_TRC("key_t_min" ) ; 
-      GPIO_DISPLAY_TEMPS( gp_Alt_Mot, gp_Azi_Mot) ;
-    }
-
-    MACRO_IF_KEY_MOT_IS("key_q_min" ) { MACRO_COD_TRC("key_q_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_r_min" ) { MACRO_COD_TRC("key_r_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_s_min" ) { MACRO_COD_TRC("key_s_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_t_min" ) { MACRO_COD_TRC("key_t_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_u_min" ) { MACRO_COD_TRC("key_u_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_v_min" ) { MACRO_COD_TRC("key_v_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_w_min" ) { MACRO_COD_TRC("key_w_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_x_min" ) { MACRO_COD_TRC("key_x_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_y_min" ) { MACRO_COD_TRC("key_y_min" ) ; }
-    MACRO_IF_KEY_MOT_IS("key_z_min" ) { MACRO_COD_TRC("key_z_min" ) ; }
+    MACRO_IF_KEY_MOT_IS("key_a_min" ) { i++ ; gp_Ast->ast_display( gp_Ast ) ; }
+    MACRO_IF_KEY_MOT_IS("key_b_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_c_min" ) { /* gp_Cod->cod_display( gp_Cod ) ; */ } 
+    MACRO_IF_KEY_MOT_IS("key_d_min" ) { i++ ; gp_Dat->dat_display( gp_Dat ) ; }
+    MACRO_IF_KEY_MOT_IS("key_e_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_f_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_g_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_h_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_i_min" ) { i++ ; ASTRE_STELLARIUM_VIEW() ;  }
+    // MACRO_IF_KEY_MOT_IS("key_j_min" ) { }
+    // MACRO_IF_KEY_MOT_IS("key_k_min" ) { }
+    // MACRO_IF_KEY_MOT_IS("key_l_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_m_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_n_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_o_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_p_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_q_min" ) { i++ ; Trace("key_q_min appele");}
+    MACRO_IF_KEY_MOT_IS("key_r_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_s_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_t_min" ) { i++ ; GPIO_DISPLAY_TEMPS( gp_Alt_Mot, gp_Azi_Mot) ;}
+    MACRO_IF_KEY_MOT_IS("key_u_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_v_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_w_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_x_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_y_min" ) { }
+    MACRO_IF_KEY_MOT_IS("key_z_min" ) { }
 
     HANDLE_ERROR_PTHREAD_MUTEX_LOCK( & gp_Vou->vou_mutex ) ;
 
-    MACRO_IF_KEY_MOT_IS("stop")         { MACRO_COD_TRC("stop") ; gp_Vou->vou_run = 0 ; }
-    MACRO_IF_KEY_MOT_IS("play")         { MACRO_COD_TRC("play") ; gp_Vou->vou_run = 1 ; }
+    MACRO_IF_KEY_MOT_IS("stop")       { i++ ; gp_Vou->vou_run = 0 ; }
+    MACRO_IF_KEY_MOT_IS("play")       { i++ ; gp_Vou->vou_run = 1 ; }
     
     HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Vou->vou_mutex ) ;
 
     /* Quelques actions d 'affichage a l'ecran  */
 
-    MACRO_IF_KEY_MOT_IS("v")       { CONFIG_PARAMS_DISPLAY() ; i=1 ; } ;
+    MACRO_IF_KEY_MOT_IS("v")       { i++ ; CONFIG_PARAMS_DISPLAY() ; i=1 ; } ;
 
     /* Quelques actions d 'affichage a l'ecran LCD */
 
-    MACRO_IF_KEY_MOT_IS("aff_tps_lie")         { MACRO_COD_TRC("aff_tps_lie")       ; gp_Lcd->display_tps_lie( 2000000 ) ; }  
-    MACRO_IF_KEY_MOT_IS("aff_ast_vit")         { MACRO_COD_TRC("aff_ast_vit")       ; gp_Lcd->display_ast_vit( 2000000 ) ; }  
-    MACRO_IF_KEY_MOT_IS("aff_ast_fre")         { MACRO_COD_TRC("aff_ast_fre")       ; gp_Lcd->display_ast_fre( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_ast_per")         { MACRO_COD_TRC("aff_ast_per")       ; gp_Lcd->display_ast_per( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_azi_alt")         { MACRO_COD_TRC("aff_azi_alt")       ; gp_Lcd->display_azi_alt( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_agh_dec")         { MACRO_COD_TRC("aff_agh_dec")       ; gp_Lcd->display_agh_dec( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_asc_dec")         { MACRO_COD_TRC("aff_asc_dec")       ; gp_Lcd->display_asc_dec( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_mod_ste")         { MACRO_COD_TRC("aff_mod_ste")       ; gp_Lcd->display_mod_ste( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_gpios_alt_azi")   { MACRO_COD_TRC("aff_gpios_alt_azi") ; gp_Lcd->display_gpios_alt_azi( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_gpios_mas_fre")   { MACRO_COD_TRC("aff_gpios_mas_fre") ; gp_Lcd->display_gpios_mas_fre( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_gpios_leds")      { MACRO_COD_TRC("aff_gpios_leds")    ; gp_Lcd->display_gpios_leds( 2000000 ) ; }
-    MACRO_IF_KEY_MOT_IS("aff_reductions")      { MACRO_COD_TRC("aff_reductions")    ; gp_Lcd->display_reductions( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_tps_lie")         { i++; gp_Lcd->display_tps_lie( 2000000 ) ; }  
+    MACRO_IF_KEY_MOT_IS("aff_ast_vit")         { i++; gp_Lcd->display_ast_vit( 2000000 ) ; }  
+    MACRO_IF_KEY_MOT_IS("aff_ast_fre")         { i++; gp_Lcd->display_ast_fre( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_ast_per")         { i++; gp_Lcd->display_ast_per( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_azi_alt")         { i++; gp_Lcd->display_azi_alt( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_agh_dec")         { i++; gp_Lcd->display_agh_dec( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_asc_dec")         { i++; gp_Lcd->display_asc_dec( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_mod_ste")         { i++; gp_Lcd->display_mod_ste( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_gpios_alt_azi")   { i++; gp_Lcd->display_gpios_alt_azi( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_gpios_mas_fre")   { i++; gp_Lcd->display_gpios_mas_fre( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_gpios_leds")      { i++; gp_Lcd->display_gpios_leds( 2000000 ) ; }
+    MACRO_IF_KEY_MOT_IS("aff_reductions")      { i++; gp_Lcd->display_reductions( 2000000 ) ; }
 
     /* Activation algorithme PID de regulation des periodes / frequences moteurs */
 
     MACRO_IF_KEY_MOT_IS("key_l_min") { 
-      MACRO_COD_TRC("key_l_min") ;
-      i=1 ; 
+      
+      i++;
       if ( gi_pid_trace == 0 ){
+
+        TIME_TEMPOS_DISPLAY( gp_Tpo ) ;
+
         gi_pid_trace = gp_Tpo->tpo_pid_loop ; 
-        sprintf(c_l0,"PID:activation") ;
+
+        sprintf(c_l0,"PID => activation") ;
         sprintf(c_l1,"echant. = %d pas", gi_pid_trace) ;
+
+        Trace("avant : %s : %s", c_l0, c_l1) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
-        Trace1("%s : %s", c_l0, c_l1) ;
+        Trace("apres : %s : %s", c_l0, c_l1) ;
+        Trace("") ;
       } 
       else {
         gi_pid_trace = 0 ; 
         sprintf(c_l0,"PID:") ;
         sprintf(c_l1,"desactivation") ;
+        Trace("avant : %s : %s", c_l0, c_l1) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
-        Trace1("%s : %s", c_l0, c_l1) ;        
+        Trace("apres : %s : %s", c_l0, c_l1) ;    
+        Trace("") ;
       }
     }
 
     /* Activation traces PID pour le moteur ALT */
 
     MACRO_IF_KEY_MOT_IS("key_j_min") { 
-      MACRO_COD_TRC("key_j_min") ;
-      i=1 ; 
+      
+      i++;
       if ( gi_pid_trace_alt == 0 ) {
-        gi_pid_trace_alt=1;      
-        sprintf(c_l0,"PID:log alt") ;
+
+        TIME_TEMPOS_DISPLAY( gp_Tpo ) ;
+
+        gi_pid_trace_alt = 1 ;      
+
+        sprintf(c_l0,"PID : log alt") ;
         sprintf(c_l1,"echant. = %d pas", gi_pid_trace) ;
+        Trace("avant : %s : %s", c_l0, c_l1) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
-        Trace1("%s : %s", c_l0, c_l1) ;
+        Trace("apres : %s : %s", c_l0, c_l1) ;
+        Trace("") ;
       }
       else {
         gi_pid_trace_alt=0;      
-        sprintf(c_l0,"PID:log alt") ;
+        sprintf(c_l0,"PID : log alt") ;
         sprintf(c_l1,"desactivation") ;
+        Trace("avant : %s : %s", c_l0, c_l1) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
-        Trace1("%s : %s", c_l0, c_l1) ;        
+        Trace("apres : %s : %s", c_l0, c_l1) ;    
+        Trace("") ;
       }
     }
 
     /* Activation traces PID pour le moteur AZI */
 
     MACRO_IF_KEY_MOT_IS("key_k_min") { 
-      MACRO_COD_TRC("key_k_min") ;
-      i=1 ;
+      
+      i++;
       if ( gi_pid_trace_azi == 0 ) {
-        gi_pid_trace_azi=1 ; 
+
+        TIME_TEMPOS_DISPLAY( gp_Tpo ) ;
+
+        gi_pid_trace_azi = 1 ; 
+
         sprintf(c_l0,"PID:log azi") ;
         sprintf(c_l1,"echant. = %d pas", gi_pid_trace) ;
+
+        Trace("avant : %s : %s", c_l0, c_l1) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
-        Trace1("%s : %s", c_l0, c_l1) ;
+        Trace("apres : %s : %s", c_l0, c_l1) ;
+        Trace("") ;
       }
       else {
         gi_pid_trace_azi=0 ; 
         sprintf(c_l0,"PID:log azi") ;
         sprintf(c_l1,"desactivation") ;
+
+        Trace("avant : %s : %s", c_l0, c_l1) ;
         gp_Lcd->display_str_str( 2000000, c_l0, c_l1 ) ; 
-        Trace1("%s : %s", c_l0, c_l1) ;        
+        Trace("apres : %s : %s", c_l0, c_l1) ;    
+        Trace("") ; 
       }
     }
 
     MACRO_IF_KEY_MOT_IS("aff_acc_alt_azi")     { 
-       MACRO_COD_TRC("aff_acc_alt_azi") ;
+       i++;
        gp_Lcd->display_acc_alt_azi( 2000000 ) ; 
     }
 
     /*  touche mode equatorial */
     
     MACRO_IF_KEY_MOT_IS("MODE_EQUATORIAL")      { 
-      MACRO_COD_TRC("MODE_EQUATORIAL")  ;
+      i++;
       gp_Lcd->display_str_str( 2000000, "Mode equatorial", (char*)gc_hach_suivi_menus[ MENU_EQUATORIAL ] ) ;
       lp_Sui->sui_menu = MENU_EQUATORIAL ; 
       
@@ -887,7 +911,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /*  touche mode azimutal */
 
     MACRO_IF_KEY_MOT_IS("MODE_AZIMUTAL")      { 
-      MACRO_COD_TRC("MODE_AZIMUTAL") ;
+      i++;
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_AZIMUTAL ; 
       
@@ -896,17 +920,9 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* touche POWER : arret su systeme */
 
     MACRO_IF_KEY_MOT_IS("key_power")     { 
-      MACRO_COD_TRC("key_power") ;
+      i++;
       gp_Lcd->display_str_str( 2000000, "Mode azimutal", (char*)gc_hach_suivi_menus[ MENU_AZIMUTAL ] ) ;
       lp_Sui->sui_menu = MENU_DOWN ; 
-      
-    } 
-
-    /* touche QUIT : arret su programme */
-
-    MACRO_IF_KEY_MOT_IS("QUIT")      { 
-      MACRO_COD_TRC("QUIT") ;
-      lp_Sui->sui_menu = MENU_PROGRAMME_DOWN ; 
       
     } 
 
@@ -914,9 +930,7 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* TODO : non implemente : a definir et coder */
 
     MACRO_IF_KEY_MOT_IS("KEY_R") { 
-      
-      MACRO_COD_TRC("KEY_R"); 
-
+      i++;
       lp_Sui->sui_menu = MENU_RESEAU_UP ; 
       /* TODO : a terminer */
       
@@ -938,6 +952,13 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
   // Si autre chose qu'un menu est lu sur le clavier , on peut aussi changer
   // de menu (pour plus de rapidite)
   //-----------------------------------------------------------------
+
+  /* GESTION des ACTIONS : combinaisons touches : 
+
+    * ACTION  (exemple MES)     (exemple TIME)    (exemple LAT)
+    * VALEUR  (exemple 12)      (exemple 1204)    (exemple 12.05)
+    * VALIDER (exemple VALIDER) (exemple VALIDER) (exemple VALIDER)
+  */
 
   if ( gp_Key->key_phrase_lue ) {
     
@@ -970,6 +991,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
 
       HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Lie->lie_mutex )  ;
 
+      Trace("changement latitude = %f" , gp_Lie->lie_lat ) ;
+
       gp_Lie->lie_display( gp_Lie ) ;
     }
 
@@ -980,6 +1003,8 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
       gp_Lie->lie_lon = atof( gp_Key->key_nombre ) / CALCULS_UN_RADIAN_EN_DEGRES ;
 
       HANDLE_ERROR_PTHREAD_MUTEX_UNLOCK( & gp_Lie->lie_mutex )  ;
+
+      Trace("changement longitude = %f" , gp_Lie->lie_lon ) ;
 
       gp_Lie->lie_display( gp_Lie ) ;
     }

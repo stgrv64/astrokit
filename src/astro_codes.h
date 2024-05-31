@@ -87,7 +87,7 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "78",  "KEY_N_MAJ",    "KEY_N_MAJ"},  
 { "79",  "KEY_O_MAJ",    "KEY_O_MAJ"},  
 { "80",  "KEY_P_MAJ",    "KEY_P_MAJ"},  
-{ "81",  "KEY_EXIT",     "QUIT"     }, /* quitter le programme */  
+{ "81",  "KEY_EXIT",     "KEY_Q_MAJ"}, /* quitter le programme */  
 { "82",  "KEY_R_MAJ",    "KEY_R_MAJ"},  
 { "83",  "KEY_S_MAJ",    "KEY_S_MAJ"},  
 { "84",  "KEY_MUTE",     "TIME"     }, /* changement date / heure */  
@@ -111,15 +111,15 @@ static const char gc_hach_codes[CODES_X][ CODES_Y ][CODES_Z] = {
 { "103", "KEY_G_MIN", "key_g_min"},     
 { "104", "KEY_H_MIN", "key_h_min"},   
 { "105", "KEY_I_MIN", "key_i_min"},  /* affichage infos generales astre / vitesses / etc */
-{ "106", "KEY_J_MIN", "key_j_min" }, /* generer les traces pid alt */ 
-{ "107", "KEY_K_MIN", "key_k_min" }, /* generer les traces pid azi */ 
-{ "108", "KEY_L_MIN", "key_l_min" },        
+{ "106", "KEY_J_MIN", "key_j_min"}, /* generer les traces pid alt */ 
+{ "107", "KEY_K_MIN", "key_k_min"}, /* generer les traces pid azi */ 
+{ "108", "KEY_L_MIN", "key_l_min"},        
 { "109", "KEY_M_MIN", "key_m_min"},         
 { "110", "KEY_N_MIN", "key_n_min"},     
 { "111", "KEY_O_MIN", "key_o_min"},  
 { "112", "KEY_P_MIN", "key_p_min"},       /* 112 sum ascii = touche 'p' = activer les traces pid temps reel */ 
-{ "113", "KEY_Q_MIN", "key_q_min" },  
-{ "114", "KEY_R_MIN", "key_r_min" },            /* 114 sum ascii = touche 'r' = reseau */ 
+{ "113", "KEY_Q_MIN", "key_q_min"},  
+{ "114", "KEY_R_MIN", "key_r_min"},            /* 114 sum ascii = touche 'r' = reseau */ 
 { "115", "KEY_S_MIN", "key_s_min"},             /* 115 sum ascii = touche 's'        = log */ 
 { "116", "KEY_T_MIN", "key_t_min"},          /* 116 sum ascii = touche 't' = temps */
 { "117", "KEY_U_MIN", "key_u_min"},             /* 117 sum ascii = touche 'u'     = log */ 

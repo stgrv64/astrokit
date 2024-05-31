@@ -69,7 +69,7 @@ static void ASTRE_DISPLAY(STRUCT_ASTRE *lp_Ast) {
   ASTRE_DISPLAY_PREPARE( lp_Ast ) ;
 
   ASTRO_GLOBAL_LOG_ON ( &  lp_Ast->ast_loglevel ) ;
-  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 2 , "%s", lp_Ast->ast_dis_cmd ) ;
+  MACRO_ASTRO_GLOBAL_LOG    ( lp_Ast->ast_loglevel , 0 , "%s", lp_Ast->ast_dis_cmd ) ;
   ASTRO_GLOBAL_LOG_OFF( &  lp_Ast->ast_loglevel ) ;
 
   return ;
