@@ -719,7 +719,11 @@ void SUIVI_TRAITEMENT_MOT( STRUCT_SUIVI * lp_Sui ) {
     /* Lettres en Majuscules : affichages ponctuels */
     /*---------------------------------------------*/
 
-    MACRO_IF_KEY_MOT_IS("KEY_A_MAJ" ) { i++; gp_Ast->ast_display(gp_Ast) ; }
+    MACRO_IF_KEY_MOT_IS("KEY_A_MAJ" ) { 
+      i++; 
+      gp_Lcd->display_str_int(1000000,"test touche A", 2) ;
+      gp_Ast->ast_display(gp_Ast) ; 
+    }
     MACRO_IF_KEY_MOT_IS("KEY_B_MAJ" ) { }
     MACRO_IF_KEY_MOT_IS("KEY_C_MAJ" ) { i++; gp_Con->con_display(gp_Con) ;}
     MACRO_IF_KEY_MOT_IS("KEY_D_MAJ" ) { i++; gp_Dat->dat_display(gp_Dat) ;}
